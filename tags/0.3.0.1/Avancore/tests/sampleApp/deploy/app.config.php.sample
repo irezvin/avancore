@@ -1,0 +1,18 @@
+<?php
+
+$config = array(
+    'someKey' => 'someValue',
+    'baseKey' => 'baseValue',
+    'keyOverwrittenInConstructorOptions' => 'Value that will be overwritten',
+    'keyOverwrittenInConstructorOptions2' => 'Value that will be overwritten',
+    'keyOverwrittenInEnvOptions' => 'Value that will be overwritten',
+    
+    'legacyDatabasePrototype' => array(
+        'class' => 'Ae_Native_Database',
+        '__construct' => array(array(
+            'user' => 'irezvin',
+            'password' => '',
+            'db' => 'ae_sample',
+        )),
+    ),
+);
