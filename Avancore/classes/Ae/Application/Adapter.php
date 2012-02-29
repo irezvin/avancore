@@ -191,7 +191,7 @@ class Ae_Application_Adapter extends Ae_Autoparams {
     
     protected function guessDatabase() {
         if (!isset($this->config[$k = 'database'])) {
-            //$this->config[$k] = array('class' => 'Ae_Native_Database');
+            //$this->config[$k] = array('class' => 'Ae_Legacy_Database_Native');
         }
     }
     
@@ -213,7 +213,7 @@ class Ae_Application_Adapter extends Ae_Autoparams {
     
     protected function guessOutputPrototype() {
         if (!isset($this->config[$k = 'outputPrototype'])) {
-            $this->config[$k] = array('class' => 'Ae_Native_Output');
+            $this->config[$k] = array('class' => 'Ae_Output_Native');
         }
     }
     

@@ -6,20 +6,19 @@ elseif (!class_exists('Ae_Sql_Db')) require('Ae/Sql/Db.php');
 class Ae_Sql_Db_Ae extends Ae_Sql_Db {
     
     /**
-     * @var Ae_Database
+     * @var Ae_Legacy_Database
      */
     var $_aeDb = false;
     
     /**
-     * @param Ae_Database$aeDb
+     * @param Ae_Legacy_Database$aeDb
      * @return Ae_Sql_Db_Ae
      */
     function Ae_Sql_Db_Ae (& $aeDb = null) {
-        if (!$aeDb && class_exists('Ae_Dispatcher')) {
-        	$disp = & Ae_Dispatcher::getInstance();
-        	$aeDb = & $disp->database;
+        if (!$aeDb) {
+        	$aeDb = & Ae_Legacy_Database::getDefaultInstance();
         }
-    	assert(is_a($aeDb, 'Ae_Database'));
+    	assert(is_a($aeDb, 'Ae_Legacy_Database'));
         $this->_aeDb = & $aeDb;
     }
     
@@ -131,7 +130,7 @@ class Ae_Sql_Db_Ae extends Ae_Sql_Db {
     function getErrorDescr() {
         return $this->_aeDb->getErrorMsg();
     }
-        
+    
 }
 
 ?>

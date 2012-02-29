@@ -324,10 +324,12 @@ class Ae_Sql_Select extends Ae_Sql_Select_TableProvider {
             $res->useNoMapper($t->name, $pkName);
         }
         $res->setAlias($orderedAliases[0]);
+        foreach ($this->otherJoins as $j) $res->addJoin($j);
         for ($i = 1; $i < count($orderedAliases); $i++) {
             $tbl = & $this->getTable($orderedAliases[$i]);
             $res->addJoin($tbl->getJoinClausePart());
         }
+        foreach ($this->otherJoinsAfter as $j) $res->addJoin($j);
         if ($this->where) {
             if (is_array($this->where)) foreach ($this->getWhereClause(false, 'plain') as $w) $res->addWhere($w);
             else $res->addWhere($this->where);
@@ -362,6 +364,14 @@ class Ae_Sql_Select extends Ae_Sql_Select_TableProvider {
     
     function getExpression() {
     	return $this->__toString();
+    }
+    
+    function cleanupReferences() {
+        $this->_db = null;
+        foreach ($this->_tables as $t) {
+            $t->_sqlSelect = null;
+        }
+        parent::cleanupReferences();
     }
     
 }

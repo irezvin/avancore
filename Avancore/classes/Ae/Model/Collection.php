@@ -7,7 +7,7 @@
  * - LIMIT clause is supported; to count records, separate SQL statement is used. 
  * - collections are specially optimized for sequential access (records are fetched from MySQL result resource)
  * - to minimize memory usage, cursor approach can be used (one or more, but limited number of records is used to traverse through the resultset)
- * - unbuffered queries are also supported (when used with Ae_Database implementation that supports unbuffered queries) 
+ * - unbuffered queries are also supported (when used with Ae_Legacy_Database implementation that supports unbuffered queries) 
  */
 class Ae_Model_Collection {
     
@@ -109,7 +109,7 @@ class Ae_Model_Collection {
     
     /**
      * Database driver
-     * @var Ae_Database
+     * @var Ae_Legacy_Database
      */
     var $_db = false;
     
@@ -575,7 +575,7 @@ class Ae_Model_Collection {
     }
     
     /**
-     * @param Ae_Database $database
+     * @param Ae_Legacy_Database $database
      */
     function setDatabase(& $database) {
         if (!$this->_canSetLimits) trigger_error ("Can't change params of collection that is already open", E_USER_ERROR);

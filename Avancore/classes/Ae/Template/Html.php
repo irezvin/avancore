@@ -5,12 +5,12 @@ Ae_Dispatcher::loadClass('Ae_Template');
 class Ae_Template_Html extends Ae_Template {
 
     /**
-     * @var Ae_Controller_Context_Http
+     * @var Ae_Legacy_Controller_Context_Http
      */
     var $context = false;
     
     /**
-     * @var Ae_Controller_Response_Html
+     * @var Ae_Legacy_Controller_Response_Html
      */
     var $htmlResponse = false;
     
@@ -103,19 +103,19 @@ class Ae_Template_Html extends Ae_Template {
     
 
     function addPageTitle($title) {
-        if (is_a($this->htmlResponse, 'Ae_Controller_Response_Html')) $this->htmlResponse->addPageTitle($title);
+        if (is_a($this->htmlResponse, 'Ae_Legacy_Controller_Response_Html')) $this->htmlResponse->addPageTitle($title);
     }
     
     function addJsLib($jsLib, $isLocal = true, $atBeginning = false) {
         if (is_array($jsLib)) {
             foreach ($jsLib as $l) $this->addJsLib($l, $isLocal);
         } else {
-            if (is_a($this->htmlResponse, 'Ae_Controller_Response_Html')) {
+            if (is_a($this->htmlResponse, 'Ae_Legacy_Controller_Response_Html')) {
                 $this->htmlResponse->addJsLib($jsLib, $isLocal, $atBeginning);
             }
             else {
-                Ae_Dispatcher::loadClass('Ae_Controller_Response_Html');
-                echo Ae_Controller_Response_Html::getJsScriptTag($jsLib, $isLocal);
+                Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Response_Html');
+                echo Ae_Legacy_Controller_Response_Html::getJsScriptTag($jsLib, $isLocal);
             }
         }
     }
@@ -124,10 +124,10 @@ class Ae_Template_Html extends Ae_Template {
         if (is_array($cssLib)) {
             foreach ($cssLib as $l) $this->addCssLib($l, $isLocal);
         } else {
-            if (is_a($this->htmlResponse, 'Ae_Controller_Response_Html')) $this->htmlResponse->addCssLib($cssLib, $isLocal);
+            if (is_a($this->htmlResponse, 'Ae_Legacy_Controller_Response_Html')) $this->htmlResponse->addCssLib($cssLib, $isLocal);
             else {
-                Ae_Dispatcher::loadClass('Ae_Controller_Response_Html');
-                echo Ae_Controller_Response_Html::getCssLibTag($cssLib, $isLocal);
+                Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Response_Html');
+                echo Ae_Legacy_Controller_Response_Html::getCssLibTag($cssLib, $isLocal);
             }
         }
     }
@@ -141,11 +141,11 @@ class Ae_Template_Html extends Ae_Template {
     }
     
     function addMeta($metaName, $metaValue) {
-        if (is_a($this->htmlResponse, 'Ae_Controller_Response_Html')) $this->htmlResponse->addMeta($metaName, $metaValue);
+        if (is_a($this->htmlResponse, 'Ae_Legacy_Controller_Response_Html')) $this->htmlResponse->addMeta($metaName, $metaValue);
     }
     
     function appendPathway($url, $text) {
-        if (is_a($this->htmlResponse, 'Ae_Controller_Response_Html')) $this->htmlResponse->appendPathway($url, $text);
+        if (is_a($this->htmlResponse, 'Ae_Legacy_Controller_Response_Html')) $this->htmlResponse->appendPathway($url, $text);
     }
     
     /**

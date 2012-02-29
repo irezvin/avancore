@@ -53,6 +53,7 @@ class Ae_Cache {
                 'class' => 'Ae_Cache',
             	'cacheDir' => $d->config->cachePath . '/aeCache',
             );
+            if (($l = (int) $d->config->getValue('cacheLifeTime'))) $res['lifetime'] = $l;
         }
         return $res;
     }

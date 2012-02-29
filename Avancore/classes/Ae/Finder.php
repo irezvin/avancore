@@ -145,7 +145,7 @@ class Ae_Finder extends Ae_Autoparams {
     	return $this->primaryAlias;
     }
     
-    function selectKeys(Ae_Database $aeDb = null, $keys = false) {
+    function selectKeys(Ae_Legacy_Database $aeDb = null, $keys = false) {
         if ($keys !== false) {
             if (!is_array($keys)) $keys = array($keys);
         } else {

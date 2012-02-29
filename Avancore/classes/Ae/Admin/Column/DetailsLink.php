@@ -5,7 +5,7 @@ Ae_Dispatcher::loadClass('Ae_Admin_Column');
 class Ae_Admin_Column_DetailsLink extends Ae_Admin_Column {
      
      /**
-      * @var Ae_Controller_Context
+      * @var Ae_Legacy_Controller_Context
       */
      var $_context = false;
      

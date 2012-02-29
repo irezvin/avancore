@@ -13,7 +13,7 @@ class Ae_Admin_Column_Checked extends Ae_Admin_Column {
      var $_keyParamName = false;
 
      /**
-      * @var Ae_Controller_Context_Http
+      * @var Ae_Legacy_Controller_Context_Http
       */
      var $_context = false;
     

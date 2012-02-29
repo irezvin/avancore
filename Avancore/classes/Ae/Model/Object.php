@@ -22,7 +22,7 @@ class Ae_Model_Object extends Ae_Model_Data {
     var $_imId = 0;
     
     /**
-     * @var Ae_Database
+     * @var Ae_Legacy_Database
      */
     var $_db = false;
     

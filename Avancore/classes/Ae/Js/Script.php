@@ -7,7 +7,7 @@ class Ae_Js_Script extends Ae_Js_Code {
     function __toString() {
         $a = array('type' => 'text/javascript');
         if (strlen($this->src)) $a['src'] = $this->src;
-        $res = Ae_Util::mkElement('script', parent::__toString(), $a);
+        $res = Ae_Util::mkElement('script', parent::toJs(new Ae_Js()), $a);
         return $res;
     }
 

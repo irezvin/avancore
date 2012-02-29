@@ -10,7 +10,7 @@ class Ae_Admin_Column_RecordBinder extends Ae_Admin_Column {
      var $trIdPrefix = 'tr';
      
      /**
-      * @var Ae_Controller_Context_Http
+      * @var Ae_Legacy_Controller_Context_Http
       */
      var $_context = false;
     

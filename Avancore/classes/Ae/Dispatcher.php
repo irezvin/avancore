@@ -42,7 +42,7 @@ class Ae_Dispatcher {
     var $_config = false;
 
     /**
-     * @var Ae_Database
+     * @var Ae_Legacy_Database
      */
     var $database = false;
     
@@ -52,7 +52,7 @@ class Ae_Dispatcher {
     protected $sqlDb = false;
 
     /**
-     * @var Ae_Config
+     * @var Ae_Legacy_Config
      */
     var $config = false;
     
@@ -63,7 +63,7 @@ class Ae_Dispatcher {
     var $_adapterExtraSettings = false;
     
     /**
-     * @var Ae_Adapter
+     * @var Ae_Legacy_Adapter
      */
     var $adapter = false;
     
@@ -367,7 +367,7 @@ class Ae_Dispatcher {
     }
     
     /**
-     * @return Ae_User
+     * @return Ae_Legacy_User
      */
     function getUser() {
         $res = & $this->adapter->getUser();
@@ -375,7 +375,7 @@ class Ae_Dispatcher {
     }
     
     /**
-     * @return Ae_Session
+     * @return Ae_Legacy_Session
      */
     function getSession() {
         $res = & $this->adapter->getSession();

@@ -31,11 +31,11 @@ class Ae_Form_Control_Template_Basic extends Ae_Form_Control_Template {
     /**
      * @param Ae_Form_Control $control
      */
-    function showDivsList($control) {
+    function showDivsList($control, $wrap = null) {
 ?>
 
         <div <?php echo Ae_Util::mkAttribs($control->getHtmlAttribs()); ?> >
-<?php       $this->utlShowDivsList($control->getOrderedDisplayChildren());     
+<?php       $this->utlShowDivsList($control->getOrderedDisplayChildren(), $wrap);     
 ?>
         </div>
 <?php
@@ -167,7 +167,7 @@ class Ae_Form_Control_Template_Basic extends Ae_Form_Control_Template {
      */
     function showDivWrapper ($control, $html) {
 ?>
-    <div class='control<?php if($errors = $control->getErrors()) echo ' withErrors'; ?>'>
+    <div class='wrapper control<?php if($errors = $control->getErrors()) echo ' withErrors'; ?>'>
         <div class='caption'>
             <?php $this->_showCaption($control, true, ""); ?>
             <?php if ($control->isRequired()) $this->_showCoolRequiredAsterisk($control); ?>
@@ -350,7 +350,7 @@ class Ae_Form_Control_Template_Basic extends Ae_Form_Control_Template {
 ?>            
             <<?php echo $control->tagName; ?> <?php echo Ae_Util::mkAttribs($attribs); ?>>
                 <?php if (strlen($control->getValue())) $this->d ($control->getValue(), $control->allowHtml); else $this->d($control->getEmptyCaption()); ?>
-            </ <?php echo $control->tagName; ?>>       
+            </<?php echo $control->tagName; ?>>       
 <?php   
     }
     
@@ -359,14 +359,22 @@ class Ae_Form_Control_Template_Basic extends Ae_Form_Control_Template {
      */
     function showButton($control) {
         $name = $this->_mapNames($control, 'value');
-        $attribs = Ae_Util::m($this->_getAttribs($control), array(
-            'type' => $control->buttonType,
-            'name' => $name,
-            'value' => $control->getButtonCaption(),
-        ));
+        if ($control->buttonType === 'button') {
+            $attribs = Ae_Util::m($this->_getAttribs($control), array(
+                'name' => $name,
+            ));
+            echo Ae_Util::mkElement('button', $control->getButtonCaption(), $attribs);
+        } else {
+            $name = $this->_mapNames($control, 'value');
+            $attribs = Ae_Util::m($this->_getAttribs($control), array(
+                'type' => $control->buttonType,
+                'name' => $name,
+                'value' => $control->getButtonCaption(),
+            ));
 ?>
         <input <?php echo Ae_Util::mkAttribs($attribs); ?> />
 <?php
+        }
     }
     
     /**
@@ -491,7 +499,8 @@ class Ae_Form_Control_Template_Basic extends Ae_Form_Control_Template {
         else {
             if ($group->style == 'table') $this->showTable($group);
             elseif ($group->style == 'horizontal') $this->showHTable($group);
-                else $this->showSimpleList($group);
+            elseif ($group->style == 'divsList') $this->showDivsList ($group, 'divWrapper');
+            else $this->showSimpleList($group);
         }
         if (strlen($group->postHtml)) echo $group->postHtml;
     }

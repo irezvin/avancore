@@ -1,6 +1,6 @@
 <?php
 
-class Ae_Upload_Controller extends Ae_Controller {
+class Ae_Upload_Controller extends Ae_Legacy_Controller {
 
     var $uploadCharset = false;
     
@@ -40,7 +40,7 @@ class Ae_Upload_Controller extends Ae_Controller {
     
     var $_error = false;
     
-    var $_autoStateVars = array('retFieldName', 'retFormName', 'uploadId', 'retLabelId', 'fileChangeFn', 'error');
+    var $_autoStateVars = array('retFieldName', 'retFormName', 'uploadId', 'retLabelId', 'fileChangeFn'/*, 'error'*/);
     
     var $uploadErrorMessage = 'Error in upload processing: %s';
     
@@ -64,6 +64,8 @@ class Ae_Upload_Controller extends Ae_Controller {
      * @var Ae_Upload_File
      */
     var $_newUpload = false;
+    
+    var $_fileData = false;
     
     function getError() {
         if ($this->_error === false) {
@@ -185,14 +187,20 @@ class Ae_Upload_Controller extends Ae_Controller {
         $this->_templatePart = 'close';
     }
     
+    function getFileData() {
+        $paramPath = $this->_context->mapParam('file', true);
+        $f = Ae_Util::getUploadedFilesByHierarchy();
+        $fileData = Ae_Util::getArrayByPath($f, $paramPath, false);
+        return $fileData;
+    }
+    
     function executeUpload() {
         $f = false;
         $m = & $this->getUploadManager();
         $paramPath = $this->_context->mapParam('file', true);
         $fileData = false;
         $this->_templatePart = 'default';
-        $f = Ae_Util::getUploadedFilesByHierarchy();
-        $fileData = Ae_Util::getArrayByPath($f, $paramPath, false);
+        $fileData = $this->getFileData();
         if ($fileData && (!isset($fileData['error']) || !$fileData['error']) ) {
             if ($u = & $this->getUpload()) {
                 $m->purgeUploads($u->getId());
@@ -285,6 +293,10 @@ class Ae_Upload_Controller extends Ae_Controller {
         $this->_bound = false;
         $this->_response = false;
         $this->_template = false;
+    }
+    
+    function getMaxUploadSize() {
+        return ini_get('upload_max_filesize');
     }
     
 }

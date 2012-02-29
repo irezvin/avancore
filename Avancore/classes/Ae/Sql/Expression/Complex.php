@@ -10,7 +10,7 @@ class Ae_Sql_Expression_Complex extends Ae_Sql_Expression {
     }
     
     /**
-     * @param Ae_Database|Ae_Sql_Db $db
+     * @param Ae_Legacy_Database|Ae_Sql_Db $db
      */
     function getExpression($db) {
         if (is_array($this->expression)) {

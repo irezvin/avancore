@@ -246,9 +246,6 @@ class Ae_Model_Data {
         if ($this->_errors) {
             if ($propertyName) {
                 $res = Ae_Util::getArrayByPath($this->_errors, Ae_Util::pathToArray($propertyName));
-                if ($propertyName === 'element[alias]') {
-                    Pm_Conversation::log("Gotcha!!!", array($this->_errors, Ae_Util::pathToArray($propertyName)));
-                }
                 if (($concat !== false) && is_array($res)) $res = Ae_Util::implode_r($concat, $res);
             } else {
                 if ($concat === false) $res = $this->_errors;
@@ -1191,13 +1188,15 @@ class Ae_Model_Data {
                 $res = & $this->$m($key);
             } else {
                 if (!$this->_isOwnAssocLoaded($head, $key)) {
-                    if ($m = $this->_getMethod('load', $head.'Item') || $m = $this->_getMethod('load', $head)) $this->$m($key);
+                    if (($m = $this->_getMethod('load', $head.'Item')) || ($m = $this->_getMethod('load', $head))) $this->$m($key);
                     elseif ($m = $this->_getMethod('load', $head.'Items')) $this->$m();
                     else trigger_error ('Cannot load item of associated list '.get_class($this).'::'.$head.'; consider implementing load/loadItem/loadItems method', E_USER_ERROR);
                 }
                 if ((isset($this->$vn) || $this->_hasVar($vn)) && is_array($this->$vn) && isset($this->{$vn}[$key]) && is_object($this->{$vn}[$key])) {
                     $res = & $this->{$vn}[$key];
-                } else trigger_error ('Cannot retrieve item of associated list '.get_class($this).'::'.$head.'; please check accessor methods for consistence', E_USER_ERROR);
+                } else {
+                    trigger_error ('Cannot retrieve item of associated list '.get_class($this).'::'.$head.'; please check accessor methods for consistence', E_USER_ERROR);
+                }
             }
         } else {
             if ($m = $this->_getMethod('get', $head)) {
@@ -1292,7 +1291,7 @@ class Ae_Model_Data {
      * @access private
      */
     function _setOwnAssocItem($head, $plural, $key, & $assocObject) {
-        if ($m = $this->_getMethod('set', $head.'Item')) return $this->$m($assocObject);
+        if ($m = $this->_getMethod('set', $head.'Item')) return $this->$m($assocObject, $key);
         elseif ($m = $this->_getMethod('set', $head)) return $this->$m($assocObject, $key);
         else {
             if ($this->_hasOwnAssoc($head, $key)) $this->_deleteOwnAssoc($head, $key);

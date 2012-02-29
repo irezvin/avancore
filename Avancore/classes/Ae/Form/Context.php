@@ -1,6 +1,6 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Controller_Context_Http');
+Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Context_Http');
 
 /**
  * Form context has specific behavior when it comes to name mapping:
@@ -13,14 +13,14 @@ Ae_Dispatcher::loadClass('Ae_Controller_Context_Http');
  * lang => _details[title][lang]
  */
 
-class Ae_Form_Context extends Ae_Controller_Context_Http {  
+class Ae_Form_Context extends Ae_Legacy_Controller_Context_Http {  
     
     var $_controlName = false;
     var $idPrefix = false;
     var $valueFirst = true;    
     
     /**
-     * @param Ae_Controller_Context_Http $context
+     * @param Ae_Legacy_Controller_Context_Http $context
      * @return Ae_Form_Context
      * @static
      */

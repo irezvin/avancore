@@ -103,6 +103,15 @@ abstract class Ae_Autoparams {
         return $res;
     }
 
+    static function getObjectPropertyByPath($item, array $path, $defaultValue = null) {
+        $head = $item;
+        while (is_object($head) && !is_null($segment = array_shift($path))) {
+            $head = self::getObjectProperty($head, $segment, $defaultValue);
+        }
+        $res = count($path)? $defaultValue : $head;
+        return $res;;
+    }
+    
     static function getObjectProperty($item, $propertyName, $defaultValue = null) {
         if (is_array($item)) {
             $res = array();
@@ -116,6 +125,8 @@ abstract class Ae_Autoparams {
                 $res[$k] = self::getObjectProperty($item, $k, $defaultValue);
             }
             return $res;
+        } elseif ($propertyName instanceof Ae_I_Getter) {
+            $res = $propertyName->get($item, $defaultValue);
         } else {
             if (strlen($propertyName) && method_exists($item, $g = 'get'.ucFirst($propertyName))) {
                 $res = $item->$g();
@@ -128,8 +139,8 @@ abstract class Ae_Autoparams {
             } else {
                 $res = $defaultValue;
             }
-            return $res;
         }
+        return $res;
     }
 
     static function setObjectProperty($item, $propertyName, $value = null) {

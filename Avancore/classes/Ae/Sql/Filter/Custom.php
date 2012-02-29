@@ -58,7 +58,7 @@ class Ae_Sql_Filter_Custom extends Ae_Sql_Filter {
      */
     function _doBind($input) {
         $this->values = array();
-        if (!is_array($input)) {
+        if (!is_array($input) || (count($this->params) == 1)) {
             if (strlen($this->defaultParamName)) $input = array($this->defaultParamName => $input);
                 else $input = array();
         }
