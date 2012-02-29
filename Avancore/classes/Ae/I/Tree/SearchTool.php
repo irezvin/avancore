@@ -5,7 +5,7 @@
  */
 
 /**
- * Used to implement search-by-autocomplete and format tree nodes in Ae_Controller_Std_Tree
+ * Used to implement search-by-autocomplete and format tree nodes in Ae_Legacy_Controller_Std_Tree
  */
 interface Ae_I_Tree_SearchTool {
     

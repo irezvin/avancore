@@ -8,7 +8,7 @@ class Ae_Admin_Template extends Ae_Template_Html {
      */
     var $manager = false;
     /**
-     * @var Ae_Controller_Context_Http
+     * @var Ae_Legacy_Controller_Context_Http
      */
     var $context = false;
     var $inForm = false;
@@ -239,7 +239,7 @@ class Ae_Admin_Template extends Ae_Template_Html {
             $url = & $this->manager->getManagerUrl();
         
 ?>
-    <form action="<?php $this->d($url->toString(false)); ?>" method="<?php $this->d($context->requestMethod); ?>" id="<?php $this->d($formName); ?>" name="<?php $this->d($formName); ?>" >
+    <form action="<?php $this->d($url->toString(false)); ?>" method="<?php $this->d($context->requestMethod); ?>" id="<?php $this->d($formName); ?>" name="<?php $this->d($formName); ?>" enctype="multipart/form-data" >
         
         <?php $this->d($url->getHidden(), true); ?>
 <?php   } else {
@@ -254,15 +254,8 @@ class Ae_Admin_Template extends Ae_Template_Html {
 
     <div class='manager'>
 <?php if ($this->manager->separateToolbar) ob_start(); ?>    
-    <table class='heading'>
-    <tr>
-    <td class='headingTd'><?php if ($this->manager->isForm()) echo $this->manager->getFormTitle(); else echo $this->manager->getPluralCaption(); ?></td>
-    <td class='afterHeading'>&nbsp;</td>
-    <td class='toolbarTd'>
-    <?php $this->showToolbar(); ?>
-    </td>
-    </tr>
-    </table>
+<?php   $this->manager->toolbarHeader = $this->manager->isForm()? $this->manager->getFormTitle() : $this->manager->getPluralCaption(); ?>
+<?php   $this->showToolbar(); ?>
 <?php if ($this->manager->separateToolbar) { $this->manager->toolbarContent = ob_get_clean(); } ?>    
     <?php $this->showCreateManagerController(); ?>
     <?php $this->d($innerHtml, true); ?>

@@ -1,8 +1,8 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Controller');
+Ae_Dispatcher::loadClass('Ae_Legacy_Controller');
 
-class Ae_Admin_Manager extends Ae_Controller {
+class Ae_Admin_Manager extends Ae_Legacy_Controller {
 
     var $singleCaption = false;
     
@@ -23,6 +23,8 @@ class Ae_Admin_Manager extends Ae_Controller {
      * @var string
      */
     var $toolbarContent = false;
+    
+    var $toolbarHeader = false;
     
     /**
      * @var Ae_Sql_Filter
@@ -196,8 +198,8 @@ class Ae_Admin_Manager extends Ae_Controller {
         if ($this->_formResponse === false) {
             $template = & $this->getTemplate();
             $form = & $this->getForm();
-            Ae_Dispatcher::loadClass('Ae_Controller_Response_Html');
-            $hr = new Ae_Controller_Response_Html();
+            Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Response_Html');
+            $hr = new Ae_Legacy_Controller_Response_Html();
             $form->htmlResponse = & $hr;
             $hr->content = $form->fetchPresentation();
             $this->_formResponse = & $hr;
@@ -209,8 +211,8 @@ class Ae_Admin_Manager extends Ae_Controller {
         if ($this->_filterFormResponse === false) {
             $template = & $this->getTemplate();
             $form = & $this->getFilterForm();
-            Ae_Dispatcher::loadClass('Ae_Controller_Response_Html');
-            $hr = new Ae_Controller_Response_Html();
+            Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Response_Html');
+            $hr = new Ae_Legacy_Controller_Response_Html();
             $form->htmlResponse = & $hr;
             $hr->content = $form->fetchPresentation();
             $this->_filterFormResponse = & $hr;
@@ -464,7 +466,7 @@ class Ae_Admin_Manager extends Ae_Controller {
     // -------------------------------------- request related methods -------------------------------------------------
     
     /**
-     * @return Ae_Controller_Context_Http
+     * @return Ae_Legacy_Controller_Context_Http
      */
     function getContext() {
         $res = & parent::getContext();
@@ -980,7 +982,7 @@ class Ae_Admin_Manager extends Ae_Controller {
     }
     
     /**
-     * @return Ae_Controller_Context
+     * @return Ae_Legacy_Controller_Context
      */
     function & _createFormContext() {
         $res = & $this->_context->spawn('form');
@@ -990,7 +992,7 @@ class Ae_Admin_Manager extends Ae_Controller {
     }
     
     /**
-     * @return Ae_Controller_Context
+     * @return Ae_Legacy_Controller_Context
      */
     function & _createFilterFormContext() {
         $res = & $this->_context->spawn('filterForm');
@@ -1064,7 +1066,7 @@ class Ae_Admin_Manager extends Ae_Controller {
     
     /**
      * @param string $id Sub manager id
-     * @return Ae_Controller_Context_Http
+     * @return Ae_Legacy_Controller_Context_Http
      */
     function & _createSubManagerContext($id) {
         $ctx = & $this->_context->spawn('sm_'.$id);
@@ -1072,7 +1074,7 @@ class Ae_Admin_Manager extends Ae_Controller {
     }
     
 	/**
-     * @return Ae_Controller_Context_Http
+     * @return Ae_Legacy_Controller_Context_Http
      */
     function & _createProcessingContext($processingId) {
         $ctx = & $this->_context->spawn('processingParams');

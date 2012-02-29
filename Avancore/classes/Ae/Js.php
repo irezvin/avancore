@@ -64,6 +64,7 @@ class Ae_Js {
         } else {
             if (!count($value)) return '[]'; else {
                 $nk = !$withNumericKeys && Ae_Js::areOnlyNumericKeys($value);
+                if ($withNumericKeys == 1) $withNumericKeys = false;
                 $res = $nk? '[' : '{';
                 $n = 0;
                 $c = count($value);

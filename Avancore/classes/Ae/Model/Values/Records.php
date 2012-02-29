@@ -5,6 +5,9 @@ Ae_Dispatcher::loadClass('Ae_Model_Values');
 /**
  * Implements values list from the records
  */
+/**
+ * Implements values list from the records
+ */
 class Ae_Model_Values_Records extends Ae_Model_Values {
     
     /**
@@ -42,7 +45,7 @@ class Ae_Model_Values_Records extends Ae_Model_Values {
         if ($this->ordering === '?') {
             $this->ordering = $this->_mapper->getDefaultOrdering();
             if ($this->ordering === false && $this->_mapper->getTitleFieldName()) {
-                $this->ordering = $this->_mapper->getTitleFieldName();
+                $this->ordering = 't.'.$this->_mapper->getTitleFieldName();
             }
         }
         if ($this->valueFieldName) {

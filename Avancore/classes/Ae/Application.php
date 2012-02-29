@@ -55,6 +55,10 @@ abstract class Ae_Application extends Ae_Autoparams {
                 self::$defaultInstanceIds[$class] = $id;
     }
     
+    function setDefaultInstance(Ae_Application $instance) {
+        self::$defaultInstance = $instance;
+    }
+    
     protected static function getNextId(Ae_Application $instance) {
         $id = 1;
         $class = get_class($instance);
@@ -150,6 +154,7 @@ abstract class Ae_Application extends Ae_Autoparams {
             $adapter = $this->getAdapter();
             if ($this->addIncludePaths) {
                 Ae_Dispatcher::addIncludePath($adapter->getClassPaths());
+                if (strlen($gp = $adapter->getGenPath()))Ae_Dispatcher::addIncludePath($adapter->getGenPath());
             }
             $this->doOnInitialize();
             $this->stage = self::stInitialized;
@@ -162,20 +167,20 @@ abstract class Ae_Application extends Ae_Autoparams {
     protected function doOnInitialize() {
     }
 
-    function setLegacyDatabase(Ae_Database $database = null) {
+    function setLegacyDatabase(Ae_Legacy_Database $database = null) {
         $this->legacyDatabase = $database;
     }
 
     /**
-     * @return Ae_Database
+     * @return Ae_Legacy_Database
      */
     function getLegacyDatabase() {
         if (!$this->legacyDatabase) {
             $db = $this->adapter->getLegacyDatabasePrototype();
             if (is_array($db) && $db) {
-                if (!isset($db['tmpDir'])) $db['tmpDir'] = $this->adapter->getVarTmpPath();
+                $db = Ae_Util::m(array('__construct' => array('config' => array('tmpDir' => $this->adapter->getVarTmpPath()))), $db);
             }
-            if ($db) $this->legacyDatabase = Ae_Autoparams::factory ($db, 'Ae_Database');
+            if ($db) $this->legacyDatabase = Ae_Autoparams::factory ($db, 'Ae_Legacy_Database');
         }
         return $this->legacyDatabase;
     }    
@@ -232,7 +237,7 @@ abstract class Ae_Application extends Ae_Autoparams {
     }
     
     /**
-     * @return Ae_Controller
+     * @return Ae_Legacy_Controller
      */
     function getController($id) {
         if (isset($this->controllers[$id])) {
@@ -240,7 +245,7 @@ abstract class Ae_Application extends Ae_Autoparams {
                     $proto = $this->controllers[$id];
                     if (!is_array($proto)) $proto = array('class' => $proto);
                     if (!isset($proto['application'])) $proto['application'] = $this;
-                    $this->controllers[$id] = Ae_Autoparams::factory($proto, 'Ae_Controller');
+                    $this->controllers[$id] = Ae_Autoparams::factory($proto, 'Ae_Legacy_Controller');
             }
             $res = $this->controllers[$id];
         } else {
@@ -263,17 +268,17 @@ abstract class Ae_Application extends Ae_Autoparams {
     
     function createOutput() {
         $output = $this->getAdapter()->getOutputPrototype();
-        $output = Ae_Autoparams::factory($output, 'Ae_Output');
+        $output = Ae_Autoparams::factory($output, 'Ae_Legacy_Output');
         // TODO: add asset placeholders to output
         return $output;
     }
     
     /**
-     * @return Ae_Controller_Response
+     * @return Ae_Legacy_Controller_Response
      * @param bool $noOutput Just return the Response, don't try to output it
-     * @param Ae_Output $output Or its prototype. If not provided, Adapter will be used to retrieve Output prototype
+     * @param Ae_Legacy_Output $output Or its prototype. If not provided, Adapter will be used to retrieve Output prototype
      */
-    function processRequest($noOutput = false, Ae_Output $output = null) {
+    function processRequest($noOutput = false, Ae_Legacy_Output $output = null) {
         if ($this->defaultControllerId === false) throw new Exception("\$defaultControllerId property not set");
         $controller = $this->getController($this->defaultControllerId);
         $response = $controller->getResponse();

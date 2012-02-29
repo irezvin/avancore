@@ -1,8 +1,8 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Controller');
+Ae_Dispatcher::loadClass('Ae_Legacy_Controller');
 
-class Ae_Form_Control extends Ae_Controller {
+class Ae_Form_Control extends Ae_Legacy_Controller {
 
     protected $init = false;
     
@@ -184,7 +184,7 @@ class Ae_Form_Control extends Ae_Controller {
     var $hasOwnTemplates = false;
 
     /**
-     * @var Ae_Controller_Response_Html
+     * @var Ae_Legacy_Controller_Response_Html
      */
     var $htmlResponse = false;
     
@@ -209,6 +209,8 @@ class Ae_Form_Control extends Ae_Controller {
     var $_presentation = false;
     
     var $_presentationWithWrapper = false;
+    
+    var $dontGetDefaultFromModel = false;
     
     /**
      * Model that provides current control with the values and error info (or FALSE if no model is provided)
@@ -251,7 +253,9 @@ class Ae_Form_Control extends Ae_Controller {
     
     var $_submitted = '?';
     
-    var $_creationOrder = false;
+    var $_creationOrder = null;
+    
+    var $index = false;
     
     var $decorator = false;
     
@@ -273,12 +277,15 @@ class Ae_Form_Control extends Ae_Controller {
         $tmp = $options;
         foreach (array('default', 'parent', 'model', 'modelProperty') as $opt) unset($tmp[$opt]);
         if (isset($options['name'])) $this->name = $options['name'];
+        if (isset($options['creationOrder'])) {
+            $this->_creationOrder = $options['creationOrder'];
+        }
         Ae_Util::bindAutoparams($this, $options);
     }
     
 /**
      * Returns context of the controller 
-     * @return Ae_Controller_Context_Http
+     * @return Ae_Legacy_Controller_Context_Http
      */
     function getContext() {
         return $this->_context;
@@ -415,6 +422,14 @@ class Ae_Form_Control extends Ae_Controller {
         else $res = false; 
     }
     
+    function getDebugCaption() {
+        return $this->name.' - '.$this->displayOrder.' / '.$this->_creationOrder;
+    }
+    
+    function dumpControlNames($arr) {
+        var_dump(Ae_Autoparams::getObjectProperty($arr, 'debugCaption'));
+    }
+    
     function getOrderedDisplayChildren() {
         if ($this->_orderedDisplayChildren === false) {
             $this->_doInitDisplayChildren();
@@ -474,7 +489,10 @@ class Ae_Form_Control extends Ae_Controller {
             trigger_error ("\$path must be a string or an array; use Ae_Form_Control::searchControlByPathRef() to supply Ae_Form_Control references instead", E_USER_ERROR);
         $curr = $this;
         if (!is_array($path)) $path = explode('/', $path);
-        if (!strlen($path[0])) $curr = $curr->_getRootControl();
+        if (!strlen($path[0])) {
+            $curr = $curr->_getRootControl();
+            $path = array_slice($path, 1);
+        }
         while ($curr && count($path)) {
             $segment = $path[0];
             //var_dump(get_class($curr), get_class($curr->_parent), $segment);
@@ -524,6 +542,7 @@ class Ae_Form_Control extends Ae_Controller {
                     $template = & $this->getTemplate();
                     $template->setVars($this->tplExtras);
                     $this->_presentation = $template->fetch($this->templatePart, $this->_doGetTemplatePartParams());
+                    $this->postProcessPresentation($this->_presentation);
                 }
                 $res = $this->_presentation;
             }
@@ -531,6 +550,13 @@ class Ae_Form_Control extends Ae_Controller {
         } else {
             return false;
         }
+    }
+    
+    function postProcessChildPresentation(& $html, Ae_Form_Control $child) {
+    }
+    
+    protected function postProcessPresentation(& $html) {
+        if ($this->_parent) $this->_parent->postProcessChildPresentation($html, $this);
     }
     
     function fetchWithWrapper($refresh = false) {
@@ -800,8 +826,10 @@ class Ae_Form_Control extends Ae_Controller {
      * Should return default value
      */
     function _doGetDefault() {
-        if (($m = & $this->getModel())) {
-            if (strlen($p = $this->getPropertyName())) $res = $m->getField($p);
+        if (($m = & $this->getModel()) && !$this->dontGetDefaultFromModel) {
+            if (strlen($p = $this->getPropertyName())) {
+                $res = $m->getField($p);
+            }
             elseif ($this->useGetterIfPossible && $g = $this->getGetterName()) $res = $m->$g();
             else $res = null;
         }
@@ -886,18 +914,25 @@ class Ae_Form_Control extends Ae_Controller {
         return $res;
     }
     
+    function getPath() {
+        return $this->_getPath();
+    }
+    
     /**
      * @return Ae_Form_Control
+     * @param string $class Find parent control of specified class
      */
-    function & _getRootControl() {
+    function & _getRootControl($class = false) {
         $curr = & $this;
-        while ($curr->_parent) $curr = & $curr->_parent;
+        while ($curr->_parent && ($class === false || !($curr instanceof $class)))
+            $curr = & $curr->_parent;
+        if ($class !== false && !($curr instanceof $class)) $curr = null;
         return $curr;
     }
     
     function bindAutoparams() {
         /**
-         * After I have added bindAutoparams() call to Ae_Controller, doInitProperties() is called after
+         * After I have added bindAutoparams() call to Ae_Legacy_Controller, doInitProperties() is called after
          * bindAutoparams(), that adds bug to the controls creation
          */
         if (!$this->init) return false;
@@ -906,6 +941,48 @@ class Ae_Form_Control extends Ae_Controller {
     function updateFromModel() {
         $this->_value = $this->getDefault();
         $this->_gotValue = true;
+    }
+    
+    function updateModel() {
+        if (($m = $this->getModel()) && strlen($p = $this->getPropertyName()) && $m->hasProperty($p)) {
+            $m->setField($p, $this->getValue());
+        }
+    }
+    
+    function executeXhr() {
+        $this->executeXhrCore();
+    }
+    
+    function executeXhrCore() {
+    }
+    
+    function getXhrId() {
+        $res = $this->_getPath();
+        return $res;
+    }
+    
+    function getXhrUrl() {
+        $ctx = $this->_context->cloneObject();
+        $f = $this->_getRootControl();
+        Ae_Util::setArrayByPath($ctx->_baseUrl->query, Ae_Util::pathToArray($f->getContext()->mapParam($f->_methodParamName)), 'xhr');
+        Ae_Util::setArrayByPath($ctx->_baseUrl->query, Ae_Util::pathToArray($f->getContext()->mapParam('xhrTarget')), $this->getXhrId());
+        $res = $ctx->getUrl(array(), false);
+        return $res;
+    }
+    
+    function invokeCallback($callback) {
+        $res = null;
+        if ($callback) {
+            $args = func_get_args();
+            $args = array_slice($args, 1);
+            if (is_array($callback) && isset($callback[0])) {
+                if (is_object($callback[0]) && ($callback[0] instanceof Ae_Form_Control_Path)) {
+                    $callback[0] = $callback[0]->getControl($this, true);
+                }
+            }
+            $res = call_user_func_array($callback, $args);
+        }
+        return $res;
     }
     
 }

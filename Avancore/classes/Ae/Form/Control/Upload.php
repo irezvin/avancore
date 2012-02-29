@@ -7,7 +7,7 @@ class Ae_Form_Control_Upload extends Ae_Form_Control {
     var $templatePart = 'upload';
     
     function getFileParamName() {
-        $res = md5($this->_context->mapParam('value'));
+        $res = md5($pv = $this->_context->mapParam('value'));
         return $res;
     }
     

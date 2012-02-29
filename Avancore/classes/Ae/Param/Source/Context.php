@@ -3,7 +3,7 @@
 class Ae_Param_Source_Context extends Ae_Autoparams implements Ae_I_Param_Destination {
     
     /**
-	 * @var Ae_Controller_Context 
+	 * @var Ae_Legacy_Controller_Context 
      */
     protected $data = false;
     
@@ -17,7 +17,7 @@ class Ae_Param_Source_Context extends Ae_Autoparams implements Ae_I_Param_Destin
         if (isset($options['data'])) $this->setData($options['data']);
     }
     
-    function setData(Ae_Controller_Context $data) {
+    function setData(Ae_Legacy_Controller_Context $data) {
         $this->data = $data;
     }
     

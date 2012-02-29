@@ -13,7 +13,7 @@ class Ae_Admin_Column_Published extends Ae_Table_Column_Published {
         $alt = $data? $this->getPublishedAlt() : $this->getUnpublishedAlt();
         $task = $data? $this->getUnpublishTask() : $this->getPublishTask();
         
-        $jsCall = new Pm_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
+        $jsCall = new Ae_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
             $task,
             array($this->manager->getStrPk($record))
         ));
@@ -26,7 +26,7 @@ class Ae_Admin_Column_Published extends Ae_Table_Column_Published {
                 "> ".
                     "<img ".
                         Ae_Util::mkAttribs(array(
-                            'src' => "images/$img", 
+                            'src' => "$img", 
                             'width' => 12,
                             'height' => 12,
                             'border' => 0,

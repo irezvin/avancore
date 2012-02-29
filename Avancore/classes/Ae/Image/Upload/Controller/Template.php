@@ -38,7 +38,7 @@ class Ae_Image_Upload_Controller_Template extends Ae_Upload_Controller_Template 
     
     function showThumb() {
         $this->htmlResponse->extraHeaders[] = 'Content-Type: '.$this->upload->getMimeType();
-        $this->htmlResponse->extraHeaders[] = 'Content-Disposition: inline; filename=thumb-'.$this->upload->getFilename();
+        $this->htmlResponse->extraHeaders[] = 'Content-Disposition: inline; filename="thumb-'.$this->upload->getFilename().'"';
         $this->htmlResponse->noHtml = true;
         $this->htmlResponse->noWrap = true;
         echo $this->upload->getThumbnail();

@@ -24,7 +24,7 @@ class Ae_Image_Processor_Gd extends Ae_Image_Processor {
     function _doOnSetFile() {
         $r = & $this->_getResizer();
         $r->setImage($this->_filePath);
-        if (strlen($e = $r->error())) $this->error = $e;
+        if (strlen($e = $r->error())) $this->_error = $e;
         $this->_type = $r->imgType;
         $this->_width = $r->imgWidth;
         $this->_height = $r->imgHeight;

@@ -67,7 +67,7 @@ class Ae_Admin_Template_Pagination extends Ae_Template_Html {
      * Populates template with given Pagination controller
      *
      * @param Ae_Admin_Pagination $pagination
-     * @param Ae_Controller_Context_Http $context
+     * @param Ae_Legacy_Controller_Context_Http $context
      * @param array $limitsList
      */
     function populate(& $pagination, & $context, $numPages, $limitsList) {

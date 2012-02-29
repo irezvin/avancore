@@ -15,9 +15,7 @@ class Ae_Form_Control_Composite extends Ae_Form_Control {
 
     var $moveErrorsToTheChildren = true;
     
-    var $_controlSettings = false;
-    
-    var $_controls = false;
+    var $_controls = array();
     
     var $_creationCount = 0;
     
@@ -27,29 +25,28 @@ class Ae_Form_Control_Composite extends Ae_Form_Control {
     
     var $valueFirstInContext = false;
     
+    protected $modelUpdated = false;
+    
     function doInitProperties($options) {
+        $this->_iid = round(rand()*100);
         parent::doInitProperties($options);
-        if (isset($options['controls']) && is_array($options['controls'])) {
-            $this->addControls($options['controls']);
-        }
+        if (!isset($options['controls'])) $options['controls'] = array();
+        $this->addInitialControls($options['controls']);
+    }
+    
+    protected function addInitialControls(array $controls) {
+        $this->addControls($controls);
     }
     
     function addControl($name, $settings = array()) {
-        if (is_array($this->_controls)) {
-            if (isset($this->_controls[$name])) trigger_error ("Control with name '{$name}' already exists - delete it first", E_USER_ERROR);
-                else {
-                    $settings['_creationOrder'] = $this->_creationCount++;
-                    $this->_controls[$name] = $settings;
+        if (isset($this->_controls[$name])) trigger_error ("Control with name '{$name}' already exists - delete it first", E_USER_ERROR);
+            else {
+                if (!isset($settings['creationOrder'])) {
+                    $settings['creationOrder'] = $this->_creationCount++;
                 }
-        } elseif (is_array($this->_controlSettings)) {
-            if (isset($this->_controlSettings[$name])) trigger_error ("Control with name '{$name}' already exists - delete it first", E_USER_ERROR);
-                else {
-                    $settings['_creationOrder'] = $this->_creationCount++;
-                    $this->_controlSettings[$name] = $settings;
-                }
-        } else {
-            $this->_controlSettings = array($name => $settings);
-        }
+                $this->_controls[$name] = $settings;
+            }
+        $this->_orderedDisplayChildren = false;
     }
     
     protected function sortControlPrototypesByCreationOrder(array $prototypes) {
@@ -62,14 +59,14 @@ class Ae_Form_Control_Composite extends Ae_Form_Control {
         if (is_object($prot1)) {
             $co1 = isset($prot1->_creationOrder)? $prot1->_creationOrder : 0;
         } elseif (is_array($prot1)) {
-            $co1 = isset($prot1['_creationOrder'])?  $prot1['_creationOrder'] : 0;
+            $co1 = isset($prot1['creationOrder'])?  $prot1['creationOrder'] : 0;
         } else {
             $co1 = 0;
         }
         if (is_object($prot2)) {
             $co2 = isset($prot2->_creationOrder)? $prot2->_creationOrder : 0;
         } elseif (is_array($prot2)) {
-            $co2 = isset($prot2['_creationOrder'])?  $prot2['_creationOrder'] : 0;
+            $co2 = isset($prot2['creationOrder'])?  $prot2['creationOrder'] : 0;
         } else {
             $co2 = 0;
         }
@@ -104,10 +101,6 @@ class Ae_Form_Control_Composite extends Ae_Form_Control {
     }
     
     function listControls() {
-        if ($this->_controls === false) {
-            $this->_controls = array();
-            if (is_array($this->_controlSettings)) $this->addControls($this->_controlSettings);
-        }
         $res = array_keys($this->_controls);
         return $res;
     }
@@ -198,7 +191,6 @@ class Ae_Form_Control_Composite extends Ae_Form_Control {
         if ($this->getDefaultFromModel) {
             if (!($this->readOnly === true) && isset($this->_rqData) && $this->_rqData) {
                 $res = & $this->getControlsValues();
-                //var_dump($this->name, $this->_rqData, $res);
             } else {
                 $res = $this->getDefault();
             }
@@ -209,7 +201,7 @@ class Ae_Form_Control_Composite extends Ae_Form_Control {
     }
     
     /**
-     * @return Ae_Controller_Context_Http
+     * @return Ae_Legacy_Controller_Context_Http
      */
     function & _createSubContext($name) {
         Ae_Dispatcher::loadClass('Ae_Form_Context');
@@ -237,10 +229,11 @@ class Ae_Form_Control_Composite extends Ae_Form_Control {
             trigger_error ("Name in the settings of the sub control ('{$settings['name']}') does not match key in the array ('{$name}')", E_USER_WARNING);
         $settings['name'] = $name;
         $instanceId = $name;
+        $co = isset($settings['creationOrder'])? $settings['creationOrder'] : '-';
         $res = new $class ($context, $settings, $instanceId);
         if (isset($settings['displayParent'])) $res->setDisplayParent($settings['displayParent']);
             else $res->setDisplayParent($this);
-        if (isset($settings['_creationOrder'])) $res->_creationOrder = $settings['_creationOrder']; 
+        //if (isset($settings['_creationOrder'])) $res->_creationOrder = $settings['_creationOrder']; 
         return $res;
     }
     
@@ -251,7 +244,7 @@ class Ae_Form_Control_Composite extends Ae_Form_Control {
     }
     
     function _doGetDefault() {
-        if (($m = & $this->getModel())) {
+        if (($m = & $this->getModel()) && !$this->dontGetDefaultFromModel) {
             if (strlen($p = $this->getPropertyName())) $res = $m->getField($p);
             elseif ($this->useGetterIfPossible && $g = $this->getGetterName()) $res = $m->$g();
             else $res = null;
@@ -267,7 +260,23 @@ class Ae_Form_Control_Composite extends Ae_Form_Control {
         }
     }
     
+    function updateModel() {
+        $this->modelUpdated = true;
+        foreach ($this->listControls() as $c) {
+            $this->getControl($c)->updateModel();
+        }
+    }
     
+    function executeXhr() {
+        $xhrTarget = $this->_context->getData('xhrTarget', '');
+        if (strlen($xhrTarget) && ($c = $this->searchControlByPath($xhrTarget))) $c->executeXhr();
+            else $this->executeXhrCore();
+    }
+    
+    function isXhr() {
+        $res = $this->_context->getData($this->_methodParamName) === 'xhr';
+        return $res;
+    }
     
 }
 

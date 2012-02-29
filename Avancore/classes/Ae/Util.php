@@ -579,9 +579,9 @@ class Ae_Util {
      * Converts 'foo_bar' to 'Foo_Bar'
      */
     static function fixClassName($className) {
-        $className = str_replace("_", " ", $className);
+        /*$className = str_replace("_", " ", $className);
         $className = ucwords($className);
-        $className = str_replace(" ", "_", $className);
+        $className = str_replace(" ", "_", $className);*/
         return $className;
     }
     
@@ -678,7 +678,7 @@ class Ae_Util {
         $cells[] = $headerRow;
         foreach ($tableData as $k => $row) {
             $rowCells = array();
-            if (isset($rowTitles[$k])) $rowCells[] = $rowTitles[$k]; else $rowCells = '';
+            if (isset($rowTitles[$k])) $rowCells[] = $rowTitles[$k]; else $rowCells[] = '';
             foreach ($colsList as $col) $rowCells[] = isset($row[$col])? $row[$col] : '';
             $cells[] = $rowCells;
         }

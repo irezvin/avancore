@@ -103,9 +103,9 @@ class Ae_Sql_Select_TableProvider {
      * @param string $alias
      * @return Ae_Sql_Select_Table
      */
-    function & addTable(& $options, $alias = false) {
+    function & addTable($options, $alias = false) {
     	if (is_a($options, 'Ae_Sql_Select_Table')) {
-            $t = & $options;
+            $t = $options;
             $t->setTableProvider($this);
         }
         else {
@@ -120,8 +120,10 @@ class Ae_Sql_Select_TableProvider {
         }
         $alias = $t->alias? $t->alias : $t->name;
         if (!strlen($alias)) trigger_error("name of table must be provided", E_USER_ERROR);
-        if (isset($this->_tables[$alias])) trigger_error("table with alias '{$alias}' is already in tables collection", E_USER_ERROR);
-        $this->_tables[$alias] = & $t;
+        if (isset($this->_tables[$alias])) {
+            trigger_error("table with alias '{$alias}' is already in tables collection", E_USER_ERROR);
+        }
+        $this->_tables[$alias] = $t;
         return $t;
     }
     
@@ -239,5 +241,16 @@ class Ae_Sql_Select_TableProvider {
 	function getId() {
 		return $this->_id;
 	}
+    
+    function cleanupReferences() {
+        foreach ($this->_tables as $t) $t->_tableProvider = null;
+        $this->_tables = array();
+        foreach ($this->_tableProviders as $t) {
+            $t->cleanupReferences();
+            $t->_parent = null;
+        }
+        $this->_tableProviders = array();
+        $this->_foundTables = array();
+    }
     
 }

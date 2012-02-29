@@ -20,17 +20,6 @@ class Cg_Frontend {
     var $genDeployPath = false;
     
     /**
-     * @var FALSE|array 
-     * - TRUE = Ae_Dispatcher will be instantiated with default arguments:
-     * 	 <code>'Codegen', false, 'english', 'Ae_Native_Adapter', 'Ae_Dispatcher', array('configPath' => dirname(__FILE__).'/../app.config.php')</code>
-     * 
-     * - FALSE = Ae_Dispatcher won't be instantiated by Cg_Frontend; 
-     * - array = array of arguments for Ae_Dispatcher::instantiate
-     *  
-     */
-    var $instantiateDispatcher = true;
-    
-    /**
      * @var TRUE|FALSE|number TRUE = unlimited time; FALSE = don't set time limit; number = explicit time limit
      */
     var $maxExecutionTime = 60;
@@ -38,6 +27,11 @@ class Cg_Frontend {
     var $showErrors = true;
     
     var $showOuterHtml = true;
+    
+    /**
+     * @var Ae_Application
+     */
+    var $application = false;
     
     /**
      * @var bool
@@ -69,18 +63,6 @@ class Cg_Frontend {
             if ($this->maxExecutionTime !== false) {
                 ini_set('max_execution_time', $this->maxExecutionTime === true? 0 : $this->maxExecutionTime);
             }
-            
-            if ($this->instantiateDispatcher !== false) { 
-                if (is_array($this->instantiateDispatcher))
-                    $args = $this->instantiateDispatcher;
-                else
-                    $args = array(
-                		'Codegen', false, 'english', 'Ae_Native_Adapter', 'Ae_Dispatcher', array('configPath' => getcwd().'/../app.config.php')
-                    );
-                require_once('Ae/Dispatcher.php');
-                call_user_func_array(array('Ae_Dispatcher', 'instantiate'), $args);
-            }
-            
         }
     }
     

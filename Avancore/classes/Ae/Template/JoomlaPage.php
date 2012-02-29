@@ -97,7 +97,7 @@ class Ae_Template_JoomlaPage extends Ae_Template_Html {
     function _showQueries() {
         $disp = & Ae_Dispatcher::getInstance();
         $db = & $disp->database;
-        if (is_a($db, 'Ae_Native_Database') && $db->trackQueries) {
+        if (is_a($db, 'Ae_Legacy_Database_Native') && $db->trackQueries) {
             foreach ($db->queries as $q) echo '<hr /><pre>'.htmlspecialchars($q).'</pre>';
         }
     }

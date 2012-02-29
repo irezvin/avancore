@@ -198,13 +198,13 @@ class Ae_Sql_Statement extends Ae_Sql_Expression {
     }
     
     /**
-     * @param Ae_Database|Ae_Sql_Db $db
+     * @param Ae_Legacy_Database|Ae_Sql_Db $db
      */
     function setDb(& $db) {
-        if (!is_null($db) && !is_a($db, 'Ae_Sql_Db') && !is_a($db, 'Ae_Database'))
-            trigger_error('\$db must be either null, Ae_Database or Ae_Sql_Db instance', E_USER_ERROR);
+        if (!is_null($db) && !is_a($db, 'Ae_Sql_Db') && !is_a($db, 'Ae_Legacy_Database'))
+            trigger_error('\$db must be either null, Ae_Legacy_Database or Ae_Sql_Db instance', E_USER_ERROR);
             
-        if (is_a($db, 'Ae_Database')) {
+        if (is_a($db, 'Ae_Legacy_Database')) {
             $this->_db = new Ae_Sql_Db_Ae($db);
         }
         $this->_db = & $db;

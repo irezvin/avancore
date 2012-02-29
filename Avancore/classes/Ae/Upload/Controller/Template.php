@@ -15,6 +15,7 @@ class Ae_Upload_Controller_Template extends Ae_Template_Html {
     var $langNoUpload = 'No file uploaded';
     var $langUploadNewFile = 'Upload new file';
     var $langDownloadFile = 'Download file';
+    var $langMaxUploadSize = 'File size should not exceed %s';
     
     var $readOnly = false;
     var $retFieldName = false;
@@ -106,7 +107,7 @@ class Ae_Upload_Controller_Template extends Ae_Template_Html {
 <?php       if ($this->error) { ?>
             <p style='color: red; text-align: center'><?php echo htmlspecialchars($this->error); ?></p>
 <?php       } ?>
-            <?php $this->openFormElement(array(), array('enctype' => 'multipart/form-data', 'method' => 'post')); ?>
+            <?php $this->openFormElement(array(), array('enctype' => 'multipart/form-data', 'method' => 'post'), false); ?>
 <?php           if ($this->upload) { ?>
 <?php           $this->rShowUpload(); ?>
                 <input type='submit' name='<?php $this->mapParam('ok'); ?>' value=<?php echo($this->langUseThisFile ); ?> />
@@ -115,6 +116,9 @@ class Ae_Upload_Controller_Template extends Ae_Template_Html {
                 <input type='file' name='<?php $this->mapParam('file') ?>' />
                 <input type='submit' name='<?php $this->mapParam('upload'); ?>' value='<?php if ($this->upload) { echo($this->langReplaceFile);  } else { echo($this->langUploadFile);  } ?>' />
                 <br />
+<?php           if (strlen($s = $this->controller->getMaxUploadSize())) { ?>
+                <p><?php echo(sprintf($this->langMaxUploadSize, $s)); ?></p>
+<?php           } ?>                
                 <br />
                 <input type='submit'  name='<?php $this->mapParam('cancel'); ?>' value='<?php echo($this->langCancel); ?>' />
             </form>
@@ -149,7 +153,6 @@ class Ae_Upload_Controller_Template extends Ae_Template_Html {
                     ?>' id='<?php echo htmlspecialchars($valueId); 
                     ?>' value='<?php echo htmlspecialchars($value); 
                     ?>' />
-                <br />
                 <a href='#' onclick='showSelectFile("<?php 
                     $this->d($this->controller->getPartialUrlWithOpenParam('uploadId', array('retFieldName' => $valueId, 'retLabelId' => $titleId, 'fileChangeFn' => $this->fileChangeFn))); 
                 ?>", document.getElementById("<?php echo htmlspecialchars($valueId); ?>").value<?php if ($this->fileChangeFn !== false) { echo ', '.$this->fileChangeFn; } ?>); return false;'> <?php echo($this->langUploadNewFile); ?></a>
