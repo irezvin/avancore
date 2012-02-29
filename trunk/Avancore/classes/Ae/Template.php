@@ -3,12 +3,12 @@
 class Ae_Template {
 
     /**
-     * @var Ae_Controller
+     * @var Ae_Legacy_Controller
      */
     var $controller = false;
     
     /**
-     * @var Ae_Controller_Context
+     * @var Ae_Legacy_Controller_Context
      */
     var $context = false;
     

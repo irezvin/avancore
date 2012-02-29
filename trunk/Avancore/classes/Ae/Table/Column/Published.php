@@ -14,13 +14,13 @@ class Ae_Table_Column_Published extends Ae_Table_Column {
     
     function getPublishedImg() {
         if (isset($this->settings['publishedImg'])) $res = $this->settings['publishedImg'];
-            else $res = 'publish_g.png';
+            else $res = 'images/publish_g.png';
         return $res;
     }
     
     function getUnpublishedImg() {
         if (isset($this->settings['unpublishedImg'])) $res = $this->settings['unpublishedImg'];
-            else $res = 'publish_x.png';
+            else $res = 'images/publish_x.png';
         return $res;
     }
     

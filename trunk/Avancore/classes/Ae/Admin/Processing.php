@@ -1,8 +1,8 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Controller');
+Ae_Dispatcher::loadClass('Ae_Legacy_Controller');
 
-class Ae_Admin_Processing extends Ae_Controller {
+class Ae_Admin_Processing extends Ae_Legacy_Controller {
 
     var $title = 'Processing';
 

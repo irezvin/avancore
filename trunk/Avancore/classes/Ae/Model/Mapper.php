@@ -11,7 +11,7 @@ class Ae_Model_Mapper {
     var $_prototype = false;
 
     /**
-     * @var Ae_Database
+     * @var Ae_Legacy_Database
      */
     var $database = null;
 
@@ -252,7 +252,7 @@ class Ae_Model_Mapper {
             //$sql .= $this->database->getLimitsClause($limitCount, $limitOffset);
             $sql = $this->database->applyLimits($sql, $limitCount, $limitOffset, strlen($order)? $order : false);
         }
-
+        
         $this->database->setQuery($sql);
         //$objectList = $this->database->loadAssocList();
 
@@ -836,7 +836,7 @@ class Ae_Model_Mapper {
     }
     
     /**
-	 * @return Parameter $columnFormats for Ae_Database::convertDates
+	 * @return Parameter $columnFormats for Ae_Legacy_Database::convertDates
      */
     function getDateFormats() {
         if ($this->_dateFormats === false) {

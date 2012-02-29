@@ -297,12 +297,14 @@ class Ae_Model_Validator {
     
     function _checkForRequiredField($fieldName, $fieldInfo) {
         $res = true;
-        if (isset($fieldInfo['required']) && $fieldInfo['required']) {
-            $value = $this->convertValue($this->getFieldValue($fieldName, null, $fieldInfo), false, array());
-            if ($this->valueIsEmpty($value)) {
-                $res = false;
-                $this->errors[$fieldName]['required'] = $this->makeErrorMsg($this->msgs['required'], $fieldInfo);
-            } else {
+        if (!(isset($fieldInfo['skipValidation']) && $fieldInfo['skipValidation'])) {
+            if (isset($fieldInfo['required']) && $fieldInfo['required']) {
+                $value = $this->convertValue($this->getFieldValue($fieldName, null, $fieldInfo), false, array());
+                if ($this->valueIsEmpty($value)) {
+                    $res = false;
+                    $this->errors[$fieldName]['required'] = $this->makeErrorMsg($this->msgs['required'], $fieldInfo);
+                } else {
+                }
             }
         }
         return $res;
@@ -335,19 +337,21 @@ class Ae_Model_Validator {
     
     function _checkForDataType($fieldName, $fieldInfo, $modifyModel) {
         $res = true;
-        $fieldValue = $this->getFieldValue($fieldName, null, $fieldInfo);
-        if (!$this->valueIsEmpty($fieldValue)) {
-            $errValue = null;
-            if (isset($fieldInfo['isNullable']) && $fieldInfo['isNullable']) $errValue = md5(microtime().rand());
-                else $errValue = null;
-            $cValue = $this->convertValue($fieldValue, false, $fieldInfo, $errValue);
-            if ($cValue === $errValue) {
-                $type = isset($fieldInfo['dataType'])? $fieldInfo['dataType'] : 'string';
-                $this->errors[$fieldName]['type'] = $this->makeErrorMsg($this->msgs[$type.'Type'], $fieldInfo);
-                $res = false; 
-            } 
-            elseif ($modifyModel && $fieldValue !== $cValue) {
-                $this->setFieldValue($fieldName, $cValue);
+        if (!(isset($fieldInfo['skipValidation']) && $fieldInfo['skipValidation'])) {
+            $fieldValue = $this->getFieldValue($fieldName, null, $fieldInfo);
+            if (!$this->valueIsEmpty($fieldValue)) {
+                $errValue = null;
+                if (isset($fieldInfo['isNullable']) && $fieldInfo['isNullable']) $errValue = md5(microtime().rand());
+                    else $errValue = null;
+                $cValue = $this->convertValue($fieldValue, false, $fieldInfo, $errValue);
+                if ($cValue === $errValue) {
+                    $type = isset($fieldInfo['dataType'])? $fieldInfo['dataType'] : 'string';
+                    $this->errors[$fieldName]['type'] = $this->makeErrorMsg($this->msgs[$type.'Type'], $fieldInfo);
+                    $res = false; 
+                } 
+                elseif ($modifyModel && $fieldValue !== $cValue) {
+                    $this->setFieldValue($fieldName, $cValue);
+                }
             }
         }
         return $res;
@@ -379,6 +383,7 @@ class Ae_Model_Validator {
      * @return mixed Typed value or $errValue if it can't convert value 
      */
     function convertValue($value, $type = false, $fieldInfo = array(), $errValue = null) {
+        if (isset($fieldInfo['skipValidation']) && $fieldInfo['skipValidation']) return $value;
         if (is_array($value)) {
             if (isset($fieldInfo['plural']) || isset($fieldInfo['arrayValue'])) {
                 $res = array();

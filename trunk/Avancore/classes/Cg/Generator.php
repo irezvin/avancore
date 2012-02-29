@@ -38,7 +38,7 @@ class Cg_Generator {
     var $targetDir = '../';
     
     /**
-     * @var Ae_Database 
+     * @var Ae_Legacy_Database 
      */
     var $_db = false;
     
@@ -180,7 +180,7 @@ class Cg_Generator {
     }
     
     /**
-     * @return Ae_Database 
+     * @return Ae_Legacy_Database 
      */
     function getDb() {
         if ($this->_db === false) {
@@ -190,7 +190,7 @@ class Cg_Generator {
         	} else {
         	    $dbClass = false;
         	}
-        	if (!strlen($dbClass)) $dbClass = 'Ae_Native_Database';
+        	if (!strlen($dbClass)) $dbClass = 'Ae_Legacy_Database_Native';
             Ae_Dispatcher::loadClass($dbClass);
             $dbOptions = array_merge(array(
                 'host' => $this->host,

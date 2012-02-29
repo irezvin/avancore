@@ -7,6 +7,10 @@ class Ae_Admin_Column_Reorder extends Ae_Table_Column_Reorder {
      */
     var $manager = false;
     
+    var $orderUpIcon = 'images/uparrow.png';
+    
+    var $orderDownIcon = 'images/downarrow.png';
+    
     /**
      * Renders (echo's) column cell
      */
@@ -18,14 +22,14 @@ class Ae_Admin_Column_Reorder extends Ae_Table_Column_Reorder {
         $spk = $this->manager->getStrPk($record);
         
         if ($canUp = $this->canOrderUp($record, $rowNo)) {
-            $upJavascript = 'return '.(new Pm_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
+            $upJavascript = 'return '.(new Ae_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
                 $this->getOrderUpTask(),
                 array($spk)
             ))).';';
         }
         
         if ($canDown = $this->canOrderDown($record, $rowNo)) {
-            $downJavascript = 'return '.(new Pm_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
+            $downJavascript = 'return '.(new Ae_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
                 $this->getOrderDownTask(),
                 array($spk)
             ))).';';
@@ -38,7 +42,7 @@ class Ae_Admin_Column_Reorder extends Ae_Table_Column_Reorder {
     function orderUpIcon($condition=true, $javascript, $alt='Move up' ) {
         if ($condition) {
             return '<a href="#reorder" onClick="'.$javascript.'" title="'.$alt.'">
-                <img src="images/uparrow.png" width="12" height="12" border="0" alt="'.$alt.'" />
+                <img src="'.$this->orderUpIcon.'" width="12" height="12" border="0" alt="'.$alt.'" />
             </a>';
         } else {
             return '&nbsp;';
@@ -48,7 +52,7 @@ class Ae_Admin_Column_Reorder extends Ae_Table_Column_Reorder {
     function orderDownIcon($condition=true, $javascript, $alt='Move down' ) {
         if ($condition) {
             return '<a href="#reorder" onClick="'.$javascript.'" title="'.$alt.'">
-                <img src="images/downarrow.png" width="12" height="12" border="0" alt="'.$alt.'" />
+                <img src="'.$this->orderDownIcon.'" width="12" height="12" border="0" alt="'.$alt.'" />
             </a>';
         } else {
             return '&nbsp;';

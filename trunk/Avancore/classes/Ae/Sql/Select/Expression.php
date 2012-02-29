@@ -64,10 +64,13 @@ class Ae_Sql_Select_Expression extends Ae_Sql_Expression {
 				if ($db) $res = $db->nameQuote($this->expression);
 					else $res = $this->expression;
 			}
-		} else $res = $this->expression;
+		} else {
+            if (is_array($this->expression)) $res = implode(", ", $this->expression);
+            else $res = $this->expression;
+        }
 		return $res;
 	}
-	
+    
 	function nameQuote(& $db) {
 		return $this->getExpression($db);
 	}

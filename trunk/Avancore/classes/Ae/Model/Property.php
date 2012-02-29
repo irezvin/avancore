@@ -71,6 +71,8 @@ class Ae_Model_Property {
     
     var $maxLength = null;
     
+    var $skipValidation = false;
+    
     function Ae_Model_Property (& $srcObject, $propName, $isStatic, $formOptions = array()) {
         foreach (array_keys($formOptions) as $optionName) $this->$optionName = & $formOptions[$optionName];
 

@@ -219,7 +219,7 @@ class Ae_Model_Relation extends Ae_Model_Relation_Abstract {
     var $matchKeys = false;
     
     /**
-     * @var Ae_Database
+     * @var Ae_Legacy_Database
      */
     var $database = false;
     

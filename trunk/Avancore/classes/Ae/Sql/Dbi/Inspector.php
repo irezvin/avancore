@@ -14,7 +14,7 @@ class Ae_Sql_Dbi_Inspector {
     var $defaultDatabaseName = false;
 
     function Ae_Sql_Dbi_Inspector(& $sqlDb, $defaultDatabaseName = false) {
-        if (is_a($sqlDb, 'Ae_Database')) {
+        if (is_a($sqlDb, 'Ae_Legacy_Database')) {
             Ae_Dispatcher::loadClass('Ae_Sql_Db_Ae');
             $this->_db = new Ae_Sql_Db_Ae($sqlDb);
         } else {

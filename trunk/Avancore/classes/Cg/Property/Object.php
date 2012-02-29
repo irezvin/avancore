@@ -351,6 +351,11 @@ class Cg_Property_Object extends Cg_Property {
                 $this->getOtherEntityName(true).'Ids' => array(
                     'dataType' => 'int',
                     'arrayValue' => true,
+                    //'caption' => $this->_other->pluralCaption,
+                    'values' => array(
+                        'class' => 'Ae_Model_Values_Records',
+                        'mapperClass' => $this->_other->getMapperClass(),
+                    ),
                 ),
             );
         } else {

@@ -85,6 +85,8 @@ class Ae_Sql_Select_Table {
      */
     var $_tableProvider = false;
     
+    var $omitInFromClause = false;
+    
     /**
      * @param array $options
      * @param Ae_Sql_Select_TableProvider $tableProvider
@@ -221,46 +223,49 @@ class Ae_Sql_Select_Table {
     }
     
     function getJoinClausePart() {
-        $sqlSelect = & $this->getSqlSelect(true);
-    	//if (!$this->_sqlSelect) trigger_error("\'sqlSelect' property not set - call setSqlSelect() first", E_USER_ERROR);
-        if (!strlen($this->name)) trigger_error ("\$name must be provided for table '{$this->alias}'", E_USER_ERROR);
-        //if (!strlen($this->alias)) trigger_error ("\$alias must be provided", E_USER_ERROR);
-        
-        if (strlen($this->joinsAlias)) {
-        	
-        	$joinType = $this->getEffectiveJoinType();
-            
-            $needsCondition = $this->_joinNeedsCondition($joinType);
-            if ($needsCondition){
-            	if ($this->_empty($this->joinsOn)) {
-            		trigger_error ("\$joinsOn property not provided for '{$joinType}' type join (neither CROSS nor NATURAL)", E_USER_WARNING);
-            	}
+        if ($this->omitInFromClause) $res = '';
+        else {
+            $sqlSelect = & $this->getSqlSelect(true);
+            //if (!$this->_sqlSelect) trigger_error("\'sqlSelect' property not set - call setSqlSelect() first", E_USER_ERROR);
+            if (!strlen($this->name)) trigger_error ("\$name must be provided for table '{$this->alias}'", E_USER_ERROR);
+            //if (!strlen($this->alias)) trigger_error ("\$alias must be provided", E_USER_ERROR);
+
+            if (strlen($this->joinsAlias)) {
+
+                $joinType = $this->getEffectiveJoinType();
+
+                $needsCondition = $this->_joinNeedsCondition($joinType);
+                if ($needsCondition){
+                    if ($this->_empty($this->joinsOn)) {
+                        trigger_error ("\$joinsOn property not provided for '{$joinType}' type join (neither CROSS nor NATURAL)", E_USER_WARNING);
+                    }
+                } else {
+                    if (!$this->_empty($this->joinsOn)) {
+                        trigger_error ("'{$joinType}' type join don't needs \$joinsOn, but it's provided", E_USER_WARNING);
+                    }
+                }
+
+                if (!strlen($joinType) || (trim($joinType) == ',')) {
+                    $joinType = ',';
+                }
+                $res = $joinType.' '.$sqlSelect->nameQuote($this->name);
+                if (strlen($this->alias)) $res .= ' AS '.$sqlSelect->nameQuote($this->alias);
+
+                if ($this->useIndex !== false) {
+                    $res .= ' USE INDEX('.(is_array($this->useIndex)? implode(", ", $this->useIndex) : $this->useIndex).')'; 
+                }
+
+                $res .= $this->getJoinsOn();
+
             } else {
-            	if (!$this->_empty($this->joinsOn)) {
-            		trigger_error ("'{$joinType}' type join don't needs \$joinsOn, but it's provided", E_USER_WARNING);
-            	}
+
+                $res = $sqlSelect->nameQuote($this->name);
+                if (strlen($this->alias)) $res .= ' AS '.$sqlSelect->nameQuote($this->alias);
+                if ($this->useIndex !== false) {
+                    $res .= ' USE INDEX('.(is_array($this->useIndex)? implode(", ", $this->useIndex) : $this->useIndex).')'; 
+                }
+
             }
-            
-            if (!strlen($joinType) || (trim($joinType) == ',')) {
-            	$joinType = ',';
-            }
-            $res = $joinType.' '.$sqlSelect->nameQuote($this->name);
-            if (strlen($this->alias)) $res .= ' AS '.$sqlSelect->nameQuote($this->alias);
-            
-            if ($this->useIndex !== false) {
-                $res .= ' USE INDEX('.(is_array($this->useIndex)? implode(", ", $this->useIndex) : $this->useIndex).')'; 
-            }
-            
-            $res .= $this->getJoinsOn();
-        
-        } else {
-        	
-            $res = $sqlSelect->nameQuote($this->name);
-            if (strlen($this->alias)) $res .= ' AS '.$sqlSelect->nameQuote($this->alias);
-            if ($this->useIndex !== false) {
-                $res .= ' USE INDEX('.(is_array($this->useIndex)? implode(", ", $this->useIndex) : $this->useIndex).')'; 
-            }
-            
         }
         return $res;
     }

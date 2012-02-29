@@ -26,5 +26,3 @@ class Ae_Image_Upload_Controller extends Ae_Upload_Controller {
     }
     
 }
-
-?>

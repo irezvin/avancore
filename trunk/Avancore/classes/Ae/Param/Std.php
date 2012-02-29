@@ -29,13 +29,25 @@ class Ae_Param_Std {
 					'gt' => 0,
 				)),
 			),
-			
+            
 			'enum' => array(
 				'conditions' => array('c1' => array(
 					'class' => 'Ae_Param_Condition_Enum',
 					'values' => array(), 
 				)),
 			),
+            
+            'bool' => array(
+                'filters' => array(
+                    'f1' => array(
+                        'class' => 'Ae_Param_Decorator',
+                        'decorator' => array(
+                            'class' => 'Ae_Decorator_Cast',
+                            'type' => 'bool',
+                        ),
+                    ),
+                ),
+            ),
         
         );
         Ae_Util::ms($this->defaults, $extraDefaults);

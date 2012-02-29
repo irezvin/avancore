@@ -65,7 +65,7 @@ class Ae_Decorator_Multi extends Ae_Decorator {
     function apply($value) {
         $res = $value;
         foreach ($this->decorators as $d) {
-            $res = $d->apply($value);
+            $res = $d->apply($res);
         }
         return $res;
     }

@@ -17,6 +17,9 @@ class Ae_Form_Control_Button extends Ae_Form_Control {
     
     var $templatePart = 'button';
     
+    /**
+     * @var string 'submit', 'cancel', 'button'
+     */
     var $buttonType = 'submit';
     
     var $showsOwnCaption = true;
@@ -41,6 +44,9 @@ class Ae_Form_Control_Button extends Ae_Form_Control {
             $res = false;
         }
         return $res;
+    }
+    
+    function updateModel() {
     }
     
 }

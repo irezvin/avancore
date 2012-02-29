@@ -14,7 +14,7 @@ class Ae_Form_Control_Template extends Ae_Template_Html {
     function setVars($vars) {
         parent::setVars($vars);
         if (!$this->htmlResponse) {
-            $this->htmlResponse = Ae_Controller_Response_Global::r();
+            $this->htmlResponse = Ae_Legacy_Controller_Response_Global::r();
         }
     }
 

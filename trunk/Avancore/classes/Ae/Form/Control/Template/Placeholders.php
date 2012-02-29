@@ -42,6 +42,9 @@ class Ae_Form_Control_Template_Placeholders extends Ae_Form_Control_Template_Bas
                     } else {
                         $val = '';
                     }
+                } elseif (!strncmp($mc = trim($matches[1]), 'own:', 4)) {
+                	$propId = substr($matches[1], 4);
+                    $val = Ae_Autoparams::getObjectProperty($control, trim($propId));
                 } elseif (substr(trim($matches[1]), 0, 1) == '#') {
                     $path = substr(trim($matches[1]), 1);
                     if (($c = $control->getControlByPath($path)) && ($c->getDisplayParent() === $control)) {
