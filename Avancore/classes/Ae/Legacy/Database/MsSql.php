@@ -3,6 +3,9 @@
 Ae_Dispatcher::loadClass('Ae_Legacy_Database');
 
 class Ae_Legacy_Database_MsSql extends Ae_Legacy_Database {
+    
+    protected $inspectorClass = 'Ae_Sql_Dbi_Inspector_MsSql';
+    
     var $_sql = false;
     
     var $_connection = false;

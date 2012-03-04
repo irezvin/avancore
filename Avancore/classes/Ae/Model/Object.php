@@ -61,6 +61,8 @@ class Ae_Model_Object extends Ae_Model_Data {
      */
     var $_origPk = null;
     
+    protected $mapper = false;
+    
     function doAfterLoad() {
     }
     
@@ -91,7 +93,7 @@ class Ae_Model_Object extends Ae_Model_Data {
     }
     
     function doOnCreate() {
-        
+        $this->setDefaultFields();
     }
     
     function _describeIndex($indexName, $indexFields = false) {
@@ -101,6 +103,7 @@ class Ae_Model_Object extends Ae_Model_Data {
         }
         $r = array();
         foreach ($indexFields as $f) {
+            if (!$this->hasProperty($f)) continue;
             $p = & $this->getPropertyInfo($f);
             $r[] = "'".($p->caption? $p->caption : $f)."'";
         }
@@ -141,16 +144,29 @@ class Ae_Model_Object extends Ae_Model_Data {
         }
     }
     
-    function Ae_Model_Object($tableName, $keyColName) {
+    function __construct($mapperOrMapperClass = null) {
         static $imId = 0;
         $this->_imId = $imId++;
+
+        if (is_null($mapperOrMapperClass) && strlen($this->_mapperClass)) $mapperOrMapperClass = $this->_mapperClass;
         
-        $disp = & Ae_Dispatcher::getInstance();
-        $db = & $disp->database;
-        $this->_pk = $keyColName;
-        $this->_tableName = $tableName;
-        $this->_db = & $db;
+        if ($mapperOrMapperClass instanceof Ae_Model_Mapper) {
+            $mapper = $mapperOrMapperClass;
+        } else {
+            $mapper = Ae_Model_Mapper::getMapper($mapperOrMapperClass);
+        }
+        
+        if (!$mapper) throw new Exception("Cannot determine \$mapper for ".get_class($this));
+        
+        $this->mapper = $mapper;
+        
+        if (!strlen($this->_mapperClass)) $this->_mapperClass = $mapper->getId();
+        
+        $this->_db = $mapper->getDatabase();
+        $this->_pk = $mapper->pk;
+        $this->_tableName = $mapper->tableName;
         $this->doOnCreate();
+        
         if ($this->tracksChanges()) $this->_memorizeFields();
     }
     
@@ -246,12 +262,14 @@ class Ae_Model_Object extends Ae_Model_Data {
         $tpk = $this->tracksPk();
         $convertsDates = $this->_db->hasToConvertDatesOnStore();
         $sf = $this->_storesFalseValues(); 
-        foreach ($this->_listOwnPublicVars() as $propName) {
+        foreach ($this->_listSavedMembers() as $propName) {
             $val = $this->$propName;  
             if ($sf || ($val !== false)) {
-                $pi = $this->getPropertyInfo($propName, true);
-                if (in_array($pi->dataType, array('date', 'time', 'dateTime')) && $convertsDates) {
-                    $val = $this->_db->convertDateForStore($val, $pi->dataType);
+                if ($this->hasProperty($propName)) {
+                    $pi = $this->getPropertyInfo($propName, true);
+                    if (in_array($pi->dataType, array('date', 'time', 'dateTime')) && $convertsDates) {
+                        $val = $this->_db->convertDateForStore($val, $pi->dataType);
+                    }
                 }
                 if ($tpk || ($propName != $k)) $kv[$this->_db->NameQuote($propName)] = $this->_db->Quote($val);
             }
@@ -366,10 +384,16 @@ class Ae_Model_Object extends Ae_Model_Data {
      * @return Ae_Model_Mapper
      */
     function getMapper($mapperClass = false) {
-        if ($mapperClass === false) $mapperClass = $this->_mapperClass;
-        if (!$mapperClass) trigger_error (__FILE__."::".__FUNCTION__." - mapperClass not specified", E_USER_ERROR);
-        Ae_Dispatcher::loadClass('Ae_Model_Mapper');
-        $res = & Ae_Model_Mapper::getMapper($mapperClass);
+        $res = null;
+        if ($mapperClass === false) {
+            $mapperClass = $this->_mapperClass;
+            if ($this->mapper) $res = $this->mapper;
+        }
+        if (!$res) {
+            if (!$mapperClass) trigger_error (__FILE__."::".__FUNCTION__." - mapperClass not specified", E_USER_ERROR);
+            Ae_Dispatcher::loadClass('Ae_Model_Mapper');
+            $res = & Ae_Model_Mapper::getMapper($mapperClass);
+        }
         return $res;
     }
     
@@ -479,6 +503,7 @@ class Ae_Model_Object extends Ae_Model_Data {
         $vars = get_class_vars(get_class($this));
         foreach ($this->listOwnProperties() as $propName) if (isset($vars[$propName])) $this->$propName = $vars[$propName];
         $m = & $this->getMapper();
+        $this->setDefaultFields();
         $m->_memorize($this);
         $this->_origPk = null;
     }
@@ -633,7 +658,12 @@ class Ae_Model_Object extends Ae_Model_Data {
     
     function _listOwnPublicVars() {
         $res = array();
-        foreach (array_keys(get_class_vars(get_class($this))) as $f) if ($f{0} !== '_') $res[] = $f;
+        foreach (Ae_Util::getPublicVars($this) as $f => $v) if ($f{0} !== '_') $res[] = $f;
+        return $res;
+    }
+    
+    function _listSavedMembers() {
+        $res = array_intersect($this->_listOwnPublicVars(), $this->getMapper()->getColumnNames());
         return $res;
     }
     
@@ -1122,6 +1152,17 @@ class Ae_Model_Object extends Ae_Model_Data {
                 unset($o);
             }
             if (is_object($this->$k)) $this->$k = & $vars[$k];      
+        }
+    }
+    
+    function setDefaultFields() {
+        $cv = get_class_vars(get_class($this));
+        $defs = $this->getMapper()->getDefaults();
+        foreach ($defs as $k => $v) {
+            if (array_key_exists($k, $cv)) {
+                $v = $cv[$k];
+            }
+            $this->$k = $v;
         }
     }
     

@@ -188,7 +188,7 @@ class Ae_Admin_Processing extends Ae_Legacy_Controller {
         if ($this->_mapper === false) {
             if (!strlen($this->_mapperClass)) 
                 trigger_error ('Mapper class not provided - call setMapperClass() or provide \'mapperClass\' entry in the config array first', E_USER_ERROR);
-            $this->_mapper = & Ae_Dispatcher::getMapper($this->_mapperClass);
+            $this->_mapper = & Ae_Model_Mapper::getMapper($this->_mapperClass);
         }
         return $this->_mapper;
     }

@@ -315,7 +315,7 @@ class Ae_Sql_Select extends Ae_Sql_Select_TableProvider {
         $t = & $this->getTable($this->getEffectivePrimaryAlias());
             
         if ($mapperClass) {
-            $mapper = & Ae_Dispatcher::getMapper($mapperClass);
+            $mapper = & Ae_Model_Mapper::getMapper($mapperClass);
             if ($mapper->tableName !== $t->name) 
                 trigger_error("Table of '{$mapperClass}' is '{$mapper->tableName}' and does not match name of primary table '{$t->name}'", E_USER_WARNING);
             $res->useMapper($mapperClass);

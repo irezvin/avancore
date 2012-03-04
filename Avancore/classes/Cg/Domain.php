@@ -18,6 +18,13 @@ class Cg_Domain {
     var $appName = false;
     
     /**
+     * @var string Class of the Application instance. Defaults to $appName
+     */
+    var $appClass = false;
+    
+    var $appBaseClass = 'Ae_Application';
+    
+    /**
      * Caption of whole application (defaults to appName)
      * @var string
      */

@@ -27,7 +27,7 @@ class Cg_Util {
     function listDirContents($dirPath, $recursive = false, $files = array(), $fileRegex = false, $dirRegex = false, $includeDirNames = false) {
         if(!($res = opendir($dirPath))) trigger_error("$dirPath doesn't exist!", E_USER_ERROR);
         while($file = readdir($res)) {
-            if($file != "." && $file != "..") {
+            if($file != "." && $file != ".." && $file != ".svn") {
                 if($recursive && is_dir("$dirPath/$file") && (!$dirRegex || preg_match($dirRegex, "$dirPath/$file"))) { 
                     if ($includeDirNames) array_push($files, "$dirPath/$file");    
                     $files=Cg_Util::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex, $includeDirNames);

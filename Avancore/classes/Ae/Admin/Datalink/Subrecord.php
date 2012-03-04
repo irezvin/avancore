@@ -56,7 +56,7 @@ class Ae_Admin_Datalink_Subrecord extends Ae_Admin_Datalink {
     function getRelation() {
         if ($this->_relation === false) {
             if (!strlen($this->_mapperClass) || !strlen($this->_relationId)) trigger_error ("call setRelationId() first", E_USER_ERROR);
-            $mapper = & Ae_Dispatcher::getMapper($this->_mapperClass);
+            $mapper = & Ae_Model_Mapper::getMapper($this->_mapperClass);
             $this->_relation = & $mapper->getRelation($this->_relationId);
         } else {
             if (is_array($this->_relation)) {
