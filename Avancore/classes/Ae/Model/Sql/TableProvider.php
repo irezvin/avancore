@@ -39,7 +39,7 @@ class Ae_Model_Sql_TableProvider extends Ae_Sql_Select_TableProvider {
 	
 	function getMapper($required = false) {
 		if (!$this->_mapper && strlen($this->_mapperClass)) {
-			$this->_mapper = & Ae_Dispatcher::getMapper($this->_mapperClass);
+			$this->_mapper = & Ae_Model_Mapper::getMapper($this->_mapperClass);
 		}
 		$res = & $this->_mapper;
 		if ($required && !$res) trigger_error("Neither \$mapper nor \$mapperClass are provided", E_USER_ERROR);
@@ -62,7 +62,7 @@ class Ae_Model_Sql_TableProvider extends Ae_Sql_Select_TableProvider {
 				$baseInfo = array('mapperClass' => $this->getMapperClass());
 			}
 			if ($baseInfo) {
-				$mapper = & Ae_Dispatcher::getMapper($baseInfo['mapperClass']);
+				$mapper = & Ae_Model_Mapper::getMapper($baseInfo['mapperClass']);
 				$proto = & $mapper->getPrototype();
 				$pi = & $proto->getPropertyInfo($last, true);
 				if (isset($pi->mapperClass) && $pi->mapperClass && isset($pi->relationId) && ($pi->relationId)) {
@@ -86,10 +86,10 @@ class Ae_Model_Sql_TableProvider extends Ae_Sql_Select_TableProvider {
 	function & _doGetTable($alias) {
 		$p = $this->_searchPath($alias);
 		if ($p) {
-			$m = & Ae_Dispatcher::getMapper($p['mapperClass']);
+			$m = & Ae_Model_Mapper::getMapper($p['mapperClass']);
 			if (isset($p['prevAlias'])) {
 				$prevPath = $this->_searchPath($p['prevAlias']);
-				$prevMapper = & Ae_Dispatcher::getMapper($prevPath['mapperClass']);
+				$prevMapper = & Ae_Model_Mapper::getMapper($prevPath['mapperClass']);
 				$joinsAlias = $p['prevAlias'];	
 			}
 			else {

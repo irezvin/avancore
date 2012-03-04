@@ -681,7 +681,7 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
      * @return Ae_Model_Mapper
      */
     function getMapper() {
-        $res = Ae_Dispatcher::getMapper($this->mapperClass);
+        $res = Ae_Model_Mapper::getMapper($this->mapperClass);
         return $res;
     }
     

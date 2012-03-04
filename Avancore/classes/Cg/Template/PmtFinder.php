@@ -68,7 +68,7 @@ Ae_Dispatcher::loadClass(<?php $this->str($this->parentFinderClass); ?>);
 	
 	protected function doOnGetSqlSelectPrototype(& $prototype) {
 		parent::doOnGetSqlSelectPrototype($prototype);
-		$m = & Ae_Dispatcher::getMapper($this->mapperClass);
+		$m = & Ae_Model_Mapper::getMapper($this->mapperClass);
 		Ae_Util::ms($prototype, array(
 			'tables' => array(
 				$this->primaryAlias => array(

@@ -7,6 +7,13 @@ class Ae_Legacy_Database {
 
     protected static $defaultInstance = null;
     
+    /**
+     * @var Ae_Sql_Dbi_Inspector
+     */
+    protected $inspector = false;
+    
+    protected $inspectorClass = false;
+    
     static function getDefaultInstance() {
         if (!self::$defaultInstance) self::$defaultInstance = Ae_Application::getDefaultInstance()->getLegacyDatabase();
         return self::$defaultInstance;
@@ -43,7 +50,7 @@ class Ae_Legacy_Database {
     
     var $initOptions = array();
 
-    function Ae_Legacy_Database($options = array()) {
+    function __construct($options = array()) {
         if (get_class($this) == 'Ae_Legacy_Database') trigger_error ("Attempt to instantiate abstract class Ae_Legacy_Database", E_USER_ERROR);
         if (isset($options['config']) && is_a($options['config'], 'Ae_Legacy_Config')) {
             $this->_config = & $options['config']; 
@@ -477,6 +484,20 @@ class Ae_Legacy_Database {
     	    Ae_Callbacks::call(CALLBACK_AE_DATABASE_AFTER_QUERY, $this, $sql, $time, $numRows, $isHandleReturned);
 	    }
 	}
+    
+    /**
+     * @return Ae_Sql_Dbi_Inspector
+     */
+    function getInspector() {
+        if ($this->inspector === false) {
+            $c = $this->inspectorClass;
+            if (!strlen($c)) throw new Exception("\$inspectorClass not provided in ".get_class($this));
+            $access = $this->_doGetAccess();
+            $db = isset($access['db'])? $access['db'] : null;
+            $this->inspector = new $c(new Ae_Sql_Db_Ae($this), $db);
+        }
+        return $this->inspector;
+    }
 	
 }
 

@@ -1,0 +1,10 @@
+2012-03-03
+
++ Ae_I_Autopoarams can be used to tag classes whose constructors accept prototype arrays
+
+2012-03-04
+
++ Ae_Application is now provider of mapper instances
++ Basic support for table-independent mappers and model objects via Ae_Model_Mapper / Ae_Model_Object instances.
++ Cg now creates Ae_Application descendants with mapper prototypes instead of static 'Domain' classes
++ Dropped Ae_Dispatcher::getMapper() in favor of Ae_Model_Mapper::getMapper()

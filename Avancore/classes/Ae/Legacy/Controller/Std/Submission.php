@@ -98,7 +98,7 @@ class Ae_Legacy_Controller_Std_Submission extends Ae_Legacy_Controller {
             $this->_form = null;
             if ($this->_model === false) {
                 if ($this->mapperClass) {
-                    $mapper = & Ae_Dispatcher::getMapper($this->mapperClass);
+                    $mapper = & Ae_Model_Mapper::getMapper($this->mapperClass);
                     $this->_model = & $mapper->factory();
                 } else {
                     assert(strlen($this->modelClass));

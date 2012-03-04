@@ -37,6 +37,8 @@ abstract class Ae_Application extends Ae_Autoparams {
     
     protected $defaultControllerId = false;
     
+    protected $mappers = array();
+    
     /**
      * To be redefined in concrete subclasses.
      * Placeholder that will link to current application' assets dir by default
@@ -93,7 +95,7 @@ abstract class Ae_Application extends Ae_Autoparams {
     static function getInstance($className, $id = null) {
         if (!isset($className)) throw new Exception("\$className not provided");
         $res = self::findInstance($className, $id);
-        if (!$res) $res = new $className(array('id' => is_null($id)? false : $id, 'autoRegister' => true));
+        if (!$res) $res = new $className(array('id' => is_null($id)? false : $id/*, 'autoRegister' => true*/));
         return $res;
     }
     
@@ -221,12 +223,44 @@ abstract class Ae_Application extends Ae_Autoparams {
      * @return array
      */
     function listMappers() {
+        if ($this->mappers === false) {
+            $this->mappers = Ae_Util::toArray($this->doGetMapperPrototypes());
+        }
+        return array_keys($this->mappers);
+    }
+    
+    function hasMapper($id) {
+        return in_array($id, $this->listMappers());
+    }
+    
+    function addMapper(Ae_Model_Mapper $mapper) {
+        $id = $mapper->getId();
+        if (in_array($id, $this->listMappers())) throw new Exception("Mapper '$id' already registered in ".get_class($this));
+        $this->mappers[$id] = $mapper;
+        $mapper->setApplication($this);
+    }
+    
+    protected function doGetMapperPrototypes() {
+        return array();
     }
     
     /**
      * @return Ae_Model_Mapper
      */
-    function getMapper($id) {
+    function getMapper($id, $dontThrow = false) {
+        if (in_array($id, $this->listMappers())) {
+            if (!is_object($this->mappers[$id])) {
+                $defaults = $this->mappers[$id];
+                if (!is_array($defaults)) $defaults = array('class' => $defaults);
+                $defaults['application'] = $this;
+                $this->mappers[$id] = Ae_Autoparams::factory($defaults, 'Ae_Model_Mapper');
+            }
+            $res = $this->mappers[$id];
+        } else {
+            if (!$dontThrow) throw new Exception("No such mapper '{$id}' in ".get_class($this));
+            else $res = null;
+        }
+        return $res;
     }
     
     /**

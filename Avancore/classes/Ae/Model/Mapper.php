@@ -1,26 +1,33 @@
 <?php
 
-class Ae_Model_Mapper {
-
-    var $tableName = null;
-
-    var $recordClass = null;
-
-    var $pk = null;
-
-    var $_prototype = false;
+class Ae_Model_Mapper implements Ae_I_Autoparams {
+    
+    protected $id = false;
+    
+    /**
+     * @var Ae_Application
+     */
+    protected $application = false;
 
     /**
      * @var Ae_Legacy_Database
      */
-    var $database = null;
+    protected $database = false;
+    
+    protected $autoincFieldName = false;
 
     /**
-     * @var Ae_Sql_Db_Ae
+     * @var Ae_Sql_Db
      */
-    var $sqlDb = null;
+    protected $sqlDb = false;
 
-    var $dispatcher = null;
+    var $tableName = null;
+
+    var $recordClass = 'Ae_Model_Object';
+
+    var $pk = null;
+
+    var $_prototype = false;
 
     /**
      * Use records collection (records that already were loaded will not be loaded again)
@@ -73,33 +80,133 @@ class Ae_Model_Mapper {
     
     var $_dateFormats = false;
     
-    function Ae_Model_Mapper($tableName, $recordClass, $pk = 'id') {
-
-        $this->tableName = $tableName;
-        $this->pk = $pk;
-        $this->recordClass = $recordClass;
+    protected $columnNames = false;
+    
+    protected $defaults = false;
+    
+    function Ae_Model_Mapper(array $options = array()) {
+        if ($options) Ae_Autoparams::setObjectProperty ($this, $options);
+/*     
+        if (!$this->database) {
+            throw new Exception("No \$database provided");
+        }
+*/
 
         if (!$this->tableName) trigger_error (__FILE__."::".__FUNCTION__." - tableName missing", E_USER_ERROR);
-        if (!$this->pk) trigger_error (__FILE__."::".__FUNCTION__." - pk missing", E_USER_ERROR);
-        if (!$this->recordClass) trigger_error (__FILE__."::".__FUNCTION__." - recordClass missing", E_USER_ERROR);
+    }
+    
+    function getDefaults() {
+        if ($this->defaults === false) {
+            $this->getColumnNames();
+        }
+        return $this->defaults;
+    }
 
-        $this->dispatcher = & Ae_Dispatcher::getInstance();
-        $this->database = & $this->dispatcher->database;
-        $this->sqlDb = & $this->dispatcher->getSqlDb();
+    function setId($id) {
+        if ($this->id !== false) throw new Exception("Can setId() only once!");
+        $this->id = $id;
+    }
+
+    function getId() {
+        if ($this->id === false) {
+            $this->id = get_class($this);
+            if ($this->id == 'Ae_Model_Mapper') {
+                $this->id .= '_'.$this->tableName;
+            }
+        }
+        return $this->id;
+    }    
+
+    function setApplication(Ae_Application $application) {
+        $this->application = $application;
+        if (!$this->database && !$this->sqlDb) {
+            $this->setDatabase($this->application->getLegacyDatabase());
+            $this->sqlDb = $this->application->getDb();
+        }
+    }
+
+    /**
+     * @return Ae_Application
+     */
+    function getApplication() {
+        return $this->application;
+    }
+
+    function setDatabase(Ae_Legacy_Database $database) {
+        $this->database = $database;
+        if (!$this->sqlDb) $this->sqlDb = new Ae_Sql_Db_Ae($this->database);
+        if (!strlen($this->pk)) {
+            $dbi = $this->database->getInspector();
+            $idxs = $dbi->getIndicesForTable($this->database->replacePrefix($this->tableName));
+            $this->_indexData = array();
+            foreach ($idxs as $name => $idx) {
+                if (isset($idx['primary']) && $idx['primary']) {
+                    if (count($idx['columns']) == 1) {
+                        $cVals = array_values($idx['columns']);
+                        $this->pk = $cVals[0];
+                    } else {
+                        $this->pk = $idx['columns'];
+                    }
+                }
+                if (isset($idx['unique']) && $idx['unique'] || isset($idx['primary']) && $idx['primary']) {
+                    $this->_indexData[$name] = array_values($idx['columns']);
+                }
+            }
+            if (!(is_array($this->pk) && $this->pk || strlen($this->pk))) trigger_error (__FILE__."::".__FUNCTION__." - pk missing", E_USER_ERROR);
+        }
+    }
+
+    /**
+     * @return Ae_Legacy_Database
+     */
+    function getDatabase() {
+        return $this->database;
+    }
+
+    function setSqlDb(Ae_Sql_Db $sqlDb) {
+        $this->sqlDb = $sqlDb;
+    }
+
+    /**
+     * @return Ae_Sql_Db
+     */
+    function getSqlDb() {
+        return $this->sqlDb;
+    }
+    
+    function hasPublicVars() {
+        return true;
     }
 
     /**
      * @return Ae_Model_Mapper
      */
-    function getMapper ($classPath) {
-        static $mappers = array();
-        if (!isset($mappers[$classPath]) || !is_object($mappers[$classPath])) {
-            $className = Ae_Dispatcher::loadClass($classPath);
-            $mappers[$classPath] = new $className ();
-            //var_dump("New mapper created: ".$className);
+    function getMapper ($mapperClass) {
+        $res = null;
+        foreach(Ae_Application::listInstances() as $className => $ids) {
+            foreach ($ids as $appId) {
+                $app = Ae_Application::getInstance($className, $appId);
+                if ($app->hasMapper($mapperClass)) {
+                    $res = $app->getMapper($mapperClass);
+                }
+            }
         }
-        $res = & $mappers[$classPath];
         return $res;
+    }
+    
+    function getColumnNames() {
+        if ($this->columnNames === false) {
+            $cols = $this->database->getInspector()->getColumnsForTable($this->database->replacePrefix($this->tableName));
+            $this->defaults = array();
+            foreach ($cols as $nm => $col) {
+                $this->defaults[$nm] = $col['default'];
+                if (isset($col['autoInc']) && $col['autoInc'] && ($this->autoincFieldName === false)) {
+                    $this->autoincFieldName = $nm;
+                }
+            }
+            $this->columnNames = array_keys($this->defaults);
+        }
+        return $this->columnNames;
     }
 
     /**
@@ -110,13 +217,13 @@ class Ae_Model_Mapper {
         if ($this->useProto) {
             if (!isset($this->_proto[$className])) {
                 Ae_Dispatcher::loadClass($className);
-                $this->_proto[$className] = new $className();
+                $this->_proto[$className] = new $className($this);
             }
             $proto = & $this->_proto[$className];
             $res = $proto;
         } else {
             Ae_Dispatcher::loadClass($className);
-            $res = new $this->recordClass ($this->database);
+            $res = new $this->recordClass($this);
         }
         $this->_memorize($res);
         return $res;
@@ -169,9 +276,8 @@ class Ae_Model_Mapper {
                 $this->database->setQuery($sql);
                 $rows = $this->database->loadAssocList();
                 if ($rows && $arrayRow = $rows[0]) {
-                    $classPath = $this->getRecordClass ($arrayRow);
-                    $className = Ae_Dispatcher::loadClass($classPath);
-                    $record = new $className();
+                    $className = $this->getRecordClass ($arrayRow);
+                    $record = new $className($this);
                     $record->load ($arrayRow, null, true);
                 } else {
                     $record = null;
@@ -545,7 +651,7 @@ class Ae_Model_Mapper {
      * @return bool|string FALSE or name of autoinc field
      */
     function getAutoincFieldName() {
-        return false;
+        return $this->autoincFieldName;
     }
 
     /**
@@ -709,7 +815,7 @@ class Ae_Model_Mapper {
      $relation = & $m->getRelation($r);
      $recs = $relation->loadDest($curr);
      $curr = Ae_Util::flattenArray($recs);
-     $m = & Ae_Dispatcher::getMapper($relation->destMapperClass);
+     $m = & Ae_Model_Mapper::getMapper($relation->destMapperClass);
      }
      }
      */

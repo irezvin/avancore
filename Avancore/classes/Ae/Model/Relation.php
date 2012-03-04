@@ -275,12 +275,12 @@ class Ae_Model_Relation extends Ae_Model_Relation_Abstract {
             $this->database = & $disp->database;
         }
         if (($this->srcTableName === false) && strlen($this->srcMapperClass)) {
-            $this->_srcMapper = & Ae_Dispatcher::getMapper($this->srcMapperClass);
+            $this->_srcMapper = & Ae_Model_Mapper::getMapper($this->srcMapperClass);
             $this->srcTableName = $this->_srcMapper->tableName;
             if ($this->srcOrdering === false) $this->srcOrdering = $this->_srcMapper->getDefaultOrdering();
         }
         if (($this->destTableName === false) && strlen($this->destMapperClass)) {
-            $this->_destMapper = & Ae_Dispatcher::getMapper($this->destMapperClass);
+            $this->_destMapper = & Ae_Model_Mapper::getMapper($this->destMapperClass);
             $this->destTableName = $this->_destMapper->tableName;
             if ($this->destOrdering === false) $this->destOrdering = $this->_destMapper->getDefaultOrdering();
         }

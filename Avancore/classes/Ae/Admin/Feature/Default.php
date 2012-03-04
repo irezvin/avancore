@@ -71,7 +71,7 @@ class Ae_Admin_Feature_Default extends Ae_Admin_Feature {
                 if (isset($pi->objectPropertyName) && strlen($opn = $pi->objectPropertyName)) {
                     $op = & $prot->getPropertyInfo($opn, true);
                     if (isset($op->mapperClass) && strlen($mc = $op->mapperClass)) {
-                        $mpr = & Ae_Dispatcher::getMapper($mc);
+                        $mpr = & Ae_Model_Mapper::getMapper($mc);
                         if ($tfn = $mpr->getTitleFieldName()) {
                             $s = array('fieldName' => "{$opn}[{$tfn}]");
                             if (strlen($op->caption)) $s['title'] = $op->caption;
@@ -232,7 +232,7 @@ class Ae_Admin_Feature_Default extends Ae_Admin_Feature {
                 if (isset($p->mapperClass) && strlen($mc = $p->mapperClass) && isset($p->relationId) && strlen($rid = $p->relationId)) {
                     $rel = & $mpr->getRelation($rid);
                     if (!$rel->midTableName) {
-                        $subMapper = & Ae_Dispatcher::getMapper($mc);
+                        $subMapper = & Ae_Model_Mapper::getMapper($mc);
                         $i = & $subMapper->getInfo();
                         $asm = $i->allowSubManagers;
                         $res[$propName] = array('mapperClass' => $mc, 'allowSubManagers' => $asm, '_relId' => $p->relationId);

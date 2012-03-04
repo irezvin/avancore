@@ -41,7 +41,7 @@ class Ae_Model_Values_Records extends Ae_Model_Values {
     function Ae_Model_Values_Records (& $data, $propName = false, $options = true, $isStatic = false) {
         parent::Ae_Model_Values($data, $propName, $options);
         if (!$this->mapperClass) trigger_error ('$mapperClass property must be provided', E_USER_ERROR);
-        $this->_mapper = & Ae_Dispatcher::getMapper($this->mapperClass);
+        $this->_mapper = & Ae_Model_Mapper::getMapper($this->mapperClass);
         if ($this->ordering === '?') {
             $this->ordering = $this->_mapper->getDefaultOrdering();
             if ($this->ordering === false && $this->_mapper->getTitleFieldName()) {
@@ -88,7 +88,7 @@ class Ae_Model_Values_Records extends Ae_Model_Values {
     }
     
     function __wakeup() {
-        $this->_mapper = & Ae_Dispatcher::getMapper($this->mapperClass);        
+        $this->_mapper = & Ae_Model_Mapper::getMapper($this->mapperClass);        
     }
     
     // TODO: make getCaption() and check() methods

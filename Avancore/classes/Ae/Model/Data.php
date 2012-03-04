@@ -1385,7 +1385,9 @@ class Ae_Model_Data {
         $head = $arrPath[0];
         $arrTail = array_slice($arrPath, 1);
         if (!in_array($head, $this->listOwnProperties())) {
-            if ($trigger) trigger_error (get_class($this).' does not have property "'.$head.'"', E_USER_ERROR);
+            if ($trigger) {
+                trigger_error (get_class($this).' does not have property "'.$head.'"', E_USER_ERROR);
+            }
             else return false;
         }
         if ($c = count($arrTail)) {

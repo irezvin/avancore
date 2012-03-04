@@ -156,7 +156,7 @@ class Ae_Model_Collection {
         $this->_mapperClass = $mapperClass;
         $this->_mapper = false;
         if (!$pkName) {
-            $mapper = & Ae_Dispatcher::getMapper($mapperClass);
+            $mapper = & Ae_Model_Mapper::getMapper($mapperClass);
             $pkName = $mapper->listPkFields();
             if (is_array($pkName) && count($pkName) == 1) $pkName = $pkName[0];
         }
@@ -205,7 +205,7 @@ class Ae_Model_Collection {
     function useMapper($mapperClass) {
         if (!$mapperClass) trigger_error ('No mapper class provided. Provide mapper class or call useNoMapper() instead');
         $this->_mapperClass = $mapperClass;
-        $this->_mapper = & Ae_Dispatcher::getMapper($mapperClass);
+        $this->_mapper = & Ae_Model_Mapper::getMapper($mapperClass);
         $this->_tableName = $this->_mapper->tableName;
         $this->_recordClass = false;
         $this->_rcFun = false;

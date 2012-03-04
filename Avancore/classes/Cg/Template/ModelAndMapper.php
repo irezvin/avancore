@@ -12,6 +12,8 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     var $genMapperClass = false;
     var $parentMapperClass = false;
     
+    var $mapperVars = array();
+    
     var $vars = array();
     var $ownPropInfo = false;
     var $ownProperties = false;
@@ -56,7 +58,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         
         $this->mapperClass = $this->model->getMapperClass();
         $this->genMapperClass = $this->model->getGenMapperClass();
-        $this->parentMapperClass = $this->model->parentMapperClassName;        
+        $this->parentMapperClass = $this->model->parentMapperClassName;
         
         foreach ($this->model->listProperties() as $name) {
             $prop = & $this->model->getProperty($name);
@@ -87,6 +89,17 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         } else {
             $this->pkStr = $this->exportArray($pk, 0, false, true, true);
         }
+        
+        $this->mapperVars['pk'] = new Cg_Php_Expression($this->pkStr);
+        $this->mapperVars['recordClass'] = $this->modelClass;
+        $this->mapperVars['tableName'] = $this->tableName;
+        $this->mapperVars['id'] = $this->mapperClass;
+        $this->mapperVars['columnNames'] = new Cg_Php_Expression($this->exportArray($this->model->tableObject->listColumns(), 0, false, true, true));
+        foreach ($this->model->tableObject->listColumns() as $nm) {
+            $col = $this->model->tableObject->getColumn($nm);
+            $this->mapperVars['defaults'][$nm] = $col->default;
+        }
+        $this->mapperVars['defaults'] = new Cg_Php_Expression($this->exportArray($this->mapperVars['defaults'], 8, true, false, true));
         
         $this->relationPrototypes = array();
         
@@ -229,16 +242,6 @@ Ae_Dispatcher::loadClass(<?php $this->str($this->parentClass); ?>);
     
     var $_mapperClass = <?php $this->str($this->mapperClass); ?>;
 
-<?php if ($this->generator->php5) { ?>
-    function __construct() {
-        parent::__construct(<?php $this->str($this->tableName); ?>, <?php $this->d($this->pkStr); ?>);
-    }
-<?php } else { ?>
-    function <?php $this->d($this->genModelClass); ?>() {
-        parent::<?php $this->d($this->parentClass); ?> (<?php $this->str($this->tableName); ?>, <?php $this->d($this->pkStr); ?>);
-    }
-<?php } ?>
-
     function listOwnProperties() {
 <?php if ($this->parentClass !== 'Ae_Model_Object') { ?>
     return array_merge(parent::listOwnProperties(), <?php $this->exportArray($this->ownProperties, 0, false, true); ?>);
@@ -347,7 +350,15 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 Ae_Dispatcher::loadClass(<?php $this->str($this->parentMapperClass); ?>);
 
 <?php if ($this->model->parentMapperIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genMapperClass); ?> extends <?php $this->d($this->parentMapperClass); ?> {
+<?php foreach ($this->mapperVars as $var => $default) { ?>
+
+    var $<?php echo $var; ?> = <?php $this->export($default); ?>; 
+<?php } ?> 
+<?php if ($this->autoincFieldName) { ?>
     
+    protected $autoincFieldName = <?php $this->str($this->autoincFieldName) ?>;
+    
+<?php } ?>
     /**
      * @return <?php $this->d($this->modelClass); ?> 
      */ 
@@ -387,16 +398,6 @@ Ae_Dispatcher::loadClass(<?php $this->str($this->parentMapperClass); ?>);
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount);
     }
 
-<?php if ($this->generator->php5) { ?>
-    function __construct() {
-        parent::__construct(<?php $this->str($this->tableName); ?>, <?php $this->str($this->modelClass); ?>, <?php $this->d($this->pkStr); ?>);
-    }
-<?php } else { ?>
-    function <?php $this->d($this->genMapperClass); ?> () {
-        parent::<?php $this->d($this->parentMapperClass); ?>(<?php $this->str($this->tableName); ?>, <?php $this->str($this->modelClass); ?>, <?php $this->d($this->pkStr); ?>);
-    }
-<?php } ?>
-
     <?php if ($this->model->titleProp) { ?>
     
     function getTitleFieldName() {
@@ -428,12 +429,6 @@ Ae_Dispatcher::loadClass(<?php $this->str($this->parentMapperClass); ?>);
     
     function _doGetUniqueIndexData() {
         return <?php $this->exportArray($this->uniqueIndexData, 8); ?>;
-    }
-    <?php } ?>
-    <?php if ($this->autoincFieldName) { ?>
-    
-    function getAutoincFieldName() {
-        return <?php $this->str($this->autoincFieldName) ?>;
     }
     <?php } ?>
     <?php $this->_showMapperLoaderMethods(); ?>

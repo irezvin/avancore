@@ -46,6 +46,7 @@ class Ae_Sql_Dbi_Inspector {
      */
     function getColumnsForTable($tableName, $databaseName = false) {
         $res = array();
+        $databaseName = $this->_getDbName($databaseName);
         foreach ($this->_db->fetchArray('SHOW COLUMNS FROM '.$this->_getQTableName($databaseName, $tableName), 'Field') as $fieldName => $fieldData)  {
             $fi = array_merge($this->_parseType($fieldData['Type']));
             $fi['nullable'] = !strcasecmp($fieldData['Null'], 'yes');
@@ -64,7 +65,7 @@ class Ae_Sql_Dbi_Inspector {
     function getIndicesForTable($tableName, $databaseName = false) {
         $dbName = $this->_getQDbName($databaseName);
         $res = array();
-        foreach ($this->_db->fetchArray('SHOW INDEX FROM '.$this->_getQTableName($databaseName, $tableName)) as $idxData) {
+        foreach ($this->_db->fetchArray('SHOW INDEX FROM '.$this->_getQTableName($dbName, $tableName)) as $idxData) {
             $idxName = $idxData['Key_name'];
             if (!isset($res[$idxName])) $res[$idxName] = array(
                 'primary' => ($idxName === 'PRIMARY'), 
@@ -86,9 +87,9 @@ class Ae_Sql_Dbi_Inspector {
     // --------------------------- PRIVATE METHODS --------------------------
     
     function _getDbName($dbName) {
-        if ($dbName) $res = $dbName;
+        if (strlen($dbName)) $res = $dbName;
         else {
-            if (!$this->defaultDatabaseName) trigger_error ('Default database name not specified', E_USER_ERROR);
+            if (!strlen($this->defaultDatabaseName)) trigger_error ('Default database name not specified', E_USER_ERROR);
             $res = $this->defaultDatabaseName;
         }
         return $res;

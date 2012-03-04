@@ -1,6 +1,8 @@
 <?php
 
-abstract class Ae_Autoparams {
+abstract class Ae_Autoparams implements Ae_I_Autoparams {
+    
+    static $strictParams = true;
 
     function hasPublicVars() {
         return false;
@@ -10,23 +12,28 @@ abstract class Ae_Autoparams {
         $this->initFromOptions($options);
     }
     
-    protected function initFromOptions(array $options = array()) {
+    protected function initFromOptions(array $options = array(), $strictParams = null) {
         $v = ($this->hasPublicVars());
         $gotKeys = array();
         if ($v) $v = array_flip(array_keys(Ae_Util::getClassVars(get_class($this))));
-        foreach ($options as $n => $opt) {
+        if (is_null($strictParams)) $strictParams = self::$strictParams;
+        foreach ($options as $n => $opt) if ($n !== 'class') {
             if (method_exists($this, $mn = 'set'.ucfirst($n))) {
                 $this->$mn($opt);
                 $gotKeys[] = $n;
-            } elseif (isset($v[$n])) {
+            } elseif (isset($v[$n]) || method_exists($this, '__isset') && $this->__isset($n)) {
                 $this->$n = $opt;
                 $gotKeys[] = $n;
+            } elseif ($strictParams) {
+                throw new Ae_Exception_InvalidPrototype("Unknown member '{$n}' in class '".get_class($this)."'");
             }
         }
         return $gotKeys;
     }
     
-    static function factory($prototype, $baseClass = null) {
+    static function factory($prototype, $baseClass = null, $strictParams = null) {
+        if (is_null($strictParams)) $strictParams = self::$strictParams;
+        
         $className = $baseClass;
         
         if (is_object($prototype)) {
@@ -40,7 +47,7 @@ abstract class Ae_Autoparams {
 			 * A bug very hard to spot; workaround for https://bugs.php.net/bug.php?id=53727, https://bugs.php.net/bug.php?id=51570
              * Had to call class_exists to autoload class
 			 */
-            if (class_exists($className) && is_subclass_of($className, 'Ae_Autoparams')) { 
+            if (class_exists($className) && Ae_Util::implementsInterface($className, 'Ae_I_Autoparams')) { 
                 $res = new $className ($prototype);
             } else {
                 
@@ -55,7 +62,7 @@ abstract class Ae_Autoparams {
                 } else {
                     $res = new $className();
                 }
-                Ae_Autoparams::setObjectProperty($res, $p);
+                Ae_Autoparams::setObjectProperty($res, $p, null, $strictParams);
             }
         }
         if (strlen($baseClass && !$res instanceof $baseClass)) throw new Exception(get_class($res).' is not an instance of '.$baseClass);
@@ -70,8 +77,10 @@ abstract class Ae_Autoparams {
         $keyToCollection = true, 
         $setObjectPropertiesToDefaults = false, 
         & $resArray = null,
-        $treatNumericKeysAsEmpty = false
+        $treatNumericKeysAsEmpty = false,
+        $strictParams = null
     ) {
+        if (is_null($strictParams)) $strictParams = self::$strictParams;
         $res = array();
         $p = array_merge(array(), $prototypes);
         if ($keyToCollection === true) $keyToCollection = $keyToProperty;
@@ -91,10 +100,10 @@ abstract class Ae_Autoparams {
                     else {
                         $item = $v;
 		                if (!is_null($resArray)) $resArray[$collectionKey] = $item;
-			            if ($keyToCollection !== false) $collectionKey = self::getObjectProperty($item, $keyToCollection, $k);
+			            if ($keyToCollection !== false) $collectionKey = self::getObjectProperty($item, $keyToCollection, $k, $strictParams);
 			                else $collectionKey = $k;
                         if ($setObjectPropertiesToDefaults) 
-                            self::setObjectProperty($item, $defaults);
+                            self::setObjectProperty($item, $defaults, null, $strictParams);
 			            $res[$collectionKey] = $item;
                     }
                 }
@@ -134,7 +143,7 @@ abstract class Ae_Autoparams {
                 $pi = $item->getPropertyInfo($propertyName, true);
                 if ($pi->assocClass) $res = $item->getAssoc($propertyName);              
                     else $res = $item->getField($propertyName);
-            } elseif (($item instanceof Ae_Autoparams? $item->hasPublicVars() : true) && array_key_exists($propertyName, Ae_Util::getClassVars(get_class($item)))) {
+            } elseif (($item instanceof Ae_I_Autoparams? $item->hasPublicVars() : true) && (array_key_exists($propertyName, Ae_Util::getClassVars(get_class($item))))) {
                 $res = $item->$propertyName;
             } else {
                 $res = $defaultValue;
@@ -143,21 +152,24 @@ abstract class Ae_Autoparams {
         return $res;
     }
 
-    static function setObjectProperty($item, $propertyName, $value = null) {
+    static function setObjectProperty($item, $propertyName, $value = null, $strictParams = false) {
         if (is_array($item)) {
             $res = 0;
             foreach ($item as $c) {
-                $res += (int) self::setObjectProperty($c, $propertyName, $value);
+                $res += (int) self::setObjectProperty($c, $propertyName, $value, $strictParams);
             }
             return $res;
         } else {
-            
-            if (is_array($propertyName) && func_num_args() < 3) {
+            if (is_array($propertyName) && is_null($value)) {
                 $res = 0;
                 foreach ($propertyName as $k => $v) {
-                    $res += self::setObjectProperty($item, $k, $v);
+                    $res += self::setObjectProperty($item, $k, $v, $strictParams);
                 }
             } else {
+                if (is_array($propertyName)) {
+                    var_dump($value);
+                    $s->{''} = 'Foo';
+                }
 	            if (strlen($propertyName) && method_exists($item, $s = 'set'.ucFirst($propertyName))) {
 	                $res = true;
 	                $item->$s($value);
@@ -167,9 +179,14 @@ abstract class Ae_Autoparams {
                     if ($pi->assocClass) $item->setAssoc($propertyName, $value);              
                         else $res = $item->setField($propertyName, $value);
 	                //$item->setField
-	            } elseif ($item instanceof Ae_Autoparams? $item->hasPublicVars() : true) {
+	            } elseif ($item instanceof Ae_I_Autoparams? $item->hasPublicVars() : true) {
+                    if ($strictParams && $propertyName != 'class') {
+                        if (!isset($item->$propertyName) && !property_exists($item, $propertyName)) {
+                            throw new Ae_Exception_InvalidPrototype("Unknown member '{$propertyName}' in class '".get_class($item)."'");
+                        }
+                    }
 	                $res = true;
-	                $item->$propertyName = $value;	                
+	                $item->$propertyName = $value;
 	            } else {
 	                $res = false;
 	            }
