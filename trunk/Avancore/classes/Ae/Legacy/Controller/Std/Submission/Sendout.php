@@ -110,7 +110,7 @@ class Ae_Legacy_Controller_Std_Submission_Sendout {
     function getRecipients() {
         if ($this->recipients) $res = $this->recipients;
         elseif ($this->recipientsAreAdmins) {
-            $mapper = & Ae_Dispatcher::getMapper('Mos_User_Mapper');
+            $mapper = & Ae_Model_Mapper::getMapper('Mos_User_Mapper');
             $res = $mapper->getMailAdmins();
         } else $res = array();
         return $res;

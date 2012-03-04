@@ -3,6 +3,8 @@
 Ae_Dispatcher::loadClass('Ae_Legacy_Database');
 
 class Ae_Legacy_Database_Joomla extends Ae_Legacy_Database {
+
+    protected $inspectorClass = 'Ae_Sql_Dbi_Inspector_MySql5';    
     
     /**
      * @var database

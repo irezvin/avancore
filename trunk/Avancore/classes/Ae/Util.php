@@ -15,6 +15,24 @@ if (!defined('AE_UTIL_DEFAULT_CHARSET')) define('AE_UTIL_DEFAULT_CHARSET', 'utf-
 
 class Ae_Util {
     
+    static function implementsInterface($classOrObject, $interfaceName) {
+        static $cache = array();
+        
+        $res = false;
+        if (!is_object($classOrObject)) {
+            if (class_exists($classOrObject, true) && interface_exists($interfaceName, true)) {
+                if (!isset($cache[$classOrObject])) {
+                    $r = new ReflectionClass($classOrObject);
+                    $cache[$classOrObject] = $r->getInterfaceNames();
+                }
+                $res = in_array($interfaceName, $cache[$classOrObject]);
+            }
+        } else {
+            $res = $classOrObject instanceof $interfaceName;
+        }
+        return $res;
+    }
+    
     static function m($paArray1, $paArray2, $preserveNumeric = false) {
         return Ae_Util::array_merge_recursive2 ($paArray1, $paArray2, $preserveNumeric);
     }
@@ -699,6 +717,16 @@ class Ae_Util {
         return get_class_vars($className);
     }
     
+    /**
+     * @param object $object
+     * @return array (property => value)
+     */
+    static function getPublicVars($object) {
+        // Workaround to change scope to skip using Reflection
+        $g = new _Ae_Util_ObjectVarGetter();
+        return $g->getObjectVars($object);
+    }
+    
     static function htmlEntityDecode($stringOrArray, $quoteStyle = ENT_QUOTES, $charset = null) {
         if (is_array($stringOrArray)) {
             $res = array();
@@ -828,6 +856,12 @@ class Ae_Util {
         return '<span id="'.$id.'">[javascript protected email address]</span>'.$script;
     }
     
+}
+
+class _Ae_Util_ObjectVarGetter {
+    function getObjectVars($foo) {
+        return get_object_vars($foo);
+    }
 }
 
 /**

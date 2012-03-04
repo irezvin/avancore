@@ -19,9 +19,10 @@ function __autoload($class) {
 ini_set('display_errors', 1);
 ini_set('html_errors', 1);
 
-Ae_Dispatcher::instantiate('avancore', false, 'english', 'Ae_Native_Adapter', 'Ae_Dispatcher', array(
+/*
+Ae_Dispatcher::instantiate('avancore', false, 'english', 'Ae_Legacy_Adapter_Native', 'Ae_Dispatcher', array(
 	'configPath' => dirname(__FILE__).'/app.config.php',
 	'cachePath' => dirname(__FILE__).'/var'
 ));
-
+*/
 ?>

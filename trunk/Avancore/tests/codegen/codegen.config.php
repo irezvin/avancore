@@ -1,14 +1,17 @@
 <?php
 
-require(dirname(__FILE__).'/../app.config.php');
+require(dirname(__FILE__).'/../sampleApp/deploy/app.config.php');
+
+$dbConf = $config['legacyDatabasePrototype']['__construct']['config'];
+
 
 $config = array(
     'generator' => array(
         //'php5' => true,
-        'user' => $config['user'],
-        'password' => $config['password'],
-        'host' => $config['host'],
-        'inspectorClass' => 'Cg_Dbs_Inspector_Mysql5',
+        'user' => $dbConf['user'],
+        'password' => $dbConf['password'],
+        'host' => isset($dbConf['host'])? $dbConf['host'] : 'localhost',
+//        'inspectorClass' => 'Ae_Sql_Dbi_Dbs_Inspector_Mysql5',
         'clearOutputDir' => false,
         'overwriteLog' => true,
         'domainDefaults' => array(
@@ -23,10 +26,10 @@ $config = array(
     'domains.AeTestModel' => array(
         'strategyClass' => 'Cg_Strategy',
         'appName' => 'Ae_Test_Model',
-        'dbName' => $config['db'],
+        'dbName' => $dbConf['db'],
         'caption' => 'Test_Avancore',
         'josComId' => 'ac',
-        'tablePrefix' => 'ac_',
+        'tablePrefix' => $dbConf['prefix'],
         'subsystemPrefixes' => array(),
         'dontLinkSubsystems' => array(
         ),
@@ -50,6 +53,7 @@ $config = array(
         ),
         
         'models' => array(
+            /*
         	'relations' => array(
         		'properties' => array(
         			'_rel_FK_ac_relations_1' => array(
@@ -74,6 +78,7 @@ $config = array(
         			),
         		),
         	),
+        	*/
         ),
     ),
 );

@@ -42,7 +42,7 @@ class Ae_Sql_Select_TableProvider {
 		} else {
 			$aDb = & $db;
 		}
-		$m = & Ae_Dispatcher::getMapper($mapperClass);
+		$m = & Ae_Model_Mapper::getMapper($mapperClass);
 		$res = new Ae_Sql_Select($aDb, array(
 			'tables' => array(
 				$alias => array(

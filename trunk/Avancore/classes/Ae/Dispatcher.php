@@ -361,8 +361,7 @@ class Ae_Dispatcher {
      * @return Ae_Model_Mapper
      */
     static function getMapper($className) {
-        Ae_Dispatcher::loadClass('Ae_Model_Mapper');
-        $res = & Ae_Model_Mapper::getMapper($className);
+        $res = Ae_Model_Mapper::getMapper($className);
         return $res;
     }
     

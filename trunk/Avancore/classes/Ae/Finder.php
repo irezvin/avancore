@@ -149,7 +149,7 @@ class Ae_Finder extends Ae_Autoparams {
         if ($keys !== false) {
             if (!is_array($keys)) $keys = array($keys);
         } else {
-            $m = Ae_Dispatcher::getMapper($this->mapperClass);
+            $m = Ae_Model_Mapper::getMapper($this->mapperClass);
             $keys = $m->listPkFields(); 
         }
         if (is_null($aeDb)) $aeDb = Ae_Dispatcher::getInstance()->database;
@@ -183,7 +183,7 @@ class Ae_Finder extends Ae_Autoparams {
 
     protected function doOnGetSqlSelectPrototype(array & $prototype) {
     	if (($this->mapperClass !== false) && ($this->primaryAlias !== false)) {
-    		$m = Ae_Dispatcher::getMapper($this->mapperClass);
+    		$m = Ae_Model_Mapper::getMapper($this->mapperClass);
     		Ae_Util::ms($prototype, array(
     			'tables' => array(
     				$this->primaryAlias => array(
