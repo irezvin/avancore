@@ -296,12 +296,6 @@ class Ae_Model_DateTime {
     		$srcTs = (int) $src->format('U');
     	} else {
 	        if (!is_int($src)) { 
-	            if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass('Ae_Model_DateTime');
-	                else {
-	                    if (!class_exists('Ae_Model_DateTime')) {
-	                        require(dirname(__FILE__).'/Model/DateTime.php');
-	                    }
-	                }
 	            $dtp = & Ae_Model_DateTime::getInstance();
 	            $srcTs = $dtp->fromString($src, false, $useGmt); 
 	        } else $srcTs = $src;

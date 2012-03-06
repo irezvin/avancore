@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Table_Column');
-
 /**
  * This class shows cell with the link to edit the record
  * 

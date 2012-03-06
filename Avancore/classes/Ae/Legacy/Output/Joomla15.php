@@ -54,7 +54,6 @@ class Ae_Legacy_Output_Joomla15 extends Ae_Legacy_Output_Joomla {
     
     static function addHtmlToJoomlaToolbar($html) {
         $bar = JToolBar::getInstance('toolbar');
-        Ae_Dispatcher::loadClass('Ae_Joomla_15_AnyHtmlButton');
         $bar->appendButton('AnyHtml', $html);
         
     }

@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control_Listable');
-
 /**
  * Single- and multiple- selection list, checkboxes list, radios list
  */
@@ -75,12 +73,10 @@ class Ae_Form_Control_List extends Ae_Form_Control_Listable {
     function & _getValuesProvider() {
         if ($this->_valuesProvider === false) {
             if ($this->_valuesProviderPrototype) {
-                Ae_Dispatcher::loadClass('Ae_Model_Values');
                 $this->_valuesProvider = & Ae_Model_Values::factoryIndependent($this->_valuesProviderPrototype);
             }
             elseif ($p = & $this->getModelProperty()) {
                 if (isset($p->values) && $p->values) {
-                    Ae_Dispatcher::loadClass('Ae_Model_Values');
                     $this->_valuesProvider = & Ae_Model_Values::factoryWithProperty($p);
                 }
             }

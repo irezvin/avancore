@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Table_Column');
-
 class Ae_Table_Column_Reorder extends Ae_Table_Column {
 
     var $canOrderUpMethod = false;

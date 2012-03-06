@@ -1,8 +1,5 @@
 <?php
 
-if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass('Ae_Sql_Order');
-elseif (!class_exists('Ae_Sql_Order')) require('Ae/Sql/Order.php');
-
 class Ae_Sql_Order_Multiple extends Ae_Sql_Order {
 
     var $_orders = array();

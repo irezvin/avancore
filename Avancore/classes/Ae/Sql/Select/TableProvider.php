@@ -34,9 +34,7 @@ class Ae_Sql_Select_TableProvider {
      * @return Ae_Sql_Select
      */
     static function createSelect($mapperClass, & $db, $alias = 't') {
-		Ae_Dispatcher::loadClass('Ae_Sql_Select');
 		if (empty($db)) {
-			Ae_Dispatcher::loadClass('Ae_Sql_Db_Ae');
 			$d = & Ae_Dispatcher::getInstance();
 			$aDb = new Ae_Sql_Db_Ae($d->database);
 		} else {
@@ -114,8 +112,6 @@ class Ae_Sql_Select_TableProvider {
             if (isset($options['class'])) 
                 $class = $options['class']; 
                 else $class = 'Ae_Sql_Select_Table';
-            if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass($class);
-                else if (!class_exists($class)) require(str_replace('_', '/', $class).'.php');
             $t = new $class ($this, $options);
         }
         $alias = $t->alias? $t->alias : $t->name;

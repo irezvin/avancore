@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Config');
-
 class Ae_Legacy_Config_Joomla extends Ae_Legacy_Config {
 
     function Ae_Legacy_Config_Joomla($configFilePath, $configOptions = array()) {

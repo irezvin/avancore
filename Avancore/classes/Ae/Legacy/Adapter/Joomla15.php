@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Joomla_Adapter');
-
 class Ae_Legacy_Adapter_Joomla15 extends Ae_Joomla_Adapter {
     
     var $configClass = 'Ae_Legacy_Config_Joomla15';
@@ -21,25 +19,20 @@ class Ae_Legacy_Adapter_Joomla15 extends Ae_Joomla_Adapter {
         $dbSettings['config'] = & $this->config;
         
         if ($this->useNativeDatabase) {
-            Ae_Dispatcher::loadClass('Ae_Legacy_Database_Native');
             $this->database = new Ae_Legacy_Database_Native($dbSettings);
         } else {
             if ($this->dbClass) {
-                Ae_Dispatcher::loadClass($this->dbClass);
                 $dbc = $this->dbClass;
                 $this->database = new $dbc($dbSettings); 
             } else {
-                Ae_Dispatcher::loadClass('Ae_Legacy_Database_Joomla15');
                 $this->database = new Ae_Legacy_Database_Joomla15(array('config' => & $this->config));
             }
         }
         
-        Ae_Dispatcher::loadClass('Ae_Legacy_User_Joomla');
         $session = & JFactory::getSession();
         $josUser = & $session->get('user');
         $this->_user = new Ae_Legacy_User_Joomla($josUser);
         
-        Ae_Dispatcher::loadClass('Ae_Joomla_Userstate');
         $this->userstate = new Ae_Joomla_Userstate();
 
     }

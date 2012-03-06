@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Model_Property');
-
 define('AE_ZERO_DATE', '0000-00-00');
 define('AE_ZERO_DATETIME', '0000-00-00 00:00:00');
 
@@ -349,7 +347,6 @@ class Ae_Model_Data {
      * @access protected
      */
     function & _createValidator() {
-        Ae_Dispatcher::loadClass('Ae_Model_Validator');
         $res = new Ae_Model_Validator($this);
         return $res;
     }
@@ -1343,7 +1340,6 @@ class Ae_Model_Data {
         if (!($assocClass = $this->_getAssocClass($ownAssocName))) trigger_error('Unknown own association: '.$ownAssocName);
         $object = false;
         if (!$this->doCreateAssociable($ownAssocName, $assocClass, $object)) {
-            Ae_Dispatcher::loadClass($assocClass);
             $object = new $assocClass();
         }
         return $object;

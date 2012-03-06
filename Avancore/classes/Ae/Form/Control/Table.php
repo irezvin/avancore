@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control');
-
 /**
  * Text field, textarea, rte, hidden
  */

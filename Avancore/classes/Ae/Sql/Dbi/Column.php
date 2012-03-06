@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Sql_Dbi_Object');
-
 class Ae_Sql_Dbi_Column extends Ae_Sql_Dbi_Object {
 
     /**

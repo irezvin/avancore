@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Table');
-
 class Ae_Table_Sequential extends Ae_Table {
     
     /**

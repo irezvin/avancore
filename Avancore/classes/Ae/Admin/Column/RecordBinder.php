@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Admin_Column');
-
 /**
  * Binds records to the Javascript GUI
  */

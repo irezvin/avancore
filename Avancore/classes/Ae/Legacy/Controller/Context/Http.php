@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Context');
-
 class Ae_Legacy_Controller_Context_Http extends Ae_Legacy_Controller_Context {
     
     /**
@@ -62,7 +60,6 @@ class Ae_Legacy_Controller_Context_Http extends Ae_Legacy_Controller_Context {
         parent::initialize($options);
         if (isset($options['baseUrl'])) {
             if (is_string($options['baseUrl']) && strlen($options['baseUrl'])) {
-                Ae_Dispatcher::loadClass('Ae_Url');
                 $url = new Ae_Url($options['baseUrl']);
                 $this->setBaseUrl($url);
             } 
@@ -195,7 +192,6 @@ class Ae_Legacy_Controller_Context_Http extends Ae_Legacy_Controller_Context {
             trigger_error ("Base Url is not set - call setBaseUrl() first", E_USER_ERROR);
         }
 //        if ($this->_url === false) {
-//            Ae_Dispatcher::loadClass('Ae_Url');
 //            $this->_url = & $this->_baseUrl->cloneObject();
 //            $data = $this->_data;
 //            Ae_Util::ms($data, $extraParams);
@@ -206,7 +202,6 @@ class Ae_Legacy_Controller_Context_Http extends Ae_Legacy_Controller_Context {
 //        }
 //        return $this->_url;
 
-        Ae_Dispatcher::loadClass('Ae_Url');
         $res = & $this->_baseUrl->cloneObject();
         if (strlen($this->pathInfo)) $res->pathInfo .= $this->pathInfo;
         if ($withData) $data = $this->_data;

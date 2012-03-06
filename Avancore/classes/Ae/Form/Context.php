@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Context_Http');
-
 /**
  * Form context has specific behavior when it comes to name mapping:
  * parameters with name 'value' are mapped directly into the form namespace,

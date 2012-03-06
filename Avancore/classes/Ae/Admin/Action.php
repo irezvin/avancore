@@ -32,7 +32,6 @@ class Ae_Admin_Action {
         if (!is_array($options)) trigger_error ('$options must be an array, E_USER_ERROR');
         if (isset($options['class'])) $class = $options['class'];
             else $class = 'Ae_Admin_Action';
-        Ae_Dispatcher::loadClass($class);
         $res = new $class ($options);
         return $res;
     }

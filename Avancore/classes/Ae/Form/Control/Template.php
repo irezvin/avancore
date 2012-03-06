@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Template_Html');
-
 /**
  * Important note: form template show... methods should accept reference to the rendered control as the first parameter
  */

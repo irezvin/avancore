@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Table_Column');
-
 class Ae_Admin_Column extends Ae_Table_Column {
     /**
      * Reference to manager that holds table with this column

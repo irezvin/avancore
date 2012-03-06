@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Sql_Select_TableProvider');
-
 class Ae_Model_Sql_TableProvider extends Ae_Sql_Select_TableProvider {
 	
 	var $_mapperClass = false;

@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control');
-
 class Ae_Form_Control_Composite extends Ae_Form_Control {
     
     /**
@@ -204,7 +202,6 @@ class Ae_Form_Control_Composite extends Ae_Form_Control {
      * @return Ae_Legacy_Controller_Context_Http
      */
     function & _createSubContext($name) {
-        Ae_Dispatcher::loadClass('Ae_Form_Context');
         $res = & Ae_Form_Context::spawnFrom($this->_context, $name);
         return $res;
     }
@@ -219,7 +216,6 @@ class Ae_Form_Control_Composite extends Ae_Form_Control {
     function & _createControl($name, $settings = array()) {
         if (isset($settings['class']) && strlen($settings['class'])) {
             $class = $settings['class'];
-            Ae_Dispatcher::loadClass($class);
         } else {
             $class = 'Ae_Form_Control'; 
         }

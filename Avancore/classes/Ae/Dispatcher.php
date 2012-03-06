@@ -112,8 +112,6 @@ class Ae_Dispatcher {
     
     function & instantiate($appName = null, $isBackend = false, $language = false, $adapterClass = 'Ae_Joomla_Adapter', $dispatcherClass = 'Ae_Dispatcher', $adapterExtraSettings = array()) {
         if (!isset($GLOBALS['avsDispatcher']) || !is_a($GLOBALS['avsDispatcher'], 'Ae_Dispatcher')) {
-            //var_dump($dispatcherClass);
-            if (!class_exists($dispatcherClass)) Ae_Dispatcher::loadClass($dispatcherClass);
             $GLOBALS['avsDispatcher'] = new Ae_Dispatcher($appName, $isBackend, $language, $adapterClass, $adapterExtraSettings);
         }
         $res = & $GLOBALS['avsDispatcher'];
@@ -174,7 +172,6 @@ class Ae_Dispatcher {
     function init() {
         if (!$this->_init) {
             $this->_init = true;
-            Ae_Dispatcher::loadClass($this->_adapterClass);
             $this->adapter = new $this->_adapterClass($this->_adapterExtraSettings);
             $this->database = & $this->adapter->database;
             $this->config = & $this->adapter->config;
@@ -394,11 +391,9 @@ class Ae_Dispatcher {
     function getCache() {
         if ($this->_cache === false) {
             
-            // Ae_Dispatcher::loadClass('Cache_Lite'); - this fu(|<s Joomla up so don't use
-            
             if (!strcasecmp(get_class($this->adapter), 'Ae_Joomla_Adapter')) {
                 if (!class_exists('Cache_Lite')) require_once($this->config->absolutePath.'/includes/Cache/Lite.php');
-            } else Ae_Dispatcher::loadClass('Cache_Lite');
+            }
             $options = array('cacheDir' => $this->getCacheDir().'/'.$this->config->cachePrefix, 'readControl' => false);
             if ($cl = $this->getConfig('cacheLifeTime')) {
                 $options['lifeTime'] = $cl;

@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Session');
-
 class Ae_Legacy_Session_Joomla extends Ae_Legacy_Session {
 
     function Ae_Legacy_Session_Joomla() {

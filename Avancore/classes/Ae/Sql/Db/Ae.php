@@ -1,8 +1,5 @@
 <?php
 
-if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass('Ae_Sql_Db');
-elseif (!class_exists('Ae_Sql_Db')) require('Ae/Sql/Db.php');
-
 class Ae_Sql_Db_Ae extends Ae_Sql_Db {
     
     /**

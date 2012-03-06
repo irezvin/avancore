@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Table_Column');
-
 /**
  * This class shows checkbox to select record for some action and "checkAll" checkbox in the header
  * 

@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Template_Html');
-
 class Ae_Legacy_Controller_Std_Submission_Template extends Ae_Template_Html {
     
     /**

@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Template');
-
 class Ae_Template_Html extends Ae_Template {
 
     /**
@@ -114,7 +112,6 @@ class Ae_Template_Html extends Ae_Template {
                 $this->htmlResponse->addJsLib($jsLib, $isLocal, $atBeginning);
             }
             else {
-                Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Response_Html');
                 echo Ae_Legacy_Controller_Response_Html::getJsScriptTag($jsLib, $isLocal);
             }
         }
@@ -126,7 +123,6 @@ class Ae_Template_Html extends Ae_Template {
         } else {
             if (is_a($this->htmlResponse, 'Ae_Legacy_Controller_Response_Html')) $this->htmlResponse->addCssLib($cssLib, $isLocal);
             else {
-                Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Response_Html');
                 echo Ae_Legacy_Controller_Response_Html::getCssLibTag($cssLib, $isLocal);
             }
         }

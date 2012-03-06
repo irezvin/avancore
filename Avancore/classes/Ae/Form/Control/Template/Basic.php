@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control_Template');
-
 class Ae_Form_Control_Template_Basic extends Ae_Form_Control_Template {
     
     var $textAreaRows = 4;

@@ -26,7 +26,7 @@ class Ae_Output_Native extends Ae_Legacy_Output {
             if ($glob->hasResponse() && ($glob->getResponse() !== $r)) $r->mergeWithResponse($glob->getResponse());
         }
         
-        Ae_Dispatcher::loadClass(($t = $this->templateClass));
+        $t = $this->templateClass;
         $tpl = new $t($this->htmlTemplateSettings);
         $tpl->htmlResponse = & $r;
         if (!$r->contentType) $r->contentType = $this->defaultContentType;

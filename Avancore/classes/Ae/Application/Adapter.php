@@ -73,7 +73,7 @@ class Ae_Application_Adapter extends Ae_Autoparams {
     }
     
     function __construct(array $options = array()) {
-        foreach ($gotKeys = $this->initFromOptions($options) as $key) {
+        foreach ($gotKeys = $this->initFromOptions($options, false) as $key) {
             unset($options[$key]);
         }
         if (isset($options['class'])) unset($options['class']);

@@ -463,7 +463,6 @@ class Ae_Model_Collection {
         while ($row = $this->_db->fetchAssoc($rr)) {
             $key = $this->_matchKeys? $row[$this->_pkName] : $i;
             if ($rc = $this->_getRecordClass($row)) {
-                Ae_Dispatcher::loadClass($rc);
                 $this->_records[$key] = new $rc;
                 $this->_records[$key]->load($row, null, true);    
             } else {
@@ -539,7 +538,6 @@ class Ae_Model_Collection {
                     return $res;
                 } else {
                     if ($rc = $this->_getRecordClass($row)) {
-                        Ae_Dispatcher::loadClass($rc);
                         $res = new $rc();
                         $res->load($row, null, true);
                     } else $res = $row;

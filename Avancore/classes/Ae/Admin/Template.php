@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Template_Html');
-
 class Ae_Admin_Template extends Ae_Template_Html {
     /**
      * @var Ae_Admin_Manager
@@ -247,7 +245,6 @@ class Ae_Admin_Template extends Ae_Template_Html {
             // TODO: fix this ugly crap!
             $stateData = $this->manager->getStateData();
             unset($stateData['action']);
-            Ae_Dispatcher::loadClass('Ae_Url');
             $adp = $this->manager->_context->getDataPath();
             echo $foo = Ae_Url::getHidden($stateData, /*Ae_Util::arrayToPath($adp)*/ $adp );
         } ?>

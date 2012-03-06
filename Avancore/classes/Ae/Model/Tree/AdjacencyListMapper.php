@@ -30,7 +30,6 @@ class Ae_Tree_AdjacencyListMapper extends Ae_Model_Mapper implements Ae_I_Tree_M
 
     function Ae_Tree_AdjacencyListMapper($tableName, $recordClass, $pk = 'id') {
     	parent::Ae_Model_Mapper($tableName, $recordClass, $pk);
-    	Ae_Dispatcher::loadClass('Ae_Sql_Db_Ae');
     	$this->sqlDb = new Ae_Sql_Db_Ae($this->database);
     	$this->_stmtCache = new Ae_Sql_Statement_Cache(array(
     		'defaults' => array(

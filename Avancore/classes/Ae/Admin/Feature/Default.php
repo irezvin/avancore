@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Admin_Feature');
-
 /**
  * This feature works with every record to populate manager with basic info 
  */
@@ -181,7 +179,6 @@ class Ae_Admin_Feature_Default extends Ae_Admin_Feature {
         $mpr = & $this->manager->getMapper();
         if ($mpr) $aif = $mpr->getAutoincFieldName();
             else $aif = false;
-        Ae_Dispatcher::loadClass('Ae_Form_Converter');
         $conv = new Ae_Form_Converter();
         $do = $this->displayOrderStart;
         foreach ($rec->listOwnFields() as $p) {
@@ -251,7 +248,6 @@ class Ae_Admin_Feature_Default extends Ae_Admin_Feature {
      */
     function onSubManagerCreated($id, & $subManager, $smConfig = array()) {
         if (isset($smConfig['_relId'])) {
-            Ae_Dispatcher::loadClass('Ae_Admin_Datalink_Subrecord');
             $dl = new Ae_Admin_Datalink_Subrecord();
             $subManager->setDatalink($dl);
             $dl->setRelationId($this->manager->mapperClass, $smConfig['_relId']);

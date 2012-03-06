@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Controller');
-
 class Ae_Admin_Pagination extends Ae_Legacy_Controller {
     
     // ------------------------------ configuration variables ---------------------------------

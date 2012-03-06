@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Admin_Column');
-
 class Ae_Admin_Column_DetailsLink extends Ae_Admin_Column {
      
      /**
