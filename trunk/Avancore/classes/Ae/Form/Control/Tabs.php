@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control_Composite');
-
 /**
  * Shows tabs/accordeon/etc and controls inside them
  */

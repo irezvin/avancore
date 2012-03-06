@@ -112,7 +112,6 @@ class Ae_Legacy_Controller_Context {
      */
     function & cloneObject() {
         $className = Ae_Util::fixClassName(get_class($this));
-        Ae_Dispatcher::loadClass($className);
         $res = new $className();
         $res->assign($this);
         return $res;

@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Controller');
-
 class Ae_Legacy_Controller_Std_Submission extends Ae_Legacy_Controller {
     
     /**
@@ -72,7 +70,6 @@ class Ae_Legacy_Controller_Std_Submission extends Ae_Legacy_Controller {
     var $reportAdminAboutUnsuccessfulSend = true;
     
     function doInitProperties($options = array()) {
-        Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Filter');
         $this->_filter = new Ae_Legacy_Controller_Filter;
     }
 
@@ -102,13 +99,11 @@ class Ae_Legacy_Controller_Std_Submission extends Ae_Legacy_Controller {
                     $this->_model = & $mapper->factory();
                 } else {
                     assert(strlen($this->modelClass));
-                    Ae_Dispatcher::loadClass($this->modelClass);
                     $this->_model = new $this->modelClass;
                 }
             }
             $formPrototype = $this->doGetFormPrototype();
             $ppf = $this->publicPropertyFlag;
-            Ae_Dispatcher::loadClass('Ae_Form_Converter');
             $conv = new Ae_Form_Converter();
             foreach ($this->_model->listProperties() as $propName) {
                 $prop = & $this->_model->getPropertyInfo($propName);
@@ -125,7 +120,6 @@ class Ae_Legacy_Controller_Std_Submission extends Ae_Legacy_Controller {
             Ae_Util::setArrayByPath($d, $path, $pp);
             Ae_Util::ms($feContext->_baseUrl->query, $pp);
             $formContext = & $feContext->spawn('form');
-            Ae_Dispatcher::loadClass('Ae_Form');
             $this->_form = new Ae_Form($formContext, $formPrototype, 'form');
             $this->_form->setModel($this->_model);
         }
@@ -254,7 +248,6 @@ class Ae_Legacy_Controller_Std_Submission extends Ae_Legacy_Controller {
     }
     
     function notifyRecipients() {
-        Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Std_Submission_Sendout');
         foreach ($this->doGetSendouts() as $sendoutPrototype) {
             $sendout = new Ae_Legacy_Controller_Std_Submission_Sendout($this, $this->getModelObject(), $this->getTemplate(), $sendoutPrototype);
             $mail = & $sendout->getMail();

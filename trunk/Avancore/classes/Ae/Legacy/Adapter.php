@@ -81,7 +81,6 @@ class Ae_Legacy_Adapter {
      * @access protected
      */
     function & _instantiateConfig ($configClass) {
-        Ae_Dispatcher::loadClass($configClass);
         if (strlen($this->configPath)) 
             $configPath = str_replace('%a%', Ae_Dispatcher::getAppDir(), $this->configPath);
         else $configPath = false;
@@ -90,7 +89,7 @@ class Ae_Legacy_Adapter {
     }
     
     function & createPageNav($total, $limitstart, $limit) {
-        Ae_Dispatcher::loadClass($pnc = $this->pageNavClass);
+        $pnc = $this->pageNavClass;
         $res = new $pnc ($total, $limitstart, $limit);
         return $res;
     }
@@ -105,7 +104,6 @@ class Ae_Legacy_Adapter {
     function getSession() {
         if ($this->_session === false) {
             if ($this->sessionClass === false) trigger_error ('$sessionClass is not specified in conrete Ae_Legacy_Adapter instance', E_USER_ERROR);          
-            Ae_Dispatcher::loadClass($this->sessionClass);
             $sc = $this->sessionClass;
             $this->_session = new $sc();
         }

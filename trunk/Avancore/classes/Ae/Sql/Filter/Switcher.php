@@ -1,8 +1,5 @@
 <?php
 
-if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass('Ae_Sql_Filter');
-elseif (!class_exists('Ae_Sql_Order')) require('Ae/Sql/Filter.php');
-
 class Ae_Sql_Filter_Switcher extends Ae_Sql_Filter {
      
     /**

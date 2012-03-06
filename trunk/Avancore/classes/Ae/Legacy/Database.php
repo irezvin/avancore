@@ -1,7 +1,6 @@
 <?php
 
 define('CALLBACK_AE_DATABASE_AFTER_QUERY', 'Ae_Legacy_Database.afterQuery');
-Ae_Dispatcher::loadClass('Ae_Callbacks');
 
 class Ae_Legacy_Database {
 
@@ -373,7 +372,6 @@ class Ae_Legacy_Database {
      */
     function getSqlDb() {
         if ($this->_sqlDb === false) {
-            Ae_Dispatcher::loadClass('Ae_Sql_Db_Ae');
             $this->_sqlDb = new Ae_Sql_Db_Ae($this);
         }
         return $this->_sqlDb;

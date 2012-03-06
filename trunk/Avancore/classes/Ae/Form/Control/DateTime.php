@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control_Date');
-
 class Ae_Form_Control_DateTime extends Ae_Form_Control_Date {
     
     var $defaultExternalFormat = 'd.m.Y H:i:s';

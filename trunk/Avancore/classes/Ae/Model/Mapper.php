@@ -216,13 +216,11 @@ class Ae_Model_Mapper implements Ae_I_Autoparams {
         if ($className === false) $className = $this->recordClass;
         if ($this->useProto) {
             if (!isset($this->_proto[$className])) {
-                Ae_Dispatcher::loadClass($className);
                 $this->_proto[$className] = new $className($this);
             }
             $proto = & $this->_proto[$className];
             $res = $proto;
         } else {
-            Ae_Dispatcher::loadClass($className);
             $res = new $this->recordClass($this);
         }
         $this->_memorize($res);
@@ -480,7 +478,6 @@ class Ae_Model_Mapper implements Ae_I_Autoparams {
      */
     function getInfo() {
         if ($this->_info === false) {
-            Ae_Dispatcher::loadClass('Ae_Model_MapperInfo');
             $this->_info = new Ae_Model_MapperInfo(Ae_Util::fixClassName(get_class($this)), $this->_doGetInfoParams());
         }
         return $this->_info;
@@ -603,7 +600,6 @@ class Ae_Model_Mapper implements Ae_I_Autoparams {
                 $res[] = array($pk, $title);
             }
         } else {
-            Ae_Dispatcher::loadClass('Ae_Model_Collection');
             $coll = new Ae_Model_Collection(get_class($this), false, $where, $ordering, $extraJoins);
             $coll->setSequential();
             $coll->useCursor();
@@ -778,7 +774,6 @@ class Ae_Model_Mapper implements Ae_I_Autoparams {
      */
     function & createRelation($relId) {
         $proto = $this->getRelationPrototype($relId);
-        Ae_Dispatcher::loadClass('Ae_Model_Relation');
         $res = & Ae_Model_Relation::factory($proto);
         return $res;
     }
@@ -935,7 +930,6 @@ class Ae_Model_Mapper implements Ae_I_Autoparams {
      */
     function getCommonValidator() {
         if ($this->_validator === false) {
-            Ae_Dispatcher::loadClass('Ae_Model_Validator');
             $this->_validator = new Ae_Model_Validator($this->getPrototype(), $this->getPrototype()->getOwnPropertiesInfo());
         }
         return $this->_validator;

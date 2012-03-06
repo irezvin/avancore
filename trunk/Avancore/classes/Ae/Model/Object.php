@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Model_Data');
-
 /**
  * If $model::tracksChanges() returns true or AE_CHANGES_BEFORE_SAVE, changes will be destroyed immediately after database operation 
  * (and before afterSave() method)  
@@ -131,7 +129,6 @@ class Ae_Model_Object extends Ae_Model_Data {
             $res = & $m->getCommonValidator();
             $res->model = & $this;
         } else {
-            Ae_Dispatcher::loadClass('Ae_Model_Validator');
             $res = new Ae_Model_Validator($this);
         }
         return $res;
@@ -391,7 +388,6 @@ class Ae_Model_Object extends Ae_Model_Data {
         }
         if (!$res) {
             if (!$mapperClass) trigger_error (__FILE__."::".__FUNCTION__." - mapperClass not specified", E_USER_ERROR);
-            Ae_Dispatcher::loadClass('Ae_Model_Mapper');
             $res = & Ae_Model_Mapper::getMapper($mapperClass);
         }
         return $res;

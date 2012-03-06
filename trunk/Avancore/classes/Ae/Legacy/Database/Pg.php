@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Database');
-
 class Ae_Legacy_Database_Pg extends Ae_Legacy_Database {
     var $_sql = false;
     

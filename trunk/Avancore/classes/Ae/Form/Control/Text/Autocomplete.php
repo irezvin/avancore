@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control_Text');
-
 class Ae_Form_Control_Text_Autocomplete extends Ae_Form_Control_Text {
 
     var $loadScripts = false;
@@ -69,12 +67,10 @@ class Ae_Form_Control_Text_Autocomplete extends Ae_Form_Control_Text {
     function & _getValuesProvider() {
         if ($this->_valuesProvider === false) {
             if ($this->_valuesProviderPrototype) {
-                Ae_Dispatcher::loadClass('Ae_Model_Values');
                 $this->_valuesProvider = & Ae_Model_Values::factoryIndependent($this->_valuesProviderPrototype);
             }
             elseif ($p = & $this->getModelProperty()) {
                 if (isset($p->values) && $p->values) {
-                    Ae_Dispatcher::loadClass('Ae_Model_Values');
                     $this->_valuesProvider = & Ae_Model_Values::factoryWithProperty($p);
                 }
             }

@@ -121,7 +121,6 @@ class Ae_Model_Values {
         $isStatic = true;
         if (isset($options['class']) && $options['class']) {
             $class = $options['class'];
-            Ae_Dispatcher::loadClass($class);
         } else $class = 'Ae_Model_Values';
         $res = new $class($data, $propName, $options, $isStatic);
         if (!is_a($res, 'Ae_Model_Values')) trigger_error ("Class '{$class}' is not derived from Ae_Model_Values", E_USER_ERROR);
@@ -146,7 +145,6 @@ class Ae_Model_Values {
         if (!isset($options['valueList']) && isset($formOptions['valueList'])) $options['valueList'] = $formOptions['valueList'];
         if (isset($options['class']) && $options['class']) {
             $class = $options['class'];
-            Ae_Dispatcher::loadClass($class);
         }
         $res = new $class($data, $propName, $options, $isStatic);
         if (!is_a($res, 'Ae_Model_Values')) trigger_error ("Class '{$class}' is not derived from Ae_Model_Values", E_USER_ERROR);
@@ -395,10 +393,6 @@ class Ae_Model_Values {
             
         } else $callback = $cb;
         
-        if (is_array($callback) && is_string($callback[0])) {
-            if (!class_exists($callback[0])) Ae_Dispatcher::loadClass($callback[0]);
-        }
-        
         $res = call_user_func_array($callback, $params);
         return $res;
     }
@@ -422,7 +416,6 @@ class Ae_Model_Values {
                 if (!Ae_Model_Values::isId($callback[0]) || !Ae_Model_Values::isId($callback[1]))
                     trigger_error ("Valid class/method identifiers must be supplied in callback", E_USER_ERROR);
                     
-                if (!class_exists($callback[0])) Ae_Dispatcher::loadClass($callback[0]);
                 $call = $callback[0].'::'.$callback[1];
             }
         } else {

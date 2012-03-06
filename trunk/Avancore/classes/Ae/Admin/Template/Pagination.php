@@ -9,8 +9,6 @@ if (!defined('AE_ADMIN_PAGINATION_OF')) define ('AE_ADMIN_PAGINATION_OF', 'of');
 if (!defined('AE_ADMIN_PAGINATION_SHOW_QTY')) define ('AE_ADMIN_PAGINATION_SHOW_QTY', 'Show #');
 if (!defined('AE_ADMIN_PAGINATION_RECORDS')) define ('AE_ADMIN_PAGINATION_RECORDS', 'records');
 
-Ae_Dispatcher::loadClass('Ae_Template_Html');
-
 class Ae_Admin_Template_Pagination extends Ae_Template_Html {
 
     var $showFormTag = false;
@@ -109,7 +107,6 @@ class Ae_Admin_Template_Pagination extends Ae_Template_Html {
                     //var_dump($myUrl->query);
                     Ae_Util::setArrayByPath($myUrl->query, Ae_Util::pathToArray($this->pageParamName), $pageNo, true);
                 } else {
-                    Ae_Dispatcher::loadClass('Ae_Url');
                     $myUrl = new Ae_Url($url);
                 }
                 $href = $myUrl->toString();

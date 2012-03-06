@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control');
-
 /**
  * Implements editing parameter values with mosParameters object and .xml file 
  */

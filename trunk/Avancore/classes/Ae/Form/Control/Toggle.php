@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control');
-
 /**
  * Anything that can be toggled on and off (checkbox, yes/no list, on/off buttons etc) to enter boolean value   
  */

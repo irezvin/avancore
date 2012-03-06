@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Model_Values');
-
 /**
  * Implements values list from the records
  */

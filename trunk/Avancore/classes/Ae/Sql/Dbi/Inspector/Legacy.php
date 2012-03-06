@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Sql_Dbi_Inspector');
-
 class Ae_Sql_Dbi_Inspector_Legacy extends Ae_Sql_Dbi_Inspector {
 
 	/**

@@ -1,8 +1,5 @@
 <?php
 
-if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass('Ae_Sql_Filter');
-elseif (!class_exists('Ae_Sql_Filter')) require('Ae/Sql/Filter.php');
-
 /**
  * This filter accepts ranges in two formats:
  * - array(array('min' => value1, 'max' => value2), value3, array('min' => value4, 'max' => value5), value6, array('min' => value7), array('max' => value8) etc

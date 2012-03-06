@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Config');
-
 class Ae_Legacy_Config_Native extends Ae_Legacy_Config {
 
     var $db = false;

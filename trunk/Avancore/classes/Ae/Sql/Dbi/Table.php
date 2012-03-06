@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Sql_Dbi_Object');
-
 class Ae_Sql_Dbi_Table extends Ae_Sql_Dbi_Object {
     
     /**
@@ -26,7 +24,6 @@ class Ae_Sql_Dbi_Table extends Ae_Sql_Dbi_Object {
     
     function listColumns() {
         if ($this->_columns === false) {
-            Ae_Dispatcher::loadClass('Ae_Sql_Dbi_Column');
             $allColumns = $this->_inspector->getColumnsForTable($this->_database->deprefixizeTable($this->name), $this->_database->name);
             if (isset($this->_extras['columns']) && is_array($this->_extras['columns'])) Ae_Util::ms($allColumns, $this->_extras['columns']); 
             foreach ($allColumns as $colName => $colData) {
@@ -47,7 +44,6 @@ class Ae_Sql_Dbi_Table extends Ae_Sql_Dbi_Object {
     
     function listIndices() {
         if ($this->_indices === false) {
-            Ae_Dispatcher::loadClass('Ae_Sql_Dbi_Index');
             $this->_indices = array();
             $allIndices = $this->_inspector->getIndicesForTable($this->_database->deprefixizeTable($this->name), $this->_database->name);
             if (isset($this->_extras['indices']) && is_array($this->_extras['indices'])) {
@@ -73,7 +69,6 @@ class Ae_Sql_Dbi_Table extends Ae_Sql_Dbi_Object {
     function listRelations() {
         if ($this->_relations === false) {
             $this->_relations = array();
-            Ae_Dispatcher::loadClass('Ae_Sql_Dbi_Relation');
             $allRelations = $this->_inspector->getRelationsForTable($this->_database->deprefixizeTable($this->name), $this->_database->name);
             if (isset($this->_extras['relations']) && is_array($this->_extras['relations'])) Ae_Util::ms($allRelations, $this->_extras['relations']);
             foreach ($allRelations as $name => $data) {

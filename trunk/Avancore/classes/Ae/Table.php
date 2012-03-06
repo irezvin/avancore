@@ -105,7 +105,7 @@ class Ae_Table {
             if (!isset($settings['class'])) $columnClass = "Ae_Table_Column";
                 else $columnClass = $settings['class'];
             
-            $className = Ae_Dispatcher::loadClass($columnClass);
+            $className = $columnClass;
             
             $this->_columns[$name] = new $className ($this, $name, $settings);
             
@@ -212,7 +212,6 @@ class Ae_Table {
     function getRecordPrototype() {
         if ($this->_recordPrototype === false) {
             if ($this->recordClass) {
-                Ae_Dispatcher::loadClass($this->recordClass);
                 $this->_recordPrototype = new $this->recordClass();
             } else $this->_recordPrototype = null;
         }

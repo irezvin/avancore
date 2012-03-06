@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_User');
-
 class Ae_Legacy_User_Joomla extends Ae_Legacy_User {
 
 	var $josUser = null;

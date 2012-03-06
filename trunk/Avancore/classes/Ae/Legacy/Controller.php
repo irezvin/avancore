@@ -249,7 +249,6 @@ class Ae_Legacy_Controller {
     function getContextInfo() {
         if ($this->_contextInfo === false) {
             $this->bindFromRequest();
-            Ae_Dispatcher::loadclass('Ae_Context_Info');
             $this->_contextInfo = new Ae_Context_Info($this);
             $this->doInitializeRequestInfo();
         }
@@ -346,7 +345,6 @@ class Ae_Legacy_Controller {
                     ob_start();
                 }
                 $rc = $this->getResponseClass();
-                Ae_Dispatcher::loadClass($rc);
                 $this->_response = new $rc;
                 if ($this->doBeforeExecute() !== false) {
                     if ($m = $this->getMethodName()) {
@@ -388,11 +386,9 @@ class Ae_Legacy_Controller {
         if ($this->_template === false) {
             $this->doBeforeGetTemplate();
             if ($tc = $this->_templateClass) {
-                Ae_Dispatcher::loadClass($tc);
                 $this->_template = new $tc();
                 if ($this->_response === false) {
                     if ($rc = $this->getResponseClass()) {
-                        Ae_Dispatcher::loadClass($rc);
                         $this->_response = new $rc;
                     }
                 }

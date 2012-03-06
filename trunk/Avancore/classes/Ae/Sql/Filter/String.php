@@ -1,8 +1,5 @@
 <?php
 
-if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass('Ae_Sql_Filter');
-elseif (!class_exists('Ae_Sql_Filter_Equals')) require('Ae/Sql/Filter/Equals.php');
-
 class Ae_Sql_Filter_String extends Ae_Sql_Filter_Equals {
 
     var $caseSensitive = true;

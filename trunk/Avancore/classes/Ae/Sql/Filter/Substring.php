@@ -1,8 +1,5 @@
 <?php
 
-if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass('Ae_Sql_Filter');
-elseif (!class_exists('Ae_Sql_Filter')) require('Ae/Sql/Filter.php');
-
 class Ae_Sql_Filter_Substring extends Ae_Sql_Filter {
 
     var $colNames = array();

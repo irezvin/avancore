@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Admin_Datalink');
-
 class Ae_Admin_Datalink_Subrecord extends Ae_Admin_Datalink {
     
     var $_relationId = false;
@@ -60,7 +58,6 @@ class Ae_Admin_Datalink_Subrecord extends Ae_Admin_Datalink {
             $this->_relation = & $mapper->getRelation($this->_relationId);
         } else {
             if (is_array($this->_relation)) {
-                Ae_Dispatcher::loadClass('Ae_Model_Relation');
                 $c = $this->_relation;
                 $this->_relation = new Ae_Model_Relation($c);
             }

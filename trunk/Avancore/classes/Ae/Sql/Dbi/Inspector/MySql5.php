@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Sql_Dbi_Inspector');
-
 /**
  * Retrieves column comments and information about relations from INFORMATION_SCHEMA database (available from MySQL v. 5.0)
  */

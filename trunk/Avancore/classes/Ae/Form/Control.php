@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Controller');
-
 class Ae_Form_Control extends Ae_Legacy_Controller {
 
     protected $init = false;
@@ -620,7 +618,6 @@ class Ae_Form_Control extends Ae_Legacy_Controller {
             $res = false;
             if (!$this->hasOwnTemplates && $this->_displayParent) $res = & $this->_displayParent->getSpecificTemplate($templateClass);
             if (!is_object($res)) {
-                Ae_Dispatcher::loadClass($templateClass);
                 $this->_templates[$templateClass] = new $templateClass (array('control' => & $this));
                 $this->_doInitializeTemplate($this->_templates[$templateClass]);
                 $res = & $this->_templates[$templateClass];

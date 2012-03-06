@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control_Template');
-
 class Ae_Form_Control_Template_Tabs extends Ae_Form_Control_Template {
     
     function showTabs (Ae_Form_Control_Tabs $tabs) {

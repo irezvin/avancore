@@ -1,14 +1,5 @@
 <?php
 
-if (class_exists('Ae_Dispatcher')) {
-    Ae_Dispatcher::loadClass('Ae_Sql_Expression');
-    Ae_Dispatcher::loadClass('Ae_Sql_Db_Ae');
-} else {
-    if (!class_exists('Ae_Sql_Expression')) require('Ae/Sql/Expression.php');
-    if (!class_exists('Ae_Sql_Db_Ae')) require('Ae/Sql/Db/Ae.php');
-}
-
-
 /**
  * Tool that generates SQL statements with placeholders.
  * Statement consists from one or more parts and params, where each 'part' is a string with a placeholders and each 'param' is a value or Ae_Sql_Expression.

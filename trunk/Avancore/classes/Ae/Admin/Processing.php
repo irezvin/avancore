@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Controller');
-
 class Ae_Admin_Processing extends Ae_Legacy_Controller {
 
     var $title = 'Processing';
@@ -162,7 +160,6 @@ class Ae_Admin_Processing extends Ae_Legacy_Controller {
             if (!$this->_extRecords) $this->_recordKeys = $this->_getRecordKeysFromRequest();
             if ($this->_noRecords || is_array($this->_recordKeys) && !count($this->_recordKeys)) $this->_records = array();
             if (!$this->_recordsCollection) {
-                Ae_Dispatcher::loadClass('Ae_Model_Collection');
                 $this->_recordsCollection = new Ae_Model_Collection();
                 // Most straightforward way
                 if (is_array($this->_records)) {
@@ -259,7 +256,6 @@ class Ae_Admin_Processing extends Ae_Legacy_Controller {
         elseif ($record->hasProperty('title') && ($p = & $record->getPropertyInfo('title')) && !$p->assocClass && !$p->plural) 
             $title = $record->getField('title');
         else $title = false;
-        Ae_Dispatcher::loadClass('Ae_Admin_ReportEntry');
         if (is_a($record, 'Ae_Model_Object')) $key = $record->getPrimaryKey();
             else $key = false; 
         $e = new Ae_Admin_ReportEntry($description, $type, $dateTime, $key, $title, $isAvailable && $key !== false);
@@ -284,7 +280,6 @@ class Ae_Admin_Processing extends Ae_Legacy_Controller {
      * @access protected
      */
     function & _createReportHeader() {
-        Ae_Dispatcher::loadClass('Ae_Admin_ReportEntry');
         $header = str_replace('{title}', $this->title, $this->header);
         $res = new Ae_Admin_ReportEntry($header, 'message', time());
         return $res;
