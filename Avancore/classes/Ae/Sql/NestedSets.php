@@ -1,15 +1,5 @@
 <?php
 
-if (class_exists('Ae_Dispatcher')) {
-    Ae_Dispatcher::loadClass('Ae_Sql_Statement');
-    Ae_Dispatcher::loadClass('Ae_Sql_Db_Ae');
-    Ae_Dispatcher::loadClass('Ae_Util');
-} else {
-    if (!class_exists('Ae_Sql_Statement')) require('Ae/Sql/Statement.php');
-    if (!class_exists('Ae_Sql_Db_Ae')) require('Ae/Sql/Db/Ae.php');
-    if (!class_exists('Ae_Util')) require('Ae/Util.php');
-}
-
 class Ae_Sql_NestedSets {
     
     const debugStmtCallback = 'Ae_Sql_NestedSets::debugStmtCallback';

@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass ('Ae_Legacy_Adapter');
-
 class Ae_Legacy_Adapter_Native extends Ae_Legacy_Adapter {
 
     var $_user = false;
@@ -35,13 +33,11 @@ class Ae_Legacy_Adapter_Native extends Ae_Legacy_Adapter {
     		$dbClass = 'Ae_Legacy_Database_Native';
     		if (strlen($this->config->dbClass)) $dbClass = $this->config->dbClass; 
             
-            Ae_Dispatcher::loadClass($dbClass);
     		$this->database = new $dbClass($dbSettings);
         } else {
             $this->database = null;
         }
 		
-        Ae_Dispatcher::loadClass('Ae_Legacy_User_Native');
         $this->_user = new Ae_Legacy_User_Native();
         
     }

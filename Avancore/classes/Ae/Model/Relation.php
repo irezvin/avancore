@@ -51,8 +51,6 @@ define ('AMR_DELETE_SET_VALUE', 'AMR_DELETE_SET_VALUE');
  */
 define ('AMR_DELETE_CALL_METHOD', 'AMR_DELETE_CALL_METHOD');
 
-Ae_Dispatcher::loadClass('Ae_Model_Relation_Abstract');
-
 /**
  * Describes relation between two tables. 
  * 
@@ -259,7 +257,6 @@ class Ae_Model_Relation extends Ae_Model_Relation_Abstract {
     function & factory($config = array()) {
         if (isset($config['class']) && $config['class']) $class = $config['class'];
             else $class = 'Ae_Model_Relation';
-        Ae_Dispatcher::loadClass($class);
         $res = new $class($config);
         if (!is_a($res, 'Ae_Model_Relation')) trigger_error ("Class '{$class}' is not inherited from Ae_Model_Relation", E_USER_ERROR);
         return $res;

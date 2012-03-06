@@ -6,9 +6,6 @@
  * @version        $Id$
  */
 
-if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass('Ae_Sql_Part');
-elseif (!class_exists('Ae_Sql_Part')) require('Ae/Sql/Part.php');
-
 class Ae_Sql_Order extends Ae_Sql_Part {
 
     function getAppliedOrderBy() {

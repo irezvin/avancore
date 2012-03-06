@@ -641,7 +641,6 @@ class Ae_Util {
         $className = $baseClass;
         if (strlen($classParam) && isset($options[$classParam]) && strlen($options[$classParam])) 
             $className = $options[$classParam];
-        if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass($className);
         if (!class_exists($className)) {
         	if ($loadWithUnderscores) {
         		require($fName = str_replace('_', DIRECTORY_SEPARATOR, trim($className,'_').'.php'));

@@ -1,10 +1,5 @@
 <?php
 
-if (!class_exists('Ae_Param_Impl_Paths')) {
-    if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass('Ae_Param_Impl_Paths');
-        else require('Ae/Param/Impl/Paths.php');
-}
-
 /**
  * Abstract source of structured (hierarchical) data.
  * 

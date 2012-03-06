@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Config_Joomla');
-
 class Ae_Legacy_Config_Joomla15 extends Ae_Legacy_Config_Joomla {
 
 	var $_jConfig = false;

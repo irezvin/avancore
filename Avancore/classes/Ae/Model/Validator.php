@@ -275,7 +275,6 @@ class Ae_Model_Validator {
             $res = array();
         }
         if(!isset($res['valueList']) && isset($res['values']) && is_array($res['values']) && is_object($this->model)) {
-            Ae_Dispatcher::loadClass('Ae_Model_Values');
             $vals = Ae_Model_Values::factoryIndependent($res['values']);
             $vals->data = & $this->model;
             
@@ -425,8 +424,6 @@ class Ae_Model_Validator {
                         break;
                         
                     case 'date':
-                        Ae_Dispatcher::loadClass('Ae_Model_DateTime');
-    
                         $arrDate = Ae_Model_DateTime::arrayFromString($value);
                         if (isset($arrDate['year']) && isset($arrDate['month']) && isset($arrDate['mday'])) {
                             if (Ae_Model_DateTime::isZeroDate($arrDate)) {
@@ -439,7 +436,6 @@ class Ae_Model_Validator {
                         break;
                         
                     case 'time':
-                        Ae_Dispatcher::loadClass('Ae_Model_DateTime');
                         $arrDate = Ae_Model_DateTime::arrayFromString($value);
                         if (isset($arrDate['hours']) && isset($arrDate['minutes'])) {
                             if (!isset($arrDate['seconds'])) $arrDate['seconds'] = 0;
@@ -449,7 +445,6 @@ class Ae_Model_Validator {
                         break;
                         
                     case 'dateTime':
-                        Ae_Dispatcher::loadClass('Ae_Model_DateTime');
                         $arrDate = Ae_Model_DateTime::arrayFromString($value);
                         if (Ae_Model_DateTime::isZeroDate($arrDate)) {
                             $res = $this->getZeroDateValue($fieldInfo, $type);

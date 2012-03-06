@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Upload_File');
-
 class Ae_Image_Upload extends Ae_Upload_File {
     
     /**

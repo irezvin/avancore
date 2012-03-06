@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Sql_Select_TableProvider');
-
 class Ae_Sql_Select extends Ae_Sql_Select_TableProvider {
     
     /**

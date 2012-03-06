@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Template_Helper');
-
 class Ae_Template_Helper_Html extends Ae_Template_Helper {
     function jsQuote($string, $singleQuote = true) {
         $quote = $singleQuote? "'" : '"';

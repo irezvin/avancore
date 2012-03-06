@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Response_Http');
-
 class Ae_Legacy_Controller_Response_Html extends Ae_Legacy_Controller_Response_Http {
     
     var $pageTitle = array();

@@ -124,7 +124,6 @@ class Ae_Legacy_Controller_Std_Submission_Sendout {
         if ($this->_mail === false) {
              $rcpt = $this->getRecipients();
              if ($rcpt) {
-                 Ae_Dispatcher::loadClass('Ae_Mail');
                  $this->_mail = new Ae_Mail(false, $rcpt, $this->subject, $this->from);
                  Ae_Util::simpleBind($this->mailExtraSettings, $this->_mail);
                  if ($this->replyTo) $this->_mail->replyTo = $this->replyTo;

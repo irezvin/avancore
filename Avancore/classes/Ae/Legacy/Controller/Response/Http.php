@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Response');
-
 class Ae_Legacy_Controller_Response_Http extends Ae_Legacy_Controller_Response {
     
     const redirMultipleChoices = '300';

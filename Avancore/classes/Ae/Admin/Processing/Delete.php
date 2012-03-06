@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Admin_Processing');
-
 class Ae_Admin_Processing_Delete extends Ae_Admin_Processing {
     
     var $header = 'Deleting records';

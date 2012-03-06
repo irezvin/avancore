@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Sql_Expression');
-
 /**
  * @author Nivzer
  */

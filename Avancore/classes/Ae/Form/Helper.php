@@ -449,7 +449,6 @@ class Ae_Form_Helper {
         if (!is_array($valueList) || !count($valueList)) {
             // Check if we can use Ae_Data_List here...
             if (isset($options['values']) && is_array($options['values'])) {
-                Ae_Dispatcher::loadClass('Ae_Model_Values');
                 $vls = & Ae_Model_Values::factoryWithFormOptions($this->_src, $name, $options);
                 $valueList = array('0' => & $vls); 
             }

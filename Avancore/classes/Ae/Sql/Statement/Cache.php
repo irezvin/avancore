@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Sql_Statement');
-
 class Ae_Sql_Statement_Cache {
 	
 	var $defaults = array();

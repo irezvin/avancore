@@ -39,7 +39,6 @@ class Ae_Template {
      * @return Ae_Template
      */
     function & factory($className, $vars = array()) {
-        Ae_Dispatcher::loadClass($className);
         $res = new $className($vars);
         return $res;
     }
@@ -182,7 +181,6 @@ class Ae_Template {
      */
     function getHelper ($class) {
         if (!isset($this->_helpers[$class])) {
-            Ae_Dispatcher::loadClass($class);
             $this->_helpers[$class] = new $class ($this);
         }
         return $this->_helpers[$class];

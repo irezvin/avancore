@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Template_Html');
-
 class Ae_Template_JoomlaPage extends Ae_Template_Html {
     
     var $addXmlTag = true;

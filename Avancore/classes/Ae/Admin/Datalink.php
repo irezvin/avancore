@@ -22,7 +22,6 @@ class Ae_Admin_Datalink {
        $class = 'Ae_Admin_Datalink';
        if (isset($params['class']) && strlen($params['class'])) {
            $class = $params['class'];
-           Ae_Dispatcher::loadClass($params['class']);
            unset($params['class']);
        }
        $res = new $class ($params);

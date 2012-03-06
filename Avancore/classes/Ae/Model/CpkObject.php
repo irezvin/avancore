@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Model_Object');
-
 /**
  * Base class of models that have compound primary key
  */

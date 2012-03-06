@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Sql_Dbi_Inspector');
-
 class Ae_Sql_Dbi_Inspector_MsSql extends Ae_Sql_Dbi_Inspector {
 	
     /**
@@ -13,7 +11,6 @@ class Ae_Sql_Dbi_Inspector_MsSql extends Ae_Sql_Dbi_Inspector {
 
     function Ae_Sql_Dbi_Inspector_MsSql(& $sqlDb, $defaultDatabaseName = false) {
     	if (is_a($sqlDb, 'Ae_Legacy_Database')) {
-    		Ae_Dispatcher::loadClass('Ae_Sql_Db_Ae');
     		$this->_db = new Ae_Sql_Db_Ae($sqlDb);
     	} elseif (!is_a($sqlDb, 'Ae_Sql_Db')) trigger_error("\$sqlDb must be an instance of Ae_Sql_Db");
     	else $this->_db = & $sqlDb;

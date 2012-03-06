@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control_Group');
-
 /**
  * Allows to visually group several controls together
  */

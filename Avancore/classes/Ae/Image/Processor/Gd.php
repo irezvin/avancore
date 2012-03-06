@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Image_Processor');
-
 class Ae_Image_Processor_Gd extends Ae_Image_Processor {
     
     /**

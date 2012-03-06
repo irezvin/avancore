@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Upload_Controller');
-
 class Ae_Image_Upload_Controller extends Ae_Upload_Controller {
 
     var $defaultUploadManagerClass = 'Ae_Image_Upload_Manager';

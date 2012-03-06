@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Upload_Controller_Template');
-
 class Ae_Image_Upload_Controller_Template extends Ae_Upload_Controller_Template {
 
     var $langWidth = 'Width';

@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Table_Column');
-
 /**
  * This class shows record's published status icon along with the link to change record's publishing 
  *  

@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Form_Control_Composite');
-
 class Ae_Form extends Ae_Form_Control_Composite {
 
     /**

@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Model_Mapper');
-
 /**
  * Base class of mapper for models that have compound primary key
  */
@@ -62,7 +60,7 @@ class Ae_Model_CpkMapper extends Ae_Model_Mapper {
                 $rows = $this->database->loadAssocList();
                 if ($rows && $arrayRow = $rows[0]) {
                     $classPath = $this->getRecordClass ($arrayRow);
-                    $className = Ae_Dispatcher::loadClass($classPath);
+                    $className = $classPath;
                     $record = new $className();
                     $record->load ($arrayRow, null, true);
                 } else {

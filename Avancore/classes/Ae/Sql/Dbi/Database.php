@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Sql_Dbi_Object');
-
 class Ae_Sql_Dbi_Database extends Ae_Sql_Dbi_Object {
     
     var $_tables = false;
@@ -46,7 +44,6 @@ class Ae_Sql_Dbi_Database extends Ae_Sql_Dbi_Object {
     function getTable($tableName) {
         if (!in_array($tableName, $this->listTables())) trigger_error('No such table: \''.$tableName.'\' in db \''.$this->name.'\'', E_USER_ERROR);
         if ($this->_tables[$tableName] === false) {
-            Ae_Dispatcher::loadClass('Ae_Sql_Dbi_Table');
             if (isset($this->_extras['tables']) && is_array($this->_extras['tables']) && isset($this->_extras['tables'][$tableName]) && is_array($this->_extras['tables'][$tableName])) $extras = $this->_extras['tables'][$tableName];
                 else $extras = array();
             $this->_tables[$tableName] = new Ae_Sql_Dbi_Table($this->_inspector, $tableName, $this, $extras);

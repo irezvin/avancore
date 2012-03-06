@@ -54,8 +54,6 @@ class Ae_Sql_Part {
         if (isset($options['class'])) 
             $class = $options['class']; 
             else $class = $baseClass;
-        if (class_exists('Ae_Dispatcher')) Ae_Dispatcher::loadClass($class);
-            else if (!class_exists($class)) require(str_replace('_', '/', $class).'.php');
         $res = new $class($options);
         assert(is_a($res, $baseClass));
         return $res;

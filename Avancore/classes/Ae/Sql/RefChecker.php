@@ -99,7 +99,6 @@ class Ae_Sql_RefChecker {
 						foreach ($rel->columns as $myColName => $otherColName) {
 							$nrv = $this->getValidNonRefValues($tableName, $myColName, false);
 							if ($nrv) {
-								Ae_Dispatcher::loadClass('Ae_Sql_Expression');
 								$joinsOn[] = new Ae_Sql_Expression($this->_db->n(array($alias, $myColName)).' NOT IN ('.$this->_db->q($nrv).')');
 							}
 						}
@@ -115,7 +114,6 @@ class Ae_Sql_RefChecker {
 		} else {
 			if (!$this->suppressWarnings) trigger_error("Table \'$tableName\' doesn't have outgoing references", E_USER_WARNING);
 		}
-		Ae_Dispatcher::loadClass('Ae_Sql_Select');
 		$s = new Ae_Sql_Select($this->_db, array(
 			'primaryAlias' => $alias,
 			'tables' => $tablePrototypes,

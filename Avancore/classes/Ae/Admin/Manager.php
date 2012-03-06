@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Legacy_Controller');
-
 class Ae_Admin_Manager extends Ae_Legacy_Controller {
 
     var $singleCaption = false;
@@ -198,7 +196,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
         if ($this->_formResponse === false) {
             $template = & $this->getTemplate();
             $form = & $this->getForm();
-            Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Response_Html');
             $hr = new Ae_Legacy_Controller_Response_Html();
             $form->htmlResponse = & $hr;
             $hr->content = $form->fetchPresentation();
@@ -211,7 +208,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
         if ($this->_filterFormResponse === false) {
             $template = & $this->getTemplate();
             $form = & $this->getFilterForm();
-            Ae_Dispatcher::loadClass('Ae_Legacy_Controller_Response_Html');
             $hr = new Ae_Legacy_Controller_Response_Html();
             $form->htmlResponse = & $hr;
             $hr->content = $form->fetchPresentation();
@@ -290,7 +286,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
                     $resp = & $proc->getResponse(); // TODO: merge processing response with current one and show processing dialog if needed
                     if ($rep = & $proc->getReport()) {
                         if (!$this->_report) {
-                            Ae_Dispatcher::loadClass('Ae_Admin_ReportEntry');
                             $this->_report = new Ae_Admin_ReportEntry();
                         }
                         $this->_report->addChildEntry($rep);
@@ -606,10 +601,8 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
         if ($this->_form === false) {
             if ($record = & $this->getRecord()) {
                 $formConfig = $this->_computeFormConfig();
-                Ae_Dispatcher::loadClass('Ae_Form');
                 if (isset($formConfig['class']) && strlen($formConfig['class'])) $class = $formConfig['class'];
                     else $class = 'Ae_Form';
-                Ae_Dispatcher::loadClass($class);
                 $formContext = & $this->_createFormContext();
                 $this->_form = new $class ($formContext, $formConfig, 'form');
                 $this->_form->htmlResponse = & $this->_response;
@@ -633,10 +626,8 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
         if ($this->_filterForm === false) {
             $formConfig = $this->_computeFilterFormConfig();
             if (isset($formConfig['controls']) && is_array($formConfig['controls']) && count($formConfig['controls'])) {
-                Ae_Dispatcher::loadClass('Ae_Form');
                 if (isset($formConfig['class']) && strlen($formConfig['class'])) $class = $formConfig['class'];
                     else $class = 'Ae_Form';
-                Ae_Dispatcher::loadClass($class);
                 $formContext = & $this->_createFilterFormContext();
                 $this->_filterForm = new $class ($formContext, $formConfig, 'filterForm');
                 $this->_filterForm->htmlResponse = & $this->_response;
@@ -710,11 +701,9 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
     function getTable() {
         if ($this->_table === false) {
             if ($this->_collectionCanBeUsed()) {
-                Ae_Dispatcher::loadClass('Ae_Table_Sequential');
                 $this->_table = new Ae_Table_Sequential($this->_getColumnSettings(), $this->_getRecordsCollection(), $this->getPagination(), array(), $this->_getRecordClass());
                 //var_dump($this->_getRecordsCollection()->getStatementTail(), $this->_getRecordsCollection()->_extraColumns);
             } else {
-                Ae_Dispatcher::loadClass('Ae_Table');
                 $records = array($this->onlyRecord);
                 $this->_table = new Ae_Table ($this->_getColumnSettings(), $records, $this->_getCompatPagenav(), array(), $this->_getRecordClass());
             }
@@ -737,7 +726,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
                 }
             }
             foreach ($this->listAllFeatureClasses() as $fc) {
-                Ae_Dispatcher::loadClass($fc);
                 if (isset($this->featureSettings[$fc]) && is_array($this->featureSettings[$fc])) $featureSettings = $this->featureSettings[$fc];
                     else $featureSettings = array(); 
                 $feature = new $fc ($this, $featureSettings);
@@ -778,7 +766,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
                     }
                 }
             }
-            Ae_Dispatcher::loadClass('Ae_Admin_Action');
             if (!is_array($actionPrototypes)) $actionPrototypes = array();
             foreach ($actionPrototypes as $ak => $p) {
                 $action = & Ae_Admin_Action::factory($p);
@@ -802,7 +789,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
      */
     function getPagination() {
         if ($this->_pagination === false) {
-            Ae_Dispatcher::loadClass('Ae_Admin_Pagination');
             $context = & $this->getContext();
             $pgContext = & $context->spawn('pagination');
             $this->_pagination = new Ae_Admin_Pagination($pgContext, array(), $this->_instanceId.'_pagination');
@@ -878,7 +864,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
             $ctx = & $this->_createSubManagerContext($id);
             if (isset($conf['class']) && strlen($conf['class'])) {
                 $class = $conf['class'];
-                Ae_Dispatcher::loadClass($conf['class']);
             } else $class = 'Ae_Admin_Manager';
             $sm = new $class ($ctx, $conf, $this->_instanceId.'_'.$id);
             $this->_subManagers[$id] = & $sm;
@@ -902,7 +887,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
             $prot['manager'] = $this;
             if (isset($prot['class']) && strlen($prot['class'])) {
                 $class = $prot['class'];
-                Ae_Dispatcher::loadClass($class);
             } else {
                 $class = 'Ae_Admin_Processing';
             }
@@ -1056,7 +1040,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
             $allState['sm_'.$i] = $s->getStateData();
         }
         if ($subRedirect) {
-            Ae_Dispatcher::loadClass('Ae_Url');
             $u = new Ae_Url($subRedirect);
             $mu = & $this->getManagerUrl('details', $allState);
             $mu->query = Ae_Util::m($mu->query, $u->query, true);
@@ -1146,7 +1129,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
                         'filters' => $allFilters, 
                     );
                 }
-                Ae_Dispatcher::loadClass('Ae_Sql_Part');
                 $this->_sqlFilter = & Ae_Sql_Part::factory($filterSettings, 'Ae_Sql_Filter');
             }
         }
@@ -1176,7 +1158,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
                         'applied' => 1,
                     );
                 }
-                Ae_Dispatcher::loadClass('Ae_Sql_Part');
                 $this->_sqlOrder = & Ae_Sql_Part::factory($orderSettings, 'Ae_Sql_Order');
             }
         }
@@ -1198,11 +1179,9 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
             $f = & $this->_getSqlFilter();
             $o = & $this->_getSqlOrder();
             if ($f || $o || $options) {
-                Ae_Dispatcher::loadClass('Ae_Sql_Db_Ae');
                 $disp = & Ae_Dispatcher::getInstance();
                 $db = & $disp->database;
                 $sqlDb = new Ae_Sql_Db_Ae($db);
-	            Ae_Dispatcher::loadClass('Ae_Sql_Select');
 	            $options = Ae_Util::m(array(
 	                'tables' => array(
 	                    't' => array(
@@ -1237,7 +1216,6 @@ class Ae_Admin_Manager extends Ae_Legacy_Controller {
     function & _getRecordsCollection() {
         if ($this->_recordsCollection === false) {
             if ($this->_collectionCanBeUsed()) {
-                Ae_Dispatcher::loadClass('Ae_Model_Collection');
                 $this->_recordsCollection = new Ae_Model_Collection($this->mapperClass, false, $this->_getWhere(), $this->_getOrder(), $this->_getJoins(), $this->_getExtraColumns());
                 $this->_recordsCollection->setDistinct();
                 $this->_recordsCollection->setGroupBy($this->_getGroupBy());
