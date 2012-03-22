@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Cg_Inflector');
-
 class Cg_Dictionary {
     
     var $translations = array();

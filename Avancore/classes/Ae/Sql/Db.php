@@ -1,6 +1,6 @@
 <?php
 
-class Ae_Sql_Db {
+abstract class Ae_Sql_Db {
 
     var $defaultIndent = 4;
     
@@ -20,13 +20,13 @@ class Ae_Sql_Db {
             foreach ($value as $v) $r[] = $this->q($v, $asArray);
             return $asArray? $r: implode(", ", $r);
         } else {
-            $res = $this->_implValueQuote($value);
+            $res = $this->implValueQuote($value);
         }
         return $res;
     }
     
     function nameUnqote($name) {
-    	$res = $this->_implNameUnquote($name);
+    	$res = $this->implNameUnquote($name);
     }
     
     function nameQuoteBody($name) {
@@ -43,9 +43,9 @@ class Ae_Sql_Db {
             $r = array();
             foreach ($name as $v) $r[] = $this->n($v);
             if ($many) return implode(", ", $r);
-            else return $this->_implConcatNames($r);
-        } elseif ($this->checkIfNameQuoted && $this->_implIsNameQuoted($name)) return $name;
-        $name = $this->_implNameQuote($name);
+            else return $this->implConcatNames($r);
+        } elseif ($this->checkIfNameQuoted && $this->implIsNameQuoted($name)) return $name;
+        $name = $this->implNameQuote($name);
         return $name;
     }
     
@@ -160,61 +160,35 @@ class Ae_Sql_Db {
         return $statement.' '.$this->getLimitClause($count, $offset, $orderBy);
     }
     
-    function _implValueQuote($value) {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract protected function implValueQuote($value);
     
-    function _implNameQuote($name) {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract protected function implNameQuote($name);
     
-    function _implNameUnquote($name) {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract protected function implNameUnquote($name);
     
-    function _implIsNameQuoted($name) {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract protected function implIsNameQuoted($name);
     
-    function _implConcatNames($quotedNames) {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract protected function implConcatNames($quotedNames);
     
-    function fetchArray($query, $keyColumn = false) {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract function fetchArray($query, $keyColumn = false);
     
-    function fetchObjects($query, $keyColumn = false) {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract function fetchObjects($query, $keyColumn = false);
 
-    function fetchRow($query, $key = false, $keyColumn = false, $withNumericKeys = false, $default = false) {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract function fetchRow($query, $key = false, $keyColumn = false, $withNumericKeys = false, $default = false);
     
-    function fetchColumn($query, $colNo = 0, $keyColumn = false) {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract function fetchColumn($query, $colNo = 0, $keyColumn = false);
     
-    function fetchValue($query, $colNo = 0, $default = null) {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract function fetchValue($query, $colNo = 0, $default = null);
     
-    function query($query) {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract function query($query);
     
-    function getErrorCode() {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract function getErrorCode();
     
-    function getErrorDescr() {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract function getErrorDescr();
 
-    function getLastInsertId() {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract function getLastInsertId();
+    
+    abstract function getIfnullFunction();
     
     function getOrderDirection($orderPart) {
         if (is_array($orderPart)) {

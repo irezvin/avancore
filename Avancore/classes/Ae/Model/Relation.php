@@ -60,6 +60,11 @@ define ('AMR_DELETE_CALL_METHOD', 'AMR_DELETE_CALL_METHOD');
  * Interface of this class has one specific quality: most methods (load, count, delete) are in two flavours: for source table and for destination one.     
  */
 class Ae_Model_Relation extends Ae_Model_Relation_Abstract {
+
+    /**
+     * @var Ae_Application
+     */
+    protected $application = false;
     
     /**
      * Name of source table mapper (if given). If source mapper is given, all other parameters will be taken from its function calls.
@@ -255,32 +260,54 @@ class Ae_Model_Relation extends Ae_Model_Relation_Abstract {
      * @return Ae_Model_Relation
      */
     function & factory($config = array()) {
-        if (isset($config['class']) && $config['class']) $class = $config['class'];
-            else $class = 'Ae_Model_Relation';
-        $res = new $class($config);
-        if (!is_a($res, 'Ae_Model_Relation')) trigger_error ("Class '{$class}' is not inherited from Ae_Model_Relation", E_USER_ERROR);
-        return $res;
+        return Ae_Autoparams::factory($config, 'Ae_Model_Relation');
+    }
+    
+    function setSrcMapper(Ae_Model_Mapper $srcMapper) {
+        $this->_srcMapper = $srcMapper;
+        $this->srcMapperClass = $srcMapper->getId();
+        if (!$this->database) $this->database = $this->_srcMapper->getDatabase();
+    }
+    
+    function setDestMapper(Ae_Model_Mapper $destMapper) {
+        $this->_destMapper = $destMapper;
+        if (!$this->database) $this->database = $this->_destMapper->getDatabase();
+    }
+    
+    function setApplication(Ae_Application $application) {
+        $this->application = $application;
+        if (!$this->database) $this->database = $this->application->getLegacyDatabase();
+    }
+    
+    /**
+     * @return Ae_Application
+     */
+    function getApplication() {
+        return $this->application;
     }
     
     /**
      * @param array $config Array prototype of the object
      */
-    function Ae_Model_Relation ($config = array()) {
-        Ae_Util::simpleBind($config, $this);
-        if ($this->database === false) {
-            $disp = & Ae_Dispatcher::getInstance();
-            $this->database = & $disp->database;
-        }
+    function __construct ($config = array()) {
+        Ae_Autoparams::setObjectProperty($this, $config);
+        
         if (($this->srcTableName === false) && strlen($this->srcMapperClass)) {
-            $this->_srcMapper = & Ae_Model_Mapper::getMapper($this->srcMapperClass);
+            $this->_srcMapper = & Ae_Model_Mapper::getMapper($this->srcMapperClass, $this->application);
             $this->srcTableName = $this->_srcMapper->tableName;
             if ($this->srcOrdering === false) $this->srcOrdering = $this->_srcMapper->getDefaultOrdering();
         }
         if (($this->destTableName === false) && strlen($this->destMapperClass)) {
-            $this->_destMapper = & Ae_Model_Mapper::getMapper($this->destMapperClass);
+            $this->_destMapper = & Ae_Model_Mapper::getMapper($this->destMapperClass, $this->application);
             $this->destTableName = $this->_destMapper->tableName;
             if ($this->destOrdering === false) $this->destOrdering = $this->_destMapper->getDefaultOrdering();
         }
+        
+        if ($this->database === false) {
+            if ($this->_srcMapper) $this->database = $this->_srcMapper->getDatabase();
+            elseif ($this->_destMapper) $this->database = $this->_destMapper->getDatabase();
+        }
+        
         if (!$this->fieldLinks) trigger_error('fieldLinks must be specified', E_USER_ERROR);
             else $this->_fieldLinksRev = array_flip($this->fieldLinks);
         
@@ -846,8 +873,8 @@ class Ae_Model_Relation extends Ae_Model_Relation_Abstract {
             $fi = $this->database->getFieldsInfo($rr);
             $rightKeyFields = array_values($allKeys[1]);
             if ($byKeys) {
-                $disp = & Ae_Dispatcher::getInstance();
-                $tn = str_replace('#__', $disp->config->prefix, $tableName);
+                $prefix = $this->database->getPrefix();
+                $tn = str_replace('#__', $prefix, $tableName);
                 if ($ta) $tn = $ta;
                 if (count($keys) === 1) {
                     $key = $keys[0];

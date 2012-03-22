@@ -53,9 +53,6 @@ class Ae_Legacy_Database {
         if (get_class($this) == 'Ae_Legacy_Database') trigger_error ("Attempt to instantiate abstract class Ae_Legacy_Database", E_USER_ERROR);
         if (isset($options['config']) && is_a($options['config'], 'Ae_Legacy_Config')) {
             $this->_config = & $options['config']; 
-        } else {
-            $disp = & Ae_Dispatcher::getInstance();
-            $this->_config = & $disp->config;
         }
         if (isset($options['tmpDir'])) {
             $this->_tmpDir = $options['tmpDir'];
@@ -65,6 +62,12 @@ class Ae_Legacy_Database {
         if (isset($options['debug'])) $this->debug = $options['debug'];
         $this->initOptions = $options;
         $this->_doInitialize($options); 
+    }
+    
+    function getPrefix() {
+        $res = '';
+        if (isset($this->initOptions['prefix'])) $res = $this->initOptions['prefix'];
+        return $res;
     }
     
     /**

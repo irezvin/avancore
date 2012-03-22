@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Cg_Template_Assoc_Strategy');
-
 class Cg_Template_Assoc_Strategy_Many extends Cg_Template_Assoc_Strategy {
     
     function _doShowGenModelMethods() {

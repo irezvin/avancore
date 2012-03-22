@@ -111,7 +111,6 @@ class Cg_Strategy {
      * @return Cg_Template
      */
     function & _createTemplate($templateName, $modelName = false) {
-        Ae_Dispatcher::loadClass($templateName);
         $tpl = new $templateName;
         $tpl->generator = $this->_gen;
         if (strlen($modelName)) {

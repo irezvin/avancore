@@ -24,15 +24,33 @@ class Ae_Legacy_Controller_Response_Html extends Ae_Legacy_Controller_Response_H
         $this->pageTitle[] = $title;
     }
     
-    function addJsLib($jsLib, $isLocal, $atBeginning = false) {
-        if ($atBeginning) $this->jsLibs = array_merge(array(array($jsLib, $isLocal)), $this->jsLibs);
-        else $this->jsLibs[] = array($jsLib, $isLocal);
-        $this->jsLibs = Ae_Util::array_unique($this->jsLibs);
+    function addAssetLibs($assetLibs) {
+        $assetLibs = Ae_Util::toArray($assetLibs);
+        foreach ($assetLibs as $lib) {
+            if (!strcasecmp(substr($lib, -4), ".css")) $this->addCssLib($lib);
+                else $this->addJsLib($lib);
+        }
     }
     
-    function addCssLib($cssLib, $isLocal) {
-        $this->cssLibs[] = array($cssLib, $isLocal);
-        $this->cssLibs = Ae_Util::array_unique($this->cssLibs);
+    function addJsLib($jsLib, $isLocal = false, $atBeginning = false) {
+        if (is_array($jsLib)) {
+            foreach ($atBeginning? array_reverse($jsLib) : $jsLib as $lib) {
+                $this->addJsLib($lib, $isLocal, $atBeginning);
+            }
+        } else {
+            if ($atBeginning) $this->jsLibs = array_merge(array(array($jsLib, $isLocal)), $this->jsLibs);
+            else $this->jsLibs[] = array($jsLib, $isLocal);
+            $this->jsLibs = Ae_Util::array_unique($this->jsLibs);
+        }
+    }
+    
+    function addCssLib($cssLib, $isLocal = false) {
+        if (is_array($cssLib)) {
+            foreach ($cssLib as $lib) $this->addCssLib($lib, $isLocal);
+        } else {
+            $this->cssLibs[] = array($cssLib, $isLocal);
+            $this->cssLibs = Ae_Util::array_unique($this->cssLibs);
+        }
     }
     
     function addMeta($metaName, $metaContent, $isHttpEquiv = false) {
@@ -52,14 +70,14 @@ class Ae_Legacy_Controller_Response_Html extends Ae_Legacy_Controller_Response_H
     }
     
     function getJsScriptTag($jsLib, $isLocal) {
-        $disp = & Ae_Dispatcher::getInstance();
-        $res = '<script type="text/javascript" src="'.($disp->adapter->getJsUrlStr($jsLib, $isLocal)).'"> </script>';
+        $url = self::unfoldAssetString($jsLib, $this->getApplication()->getAssetPlaceholders());
+        $res = '<script type="text/javascript" src="'.$url.'"> </script>';
         return $res;
     }
     
     function getCssLibTag($cssLib, $isLocal) {
-        $disp = & Ae_Dispatcher::getInstance();
-        $res = '<link rel="stylesheet" type="text/css" href="'.($disp->adapter->getCssUrlStr($cssLib, $isLocal)).'" />';
+        $url = self::unfoldAssetString($cssLib, $this->getApplication()->getAssetPlaceholders());
+        $res = '<link rel="stylesheet" type="text/css" href="'.$url.'" />';
         return $res;
     }
     
@@ -134,6 +152,17 @@ class Ae_Legacy_Controller_Response_Html extends Ae_Legacy_Controller_Response_H
         $res = parent::__sleep();
         return $res;
     }
+    
+    static function unfoldAssetString($jsOrCssLib, array $assetPlaceholders) {
+        $i = 0;
+        for ($i = 0; $i < 10; $i++) {
+            $new = strtr($jsOrCssLib, $assetPlaceholders);
+            if ($new == $jsOrCssLib) break;
+            $jsOrCssLib = $new;
+        }
+        return $jsOrCssLib;
+    }
+    
     
 }
 

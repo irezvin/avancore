@@ -106,7 +106,7 @@ class Ae_Template_Html extends Ae_Template {
     
     function addJsLib($jsLib, $isLocal = true, $atBeginning = false) {
         if (is_array($jsLib)) {
-            foreach ($jsLib as $l) $this->addJsLib($l, $isLocal);
+            foreach ($jsLib as $l) $this->addJsLib($l, $isLocal, $atBeginning);
         } else {
             if (is_a($this->htmlResponse, 'Ae_Legacy_Controller_Response_Html')) {
                 $this->htmlResponse->addJsLib($jsLib, $isLocal, $atBeginning);

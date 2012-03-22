@@ -185,6 +185,24 @@ class Ae_Legacy_Controller_Response {
         foreach ($this->parts as $p) $p->handleResponseWakeup($this);
     }
     
+    /**
+     * @var Ae_Application
+     */
+    protected $application = false;
+
+    function setApplication(Ae_Application $application) {
+        $this->application = $application;
+    }
+
+    /**
+     * @return Ae_Application
+     */
+    function getApplication() {
+        if ($this->application) $res = $this->application;
+            else $res = Ae_Application::getDefaultInstance ();
+        return $res;
+    }    
+    
 }
 
 ?>

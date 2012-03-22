@@ -91,7 +91,6 @@ class Cg_Property {
     
     function getCaption() {
         if ($this->_model->_domain->captionsToPmtLangStrings) {
-            Ae_Dispatcher::loadClass('Cg_Php_Expression');
             $res = new Cg_Php_Expression("new Pmt_Lang_String('".$this->getLangStringName()."')");
         } else {
             $res = $this->caption;

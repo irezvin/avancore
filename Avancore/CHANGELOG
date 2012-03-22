@@ -1,6 +1,16 @@
+2012-03-22
+
++ Ae_Sql_Db is now abstract, added proper method visibility ('protected' instead of '_')
++ Ae_Model_Mapper::getMapper() supports $application instance and passing instance directly instead of 'mapper class' string
+- Dropped Ae_Config references in Ae_Legacy_Database and its descendant
+- Removed Ae_Dispatcher::loadClass() references in Cg_ family and code templates
++ Added addAssetLibs(), replacePrefixes() to Ae_Legacy_Controller_Response_Html; Ae_Output now provides Ae_Application instance to it
++ Ae_Util::htmlspecialchars now uses ENT_QUOTES by default (but I have to review htmlspecialchars in other parts of the framework yet)
+
 2012-03-06
 
 + Removed calls to Ae_Dispatcher::loadClass() before usage of classes, since framework already depends on autoloading
+- Ae_Model_Object will no more forget/restore $this->_db dependency during the sleep
 
 2012-03-04
 

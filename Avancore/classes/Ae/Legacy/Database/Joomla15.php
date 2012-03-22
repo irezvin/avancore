@@ -13,23 +13,21 @@ class Ae_Legacy_Database_Joomla15 extends Ae_Legacy_Database_Joomla {
         if (!$this->_config && class_exists('JConfig', false)) {
             $this->_config = new Ae_Legacy_Config_Joomla15(false);
         }
-        if ($this->_config) {
-            $res = array(
-                'user' => $this->_config->getNative('user'), 
-                'password' => $this->_config->getNative('password'), 
-                'host' => $this->_config->getNative('host'), 
-                'db' => $this->_config->getNative('db'), 
-                'prefix' => $this->_config->getNative('dbprefix'),
-            );
-        } else {
-            $res = array();
+        $res = array();
+        if (class_exists('JConfig')) {
+            $jc = new JConfig;
+            $res['user'] = $jc->user;
+            $res['password'] = $jc->password;
+            $res['db'] = $jc->db;
+            $res['host'] = $jc->host;
+            $res['prefix'] = $jc->dbprefix;
         }
         return $res;
     }
     
     function _doInitialize($options) {
-        if (!defined('_JEXEC') || !class_exists('JFactory')) 
-            trigger_error ('No Joomla and/or JFactory found', E_USER_ERROR);
+        if (!class_exists('JFactory')) 
+            trigger_error ('No JFactory found', E_USER_ERROR);
             
         $this->_db = &JFactory::getDBO();     
     }

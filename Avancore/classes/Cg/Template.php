@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Template');
-
 class Cg_Template extends Ae_Template {
     
     var $_init = false;

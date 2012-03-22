@@ -161,8 +161,7 @@ class Ae_Model_Collection {
             if (is_array($pkName) && count($pkName) == 1) $pkName = $pkName[0];
         }
         if (!$this->_db) {
-            $disp = & Ae_Dispatcher::getInstance();
-            $this->_db = & $disp->database;
+            throw new Exception("Database not provided, call setDatabase() first");
         }
         $this->setWhere($this->_db->sqlKeysCriteria($keys, $pkName));
     }
@@ -177,7 +176,7 @@ class Ae_Model_Collection {
      * 
      * $recordClassCallback function should accept parameter $row, and return corresponding record class (false to create an array)
      */
-    function useNoMapper($tableName, $pkName, $recordClass = false, $recordClassCallback = null) {
+    function useNoMapper($tableName, $pkName, $recordClass = false, $recordClassCallback = null, Ae_Legacy_Database $database = null) {
         if ($this->_open !== false) trigger_error ("Can't change params of collection that is already open", E_USER_ERROR);
         $this->_tableName = $tableName;
         $this->_pkName = $pkName;
@@ -185,10 +184,7 @@ class Ae_Model_Collection {
         $this->_mapperClass = false;
         $this->_mapper = false;
         $this->_rcFun = $recordClassCallback;
-        if (!$this->_db) {
-            $disp = & Ae_Dispatcher::getInstance();
-            $this->_db = & $disp->database;
-        }
+        if ($database) $this->_db = $database;
     }
     
     function _getRecordClass($row) {
@@ -198,14 +194,23 @@ class Ae_Model_Collection {
         else return false;
     }
     
+    function setMapper(Ae_Model_Mapper $mapper) {
+        $this->useMapper($mapper);
+    }
+    
     /**
      * Makes collection to take primary parameters such as table name, record class etc. from mapper
      * @param string $mapperClass Name of mapper class
      */
     function useMapper($mapperClass) {
         if (!$mapperClass) trigger_error ('No mapper class provided. Provide mapper class or call useNoMapper() instead');
-        $this->_mapperClass = $mapperClass;
-        $this->_mapper = & Ae_Model_Mapper::getMapper($mapperClass);
+        if (is_object($mapperClass) && $mapperClass instanceof Ae_Model_Mapper) {
+            $this->_mapper = $mapperClass;
+            $this->_mapperClass = $mapperClass->getId();
+        } else {
+            $this->_mapperClass = $mapperClass;
+            $this->_mapper = & Ae_Model_Mapper::getMapper($mapperClass);
+        }
         $this->_tableName = $this->_mapper->tableName;
         $this->_recordClass = false;
         $this->_rcFun = false;
@@ -463,7 +468,11 @@ class Ae_Model_Collection {
         while ($row = $this->_db->fetchAssoc($rr)) {
             $key = $this->_matchKeys? $row[$this->_pkName] : $i;
             if ($rc = $this->_getRecordClass($row)) {
-                $this->_records[$key] = new $rc;
+                if ($this->_mapper) {
+                    $this->_records[$key] = new $rc($this->_mapper);
+                } else {
+                    $this->_records[$key] = new $rc;
+                }
                 $this->_records[$key]->load($row, null, true);    
             } else {
                 $this->_records[$key] = $row;
@@ -529,7 +538,7 @@ class Ae_Model_Collection {
             if ($row) {
                 if ($this->_useCursor) {
                     if ($cls = $this->_getRecordClass($row)) {
-                        if (!isset($this->_cursor[$cls])) $this->_cursor[$cls] = new $cls();
+                        if (!isset($this->_cursor[$cls])) $this->_cursor[$cls] = ($this->_mapper? new $cls($this->_mapper) : new $cls);
                         $this->_cursor[$cls]->load($row, null, true);
                         $res = $this->_cursor[$cls];
                     } else {
@@ -538,7 +547,7 @@ class Ae_Model_Collection {
                     return $res;
                 } else {
                     if ($rc = $this->_getRecordClass($row)) {
-                        $res = new $rc();
+                        $res = $this->_mapper?  new $rc($this->_mapper) : new $rc();
                         $res->load($row, null, true);
                     } else $res = $row;
                     return $res;
