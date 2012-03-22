@@ -1547,48 +1547,6 @@ class Ae_Model_Data {
     function doOnWakeup() {
     }
     
-    /**
-     * @param array $basedOnVars Names of variables to build cache id 
-     * @param array $vars Names of variables to store
-     */
-    function cacheStore($basedOnVars, $vars) {
-        if (!is_array($basedOnVars)) $basedOnVars = array($basedOnVars);
-        if (!is_array($vars)) $vars = array($vars);
-        $id = array();
-        foreach ($basedOnVars as $v) {
-            $id[] = $this->$v;
-        }
-        $id = md5(serialize($id));
-        $data = array();
-        foreach ($vars as $v) {
-            $data[$v] = & $this->$v;
-        }
-        $data = serialize($data);
-        return Ae_Dispatcher::cacheSet($id, $data, get_class($this));
-    }
-    
-    /**
-     * @param array $basedOnVars Names of variables to build cache id
-     */
-    function cacheRestore($basedOnVars) {
-        if (!is_array($basedOnVars)) $basedOnVars = array($basedOnVars);
-        $id = array();
-        $data = array();
-        foreach ($basedOnVars as $v) {
-            $id[] = $this->$v;
-        }
-        $id = md5(serialize($id));
-        // $t = microtime();
-        $data = Ae_Dispatcher::cacheGet($id, get_class($this));
-        if ($data !== false) $data = @unserialize($data);
-        if (is_array($data)) {
-            foreach (array_keys($data) as $v) $this->$v = & $data[$v];
-            $res = true;
-        } else $res = false;
-        // if ($res) var_dump(microtime() - $t);
-        return $res;
-    }
-    
     function mustRevalidate() {
         $this->_bound = true;
         $this->_errors = array();

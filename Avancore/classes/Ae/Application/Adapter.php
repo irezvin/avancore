@@ -59,7 +59,7 @@ class Ae_Application_Adapter extends Ae_Autoparams {
     }
     
     function setConfigPath($configPath) {
-        return $this->configPath;
+        $this->configPath = $configPath;
     }
     
     protected function intGetConfigFromFiles() {
@@ -213,7 +213,7 @@ class Ae_Application_Adapter extends Ae_Autoparams {
     
     protected function guessOutputPrototype() {
         if (!isset($this->config[$k = 'outputPrototype'])) {
-            $this->config[$k] = array('class' => 'Ae_Output_Native');
+            $this->config[$k] = array('class' => 'Ae_Legacy_Output_Native');
         }
     }
     

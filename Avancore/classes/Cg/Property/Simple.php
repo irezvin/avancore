@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Cg_Property');
-
 class Cg_Property_Simple extends Cg_Property {
     
     var $colName = false;

@@ -735,7 +735,7 @@ class Ae_Util {
         return html_entity_decode($stringOrArray, $quoteStyle, $charset);
     }
         
-    static function htmlspecialchars($string, $quote_style = null, $charset = null, $double_encode = true)
+    static function htmlspecialchars($string, $quote_style = ENT_QUOTES, $charset = null, $double_encode = true)
     {
         
         if (!strlen($charset)) $charset = null;

@@ -1,6 +1,6 @@
 <?php
 
-class Ae_Output_Native extends Ae_Legacy_Output {
+class Ae_Legacy_Output_Native extends Ae_Legacy_Output {
     
     var $showOuterHtml = false;
     

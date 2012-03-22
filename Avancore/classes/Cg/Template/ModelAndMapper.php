@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Cg_Template');
-
 class Cg_Template_ModelAndMapper extends Cg_Template {
     
     var $modelClass = false;
@@ -128,7 +126,6 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         else $class = 'Cg_Template_Assoc_Strategy_One';
 
         //$class = 'Cg_Template_Assoc_Strategy';
-        Ae_Dispatcher::loadClass($class);
         $res = & new $class (array('relationId' => $relationId, 'prop' => & $prop, 'model' => & $this->model, 'template' => & $this));
         return $res;
     }
@@ -232,8 +229,6 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
 <?php $this->phpOpen(); ?>
 
 
-Ae_Dispatcher::loadClass(<?php $this->str($this->parentClass); ?>);
-
 <?php if ($this->model->parentClassIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genModelClass); ?> extends <?php $this->d($this->parentClass); ?> {
     
 <?php foreach($this->vars as $var => $default) { ?>
@@ -298,8 +293,6 @@ Ae_Dispatcher::loadClass(<?php $this->str($this->parentClass); ?>);
 <?php $this->phpOpen(); ?>
 
 
-Ae_Dispatcher::loadClass(<?php $this->str($this->genModelClass); ?>);
-
 class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genModelClass); ?> {
 <?php if ($this->model->generateMethodPlaceholders) { ?>
     
@@ -346,8 +339,6 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 ?>
 <?php $this->phpOpen(); ?>
 
-
-Ae_Dispatcher::loadClass(<?php $this->str($this->parentMapperClass); ?>);
 
 <?php if ($this->model->parentMapperIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genMapperClass); ?> extends <?php $this->d($this->parentMapperClass); ?> {
 <?php foreach ($this->mapperVars as $var => $default) { ?>
@@ -446,8 +437,6 @@ Ae_Dispatcher::loadClass(<?php $this->str($this->parentMapperClass); ?>);
 ?>
 <?php $this->phpOpen(); ?>
 
-
-Ae_Dispatcher::loadClass(<?php $this->str($this->genMapperClass); ?>);
 
 class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMapperClass); ?> {
 <?php if ($this->model->generateMethodPlaceholders) { ?>

@@ -181,13 +181,22 @@ class Ae_Model_Mapper implements Ae_I_Autoparams {
     /**
      * @return Ae_Model_Mapper
      */
-    function getMapper ($mapperClass) {
-        $res = null;
-        foreach(Ae_Application::listInstances() as $className => $ids) {
-            foreach ($ids as $appId) {
-                $app = Ae_Application::getInstance($className, $appId);
-                if ($app->hasMapper($mapperClass)) {
-                    $res = $app->getMapper($mapperClass);
+    function getMapper ($mapperClass, $application = null) {
+        if (is_object($mapperClass) && $mapperClass instanceof Ae_Model_Mapper) {
+            $res = $mapperClass;
+        } else {
+            $res = null;
+            if ($application) {
+                if ($application instanceof Ae_Application) {
+                    $res = $application->getMapper($mapperClass);
+                } else throw new Exception("\$application should be an Ae_Application instance");
+            }
+            foreach(Ae_Application::listInstances() as $className => $ids) {
+                foreach ($ids as $appId) {
+                    $app = Ae_Application::getInstance($className, $appId);
+                    if ($app->hasMapper($mapperClass)) {
+                        $res = $app->getMapper($mapperClass);
+                    }
                 }
             }
         }
@@ -774,6 +783,14 @@ class Ae_Model_Mapper implements Ae_I_Autoparams {
      */
     function & createRelation($relId) {
         $proto = $this->getRelationPrototype($relId);
+        
+        // Replace mapper classes with mapper instances, if possible
+        if ($this->application) $proto['application'] = $this->application;
+        if (isset($proto['srcMapperClass']) && $proto['srcMapperClass'] == $this->getId()) {
+            $proto['srcMapper'] = $this;
+        } elseif (isset($proto['destMapperClass']) && $proto['destMapperClass'] == $this->getId()) {
+            $proto['destMapper'] = $this;
+        }
         $res = & Ae_Model_Relation::factory($proto);
         return $res;
     }

@@ -188,7 +188,6 @@ class Cg_Domain {
          if (!$this->caption) $this->caption = $this->appName;
          if (!$this->josComId) $this->josComId = $this->appName;
          
-         Ae_Dispatcher::loadClass('Cg_Dictionary');
          if (isset($config['dictionary']) && is_array($config['dictionary'])) {
              $dicConf = $config['dictionary'];
          } else {
@@ -202,7 +201,6 @@ class Cg_Domain {
         $l = '_models';
         if ($this->$l === false) {
             $this->$l = array();
-            Ae_Dispatcher::loadClass('Cg_Model');
             foreach ($this->_calculateModelsConfig() as $name => $config) {
                  $this->{$l}[$name] = $config; 
             }
@@ -224,7 +222,6 @@ class Cg_Domain {
     function getDatabase() {
         if ($this->_database === false) {
             $insp = $this->getInspector();
-            Ae_Dispatcher::loadClass('Ae_Sql_Dbi_Database');
             $this->_database = new Ae_Sql_Dbi_Database($insp, $this->dbName, $this->tablePrefix, $this->replaceTablePrefixWith, $this->schemaExtras);
         }
         return $this->_database;
@@ -351,7 +348,6 @@ class Cg_Domain {
             // no prefix or replacement - leave name as is
             $res['tableNameWithPrefix'] = $aName;
         }
-        Ae_Dispatcher::loadClass('Cg_Inflector');
         $nameParts = Cg_Inflector::explode($aName);
         $ssPrefixes = array();
         foreach ($this->subsystemPrefixes as $p) $ssPrefixes[strtolower($p)] = 1;
