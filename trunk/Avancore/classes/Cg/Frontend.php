@@ -96,11 +96,7 @@ class Cg_Frontend {
         $this->check();
         $this->init();
             
-        Ae_Dispatcher::loadClass('Cg_Generator');
-    
         $gen = new Cg_Generator($this->configPath);
-    
-        Ae_Dispatcher::loadClass('Ae_Form_Helper');
     
         $hlp = new Ae_Form_Helper($dummy = null, false);
         $hlp->alwaysWrap = false;

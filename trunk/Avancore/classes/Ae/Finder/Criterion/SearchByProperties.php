@@ -75,15 +75,13 @@ class Ae_Finder_Criterion_SearchByProperties extends Ae_Finder_Criterion {
  			$aliases = array();
     		$cols = array();
  			
-    		$db = new Ae_Sql_Db_Ae();
+            $db = $select->getDb();
     		
     		foreach($this->propNames as $p) {
     			$expr = $this->createSelectExpression($p);
     			$cols[] = $expr->getExpression($db);
     			$aliases = array_merge($aliases, $expr->aliases);	
     		}
-    		
-    		$db = Ae_Dispatcher::getInstance()->database;
     		
     		$selectPart = & Ae_Sql_Part::factory(array(
     			'class' => 'Ae_Sql_Filter_Substring',

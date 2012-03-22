@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Cg_Property');
-
 class Cg_Property_Object extends Cg_Property {
 
     var $isPrivateVar = true;

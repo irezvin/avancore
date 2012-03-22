@@ -7,6 +7,8 @@ class Ae_Model_Values_Files extends Ae_Model_Values {
 
     var $dirName = false;
     
+    var $dirNameCallback = false;
+    
     var $fileNameRegex = false;
     
     var $dirNameRegex = false;
@@ -17,10 +19,13 @@ class Ae_Model_Values_Files extends Ae_Model_Values {
     
     function _doDefaultGetValueList() {
         
-        $disp = & Ae_Dispatcher::getInstance();
-        $dir = $disp->getDir();
-        if (strlen($this->dirName)) $dir .= '/'.$this->dirName;
-        $baseDir = realpath($dir).'/';
+        $dirName = $this->dirName;
+        if ($dirName === false && $this->dirNameCallback) {
+            $cb = $this->dirNameCallback;
+            if (is_array($cb) && $cb[0] === true) $cb[0] = $this->data;
+            $dirName = call_user_func($cb, $this);
+        }
+        $baseDir = realpath($dirName).'/';
         if (DIRECTORY_SEPARATOR == '\\') $baseDir = str_replace(DIRECTORY_SEPARATOR, "/", $baseDir);
         $files = Ae_Util::listDirContents($dir, $this->recursive, array(), $this->fileNameRegex, $this->dirNameRegex);
         

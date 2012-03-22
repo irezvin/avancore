@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Cg_Template');
-
 class Cg_Template_PmtFinder extends Cg_Template {
     
     var $modelClass = false;
@@ -43,8 +41,6 @@ class Cg_Template_PmtFinder extends Cg_Template {
 ?>
 <?php $this->phpOpen(); ?> 
 
-Ae_Dispatcher::loadClass(<?php $this->str($this->genFinderClass); ?>);
-
 class <?php $this->d($this->finderClass); ?> extends <?php $this->d($this->genFinderClass); ?> {
 }
     
@@ -57,8 +53,6 @@ class <?php $this->d($this->finderClass); ?> extends <?php $this->d($this->genFi
         
 ?>
 <?php $this->phpOpen(); ?> 
-
-Ae_Dispatcher::loadClass(<?php $this->str($this->parentFinderClass); ?>);
 
 <?php if ($this->model->parentFinderClassIsAbstract) echo "abstract ";?>class <?php $this->d($this->genFinderClass); ?> extends <?php $this->d($this->parentFinderClass); ?> {
 

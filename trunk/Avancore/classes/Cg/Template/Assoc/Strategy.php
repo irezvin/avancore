@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Cg_Template');
-
 class Cg_Template_Assoc_Strategy extends Cg_Template {
     
     /**

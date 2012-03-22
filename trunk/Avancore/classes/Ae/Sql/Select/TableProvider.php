@@ -35,8 +35,7 @@ class Ae_Sql_Select_TableProvider {
      */
     static function createSelect($mapperClass, & $db, $alias = 't') {
 		if (empty($db)) {
-			$d = & Ae_Dispatcher::getInstance();
-			$aDb = new Ae_Sql_Db_Ae($d->database);
+			$aDb = Ae_Application::getDefaultInstance()->getDb();
 		} else {
 			$aDb = & $db;
 		}

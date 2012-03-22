@@ -317,6 +317,7 @@ abstract class Ae_Application extends Ae_Autoparams {
         $controller = $this->getController($this->defaultControllerId);
         $response = $controller->getResponse();
         $res = $response;
+        $res->setApplication($this);
         if (!$noOutput) {
             if (!$output) $output = $this->createOutput();
             $output->outputResponse($res);

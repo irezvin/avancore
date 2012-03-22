@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Cg_Template');
-
 class Cg_Template_Domain extends Cg_Template {
     
     var $domainClass = false;

@@ -4,10 +4,13 @@
  * Defines members and methods that are common to Ae_Model_Relation and Ae_Model_Relation_Tree objects
  * (that are used mostly for data retrieval)
  */
-class Ae_Model_Relation_Abstract {
+class Ae_Model_Relation_Abstract implements Ae_I_Autoparams {
     
     var $debug = false;
 
+    function hasPublicVars() {
+        return true;
+    }
     
     function _setRef(& $dest, $varName, & $ref) {
         if (is_array($dest)) $dest[$varName] = & $ref;
@@ -81,7 +84,7 @@ class Ae_Model_Relation_Abstract {
     
     function & _recordInstance($row, $recordClass, & $mapper) {
         if ($recordClass) {
-            $res = new $recordClass ();
+            $res = new $recordClass($mapper);
             $res->load($row, null, true);
         } elseif ($recordClass === '') {
             $res = & $row;

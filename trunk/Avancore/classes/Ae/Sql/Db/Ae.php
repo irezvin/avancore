@@ -19,19 +19,27 @@ class Ae_Sql_Db_Ae extends Ae_Sql_Db {
         $this->_aeDb = & $aeDb;
     }
     
-    function _implValueQuote($value) {
+    protected function implValueQuote($value) {
         return $this->_aeDb->Quote($value);
     }
     
-    function _implNameQuote($name) {
+    protected function implNameQuote($name) {
         return $this->_aeDb->replacePrefix($this->_aeDb->NameQuote($name));
     }
     
-    function _implIsNameQuoted($name) {
+    protected function implNameUnquote($name) {
+        throw new Exception("Not implemented");
+    }
+    
+    function getErrorCode() {
+        return $this->_aeDb->getErrorCode();
+    }
+    
+    protected function implIsNameQuoted($name) {
         return !is_a($name, 'Ae_Sql_Expression') && $this->_aeDb->isNameQuoted($name);
     }
     
-    function _implConcatNames($quotedNames) {
+    protected function implConcatNames($quotedNames) {
         return implode(".", $quotedNames);
     }
         
@@ -126,6 +134,10 @@ class Ae_Sql_Db_Ae extends Ae_Sql_Db {
     
     function getErrorDescr() {
         return $this->_aeDb->getErrorMsg();
+    }
+    
+    function getIfnullFunction() {
+        return $this->_aeDb->getIfnullFunction();
     }
     
 }

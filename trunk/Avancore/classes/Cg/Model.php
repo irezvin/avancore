@@ -4,8 +4,6 @@
  * Model metamodel for Code Generator
  */
         
-Ae_Dispatcher::loadClass('Cg_Inflector');
-
 class Cg_Model {
 
     /**
@@ -243,7 +241,6 @@ class Cg_Model {
             $conf = $this->_properties[$name];
             if (isset($conf['metaPropertyClass']) && $conf['metaPropertyClass']) $cls = $conf['metaPropertyClass'];
             else $cls = 'Cg_Property_Simple';
-            Ae_Dispatcher::loadClass($cls);  
             $this->_properties[$name] = new $cls ($this, $name, $this->_properties[$name]);
         }
 

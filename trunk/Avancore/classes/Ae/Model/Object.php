@@ -327,9 +327,7 @@ class Ae_Model_Object extends Ae_Model_Data {
                     if ($this->doAfterSave() === false) $res = false;
                     if (($t = $this->tracksChanges()) && ($t === AE_CHANGES_AFTER_SAVE)) $this->_memorizeFields();
                 } else {
-                    $disp = & Ae_Dispatcher::getInstance();
-                    if ($disp->config->debug || isset($GLOBALS['my']) && is_a($GLOBALS['my'], 'mosUser') && $GLOBALS['my']->usertype == 'Super Administrator') $this->_error = $this->_db->getErrorMsg();
-                        else $this->_error = "Store() failed - please contact developer";
+                    $this->_error = "Store() failed - ".$this->_db->getErrorMsg();
                     $this->doOnSaveFailed();
                 }
             }
@@ -735,16 +733,6 @@ class Ae_Model_Object extends Ae_Model_Data {
     function checkDatabasePresence($dontReturnOwnKey = false, $checkNewRecords = false) {
        $mapper = & $this->getMapper();
        return $mapper->checkRecordPresence($this, $dontReturnOwnKey, array(), array(), $checkNewRecords); 
-    }
-    
-    function _getSerializeSkip() {
-        return array_merge(parent::_getSerializeSkip(), array('_db'));
-    }
-    
-    function doOnWakeup() {
-        parent::doOnWakeup();
-        $disp = & Ae_Dispatcher::getInstance();
-        $this->_db = & $disp->database;
     }
     
     function _storesFalseValues() {

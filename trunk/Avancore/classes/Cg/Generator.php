@@ -1,8 +1,8 @@
 <?php
 
-Ae_Dispatcher::loadClass('Cg_Util');
-
 class Cg_Generator {
+    
+    var $dbClass = 'Ae_Legacy_Database_Native';
     
     /**
      * Hostname to access database
@@ -28,7 +28,7 @@ class Cg_Generator {
      * Class of Dbs Inspector to get info on the database
      * @var string
      */
-    var $inspectorClass = 'Ae_Sql_Dbi_Inspector';
+    var $inspectorClass = false;
     
     /**
      * @var string Name of directory to output to
@@ -184,19 +184,12 @@ class Cg_Generator {
      */
     function getDb() {
         if ($this->_db === false) {
-        	$disp = Ae_Dispatcher::getInstance();
-        	if ($disp && $disp->config) {
-        	   $dbClass = $disp->config->dbClass;
-        	} else {
-        	    $dbClass = false;
-        	}
-        	if (!strlen($dbClass)) $dbClass = 'Ae_Legacy_Database_Native';
-            Ae_Dispatcher::loadClass($dbClass);
             $dbOptions = array_merge(array(
                 'host' => $this->host,
                 'user' => $this->user,
                 'password' => $this->password,
             ), $this->otherDbOptions);
+            $dbClass = $this->dbClass;
             $this->_db = new $dbClass($dbOptions);
         }
         return $this->_db;
@@ -207,9 +200,13 @@ class Cg_Generator {
      */
     function getInspector() {
         if ($this->_inspector === false) {
-            Ae_Dispatcher::loadClass($c = $this->inspectorClass);
+            $c = $this->inspectorClass;
             $db = $this->getDb();
-            $this->_inspector = new $c($db, false);
+            if ($c) {
+                $this->_inspector = new $c($db, false);
+            } else {
+                $this->_inspector = $this->getDb()->getInspector();
+            }
         }
         return $this->_inspector;
     }
@@ -219,7 +216,6 @@ class Cg_Generator {
         if ($this->$l === false) {
             $this->$l = array();
             if (isset($this->staticConfig['domains']) && is_array($this->staticConfig['domains'])) { 
-                Ae_Dispatcher::loadClass('Cg_Domain');
                 foreach ($this->staticConfig['domains'] as $name => $config) {
                     if (is_array($this->domainDefaults)) $config = Ae_Util::m($this->domainDefaults, $config);
                     $obj = new Cg_Domain($this, $name, $config);
@@ -281,7 +277,6 @@ class Cg_Generator {
      */
     function & createStrategyForDomain($domainName) {
         $class = Ae_Util::getArrayByPath($this->staticConfig, array('domains', $domainName, 'strategyClass'), 'Cg_Strategy');
-        Ae_Dispatcher::loadClass($class);
         if (is_array($this->strategySettings)) $ss = $this->strategySettings; else $ss = array();
         $ss['genNonEditable'] = $this->genNonEditable;
         $dom = $this->getDomain($domainName);

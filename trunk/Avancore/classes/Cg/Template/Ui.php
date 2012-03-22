@@ -1,7 +1,5 @@
 <?php
 
-Ae_Dispatcher::loadClass('Cg_Template');
-
 class Cg_Template_Ui extends Cg_Template {
     
     var $modelName = false;
@@ -84,8 +82,6 @@ class Cg_Template_Ui extends Cg_Template {
 ?>
 <?php $this->phpOpen(); ?>
 
-Ae_Dispatcher::loadClass (<?php $this->str($this->model->uiFormBaseClass) ?>);
-
 class <?php $this->d($this->genFormClass); ?> extends <?php $this->d($this->model->uiFormBaseClass) ?> {
 
     function <?php $this->d($this->genFormClass); ?> ($extraSettings = array(), $taskName = false) {
@@ -102,8 +98,6 @@ class <?php $this->d($this->genFormClass); ?> extends <?php $this->d($this->mode
 ?>
 <?php $this->phpOpen(); ?>
 
-Ae_Dispatcher::loadClass (<?php $this->str($this->genFormClass); ?>);
-
 class <?php $this->d($this->formClass); ?> extends <?php $this->d($this->genFormClass); ?> {
 
     function <?php $this->d($this->formClass); ?> ($extraSettings = array(), $taskName = false) {
@@ -119,8 +113,6 @@ class <?php $this->d($this->formClass); ?> extends <?php $this->d($this->genForm
     function showGenList() {
 ?> 
 <?php $this->phpOpen(); ?>
-
-Ae_Dispatcher::loadClass(<?php $this->str($this->model->uiListBaseClass) ?>);
 
 class <?php $this->d($this->genListClass); ?> extends <?php $this->d($this->model->uiListBaseClass) ?> {
 
@@ -148,8 +140,6 @@ class <?php $this->d($this->genListClass); ?> extends <?php $this->d($this->mode
     function showList() {
 ?> 
 <?php $this->phpOpen(); ?>
-
-Ae_Dispatcher::loadClass(<?php $this->str($this->genListClass); ?>);
 
 class <?php $this->d($this->listClass); ?> extends <?php $this->d($this->genListClass); ?> {
 
