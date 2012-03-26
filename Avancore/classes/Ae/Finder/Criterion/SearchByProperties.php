@@ -2,6 +2,8 @@
 
 class Ae_Finder_Criterion_SearchByProperties extends Ae_Finder_Criterion {
 
+    var $patBefore = '';
+
     protected $propNames = false;
 
     protected $substring = true;
@@ -85,7 +87,7 @@ class Ae_Finder_Criterion_SearchByProperties extends Ae_Finder_Criterion {
     		
     		$selectPart = & Ae_Sql_Part::factory(array(
     			'class' => 'Ae_Sql_Filter_Substring',
-    			'patBefore' => '',
+    			'patBefore' => $this->patBefore,
     			'aliases' => array_unique($aliases),
     			'colNames' => $cols,
     			'useConcat' => false,
