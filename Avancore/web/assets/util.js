@@ -557,6 +557,7 @@ Ae_Util.DelayedCall.prototype = {
     _immediate: false,
 
     _timeout: null,
+    _tmFn: null,
 
     _clearTimeout: function() {
         if (this._timeout) window.clearTimeout(this._timeout);
@@ -570,11 +571,12 @@ Ae_Util.DelayedCall.prototype = {
 
     call: function() {
     	this._clearTimeout();
+    	
         if (this.delay) {
-            var tmFn = function(t) {
+            if (!this._tmFn) this._tmFn = function(t) {
                 return function() {t._run();};
             } (this);
-            this._timeout = window.setTimeout(tmFn, this.delay);
+            this._timeout = window.setTimeout(this._tmFn, this.delay);
         }
         else this._run();
     },
