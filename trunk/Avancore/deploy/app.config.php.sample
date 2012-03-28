@@ -1,5 +1,5 @@
 <?php
 
 $config = array(
-    'webUrl' => 'http://nivzer2/avancore/',
+    'webUrl' => 'http://localhost/avancore/',
 );
