@@ -1,10 +1,10 @@
 <?php
 
 $config = array(
-	'host' => 'localhost:3303',
+	'host' => 'localhost',
     'db' => 'test_avancore',
-    'user' => 'irezvin',
-    'password' => 'pvdgKV8',
+    'user' => 'user',
+    'password' => 'password',
     'cachePath' => dirname(__FILE__).'/var',
     'absolutePath' => dirname(__FILE__),
     'liveSite' => 'http://'.$_SERVER['SERVER_NAME'].dirname($_SERVER['SCRIPT_NAME']),

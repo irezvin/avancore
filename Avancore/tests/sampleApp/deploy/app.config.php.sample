@@ -10,7 +10,7 @@ $config = array(
     'legacyDatabasePrototype' => array(
         'class' => 'Ae_Legacy_Database_Native',
         '__construct' => array(array(
-            'user' => 'irezvin',
+            'user' => 'user',
             'password' => '',
             'db' => 'ae_sample',
         )),
