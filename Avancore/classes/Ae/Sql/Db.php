@@ -170,7 +170,7 @@ abstract class Ae_Sql_Db {
     
     abstract protected function implConcatNames($quotedNames);
     
-    abstract function fetchArray($query, $keyColumn = false);
+    abstract function fetchArray($query, $keyColumn = false, $withNumericKeys = false);
     
     abstract function fetchObjects($query, $keyColumn = false);
 
