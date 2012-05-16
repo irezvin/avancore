@@ -62,8 +62,8 @@ class <?php $this->d($this->finderClass); ?> extends <?php $this->d($this->genFi
 	
 	protected function doOnGetSqlSelectPrototype(& $prototype) {
 		parent::doOnGetSqlSelectPrototype($prototype);
-		$m = & Ae_Model_Mapper::getMapper($this->mapperClass);
-		Ae_Util::ms($prototype, array(
+		$m = & Ac_Model_Mapper::getMapper($this->mapperClass);
+		Ac_Util::ms($prototype, array(
 			'tables' => array(
 				$this->primaryAlias => array(
 					'name' => $m->tableName, 
@@ -71,7 +71,7 @@ class <?php $this->d($this->finderClass); ?> extends <?php $this->d($this->genFi
 			),
 			'tableProviders' => array(
 				'model' => array(
-					'class' => 'Ae_Model_Sql_TableProvider',
+					'class' => 'Ac_Model_Sql_TableProvider',
 					'mapperClass' => $this->mapperClass,
 				),
 			),

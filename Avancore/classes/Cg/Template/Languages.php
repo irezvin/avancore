@@ -52,7 +52,7 @@ class Cg_Template_Languages extends Cg_Template {
 ?>
 	
 	require(dirname(__FILE__).'/../../languages/en.php');
-	Ae_Util::ms($lang, array(
+	Ac_Util::ms($lang, array(
 	
 //	'lang_string_1' => 'caption_1',
 //	'lang_string_2' => 'caption_2',	

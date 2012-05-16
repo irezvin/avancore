@@ -1,12 +1,12 @@
 if (!window.console) console = {log: function(){}}
 
-AeBiNode = function (options) {
+AcBiNode = function (options) {
     this.id = this._id;
-    AeBiNode.prototype._id++;
+    AcBiNode.prototype._id++;
     if (options) Object.extend(this, options);
 }
 
-AeBiNode.prototype = {
+AcBiNode.prototype = {
     prev: null,
     next: null,
     _id: 0,
@@ -91,7 +91,7 @@ AeBiNode.prototype = {
 }
 
 
-AeTableData = function(options) {
+AcTableData = function(options) {
     Object.extend(this, AvanControllers.Observable);
     if (options.tables instanceof Array && options.tables.length) {
         var tbl = this.firstTable = new this.Table (this, options.tables[0]);
@@ -100,11 +100,11 @@ AeTableData = function(options) {
     }
 }
 
-AeTableData.prototype = {
+AcTableData.prototype = {
     firstTable: null,
     log: false,
     Table: function(aeTableData, options) {
-        Object.extend(this, new AeBiNode);
+        Object.extend(this, new AcBiNode);
         if (options) Object.extend(this, options);
         this.aeTableData = aeTableData;
         var i, j;
@@ -148,7 +148,7 @@ AeTableData.prototype = {
     },
     
     RowCol: function(table, options) {
-        Object.extend(this, new AeBiNode);
+        Object.extend(this, new AcBiNode);
         this.value = '';
         this.table = table;
         if (typeof options == 'object') {
@@ -243,7 +243,7 @@ AeTableData.prototype = {
     
 }
 
-AeTableData.prototype.Table.prototype = {
+AcTableData.prototype.Table.prototype = {
     id: 0,
     _id: 0,
     rows: [],
@@ -577,7 +577,7 @@ AeTableData.prototype.Table.prototype = {
     
 }
 
-AeTableData.prototype.RowCol.prototype = {
+AcTableData.prototype.RowCol.prototype = {
     id: 0,
     _id: 0,
     table: null,

@@ -1,11 +1,11 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Model_Mapper');
+Ac_Dispatcher::loadClass('Ac_Model_Mapper');
 
-class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
+class Ac_Test_Model_Relation_Base_Mapper extends Ac_Model_Mapper {
     
     /**
-     * @return Ae_Test_Model_Relation 
+     * @return Ac_Test_Model_Relation 
      */ 
     function & factory ($className = false) {
         $res = & parent::factory($className);
@@ -13,7 +13,7 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
     }
     
     /**
-     * @return Ae_Test_Model_Relation 
+     * @return Ac_Test_Model_Relation 
      */ 
     function & reference ($values = array()) {
         $res = & parent::reference($values);
@@ -21,22 +21,22 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
     }
     
     /**
-     * @return Ae_Test_Model_Relation 
+     * @return Ac_Test_Model_Relation 
      */ 
     function & loadRecord ($id) {
         $res = & parent::loadRecord($id);
         return $res;
     }
     
-    function Ae_Test_Model_Relation_Base_Mapper () {
-        parent::Ae_Model_Mapper('#__relations', 'Ae_Test_Model_Relation', 'relationId');
+    function Ac_Test_Model_Relation_Base_Mapper () {
+        parent::Ac_Model_Mapper('#__relations', 'Ac_Test_Model_Relation', 'relationId');
     }
                 
     function _getRelationPrototypes() {
         return array (
               '_person' => array (  
-                  'srcMapperClass' => 'Ae_Test_Model_Relation_Mapper',
-                  'destMapperClass' => 'Ae_Test_Model_People_Mapper',
+                  'srcMapperClass' => 'Ac_Test_Model_Relation_Mapper',
+                  'destMapperClass' => 'Ac_Test_Model_People_Mapper',
                   'srcVarName' => '_person',
                   'destVarName' => '_outgoingRelations',
                   'destCountVarName' => '_outgoingRelationsCount',
@@ -48,8 +48,8 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
                   'srcOutgoing' => true,
               ),
               '_otherPerson' => array (  
-                  'srcMapperClass' => 'Ae_Test_Model_Relation_Mapper',
-                  'destMapperClass' => 'Ae_Test_Model_People_Mapper',
+                  'srcMapperClass' => 'Ac_Test_Model_Relation_Mapper',
+                  'destMapperClass' => 'Ac_Test_Model_People_Mapper',
                   'srcVarName' => '_otherPerson',
                   'destVarName' => '_incomingRelations',
                   'destCountVarName' => '_incomingRelationsCount',
@@ -61,8 +61,8 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
                   'srcOutgoing' => true,
               ),
               '_relationType' => array (  
-                  'srcMapperClass' => 'Ae_Test_Model_Relation_Mapper',
-                  'destMapperClass' => 'Ae_Test_Model_Relation_Type_Mapper',
+                  'srcMapperClass' => 'Ac_Test_Model_Relation_Mapper',
+                  'destMapperClass' => 'Ac_Test_Model_Relation_Type_Mapper',
                   'srcVarName' => '_relationType',
                   'destVarName' => '_relations',
                   'destCountVarName' => '_relationsCount',
@@ -98,7 +98,7 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
     }
         
     /**
-     * @return Ae_Test_Model_Relation     
+     * @return Ac_Test_Model_Relation     
      */
     function & loadByRelationId ($relationId) {
         $recs = $this->loadRecordsByCriteria('`relationId` = '.$this->database->Quote($relationId).'');
@@ -109,8 +109,8 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
     
     /**
      * Returns (but not loads!) several relations of given one or more people 
-     * @param Ae_Test_Model_Relation|array $people     
-     * @return Ae_Test_Model_Relation|array of Ae_Test_Model_Relation objects  
+     * @param Ac_Test_Model_Relation|array $people     
+     * @return Ac_Test_Model_Relation|array of Ac_Test_Model_Relation objects  
      */
     function & getOfPeople($people) {
         $rel = & $this->getRelation('_person');
@@ -120,7 +120,7 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
     
     /**
      * Loads several relations of given one or more people 
-     * @param Ae_Test_Model_People|array $people of Ae_Test_Model_Relation objects
+     * @param Ac_Test_Model_People|array $people of Ac_Test_Model_Relation objects
      
      */
     function loadForPeople($people) {
@@ -130,7 +130,7 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
 
     /**
      * Loads several people of given one or more relations 
-     * @param Ae_Test_Model_Relation|array $relations     
+     * @param Ac_Test_Model_Relation|array $relations     
      */
     function loadPeopleFor($relations) {
         $rel = & $this->getRelation('_person');
@@ -140,8 +140,8 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
 
     /**
      * Returns (but not loads!) several relations of given one or more people 
-     * @param Ae_Test_Model_Relation|array $otherPeople     
-     * @return Ae_Test_Model_Relation|array of Ae_Test_Model_Relation objects  
+     * @param Ac_Test_Model_Relation|array $otherPeople     
+     * @return Ac_Test_Model_Relation|array of Ac_Test_Model_Relation objects  
      */
     function & getOfOtherPeople($otherPeople) {
         $rel = & $this->getRelation('_otherPerson');
@@ -151,7 +151,7 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
     
     /**
      * Loads several relations of given one or more people 
-     * @param Ae_Test_Model_People|array $otherPeople of Ae_Test_Model_Relation objects
+     * @param Ac_Test_Model_People|array $otherPeople of Ac_Test_Model_Relation objects
      
      */
     function loadForOtherPeople($otherPeople) {
@@ -161,7 +161,7 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
 
     /**
      * Loads several people of given one or more relations 
-     * @param Ae_Test_Model_Relation|array $relations     
+     * @param Ac_Test_Model_Relation|array $relations     
      */
     function loadOtherPeopleFor($relations) {
         $rel = & $this->getRelation('_otherPerson');
@@ -171,8 +171,8 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
 
     /**
      * Returns (but not loads!) several relations of given one or more relationTypes 
-     * @param Ae_Test_Model_Relation|array $relationTypes     
-     * @return Ae_Test_Model_Relation|array of Ae_Test_Model_Relation objects  
+     * @param Ac_Test_Model_Relation|array $relationTypes     
+     * @return Ac_Test_Model_Relation|array of Ac_Test_Model_Relation objects  
      */
     function & getOfRelationTypes($relationTypes) {
         $rel = & $this->getRelation('_relationType');
@@ -182,7 +182,7 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
     
     /**
      * Loads several relations of given one or more relationTypes 
-     * @param Ae_Test_Model_Relation_Type|array $relationTypes of Ae_Test_Model_Relation objects
+     * @param Ac_Test_Model_Relation_Type|array $relationTypes of Ac_Test_Model_Relation objects
      
      */
     function loadForRelationTypes($relationTypes) {
@@ -192,7 +192,7 @@ class Ae_Test_Model_Relation_Base_Mapper extends Ae_Model_Mapper {
 
     /**
      * Loads several relationTypes of given one or more relations 
-     * @param Ae_Test_Model_Relation|array $relations     
+     * @param Ac_Test_Model_Relation|array $relations     
      */
     function loadRelationTypesFor($relations) {
         $rel = & $this->getRelation('_relationType');

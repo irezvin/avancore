@@ -1,6 +1,6 @@
 <?php
 
-class Sample_App extends Ae_Application {
+class Sample_App extends Ac_Application {
     
     const version = '0.3.0';
     
@@ -16,7 +16,7 @@ class Sample_App extends Ae_Application {
      * @return Sample_App
      */
     static function getInstance($id = null) {
-        return Ae_Application::getInstance('Sample_App', $id);
+        return Ac_Application::getInstance('Sample_App', $id);
     }
     
 }

@@ -22,7 +22,7 @@ class Cg_Domain {
      */
     var $appClass = false;
     
-    var $appBaseClass = 'Ae_Application';
+    var $appBaseClass = 'Ac_Application';
     
     /**
      * Caption of whole application (defaults to appName)
@@ -122,7 +122,7 @@ class Cg_Domain {
     var $_gen = false;
     
     /**
-     * @var Ae_Sql_Dbi_Database
+     * @var Ac_Sql_Dbi_Database
      */
     var $_database = false;
     
@@ -182,7 +182,7 @@ class Cg_Domain {
     function Cg_Domain(& $generator, $name, $config = array()) {
          $this->_gen = $generator;
          $this->$name = $name;
-         Ae_Util::simpleBind($config, $this);
+         Ac_Util::simpleBind($config, $this);
          if (!$this->dbName) $this->dbName = $name;
          if (!$this->appName) $this->appName = $name;
          if (!$this->caption) $this->caption = $this->appName;
@@ -209,7 +209,7 @@ class Cg_Domain {
     }
     
     /**
-     * @return Ae_Sql_Dbi_Inspector
+     * @return Ac_Sql_Dbi_Inspector
      */
     function getInspector() {
         $res = $this->_gen->getInspector();
@@ -217,12 +217,12 @@ class Cg_Domain {
     }
     
     /**
-     * @return Ae_Sql_Dbi_Database
+     * @return Ac_Sql_Dbi_Database
      */
     function getDatabase() {
         if ($this->_database === false) {
             $insp = $this->getInspector();
-            $this->_database = new Ae_Sql_Dbi_Database($insp, $this->dbName, $this->tablePrefix, $this->replaceTablePrefixWith, $this->schemaExtras);
+            $this->_database = new Ac_Sql_Dbi_Database($insp, $this->dbName, $this->tablePrefix, $this->replaceTablePrefixWith, $this->schemaExtras);
         }
         return $this->_database;
     }
@@ -235,7 +235,7 @@ class Cg_Domain {
         if (!in_array($name, $this->listModels())) trigger_error ('No such model: \''.$name.'\'', E_USER_ERROR);
         if (is_array($this->_models[$name])) {
             $conf = $this->_models[$name];
-            if (is_array($this->modelDefaults)) $conf = Ae_Util::m($this->modelDefaults, $conf);
+            if (is_array($this->modelDefaults)) $conf = Ac_Util::m($this->modelDefaults, $conf);
             
             if (isset($conf['metaModelClass']) && $conf['metaModelClass']) $cls = $conf['metaModelClass'];
             else $cls = 'Cg_Model';  
@@ -259,7 +259,7 @@ class Cg_Domain {
                     $autoConf[$name] = $conf;
                 }
             }
-            $res = Ae_Util::m($autoConf, $this->models);
+            $res = Ac_Util::m($autoConf, $this->models);
         } else {
             $res = $this->models;
         }

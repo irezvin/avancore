@@ -6,7 +6,7 @@ $config = array(
     'avancorePath' => '../../Avancore',
     
     'legacyDatabasePrototype' => array(
-        'class' => 'Ae_Native_Database',
+        'class' => 'Ac_Native_Database',
         '__construct' => array(array(
             'user' => 'dbuser',
             'password' => 'dbpassword',

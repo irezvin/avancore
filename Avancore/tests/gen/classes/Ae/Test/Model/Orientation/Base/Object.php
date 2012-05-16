@@ -1,18 +1,18 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Model_Object');
+Ac_Dispatcher::loadClass('Ac_Model_Object');
 
-class Ae_Test_Model_Orientation_Base_Object extends Ae_Model_Object {
+class Ac_Test_Model_Orientation_Base_Object extends Ac_Model_Object {
     
     var $_people = false;
     var $_peopleCount = false;
     var $sexualOrientationId = NULL;
     var $title = '';
     
-    var $_mapperClass = 'Ae_Test_Model_Orientation_Mapper';
+    var $_mapperClass = 'Ac_Test_Model_Orientation_Mapper';
     
-    function Ae_Test_Model_Orientation_Base_Object() {
-        parent::Ae_Model_Object ('#__orientation', 'sexualOrientationId');
+    function Ac_Test_Model_Orientation_Base_Object() {
+        parent::Ac_Model_Object ('#__orientation', 'sexualOrientationId');
     }
     
     function listOwnProperties() {
@@ -24,15 +24,15 @@ class Ae_Test_Model_Orientation_Base_Object extends Ae_Model_Object {
     }
 
     function listOwnAssociations() {
-        return array ( 'people' => 'Ae_Test_Model_People', );
+        return array ( 'people' => 'Ac_Test_Model_People', );
     }
 
     function getOwnPropertiesInfo() {
     
         return array (
               'people' => array (  
-                  'className' => 'Ae_Test_Model_People',
-                  'mapperClass' => 'Ae_Test_Model_People_Mapper',
+                  'className' => 'Ac_Test_Model_People',
+                  'mapperClass' => 'Ac_Test_Model_People_Mapper',
                   'relationId' => '_people',
                   'caption' => 'People',
                   'isEnabled' => true,
@@ -77,7 +77,7 @@ class Ae_Test_Model_Orientation_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @return Ae_Test_Model_People 
+     * @return Ac_Test_Model_People 
      */
     function & getPeople($id) {
         if ($this->_people === false) {
@@ -91,19 +91,19 @@ class Ae_Test_Model_Orientation_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @param Ae_Test_Model_People $people 
+     * @param Ac_Test_Model_People $people 
      */
     function addPeople(& $people) {
-        if (!is_a($people, 'Ae_Test_Model_People')) trigger_error('$people must be an instance of Ae_Test_Model_People', E_USER_ERROR);
+        if (!is_a($people, 'Ac_Test_Model_People')) trigger_error('$people must be an instance of Ac_Test_Model_People', E_USER_ERROR);
         $this->listPeople();
         $this->_people[] = & $people;
     }
     
     /**
-     * @return Ae_Test_Model_People  
+     * @return Ac_Test_Model_People  
      */
     function & createPeople($values = array(), $isReference = false) {
-        $m = & $this->getMapper('Ae_Test_Model_People_Mapper');
+        $m = & $this->getMapper('Ac_Test_Model_People_Mapper');
         $res = & $m->factory();
         if ($values) $res->bind($values);
         if ($isReference) $res->setIsReference(true);

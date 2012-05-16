@@ -59,7 +59,7 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
     var $mirrorVar = false;
     
     function Cg_Template_Assoc_Strategy ($options) {
-        Ae_Util::simpleBindAll($options, $this);
+        Ac_Util::simpleBindAll($options, $this);
     }
     
     function init() {

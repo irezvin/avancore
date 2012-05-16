@@ -49,16 +49,16 @@ class Cg_Model {
     var $pluralCaption = false;
     
     /**
-     * Name of class that overwritable object (<Model>_Base_Object) is derived from. Defaults to 'Ae_Model_Object' for models with simple primary key, 
-     * 'Ae_Model_CpkObject' for models with composite primary key.
+     * Name of class that overwritable object (<Model>_Base_Object) is derived from. Defaults to 'Ac_Model_Object' for models with simple primary key, 
+     * 'Ac_Model_CpkObject' for models with composite primary key.
      * 
      * @var string
      */    
     var $parentClassName = false;
     
     /**
-     * Name of class that overwritable mapper object (<Model>_Base_Mapper) is derived from. Defaults to 'Ae_Model_Mapper' for models with simple primary key, 
-     * 'Ae_Model_->tableObject' for models with composite primary key.
+     * Name of class that overwritable mapper object (<Model>_Base_Mapper) is derived from. Defaults to 'Ac_Model_Mapper' for models with simple primary key, 
+     * 'Ac_Model_->tableObject' for models with composite primary key.
      * 
      * @var string
      */    
@@ -95,7 +95,7 @@ class Cg_Model {
     var $properties = array();
     
     /**
-     * Whether Ae_Model_Object should track it's changes (and it's trackChanges() function should return true)
+     * Whether Ac_Model_Object should track it's changes (and it's trackChanges() function should return true)
      * @var bool
      */
     var $tracksChanges = false;
@@ -143,7 +143,7 @@ class Cg_Model {
     var $_domain = false;
     
     /**
-     * @var Ae_Sql_Dbi_Table
+     * @var Ac_Sql_Dbi_Table
      */
     var $tableObject = false;
     
@@ -197,12 +197,12 @@ class Cg_Model {
     /**
      * @var string Name of class to inherit records list from in UI
      */
-    var $uiListBaseClass = 'Ae_Page_List';
+    var $uiListBaseClass = 'Ac_Page_List';
     
     /**
      * @var string Name of class to inherit records form from in UI
      */
-    var $uiFormBaseClass = 'Ae_Page_Form';
+    var $uiFormBaseClass = 'Ac_Page_Form';
     
     var $generateMethodPlaceholders = false;
     
@@ -215,7 +215,7 @@ class Cg_Model {
     function Cg_Model(& $domain, $name, $config = array()) {
         $this->_domain = $domain;
         $this->name = $name;
-        Ae_Util::simpleBindAll($config, $this);
+        Ac_Util::simpleBindAll($config, $this);
     }
     
     function listProperties() {
@@ -228,7 +228,7 @@ class Cg_Model {
             }
             foreach ($this->tableObject->listColumns() as $colName) $this->_addSimplePropertyConfig($colName);
             if (is_array($this->properties) && $this->properties) {
-                Ae_Util::ms($this->_properties, $this->properties);
+                Ac_Util::ms($this->_properties, $this->properties);
             }
         }
         return array_keys($this->_properties);
@@ -300,8 +300,8 @@ class Cg_Model {
     }
     
     function getDefaultParentClassName() {
-        if (count($this->tableObject->listPkFields()) == 1) $res = 'Ae_Model_Object';
-            else $res = 'Ae_Model_CpkObject'; 
+        if (count($this->tableObject->listPkFields()) == 1) $res = 'Ac_Model_Object';
+            else $res = 'Ac_Model_CpkObject'; 
         return $res;
     }
     
@@ -376,11 +376,11 @@ class Cg_Model {
     /**
      * Checks whether other table of given relation is bi-junctional and returns relation from the junction table to third table or other model 
      *
-     * @param Ae_Sql_Dbi_Relation $rel
+     * @param Ac_Sql_Dbi_Relation $rel
      * @param bool $isIncoming Whether given relation is incoming
      * @param bool $toModelsOnly Ignore junctional tables that are related to non-models
      * 
-     * @return Ae_Sql_Dbi_Relation Other relation that is involved in the junction
+     * @return Ac_Sql_Dbi_Relation Other relation that is involved in the junction
      */
     function & _determineJunctionRelation (& $rel, $isIncoming, $toModelsOnly) {
         $res = false;
@@ -391,7 +391,7 @@ class Cg_Model {
         if ($rels = $ot->isBiJunctionTable()) {
             $otherRel = false;
             foreach (array_keys($rels) as $r) {
-                if (!Ae_Util::sameObject($rels[$r], $rel)) {
+                if (!Ac_Util::sameObject($rels[$r], $rel)) {
                     $otherRel = $rels[$r];
                     break;
                 }
@@ -461,7 +461,7 @@ class Cg_Model {
             } while (isset($this->_properties[$nm]));
             $xp = array('relation' => $relName, 'metaPropertyClass' => 'Cg_Property_Object', 'isIncoming' => $isIncoming, 
                 'otherRelation' => $otherRelationName, 'isOtherIncoming' => $otherRelationIsIncoming);
-            //if (isset($this->properties[$nm]) && is_array($this->properties[$nm])) Ae_Util::ms($xp, $this->properties[$nm]);
+            //if (isset($this->properties[$nm]) && is_array($this->properties[$nm])) Ac_Util::ms($xp, $this->properties[$nm]);
             $this->_properties[$nm] = $xp;
         }
     }
@@ -534,7 +534,7 @@ class Cg_Model {
     }
     
     /**
-     * @param Ae_Model_Property $prop
+     * @param Ac_Model_Property $prop
      */
     function searchRelationIdByProperty(& $prop) {
         $res = false;
@@ -567,13 +567,13 @@ class Cg_Model {
     
     function getDefaultParentMapperClassName() {
         $this->init();
-        if (count($this->tableObject->listPkFields()) == 1) $res = 'Ae_Model_Mapper';
-            else $res = 'Ae_Model_CpkMapper'; 
+        if (count($this->tableObject->listPkFields()) == 1) $res = 'Ac_Model_Mapper';
+            else $res = 'Ac_Model_CpkMapper'; 
         return $res;
     }
     
     /**
-     * Returns prototype for creating Ae_Model_Relation
+     * Returns prototype for creating Ac_Model_Relation
      * @return array
      */
     function getNonModelRelationPrototype($relName, $isIncoming, & $otherRel) {

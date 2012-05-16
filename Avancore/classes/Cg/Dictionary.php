@@ -146,7 +146,7 @@ class Cg_Dictionary {
                 $allConstants[$const] = $tr;
             }
         }
-        $this->constants = Ae_Util::m($allConstants, $this->constants);
+        $this->constants = Ac_Util::m($allConstants, $this->constants);
         return $this->constants;
     }
     

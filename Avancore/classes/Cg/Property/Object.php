@@ -12,7 +12,7 @@ class Cg_Property_Object extends Cg_Property {
     
     /**
      * @var string
-     * Name of Ae_Dbs_Relation in schema that corresponds to this association
+     * Name of Ac_Dbs_Relation in schema that corresponds to this association
      */
     var $relation = false;
     
@@ -42,12 +42,12 @@ class Cg_Property_Object extends Cg_Property {
     var $relationId = false;
     
     /**
-     * @var Ae_Sql_Dbi_Relation
+     * @var Ac_Sql_Dbi_Relation
      */
     var $_rel = false;
     
     /**
-     * @var Ae_Sql_Dbi_Relation
+     * @var Ac_Sql_Dbi_Relation
      */
     var $_otherRel = false;
     
@@ -115,7 +115,7 @@ class Cg_Property_Object extends Cg_Property {
         if ($this->varName === $pdn) {
             foreach ($this->_model->listProperties() as $i) {
                 $p = $this->_model->getProperty($i);
-                if (!Ae_Util::sameObject($p, $this) && is_a($p, 'Cg_Property_Object') && $p->getPreferredDefaultVarName() == $pdn) $res = true;
+                if (!Ac_Util::sameObject($p, $this) && is_a($p, 'Cg_Property_Object') && $p->getPreferredDefaultVarName() == $pdn) $res = true;
             }
         }
         return $res;
@@ -223,13 +223,13 @@ class Cg_Property_Object extends Cg_Property {
             if (is_a($prop, 'Cg_Property_Object')) {
                 if ($this->_otherRel) {
                     if ($prop->_otherRel && ($prop->isIncoming == !$this->isOtherIncoming) && ($prop->isOtherIncoming == !$this->isIncoming) 
-                        && Ae_Util::sameObject($this->_rel, $prop->_otherRel) && Ae_Util::sameObject($this->_otherRel, $prop->_rel)) 
+                        && Ac_Util::sameObject($this->_rel, $prop->_otherRel) && Ac_Util::sameObject($this->_otherRel, $prop->_rel)) 
                     {
                         $res = $prop;
                         break;
                     }
                 } else {
-                    if (($prop->isIncoming == !$this->isIncoming) && Ae_Util::sameObject($this->_rel, $prop->_rel)) {
+                    if (($prop->isIncoming == !$this->isIncoming) && Ac_Util::sameObject($this->_rel, $prop->_rel)) {
                         $res = $prop;
                         break;
                     }
@@ -313,7 +313,7 @@ class Cg_Property_Object extends Cg_Property {
     }
     
     /**
-     * @return Ae_Sql_Dbi_Relation
+     * @return Ac_Sql_Dbi_Relation
      */
     function getRelation() {
         return $this->_rel;
@@ -351,7 +351,7 @@ class Cg_Property_Object extends Cg_Property {
                     'arrayValue' => true,
                     //'caption' => $this->_other->pluralCaption,
                     'values' => array(
-                        'class' => 'Ae_Model_Values_Records',
+                        'class' => 'Ac_Model_Values_Records',
                         'mapperClass' => $this->_other->getMapperClass(),
                     ),
                 ),

@@ -2,8 +2,8 @@
 
 require_once(dirname(__FILE__).'/deploy.settings.php');
 
-if (class_exists('Ae_Url')) {
-    $u = Ae_Url::guess();
+if (class_exists('Ac_Url')) {
+    $u = Ac_Url::guess();
     $u->query = array();
     if (substr($u->path, -1) !== '/') $u->path = dirname($u->path).'/';
 } else {
@@ -24,8 +24,8 @@ $config = array(
     'cacheLifeTime' => 600,
     'prefix' => _DEPLOY_DB_PREFIX,
     'assetPlaceholders' => array(
-        '{AECSS}' => _DEPLOY_AVANCORE_SITE.'/',
-        '{AE}' => _DEPLOY_AVANCORE_SITE."/js/",
+        '{ACCSS}' => _DEPLOY_AVANCORE_SITE.'/',
+        '{AC}' => _DEPLOY_AVANCORE_SITE."/js/",
         '{PAX}' => _DEPLOY_SITE.'/assets/',
     ),
     'sendEmails' => defined('_DEPLOY_SEND_EMAILS')? _DEPLOY_SEND_EMAILS : false,

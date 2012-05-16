@@ -29,7 +29,7 @@ class Cg_Frontend {
     var $showOuterHtml = true;
     
     /**
-     * @var Ae_Application
+     * @var Ac_Application
      */
     var $application = false;
     
@@ -98,7 +98,7 @@ class Cg_Frontend {
             
         $gen = new Cg_Generator($this->configPath);
     
-        $hlp = new Ae_Form_Helper($dummy = null, false);
+        $hlp = new Ac_Form_Helper($dummy = null, false);
         $hlp->alwaysWrap = false;
     
         $cleanOutputDir = isset($_REQUEST['cod']);
