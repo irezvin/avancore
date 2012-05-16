@@ -1,11 +1,11 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Model_Mapper');
+Ac_Dispatcher::loadClass('Ac_Model_Mapper');
 
-class Ae_Test_Model_Orientation_Base_Mapper extends Ae_Model_Mapper {
+class Ac_Test_Model_Orientation_Base_Mapper extends Ac_Model_Mapper {
     
     /**
-     * @return Ae_Test_Model_Orientation 
+     * @return Ac_Test_Model_Orientation 
      */ 
     function & factory ($className = false) {
         $res = & parent::factory($className);
@@ -13,7 +13,7 @@ class Ae_Test_Model_Orientation_Base_Mapper extends Ae_Model_Mapper {
     }
     
     /**
-     * @return Ae_Test_Model_Orientation 
+     * @return Ac_Test_Model_Orientation 
      */ 
     function & reference ($values = array()) {
         $res = & parent::reference($values);
@@ -21,15 +21,15 @@ class Ae_Test_Model_Orientation_Base_Mapper extends Ae_Model_Mapper {
     }
     
     /**
-     * @return Ae_Test_Model_Orientation 
+     * @return Ac_Test_Model_Orientation 
      */ 
     function & loadRecord ($id) {
         $res = & parent::loadRecord($id);
         return $res;
     }
     
-    function Ae_Test_Model_Orientation_Base_Mapper () {
-        parent::Ae_Model_Mapper('#__orientation', 'Ae_Test_Model_Orientation', 'sexualOrientationId');
+    function Ac_Test_Model_Orientation_Base_Mapper () {
+        parent::Ac_Model_Mapper('#__orientation', 'Ac_Test_Model_Orientation', 'sexualOrientationId');
     }
         
     function getTitleFieldName() {
@@ -39,8 +39,8 @@ class Ae_Test_Model_Orientation_Base_Mapper extends Ae_Model_Mapper {
     function _getRelationPrototypes() {
         return array (
               '_people' => array (  
-                  'srcMapperClass' => 'Ae_Test_Model_Orientation_Mapper',
-                  'destMapperClass' => 'Ae_Test_Model_People_Mapper',
+                  'srcMapperClass' => 'Ac_Test_Model_Orientation_Mapper',
+                  'destMapperClass' => 'Ac_Test_Model_People_Mapper',
                   'srcVarName' => '_people',
                   'srcCountVarName' => '_peopleCount',
                   'destVarName' => '_orientation',
@@ -75,7 +75,7 @@ class Ae_Test_Model_Orientation_Base_Mapper extends Ae_Model_Mapper {
     }
         
     /**
-     * @return Ae_Test_Model_Orientation     
+     * @return Ac_Test_Model_Orientation     
      */
     function & loadBySexualOrientationId ($sexualOrientationId) {
         $recs = $this->loadRecordsByCriteria('`sexualOrientationId` = '.$this->database->Quote($sexualOrientationId).'');
@@ -86,8 +86,8 @@ class Ae_Test_Model_Orientation_Base_Mapper extends Ae_Model_Mapper {
     
     /**
      * Returns (but not loads!) one or more orientation of given one or more people 
-     * @param Ae_Test_Model_Orientation|array $people     
-     * @return array of Ae_Test_Model_Orientation objects  
+     * @param Ac_Test_Model_Orientation|array $people     
+     * @return array of Ac_Test_Model_Orientation objects  
      */
     function & getOfPeople($people) {
         $rel = & $this->getRelation('_people');
@@ -97,7 +97,7 @@ class Ae_Test_Model_Orientation_Base_Mapper extends Ae_Model_Mapper {
     
     /**
      * Loads one or more orientation of given one or more people 
-     * @param Ae_Test_Model_People|array $people of Ae_Test_Model_Orientation objects
+     * @param Ac_Test_Model_People|array $people of Ac_Test_Model_Orientation objects
      
      */
     function loadForPeople($people) {
@@ -107,7 +107,7 @@ class Ae_Test_Model_Orientation_Base_Mapper extends Ae_Model_Mapper {
 
     /**
      * Loads one or more people of given one or more orientation 
-     * @param Ae_Test_Model_Orientation|array $orientation     
+     * @param Ac_Test_Model_Orientation|array $orientation     
      */
     function loadPeopleFor($orientation) {
         $rel = & $this->getRelation('_people');

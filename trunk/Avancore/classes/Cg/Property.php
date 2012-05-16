@@ -27,7 +27,7 @@ class Cg_Property {
     function Cg_Property (& $model, $name, $config = array()) {
         $this->_model = $model;
         $this->name = $name;
-        Ae_Util::simpleBindAll($config, $this);
+        Ac_Util::simpleBindAll($config, $this);
         $this->_init();
     }
     
@@ -41,7 +41,7 @@ class Cg_Property {
     }
     
     /**
-     * Property info for function Ae_Model::getOwnPropertiesInfo() -- same as $formOptions in Ae_Model_Property. If $this->hasSeveralProperties() returns true,
+     * Property info for function Ac_Model::getOwnPropertiesInfo() -- same as $formOptions in Ac_Model_Property. If $this->hasSeveralProperties() returns true,
      * should return associative array (propName => array(propInfo...))
      *  
      * @return array

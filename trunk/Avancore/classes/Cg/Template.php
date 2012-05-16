@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Template extends Ae_Template {
+class Cg_Template extends Ac_Template {
     
     var $_init = false;
     
@@ -60,7 +60,7 @@ class Cg_Template extends Ae_Template {
     function getFilePath($id, $basePath = false) {
        if (!in_array($id, $this->listFiles())) trigger_error ("No such file: '$id' in template ".get_class($this), E_USER_ERROR); 
        $res = $this->_filesList[$id]['relPath'];
-       if ($basePath) $res = Ae_Util::stripTrailingSlash($basePath, '/\\') . '/' . $res; 
+       if ($basePath) $res = Ac_Util::stripTrailingSlash($basePath, '/\\') . '/' . $res; 
        return $res; 
     }
     

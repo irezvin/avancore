@@ -59,7 +59,7 @@ class <?php $this->d($this->domainClass); ?> extends <?php $this->d($this->domai
     }
 
     static function getInstance($id = null) {
-        return Ae_Application::getInstance(<?php $this->export($this->domainClass); ?>, $id);
+        return Ac_Application::getInstance(<?php $this->export($this->domainClass); ?>, $id);
     }
 
 }

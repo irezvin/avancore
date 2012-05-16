@@ -10,7 +10,7 @@ class Cg_Inflector {
      */
     function explode($string) {
         if (!is_string($string)) {
-            if (is_array($string)) $res = Ae_Util::array_values($string);
+            if (is_array($string)) $res = Ac_Util::array_values($string);
             else $res = $string;
         } else {
             $string = str_replace('_', ' ', $string);

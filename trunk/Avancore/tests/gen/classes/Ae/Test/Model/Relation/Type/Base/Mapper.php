@@ -1,11 +1,11 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Model_Mapper');
+Ac_Dispatcher::loadClass('Ac_Model_Mapper');
 
-class Ae_Test_Model_Relation_Type_Base_Mapper extends Ae_Model_Mapper {
+class Ac_Test_Model_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     
     /**
-     * @return Ae_Test_Model_Relation_Type 
+     * @return Ac_Test_Model_Relation_Type 
      */ 
     function & factory ($className = false) {
         $res = & parent::factory($className);
@@ -13,7 +13,7 @@ class Ae_Test_Model_Relation_Type_Base_Mapper extends Ae_Model_Mapper {
     }
     
     /**
-     * @return Ae_Test_Model_Relation_Type 
+     * @return Ac_Test_Model_Relation_Type 
      */ 
     function & reference ($values = array()) {
         $res = & parent::reference($values);
@@ -21,15 +21,15 @@ class Ae_Test_Model_Relation_Type_Base_Mapper extends Ae_Model_Mapper {
     }
     
     /**
-     * @return Ae_Test_Model_Relation_Type 
+     * @return Ac_Test_Model_Relation_Type 
      */ 
     function & loadRecord ($id) {
         $res = & parent::loadRecord($id);
         return $res;
     }
     
-    function Ae_Test_Model_Relation_Type_Base_Mapper () {
-        parent::Ae_Model_Mapper('#__relation_types', 'Ae_Test_Model_Relation_Type', 'relationTypeId');
+    function Ac_Test_Model_Relation_Type_Base_Mapper () {
+        parent::Ac_Model_Mapper('#__relation_types', 'Ac_Test_Model_Relation_Type', 'relationTypeId');
     }
         
     function getTitleFieldName() {
@@ -39,8 +39,8 @@ class Ae_Test_Model_Relation_Type_Base_Mapper extends Ae_Model_Mapper {
     function _getRelationPrototypes() {
         return array (
               '_relations' => array (  
-                  'srcMapperClass' => 'Ae_Test_Model_Relation_Type_Mapper',
-                  'destMapperClass' => 'Ae_Test_Model_Relation_Mapper',
+                  'srcMapperClass' => 'Ac_Test_Model_Relation_Type_Mapper',
+                  'destMapperClass' => 'Ac_Test_Model_Relation_Mapper',
                   'srcVarName' => '_relations',
                   'srcCountVarName' => '_relationsCount',
                   'destVarName' => '_relationType',
@@ -75,7 +75,7 @@ class Ae_Test_Model_Relation_Type_Base_Mapper extends Ae_Model_Mapper {
     }
         
     /**
-     * @return Ae_Test_Model_Relation_Type     
+     * @return Ac_Test_Model_Relation_Type     
      */
     function & loadByRelationTypeId ($relationTypeId) {
         $recs = $this->loadRecordsByCriteria('`relationTypeId` = '.$this->database->Quote($relationTypeId).'');
@@ -86,8 +86,8 @@ class Ae_Test_Model_Relation_Type_Base_Mapper extends Ae_Model_Mapper {
     
     /**
      * Returns (but not loads!) one or more relationTypes of given one or more relations 
-     * @param Ae_Test_Model_Relation_Type|array $relations     
-     * @return array of Ae_Test_Model_Relation_Type objects  
+     * @param Ac_Test_Model_Relation_Type|array $relations     
+     * @return array of Ac_Test_Model_Relation_Type objects  
      */
     function & getOfRelations($relations) {
         $rel = & $this->getRelation('_relations');
@@ -97,7 +97,7 @@ class Ae_Test_Model_Relation_Type_Base_Mapper extends Ae_Model_Mapper {
     
     /**
      * Loads one or more relationTypes of given one or more relations 
-     * @param Ae_Test_Model_Relation|array $relations of Ae_Test_Model_Relation_Type objects
+     * @param Ac_Test_Model_Relation|array $relations of Ac_Test_Model_Relation_Type objects
      
      */
     function loadForRelations($relations) {
@@ -107,7 +107,7 @@ class Ae_Test_Model_Relation_Type_Base_Mapper extends Ae_Model_Mapper {
 
     /**
      * Loads one or more relations of given one or more relationTypes 
-     * @param Ae_Test_Model_Relation_Type|array $relationTypes     
+     * @param Ac_Test_Model_Relation_Type|array $relationTypes     
      */
     function loadRelationsFor($relationTypes) {
         $rel = & $this->getRelation('_relations');

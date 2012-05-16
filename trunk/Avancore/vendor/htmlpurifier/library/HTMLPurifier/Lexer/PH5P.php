@@ -69,7 +69,7 @@ class HTML5 {
     private $token;
     private $content_model;
     private $escape = false;
-    private $entities = array('AElig;','AElig','AMP;','AMP','Aacute;','Aacute',
+    private $entities = array('AClig;','AClig','AMP;','AMP','Aacute;','Aacute',
     'Acirc;','Acirc','Agrave;','Agrave','Alpha;','Aring;','Aring','Atilde;',
     'Atilde','Auml;','Auml','Beta;','COPY;','COPY','Ccedil;','Ccedil','Chi;',
     'Dagger;','Delta;','ETH;','ETH','Eacute;','Eacute','Ecirc;','Ecirc','Egrave;',

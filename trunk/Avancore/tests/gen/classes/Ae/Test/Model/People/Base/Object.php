@@ -1,8 +1,8 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Model_Object');
+Ac_Dispatcher::loadClass('Ac_Model_Object');
 
-class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
+class Ac_Test_Model_People_Base_Object extends Ac_Model_Object {
     
     var $_orientation = false;
     var $_tags = false;
@@ -21,10 +21,10 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
     var $createdTs = false;
     var $sexualOrientationId = NULL;
     
-    var $_mapperClass = 'Ae_Test_Model_People_Mapper';
+    var $_mapperClass = 'Ac_Test_Model_People_Mapper';
     
-    function Ae_Test_Model_People_Base_Object() {
-        parent::Ae_Model_Object ('#__people', 'personId');
+    function Ac_Test_Model_People_Base_Object() {
+        parent::Ac_Model_Object ('#__people', 'personId');
     }
     
     function listOwnProperties() {
@@ -36,22 +36,22 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
     }
 
     function listOwnAssociations() {
-        return array ( 'orientation' => 'Ae_Test_Model_Orientation', 'tags' => 'Ae_Test_Model_Tag', 'outgoingRelations' => 'Ae_Test_Model_Relation', 'incomingRelations' => 'Ae_Test_Model_Relation', );
+        return array ( 'orientation' => 'Ac_Test_Model_Orientation', 'tags' => 'Ac_Test_Model_Tag', 'outgoingRelations' => 'Ac_Test_Model_Relation', 'incomingRelations' => 'Ac_Test_Model_Relation', );
     }
 
     function getOwnPropertiesInfo() {
     
         return array (
               'orientation' => array (  
-                  'className' => 'Ae_Test_Model_Orientation',
-                  'mapperClass' => 'Ae_Test_Model_Orientation_Mapper',
+                  'className' => 'Ac_Test_Model_Orientation',
+                  'mapperClass' => 'Ac_Test_Model_Orientation_Mapper',
                   'relationId' => '_orientation',
                   'caption' => 'Orientation',
                   'isEnabled' => true,
               ),
               'tags' => array (  
-                  'className' => 'Ae_Test_Model_Tag',
-                  'mapperClass' => 'Ae_Test_Model_Tag_Mapper',
+                  'className' => 'Ac_Test_Model_Tag',
+                  'mapperClass' => 'Ac_Test_Model_Tag_Mapper',
                   'relationId' => '_tags',
                   'caption' => 'Tags',
                   'isEnabled' => true,
@@ -61,8 +61,8 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
                   'arrayValue' => true,
               ),
               'outgoingRelations' => array (  
-                  'className' => 'Ae_Test_Model_Relation',
-                  'mapperClass' => 'Ae_Test_Model_Relation_Mapper',
+                  'className' => 'Ac_Test_Model_Relation',
+                  'mapperClass' => 'Ac_Test_Model_Relation_Mapper',
                   'relationId' => '_outgoingRelations',
                   'otherModelIdInMethodsSingle' => 'outgoingRelation',
                   'otherModelIdInMethodsPlural' => 'outgoingRelations',
@@ -70,8 +70,8 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
                   'isEnabled' => true,
               ),
               'incomingRelations' => array (  
-                  'className' => 'Ae_Test_Model_Relation',
-                  'mapperClass' => 'Ae_Test_Model_Relation_Mapper',
+                  'className' => 'Ac_Test_Model_Relation',
+                  'mapperClass' => 'Ac_Test_Model_Relation_Mapper',
                   'relationId' => '_incomingRelations',
                   'otherModelIdInMethodsSingle' => 'incomingRelation',
                   'otherModelIdInMethodsPlural' => 'incomingRelations',
@@ -142,8 +142,8 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
                   'controlType' => 'selectList',
                   'maxLength' => '10',
                   'values' => array (    
-                      'class' => 'Ae_Model_Values_Records',
-                      'mapperClass' => 'Ae_Test_Model_Orientation_Mapper',
+                      'class' => 'Ac_Model_Values_Records',
+                      'mapperClass' => 'Ac_Test_Model_Orientation_Mapper',
                   ),
                   'objectPropertyName' => 'orientation',
                   'isNullable' => true,
@@ -160,7 +160,7 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
         
     
     /**
-     * @return Ae_Test_Model_Orientation 
+     * @return Ac_Test_Model_Orientation 
      */
     function & getOrientation() {
         if ($this->_orientation === false) {
@@ -171,14 +171,14 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @param Ae_Test_Model_Orientation $orientation 
+     * @param Ac_Test_Model_Orientation $orientation 
      */
     function setOrientation(& $orientation) {
         if ($orientation === false) $this->_orientation = false;
         elseif ($orientation === null) $this->_orientation = null;
         else {
-            if (!is_a($orientation, 'Ae_Test_Model_Orientation')) trigger_error('$orientation must be an instance of Ae_Test_Model_Orientation', E_USER_ERROR);
-            if (!is_object($this->_orientation) && !Ae_Util::sameObject($this->_orientation, $orientation)) { 
+            if (!is_a($orientation, 'Ac_Test_Model_Orientation')) trigger_error('$orientation must be an instance of Ac_Test_Model_Orientation', E_USER_ERROR);
+            if (!is_object($this->_orientation) && !Ac_Util::sameObject($this->_orientation, $orientation)) { 
                 $this->_orientation = & $orientation;
             }
         }
@@ -189,10 +189,10 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @return Ae_Test_Model_Orientation  
+     * @return Ac_Test_Model_Orientation  
      */
     function & createOrientation($values = array(), $isReference = false) {
-        $m = & $this->getMapper('Ae_Test_Model_Orientation_Mapper');
+        $m = & $this->getMapper('Ac_Test_Model_Orientation_Mapper');
         $res = & $m->factory();
         if ($values) $res->bind($values);
         if ($isReference) $res->setIsReference(true);
@@ -219,7 +219,7 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @return Ae_Test_Model_Tag 
+     * @return Ac_Test_Model_Tag 
      */
     function & getTag($id) {
         if ($this->_tags === false) {
@@ -233,19 +233,19 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @param Ae_Test_Model_Tag $tag 
+     * @param Ac_Test_Model_Tag $tag 
      */
     function addTag(& $tag) {
-        if (!is_a($tag, 'Ae_Test_Model_Tag')) trigger_error('$tag must be an instance of Ae_Test_Model_Tag', E_USER_ERROR);
+        if (!is_a($tag, 'Ac_Test_Model_Tag')) trigger_error('$tag must be an instance of Ac_Test_Model_Tag', E_USER_ERROR);
         $this->listTags();
         $this->_tags[] = & $tag;
     }
     
     /**
-     * @return Ae_Test_Model_Tag  
+     * @return Ac_Test_Model_Tag  
      */
     function & createTag($values = array(), $isReference = false) {
-        $m = & $this->getMapper('Ae_Test_Model_Tag_Mapper');
+        $m = & $this->getMapper('Ac_Test_Model_Tag_Mapper');
         $res = & $m->factory();
         if ($values) $res->bind($values);
         if ($isReference) $res->setIsReference(true);
@@ -291,7 +291,7 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @return Ae_Test_Model_Relation 
+     * @return Ac_Test_Model_Relation 
      */
     function & getOutgoingRelation($id) {
         if ($this->_outgoingRelations === false) {
@@ -305,19 +305,19 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @param Ae_Test_Model_Relation $outgoingRelation 
+     * @param Ac_Test_Model_Relation $outgoingRelation 
      */
     function addOutgoingRelation(& $outgoingRelation) {
-        if (!is_a($outgoingRelation, 'Ae_Test_Model_Relation')) trigger_error('$outgoingRelation must be an instance of Ae_Test_Model_Relation', E_USER_ERROR);
+        if (!is_a($outgoingRelation, 'Ac_Test_Model_Relation')) trigger_error('$outgoingRelation must be an instance of Ac_Test_Model_Relation', E_USER_ERROR);
         $this->listOutgoingRelations();
         $this->_outgoingRelations[] = & $outgoingRelation;
     }
     
     /**
-     * @return Ae_Test_Model_Relation  
+     * @return Ac_Test_Model_Relation  
      */
     function & createOutgoingRelation($values = array(), $isReference = false) {
-        $m = & $this->getMapper('Ae_Test_Model_Relation_Mapper');
+        $m = & $this->getMapper('Ac_Test_Model_Relation_Mapper');
         $res = & $m->factory();
         if ($values) $res->bind($values);
         if ($isReference) $res->setIsReference(true);
@@ -344,7 +344,7 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @return Ae_Test_Model_Relation 
+     * @return Ac_Test_Model_Relation 
      */
     function & getIncomingRelation($id) {
         if ($this->_incomingRelations === false) {
@@ -358,19 +358,19 @@ class Ae_Test_Model_People_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @param Ae_Test_Model_Relation $incomingRelation 
+     * @param Ac_Test_Model_Relation $incomingRelation 
      */
     function addIncomingRelation(& $incomingRelation) {
-        if (!is_a($incomingRelation, 'Ae_Test_Model_Relation')) trigger_error('$incomingRelation must be an instance of Ae_Test_Model_Relation', E_USER_ERROR);
+        if (!is_a($incomingRelation, 'Ac_Test_Model_Relation')) trigger_error('$incomingRelation must be an instance of Ac_Test_Model_Relation', E_USER_ERROR);
         $this->listIncomingRelations();
         $this->_incomingRelations[] = & $incomingRelation;
     }
     
     /**
-     * @return Ae_Test_Model_Relation  
+     * @return Ac_Test_Model_Relation  
      */
     function & createIncomingRelation($values = array(), $isReference = false) {
-        $m = & $this->getMapper('Ae_Test_Model_Relation_Mapper');
+        $m = & $this->getMapper('Ac_Test_Model_Relation_Mapper');
         $res = & $m->factory();
         if ($values) $res->bind($values);
         if ($isReference) $res->setIsReference(true);

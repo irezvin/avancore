@@ -28,7 +28,7 @@ class Cg_Template_Assoc_Strategy_One extends Cg_Template_Assoc_Strategy {
         elseif ($<?php $this->d($this->single); ?> === null) $this-><?php $this->d($this->var); ?> = null;
         else {
             if (!is_a($<?php $this->d($this->single); ?>, <?php $this->str($prop->className); ?>)) trigger_error('$<?php $this->d($this->single); ?> must be an instance of <?php $this->d($prop->className); ?>', E_USER_ERROR);
-            if (!is_object($this-><?php $this->d($this->var); ?>) && !Ae_Util::sameObject($this-><?php $this->d($this->var); ?>, $<?php $this->d($this->single); ?>)) { 
+            if (!is_object($this-><?php $this->d($this->var); ?>) && !Ac_Util::sameObject($this-><?php $this->d($this->var); ?>, $<?php $this->d($this->single); ?>)) { 
                 $this-><?php $this->d($this->var); ?> = & $<?php $this->d($this->single); ?>;
             }
         }

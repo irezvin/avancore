@@ -29,7 +29,7 @@ class Cg_Property_Simple extends Cg_Property {
     var $isNullable = false;
     
     /**
-     * @var Ae_Sql_Dbi_Column
+     * @var Ac_Sql_Dbi_Column
      */
     var $_col = false;
     
@@ -193,7 +193,7 @@ class Cg_Property_Simple extends Cg_Property {
                 if ($sfc->isPk()) {
                     $foreignTbl = $sfc->_table;
                     if ($mod = $this->_model->_domain->searchModelByTable($foreignTbl->name)) {
-                        $this->values = array('class' => 'Ae_Model_Values_Records', 'mapperClass' => $mod->getMapperClass());
+                        $this->values = array('class' => 'Ac_Model_Values_Records', 'mapperClass' => $mod->getMapperClass());
                         $controlType = 'selectList';
                     }
                 }
@@ -230,7 +230,7 @@ class Cg_Property_Simple extends Cg_Property {
                         foreach ($this->_model->listProperties() as $i) {
                             $p = $this->_model->getProperty($i);
                             if (is_a($p, 'Cg_Property_Object') && $om = $p->getOtherModel()) {
-                                if (Ae_Util::sameObject($om, $mod)) {
+                                if (Ac_Util::sameObject($om, $mod)) {
                                     $rel = $p->_rel;
                                     if (in_array($this->colName, array_keys($rel->columns))) {
                                         $this->_objectPropertyName = $p->varName;

@@ -2,7 +2,7 @@
 
 class Cg_Generator {
     
-    var $dbClass = 'Ae_Legacy_Database_Native';
+    var $dbClass = 'Ac_Legacy_Database_Native';
     
     /**
      * Hostname to access database
@@ -38,12 +38,12 @@ class Cg_Generator {
     var $targetDir = '../';
     
     /**
-     * @var Ae_Legacy_Database 
+     * @var Ac_Legacy_Database 
      */
     var $_db = false;
     
     /**
-     * @var Ae_Sql_Dbi_Inspector
+     * @var Ac_Sql_Dbi_Inspector
      */
     var $_inspector = false;
     
@@ -138,8 +138,8 @@ class Cg_Generator {
         $this->_loadStaticConfig();
         if (isset($this->staticConfig['generator']) && is_array($this->staticConfig['generator'])) {
             if (isset($this->staticConfig['generator']['staticConfig'])) unset($this->staticConfig['generator']['staticConfig']);
-            Ae_Util::simpleBind($this->staticConfig['generator'], $this); 
-            Ae_Util::simpleBind($runtimeOptions, $this);
+            Ac_Util::simpleBind($this->staticConfig['generator'], $this); 
+            Ac_Util::simpleBind($runtimeOptions, $this);
         }
     }
     
@@ -180,7 +180,7 @@ class Cg_Generator {
     }
     
     /**
-     * @return Ae_Legacy_Database 
+     * @return Ac_Legacy_Database 
      */
     function getDb() {
         if ($this->_db === false) {
@@ -196,7 +196,7 @@ class Cg_Generator {
     }
     
     /**
-     * @return Ae_Sql_Dbi_Inspector
+     * @return Ac_Sql_Dbi_Inspector
      */
     function getInspector() {
         if ($this->_inspector === false) {
@@ -217,7 +217,7 @@ class Cg_Generator {
             $this->$l = array();
             if (isset($this->staticConfig['domains']) && is_array($this->staticConfig['domains'])) { 
                 foreach ($this->staticConfig['domains'] as $name => $config) {
-                    if (is_array($this->domainDefaults)) $config = Ae_Util::m($this->domainDefaults, $config);
+                    if (is_array($this->domainDefaults)) $config = Ac_Util::m($this->domainDefaults, $config);
                     $obj = new Cg_Domain($this, $name, $config);
                     $this->{$l}[$name] = $obj; 
                 }
@@ -266,7 +266,7 @@ class Cg_Generator {
                 $replacement = array ($head => array());
                 unset($array[$k]);
                 $path = explode('.', $k);
-                Ae_Util::setArrayByPath($array, $path, $value);
+                Ac_Util::setArrayByPath($array, $path, $value);
             }
         }
         return $array;
@@ -276,11 +276,11 @@ class Cg_Generator {
      * @return Cg_Strategy
      */
     function & createStrategyForDomain($domainName) {
-        $class = Ae_Util::getArrayByPath($this->staticConfig, array('domains', $domainName, 'strategyClass'), 'Cg_Strategy');
+        $class = Ac_Util::getArrayByPath($this->staticConfig, array('domains', $domainName, 'strategyClass'), 'Cg_Strategy');
         if (is_array($this->strategySettings)) $ss = $this->strategySettings; else $ss = array();
         $ss['genNonEditable'] = $this->genNonEditable;
         $dom = $this->getDomain($domainName);
-        Ae_Util::ms($ss, $dom->getStrategySettings());
+        Ac_Util::ms($ss, $dom->getStrategySettings());
         $res = new $class($this, $domainName, $this->outputDir, $this->genEditable, $this->ovrEditable, $ss);
         return $res;
     }
