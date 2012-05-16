@@ -1,8 +1,8 @@
 <?php
 
-Ae_Dispatcher::loadClass('Ae_Model_Object');
+Ac_Dispatcher::loadClass('Ac_Model_Object');
 
-class Ae_Test_Model_Relation_Type_Base_Object extends Ae_Model_Object {
+class Ac_Test_Model_Relation_Type_Base_Object extends Ac_Model_Object {
     
     var $_relations = false;
     var $_relationsCount = false;
@@ -10,10 +10,10 @@ class Ae_Test_Model_Relation_Type_Base_Object extends Ae_Model_Object {
     var $title = '';
     var $isSymmetrical = 0;
     
-    var $_mapperClass = 'Ae_Test_Model_Relation_Type_Mapper';
+    var $_mapperClass = 'Ac_Test_Model_Relation_Type_Mapper';
     
-    function Ae_Test_Model_Relation_Type_Base_Object() {
-        parent::Ae_Model_Object ('#__relation_types', 'relationTypeId');
+    function Ac_Test_Model_Relation_Type_Base_Object() {
+        parent::Ac_Model_Object ('#__relation_types', 'relationTypeId');
     }
     
     function listOwnProperties() {
@@ -25,15 +25,15 @@ class Ae_Test_Model_Relation_Type_Base_Object extends Ae_Model_Object {
     }
 
     function listOwnAssociations() {
-        return array ( 'relations' => 'Ae_Test_Model_Relation', );
+        return array ( 'relations' => 'Ac_Test_Model_Relation', );
     }
 
     function getOwnPropertiesInfo() {
     
         return array (
               'relations' => array (  
-                  'className' => 'Ae_Test_Model_Relation',
-                  'mapperClass' => 'Ae_Test_Model_Relation_Mapper',
+                  'className' => 'Ac_Test_Model_Relation',
+                  'mapperClass' => 'Ac_Test_Model_Relation_Mapper',
                   'relationId' => '_relations',
                   'caption' => 'Relations',
                   'isEnabled' => true,
@@ -89,7 +89,7 @@ class Ae_Test_Model_Relation_Type_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @return Ae_Test_Model_Relation 
+     * @return Ac_Test_Model_Relation 
      */
     function & getRelation($id) {
         if ($this->_relations === false) {
@@ -103,19 +103,19 @@ class Ae_Test_Model_Relation_Type_Base_Object extends Ae_Model_Object {
     }
     
     /**
-     * @param Ae_Test_Model_Relation $relation 
+     * @param Ac_Test_Model_Relation $relation 
      */
     function addRelation(& $relation) {
-        if (!is_a($relation, 'Ae_Test_Model_Relation')) trigger_error('$relation must be an instance of Ae_Test_Model_Relation', E_USER_ERROR);
+        if (!is_a($relation, 'Ac_Test_Model_Relation')) trigger_error('$relation must be an instance of Ac_Test_Model_Relation', E_USER_ERROR);
         $this->listRelations();
         $this->_relations[] = & $relation;
     }
     
     /**
-     * @return Ae_Test_Model_Relation  
+     * @return Ac_Test_Model_Relation  
      */
     function & createRelation($values = array(), $isReference = false) {
-        $m = & $this->getMapper('Ae_Test_Model_Relation_Mapper');
+        $m = & $this->getMapper('Ac_Test_Model_Relation_Mapper');
         $res = & $m->factory();
         if ($values) $res->bind($values);
         if ($isReference) $res->setIsReference(true);

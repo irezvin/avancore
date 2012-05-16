@@ -36,7 +36,7 @@ class Cg_Template_Assoc_Strategy_ManyToMany extends Cg_Template_Assoc_Strategy_M
     function _showLinkBackCode() {
 ?>        
 <?php   if (strlen($this->mirrorVar)) { ?>
-        if (is_array($<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>) && !Ae_Util::sameInArray($this, $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>)) {
+        if (is_array($<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>) && !Ac_Util::sameInArray($this, $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>)) {
                 $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>[] = & $this;
         }
 <?php   } ?>

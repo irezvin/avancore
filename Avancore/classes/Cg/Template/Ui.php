@@ -223,34 +223,34 @@ $pageMap = array_merge($pageMap, array(
             'ordering' => "t.<?php $this->d($this->orderingColumn); ?><?php if ($this->orderGroupColumn) { ?>, <?php $this->d($this->orderGroupColumn); ?><?php } ?>",
 <?php } ?>            
             'tableColumnSettings' => array(
-                'number' => array('class' => 'Ae_Page_List_Column_Number'),
-                'checked' => array('class' => 'Ae_Page_List_Column_Checked', 'checkoutProcessing' => false),
+                'number' => array('class' => 'Ac_Page_List_Column_Number'),
+                'checked' => array('class' => 'Ac_Page_List_Column_Checked', 'checkoutProcessing' => false),
 <?php if ($this->nameColumn) { ?>
-                <?php $this->str($this->nameColumn); ?> => array('class' => 'Ae_Page_List_Column_Link', 'taskName' => '<?php echo $mn; ?>_Edit', 'linkTitle' => <?php $this->lng('editRecord'); ?>, 'title' => <?php $this->lng('title'); ?>),
+                <?php $this->str($this->nameColumn); ?> => array('class' => 'Ac_Page_List_Column_Link', 'taskName' => '<?php echo $mn; ?>_Edit', 'linkTitle' => <?php $this->lng('editRecord'); ?>, 'title' => <?php $this->lng('title'); ?>),
 <?php } else { ?>
-                '<?php $this->d($this->singlePkColumn); ?>' => array('class' => 'Ae_Page_List_Column_Link', 'taskName' => '<?php echo $mn; ?>_Edit', 'linkTitle' => <?php $this->lng('editRecord'); ?>, 'title' => <?php $this->lng('id'); ?>),
+                '<?php $this->d($this->singlePkColumn); ?>' => array('class' => 'Ac_Page_List_Column_Link', 'taskName' => '<?php echo $mn; ?>_Edit', 'linkTitle' => <?php $this->lng('editRecord'); ?>, 'title' => <?php $this->lng('id'); ?>),
 <?php } ?>
 <?php if ($this->orderingColumn) { ?>
-                'ordering' => array('class' => 'Ae_Page_List_Column_Reorder', 'orderUpTask' => '<?php echo $mn; ?>_Order_Up', 'orderDownTask' => '<?php echo $mn; ?>_Order_Down' <?php if($this->orderGroupColumn) { ?>, 'orderProperty' => '<?php  $this->d($this->orderGroupColumn); ?>' <?php } ?>),
-                'saveOrder' => array('class' => 'Ae_Page_List_Column_SaveOrder', 'taskName' => '<?php echo $mn; ?>_Order_Save', 'groupProperty' => 'groupId'),
+                'ordering' => array('class' => 'Ac_Page_List_Column_Reorder', 'orderUpTask' => '<?php echo $mn; ?>_Order_Up', 'orderDownTask' => '<?php echo $mn; ?>_Order_Down' <?php if($this->orderGroupColumn) { ?>, 'orderProperty' => '<?php  $this->d($this->orderGroupColumn); ?>' <?php } ?>),
+                'saveOrder' => array('class' => 'Ac_Page_List_Column_SaveOrder', 'taskName' => '<?php echo $mn; ?>_Order_Save', 'groupProperty' => 'groupId'),
 <?php } ?>
 <?php if ($this->publishedColumn) { ?>
-                '<?php  $this->d($this->publishedColumn); ?>' => array('class' => 'Ae_Page_List_Column_Published', 'publishTask' => '<?php echo $mn; ?>_Publish', 'unpublishTask' => '<?php echo $mn; ?>_Unpublish'),
+                '<?php  $this->d($this->publishedColumn); ?>' => array('class' => 'Ac_Page_List_Column_Published', 'publishTask' => '<?php echo $mn; ?>_Publish', 'unpublishTask' => '<?php echo $mn; ?>_Unpublish'),
 <?php } ?>
             ),
             
             'processingSettings' => array(
 <?php if ($this->model->uiCanDelete) { ?>
-                'delete' => array('class' => 'Ae_Page_Processing_Delete'),
+                'delete' => array('class' => 'Ac_Page_Processing_Delete'),
 <?php } ?>                
 <?php if ($this->orderingColumn) { ?>
-                'orderUp' => array('class' => 'Ae_Page_Processing_Reorder', 'extraSettings' => array('direction' => -1, <?php if ($this->orderGroupColumn) { ?>'groupProperty' => '<?php $this->d($this->orderGroupColumn); ?>', <?php } ?>)),
-                'orderDown' => array('class' => 'Ae_Page_Processing_Reorder', 'extraSettings' => array('direction' => 1, <?php if ($this->orderGroupColumn) { ?>'groupProperty' => '<?php $this->d($this->orderGroupColumn); ?>', <?php } ?>)),
-                'saveOrder' => array('class' => 'Ae_Page_Processing_SaveOrder' <?php if ($this->orderGroupColumn) { ?>, 'extraSettings' => array('groupProperty' => '<?php $this->d($this->orderGroupColumn); ?>', ), <?php } ?> ),
+                'orderUp' => array('class' => 'Ac_Page_Processing_Reorder', 'extraSettings' => array('direction' => -1, <?php if ($this->orderGroupColumn) { ?>'groupProperty' => '<?php $this->d($this->orderGroupColumn); ?>', <?php } ?>)),
+                'orderDown' => array('class' => 'Ac_Page_Processing_Reorder', 'extraSettings' => array('direction' => 1, <?php if ($this->orderGroupColumn) { ?>'groupProperty' => '<?php $this->d($this->orderGroupColumn); ?>', <?php } ?>)),
+                'saveOrder' => array('class' => 'Ac_Page_Processing_SaveOrder' <?php if ($this->orderGroupColumn) { ?>, 'extraSettings' => array('groupProperty' => '<?php $this->d($this->orderGroupColumn); ?>', ), <?php } ?> ),
 <?php } ?>
 <?php  if ($this->publishedColumn) { ?>
-                'publish' => array('class' => 'Ae_Page_Processing_Publish', <?php if ($this->publishedColumn != 'published') { ?> 'extraSettings' => array('propName' => '<?php $this->d($this->publishedColumn); ?>'), <?php } ?>),
-                'unpublish' => array('class' => 'Ae_Page_Processing_Unpublish', <?php if ($this->publishedColumn != 'published') { ?>  'extraSettings' => array('propName' => '<?php $this->d($this->publishedColumn); ?>'),  <?php } ?>),
+                'publish' => array('class' => 'Ac_Page_Processing_Publish', <?php if ($this->publishedColumn != 'published') { ?> 'extraSettings' => array('propName' => '<?php $this->d($this->publishedColumn); ?>'), <?php } ?>),
+                'unpublish' => array('class' => 'Ac_Page_Processing_Unpublish', <?php if ($this->publishedColumn != 'published') { ?>  'extraSettings' => array('propName' => '<?php $this->d($this->publishedColumn); ?>'),  <?php } ?>),
 <?php } ?>
             ),
 

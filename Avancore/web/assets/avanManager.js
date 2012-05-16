@@ -73,13 +73,13 @@ var AvanControllers = {
 	},
     
     initFromProps: function(props, target) {
-		Ae_Util.override(target, props);
+		Ac_Util.override(target, props);
     },
     
     matchesProps: function(props, target) {
         ok = true;
     	for (var i in props) {
-    		if (Ae_Util.hasOwnProperty(props, i)) {
+    		if (Ac_Util.hasOwnProperty(props, i)) {
     			if (target[i] != props[i]) {
     				ok = false;
     				break;
@@ -174,7 +174,7 @@ AvanControllers.ListControllerRecord = function (aOptions) {
     this.excludeActions = false;
     
     if (aOptions) AvanControllers.initFromProps(aOptions, this);
-    Ae_Util.augment(this, AvanControllers.Observable);
+    Ac_Util.augment(this, AvanControllers.Observable);
     
     /** @param mode true|false|'toggle' - whether record will be selected|de-selected|toggled (based on current status) */
     this.setSelected = function(mode) {
@@ -206,7 +206,7 @@ AvanControllers.Action = function (aOptions) {
     if (aOptions) AvanControllers.initFromProps(aOptions, this);
     
     this.updateAllowedStatus = function (records) {
-    	records = Ae_Util.toArray(records);
+    	records = Ac_Util.toArray(records);
         
     	var selectedRecords = [];
     	for (var i = 0, l = records.length; i < l; i++) if (records[i].selected) selectedRecords.push(records[i]);
@@ -241,9 +241,9 @@ AvanControllers.Action = function (aOptions) {
         for (var i = records.length - 1; res && i >= 0; i--) {
         	var r = records[i];
             res = res && include? 
-            		r.includeActions && Ae_Util.indexOf(this.id, Ae_Util.toArray(r.includeActions)) >= 0 
+            		r.includeActions && Ac_Util.indexOf(this.id, Ac_Util.toArray(r.includeActions)) >= 0 
             	: 
-            		!(r.excludeActions && Ae_Util.indexOf(this.id, Ae_Util.toArray(r.excludeActions)) >= 0);
+            		!(r.excludeActions && Ac_Util.indexOf(this.id, Ac_Util.toArray(r.excludeActions)) >= 0);
         }
         return res;
     };
@@ -252,7 +252,7 @@ AvanControllers.Action = function (aOptions) {
         return allowed;
     };
     
-    Ae_Util.augment(this, AvanControllers.Observable);
+    Ac_Util.augment(this, AvanControllers.Observable);
 };
 
 // Represents record list pagination
@@ -290,11 +290,11 @@ AvanControllers.ListController = function(aOptions) {
         this.update = function(record, params) {
             if (!params || typeof(params.selected) != 'undefined' ) {
                 if (record.selected) {
-                	Ae_Util.addRemoveClassName(this.element, this.selectedClass, this.deselectedClass);
+                	Ac_Util.addRemoveClassName(this.element, this.selectedClass, this.deselectedClass);
                     if (this.element.tagName.toLowerCase() == 'input' && this.element.type.toLowerCase() == 'checkbox')
                         this.element.checked = true;
                 } else {
-                	Ae_Util.addRemoveClassName(this.element, this.deselectedClass, this.selectedClass);
+                	Ac_Util.addRemoveClassName(this.element, this.deselectedClass, this.selectedClass);
                     if (this.element.tagName.toLowerCase() == 'input' && this.element.type.toLowerCase() == 'checkbox')
                         this.element.checked = false;
                 }
@@ -311,11 +311,11 @@ AvanControllers.ListController = function(aOptions) {
         this.update = function(listController, params) {
             if (!params || typeof(params.allSelected) != 'undefined' ) {
                 if (listController.areAllRecordsSelected()) {
-                	Ae_Util.addRemoveClassName(this.element, this.selectedClass, this.deselectedClass);
+                	Ac_Util.addRemoveClassName(this.element, this.selectedClass, this.deselectedClass);
                     if (this.element.tagName.toLowerCase() == 'input' && this.element.type.toLowerCase() == 'checkbox')
                         this.element.checked = true;
                 } else {
-                	Ae_Util.addRemoveClassName(this.element, this.deselectedClass, this.selectedClass);
+                	Ac_Util.addRemoveClassName(this.element, this.deselectedClass, this.selectedClass);
                     if (this.element.tagName.toLowerCase() == 'input' && this.element.type.toLowerCase() == 'checkbox')
                         this.element.checked = false;
                 }
@@ -384,7 +384,7 @@ AvanControllers.ListController = function(aOptions) {
         this.listController = _controller;
         this.actionName = 'edit';
         this.action = false;
-        if (options) Ae_Util.override(this, options);
+        if (options) Ac_Util.override(this, options);
         if (options && options.element) this.element = AvanControllers.getElement(options.element);
         
         var eventHandler = false;
@@ -441,7 +441,7 @@ AvanControllers.ListController = function(aOptions) {
     
     
     this.addRecords = function(prototypes) {
-    	for (var i in prototypes) if (Ae_Util.hasOwnProperty(prototypes, i)) {
+    	for (var i in prototypes) if (Ac_Util.hasOwnProperty(prototypes, i)) {
             var index = records.length;
             var rec = new AvanControllers.ListControllerRecord(prototypes[i]);
             rec.index = records.length;
@@ -489,7 +489,7 @@ AvanControllers.ListController = function(aOptions) {
     this.selectRecords = function(recordsOrKeys, mode) {
         if (mode == null) mode = 'toggle';
         var recs = [];
-        recordsOrKeys = Ae_Util.toArray(recordsOrKeys);
+        recordsOrKeys = Ac_Util.toArray(recordsOrKeys);
         for (var i = 0, l = recordsOrKeys.length; i < l; i++) {
         	var r = this.findRecord(recordsOrKeys[i]);
         	if (r) {
@@ -530,7 +530,7 @@ AvanControllers.ListController = function(aOptions) {
         
     }
     
-    Ae_Util.augment(this, AvanControllers.Observable);
+    Ac_Util.augment(this, AvanControllers.Observable);
 
 };
 
@@ -546,7 +546,7 @@ AvanControllers.ActionsController = function(aOptions) {
     
     this.addActions = function(prototypes) {
     	
-    	for (var i in prototypes) if (Ae_Util.hasOwnProperty(prototypes, i)) {
+    	for (var i in prototypes) if (Ac_Util.hasOwnProperty(prototypes, i)) {
     		var prot = prototypes[i];
             if (prot.id) {
                 var act = new AvanControllers.Action(prot);
@@ -558,14 +558,14 @@ AvanControllers.ActionsController = function(aOptions) {
     };
     
     this.update = function (records) {
-    	for (var i in actions) if (Ae_Util.hasOwnProperty(actions, i)) {
+    	for (var i in actions) if (Ac_Util.hasOwnProperty(actions, i)) {
     		actions[i].updateAllowedStatus(records);
     	}
     };
     
     this.listActions = function () {
     	var res = [];
-    	for (var i in actions) if (Ae_Util.hasOwnProperty(actions, i)) res.push(i);
+    	for (var i in actions) if (Ac_Util.hasOwnProperty(actions, i)) res.push(i);
     	return res;
     };
     
@@ -662,11 +662,11 @@ AvanControllers.ActionsController = function(aOptions) {
             if (params.allowed !== null) {
                 if (params.allowed) {
                     if (this.element) {
-                    	Ae_Util.addRemoveClassName(this.element, this.controller.enabledClass, this.controller.disabledClass);
+                    	Ac_Util.addRemoveClassName(this.element, this.controller.enabledClass, this.controller.disabledClass);
                     }
                 } else {
                     if (this.element) {
-                    	Ae_Util.addRemoveClassName(this.element, this.controller.disabledClass, this.controller.enabledClass);
+                    	Ac_Util.addRemoveClassName(this.element, this.controller.disabledClass, this.controller.enabledClass);
                     }
                 }
             }
@@ -730,7 +730,7 @@ AvanControllers.ActionsController = function(aOptions) {
         this.eventName = 'click';
         this.ignoreSubElements = ['input', 'a', 'select', 'textarea'];
         
-        if (props) Ae_Util.override(this, props);
+        if (props) Ac_Util.override(this, props);
         if (props.element) this.element = AvanControllers.getElement(props.element); else this.element = false;
         
         var clickHandler = false;

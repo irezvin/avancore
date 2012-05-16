@@ -1,6 +1,6 @@
 if (!window.console) window.console = new function () {this.log = function() {};} ();
 
-Ae_Util = {
+Ac_Util = {
 
     indexOf: function(item, arr, start) {
         if (start === undefined) start = 0;
@@ -104,9 +104,9 @@ Ae_Util = {
      * with overrider's ones. Concats numerical Arrays.
      *
      * Special values can be provided in overrider:
-     * - new Ae_Util.override.Value(value) -- will replace corresponding modifiedObject property with value;
-     * - new Ae_Util.override.Remove() -- will delete corresponding modifiedObject property with delete statement;
-     * - new Ae_Util.override.Remove -- same as new Ae_Util.override.Remove().
+     * - new Ac_Util.override.Value(value) -- will replace corresponding modifiedObject property with value;
+     * - new Ac_Util.override.Remove() -- will delete corresponding modifiedObject property with delete statement;
+     * - new Ac_Util.override.Remove -- same as new Ac_Util.override.Remove().
      *
      * @param {object} modifiedObject Object that is being changed.
      * @param {object} overrider Source of override properties.
@@ -116,16 +116,16 @@ Ae_Util = {
             throw 'Both modifiedObject and overrider must be objects';
 
         for (var i in overrider) {
-            if (Ae_Util.hasOwnProperty(overrider, i)) {
+            if (Ac_Util.hasOwnProperty(overrider, i)) {
                 switch (true) {
-                    case overrider[i] instanceof Ae_Util.override.Value:
+                    case overrider[i] instanceof Ac_Util.override.Value:
 
-                        if (!noOverwrite || !Ae_Util.hasOwnProperty(modifiedObject, i))
+                        if (!noOverwrite || !Ac_Util.hasOwnProperty(modifiedObject, i))
                             modifiedObject[i] = overrider[i].value;
                             
                         break;
 
-                    case overrider[i] instanceof  Ae_Util.override.Remove:
+                    case overrider[i] instanceof  Ac_Util.override.Remove:
                         delete modifiedObject[i];
                         break;
 
@@ -134,12 +134,12 @@ Ae_Util = {
                         break;
 
                     case typeof modifiedObject[i] === 'object' && typeof overrider[i] === 'array':
-                        new Ae_Util.override(modifiedObject[i], overrider[i], noOverwrite);
+                        new Ac_Util.override(modifiedObject[i], overrider[i], noOverwrite);
                         break;
 
                     default:
 
-                        if (!noOverwrite || !Ae_Util.hasOwnProperty(modifiedObject, i))
+                        if (!noOverwrite || !Ac_Util.hasOwnProperty(modifiedObject, i))
                             modifiedObject[i] = overrider[i];
                             
                         break;
@@ -155,7 +155,7 @@ Ae_Util = {
         if (data instanceof Array) {
         	if (data.length) {
 	            for (var i = 0; i < data.length; i++) {
-	                res = res + Ae_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i);
+	                res = res + Ac_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i);
 	            }
         	} else {
         		res = '&' + paramName + '=';
@@ -163,7 +163,7 @@ Ae_Util = {
         } else {
             if ((typeof data) == 'object') {
                 for (var i in data) if (YAHOO.lang.hasOwnProperty(data, i)) {
-                    res = res + Ae_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i);
+                    res = res + Ac_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i);
                 }
             } else {
                 res = '&' + paramName + '=' + encodeURIComponent(data);
@@ -185,7 +185,7 @@ Ae_Util = {
 	 * Since type of target may need to be changed to Array or more general object, 
 	 * the recommended usage is as follows:
 	 *  
-	 * 		var foo = Ae_Util.setByPath(foo, ['a', 1, 'c'], 'val'); 
+	 * 		var foo = Ac_Util.setByPath(foo, ['a', 1, 'c'], 'val'); 
 	 */
 	setByPath: function(target, arrPath, value) {
 		
@@ -205,7 +205,7 @@ Ae_Util = {
 					else {
 						nKey = 0; 
 						for (var prop in curr) 
-							if (Ae_Util.hasOwnProperty(curr, prop)) {
+							if (Ac_Util.hasOwnProperty(curr, prop)) {
 								var idx = parseInt(prop);
 								if (idx >= nKey) nKey = idx + 1;
 							}
@@ -222,7 +222,7 @@ Ae_Util = {
 				} else {
 					// it's a string key
 					if (curr instanceof Array) {
-						prev[prevKey] = Ae_Util.arrayToObject(prev[prevKey]);
+						prev[prevKey] = Ac_Util.arrayToObject(prev[prevKey]);
 						curr = prev[prevKey];
 					}
 					if (last) curr[seg] = value;
@@ -248,7 +248,7 @@ Ae_Util = {
     		var nameVal = pairs[i].split(eq, 2), path = nameVal[0].replace(']', '');
     		path = path.replace(/\]/g, '').split('[');
     		if (nameVal.length < 2) nameVal.push('');
-    		res = Ae_Util.setByPath(res, path, nameVal[1]);
+    		res = Ac_Util.setByPath(res, path, nameVal[1]);
     	}
     	return res;
     },
@@ -268,7 +268,7 @@ Ae_Util = {
 
         for (var i = a2.length - 1; i >= 0; i--) {
             for (var j = a1.length - 1; j >= 0; j--) {
-                if ((useLooseCompare && Ae_Util.looseCompare(a1[j], a2[j])) || (a1[j] === a2[i])) {
+                if ((useLooseCompare && Ac_Util.looseCompare(a1[j], a2[j])) || (a1[j] === a2[i])) {
                     a1.splice(j, 1);
                 }
             }
@@ -293,17 +293,17 @@ Ae_Util = {
     			var l = value1.length;
     			if (value2 instanceof Array && (l == value2.length)) {
     				res = true;
-    				for (var i = 0; (i < l) && res; i++) if (!Ae_Util.looseCompare(value1[i], value2[i])) res = false;
+    				for (var i = 0; (i < l) && res; i++) if (!Ac_Util.looseCompare(value1[i], value2[i])) res = false;
     			} else {
     				res = false;
     			}
     		} else {
     			if ((typeof value2) == 'object') {
     				// Compare objects
-    				var p1 = Ae_Util.listOwnProperties(value1), p2 = Ae_Util.listOwnProperties(value2), l = p1.length; 
-    				if ((l == p2.length) && !Ae_Util.arrayDiff(p2, p1).length) {
+    				var p1 = Ac_Util.listOwnProperties(value1), p2 = Ac_Util.listOwnProperties(value2), l = p1.length; 
+    				if ((l == p2.length) && !Ac_Util.arrayDiff(p2, p1).length) {
     					res = true;
-    					for (var i = l - 1; res && (i >= 0); i--) if (!Ae_Util.looseCompare(value1[p1[i]], value2[p1[i]])) res = false;
+    					for (var i = l - 1; res && (i >= 0); i--) if (!Ac_Util.looseCompare(value1[p1[i]], value2[p1[i]])) res = false;
     				} else res = false;
     			} else {
     				res = false;
@@ -337,7 +337,7 @@ Ae_Util = {
     		c = c.replace(toRemove[i], '');
     	}    	
     	
-    	if (toAdd.length) c  = Ae_Util.trim(c + ' ' + toAdd.join(' '));
+    	if (toAdd.length) c  = Ac_Util.trim(c + ' ' + toAdd.join(' '));
     	if (c != 0) element.setAttribute('className', c);
     },
     
@@ -372,7 +372,7 @@ Ae_Util = {
 			}
 		} else if (typeof data == 'object') {
 			for (var i in data) {
-				if (Ae_Util.hasOwnProperty(data, i)) this.callScripts(data[i], args, context);
+				if (Ac_Util.hasOwnProperty(data, i)) this.callScripts(data[i], args, context);
 			}
 		} else if (typeof data == 'function') {
 			data.apply(context, args);
@@ -523,21 +523,21 @@ Ae_Util = {
     
 };
 
-Ae_Util.override.Value = function(value) {
+Ac_Util.override.Value = function(value) {
     this.value = value;
 };
 
-Ae_Util.override.Value.prototype = {
+Ac_Util.override.Value.prototype = {
     value: null
 }
 
-Ae_Util.override.Remove = function() {
+Ac_Util.override.Remove = function() {
 }
 
 
-Ae_Util.DelayedCall = function(func, id, contextObject, args, delay, immediate) {
-    if (id === undefined) id = Ae_Util.DelatedCall.lastId++;
-        else Ae_Util.DelayedCall.cancelCall(id);
+Ac_Util.DelayedCall = function(func, id, contextObject, args, delay, immediate) {
+    if (id === undefined) id = Ac_Util.DelatedCall.lastId++;
+        else Ac_Util.DelayedCall.cancelCall(id);
     this.id = id;
     this.func = func;
     if (this.contextObject !== undefined) this.contextObject = contextObject;
@@ -547,8 +547,8 @@ Ae_Util.DelayedCall = function(func, id, contextObject, args, delay, immediate) 
     if (this._immediate) this.call();
 };
 
-Ae_Util.DelayedCall.prototype = {
-	jsClassName: "Ae_Util.DelayedCall", 
+Ac_Util.DelayedCall.prototype = {
+	jsClassName: "Ac_Util.DelayedCall", 
     func: null,
     id: null,
     contextObject: null,
@@ -566,7 +566,7 @@ Ae_Util.DelayedCall.prototype = {
 
     cancel: function() {
         this._clearTimeout();
-        if (this.id !== null) if (Ae_Util.DelayedCall[this.id]) delete Ae_Util.DelayedCall[this.id];
+        if (this.id !== null) if (Ac_Util.DelayedCall[this.id]) delete Ac_Util.DelayedCall[this.id];
     },
 
     call: function() {
@@ -613,10 +613,10 @@ Ae_Util.DelayedCall.prototype = {
     }
 };
 
-Ae_Util.augment(Ae_Util.DelayedCall, {
+Ac_Util.augment(Ac_Util.DelayedCall, {
     delayedCalls: {},
     lastId: 0,
     cancelCall: function(id) {
-        if (Ae_Util.DelayedCall[id]) Ae_Util.DelayedCall[id].cancel();
+        if (Ac_Util.DelayedCall[id]) Ac_Util.DelayedCall[id].cancel();
     }
 });

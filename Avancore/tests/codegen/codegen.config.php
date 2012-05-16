@@ -11,7 +11,7 @@ $config = array(
         'user' => $dbConf['user'],
         'password' => $dbConf['password'],
         'host' => isset($dbConf['host'])? $dbConf['host'] : 'localhost',
-//        'inspectorClass' => 'Ae_Sql_Dbi_Dbs_Inspector_Mysql5',
+//        'inspectorClass' => 'Ac_Sql_Dbi_Dbs_Inspector_Mysql5',
         'clearOutputDir' => false,
         'overwriteLog' => true,
         'domainDefaults' => array(
@@ -23,9 +23,9 @@ $config = array(
             'charset' => 'utf8',
         ),
     ),
-    'domains.AeTestModel' => array(
+    'domains.AcTestModel' => array(
         'strategyClass' => 'Cg_Strategy',
-        'appName' => 'Ae_Test_Model',
+        'appName' => 'Ac_Test_Model',
         'dbName' => $dbConf['db'],
         'caption' => 'Test_Avancore',
         'josComId' => 'ac',

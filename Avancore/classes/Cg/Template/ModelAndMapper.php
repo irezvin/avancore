@@ -18,7 +18,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     var $ownLists = false;
     var $ownAssociations = false;
     var $tableName = false;
-    var $pkStr = false; // "null" / "'id'" / "array('foo', 'bar')" - PK param for Ae_Model_Object as it will be inserted into PHP code
+    var $pkStr = false; // "null" / "'id'" / "array('foo', 'bar')" - PK param for Ac_Model_Object as it will be inserted into PHP code
     var $autoincFieldName = false;
     var $assocProperties = array();
     var $relationPrototypes = false;
@@ -238,7 +238,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     var $_mapperClass = <?php $this->str($this->mapperClass); ?>;
 
     function listOwnProperties() {
-<?php if ($this->parentClass !== 'Ae_Model_Object') { ?>
+<?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
     return array_merge(parent::listOwnProperties(), <?php $this->exportArray($this->ownProperties, 0, false, true); ?>);
 <?php } else { ?>        
         return <?php $this->exportArray($this->ownProperties, 0, false, true); ?>;
@@ -246,7 +246,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     }
 
     function listOwnLists() {
-<?php if ($this->parentClass !== 'Ae_Model_Object') { ?>
+<?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
     return array_merge(parent::listOwnLists(), <?php $this->exportArray($this->ownLists, 0, false, true); ?>);
 <?php } else { ?>        
         return <?php $this->exportArray($this->ownLists, 0, false, true); ?>;
@@ -254,7 +254,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     }
 
     function listOwnAssociations() {
-<?php if ($this->parentClass !== 'Ae_Model_Object') { ?>
+<?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
     return array_merge(parent::listOwnLists(), <?php $this->exportArray($this->ownAssociations, 0, false, true); ?>);
 <?php } else { ?>        
         return <?php $this->exportArray($this->ownAssociations, 0, false, true); ?>;
@@ -263,10 +263,10 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
 
     function getOwnPropertiesInfo() {
     	<?php if ($this->generator->php5) echo 'static $pi = false; if ($pi === false) '; ?>$pi = <?php $this->exportArray($this->ownPropInfo, 8, true); ?>;
-<?php   if ($this->parentClass === 'Ae_Model_Object') { ?>    
+<?php   if ($this->parentClass === 'Ac_Model_Object') { ?>    
         return $pi;
 <?php   } else { ?>
-        return Ae_Util::m(parent::getOwnPropertiesInfo(), $pi);
+        return Ac_Util::m(parent::getOwnPropertiesInfo(), $pi);
 <?php   } ?>                
     }
 <?php if ($this->model->hasUniformPropertiesInfo) { ?>
@@ -298,7 +298,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     
     /*
     function getOwnPropertiesInfo() {
-        return Ae_Util::m(parent::getOwnPropertiesInfo(), array(
+        return Ac_Util::m(parent::getOwnPropertiesInfo(), array(
             '' => array(
                 'caption' => '',
                 'dataType' => '',
@@ -404,8 +404,8 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     <?php if ($this->relationPrototypes) { ?>
     
     function _getRelationPrototypes() {
-<?php   if (!in_array($this->genMapperClass, array('Ae_Model_Mapper', 'Ae_Model_CpkMapper'))) { ?>
-        return Ae_Util::m(parent::_getRelationPrototypes(), <?php $this->exportArray($this->relationPrototypes, 8); ?>);
+<?php   if (!in_array($this->genMapperClass, array('Ac_Model_Mapper', 'Ac_Model_CpkMapper'))) { ?>
+        return Ac_Util::m(parent::_getRelationPrototypes(), <?php $this->exportArray($this->relationPrototypes, 8); ?>);
 <?php   } else { ?>
         return <?php $this->exportArray($this->relationPrototypes, 8); ?>;
 <?php   } ?>        
@@ -443,7 +443,7 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
     
     /*
     function _getRelationPrototypes() {
-        return Ae_Util::m(parent::_getRelationPrototypes(), array(
+        return Ac_Util::m(parent::_getRelationPrototypes(), array(
             '' => array(
                 'srcMapperClass' => <?php $this->str($this->mapperClass); ?>,
                 'destMapperClass' => '',

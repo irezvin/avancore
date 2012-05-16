@@ -60,7 +60,7 @@ class Cg_Strategy {
      * @param string $domainName
      */
     function Cg_Strategy(& $generator, $domainName, $outputDir, $genEditable, $overwriteEditable, $extraOptions = array()) {
-        Ae_Util::simpleBind($extraOptions, $this);
+        Ac_Util::simpleBind($extraOptions, $this);
         $this->_gen = $generator;
         $this->_dom = $generator->getDomain($domainName);
         $this->outputDir = $outputDir;

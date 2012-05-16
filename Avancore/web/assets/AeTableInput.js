@@ -1,9 +1,9 @@
-AeTableInput = function(options) {
+AcTableInput = function(options) {
     if (options) Object.extend(this, options);
     if (this.data) this.data.observe(this, {}, true);
 }
 
-AeTableInput.prototype = {
+AcTableInput.prototype = {
 
     inputNamePrefix: 'tableInput',
     
