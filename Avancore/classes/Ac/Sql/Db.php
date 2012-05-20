@@ -26,7 +26,7 @@ abstract class Ac_Sql_Db {
     }
     
     function nameUnqote($name) {
-    	$res = $this->implNameUnquote($name);
+    	return $this->implNameUnquote($name);
     }
     
     function nameQuoteBody($name) {
