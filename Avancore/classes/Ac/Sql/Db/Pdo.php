@@ -12,9 +12,26 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
      */
     protected $quoter = false;
     
-    protected $nameQuoteChar = '"';
-    
-    function __construct(PDO $pdo, Ac_Sql_Db_Quoter $quoter = null) {
+    function __construct($pdo, Ac_Sql_Quoter $quoter = null) {
+        if (is_array($pdo)) {
+            $pdoParams = $pdo;
+            $rc = new ReflectionClass('PDO');
+            $params = array();
+            $badParams = array_diff(array_keys($pdoParams), array('dsn', 'username', 'password', 'driver_options'));
+            if ($badParams) throw new Exception("Disallowed key(s) '".implode("', '", $badParams)
+                    ."' in array argument \$pdo,  accepted keys are: 'dsn', 'username', 'password', 'driver_options'");
+            if (isset($pdoParams['dsn'])) $args[] = $pdoParams['dsn'];
+                else throw new Exception ("'dsn' key must be proveded in array \$pdo argument");
+            foreach (array('username', 'password', 'driver_options') as $i => $k) {
+                    if (isset($pdoParams[$k])) {
+                        while (count($args) < $i + 1) $args[] = null;
+                        $args[] = $pdoParams[$k]; 
+                    }
+            }
+            $pdo = $rc->newInstanceArgs($args);
+        } else {
+            if (!$pdo instanceof PDO) throw new Exception("Only array or PDO instance are accepted as \$pdo argument");
+        }
         $this->pdo = $pdo;
         if (is_null($quoter)) $quoter = new Ac_Sql_Db_Quoter();
         $this->quoter = $quoter;
@@ -50,7 +67,8 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     function fetchArray($query, $keyColumn = false, $withNumericKeys = false) {
         $res = array();
         $key = -1;
-        foreach ($this->pdo->query($statement) as $row) {
+        $q = $this->pdo->query($query);
+        foreach ($q->fetchAll($withNumericKeys? PDO::FETCH_BOTH : PDO::FETCH_ASSOC) as $row) {
             $r = $row;
             if ($withNumericKeys) $r = array_merge($r, array_values($row));
             if ($keyColumn !== false) $key = $r[$keyColumn];
@@ -72,12 +90,46 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
 
     function fetchRow($query, $key = false, $keyColumn = false, $withNumericKeys = false, $default = false) {
         $res = $default; 
-        
+        $k = -1;
+        foreach (($stmt = $this->pdo->query($query)) as $row) {
+            $r = $row;
+            if ($withNumericKeys) $r = array_merge($r, array_values($row));
+            if ($keyColumn !== false) $k = $r[$keyColumn];
+                else $k++;
+            if ($key === false || $k == $key) {
+                $res = $r;
+                break;
+            }
+        }
+        $stmt->closeCursor();
+        return $res;
     }
     
-    abstract function fetchColumn($query, $colNo = 0, $keyColumn = false);
+    function fetchColumn($query, $colNo = 0, $keyColumn = false) {
+        $res = array();
+        $key = -1;
+        $withNumericKeys = (is_numeric($colNo) && ($keyColumn === false || is_numeric($keyColumn)));
+        foreach ($this->pdo->query($query) as $row) {
+            $r = $row;
+            if ($withNumericKeys) $r = array_merge($r, array_values($row));
+            if ($keyColumn !== false) $key = $r[$keyColumn];
+                else $key++;
+            $res[$key] = $r[$colNo];
+        }
+        return $res;
+    }
     
-    abstract function fetchValue($query, $colNo = 0, $default = null);
+    function fetchValue($query, $colNo = 0, $default = null) {
+        $res = $default;
+        if (is_numeric($colNo)) {
+            $stmt = $this->pdo->query($query);
+            $res = $stmt->fetchColumn($colNo);
+            $stmt->closeCursor();
+        } else {
+            if (is_array($row = $this->fetchRow($query))) $res = $row[$colNo];
+        }
+        return $res;
+    }
     
     function query($query) {
         return $this->pdo->exec($query);
@@ -97,6 +149,18 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     
     function getIfnullFunction() {
         return $this->quoter->getIfnullFunction();
+    }
+    
+    function setQuoter(Ac_Sql_Quoter $quoter) {
+        if ($this->quoter !== false) throw new Exception("Can setQuoter() only once!");
+        $this->quoter = $quoter;
+    }
+
+    /**
+     * @return Ac_Sql_Quoter
+     */
+    function getQuoter() {
+        return $this->quoter;
     }
     
     
