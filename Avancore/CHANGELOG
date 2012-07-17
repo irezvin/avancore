@@ -1,3 +1,10 @@
+2012-07-18
+
++ Small fixes to Ac_Application, Ac_Util & Ac_Autoparams
++ Added Ac_Request family (with _Src and _Accessor sub-classes), tests for them
++ Added Ac_Cr_Url
+* Fixed some tests that involved legacy database
+
 2012-03-22
 
 + Ae_Sql_Db is now abstract, added proper method visibility ('protected' instead of '_')

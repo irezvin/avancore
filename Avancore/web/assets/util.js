@@ -2,10 +2,16 @@ if (!window.console) window.console = new function () {this.log = function() {};
 
 Ac_Util = {
 
-    indexOf: function(item, arr, start) {
+    indexOf: function(item, arr, start, strict) {
         if (start === undefined) start = 0;
-        for (var i = start; i < arr.length; i++)
-            if (arr[i] == item) return i;
+        var i, l = arr.length;
+        if (strict) {
+            for (i = start; i < l; i++)
+                if (arr[i] === item) return i;
+        } else {
+            for (i = start; i < l; i++)
+                if (arr[i] == item) return i;
+        }
         return -1;
     },
     

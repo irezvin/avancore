@@ -5,32 +5,43 @@ require_once('simpletest/unit_tester.php');
 
 class Ac_Test_Base extends UnitTestCase {
 
-	var $_aeDb = false;
+    // Ugly but allows us to run test without legacy adapter
+    static $config = array();
+    
+	protected $aeDb = false;
+    
+    protected $legacyDb = false;
 	
 	/**
 	 * @return Ac_Sql_Db_Ae
 	 */
 	function & getAeDb() {
-		$d = Ac_Dispatcher::getInstance();
-		if ($this->_aeDb === false) $this->_aeDb = new Ac_Sql_Db_Ae($d->database);
-		return $this->_aeDb;
+		if ($this->aeDb === false) $this->aeDb = new Ac_Sql_Db_Ae($this->getLegacyDb());
+		return $this->aeDb;
 	}
+    
+    /**
+     * @return Ac_Legacy_Database 
+     */
+    function getLegacyDb() {
+        if ($this->legacyDb === false) $this->legacyDb = new Ac_Legacy_Database_Native(self::$config);
+        return $this->legacyDb;
+    }
 	
 	function normalizeStatement($sql, $replacePrefix = false) {
 		$res = preg_replace('/\s+/', ' ', trim($sql));
 		if ($replacePrefix) {
-			$disp = & Ac_Dispatcher::getInstance();
-			$res = $disp->database->replacePrefix($res);			
+			$res = $this->getLegacyDb()->replacePrefix($res);			
 		}
 		return $res;
 	}
 	
 	function getDbName() {
-		return Ac_Dispatcher::getInstance()->config->getValue('db');
+		return self::$config['db'];
 	}
 	
 	function getTablePrefix() {
-		return Ac_Dispatcher::getInstance()->config->getValue('prefix');
+		return self::$config['prefix'];
 	}
 	
     function _replaceIndent($match) {

@@ -2,6 +2,9 @@
 
 require('../tests/testsStartup.php');
 require_once('simpletest/reporter.php');
+require_once(dirname(__FILE__).'/classes/Ac/Test/Base.php');
+require_once(dirname(__FILE__).'/app.config.php');
+Ac_Test_Base::$config = $config;
 
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
@@ -17,8 +20,8 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
 
 } else {
 	$t = new TestSuite('Avancore Framework v0.3 Tests');
-	$t->add(new Ac_Test_CsvResume);
-	$t->add(new Ac_Test_Hacks);
+	$t->add(new Ac_Test_Cr);
+    $t->add(new Ac_Test_Hacks);
 	$t->add(new Ac_Test_Dbi);
 	$t->add(new Ac_Test_SqlSelect);
 	$t->add(new Ac_Test_RefChecker);
