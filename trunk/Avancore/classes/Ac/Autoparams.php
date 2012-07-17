@@ -25,7 +25,7 @@ abstract class Ac_Autoparams implements Ac_I_Autoparams {
                 $this->$n = $opt;
                 $gotKeys[] = $n;
             } elseif ($strictParams) {
-                throw new Ac_Exception_InvalidPrototype("Unknown member '{$n}' in class '".get_class($this)."'");
+                throw new Ac_E_InvalidPrototype("Unknown member '{$n}' in class '".get_class($this)."'");
             }
         }
         return $gotKeys;
@@ -182,7 +182,7 @@ abstract class Ac_Autoparams implements Ac_I_Autoparams {
 	            } elseif ($item instanceof Ac_I_Autoparams? $item->hasPublicVars() : true) {
                     if ($strictParams && $propertyName != 'class') {
                         if (!isset($item->$propertyName) && !property_exists($item, $propertyName)) {
-                            throw new Ac_Exception_InvalidPrototype("Unknown member '{$propertyName}' in class '".get_class($item)."'");
+                            throw new Ac_E_InvalidPrototype("Unknown member '{$propertyName}' in class '".get_class($item)."'");
                         }
                     }
 	                $res = true;

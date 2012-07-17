@@ -61,6 +61,7 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 			}
 			if ($baseInfo) {
 				$mapper = & Ac_Model_Mapper::getMapper($baseInfo['mapperClass']);
+                if (!$mapper) throw new Exception("Mapper '{$baseInfo['mapperClass']}' not found");
 				$proto = & $mapper->getPrototype();
 				$pi = & $proto->getPropertyInfo($last, true);
 				if (isset($pi->mapperClass) && $pi->mapperClass && isset($pi->relationId) && ($pi->relationId)) {

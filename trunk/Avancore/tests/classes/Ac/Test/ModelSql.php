@@ -6,14 +6,13 @@ require_once('simpletest/unit_tester.php');
 ini_set('xdebug.var_display_max_data', 102400);
 ini_set('xdebug.var_display_max_depth', 7);
 
+// TODO: make the test work (requires Application as mapper provider!)
 class Ac_Test_ModelSql extends Ac_Test_Base {
 
 	/**
 	 * @return Ac_Sql_Select
 	 */
 	function & createSelect() {
-		Ac_Dispatcher::loadClass('Ac_Sql_Select');
-		Ac_Dispatcher::loadClass('Ac_Test_Model');
 		$m = & Ac_Test_Model::getAeTestModelPeopleMapper();
 		$sel = new Ac_Sql_Select($this->getAeDb(), array(
 			'tables' => array(
