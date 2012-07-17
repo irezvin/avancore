@@ -31,14 +31,6 @@ class Ac_Test_RefChecker extends Ac_Test_Base {
 	 */
 	var $_sqlDb = false;
 	
-	function getDbName() {
-		return Ac_Dispatcher::getInstance()->config->getValue('db');
-	}
-	
-	function getTablePrefix() {
-		return Ac_Dispatcher::getInstance()->config->getValue('prefix');
-	}
-	
 	/**
 	 * @return Ac_Sql_Dbi_Database
 	 */
@@ -53,8 +45,7 @@ class Ac_Test_RefChecker extends Ac_Test_Base {
 	 * @return Ac_Sql_Db
 	 */
 	function & getSqlDb() {
-		if ($this->_sqlDb === false) $this->_sqlDb = new Ac_Sql_Db_Ae(Ac_Dispatcher::getInstance()->database);
-		return $this->_sqlDb;
+		return $this->getAeDb();
 	}
 
 	/**

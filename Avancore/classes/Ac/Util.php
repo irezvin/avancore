@@ -351,15 +351,19 @@ class Ac_Util {
      * @param string|array $path  Keys that we are interested in (string 'path' will be converted to array('path'))
      * @param mixed $defaultValue Value that will be returned when corresponding entry is not found
      */
-    static function getArrayByPath($arr, $arrPath, $defaultValue = null) {
+    static function getArrayByPath($arr, $arrPath, $defaultValue = null, & $found = false) {
         if (!is_array($arrPath)) $arrPath = array($arrPath);
         $src = & $arr;
         $arrPath = array_reverse($arrPath);
         while ($arrPath) {
             $key = array_pop($arrPath);
-            if (is_array($src) && isset($src[$key])) $src = & $src[$key];
-                else return $defaultValue;
+            if (is_array($src) && array_key_exists($key, $src)) $src = & $src[$key];
+                else {
+                    $found = false;
+                    return $defaultValue;
+                }
         }
+        $found = true;
         return $src;
     }
     
@@ -854,7 +858,7 @@ class Ac_Util {
         $script = '<script type="text/javascript">/*<![CDATA[*/'.$script.'/*]]>*/</script>';
         return '<span id="'.$id.'">[javascript protected email address]</span>'.$script;
     }
-    
+
 }
 
 class _Ae_Util_ObjectVarGetter {

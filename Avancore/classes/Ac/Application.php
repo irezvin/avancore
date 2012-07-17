@@ -336,4 +336,8 @@ abstract class Ac_Application extends Ac_Autoparams {
         return $res;
     }
     
+    function createDefaultContext(Ac_Cr_Controller $forController) {
+        return new Ac_Cr_Context();
+    }
+    
 }
