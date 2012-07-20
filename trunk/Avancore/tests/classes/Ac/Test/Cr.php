@@ -154,11 +154,18 @@ class Ac_Test_Cr extends Ac_Test_Base {
         // Simulate following URL
         $url = 'http://example.com/index.php/aaa/bbb?foo=bar&baz=quux';
         
-        $rq->server->httpHost = 'example.com';
-        $rq->server->requestUri = '/index.php/aaa/bbb?foo=bar&baz=quux';
-        $rq->server->pathInfo = '/aaa/bbb';
-        $rq->server->scriptName = '/index.php';
-        $rq->server->queryString = 'foo=bar&baz=quux';
+        $popRes = ($rq->populate($url, '/index.php'));
+        $this->assertArraysMatch(
+            array_keys($popRes), 
+            array('get', 'post', 'server', 'env'),
+            'populate() should return array with alteration data'
+        );
+        
+        $this->assertEqual($rq->server->httpHost, 'example.com');
+        $this->assertEqual($rq->server->requestUri, '/index.php/aaa/bbb?foo=bar&baz=quux');
+        $this->assertEqual($rq->server->pathInfo, '/aaa/bbb');
+        $this->assertEqual($rq->server->scriptName, '/index.php');
+        $this->assertEqual($rq->server->queryString, 'foo=bar&baz=quux');
         
         $this->assertEqual(
             Ac_Cr_Url::guess(true, $rq).'',
@@ -175,6 +182,139 @@ class Ac_Test_Cr extends Ac_Test_Base {
             $url,
             "Guess URL without \$_SERVER['PATHINFO']"
         );
+    }
+    
+    function testContext() {
+        $rq = new Ac_Request();
+        
+        $rq->populate('http://example.com/some/long/path', '/index.php');
+        
+        $rq->get->foo = array('fooKey1' => 'fooVal1', 'fooKey2' => 'fooVal2');
+        $rq->get->sub = array('subKey1' => 'subVal1', 'subKey2' => array('subVal2.1', 'subVal2.2'));
+        $rq->get->bar = 'barVal';
+        $rq->post->baz = 'bazVal';
+        
+        $ctx = new Ac_Cr_Context();
+        $ctx->setRequest($rq);
+        $this->assertEqual(
+            $ctx->getParam('bar'), 
+            'barVal',
+            'simple getParam()'
+        );
+        $this->assertEqual(
+             $ctx->getParam(array('foo', 'fooKey1')), 
+             'fooVal1',
+             'getParam(array path)'
+        );
+        
+        $this->assertEqual(
+             $ctx->getParam('foo[fooKey1]'), 
+             'fooVal1',
+             'getParam(string path)'
+        );
+        
+        $this->assertEqual(
+            $ctx->useParam('inexistent'),
+            NULL,
+            'useParam(inexistent) should return NULL'
+        );
+        
+        $ctx->useParam(array('foo', 'fooKey2'));
+        $this->assertTrue(
+            $ctx->isParamUsed('foo[fooKey2]'),
+            'isParamUsed(string $path)'
+        );
+        $this->assertTrue(
+            $ctx->isParamUsed(array('foo', 'fooKey2')),
+            'isParamUsed(array $path) works the same way'
+        );
+        $this->assertFalse(
+            $ctx->isParamUsed(array('foo')),
+            'isParamUsed($parentPathSegment) without $includeSubPaths should return FALSE'
+        );
+        $this->assertTrue(
+            $ctx->isParamUsed(array('foo'), true),
+            'isParamUsed($parentPathSegment) with $includeSubPaths should return TRUE'
+        );
+        
+        $this->assertArraysMatch(
+            $ctx->getUsedParams(), 
+            array(
+                'inexistent' => NULL,
+                'foo' => array('fooKey2' => 'fooVal2')
+            ),
+            'getUsedParams() should return used params in their order, including NULLs for inexistent ones'
+        );
+        $this->assertEqual(
+            urldecode($ctx->createUrl().''),
+            'http://example.com/some/long/path?foo[fooKey2]=fooVal2',
+            'createUrl() for context without path prefix but with used params'
+        );
+        $this->assertEqual(
+            urldecode($ctx->createUrl(array('bar' => 'barOverride', 'foo' => array('fooKey3' => 'fooVal3'))).''),
+            'http://example.com/some/long/path?foo[fooKey2]=fooVal2&foo[fooKey3]=fooVal3&bar=barOverride',
+            'createUrl($params)'
+        );
+        
+        $contextWithPath = new Ac_Cr_Context();
+        $contextWithPath->setRequest($rq);
+        $contextWithPath->setPathPrefix('sub');
+        
+        $this->assertEqual(
+            $p = $contextWithPath->useParam('subKey1'),
+            'subVal1',
+            '$contextWithPathPrefix->useParam()'
+        );
+        $this->assertEqual(
+            $u = urldecode($contextWithPath->createUrl().''),
+            'http://example.com/some/long/path?sub[subKey1]=subVal1',
+            '$contextWithPathPrefix->createUrl()'
+        );
+        
+        $sub = $ctx->createSubContext('sub');
+        $this->assertSame($sub->getTopContext(), $ctx);
+        $this->assertEqual($sub->getPathPrefix(), 'sub');
+        
+        
+        $this->assertEqual(
+            $sub->getParam('subKey1'),
+            'subVal1',
+            '$subContext->getParam()'
+        );
+        $sub->useParam('subKey2[0]');
+        
+        $this->assertEqual(
+            urldecode(''.$sub->createUrl()),
+            'http://example.com/some/long/path?foo[fooKey2]=fooVal2&sub[subKey2][0]=subVal2.1',
+            '$subContext->createUrl()'
+        );
+        
+        $this->assertEqual(
+            $sub->param->subKey2__0, 
+            'subVal2.1',
+            'magic $context->param->key__subKey (read)'
+        );
+        
+        $this->assertFalse(
+            isset($sub->use->subKey2__1),
+            'magic isset($context->use->key__subKey returns FALSE (before actual use))'
+        );
+        
+        $this->assertEqual(
+            $sub->use->subKey2__1, 
+            'subVal2.2',
+            'magic $context->use->key__subKey returns value too'
+        );
+                    
+        $this->assertTrue(
+            isset($sub->use->subKey2__1),
+            'magic isset($context->use->key__subKey) returns true after param was used'
+        );
+        
+        $this->assertTrue(isset($sub->param->subKey2__1));
+        
+        $this->assertTrue(!isset($sub->param->subKey2__3));
+        
     }
     
 }

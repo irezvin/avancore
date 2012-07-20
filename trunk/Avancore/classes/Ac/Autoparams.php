@@ -3,6 +3,8 @@
 abstract class Ac_Autoparams implements Ac_I_Autoparams {
     
     static $strictParams = true;
+    
+    public static $factoryOnceInstances = array();
 
     function hasPublicVars() {
         return false;
@@ -29,6 +31,26 @@ abstract class Ac_Autoparams implements Ac_I_Autoparams {
             }
         }
         return $gotKeys;
+    }
+    
+    /**
+     * Creates object with given prototype or return previously created instance with the same prototype (only if prototype is an array or a string).
+     * If prototype is an object, works as regular Ac_Autoparams::factory
+     * 
+     * @return object
+     */
+    static function factoryOnce($prototype, $baseClass = null, $strictParams = null) {
+        if (is_array($prototype)) {
+            $hash = md5(serialize($prototype));
+            $bc = (string) $baseClass;
+            if (!isset(self::$factoryOnceInstances[$bc]) || !isset(self::$factoryOnceInstances[$bc][$hash])) {
+                self::$factoryOnceInstances[$bc][$hash] = self::factory($prototype, $baseClass, $strictParams);
+            }
+            $res = self::$factoryOnceInstances[$bc][$hash];
+        } else {
+            $res = self::factory($prototype, $baseClass, $strictParams);
+        }
+        return $res;
     }
     
     static function factory($prototype, $baseClass = null, $strictParams = null) {
@@ -151,6 +173,87 @@ abstract class Ac_Autoparams implements Ac_I_Autoparams {
         }
         return $res;
     }
+    
+    static function listObjectProperties($item) {
+        if (is_array($item)) {
+            $res = array();
+            foreach ($item as $k => $v) $res[$k] = self::listObjectProperties ($item);
+            return $res;
+        } elseif ($item instanceof Ac_Model_Data) {
+            $res = $item->listProperties();
+        } else {
+            if (!($item instanceof Ac_I_Autoparams) || $item->hasPublicVars()) {
+                $vars = array_keys(Ac_Util::getPublicVars($item));
+            } else {
+                $vars = array();
+            }
+            if (method_exists($item, '__list_magic')) {
+                $magic = $item->__list_magic();
+            } else {
+                $magic = array();
+            }
+            $res = array_unique(array_merge(
+                    self::listObjectAccessors($item, 'get'),
+                    self::listObjectAccessors($item, 'set', 1),
+                    $vars,
+                    $magic
+            ));
+        }
+        return $res;
+    }
+    
+    private static $apListAccessorsCache = array();
+    
+    static function listObjectAccessors($item, $prefix = 'get', $nArgs = 0, $stripPrefixAndLcFirst = true) {
+        $c = is_object($item)? get_class($item) : '';
+        $hash = $c.'/'.$prefix.'/'.$nArgs.'/'.$stripPrefixAndLcFirst;
+        if (!(isset(self::$apListAccessorsCache[$hash]))) {
+            $refl = new ReflectionClass($c);
+            $l = strlen($prefix);
+            self::$apListAccessorsCache[$hash] = array();
+            foreach ($refl->getMethods(ReflectionMethod::IS_PUBLIC) as $m) {
+                if (!strncmp($acc = $m->getName(), $prefix, $l) && !$m->isStatic()) {
+                    if ($m->getNumberOfRequiredParameters() == $nArgs) { // Should we use == or <= ? Can setter have all-default params?
+                        if ($stripPrefixAndLcFirst) {
+                            $acc = substr($acc ,$l);
+                            $acc{0} = strtolower($acc{0});
+                        }
+                        self::$apListAccessorsCache[$hash][] = $acc;
+                    }
+                }
+            }
+        }
+        return self::$apListAccessorsCache[$hash];
+    }
+    
+    static function objectPropertyExists($item, $propertyName) {
+        if (is_array($item)) {
+            $res = array();
+            foreach ($item as $k => $v) {
+                $res[$k] = self::objectPropertyExists($v, $propertyName);
+            }
+            return $res;
+        } elseif (is_array($propertyName)) {
+            $res = array();
+            foreach ($propertyName as $k) {
+                $res[$k] = self::objectPropertyExists($item, $k);
+            }
+            return $res;
+        } elseif ($propertyName instanceof Ac_I_Getter) {
+            $res = $propertyName->get($item, $defaultValue);
+        } else {
+            if (strlen($propertyName) && method_exists($item, $g = 'get'.ucFirst($propertyName))) {
+                $res = true;
+            } elseif ($item instanceof Ac_Model_Data && $item->hasProperty($propertyName)) {
+                $res = $item->hasProperty($propertyName);
+            } elseif (($item instanceof Ac_I_Autoparams? $item->hasPublicVars() : true) && (array_key_exists($propertyName, Ac_Util::getClassVars(get_class($item))))) {
+                $res = true;
+            } else {
+                $res = false;
+            }
+        }
+        return $res;
+    }
 
     static function setObjectProperty($item, $propertyName, $value = null, $strictParams = false) {
         if (is_array($item)) {
@@ -166,10 +269,6 @@ abstract class Ac_Autoparams implements Ac_I_Autoparams {
                     $res += self::setObjectProperty($item, $k, $v, $strictParams);
                 }
             } else {
-                if (is_array($propertyName)) {
-                    var_dump($value);
-                    $s->{''} = 'Foo';
-                }
 	            if (strlen($propertyName) && method_exists($item, $s = 'set'.ucFirst($propertyName))) {
 	                $res = true;
 	                $item->$s($value);

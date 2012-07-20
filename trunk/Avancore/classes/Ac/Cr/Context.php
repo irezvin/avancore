@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * @TODO: magic accessor for getParam / useParam
+ * @TODO: think out whether useParam should take data from GET only?
+ * 
+ * @TODO Possible improvement: ability to replace $pathPrefix with mapping strategy 
+ *      and call it during updateUrlWithParams. 
+ * 
+ * The strategy can be used for JS, HTML name & HTML id mapping too.
+ * 
+ * @property Ac_Accessor param
+ * @property Ac_Accessor used
+ */
 class Ac_Cr_Context {
     
     protected $usedParams = array();
@@ -27,9 +39,51 @@ class Ac_Cr_Context {
     protected $router = false;
     
     /**
-     * @var Ac_Url
+     * @var Ac_Cr_Url
      */
     protected $baseUrl = false;
+    
+    /**
+     * @var Ac_Accessor
+     */
+    protected $paramAccessor = false;
+    
+    /**
+     * @var Ac_Accessor
+     */
+    protected $useAccessor = false;
+    
+    function __get($var) {
+        if ($var == 'param') {
+            if (!$this->paramAccessor) $this->paramAccessor = new Ac_Accessor($this, true, array(
+                'class' => 'Ac_Accessor_Strategy_UseMethod', 
+                'getMethodName' => 'getParam',
+                'hasMethodName' => 'hasParam',
+            ));
+            return $this->paramAccessor;
+        }
+        elseif ($var == 'use') {
+            if (!$this->useAccessor) $this->useAccessor = new Ac_Accessor($this, true, array(
+                'class' => 'Ac_Accessor_Strategy_UseMethod', 
+                'getMethodName' => 'useParam',
+                'hasMethodName' => 'isParamUsed',
+            ));
+            return $this->useAccessor;
+        } else {
+            throw new Exception("No such property: ".$var);
+        }
+    }
+    
+    function __set($var, $value) {
+        if ($var == 'param' || $var == 'use') throw new Exception("Cannot assign value to a read-only property {$var}");
+        throw new Exception("No such property: $var");
+    }
+    
+    function __isset($var) {
+        $res = false;
+        if ($var == 'param' || $var == 'use') $res = true;
+        return $res;
+    }
     
     function setPathPrefix($pathPrefix) {
         if ($this->pathPrefix !== false) throw Ac_E_InvalidCall::canRunMethodOnce ($this, __FUNCTION__);
@@ -49,7 +103,7 @@ class Ac_Cr_Context {
      * @return Ac_Cr_Url 
      */
     function getBaseUrl() {
-        if ($this->baseUrl === false) $this->baseUrl = Ac_Cr_Url::guess();
+        if ($this->baseUrl === false) $this->baseUrl = Ac_Cr_Url::guess(true, $this->getRequest());
         return $this->baseUrl; 
     }
     
@@ -88,7 +142,7 @@ class Ac_Cr_Context {
     }
     
     /**
-     * @return Ac_Cr_Reques
+     * @return Ac_Cr_Request
      */
     protected function getTranslatedRequest() {
         if ($this->translatedRequest === false) {
@@ -100,7 +154,7 @@ class Ac_Cr_Context {
     
     protected function translatePath($ownParamPath) {
         if ($this->pathPrefix) $res = array_merge(Ac_Util::pathToArray($this->pathPrefix), Ac_Util::pathToArray($ownParamPath));
-            else $res = $ownParamPath;
+            else $res = Ac_Util::pathToArray($ownParamPath);
         return $res;
     }
     
@@ -121,6 +175,52 @@ class Ac_Cr_Context {
         return $res;
     }
     
+    function hasParam($path) {
+        $path = $this->translatePath($path);
+        $this->getRequest()->getValue($path, null, $res);
+        return $res;
+    }
+    
+    /**
+     * @return array 
+     */
+    function getUsedParams() {
+        $res = array();
+        foreach ($this->usedParams as $hash => $data) {
+            list($path, $value, $found) = $data;
+            if (!is_array($path)) $path = Ac_Util::pathToArray($path);
+            Ac_Util::setArrayByPath($res, $path, $value, true);
+        }
+        return $res;
+    }
+    
+    function isParamUsed($path, $includeSubPaths = false) {
+        if ($includeSubPaths) {
+            $l = strlen($hash = $this->getPathHash($path));
+            foreach (array_keys($this->usedParams) as $k) {
+                if (!strncmp($k, $hash, $l)) {
+                    $res = true;
+                    break;
+                }
+            }
+        } else {
+            $res = isset($this->usedParams[$this->getPathHash($path)]);
+        }
+        return $res;
+    }
+    
+    function forgetParam($path, $includeSubPaths = false) {
+        if ($includeSubPaths) {
+            $l = strlen($hash = $this->getPathHash($path));
+            foreach (array_keys($this->usedParams) as $k)
+                if (!strncmp($k, $hash, $l)) {
+                    unset($this->usedParams[$k]);
+                }
+        } else {
+            unset($this->usedParams[$this->getPathHash($path)]);
+        }
+    }
+
     protected function updateUrlWithUsedParams(Ac_Url $url) {
         foreach ($this->usedParams as $hash => $data) {
             list($path, $value, $found) = $data;
@@ -129,6 +229,7 @@ class Ac_Cr_Context {
         }
     }
     
+    // TODO: should we fully overwrite params (as it is now) or merge them?
     protected function updateUrlWithParams(Ac_Url $url, array $params) {
         if ($this->pathPrefix) {
             $tmp = array();
@@ -140,14 +241,18 @@ class Ac_Cr_Context {
     }
     
     protected function getPathHash($path) {
-        return md5(serialize($path));
+        return is_array($path)? Ac_Util::arrayToPath($path) : ''.$path;
     }
     
     /**
      * @return Ac_Cr_Url 
      */
     function createUrl(array $params = array()) {
-        $res = $this->getBaseUrl()->cloneObject();
+        if (!$this->topContext) {
+            $res = $this->getBaseUrl()->cloneObject();
+        } else {
+            $res = $this->topContext->createUrl();
+        }
         if ($r = $this->getRouter()) $res->setRouter($r);
         $this->updateUrlWithUsedParams($res);
         if ($params) $this->updateUrlWithParams ($res, $params);
@@ -168,6 +273,28 @@ class Ac_Cr_Context {
     function mapHtmlId($paramName) {
         $a = Ac_Util::pathToArray($this->translatePath($paramName));
         return 'e_'.implode('_', $a);
+    }
+    
+    /**
+     * @param string $pathPrefix 
+     * @return Ac_Cr_Context
+     */
+    function createSubContext($pathPrefix = false) {
+        $res = new Ac_Cr_Context;
+        $res->setTopContext($this, $pathPrefix);
+        return $res;
+    }
+    
+    function setTopContext(Ac_Cr_Context $context, $pathPrefix = false) {
+        if ($this->topContext) throw Ac_E_InvalidCall::canRunMethodOnce ($this, __FUNCTION__);
+        if ($pathPrefix !== false) {
+            if ($this->pathPrefix !== $pathPrefix) $this->setPathPrefix($pathPrefix);
+        }
+        $this->topContext = $context;
+    }
+    
+    function getTopContext() {
+        return $this->topContext;
     }
     
 }
