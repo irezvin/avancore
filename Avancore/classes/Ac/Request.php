@@ -1,4 +1,8 @@
 <?php
+    
+// TODO: function overrideWithUrl($url) - will set values in server & get
+// TODO: integrate with Ac_Application
+// TODO: add FILES?
 
 /**
  * @property Ac_Request_Accessor get
@@ -183,6 +187,70 @@ class Ac_Request {
         elseif (is_string($src)) $res = false;
         elseif (is_array($src)) $res = count($src) == 1;
         else throw Ac_E_InvalidCall::wrongType ('src', $src, array('string', 'array', 'Ac_Request'));
+        return $res;
+    }
+    
+    // 
+    
+    /**
+     * Populates the Request with data taken from URL in degree enough to build that URL back using
+     * Ac_Url::guess. Also sets GET and, optionally, POST data.
+     * 
+     * $scriptName may be provided to make future guessing more reliable.
+     * 
+     * Other SERVER and ENV parameters, also FILES and COOKIE will remain unchanged (to set them proprly,
+     * we need RFC-compliant parsing code for HTTP request.
+     * 
+     * @param string|Ac_Url $url
+     * @param string $scriptName If provided, will be used to populate $_SERVER['SCRIPT_NAME'] since it is important for the future pathinfo calculation
+     * @param array $postData If provider, REQUEST_METHOD will be POST and post data will be set; otherwise REQUEST_METHOD will be GET
+     * @param bool $returnAlterationOnly Only returns array with overrides, without changing the request
+     * 
+     * @return array ('get' => array(), 'post' => array(), 'env' => array(), 'server' => array() -- what have (should have) been changed
+     */
+    function populate($url, $scriptName = false, $postData = false, $dontChange = false) {
+        $u = parse_url($url);
+        if (is_array($postData)) {
+            $post = $postData;
+            $rm = 'POST';
+        } else {
+            $post = array();
+            $rm = 'GET';
+        }
+        $q = isset($u['query'])? $u['query'] : null;
+        $serverData = array(
+            'SERVER_PROTOCOL' => strtoupper($u['scheme']),
+            'HTTP_HOST' => $u['host'].(isset($u['port'])? ':'.$u['port'] : ''),
+            'PATH_INFO' => NULL,
+            'REQUEST_METHOD' => $rm,
+            'REQUEST_URI' => $u['path'].(strlen($q)? '?'.$q : ''),
+            'QUERY_STRING' => $q,
+        );
+        if (strlen($scriptName)) {
+            $serverData['SCRIPT_NAME'] = $scriptName;
+        } elseif ($scriptName === false) { 
+            $scriptName = $this->getValueFrom(self::server, 'SCRIPT_NAME');
+        }
+        if (($l = strlen($scriptName)) && !strncmp($scriptName, $u['path'], $l)) {
+            $serverData['PATH_INFO'] = substr($u['path'], $l);
+        }
+        if (isset($u['query'])) {
+            parse_str($u['query'], $get);
+        } else $get = array();
+        
+        $res = array(
+            'get' => $get,
+            'post' => $post,
+            'server' => $serverData,
+            'env' => $serverData
+        );
+        
+        if (!$dontChange) {
+            $this->setValues(self::server, $serverData, false);
+            $this->setValues(self::env, $serverData, false);
+            $this->setValues(self::get, $get, true);
+            $this->setValues(self::get, $post, true);
+        }
         return $res;
     }
     

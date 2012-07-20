@@ -21,7 +21,21 @@ class Ac_Test_Autoparams extends Ac_Test_Base {
             'baz' => 'bazVal',
             'quux' => 'quuxval'
         ));
-    }    
+    }
+    
+    function testAccessor() {
+        $obj = new ApSample();
+        $acc = new Ac_Accessor($obj);
+        $this->assertTrue(!array_diff($acc->listProperties(), array('foo', 'bar', 'baz', 'readOnlyParam', 'writeOnlyParam')));
+        $acc->foo = '123';
+        $this->assertEqual($obj->foo, '123');
+        $acc->bar = '123';
+        $this->assertEqual($obj->bar, '123');
+        $acc->baz = '123';
+        $this->assertEqual($obj->getBaz(), '123');
+    }
+    
+    
 }
 
 class ApSample extends Ac_Autoparams {
@@ -48,12 +62,23 @@ class ApSample extends Ac_Autoparams {
         if ($prop == 'bar') return true;
     }
     
+    function __list_magic() {
+        return array('bar');
+    }
+    
     function setBaz($value) {
         $this->bazVal = $value;
     }
     
     function getBaz() {
         return $this->bazVal;
+    }
+    
+    function getReadOnlyParam() {
+        return 'readOnlyValue';
+    }
+    
+    function setWriteOnlyParam($value) {
     }
     
 }
