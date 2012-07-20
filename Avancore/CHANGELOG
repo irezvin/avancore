@@ -1,3 +1,9 @@
+2012-07-20
+
++ Created Ac_Accessor with Strategy dependency (Ac_I_AccessorStrategy); used them in Ac_Cr_Strategy to implement 'magic' properties 'param' & 'use'.
++ Added Ac_Autoparams::factoryOnce for helper flyweight classes.
++ Added Ac_Request::populate() function to help to create virtual requests based on Url & post values
+
 2012-07-18
 
 + Small fixes to Ac_Application, Ac_Util & Ac_Autoparams

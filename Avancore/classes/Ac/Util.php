@@ -730,6 +730,16 @@ class Ac_Util {
         return $g->getObjectVars($object);
     }
     
+    /**
+     * @param object $object
+     * @return array
+     */
+    static function getPublicMethods($object) {
+        // Workaround to change scope to skip using Reflection
+        $g = new _Ae_Util_ObjectVarGetter();
+        return $g->getObjectMethods($object);
+    }
+    
     static function htmlEntityDecode($stringOrArray, $quoteStyle = ENT_QUOTES, $charset = null) {
         if (is_array($stringOrArray)) {
             $res = array();
@@ -864,6 +874,10 @@ class Ac_Util {
 class _Ae_Util_ObjectVarGetter {
     function getObjectVars($foo) {
         return get_object_vars($foo);
+    }
+    
+    function getObjectMethods($foo) {
+        return get_class_methods(get_class($foo));
     }
 }
 
