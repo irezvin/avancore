@@ -30,7 +30,7 @@ abstract class Ac_Param_Condition_Composite extends Ac_Param_Condition {
         if (!isset($this->conditions[$index])) throw new Exception("No such condition", $index);
         else {
             if (!(is_object($this->conditions[$index]) && ($this->conditions[$index] instanceof Ac_I_Param_Condition))) {
-                $this->conditions[$index] = Ac_Autoparams::factory($this->conditions[$index], 'Ac_I_Param_Condition');
+                $this->conditions[$index] = Ac_Prototyped::factory($this->conditions[$index], 'Ac_I_Param_Condition');
             }
         }
         return $this->conditions[$index];

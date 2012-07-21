@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Model_Mapper implements Ac_I_Autoparams {
+class Ac_Model_Mapper implements Ac_I_Prototyped {
     
     protected $id = false;
     
@@ -85,7 +85,7 @@ class Ac_Model_Mapper implements Ac_I_Autoparams {
     protected $defaults = false;
     
     function Ac_Model_Mapper(array $options = array()) {
-        if ($options) Ac_Autoparams::setObjectProperty ($this, $options);
+        if ($options) Ac_Accessor::setObjectProperty ($this, $options);
 /*     
         if (!$this->database) {
             throw new Exception("No \$database provided");

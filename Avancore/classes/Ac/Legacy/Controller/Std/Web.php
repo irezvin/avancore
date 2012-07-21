@@ -292,7 +292,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
             if ($this->aeCache !== false) {
                 if ($this->aeCache === true) $this->aeCache = Ac_Cache::getDefaultPrototype();
                 elseif (is_array($this->aeCache)) $this->aeCache = Ac_Util::m(Ac_Cache::getDefaultPrototype(), $this->aeCache);
-                $this->aeCache = Ac_Autoparams::factory($this->aeCache, 'Ac_Cache');
+                $this->aeCache = Ac_Prototyped::factory($this->aeCache, 'Ac_Cache');
             }
         }
         return $this->aeCache;

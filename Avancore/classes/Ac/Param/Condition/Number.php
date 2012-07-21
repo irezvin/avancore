@@ -18,7 +18,7 @@ class Ac_Param_Condition_Number extends Ac_Param_Condition {
     var $ne = false;
 
     function getTranslations() {
-        return array_merge(parent::getTranslations(), Ac_Autoparams::getObjectProperty($this, array('type', 'lt', 'le', 'gt', 'ge', 'nz', 'ne')));
+        return array_merge(parent::getTranslations(), Ac_Accessor::getObjectProperty($this, array('type', 'lt', 'le', 'gt', 'ge', 'nz', 'ne')));
     }
     
     function match($value, & $errors = array(), Ac_I_Param $param = null) {

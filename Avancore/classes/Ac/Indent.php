@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Indent extends Ac_Autoparams {
+class Ac_Indent extends Ac_Prototyped {
 
     protected $tmpCache = array();
 

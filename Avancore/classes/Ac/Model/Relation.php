@@ -260,7 +260,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @return Ac_Model_Relation
      */
     function & factory($config = array()) {
-        return Ac_Autoparams::factory($config, 'Ac_Model_Relation');
+        return Ac_Prototyped::factory($config, 'Ac_Model_Relation');
     }
     
     function setSrcMapper(Ac_Model_Mapper $srcMapper) {
@@ -290,7 +290,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @param array $config Array prototype of the object
      */
     function __construct ($config = array()) {
-        Ac_Autoparams::setObjectProperty($this, $config);
+        Ac_Accessor::setObjectProperty($this, $config);
         
         if (($this->srcTableName === false) && strlen($this->srcMapperClass)) {
             $this->_srcMapper = & Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->application);

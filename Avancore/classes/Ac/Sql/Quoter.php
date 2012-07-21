@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Sql_Quoter implements Ac_I_Autoparams {
+class Ac_Sql_Quoter implements Ac_I_Prototyped {
     
     var $nameQuoteChar = '"';
     

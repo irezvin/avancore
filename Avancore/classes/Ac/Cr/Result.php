@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Cr_Result extends Ac_Autoparams {
+class Ac_Cr_Result extends Ac_Prototyped {
     
     /**
      * @var Ac_Cr_Controller

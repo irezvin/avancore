@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Param_Block extends Ac_Autoparams {
+class Ac_Param_Block extends Ac_Prototyped {
     
     protected $params = array();
     
@@ -76,7 +76,7 @@ class Ac_Param_Block extends Ac_Autoparams {
                  if (!isset($this->params[$id]['class'])) $this->params[$id]['class'] = 'Ac_Param';
                  if (!isset($this->params[$id]['id'])) $this->params[$id]['id'] = $id;
                  if (array_key_exists($id, $this->overrides)) $this->params[$id]['value'] = $this->overrides[$id];
-                 $this->params[$id] = Ac_Autoparams::factory($this->params[$id], 'Ac_I_Param');
+                 $this->params[$id] = Ac_Prototyped::factory($this->params[$id], 'Ac_I_Param');
                  if ($this->source && $this->params[$id] instanceof Ac_I_Param_WithSource && !$this->params[$id]->getSource()) {
                      $this->params[$id]->setSource($this->source);
                  }

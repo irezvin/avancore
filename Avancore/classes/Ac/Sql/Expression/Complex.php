@@ -6,7 +6,7 @@ class Ac_Sql_Expression_Complex extends Ac_Sql_Expression {
     
     function __construct($expression, $options = array()) {
         parent::__construct($expression);
-        if ($options) Ac_Autoparams::setObjectProperty ($this, $options);
+        if ($options) Ac_Accessor::setObjectProperty ($this, $options);
     }
     
     /**

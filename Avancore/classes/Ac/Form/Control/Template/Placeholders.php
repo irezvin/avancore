@@ -38,13 +38,13 @@ class Ac_Form_Control_Template_Placeholders extends Ac_Form_Control_Template_Bas
                 } elseif (!strncmp($mc = trim($matches[1]), 'get:', 4)) {
                 	$propId = substr($matches[1], 4);
                     if (($m = $control->getModel())) {
-                        $val = Ac_Autoparams::getObjectProperty($m, trim($propId));
+                        $val = Ac_Accessor::getObjectProperty($m, trim($propId));
                     } else {
                         $val = '';
                     }
                 } elseif (!strncmp($mc = trim($matches[1]), 'own:', 4)) {
                 	$propId = substr($matches[1], 4);
-                    $val = Ac_Autoparams::getObjectProperty($control, trim($propId));
+                    $val = Ac_Accessor::getObjectProperty($control, trim($propId));
                 } elseif (substr(trim($matches[1]), 0, 1) == '#') {
                     $path = substr(trim($matches[1]), 1);
                     if (($c = $control->getControlByPath($path)) && ($c->getDisplayParent() === $control)) {

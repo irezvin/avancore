@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Decorator extends Ac_Autoparams implements Ac_I_Decorator_Model {
+class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
     
     protected $model = null;
     
@@ -41,7 +41,7 @@ class Ac_Decorator extends Ac_Autoparams implements Ac_I_Decorator_Model {
             $res = $decorator;
         } elseif ($decorator) {
             if (!is_array($decorator)) $decorator = array('class' => $decorator);
-            $res = Ac_Autoparams::factory($decorator, 'Ac_I_Decorator');
+            $res = Ac_Prototyped::factory($decorator, 'Ac_I_Decorator');
         } else {
             $res = $decorator;
         }

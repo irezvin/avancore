@@ -32,7 +32,7 @@ class Ac_Param_Parent extends Ac_Param {
             $this->params = array();
             foreach ($tmp as $param) $tmp->setParent(null);
         }
-        Ac_Autoparams::factoryCollection($params, 'Ac_Param', array('parent' => $this), 'id', 'id', true, $this->params);
+        Ac_Prototyped::factoryCollection($params, 'Ac_Param', array('parent' => $this), 'id', 'id', true, $this->params);
     }
     
     function listParams() {

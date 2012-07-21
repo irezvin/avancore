@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Accessor_Strategy_UseMethod extends Ac_Autoparams implements Ac_I_AccessorStrategy {
+class Ac_Accessor_Strategy_UseMethod extends Ac_Prototyped implements Ac_I_AccessorStrategy {
     
     protected $getMethodName = false;
 

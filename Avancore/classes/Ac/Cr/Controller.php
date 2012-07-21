@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Cr_Controller extends Ac_Autoparams {
+class Ac_Cr_Controller extends Ac_Prototyped {
 
     protected $onlyListedParams = false;
     
@@ -65,7 +65,7 @@ class Ac_Cr_Controller extends Ac_Autoparams {
     function getParamBlock() {
         if ($this->paramBlock === false) {
             if ($this->paramBlockPrototype)
-                $this->paramBlock = Ac_Autoparams::factory($this->paramBlockPrototype, 'Ac_Param_Block');
+                $this->paramBlock = Ac_Prototyped::factory($this->paramBlockPrototype, 'Ac_Param_Block');
                 $this->paramBlock->setSource($this->getContext());
         }
         return $this->paramBlock;

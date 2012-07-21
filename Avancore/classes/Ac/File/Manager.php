@@ -1,6 +1,6 @@
 <?php
 
-class Ac_File_Manager extends Ac_Autoparams {
+class Ac_File_Manager extends Ac_Prototyped {
 
     protected $features = array();
     
@@ -11,7 +11,7 @@ class Ac_File_Manager extends Ac_Autoparams {
 
     
     function setFeatures(array $features) {
-        $this->features = Ac_Autoparams::factoryCollection($features, 'Ac_File_Feature', array('manager' => $this), 'id', true, $dummy, true);
+        $this->features = Ac_Prototyped::factoryCollection($features, 'Ac_File_Feature', array('manager' => $this), 'id', true, $dummy, true);
     }
     
     function addFeature(Ac_File_Feature $feature) {
@@ -73,7 +73,7 @@ class Ac_File_Manager extends Ac_Autoparams {
     }
     
     protected function doCreateFile(array $optionsOrFilename) {
-        $res = Ac_Autoparams::factory($optionsOrFilename, 'Ac_File');
+        $res = Ac_Prototyped::factory($optionsOrFilename, 'Ac_File');
         return $res;
     }
     
