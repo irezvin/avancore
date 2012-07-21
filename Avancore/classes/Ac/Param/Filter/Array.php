@@ -25,7 +25,7 @@ class Ac_Param_Filter_Array extends Ac_Param_Filter {
     }
     
     function setKeyFilters(array $keyFilters) {
-        $this->keyFilters = Ac_Autoparams::factoryCollection($keyFilters, 'Ac_I_Param_Filter');
+        $this->keyFilters = Ac_Prototyped::factoryCollection($keyFilters, 'Ac_I_Param_Filter');
     }
     
     function getKeyConditions() {
@@ -33,7 +33,7 @@ class Ac_Param_Filter_Array extends Ac_Param_Filter {
     }   
 
     function setKeyConditions(array $keyConditions) {
-        $this->keyConditions = Ac_Autoparams::factoryCollection($keyConditions, 'Ac_I_Param_Condition');
+        $this->keyConditions = Ac_Prototyped::factoryCollection($keyConditions, 'Ac_I_Param_Condition');
     }
     
     function getFilters() {
@@ -41,7 +41,7 @@ class Ac_Param_Filter_Array extends Ac_Param_Filter {
     }
     
     function setFilters(array $filters) {
-        $this->filters = Ac_Autoparams::factoryCollection($filters, 'Ac_I_Param_Filter');
+        $this->filters = Ac_Prototyped::factoryCollection($filters, 'Ac_I_Param_Filter');
     }
     
     function getConditions() {
@@ -49,7 +49,7 @@ class Ac_Param_Filter_Array extends Ac_Param_Filter {
     }   
 
     function setConditions(array $conditions) {
-        $this->conditions = Ac_Autoparams::factoryCollection($conditions, 'Ac_I_Param_Condition');
+        $this->conditions = Ac_Prototyped::factoryCollection($conditions, 'Ac_I_Param_Condition');
     }
     
     function setMaxDepth($maxDepth) {

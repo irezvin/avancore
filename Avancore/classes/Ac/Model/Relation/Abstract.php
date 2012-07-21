@@ -4,7 +4,7 @@
  * Defines members and methods that are common to Ac_Model_Relation and Ac_Model_Relation_Tree objects
  * (that are used mostly for data retrieval)
  */
-class Ac_Model_Relation_Abstract implements Ac_I_Autoparams {
+class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
     
     var $debug = false;
 

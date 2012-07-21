@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Param_Source_Object extends Ac_Autoparams implements Ac_I_Param_Destination {
+class Ac_Param_Source_Object extends Ac_Prototyped implements Ac_I_Param_Destination {
     
     protected $tmp = null;
     
@@ -33,7 +33,7 @@ class Ac_Param_Source_Object extends Ac_Autoparams implements Ac_I_Param_Destina
             $p = array_values($path);
             while (($seg = array_splice($p, 0, 1, array())) && is_object($curr) && ($curr !== $this->tmp)) {
                 $seg = $seg[0];
-                $curr = Ac_Autoparams::getObjectProperty($curr, $seg, $this->tmp);
+                $curr = Ac_Accessor::getObjectProperty($curr, $seg, $this->tmp);
             }
             if (!count($p)) {
                 $found = $curr !== $this->tmp;
@@ -55,7 +55,7 @@ class Ac_Param_Source_Object extends Ac_Autoparams implements Ac_I_Param_Destina
             $p = $path;
             $prop = array_splice($p, count($p) - 1, 1);
             $target = $this->getValue($p, null, $found);
-            if ($target) $res = Ac_Autoparams::setObjectProperty($target, $prop, $value); 
+            if ($target) $res = Ac_Accessor::setObjectProperty($target, $prop, $value); 
                 else $res = false;
         } else {
             $this->setData($value);

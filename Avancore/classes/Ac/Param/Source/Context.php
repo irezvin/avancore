@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Param_Source_Context extends Ac_Autoparams implements Ac_I_Param_Destination {
+class Ac_Param_Source_Context extends Ac_Prototyped implements Ac_I_Param_Destination {
     
     /**
 	 * @var Ac_Legacy_Controller_Context 

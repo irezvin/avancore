@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Param_Condition extends Ac_Autoparams implements Ac_I_Param_Condition {
+abstract class Ac_Param_Condition extends Ac_Prototyped implements Ac_I_Param_Condition {
 
     protected $propName = false;
     

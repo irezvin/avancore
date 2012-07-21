@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Param extends Ac_Autoparams implements Ac_I_Param_WithSource {
+class Ac_Param extends Ac_Prototyped implements Ac_I_Param_WithSource {
     
     /**
      * @var Ac_I_Param_Source
@@ -74,7 +74,7 @@ class Ac_Param extends Ac_Autoparams implements Ac_I_Param_WithSource {
             for ($i = 0; ($i < $c) && ($ok || $evaluateAllConditions); $i++) {
                 $e = array();
                 $propName = $cond[$i]->getPropName();
-                if (strlen($propName)) $propVal = $param? Ac_Autoparams::getObjectProperty($param, $cond[$c]->getPropName()) : null;  
+                if (strlen($propName)) $propVal = $param? Ac_Accessor::getObjectProperty($param, $cond[$c]->getPropName()) : null;  
                     else $propVal = $value;
                 $ok = $cond[$i]->match($propVal, $e, $param);
                 if ($e) {
@@ -92,7 +92,7 @@ class Ac_Param extends Ac_Autoparams implements Ac_I_Param_WithSource {
     // ---------------- Setup-related functions --------------
     
     function setConditions(array $conditions) {
-        $this->conditions = Ac_Autoparams::factoryCollection($conditions, 'Ac_I_Param_Condition');
+        $this->conditions = Ac_Prototyped::factoryCollection($conditions, 'Ac_I_Param_Condition');
     }
     
     function getConditions() {
@@ -100,7 +100,7 @@ class Ac_Param extends Ac_Autoparams implements Ac_I_Param_WithSource {
     }
 
     function setFilters(array $filters) {
-        $this->filters = Ac_Autoparams::factoryCollection($filters, 'Ac_I_Param_Filter');
+        $this->filters = Ac_Prototyped::factoryCollection($filters, 'Ac_I_Param_Filter');
     }
     
     function getFilters() {
@@ -212,8 +212,8 @@ class Ac_Param extends Ac_Autoparams implements Ac_I_Param_WithSource {
     }
     
     function getIdPath() {
-        $parents = Ac_Autoparams::getAllParents($this, 'parent', true, true);
-        $res = implode('.', Ac_Autoparams::getObjectProperty($parents, 'id'));
+        $parents = Ac_Accessor::getAllParents($this, 'parent', true, true);
+        $res = implode('.', Ac_Accessor::getObjectProperty($parents, 'id'));
         return $res;
     }
     

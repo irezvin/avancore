@@ -1,9 +1,9 @@
 <?php
 
 if (!class_exists('Ac_Util', false)) require_once(dirname(__FILE__).'/../Util.php');
-if (!class_exists('Ac_Autoparams', false)) require_once(dirname(__FILE__).'/../Autoparams.php');
+if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/../Autoparams.php');
 
-class Ac_Application_Adapter extends Ac_Autoparams {
+class Ac_Application_Adapter extends Ac_Prototyped {
 
     protected $appClass = false;
     
@@ -73,7 +73,7 @@ class Ac_Application_Adapter extends Ac_Autoparams {
     }
     
     function __construct(array $options = array()) {
-        foreach ($gotKeys = $this->initFromOptions($options, false) as $key) {
+        foreach ($gotKeys = $this->initFromPrototype($options, false) as $key) {
             unset($options[$key]);
         }
         if (isset($options['class'])) unset($options['class']);

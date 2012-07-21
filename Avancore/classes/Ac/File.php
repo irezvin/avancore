@@ -1,6 +1,6 @@
 <?php
 
-class Ac_File extends Ac_Autoparams {
+class Ac_File extends Ac_Prototyped {
     
     /**
      * @var Ac_File_Manager

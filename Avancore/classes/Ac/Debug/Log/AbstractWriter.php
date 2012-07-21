@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Debug_Log_AbstractWriter extends Ac_Autoparams {
+abstract class Ac_Debug_Log_AbstractWriter extends Ac_Prototyped {
     
     var $autoRegister = true;
     

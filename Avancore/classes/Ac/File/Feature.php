@@ -5,7 +5,7 @@
  * - in Ac_File_Manager for detection (their $file is null)
  * - in Ac_File
  */
-abstract class Ac_File_Feature extends Ac_Autoparams {
+abstract class Ac_File_Feature extends Ac_Prototyped {
 
     /**
      * @var Ac_File
@@ -65,7 +65,7 @@ abstract class Ac_File_Feature extends Ac_Autoparams {
     
     protected function doCreateForFile(Ac_File $file) {
         
-        if (($cp = $this->listClonedProps())) $proto = Ac_Autoparams::getObjectProperty($this, $cp);
+        if (($cp = $this->listClonedProps())) $proto = Ac_Accessor::getObjectProperty($this, $cp);
             else $proto = array();
             
         $proto['file'] = $file;

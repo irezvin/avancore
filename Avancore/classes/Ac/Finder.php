@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Finder extends Ac_Autoparams {
+class Ac_Finder extends Ac_Prototyped {
     
 	protected $anySortCriterionName = 'anySort';
     
@@ -44,7 +44,7 @@ class Ac_Finder extends Ac_Autoparams {
     }
     
     protected function registerCriterion($criterion) {
-        if (is_array($criterion)) $criterion = Ac_Autoparams::factory($criterion, 'Ac_Finder_Criterion');
+        if (is_array($criterion)) $criterion = Ac_Prototyped::factory($criterion, 'Ac_Finder_Criterion');
         elseif (!$criterion instanceof Ac_Finder_Criterion) throw new Exception ("\$criterion must be an instance of Ac_Finder_Criterion");
         if (!strlen($n = $criterion->getName())) throw new Exception("Cannot add criterion without a name");
         $this->criteria[$n] = $criterion;

@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Param_Filter extends Ac_Autoparams implements Ac_I_Param_Filter, Ac_I_Decorator {
+abstract class Ac_Param_Filter extends Ac_Prototyped implements Ac_I_Param_Filter, Ac_I_Decorator {
     
     function hasPublicVars() {
         return true;

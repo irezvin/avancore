@@ -9,7 +9,7 @@
  * So, for example, it is possible to store in the cache page with index of articles and update number of comments every
  * time when it's loaded (or do it more often then page updates, or even re-calculate presentation only of changed elements) 
  */
-class Ac_Legacy_Controller_Response_Part extends Ac_Autoparams {
+class Ac_Legacy_Controller_Response_Part extends Ac_Prototyped {
     
     /**
      * Template method
@@ -54,12 +54,12 @@ class Ac_Legacy_Controller_Response_Part extends Ac_Autoparams {
     
     /**
      * @return Ac_Legacy_Controller_Response_Part
-     * @see Ac_Autoparams::factory()
+     * @see Ac_Prototyped::factory()
      */
     static function factory($signature) {
         if (is_object($signature) && $signature instanceof Ac_Legacy_Controller_Response_Part) $res = $signature;
-            elseif (is_array($signature)) $res = Ac_Autoparams::factory($signature, 'Ac_Legacy_Controller_Response_Part');
-            else $res = Ac_Autoparams::factory(array('class' => (string) $signature), 'Ac_Legacy_Controller_Response_Part');
+            elseif (is_array($signature)) $res = Ac_Prototyped::factory($signature, 'Ac_Legacy_Controller_Response_Part');
+            else $res = Ac_Prototyped::factory(array('class' => (string) $signature), 'Ac_Legacy_Controller_Response_Part');
         return $res;
     }
     

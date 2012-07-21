@@ -6,15 +6,15 @@ require_once('simpletest/unit_tester.php');
 class Ac_Test_Autoparams extends Ac_Test_Base {
     
     function testStrictParams() {
-        Ac_Autoparams::$strictParams = true;
-        $e = Ac_Autoparams::factory(array(
+        Ac_Prototyped::$strictParams = true;
+        $e = Ac_Prototyped::factory(array(
             'class' => 'ApSample',
             'foo' => 'fooVal',
             //'bar' => 'barVal',
             'baz' => 'bazVal'));
-        $this->assertArraysMatch(Ac_Autoparams::getObjectProperty($e, array('foo', /*'bar',*/ 'baz')), array('foo' => 'fooVal', /*'bar'=> 'barVal',*/ 'baz' => 'bazVal'));
+        $this->assertArraysMatch(Ac_Accessor::getObjectProperty($e, array('foo', /*'bar',*/ 'baz')), array('foo' => 'fooVal', /*'bar'=> 'barVal',*/ 'baz' => 'bazVal'));
         $this->expectException();
-        $f = Ac_Autoparams::factory(array(
+        $f = Ac_Prototyped::factory(array(
             'class' => 'ApSample',
             'foo' => 'fooVal',
             //'bar' => 'barVal',
@@ -38,7 +38,7 @@ class Ac_Test_Autoparams extends Ac_Test_Base {
     
 }
 
-class ApSample extends Ac_Autoparams {
+class ApSample extends Ac_Prototyped {
 
     var $foo = null;
     

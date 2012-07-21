@@ -14,8 +14,8 @@ class Ac_Getter implements Ac_I_Getter {
     }
     
     function get($object, $defaultValue = null) {
-        if ($this->isMultiple) $res = Ac_Autoparams::getObjectProperty ($object, $this->path, $defaultValue);
-        else $res = Ac_Autoparams::getObjectPropertyByPath($object, $this->path, $defaultValue);
+        if ($this->isMultiple) $res = Ac_Accessor::getObjectProperty ($object, $this->path, $defaultValue);
+        else $res = Ac_Accessor::getObjectPropertyByPath($object, $this->path, $defaultValue);
         return $res;
     }
     
