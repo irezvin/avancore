@@ -118,7 +118,7 @@ class Ac_Legacy_Controller {
      */
     function __construct ($context = null, $options = array(), $instanceId = false) {
 
-        // Make the call Ac_Autoparams::factory compatible 
+        // Make the call Ac_Prototyped::factory compatible 
         if (is_array($context) && func_num_args() == 1) {
             $options = $context;
             $context = null;

@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Debug_Profiler_Counter extends Ac_Autoparams {
+class Ac_Debug_Profiler_Counter extends Ac_Prototyped {
     
     protected $start = false;
     

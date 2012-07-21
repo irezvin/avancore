@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Lang_ResourceProvider_Dir extends Ac_Autoparams implements Ac_I_Lang_ResourceProvider {
+class Ac_Lang_ResourceProvider_Dir extends Ac_Prototyped implements Ac_I_Lang_ResourceProvider {
 
 	/**
 	 * Name of a directory that contains language files or directories.

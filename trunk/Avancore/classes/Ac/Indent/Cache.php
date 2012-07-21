@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Indent_Cache extends Ac_Autoparams {
+abstract class Ac_Indent_Cache extends Ac_Prototyped {
 
     protected $cacheTable = false;
 

@@ -14,7 +14,7 @@ class Ac_Param_Condition_Enum extends Ac_Param_Condition {
     var $valuesDescr = false;
 
     function getTranslations() {
-        return array_merge(parent::getTranslations(), Ac_Autoparams::getObjectProperty($this, array('valuesDescr')));
+        return array_merge(parent::getTranslations(), Ac_Accessor::getObjectProperty($this, array('valuesDescr')));
     }
     
     function match($value, & $errors = array(), Ac_I_Param $param = null) {

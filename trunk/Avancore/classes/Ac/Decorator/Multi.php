@@ -52,7 +52,7 @@ class Ac_Decorator_Multi extends Ac_Decorator {
     }
     
     function setDecorators(array $decorators) {
-        $this->decorators = Ac_Autoparams::factoryCollection($decorators, 'Ac_I_Decorator', array_merge(array('model' => $this->model), $this->globalProps));
+        $this->decorators = Ac_Prototyped::factoryCollection($decorators, 'Ac_I_Decorator', array_merge(array('model' => $this->model), $this->globalProps));
         return $this->decorators;
     }
     
@@ -72,7 +72,7 @@ class Ac_Decorator_Multi extends Ac_Decorator {
     
     function setGlobalProps(array $globalProps) {
         $this->globalProps = $globalProps;
-        $res = Ac_Autoparams::setObjectProperty($this->decorators, $globalProps);
+        $res = Ac_Accessor::setObjectProperty($this->decorators, $globalProps);
         return $res;
     }
     

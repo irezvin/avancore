@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Util_Csv extends Ac_Autoparams {
+class Ac_Util_Csv extends Ac_Prototyped {
     
     protected $enclose = '"';
 

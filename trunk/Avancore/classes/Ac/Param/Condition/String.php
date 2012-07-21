@@ -15,7 +15,7 @@ class Ac_Param_Condition_String extends Ac_Param_Condition {
     var $exactString = false;
 
     function getTranslations() {
-        return array_merge(parent::getTranslations(), Ac_Autoparams::getObjectProperty($this, array('maxLength', 'minLength', 'regexDescr')));
+        return array_merge(parent::getTranslations(), Ac_Accessor::getObjectProperty($this, array('maxLength', 'minLength', 'regexDescr')));
     }
     
     static function getEmailRegex() {

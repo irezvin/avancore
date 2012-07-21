@@ -1,9 +1,9 @@
 <?php
 
 if (!class_exists('Ac_Util', false)) require_once(dirname(__FILE__).'/Util.php');
-if (!class_exists('Ac_Autoparams', false)) require_once(dirname(__FILE__).'/Autoparams.php');
+if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/Autoparams.php');
 
-abstract class Ac_Application extends Ac_Autoparams {
+abstract class Ac_Application extends Ac_Prototyped {
     
     private static $instances = array();
     
@@ -113,7 +113,7 @@ abstract class Ac_Application extends Ac_Autoparams {
     function setAdapter(Ac_Application_Adapter $adapter) {
         if ($this->adapter) throw new Exception("Can setAdapter() only once");
         $this->adapter = $adapter;
-        if (is_array($io = $this->adapter->getAppInitOptions())) $this->initFromOptions($io);
+        if (is_array($io = $this->adapter->getAppInitOptions())) $this->initFromPrototype($io);
         if ($this->autoInitialize && $this->stage == self::stInitializing) $this->initialize();
     }
     
@@ -145,7 +145,7 @@ abstract class Ac_Application extends Ac_Autoparams {
     }
     
     function __construct (array $options = array()) {
-        $this->initFromOptions($options);
+        $this->initFromPrototype($options);
         $this->stage = self::stInitializing;
         if ($this->autoInitialize) $this->initialize();
     }
@@ -182,7 +182,7 @@ abstract class Ac_Application extends Ac_Autoparams {
             if (is_array($db) && $db) {
                 $db = Ac_Util::m(array('__construct' => array('config' => array('tmpDir' => $this->adapter->getVarTmpPath()))), $db);
             }
-            if ($db) $this->legacyDatabase = Ac_Autoparams::factory ($db, 'Ac_Legacy_Database');
+            if ($db) $this->legacyDatabase = Ac_Prototyped::factory ($db, 'Ac_Legacy_Database');
         }
         return $this->legacyDatabase;
     }    
@@ -198,7 +198,7 @@ abstract class Ac_Application extends Ac_Autoparams {
         if ($this->db === null) {
             $this->db = false;
             $db = $this->adapter->getDbPrototype();
-            if ($db) $this->db = Ac_Autoparams::factory ($db, 'Ac_Sql_Db');
+            if ($db) $this->db = Ac_Prototyped::factory ($db, 'Ac_Sql_Db');
                 elseif (($leg = $this->getLegacyDatabase())) $this->db = new Ac_Sql_Db_Ae($leg);
         }
         return $this->db;
@@ -214,7 +214,7 @@ abstract class Ac_Application extends Ac_Autoparams {
     function getCache() {
         if ($this->cache === null) {
             $cache = $this->adapter->getCachePrototype();
-            if ($cache) $this->cache = Ac_Autoparams::factory ($cache, 'Ac_Cache');
+            if ($cache) $this->cache = Ac_Prototyped::factory ($cache, 'Ac_Cache');
         }
         return $this->cache;
     }
@@ -253,7 +253,7 @@ abstract class Ac_Application extends Ac_Autoparams {
                 $defaults = $this->mappers[$id];
                 if (!is_array($defaults)) $defaults = array('class' => $defaults);
                 $defaults['application'] = $this;
-                $this->mappers[$id] = Ac_Autoparams::factory($defaults, 'Ac_Model_Mapper');
+                $this->mappers[$id] = Ac_Prototyped::factory($defaults, 'Ac_Model_Mapper');
             }
             $res = $this->mappers[$id];
         } else {
@@ -279,7 +279,7 @@ abstract class Ac_Application extends Ac_Autoparams {
                     $proto = $this->controllers[$id];
                     if (!is_array($proto)) $proto = array('class' => $proto);
                     if (!isset($proto['application'])) $proto['application'] = $this;
-                    $this->controllers[$id] = Ac_Autoparams::factory($proto, 'Ac_Legacy_Controller');
+                    $this->controllers[$id] = Ac_Prototyped::factory($proto, 'Ac_Legacy_Controller');
             }
             $res = $this->controllers[$id];
         } else {
@@ -302,7 +302,7 @@ abstract class Ac_Application extends Ac_Autoparams {
     
     function createOutput() {
         $output = $this->getAdapter()->getOutputPrototype();
-        $output = Ac_Autoparams::factory($output, 'Ac_Legacy_Output');
+        $output = Ac_Prototyped::factory($output, 'Ac_Legacy_Output');
         // TODO: add asset placeholders to output
         return $output;
     }

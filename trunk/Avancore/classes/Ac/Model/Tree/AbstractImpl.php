@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Tree_AbstractImpl extends Ac_Autoparams implements Ac_I_Tree_Node {
+abstract class Ac_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_Tree_Node {
 
     const csBeforeDelete = 'beforeDelete';
     const csAfterDelete = 'afterDelete';

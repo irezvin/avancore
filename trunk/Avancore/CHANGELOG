@@ -1,3 +1,8 @@
+2012-07-22
+
++ Renamed Ac_Autoparams, Ac_I_Autoparams to Ac_Prototyped and Ac_I_Prototyped; renamed $options to $prototype
++ Moved all static methods for property access from Ac_Autoparams (now Ac_Prototyped) to Ac_Accessor
+
 2012-07-20
 
 + Created Ac_Accessor with Strategy dependency (Ac_I_AccessorStrategy); used them in Ac_Cr_Strategy to implement 'magic' properties 'param' & 'use'.

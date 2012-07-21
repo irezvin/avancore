@@ -82,7 +82,7 @@ class Ac_Cache {
     }
 
     function setUtil($util = 'Ac_Cache_Util_PHP') {
-        $this->util = Ac_Autoparams::factory($util, 'Ac_Cache_Util');
+        $this->util = Ac_Prototyped::factory($util, 'Ac_Cache_Util');
         $this->util->setCache($this);
     }
     

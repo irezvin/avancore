@@ -425,7 +425,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
     
     function dumpControlNames($arr) {
-        var_dump(Ac_Autoparams::getObjectProperty($arr, 'debugCaption'));
+        var_dump(Ac_Accessor::getObjectProperty($arr, 'debugCaption'));
     }
     
     function getOrderedDisplayChildren() {
