@@ -868,6 +868,19 @@ class Ac_Util {
         $script = '<script type="text/javascript">/*<![CDATA[*/'.$script.'/*]]>*/</script>';
         return '<span id="'.$id.'">[javascript protected email address]</span>'.$script;
     }
+    
+    static function stringifyObjects(array $array) {
+        $res = array();
+        foreach ($array as $k => $v) {
+            if (is_object($v)) {
+                if (method_exists($v, '__toString')) $v = ''.$v;
+                else $v = '[object '.get_class($v).']';
+            }
+            elseif (is_array($v)) $v = self::stringifyObjects($v);
+            $res[$k] = $v;
+        }
+        return $res;
+    }
 
 }
 
