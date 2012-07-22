@@ -1,0 +1,14 @@
+Tag
+
+0.3.0.10   Accessors & related
+           Move obsolete code to /obsolete/classes/ (add it to classpath)
+           Rename old model to Ac_Legacy_Model
+           Basic Ac_Meta
+
+0.3.0.11   Working controller with params
+
+0.3.0.12   Ac_Meta improvements
+           Ac_Expression at degree enough to support the model
+           integrate Ac_Expression with params
+
+...

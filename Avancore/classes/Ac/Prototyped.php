@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @TODO: move code to call __initialize to some common method? 
+ */
 abstract class Ac_Prototyped implements Ac_I_Prototyped {
     
     static $strictParams = true;
@@ -13,8 +16,24 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
     function __construct (array $prototype = array()) {
         $this->initFromPrototype($prototype);
     }
-    
+
     protected function initFromPrototype(array $prototype = array(), $strictParams = null) {
+        
+        if (isset($prototype['__initialize']) && is_array($prototype['__initialize'])) {
+            $class = new ReflectionClass($myClass = get_class($this));
+            foreach ($prototype['__initialize'] as $methodName => $args) {
+                if (!is_null($args)) {
+                    if (!is_array($args)) $args = array($args);
+                    $method = $class->getMethod($methodName);
+                    // We have to check methods visibility; otherwise we will be able to call both private and protected methods using __initialize
+                    if (!$method->isPublic()) throw new Ac_E_InvalidPrototype("Attempt to call non-public method {$myClass}::{$methodName}() from \$prototype::__initialize block");
+                    $posParams = Ac_Accessor::mapFunctionArgs($method, $args, $method->isUserDefined());
+                    call_user_func_array(array($this, $methodName), $posParams);
+                }
+            }
+        }
+        unset($prototype['__initialize']);
+        
         $v = ($this->hasPublicVars());
         $gotKeys = array();
         if ($v) $v = array_flip(array_keys(Ac_Util::getClassVars(get_class($this))));
@@ -62,6 +81,8 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
             $res = $prototype;
         } else {
             if (!is_array($prototype)) $prototype = array('class' => (string) $prototype);
+
+            $class = null;
             
             if (isset($prototype['class'])) $className = $prototype['class'];
             
@@ -76,14 +97,29 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
                 // Other objects can be instantiated using prototype arrays too
                 
                 $p = $prototype;
-                if (isset($p['__construct']) && is_array($c = $p['__construct'])) {
-                    $r = new ReflectionClass($className);
-                    ksort($c);
-                    $res = $r->newInstanceArgs(array_values($c));
-                    unset($p['__construct']);
+                if (isset($p['__construct']) && is_array($params = $p['__construct'])) {
+                    $class = new ReflectionClass($className);
+                    $cr = $class->getConstructor();
+                    $posParams = Ac_Accessor::mapFunctionArgs($cr, $params, $cr->isUserDefined());
+                    $res = $class->newInstanceArgs(array_values($posParams));
                 } else {
                     $res = new $className();
                 }
+                unset($p['__construct']);
+                if (isset($p['__initialize']) && is_array($p['__initialize'])) {
+                    if (!$class) $class = new ReflectionClass($className);
+                    $ud = $class->isUserDefined();
+                    foreach ($p['__initialize'] as $methodName => $args) {
+                        if (!is_null($args)) {
+                            if (!is_array($args)) $args = array($args);
+                            $method = $class->getMethod($methodName);
+                            if (!$method->isPublic()) throw new Ac_E_InvalidPrototype("Attempt to call non-public method {$className}::{$methodName}() from \$prototype::__initialize block");
+                            $posParams = Ac_Accessor::mapFunctionArgs($method, $args, $method->isUserDefined());
+                            call_user_func_array(array($res, $methodName), $posParams);
+                        }
+                    }
+                }
+                unset($p['__initialize']);
                 Ac_Accessor::setObjectProperty($res, $p, null, $strictParams);
             }
         }

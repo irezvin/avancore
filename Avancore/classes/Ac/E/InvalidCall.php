@@ -22,7 +22,7 @@ class Ac_E_InvalidCall extends Exception {
     }
     
     static function wrongType($paramName, $value, $allowedTypes) {
-        return new Ac_E_InvalidCall("Invalid \${$paramName} type: '".gettype($value)."'; allowed types are '".implode(', ', Ac_Util::toArray($allowedTypes)."'"));
+        return new Ac_E_InvalidCall("Invalid \${$paramName} type: '".gettype($value)."'; allowed types are '".implode(', ', Ac_Util::toArray($allowedTypes))."'");
     }
     
     static function noSuchItem($title, $key, $checkFn = false) {

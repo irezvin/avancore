@@ -1,0 +1,44 @@
+Ac0.3 Documentation To-Do
+
+
+-   basic concepts
+
+    -   "Paths" (Ac_Util::pathToArray and so on)
+    -   merging of recursive arrays
+
+-   Ac_Prototyped
+
+    -   theory of simple IOC in Avancore with prototype arrays
+
+    -   creation of Prototyped descendant
+    -   using ::factory methods with both Prototyped and non-Prototyped descendants
+    -   using ::factoryOnce, ::factoryColletion
+    -   providing information about magic members with __isset
+
+-   Ac_Prototype_Builder
+
+-   Ac_Accessor
+
+    -   using static methods to quickly retrieve objects' properties, including 
+        getAllParents
+    -   using Accessor instances
+    -   using Accessor strategies (Ac_Accessor_Strategy)
+
+    -   Catching errors with Ac_Accessor
+
+-   Ac_Request
+    
+    -   basics of data retrieval
+    -   setting override values
+    -   using accessor properties
+    -   populate() with URL
+
+-   Ac_Cr_Context
+
+    -   theory of operation
+    -   working with plain context
+    -   working context with pathPrefix
+    -   working with sub-context
+
+    
+    

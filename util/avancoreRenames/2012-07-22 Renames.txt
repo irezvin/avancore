@@ -1,0 +1,11 @@
+Ac_Autoparams -> Ac_Prototyped
+
+Ac_I_Autoparams -> Ac_I_Prototyped
+
+Ac_Prototyped:: -> Ac_Accessor::
+
+Ac_Accessor::factory* -> Ac_Prototyped::factory*
+Ac_Accessor::$strictParams -> Ac_Prototyped::$strictParams
+
+initFromOptions -> initFromPrototype
+
