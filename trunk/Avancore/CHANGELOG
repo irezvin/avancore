@@ -1,7 +1,15 @@
+2012-07-23
+
++ Added setCollectErrors() to Ac_Accessor (currently exceptions are not wrapped)
+
 2012-07-22
 
++ Added Ac_Prototype_Builder & Ac_Prototype_Chain
 + Renamed Ac_Autoparams, Ac_I_Autoparams to Ac_Prototyped and Ac_I_Prototyped; renamed $options to $prototype
 + Moved all static methods for property access from Ac_Autoparams (now Ac_Prototyped) to Ac_Accessor
++ Ac_Accessor::mapFunctionArgs for by-name passing; Ac_Prototyped::factory now accepts __initialize args 
+  and allows __constructor keys to be passed by arg name.
++ Ac_Prototyped descendants now accept __initialize key with methodName => args too
 
 2012-07-20
 

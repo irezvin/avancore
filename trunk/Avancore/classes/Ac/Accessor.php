@@ -2,8 +2,8 @@
 
 // TODO: implement $convertToPaths (foo__bar -> array('foo', bar'); check Ac_Prototyped static methods to work with paths)
 // TODO: some sane logic on trying to get write-only properties or to write read-only properties
-// TODO: errors & exceptions handling (how?)
 // TODO: add __unset() support and iterator for listable objects
+// TODO: wrap Exceptions into some sane objects that know, at least, destination class
 class Ac_Accessor {
     
     protected $src = null;
@@ -12,8 +12,61 @@ class Ac_Accessor {
     
     protected $strategy = false;
     
+    /**
+     * @var false|true|array
+     */
+    protected $collectErrors = false;
+    
+    /**
+     * @var propName => array($exception, $exception...)
+     */
+    protected $errors = array();
+    
     function getSrc() {
         return $this->src;
+    }
+    
+    /**
+     * Enables error collector
+     * Note: errors are collected on set() only
+     * 
+     * @param bool|scalar|string|array $types 
+     * 
+     * true = catch all; 
+     * false = catch none; 
+     * string = class name or 
+     * array = class names of exceptions to catch
+     */
+    function setCollectErrors($types = null) {
+       if (is_string($types)) $types = array($types);
+       $this->collectErrors = $types; 
+    }
+    
+    function getCollectErrors() {
+        return $this->collectErrors;
+    }
+    
+    /**
+     * Returns collected errors and clears collected errors' memory
+     * @return array Collected errors
+     */
+    function clearErrors() {
+        $res = $this->errors;
+        $this->errors = array();
+        return $res;
+    }
+    
+    function getErrors($propName = false, $clear = false) {
+        if ($propName !== false) {
+            if (is_array($propName)) $propName = Ac_Util::arrayToPath($propName);
+            $res = isset($this->errors[$propName])? $this->errors[$propName] : array();
+            if ($clear) unset ($this->errors[$propName]);
+        } else {
+            $res = $this->errors;
+            if ($clear) $this->errors = array();
+        }
+        
+        return $res;
     }
     
     function __construct($src, $convertToPaths = false, $strategy = false) {
@@ -36,8 +89,37 @@ class Ac_Accessor {
     
     function setProperty($name, $value) {
         if ($this->convertToPaths) $name = $this->convertToPath($name);
-        if ($this->strategy) return $this->strategy->setPropertyOf($this->src, $name, $value);
-        return Ac_Accessor::setObjectProperty($this->src, $name, $value);
+        $res = true;
+        
+        if ($this->strategy) $f = array($this->strategy, 'setPropertyOf');
+        else $f = array('Ac_Accessor', 'setObjectProperty'); 
+        
+        if ($this->collectErrors !== false) {
+            try {
+                call_user_func($f, $this->src, $name, $value);
+            } catch (Exception $e) {
+                $match = false;
+                if ($this->collectErrors === true) $match = true;
+                else {
+                    foreach ($this->collectErrors as $class) {
+                        if (is_a($e, $class)) {
+                            $match = true;
+                            break;
+                        }
+                    }
+                }
+                if ($match) {
+                    if (is_array($name)) $name = Ac_Util::arrayToPath ($name);
+                    $this->errors[$name][] = $e;
+                    $res = false;
+                } else {
+                    throw $e;
+                }
+            }
+        } else {
+            call_user_func($f, $this->src, $name, $value);
+        }
+        return $res;
     }
     
     // TODO: difference for setters & getters?
@@ -110,22 +192,26 @@ class Ac_Accessor {
         } elseif ($item instanceof Ac_Model_Data) {
             $res = $item->listProperties();
         } else {
-            if (!($item instanceof Ac_I_Prototyped) || $item->hasPublicVars()) {
-                $vars = array_keys(Ac_Util::getPublicVars($item));
+            if (method_exists($item, '__list_all_properties')) {
+                $res = $item->__list_all_properties();
             } else {
-                $vars = array();
+                if (!($item instanceof Ac_I_Prototyped) || $item->hasPublicVars()) {
+                    $vars = array_keys(Ac_Util::getPublicVars($item));
+                } else {
+                    $vars = array();
+                }
+                if (method_exists($item, '__list_magic')) {
+                    $magic = $item->__list_magic();
+                } else {
+                    $magic = array();
+                }
+                $res = array_unique(array_merge(
+                        self::listObjectAccessors($item, 'get'),
+                        self::listObjectAccessors($item, 'set', 1),
+                        $vars,
+                        $magic
+                ));
             }
-            if (method_exists($item, '__list_magic')) {
-                $magic = $item->__list_magic();
-            } else {
-                $magic = array();
-            }
-            $res = array_unique(array_merge(
-                    self::listObjectAccessors($item, 'get'),
-                    self::listObjectAccessors($item, 'set', 1),
-                    $vars,
-                    $magic
-            ));
         }
         return $res;
     }
@@ -274,5 +360,48 @@ class Ac_Accessor {
         if ($rootFirst) $res = array_reverse($res);
         return $res;
     }    
+    
+    /**
+     * @return array List of positional parameters
+     * 
+     * Parameters with matching names are passed disregarding to their position
+     * Other args are passed by position either in the key (they should begin with digit or have numeric key) and _will_ overwrite parameters with matching names
+     * 
+     * @param type $reflectionMethod
+     * @param array $argsArray 
+     * @param bool $useDefaults Try to use default values
+     */
+    static function mapFunctionArgs(ReflectionFunctionAbstract $reflectionMethod, array $argsArray, $useDefaults = true) {
+        ksort($argsArray);
+        $posParams = array();
+        $matching = 0;
+        $maxIdx = -1;
+        foreach ($reflectionMethod->getParameters() as $param) {
+            $pName = $param->getName();
+            if (array_key_exists($pName, $argsArray)) {
+                $posParams[$pName] = $argsArray[$pName];
+                unset($argsArray[$pName]);
+                $maxIdx = $param->getPosition();
+            } else {
+                $posParams[$pName] = $useDefaults && $param->isDefaultValueAvailable()? $param->getDefaultValue() : null;
+            }
+        }
+        $posParams = array_values($posParams);
+        if ($argsArray) { // all parameters with non-matching names will be by-position
+            $i = 0;
+            foreach ($argsArray as $idx => $value) {
+                if (($ch = substr($idx[0], 0, 1)) >= '0' && ($ch <= '9')) $idx = (int) $idx;
+                else $idx = $i;
+                // pad array with empty values
+                while (count($posParams) < ($idx + 1)) $posParams[] = null;
+                $posParams[$idx] = $value;
+                $maxIdx = max($maxIdx, $idx);
+                $i++;
+            }
+        }
+        $numParams = max($maxIdx + 1, $reflectionMethod->getNumberOfRequiredParameters());
+        $posParams = array_slice($posParams, 0, $numParams); // pass only required and provided parameters 
+        return $posParams;
+    }
     
 }
