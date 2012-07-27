@@ -4,7 +4,7 @@
 // TODO: some sane logic on trying to get write-only properties or to write read-only properties
 // TODO: add __unset() support and iterator for listable objects
 // TODO: wrap Exceptions into some sane objects that know, at least, destination class
-class Ac_Accessor {
+class Ac_Accessor implements Ac_I_Accessor {
     
     protected $src = null;
 
@@ -175,6 +175,9 @@ class Ac_Accessor {
                 $pi = $item->getPropertyInfo($propertyName, true);
                 if ($pi->assocClass) $res = $item->getAssoc($propertyName);              
                     else $res = $item->getField($propertyName);
+            } elseif ($item instanceof Ac_I_Accessor) {
+                if ($item->hasProperty($propertyName)) $res = $item->getProperty($propertyName);
+                else $res = $defaultValue;
             } elseif (($item instanceof Ac_I_Prototyped? $item->hasPublicVars() : true) && (array_key_exists($propertyName, Ac_Util::getClassVars(get_class($item))))) {
                 $res = $item->$propertyName;
             } else {

@@ -146,18 +146,39 @@ class Ac_Test_Cr extends Ac_Test_Base {
             'full override doesnt leave anything of the original data'
         );
         
+        $original = ';\'foo\"bar';
+        $_GET['withSlashes'] = addslashes($original);
+        $rq3 = new Ac_Request(true);
+        $this->assertEqual(
+            $rq3->get->withSlashes, 
+            $original,
+            'Ac_Request with stripSlashesGPC enabled should return string without slashes'
+        );
+        $rq4 = new Ac_Request(false);
+        $this->assertEqual(
+            $rq4->get->withSlashes, 
+            addslashes($original), 
+            'Ac_Request with stripSlashesGPC disabled should return unchanged string'
+        );
+        
     }
-    
+     
     function testUrl() {
         $rq = new Ac_Request();
         
         // Simulate following URL
         $url = 'http://example.com/index.php/aaa/bbb?foo=bar&baz=quux';
         
-        $popRes = ($rq->populate($url, '/index.php'));
+        $popRes = ($rq->populate($url, '/index.php', array('foo' => 'fooPost')));
+
+        $this->assertEqual($rq->getValueFrom('get', 'foo'), 'bar');
+        $this->assertEqual($rq->get->foo, 'bar');
+        $this->assertEqual($rq->post->foo, 'fooPost');
+        $this->assertEqual($rq->value->foo, 'fooPost');
+        
         $this->assertArraysMatch(
             array_keys($popRes), 
-            array('get', 'post', 'server', 'env'),
+            array('get', 'post', 'request', 'server', 'env'),
             'populate() should return array with alteration data'
         );
         
@@ -183,7 +204,7 @@ class Ac_Test_Cr extends Ac_Test_Base {
             "Guess URL without \$_SERVER['PATHINFO']"
         );
     }
-    
+   
     function testContext() {
         $rq = new Ac_Request();
         
@@ -251,6 +272,12 @@ class Ac_Test_Cr extends Ac_Test_Base {
             'createUrl() for context without path prefix but with used params'
         );
         $this->assertEqual(
+            urldecode($ctx->createUrl(array(), true).''),
+            'http://example.com/some/long/path',
+            'createUrl() for context without path prefix and with fullOverride should return base url only'
+        );
+        
+        $this->assertEqual(
             urldecode($ctx->createUrl(array('bar' => 'barOverride', 'foo' => array('fooKey3' => 'fooVal3'))).''),
             'http://example.com/some/long/path?foo[fooKey2]=fooVal2&foo[fooKey3]=fooVal3&bar=barOverride',
             'createUrl($params)'
@@ -295,10 +322,11 @@ class Ac_Test_Cr extends Ac_Test_Base {
             'magic $context->param->key__subKey (read)'
         );
         
-        $this->assertFalse(
+        // Isset for 'use' property has changed
+        /*$this->assertFalse(
             isset($sub->use->subKey2__1),
             'magic isset($context->use->key__subKey returns FALSE (before actual use))'
-        );
+        );*/
         
         $this->assertEqual(
             $sub->use->subKey2__1, 
@@ -306,10 +334,11 @@ class Ac_Test_Cr extends Ac_Test_Base {
             'magic $context->use->key__subKey returns value too'
         );
                     
-        $this->assertTrue(
+        // __isset for 'use' property has changed
+        /*$this->assertTrue(
             isset($sub->use->subKey2__1),
             'magic isset($context->use->key__subKey) returns true after param was used'
-        );
+        );*/
         
         $this->assertTrue(isset($sub->param->subKey2__1));
         
