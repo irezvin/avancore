@@ -1,3 +1,8 @@
+2012-07-27
+
++ Added Ac_Param_Value
++ Work-in-progress on Ac_Cr_Controller
+
 2012-07-23
 
 + Added setCollectErrors() to Ac_Accessor (currently exceptions are not wrapped)

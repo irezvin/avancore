@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Request_Accessor {
+class Ac_Request_Accessor implements Ac_I_Accessor {
     
     protected $src = false;
     
@@ -28,8 +28,9 @@ class Ac_Request_Accessor {
     
     function get($path, $default = false, & $found = null) {
         if ($this->uncamelize) $path = self::uncamelize($path);
-        if ($this->src !== false) $res = $this->request->getValueFrom($this->src, $path, $default, $found);
-            else $res = $this->request->getValue($path, $default, $found);
+        if ($this->src !== false) {
+            $res = $this->request->getValueFrom($this->src, $path, $default, $found);
+        }   else $res = $this->request->getValue($path, $default, $found);
         return $res;
     }
     
@@ -61,5 +62,21 @@ class Ac_Request_Accessor {
         $r = $this->get($varName, null, $found);
         return $found && !is_null($r);
     }
+     
+    function getProperty($name) {
+        return $this->get($name);
+    }
     
+    function hasProperty($name) {
+        return $this->__isset($name);
+    }
+    
+    function setProperty($name, $value) {
+        return $this->set($name, $value);
+    }
+    
+    function listProperties() {
+        return false;
+    }
+   
 }

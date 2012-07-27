@@ -23,6 +23,8 @@ class Ac_Request {
     
     protected $fullOverrides = array();
     
+    protected $stripSlashes = false;
+    
     private static $map = array(
         'get' => '_GET',
         'post' => '_POST',
@@ -40,15 +42,24 @@ class Ac_Request {
     const env = 'env';
     
     protected $accessors = array();
+
+    /**
+     * @param bool|null $stripSlashesGPC Strip slashes from global arrays GET, COOKIE & REQUEST
+     * If NULL is provided, value depending on ini_get('magic_quotes_gpc') will be used
+     */
+    function __construct($stripSlashesGPC = null) {
+        if ($stripSlashesGPC === null) $this->stripSlashes = (bool) ini_get('magic_quotes_gpc');
+            else $this->stripSlashes = (bool) $stripSlashesGPC;
+    }
     
     function __isset($name) {
-        return in_array($name, self::$map);
+        return $name == 'value' || in_array($name, array_merge(self::$map));
     }
     
     function __get($name) {
-        if (array_key_exists($name, self::$map)) {
+        if ($name == 'value' || array_key_exists($name, self::$map)) {
             if (!isset($this->accessors[$name])) 
-                $this->accessors[$name] = new Ac_Request_Accessor($this, $name, in_array($name, array('server', 'env')));
+                $this->accessors[$name] = new Ac_Request_Accessor($this, $name == 'value'? false : $name, in_array($name, array('server', 'env')));
             return $this->accessors[$name];
         } else throw Ac_E_InvalidCall::noSuchProperty ($this, $name, array_keys(self::$map));
     }
@@ -140,7 +151,8 @@ class Ac_Request {
     protected function implGetValue($localArrayName, $path, $globalArrayName, $localfullOverrides, & $found, $defaultValue = null) {
         
         $found = null;
-        
+        $srcIsGlob = false;
+
         if ($this->$localArrayName !== false) {
             $src = & $this->$localArrayName;    
             if ($localfullOverrides) {
@@ -150,17 +162,20 @@ class Ac_Request {
                         $found = true;
                     } else {
                         $src = & $GLOBALS[$globalArrayName];
+                        $srcIsGlob = true;
                     }
                 } else {
                     $res = Ac_Util::getArrayByPath($src, $path, $defaultValue, $found);
                     if (!$found) {
                         $found = null;
                         $src = & $GLOBALS[$globalArrayName];
+                        $srcIsGlob = true;
                     }
                 }
             }
         } else {
             $src = & $GLOBALS[$globalArrayName];
+            $srcIsGlob = true;
         }
         
         if (is_null($found)) {
@@ -174,7 +189,27 @@ class Ac_Request {
                 $res = Ac_Util::getArrayByPath($src, $path, $defaultValue, $found);
             }
         }
+        if ($this->stripSlashes && $found && $srcIsGlob && in_array($globalArrayName, array('_GET', '_POST', '_COOKIE', '_REQUEST'))) {
+            $res = self::stripSlashesRecursive($res);
+        }
         
+        return $res;
+    }
+    
+    static function stripSlashesRecursive($value) {
+        $res = '';
+        if (is_string( $value )) {
+            $res = stripslashes( $value );
+        } else {
+            if (is_array( $value )) {
+                $res = array();
+                foreach ($value as $key => $val) {
+                    $res[$key] = self::stripSlashesRecursive( $val );
+                }
+            } else {
+                $res = $value;
+            }
+        }
         return $res;
     }
     
@@ -238,9 +273,12 @@ class Ac_Request {
             parse_str($u['query'], $get);
         } else $get = array();
         
+        $request = array_merge($get, $post);
+        
         $res = array(
             'get' => $get,
             'post' => $post,
+            'request' => $request,
             'server' => $serverData,
             'env' => $serverData
         );
@@ -249,7 +287,8 @@ class Ac_Request {
             $this->setValues(self::server, $serverData, false);
             $this->setValues(self::env, $serverData, false);
             $this->setValues(self::get, $get, true);
-            $this->setValues(self::get, $post, true);
+            $this->setValues(self::post, $post, true);
+            $this->setValues(self::request, $request, true);
         }
         return $res;
     }

@@ -10,14 +10,22 @@ ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 
 if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
+    
+    $classes = explode(',', $_GET['class']);
 	
-	if (!in_array(substr($class, 0, 8), array('Ac_Test_')))
-    	$cn = 'Ac_Test_'.ucfirst($class);
-    else
-    	$cn = $class;
-    $t = new $cn;
-    $t->run(new HtmlReporter('UTF-8'));
+    $ts = new TestSuite('Avancore Framework v0.3 Tests');
+    
+    foreach ($classes as $class) {
 
+        if (!in_array(substr($class, 0, 8), array('Ac_Test_')))
+            $cn = 'Ac_Test_'.ucfirst($class);
+        else
+            $cn = $class;
+        $test = new $cn;
+        $ts->add($test);
+    }
+    $ts->run(new HtmlReporter('UTF-8'));
+    
 } else {
 	$t = new TestSuite('Avancore Framework v0.3 Tests');
 	$t->add(new Ac_Test_Cr);

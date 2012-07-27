@@ -66,7 +66,7 @@ class Ac_Cr_Context {
             if (!$this->useAccessor) $this->useAccessor = new Ac_Accessor($this, true, array(
                 'class' => 'Ac_Accessor_Strategy_UseMethod', 
                 'getMethodName' => 'useParam',
-                'hasMethodName' => 'isParamUsed',
+                'hasMethodName' => 'hasParam',
             ));
             return $this->useAccessor;
         } else {
@@ -103,7 +103,11 @@ class Ac_Cr_Context {
      * @return Ac_Cr_Url 
      */
     function getBaseUrl() {
-        if ($this->baseUrl === false) $this->baseUrl = Ac_Cr_Url::guess(true, $this->getRequest());
+        if ($this->baseUrl === false) {
+            $this->baseUrl = Ac_Cr_Url::guess(true, $this->getRequest());
+            if ($this->pathPrefix) Ac_Util::unsetArrayByPath($this->baseUrl->query, $this->pathPrefix);
+                else $this->baseUrl->query = array();
+        }
         return $this->baseUrl; 
     }
     
@@ -220,6 +224,10 @@ class Ac_Cr_Context {
             unset($this->usedParams[$this->getPathHash($path)]);
         }
     }
+    
+    function forgetAllParams() {
+        $this->usedParams = array();
+    }
 
     protected function updateUrlWithUsedParams(Ac_Url $url) {
         foreach ($this->usedParams as $hash => $data) {
@@ -246,15 +254,16 @@ class Ac_Cr_Context {
     
     /**
      * @return Ac_Cr_Url 
+     * @param bool $fullOverride Don't put used params to the context
      */
-    function createUrl(array $params = array()) {
+    function createUrl(array $params = array(), $fullOverride = false) {
         if (!$this->topContext) {
             $res = $this->getBaseUrl()->cloneObject();
         } else {
-            $res = $this->topContext->createUrl();
+            $res = $this->topContext->createUrl(array(), $fullOverride);
         }
         if ($r = $this->getRouter()) $res->setRouter($r);
-        $this->updateUrlWithUsedParams($res);
+        if (!$fullOverride) $this->updateUrlWithUsedParams($res);
         if ($params) $this->updateUrlWithParams ($res, $params);
         return $res;
     }
