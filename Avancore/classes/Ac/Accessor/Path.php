@@ -4,7 +4,7 @@
  * @TODO There is a limitation on Ac_Accessor::getObjectPropertyByPath because it cannot through the arrays
  * (same for Ac_Util::getArrayByPath which cannot pass through the objects)
  */
-class Ac_Param_Value {
+class Ac_Accessor_Path {
     
     protected $src = false;
     
@@ -37,6 +37,10 @@ class Ac_Param_Value {
         return $this->src;
     }
     
+    function getPath($asString = false) {
+        return $asString? Ac_Util::arrayToPath($this->path) : $this->path;
+    }
+    
     function getDefault() {
         return $this->default;
     }
@@ -61,24 +65,31 @@ class Ac_Param_Value {
         return $this->getValue();
     }
     
+    protected function doOnGotValue($res) {
+        if ($this->cache) {
+            $this->src = null; // We don't need it anymore so lets free up some memory
+            $this->gotValue = true;
+            $this->value = $res;
+        }        
+    }
+    
+    protected function doGetFromObject($src, $default) {
+        return Ac_Accessor::getObjectPropertyByPath($src, $this->path, $default);
+    }
+    
     function getValue() {
         if ($this->gotValue === false) {
             $src = $this->src;
-            if (is_object($src) && $src instanceof Ac_Param_Value) $src = $src->getValue();
+            if (is_object($src) && $src instanceof Ac_Accessor_Path) $src = $src->getValue();
             
             if ($this->path) {
                 if (is_array($src)) $res = Ac_Util::getArrayByPath($src, $this->path, $this->default);
-                elseif (is_object($src)) $res = Ac_Accessor::getObjectPropertyByPath($src, $this->path, $this->default);
+                elseif (is_object($src)) $res = $this->doGetFromObject($src, $this->path, $this->default);
                 else $res = $this->default;
             } else {
                 $res = $this->src;
             }
-            
-            if ($this->cache) {
-                $this->src = null; // We don't need it anymore so lets free up some memory
-                $this->gotValue = true;
-                $this->value = $res;
-            }
+            $this->doOnGotValue($res);
         } else {
             $res = $this->value;
         }
@@ -91,7 +102,7 @@ class Ac_Param_Value {
     
     /**
      * @param mixed $default
-     * @return Ac_Param_Value 
+     * @return Ac_Accessor_Path 
      */
     function cache() {
         $this->setCache(true);
@@ -100,7 +111,7 @@ class Ac_Param_Value {
     
     /**
      * @param mixed $default
-     * @return Ac_Param_Value 
+     * @return Ac_Accessor_Path 
      */
     function def($default) {
         $this->default = $default;
@@ -109,10 +120,10 @@ class Ac_Param_Value {
     
     /**
      * @param string $path
-     * @return Ac_Param_Value 
+     * @return Ac_Accessor_Path 
      */
     function __get($path) {
-        $res = new Ac_Param_Value($this, $path, $this->cache);
+        $res = new Ac_Accessor_Path($this, $path, $this->cache);
         return $res;
     }
     
@@ -120,10 +131,10 @@ class Ac_Param_Value {
      * Static function to start param chains
      * Creates Param Value with src, but without any paths
 
-     * @return Ac_Param_Value
+     * @return Ac_Accessor_Path
      */
     static function chain($src) {
-        return new Ac_Param_Value($src, array());
+        return new Ac_Accessor_Path($src, array());
     }
     
 }

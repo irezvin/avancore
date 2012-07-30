@@ -1,7 +1,17 @@
+2012-07-30
+
+* Renamed Ac_Param_Value to Ac_Accessor_Path for clarity (Ac_Test_Params > Ac_Test_AccessorPath)
++ Ac_Accessor_PathRef: path object capable to call src methods
+
+2012-07-28
+
+X Moved all to-be-abandoned or to-be-rewritten classes to /obsolete directory
+
 2012-07-27
 
 + Added Ac_Param_Value
 + Work-in-progress on Ac_Cr_Controller
+* Tests: index.php can now run several tests by specifying comma-separated class list
 
 2012-07-23
 
