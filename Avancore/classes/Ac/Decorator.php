@@ -48,4 +48,15 @@ class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
         return $res;
     }
     
+    /**
+     * @TODO: implement it
+     * - for non-stream decorators with getIsDistributive()===false capture the buffer, then apply
+     * - for non-stream decorators with isDistributive() set callback to decorator func
+     * - for Ac_I_StreamDecorator: call begin(), write(), end()
+     */    
+    
+    static function decorateStreamable(Ac_I_Streamable $streamable, $decorator, $callback = null) {
+    }
+    
+    
 }
