@@ -1,3 +1,11 @@
+2012-08-08
+
++ Created basic Ac_Response and Ac_Content hierarchy
++ Ac_Buffer: a feature to pass objects' and echo() calls to callback
++ Ac_Impl_Cleanup and Ac_I_Cleanup to clean objects' references
++ Ac_Debug: update from Ae_Debug
++ Ac_Content_StructuredText: a foundation for structured responses 
+
 2012-07-30
 
 * Renamed Ac_Param_Value to Ac_Accessor_Path for clarity (Ac_Test_Params > Ac_Test_AccessorPath)

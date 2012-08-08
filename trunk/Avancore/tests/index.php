@@ -4,6 +4,7 @@ require('../tests/testsStartup.php');
 require_once('simpletest/reporter.php');
 require_once(dirname(__FILE__).'/classes/Ac/Test/Base.php');
 require_once(dirname(__FILE__).'/app.config.php');
+define('AC_TESTS_TMP_PATH', dirname(__FILE__).'/var');
 Ac_Test_Base::$config = $config;
 
 ini_set('error_reporting', E_ALL);

@@ -72,21 +72,21 @@ class Ac_Cr_Controller extends Ac_Prototyped {
     }    
     
     /**
-     * @return Ac_Param_Value
+     * @return Ac_Accessor_Path
      */
     protected function getParamsAccessor() {
         if (!isset($this->accessors['params'])) {
-            $this->accessors['params'] = new Ac_Param_Value($this->paramBlock? $this->paramBlock : $this->context->param, null);
+            $this->accessors['params'] = new Ac_Accessor_Path($this->paramBlock? $this->paramBlock : $this->context->param, null);
         }
         return $this->accessors['params'];
     }
     
     /**
-     * @return Ac_Param_Value
+     * @return Ac_Accessor_Path
      */
     protected function getUseParamsAccessor() {
         if (!isset($this->accessors['useParams'])) {
-            $this->accessors['useParams'] = new Ac_Param_Value($this->paramBlock? $this->paramBlock : $this->context->use, null);
+            $this->accessors['useParams'] = new Ac_Accessor_Path($this->paramBlock? $this->paramBlock : $this->context->use, null);
         }
         return $this->accessors['useParams'];
     }

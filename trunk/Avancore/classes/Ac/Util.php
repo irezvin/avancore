@@ -591,9 +591,9 @@ class Ac_Util {
         return $res;
     }
     
-    static function array_unique($arr) {
+    static function array_unique($arr, $strict = false) {
         $res = array();
-        foreach ($arr as $i) if (!in_array($i, $res)) $res[] = $i;
+        foreach ($arr as $i) if (!in_array($i, $res, $strict)) $res[] = $i;
         return $res;
     }
 
