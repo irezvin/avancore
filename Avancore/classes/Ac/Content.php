@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Content implements Ac_I_DeferredString, Ac_I_WithOutput, Ac_I_Prototyped {
+abstract class Ac_Content implements Ac_I_StringObject, Ac_I_WithOutput, Ac_I_Prototyped {
     
     protected $mimeType = false;
 
@@ -13,15 +13,28 @@ abstract class Ac_Content implements Ac_I_DeferredString, Ac_I_WithOutput, Ac_I_
     
     protected $isDeferred = false;
     
-    protected $deferredStringMark = false;
+    /**
+     * @var Ac_I_DeferredContext
+     */
+    protected $deferredContext = null;
     
     static $debugInstances = 0;
+
+    protected $stringObjectMark = false;
+
+    function setStringObjectMark($stringObjectMark) {
+        $this->stringObjectMark = $stringObjectMark;
+    }
+
+    function getStringObjectMark() {
+        return $this->stringObjectMark;
+    }    
     
     function __toString() {
-        if ($this->isDeferred) return Ac_Value_Impl_DeferredString::getMarkForString($this);
+        if ($this->isDeferred) return $this->stringObjectMark;
             else return $this->getEvaluated();
     }
-    
+
     abstract function getEvaluated();
     
     /**
@@ -109,6 +122,7 @@ abstract class Ac_Content implements Ac_I_DeferredString, Ac_I_WithOutput, Ac_I_
      */
     function setIsDeferred($isDeferred) {
         $this->isDeferred = (bool) $isDeferred;
+        if ($this->isDeferred) Ac_StringObject::register ($this);
     }
 
     /**
@@ -170,7 +184,11 @@ abstract class Ac_Content implements Ac_I_DeferredString, Ac_I_WithOutput, Ac_I_
     
     function __clone() {
         if (self::$debugInstances) Ac_Debug::reportConstruct($this);
+        if ($this->isDeferred) Ac_StringObject::onClone($this);
     }
     
-    
+    function __wakekeup() {
+        if ($this->isDeferred) Ac_StringObject::onWakeup ($this);
+    }
+
 }
