@@ -4,7 +4,7 @@
  * @todo Rename to Ac_Content_Structured; add getPlaceholderDefaults() with prototypes of placeholders with given names (classes, options); 
  * check for allowedPlaceholders, isAppendable() and we will get omni-base for all structured content (CMSBlock etc)
  */
-class Ac_Content_StructuredText extends Ac_Content_WithCharset implements Ac_I_WithCleanup, Ac_I_WithClone {
+class Ac_Content_StructuredText extends Ac_Content_WithCharset implements Ac_I_WithCleanup, Ac_I_WithClone, Ac_I_EvaluationContext, Ac_I_StringObjectContainer {
 
     const mergeRecursive = 'recursive';
     const mergeAppend = 'append';
@@ -13,6 +13,8 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements Ac_I_W
     const refsLeaveBoth = 'leaveBoth';
     const refsLeaveOriginal = 'leaveOriginal';
     const refsLeaveMerged = 'leaveMerged';
+    
+    protected $stringObjects = array();
     
     protected $showBuffer = true;
     
@@ -234,6 +236,7 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements Ac_I_W
     }
     
     function getEvaluated() {
+        ;
         if ($this->evLock) {
             trigger_error("Cyclic reference detected in Ac_Content_StructuredText tree", E_USER_WARNING);
             return '';
@@ -241,18 +244,10 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements Ac_I_W
         $this->evLock++;
         if ($this->showBuffer) $res = $this->getBuffer(true);
         else {
-            Ac_Value_Impl_Deferred::evaluateDeferreds($this->buffer);
             $res = "";
         }
         $this->evLock--;
         return $res;
-    }
-    
-    function __toString() {
-        if ($this->isDeferred) return Ac_Value_Impl_DeferredString::getMarkForString($this);
-            else {
-                return $this->getEvaluated();
-            }
     }
     
     function output($callback = null) {
@@ -425,6 +420,21 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements Ac_I_W
         foreach ($res->buffer as $k => $v) {
             if (is_object($v) && $v instanceof Ac_Content_StructuredText) $res->buffer[$k] = $v->createClone();
         }
+        return $res;
+    }
+ 
+    function getEvaluatedObjects() {
+        return $this->placeholders;
+    }
+    
+    function registerStringObjects(array $stringObjects) {
+        Ac_Util::ms($this->stringObjects, $stringObjects);
+    }
+    
+    function getStringBuffers() {
+        $res = array();
+        foreach ($this->buffer as $i => $item)
+            if (is_string($item)) $res[$i] = $item;
         return $res;
     }
     
