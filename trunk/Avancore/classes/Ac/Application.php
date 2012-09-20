@@ -1,7 +1,7 @@
 <?php
 
 if (!class_exists('Ac_Util', false)) require_once(dirname(__FILE__).'/Util.php');
-if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/Autoparams.php');
+if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/Prototyped.php');
 
 abstract class Ac_Application extends Ac_Prototyped {
     

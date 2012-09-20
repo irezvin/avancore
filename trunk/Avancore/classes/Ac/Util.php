@@ -53,7 +53,7 @@ class Ac_Util {
         return $paArray1;
     }
     
-    static function mkAttribs ($attribs = array(), $quote='"', $quoteStyle = ENT_QUOTES, $charset = false, $doubleEncode = true) {
+    static function mkAttribs ($attribs = array(), $quote='"', $quoteStyle = ENT_QUOTES, $charset = false, $doubleEncode = true, $addSpace = true) {
         if (!$attribs) return "";
         if (isset($attribs['style']) && is_array($attribs['style'])) {
             $style = array();
@@ -69,12 +69,13 @@ class Ac_Util {
             }
             $res[] = $k."=".$quote.Ac_Util::htmlspecialchars($v, $quoteStyle, $charset, $doubleEncode).$quote;
         }
+        if ($res && $addSpace) array_unshift ($res, '');
         return implode(" ", $res);
     }
     
     static function mkElement($tagName, $tagBody = false, $attribs = array(), $quote='"', $quoteStyle = ENT_QUOTES, $charset = false, $doubleEncode = true) {
         $res = '<'.$tagName;
-        if ($attribs) $res .= ' '.Ac_Util::mkAttribs($attribs, $quote, $quoteStyle, $charset, $doubleEncode = true);
+        if ($attribs) $res .= Ac_Util::mkAttribs($attribs, $quote, $quoteStyle, $charset, $doubleEncode = true);
         if ($tagBody !== false) $res .= '>'.$tagBody.'</'.$tagName.'>';
             else $res .= ' />';
         return $res;
@@ -118,17 +119,26 @@ class Ac_Util {
         return $jsRes;
     }
 
-    static function implode_r($glue, $array, $array_name = NULL) {
+    static function implodeRecursive($glue, $array, $array_name = NULL) {
         if (is_string($array)) return $array;
+        if (is_array($glue)) {
+            $impl = array_shift($glue);
+            if (!$glue) $glue = $impl;
+        } else $impl = $glue;
         $return = array();
-        while(list($key,$value) = @each($array)) {
-            if(is_array($value)) $return[] = Ac_Util::implode_r($glue, $value, (string) $key);
-            else { 
-                if($array_name != NULL) $return[] = $value;
-                else $return[] = $value;
-            }
+        while(list($key,$value) = each($array)) {
+            if(is_array($value)) $return[] = self::implodeRecursive($glue, $value, (string) $key);
+            else 
+                $return[] = $value;
         }
-        return(is_array($return)? implode($glue, $return) : $return);
+        return(is_array($return)? implode($impl, $return) : $return);
+    }
+
+    /**
+     * @deprecated
+     */
+    static function implode_r($glue, $array, $array_name = NULL) {
+        return self::implodeRecursive($glue, $array, $array_name);
     }
     
     static function getCsvLine($line,$delimiter=",",$enclosure="\"") {
