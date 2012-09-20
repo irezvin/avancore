@@ -446,7 +446,7 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     function listRegistry($keyOrPath = null, $_ = null) {
         
         $path = func_get_args();
-        $path = self::flattenOnce($path);
+        $path = Ac_Registry::flattenOnce($path);
         
         if (!count($path)) {
             $res = $this->listPlaceholders();
@@ -463,7 +463,7 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     function hasRegistry($keyOrPath, $_ = null) {
         
         $path = func_get_args();
-        $path = self::flattenOnce($path);
+        $path = Ac_Registry::flattenOnce($path);
         
         return (bool) $this->getPlaceholder($path);
         
@@ -472,7 +472,7 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     function deleteRegistry($keyOrPath, $_ = null) {
         
         $path = func_get_args();
-        $path = self::flattenOnce($path);
+        $path = Ac_Registry::flattenOnce($path);
         
         if (!count($path)) $this->clear();
         else {
@@ -504,7 +504,7 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     function getRegistry($keyOrPath = null, $_ = null) {
         
         $path = func_get_args();
-        $path = self::flattenOnce($path);
+        $path = Ac_Registry::flattenOnce($path);
         
         if (!count($path)) $res = $this->getBuffer(true);
         else {
@@ -520,7 +520,8 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     function setRegistry($value, $keyOrPath = null, $_ = null) {
         
         $path = func_get_args();
-        $path = self::flattenOnce($path);
+        $path = Ac_Registry::flattenOnce($path);
+        array_shift($path);
         
         if (!count($path)) {
             $this->clear();
@@ -538,7 +539,8 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     function addRegistry($value, $keyOrPath = null, $_ = null) {
         
         $path = func_get_args();
-        $path = self::flattenOnce($path);
+        $path = Ac_Registry::flattenOnce($path);
+        array_shift($path);
         
         if (!count($path)) {
             $this->append($value);
@@ -546,7 +548,7 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
             $this->append($value, $path);
         }
 
-        return $res;
+        return true;
         
     }
     
@@ -557,7 +559,8 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     function mergeRegistry($value, $preserveExistingValues = false, $keyOrPath = null, $_ = null) {
         
         $path = func_get_args();
-        $path = self::flattenOnce($path);
+        $path = Ac_Registry::flattenOnce($path);
+        array_shift($path);
         
         if (count($path)) $this->getPlaceholder($path, true)->mergeRegistry($value);
         else {
@@ -600,7 +603,10 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
         // (if they will get somehow to the Output, it should do something with them)
         //
     
-        
+        $buf = $this->getBuffer(true);
+        $res = array();
+        Ac_Util::setArrayByPath($res, $path, $buf);
+        return $res;
         
     }
     
