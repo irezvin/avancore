@@ -4,7 +4,9 @@
  * @todo Rename to Ac_Content_Structured; add getPlaceholderDefaults() with prototypes of placeholders with given names (classes, options); 
  * check for allowedPlaceholders, isAppendable() and we will get omni-base for all structured content (CMSBlock etc)
  */
-class Ac_Content_StructuredText extends Ac_Content_WithCharset implements Ac_I_WithCleanup, Ac_I_WithClone, Ac_I_EvaluationContext, Ac_I_StringObjectContainer {
+class Ac_Content_StructuredText extends Ac_Content_WithCharset implements 
+    Ac_I_WithCleanup, Ac_I_WithClone, Ac_I_EvaluationContext, Ac_I_StringObjectContainer,
+    Ac_I_Consolidated, Ac_I_Mergeable, Ac_I_Registry {
 
     const mergeRecursive = 'recursive';
     const mergeAppend = 'append';
@@ -329,6 +331,9 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements Ac_I_W
     
     function clear() {
         Ac_Impl_Cleanup::clean($this);
+        $this->buffer = array();
+        $this->stringObjects = array();
+        $this->placeholders = array();
     }
     
     protected function mergeToSameClass(Ac_Content_StructuredText $content) {
@@ -436,6 +441,167 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements Ac_I_W
         foreach ($this->buffer as $i => $item)
             if (is_string($item)) $res[$i] = $item;
         return $res;
+    }
+    
+    function listRegistry($keyOrPath = null, $_ = null) {
+        
+        $path = func_get_args();
+        $path = self::flattenOnce($path);
+        
+        if (!count($path)) {
+            $res = $this->listPlaceholders();
+        } else {
+            $ph = $this->getPlaceholder($path);
+            if ($ph) $res = $ph->listPlaceholders();
+                else $res = null;
+        }
+        
+        return $res;
+        
+    }
+    
+    function hasRegistry($keyOrPath, $_ = null) {
+        
+        $path = func_get_args();
+        $path = self::flattenOnce($path);
+        
+        return (bool) $this->getPlaceholder($path);
+        
+    }
+    
+    function deleteRegistry($keyOrPath, $_ = null) {
+        
+        $path = func_get_args();
+        $path = self::flattenOnce($path);
+        
+        if (!count($path)) $this->clear();
+        else {
+            $last = array_pop($path);
+
+            if (count($path)) {
+                $ph = $this->getPlaceholder($path);
+            } else {
+                $ph = $this;
+            }
+
+            if ($ph && ($h = $ph->getPlaceholder($last))) {
+                $ph->replacePlaceholder($h);
+                $res = true;
+            } else {
+                $res = false;
+            }
+        }
+        
+        return $res;
+        
+    }
+    
+    //
+    // Problem: currently behaviour of getRegistry and setRegistry is rudimentary and asymmetrical.
+    // TODO: add more sanity
+    //    
+    
+    function getRegistry($keyOrPath = null, $_ = null) {
+        
+        $path = func_get_args();
+        $path = self::flattenOnce($path);
+        
+        if (!count($path)) $res = $this->getBuffer(true);
+        else {
+
+            $ph = $this->getPlaceholder($path);
+            if ($ph) $res = $ph->getBuffer(true);
+                else $res = null;
+        }
+        return $res;
+        
+    }
+    
+    function setRegistry($value, $keyOrPath = null, $_ = null) {
+        
+        $path = func_get_args();
+        $path = self::flattenOnce($path);
+        
+        if (!count($path)) {
+            $this->clear();
+            $this->setText($value);
+            $res = true;
+        } else {
+            $this->setText($value, $path);
+            $res = true;
+        }
+
+        return $res;
+        
+    }
+    
+    function addRegistry($value, $keyOrPath = null, $_ = null) {
+        
+        $path = func_get_args();
+        $path = self::flattenOnce($path);
+        
+        if (!count($path)) {
+            $this->append($value);
+        } else {
+            $this->append($value, $path);
+        }
+
+        return $res;
+        
+    }
+    
+    function exportRegistry($recursive = false, $keyOrPath = null, $_ = null) {
+        // TODO: think out and implement
+    }
+    
+    function mergeRegistry($value, $preserveExistingValues = false, $keyOrPath = null, $_ = null) {
+        
+        $path = func_get_args();
+        $path = self::flattenOnce($path);
+        
+        if (count($path)) $this->getPlaceholder($path, true)->mergeRegistry($value);
+        else {
+
+            if (is_object($value) && $value instanceof Ac_Content_StructuredText) {
+                $this->mergeToSameClass($value);
+            } elseif (is_array($value)) {
+                foreach ($value as $k => $v) {
+                    if (is_int($k)) $this->append ($v);
+                    else {
+                        $this->getPlaceholder($k, true)->mergeRegistry($v);
+                    }
+                }
+            } else {
+                $this->setText($value);
+            }
+        }
+    }
+    
+    function isMergeableWith($value) {
+        return true;
+    }
+    
+    function mergeWith($value, $preserveExistingValues = false) {
+        return $this->mergeRegistry($value, $preserveExistingValues);
+    }
+    
+    function getConsolidated(array $path = array(), $forCaching = false, $_ = null) {
+        // 
+        // Idea of StructuredText consolidation:
+        //
+        // result is an array, a mix of numeric and associative keys
+        // 
+        // numeric keys represent the buffer content:
+        //      a mix of concatenated consequential strings + non-consolidated objects
+        // 
+        // associative keys represent the placeholders that DID NOT had references in the buffer
+        // or sub-buffers. These keys should be 'passed' for future usage
+        // 
+        // (if they will get somehow to the Output, it should do something with them)
+        //
+    
+        
+        
     }
     
 }
