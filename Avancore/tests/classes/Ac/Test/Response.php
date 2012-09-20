@@ -333,7 +333,18 @@ Lets dump some debug data here
         
     }
     
-    
+    function testStructuredText() {
+        $resp = new Ac_Response();
+        
+        $resp->setRegistry(new Ac_Content_StructuredText, 'content');
+        $resp->addRegistry('<p>Header</p>', 'content');
+        
+        $w = new Ac_Response_Writer_HtmlPage();
+        $e = new Ac_Response_Environment_Dummy;
+        $w->setEnvironment($e);
+        $w->writeResponse($resp);
+        echo '<pre>'.htmlspecialchars($e->responseText).'</pre>';
+    }  
     
     
 }
