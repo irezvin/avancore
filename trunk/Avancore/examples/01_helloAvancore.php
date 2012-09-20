@@ -1,6 +1,6 @@
 <?php
 
-require(dirname(__FILE__).'/.htbootstrap.php');
+require(dirname(__FILE__).'/bootstrap.php');
 
 $resp = new Ac_Response();
 $resp->mergeRegistry(array(

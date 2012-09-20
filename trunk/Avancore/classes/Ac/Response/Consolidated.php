@@ -67,7 +67,7 @@ class Ac_Response_Consolidated extends Ac_Response implements Ac_I_Prototyped {
                 'toArray' => false,
             )),
             'content' => new Ac_Registry_Consolidated(array(
-                'default' => '',
+                'registry' => '',
             )),
             'docType' => new Ac_Registry_Consolidated(array(
                 'default' => $this->defaultDocType, 

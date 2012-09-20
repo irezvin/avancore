@@ -38,7 +38,7 @@ class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
         return !count($path);
     }
     
-    protected static function flattenOnce($path) {
+    static function flattenOnce($path) {
         $res = array();
         foreach ($path as $v) {
             if (is_array($v)) $res = array_merge($res, $v);
@@ -255,7 +255,7 @@ class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
             $res = $value1;
             
         } elseif (is_array($value1) && is_object($value2) && $value2 instanceof Ac_I_Registry) {
-            
+
             $res = self::getMerged($value1, $value2->exportRegistry(), $preserveExistingValues);
             
         } elseif (is_array($value1) && is_array($value2)) {
