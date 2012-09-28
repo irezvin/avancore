@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Response_Consolidated extends Ac_Response implements Ac_I_Prototyped {
+class Ac_Response_Consolidated extends Ac_Response {
     
     protected $titleImplodeChar = ' - ';
     
@@ -43,7 +43,7 @@ class Ac_Response_Consolidated extends Ac_Response implements Ac_I_Prototyped {
     }    
     
     function __construct(array $options = array()) {
-        Ac_Accessor::setObjectProperty($this, $options);
+        parent::__construct();
         $rta = new Ac_Registry_Consolidated;
         if (strlen($this->xmlns)) $rta->setRegistry($this->xmlns, 'xmlns');
         $this->setRegistry(array(
@@ -82,6 +82,7 @@ class Ac_Response_Consolidated extends Ac_Response implements Ac_I_Prototyped {
             'initScripts' => new Ac_Registry_Consolidated(),
             'debug' => new Ac_Registry_Consolidated(),
         ));
+        $this->registry['headers']->debug = true;
     }
     
     function hasPublicVars() {

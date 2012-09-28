@@ -66,6 +66,20 @@ class Ac_StringObject {
         return $res;
     }
     
+    static function sliceStringWithObjects($string) {
+        if ($objects = self::getObjects($string)) {
+            $items = preg_split('/(##\[[0-9a-z.]+\]##)/', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
+            foreach ($items as $key => & $item) {
+                if (!strncmp($item, '##', 2) && isset($objects[$item])) 
+                    $items[$key] = $objects[$item];
+            }
+            $res = $items;
+        } else {
+            $res = array($string);
+        }
+        return $res;
+    }
+    
     static function replaceObjects($string, $method, $checkMethod = false, $_ = null) {
         $objects = self::getObjects($string);
         $vals = array();
