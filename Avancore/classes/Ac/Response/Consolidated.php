@@ -66,9 +66,6 @@ class Ac_Response_Consolidated extends Ac_Response {
                 'reverse' => $this->titleReverse,
                 'toArray' => false,
             )),
-            'content' => new Ac_Registry_Consolidated(array(
-                'registry' => '',
-            )),
             'docType' => new Ac_Registry_Consolidated(array(
                 'default' => $this->defaultDocType, 
                 'singleValue' => Ac_Registry_Consolidated::svLast, 
@@ -81,6 +78,11 @@ class Ac_Response_Consolidated extends Ac_Response {
             'headScripts' => new Ac_Registry_Consolidated(),
             'initScripts' => new Ac_Registry_Consolidated(),
             'debug' => new Ac_Registry_Consolidated(),
+            'content' => new Ac_Registry_Consolidated(array(
+                'registry' => '',
+                //'toArray' => false,
+            )),
+             
         ));
         $this->registry['headers']->debug = true;
     }

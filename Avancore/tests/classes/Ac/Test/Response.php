@@ -71,7 +71,38 @@ class Ac_Test_Response extends Ac_Test_Base {
             array('content' => array('main.content.another' => array(2 => 'zzz'))),
         ));
         
-        $this->assertIdentical($main->getConsolidated(), array(
+        
+        
+        $slices = Ac_Response::sliceWithConsolidatedObjects($r, false, array(), array(), false);
+        
+        /*if (!$this->assertIdentical($slices, array(
+            array(
+                'foo' => array(
+                    'main.foo.0',
+                    'main.foo.1',
+                ),
+                'content' => array(
+                    'main.content.first',
+                ),
+                'bar' => array(
+                    'main.bar.0',
+                    'main.bar.1' => array('main.bar.1.1',),
+                ),
+            ),
+            array('content' => array(1 => $resp1)),
+            array('content' => array(2 => 'main.content.middle',),),
+            array('content' => array(3 => $resp2)),
+            array(
+                'content' => array(
+                    'main.content.another' => array('xxx'),
+                    4 => 'main.content.last',
+                ),
+            ),
+            array('content' => array('main.content.another' => array(1 => $resp3))),
+            array('content' => array('main.content.another' => array(2 => 'zzz'))),
+        ))) var_dump($slices);*/
+        
+        if (!$this->assertIdentical($cons = $main->getConsolidated(), array(
             'foo' => array (
                 'main.foo.0',
                 'main.foo.1',
@@ -95,7 +126,7 @@ class Ac_Test_Response extends Ac_Test_Base {
                 'resp2.bar',
                 'resp3.bar',
             ),
-        ));
+        ))) var_dump($cons);
         
     }
     
@@ -350,42 +381,6 @@ Lets dump some debug data here
 ');
    }
 
-
-    function testStructuredText() {
-        $resp = new Ac_Response();
-        
-        $resp->setRegistry(new Ac_Content_StructuredText, 'content');
-        $resp->addRegistry('<p>Header</p>', 'content');
-        $resp->addRegistry('', 'content', 'widgetContent');
-        $resp->addRegistry('<p>Footer</p>', 'content');
-        
-        $widgetResponse = new Ac_Response();
-        $widgetResponse->setRegistry(array(
-            'content' => array('widgetContent' => array('<div class="widget">A widget</div>')),
-        ));
-        
-        $resp->mergeRegistry($widgetResponse);
-        
-        $x = $resp->exportRegistry();
-        
-        $w = new Ac_Response_Writer_HtmlPage();
-        $e = new Ac_Response_Environment_Dummy;
-        $w->setEnvironment($e);
-        $w->writeResponse($resp);
-        
-        $text = $e->responseText;
-            
-        if (!$this->assertEqual(trim($text), trim('
-<!DOCTYPE html>
-<html>
-    <head>
-    </head>
-    <body><p>Header</p><div class="widget">A widget</div><p>Footer</p></body>
-</html>
-')))  echo '<pre>'.htmlspecialchars($text).'</pre>';
-        
-    }  
-    
     function testCleanOnMerge() {
         $resp = new Ac_Response;
         $sub = new Ac_Registry_Consolidated(array('singleValue' => Ac_Registry_Consolidated::svLast));
@@ -400,7 +395,7 @@ Lets dump some debug data here
         $this->assertIdentical($c = $resp->getConsolidated(), array('sub' => array('baz')));
     }
     
-    function _testStructuredTextMerge() {
+    function testStructuredTextMerge() { // FAILS!!!
         
         // TODO: remove Ac_Response_Consolidated content already 
         // has Ac_Registry_Consolidated in 'content' 
@@ -416,78 +411,19 @@ Lets dump some debug data here
         $rc = new Ac_Response_Consolidated();
         $rc->mergeRegistry($reg);
         $ca = $rc->getConsolidated();
-        $this->assertEqual($ca['content'], '<body></body>');
+        $this->assertEqual($ca['content'], array('<body></body>'));
     }
     
-    function _testStructuredTextConsolidated() {
-        $st = new Ac_Content_StructuredText;
+    function testDontChangeOnConsolidate() {
         
-        $st->setRegistry(array(
-            '<div class="main">', 
-            'body' => array(), 
-            '</div>',
-        ));
-        
-        $widget1 = new Ac_Response_Html();
-        $widget1->setAssetLibs(array('{FOO}/test.js'));
-        $widget1->setContent(array('<div class="widget">Widget 1</div>'));
-        
-        $st->addRegistry($widget1, 'body');
-
-        $st->addRegistry('<hr />', 'body');
-        
-        $widget2 = new Ac_Response_Html();
-        $widget2->setAssetLibs(array('{FOO}/test.js', '{FOO}/test2.js', '{FOO}/test.css'));
-        $widget2->setContent(array('<div class="widget">Widget 2</div>'));
-        
-        $widget2->setCacheConsolidated(false);
-        
-        $st->addRegistry($widget2, 'body');
-        
-        $cons = $st->getConsolidated(array('content'));
-        
-        if (!$this->assertIdentical(implode('', $cons['content']), 
-            $sample = 
-            '<div class="main">'.
-            '<div class="widget">Widget 1</div>'.
-            '<hr />'.
-            '<div class="widget">Widget 2</div>'.
-            '</div>'
-        )) var_dump($cons['content']);
-        
-        $hp = new Ac_Response_Writer_HtmlPage;
-        $hp->setEnvironment($e = new Ac_Response_Environment_Dummy);
-        
-        $resp = new Ac_Response();
-        $resp->setRegistry($st, 'content');
-        
-        $hp->writeResponse($resp);
-        
-/**
- * Two problems here
- * 
- * 1. We can forget that setContent should NOT be used with string parameter
- * in most cases, it shoud have string parameter (or addContent should be
- * preferred instead)
- * 
- * 2. Ac_Registry_Consolidated does not unroll consolidated sub-responses 
- * such as one that Ac_Content_StructuredText is
- *  
- */        
-        
-        if (!$this->assertEqual($e->responseText, 
-            '<!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="{FOO}/test.css" />
-        <script type="text/javascript" src="{FOO}/test.js"> </script>
-        <script type="text/javascript" src="{FOO}/test2.js"> </script>
-    </head>
-    <body>'.$sample.'</body>
-</html>'
-        )) var_dump($e->responseText);
+        $resp = $this->getMyPerfectResponse();
+        $cons = new Ac_Response_Consolidated();
+        $cons->mergeRegistry($resp);
+        $before = $cons->exportRegistry(true);
+        $cons->getConsolidated();
+        $after = $cons->exportRegistry(true);
+        $this->assertIdentical($before, $after);
         
     }
-
     
 }

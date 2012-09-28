@@ -41,4 +41,6 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
 	
 }
 
+//if (function_exists('xdebug_time_index')) var_dump(xdebug_time_index());
+
 ?>
