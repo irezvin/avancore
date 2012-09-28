@@ -12,7 +12,6 @@ class Ac_Test_StringObject extends Ac_Test_Base {
         
         $this->assertNotEqual($item3->getStringObjectMark(), $item2->getStringObjectMark(), "stringObjectMark should change after cloning");
         
-        
         $c->buf = "Item 1: $item1, item 2: $item2, item 3: $item3";
         
         if (!$this->assertEqual($c->buf, 
@@ -34,7 +33,18 @@ class Ac_Test_StringObject extends Ac_Test_Base {
         
     }
     
+    function testSliceBuffer() {
+        $o1 = new TestStringObject();
+        $o2 = new TestStringObject();
+        $s = 'abc'.$o1.'def'.$o2.'ghi';
+        $sliced = Ac_StringObject::sliceStringWithObjects($s);
+        $this->assertIdentical($sliced, array(
+            'abc', $o1, 'def', $o2, 'ghi'
+        ));
+    }
+    
     function testEvaluatedStringObject() {
+        // TODO
     }
     
 }

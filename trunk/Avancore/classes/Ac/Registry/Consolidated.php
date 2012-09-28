@@ -107,7 +107,40 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
     }    
     
     function getConsolidated(array $path = array(), $forCaching = false, $_ = null) {
-        $res = $this->exportRegistry();
+        
+        
+        $reg = $this->exportRegistry();
+        
+        if (is_array($reg)) {
+            $cons = Ac_Response_Consolidated::sliceWithConsolidatedObjects($reg, $forCaching, array(), $path);
+            $full = array();
+            foreach ($cons as $con) {
+                $full = Ac_Registry::getMerged($full, $con, false);
+            }
+            $ptr = array('ptr' => & $full);
+            $newPath = $path;
+            self::arrayDive($full, $newPath, $ptr, true);
+            $res = & $ptr['ptr'];
+        } elseif (is_object($reg) && $reg instanceof Ac_I_Consolidated) {
+            
+            $args = func_get_args();
+            $full = call_user_func_array(array($reg, 'getConsolidated'), $args);
+            $ptr = array('ptr' => & $full);
+            $newPath = $path;
+            self::arrayDive($full, $newPath, $ptr, true);
+            $res = & $ptr['ptr'];
+            
+        } else {
+            $full = array();
+            $ptr = array('ptr' => & $full);
+            $newPath = $path;
+            self::arrayDive($full, $newPath, $ptr, true);
+            $res = & $ptr['ptr'];
+            $res = $reg;
+        }
+        
+        //$res = $this->exportRegistry();
+        
         if ($this->flatten) $res = Ac_Util::flattenArray ($res);
         if ($this->keysort) $res = ksort($res);
         if ($this->unique) $res = array_unique($res);
@@ -131,13 +164,13 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
             if (is_null($res)) $res = $this->default;
         }
         
-        if (is_array($res) || !$this->toArray) {
+        /*if (is_array($res) || !$this->toArray) {
             $tmp = array();
             Ac_Util::setArrayByPath($tmp, $path, $res);
             $res = $tmp;
-        }
+        }*/
         
-        return $res;
+        return $full;
     }
     
 }
