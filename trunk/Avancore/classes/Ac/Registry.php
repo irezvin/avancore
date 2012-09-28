@@ -243,7 +243,7 @@ class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
         $found = $this->arrayDive($this->registry, $path, $ptr);
         
         if (!$found) {
-            if (is_object($ptr['ptr']) && $ptr['ptr'] instanceof Ac_I_Registry) {
+            if (is_object($ptr['ptr']) && $ptr['ptr'] instanceof Ac_I_Registry && $this->checkRecurse($ptr['ptr'], $recursive)) {
                 $res = $ptr['ptr']->exportRegistry($recursive, $path);
             }
         } else {
@@ -251,10 +251,10 @@ class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
             $res = $ptr['ptr'];
             
             if ($recursive) {
-                if (is_object($res) && $res instanceof Ac_I_Registry && $recursive) {
-                    $res = $res->exportRegistry(true);
+                if (is_object($res) && $res instanceof Ac_I_Registry && $this->checkRecurse($res, $recursive)) {
+                    $res = $res->exportRegistry($recursive);
                 } elseif (is_array($res)) {
-                    $res = $this->exportRegistryRecursive($res);
+                    $res = $this->exportRegistryRecursive($res, $recursive);
                 }
             }
             
@@ -264,17 +264,30 @@ class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
         
     }
     
-    protected function exportRegistryRecursive(array $reg) {
+    protected function exportRegistryRecursive(array $reg, $recurseOptions) {
         $res = array();
         foreach ($reg as $k => $v) {
-            if (is_array($v)) $v = $this->exportRegistryRecursive ($v);
-            elseif (is_object($v) && $v instanceof Ac_I_Registry)
-                $v = $v->exportRegistry(true);
+            if (is_array($v)) $v = $this->exportRegistryRecursive ($v, $recurseOptions);
+            elseif (is_object($v) && $v instanceof Ac_I_Registry && $this->checkRecurse($v, $recurseOptions))
+                $v = $v->exportRegistry($recurseOptions);
             $res[$k] = $v;
         }
         return $res;
     }
     
+    protected function checkRecurse($item, $recurseOptions) {
+        $res = true;
+        if (is_array($recurseOptions)){
+            if (isset($recurseOptions[0]) && strlen($recurseOptions[0])) {
+                $res = $item instanceof $recurseOptions[0];
+            }
+            if ($res && isset($recurseOptions[1]) && strlen($recurseOptions[1])) {
+                $res = !($item instanceof $recurseOptions[1]);
+            }
+        }
+        return $res;
+    }
+
     function mergeRegistry($value, $preserveExistingValues = false, $keyOrPath = null, $_ = null) {
         
         $path = func_get_args();

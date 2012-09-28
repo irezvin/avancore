@@ -109,7 +109,10 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
     function getConsolidated(array $path = array(), $forCaching = false, $_ = null) {
         
         
-        $reg = $this->exportRegistry();
+        $reg = $this->exportRegistry(array(1 => 'Ac_I_Consolidated'));
+        while (is_object($reg) && !($reg instanceof Ac_I_Consolidated) && ($reg instanceof Ac_Registry)) {
+            $reg = $reg->exportRegistry();
+        }
         
         if (is_array($reg)) {
             $cons = Ac_Response_Consolidated::sliceWithConsolidatedObjects($reg, $forCaching, array(), $path);
@@ -125,7 +128,9 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
             
             $args = func_get_args();
             $full = call_user_func_array(array($reg, 'getConsolidated'), $args);
+            
             $ptr = array('ptr' => & $full);
+            
             $newPath = $path;
             self::arrayDive($full, $newPath, $ptr, true);
             $res = & $ptr['ptr'];
@@ -143,7 +148,9 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
         
         if ($this->flatten) $res = Ac_Util::flattenArray ($res);
         if ($this->keysort) $res = ksort($res);
-        if ($this->unique) $res = array_unique($res);
+        if ($this->unique) {
+            $res = array_unique($res);
+        }
         if (is_array($res) && $this->reverse) $res = array_reverse($res);
         if ($this->singleValue !== self::svNone) {
             if (!count($res)) $res = null;
@@ -168,6 +175,11 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
             $tmp = array();
             Ac_Util::setArrayByPath($tmp, $path, $res);
             $res = $tmp;
+        }*/
+        
+        /*if ($path === array('assetLibs')) {
+            var_dump('***', $full, '***');
+            var_dump(Ac_Debug_Log::getInstance()->getTrace());
         }*/
         
         return $full;

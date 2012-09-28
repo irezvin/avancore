@@ -678,7 +678,6 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     }
 
     function getConsolidated(array $path = array(), $forCaching = false, $_ = null) {
-
         
         // 
         // Idea of StructuredText consolidation:
@@ -711,9 +710,22 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
         }
         
         if (!$hasObjects) {
-            $res = implode('', $buf);
+            $r = implode('', $buf);
+            if ($path) {
+                $res = array();
+                Ac_Util::setArrayByPath($res, $path, $r);
+            } else {
+                $res = $r;
+            }
+            
         } elseif (!$hasConsolidated) {
-            $res = $buf;
+            $r = $buf;
+            if ($path) {
+                $res = array();
+                Ac_Util::setArrayByPath($res, $path, $r);
+            } else {
+                $res = $r;
+            }
         } else {
             $r = array();
             $res = array();
@@ -722,6 +734,7 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
                 $res = Ac_Registry::getMerged($res, $chunk, false);
             }
         }
+        
         return $res;
     }
     
