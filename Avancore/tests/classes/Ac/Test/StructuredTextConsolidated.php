@@ -1,7 +1,45 @@
 <?php
 
 class Ac_Test_StructuredTextConsolidated extends Ac_Test_Base {
-   
+
+
+    function testStructuredText() { 
+        $resp = new Ac_Response();
+        
+        $resp->setRegistry($st = new Ac_Content_StructuredText, 'content');
+        $resp->addRegistry('<p>Header</p>', 'content');
+        $resp->addRegistry('', 'content', 'widgetContent');
+        $resp->addRegistry('<p>Footer</p>', 'content');
+        
+        $widgetResponse = new Ac_Response();
+        $widgetResponse->setRegistry(array(
+            'content' => array('widgetContent' => array('<div class="widget">A widget</div>')),
+        ));
+        
+        $resp->mergeRegistry($widgetResponse);
+        
+        $x = $resp->exportRegistry();
+        
+        $w = new Ac_Response_Writer_HtmlPage();
+        $e = new Ac_Response_Environment_Dummy;
+        $w->setEnvironment($e);
+
+        $w->writeResponse($resp);
+        
+        $text = $e->responseText;
+            
+        if (!$this->assertEqual(trim($text), trim('
+<!DOCTYPE html>
+<html>
+    <head>
+    </head>
+    <body><p>Header</p><div class="widget">A widget</div><p>Footer</p></body>
+</html>
+')))  echo '<pre>'.htmlspecialchars($text).'</pre>';
+        
+    }  
+    
+    
     function testStructuredTextConsolidated() {
         $st = new Ac_Content_StructuredText;
         
@@ -26,23 +64,33 @@ class Ac_Test_StructuredTextConsolidated extends Ac_Test_Base {
         $widget2->setCacheConsolidated(false);
         
         $st->addRegistry($widget2, 'body');
-        
-        $cons = $st->getConsolidated(array('content'));
 
-        if (!$this->assertIdentical(implode('', $cons['content']), 
-            $sample = 
+        $sample = 
             '<div class="main">'.
             '<div class="widget">Widget 1</div>'.
             '<hr />'.
             '<div class="widget">Widget 2</div>'.
-            '</div>'
-        )) var_dump($cons['content']);
+            '</div>';
         
-        
-        
+        $fullSample = '<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" type="text/css" href="{FOO}/test.css" />
+        <script type="text/javascript" src="{FOO}/test.js"> </script>
+        <script type="text/javascript" src="{FOO}/test2.js"> </script> 
+    </head>
+    <body>'.$sample.'</body>
+</html>';
         
         $hp = new Ac_Response_Writer_HtmlPage;
         $hp->setEnvironment($e = new Ac_Response_Environment_Dummy);
+        
+        
+        $contentCons = $st->getConsolidated(array('content'));
+        
+        if (!$this->assertIdentical(implode('', $contentCons['content']), 
+            $sample
+        )) var_dump($contentCons['content']);
         
         $resp = new Ac_Response();
         
@@ -54,7 +102,7 @@ class Ac_Test_StructuredTextConsolidated extends Ac_Test_Base {
         $cons->mergeRegistry($resp->getConsolidated());
 
         $hp->writeResponse($resp);
-        
+      
 /**
  * Two problems here
  * 
@@ -68,32 +116,40 @@ class Ac_Test_StructuredTextConsolidated extends Ac_Test_Base {
  */        
         
         if (!$this->assertEqual(str_replace("\n", "", $e->responseText), 
-            $fullSample = str_replace("\n", "", '<!DOCTYPE html>
-<html>
-    <head>
-        <link rel="stylesheet" type="text/css" href="{FOO}/test.css" />
-        <script type="text/javascript" src="{FOO}/test.js"> </script>
-        <script type="text/javascript" src="{FOO}/test2.js"> </script> 
-    </head>
-    <body>'.$sample.'</body>
-</html>')
+            str_replace("\n", "", $fullSample)
         )) var_dump($e->responseText);
         
 
-        $resp = new Ac_Response();
+        $resp2 = new Ac_Response();
         
         //$resp->mergeRegistry($stc = $st->getConsolidated(array('content')));
         
-        // TODO: The line below should give the same effect as commented code above... but it DOES NOT        
-        $resp->setRegistry($st, 'content');
+        $resp2->setRegistry($st, 'content');
         
-        $cons = new Ac_Response_Consolidated();
-        $cons->mergeRegistry($resp->getConsolidated());
+        $cons2 = new Ac_Response_Consolidated();
+        $cons2->mergeRegistry($resp2);
+        
+        $before = $cons2->exportRegistry(true);
+        
+        //$cons->deb = 1;
+        
+        $cc = $cons2->getConsolidated();
+        
+        $after = $cons2->exportRegistry(true);
+        
+        if (!$this->assertEqual(count($cc['assetLibs']), 3)) var_dump($cc['assetLibs']);
 
         $hp->writeResponse($resp);
         
-        if (!$this->assertEqual(str_replace("\n", "", $e->responseText), $fullSample)) var_dump($e->responseText);        
+        if (!$this->assertEqual(str_replace("\n", "", $e->responseText), str_replace("\n", "", $fullSample))) var_dump($e->responseText, $fullSample);        
         
+        if (!$this->assertIdentical($before, $after, "getConsolidated() MUST NOT have side effects")) {
+            echo "<table><tr><td valign='top'>";
+            var_dump($before);
+            echo "</td><td valign='top'>";
+            var_dump($after);
+            echo "</td></tr></table>";
+        }
         
     }
     

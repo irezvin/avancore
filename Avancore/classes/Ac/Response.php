@@ -106,7 +106,7 @@ class Ac_Response extends Ac_Registry
      * 
      * 
      */
-    static function sliceWithConsolidatedObjects(array & $src, $forCaching = false, array $extraArgs = array(), array $targetPath = array()) {
+    static function sliceWithConsolidatedObjects(array & $src, $forCaching = false, array $extraArgs = array(), array $targetPath = array(), $consolidate = true) {
         $chunks = array(array());
         $dest = & $chunks[0];
         if ($targetPath) {
@@ -130,10 +130,34 @@ class Ac_Response extends Ac_Registry
                 $dest = & $dest[$key];
                 reset($curr);
             } elseif (is_object($value) && $value instanceof Ac_I_Consolidated) {
-                $fullPath = array_merge($path, array($key));
-                $gcArgs = array_merge(array($fullPath, $forCaching), $extraArgs);
-                $consolidated = call_user_func_array(array($value, 'getConsolidated'), $gcArgs);
-                if (is_array($consolidated)) {
+                
+                if ($consolidate) {
+                    
+                    $fullPath = array_merge($path, array($key));
+                    $gcArgs = array_merge(array($fullPath, $forCaching), $extraArgs);
+                
+                    $consolidated = call_user_func_array(array($value, 'getConsolidated'), $gcArgs);
+                    
+                    $put = is_array($consolidated);
+                    
+                } else {
+                 
+                    $consolidated = array();
+                    
+                    $fullPath = array_merge($path, array($key));
+                    
+                    $ptr = array('ptr' => & $consolidated);
+                    
+                    self::arrayDive($consolidated, $fullPath, $ptr, true);
+                    $ptr['ptr'] = $value;
+                    
+                    $consolidated['__fullPath'] = array_merge($path, array($key));
+                    $put = true;
+                    
+                }
+                
+                
+                if ($put) {
                     $chunks[] = $consolidated;
                     $chunks[$c = count($chunks)] = array();
                     $currChunk = & $chunks[$c];
@@ -145,32 +169,32 @@ class Ac_Response extends Ac_Registry
                         $dest = & $ptr['ptr'];
                     }
                     foreach ($path as $i => $seg) {
-                        
-                        //
-                        // A BIG question: shall we put next line here or not?
-                        // 
-                        // -- behaviour must not be changed since all tests
-                        // and referring code will be broken ---
-                        // 
-                        // If YES, upper-level items of source array
-                        // will appear BEFORE deeper Consolidated chunks even those
-                        // chunks are located if earlier keys
-                        // 
-                        // My current answer is 'NO', because it will let us
-                        // to define control registries in outermost Consoludated
-                        // that will be used to control merger of sub-items
-                        // items.
-                        //
-                        
-                        
+
+                        /*
+                         A BIG question: shall we put next line here or not?
+
+                         -- behaviour must not be changed since all tests
+                         and referring code will be broken ---
+
+                         If YES, upper-level items of source array
+                         will appear BEFORE deeper Consolidated chunks even those
+                         chunks are located if earlier keys
+
+                         My current answer is 'NO', because it will let us
+                         to define control registries in outermost Consoludated
+                         that will be used to control merger of sub-items
+                         items.
+                        */
+
                         //$stack[$i]['dest'] = & $dest;
-                        
+
                         $dest[$seg] = array();
                         $dest = & $dest[$seg];
                     }
                 } else {
                     $dest[$key] = $consolidated;
                 }
+                    
             } else {
                 $dest[$key] = $value;
             }
@@ -188,13 +212,76 @@ class Ac_Response extends Ac_Registry
     function getConsolidated(array $path = array(), $forCaching = false, $_ = null) {
         
         if ($forCaching && !$this->getCacheConsolidated()) return $this;
+
+        $args = func_get_args();
         
-        $exp = $this->exportRegistry();
+        //$exp = $this->exportRegistry();
+        
+        $exp = $this->exportRegistry(array(1 => 'Ac_I_Consolidated'));
+        
         if (is_array($exp)) {
+            /*
             $res = array();
             foreach(self::sliceWithConsolidatedObjects($exp, $forCaching) as $chunk) {
                 $res = Ac_Registry::getMerged($res, $chunk, false);
-            }
+            }*/
+            
+            $slices = self::sliceWithConsolidatedObjects($exp, $forCaching, array(), array(), false);
+            
+            $many = count($slices) > 1;
+            
+            $last = array_pop($slices);
+            
+            
+            do {
+                if (isset($this->deb)) echo "<table><tr>";
+                if (!is_null($curr = array_pop($slices))) {
+                    
+                    if (isset($this->deb)) {
+                        echo "<td>";
+                        var_dump($curr);
+                        echo "</td><td>";
+                        var_dump($last);
+                        echo "</td>";
+                    }
+                    $curr = Ac_Registry::getMerged($curr, $last, false);
+                    $last = $curr;
+                }
+                if (isset($this->deb)) {
+                    echo "<td>";
+                    var_dump($last);
+                    echo "</td>";
+                }
+                if (is_array($last) && isset($last['__fullPath'])) {
+                    $ptr = array('ptr' => $last);
+                    $fp = $last['__fullPath'];
+                    $key = array_pop($fp);
+                    self::arrayDive($last, $fp, $ptr);
+                    $xp = $ptr['ptr'][$key];
+                    if (is_object($xp) && $xp instanceof Ac_I_Consolidated) {
+                        unset($ptr['ptr'][$key]);
+                        $a = $args;
+                        $a[0] = $last['__fullPath'];
+                        $cons = call_user_func_array(array($xp, 'getConsolidated'), $a);
+                        unset($last['__fullPath']);
+                        $last = self::getMerged($cons, $last, false);
+                        if (isset($this->deb)) {
+                            echo "<td>";
+                            var_dump($last);
+                            echo "</td>";
+                        }
+                    }
+                }
+                if (isset($this->deb)) {
+                    echo "</tr></table>";
+                }
+                //if (is_object($last) && $last instanceof Ac_I_Consolidated) $last = call_user_func_array(array($last, 'getConsolidated'), $args);
+                //if ($many) var_dump($last);
+                
+            } while($slices);
+            
+            $res = $last;
+            
             return $res;
         } else {
             $res = $exp;

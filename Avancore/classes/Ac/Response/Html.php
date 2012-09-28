@@ -9,22 +9,22 @@ class Ac_Response_Html extends Ac_Response_Http {
                 'headContent' => new Ac_Registry(),
                 'metaKeywords' => new Ac_Registry(),
                 'metaDescription' => new Ac_Registry(),
-                'assetLibs' => new Ac_Registry_Consolidated(array('unique' => true)),
+                'assetLibs' => new Ac_Registry/*_Consolidated(array('unique' => true))*/,
                 'headScripts' => new Ac_Registry(),
                 'initScripts' => new Ac_Registry(),
             )
         );
     }
     
-    function setHeaderContent($headerContent, $index = null) {
+    function setHeadContent($headerContent, $index = null) {
         $args = func_get_args();
-        array_splice($args, 1, 0, array('headerContent'));
+        array_splice($args, 1, 0, array('headContent'));
         return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
     function getHeaderContent($headerContent, $index = null) {
         $args = func_get_args();
-        array_splice($args, 0, 0, array('headerContent'));
+        array_splice($args, 0, 0, array('headContent'));
         return call_user_func_array(array($this, 'getRegistry'), $args);
     }
     
