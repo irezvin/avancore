@@ -1,8 +1,13 @@
 <?php
 
-class Ac_Response extends Ac_Registry implements Ac_I_WithOutput, Ac_I_Consolidated, Ac_I_EvaluatedObject, Ac_I_EvaluationContext {
+class Ac_Response extends Ac_Registry 
+    implements Ac_I_WithOutput, Ac_I_Consolidated, 
+        Ac_I_EvaluatedObject, Ac_I_EvaluationContext,
+        Ac_I_StringObject, Ac_I_Prototyped {
 
     var $cacheConsolidated = true;
+    
+    protected $stringObjectMark = false;
     
     function setCacheConsolidated($cacheConsolidated) {
         $this->cacheConsolidated = (bool) $cacheConsolidated;
@@ -20,25 +25,25 @@ class Ac_Response extends Ac_Registry implements Ac_I_WithOutput, Ac_I_Consolida
     function setContent($content) {
         $args = func_get_args();
         array_splice($args, 1, 0, array('content'));
-        return call_user_func(array($this, 'setRegistry'), $args);
+        return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
     function getContent() {
         $args = func_get_args();
         array_splice($args, 0, 0, array('content'));
-        return call_user_func(array($this, 'getRegistry'), $args);
+        return call_user_func_array(array($this, 'getRegistry'), $args);
     }    
     
     function setDebug($debug) {
         $args = func_get_args();
         array_splice($args, 1, 0, array('debug'));
-        return call_user_func(array($this, 'setRegistry'), $args);
+        return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
     function getDebug() {
         $args = func_get_args();
         array_splice($args, 0, 0, array('debug'));
-        return call_user_func(array($this, 'getRegistry'), $args);
+        return call_user_func_array(array($this, 'getRegistry'), $args);
     }    
     
     function output($callback = null) {
@@ -101,9 +106,14 @@ class Ac_Response extends Ac_Registry implements Ac_I_WithOutput, Ac_I_Consolida
      * 
      * 
      */
-    static function sliceWithConsolidatedObjects(array & $src, $forCaching = false, array $extraArgs = array()) {
+    static function sliceWithConsolidatedObjects(array & $src, $forCaching = false, array $extraArgs = array(), array $targetPath = array()) {
         $chunks = array(array());
         $dest = & $chunks[0];
+        if ($targetPath) {
+            $ptr = array('ptr' => & $dest);
+            self::arrayDive($dest, $targetPath, $ptr, true);
+            $dest = & $ptr['ptr'];
+        }
         $stack = array();
         $path = array();
         $curr = & $src;
@@ -129,6 +139,11 @@ class Ac_Response extends Ac_Registry implements Ac_I_WithOutput, Ac_I_Consolida
                     $currChunk = & $chunks[$c];
                     $tmp = null;
                     $dest = & $chunks[$c];
+                    if ($targetPath) {
+                        $ptr = array('ptr' => & $dest);
+                        self::arrayDive($dest, $targetPath, $ptr, true);
+                        $dest = & $ptr['ptr'];
+                    }
                     foreach ($path as $i => $seg) {
                         
                         //
@@ -185,6 +200,36 @@ class Ac_Response extends Ac_Registry implements Ac_I_WithOutput, Ac_I_Consolida
             $res = $exp;
         }
         return $res;
+    }
+    
+    function __construct(array $options = array()) {
+        parent::__construct();
+        Ac_Accessor::setObjectProperty($this, $options);
+        Ac_StringObject::onConstruct($this);
+    }
+    
+    function hasPublicVars() {
+        return false;
+    }
+    
+    function __clone() {
+        Ac_StringObject::onClone($this);
+    }
+    
+    function __wakeup() {
+        Ac_StringObject::onWakeup($this);
+    }
+ 
+    function setStringObjectMark($stringObjectMark) {
+        $this->stringObjectMark = $stringObjectMark;
+    }
+
+    function getStringObjectMark() {
+        return $this->stringObjectMark;
+    }    
+    
+    function __toString() {
+        return $this->stringObjectMark;
     }
     
 }

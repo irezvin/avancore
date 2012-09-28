@@ -3,6 +3,8 @@
 /**
  * @todo Rename to Ac_Content_Structured; add getPlaceholderDefaults() with prototypes of placeholders with given names (classes, options); 
  * check for allowedPlaceholders, isAppendable() and we will get omni-base for all structured content (CMSBlock etc)
+ * 
+ * @TODO: currently non-references parts ARE not exported by exportRegistry; also we can't create them by setRegistry/mergeRegistry
  */
 class Ac_Content_StructuredText extends Ac_Content_WithCharset implements 
     Ac_I_WithCleanup, Ac_I_WithClone, Ac_I_EvaluationContext, Ac_I_StringObjectContainer,
@@ -173,6 +175,7 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
      * @return Ac_Content_StructuredText $this instance for a chaining
      */
     function setText($text, $placeholder = false) {
+        // TODO: shouldn't we delete placeholders referenced from cleaned buffer?
         $noRef = func_num_args() > 2? (bool) func_get_arg(2) : false;
         if ($placeholder !== false) $this->getPlaceholder($placeholder, true, $noRef)->setText($text);
         else {
@@ -183,7 +186,6 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     }
     
     /**
-     *
      * @param mixed|Ac_Content_StructuredText $text
      * @return Ac_Content_StructuredText $this instance for a chaining
      */
@@ -356,9 +358,10 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
             $merged = $this->cloneOnMerge? $this->createClone() : $this;
             $oBuf = $content->buffer;
             $mBuf = $merged->buffer;
-
+            
             foreach ($merged->placeholders as $name => $ph) {
                 if (isset($content->placeholders[$name])) {
+                    
                     
                     // A difficult case: we have to drop merged' placeholder in favour of one of $content
                     // replace or remove references according to $refsOnMerge value
@@ -505,14 +508,18 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
         
         $path = func_get_args();
         $path = Ac_Registry::flattenOnce($path);
-        
+
+        /*
         if (!count($path)) $res = $this->getBuffer(true);
         else {
 
             $ph = $this->getPlaceholder($path);
             if ($ph) $res = $ph->getBuffer(true);
                 else $res = null;
-        }
+        }*/
+        
+        $res = $this->exportRegistry(false, $path);
+        
         return $res;
         
     }
@@ -520,15 +527,16 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     function setRegistry($value, $keyOrPath = null, $_ = null) {
         
         $path = func_get_args();
-        $path = Ac_Registry::flattenOnce($path);
         array_shift($path);
+        $path = Ac_Registry::flattenOnce($path);
         
         if (!count($path)) {
             $this->clear();
-            $this->setText($value);
+            $this->mergeRegistry($value);
             $res = true;
         } else {
-            $this->setText($value, $path);
+            $p = $this->getPlaceholder($path, true);
+            $p->setRegistry($value);
             $res = true;
         }
 
@@ -539,8 +547,8 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     function addRegistry($value, $keyOrPath = null, $_ = null) {
         
         $path = func_get_args();
-        $path = Ac_Registry::flattenOnce($path);
         array_shift($path);
+        $path = Ac_Registry::flattenOnce($path);
         
         if (!count($path)) {
             $this->append($value);
@@ -553,20 +561,59 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
     }
     
     function exportRegistry($recursive = false, $keyOrPath = null, $_ = null) {
-        // TODO: think out and implement
+        
+        $path = func_get_args();
+        array_shift($path);
+        $path = Ac_Registry::flattenOnce($path);
+        
+        if (count($path)) {
+            if ($sub = $this->getPlaceholder(array_shift($path), false)) {
+                if (!count($path) && !$recursive) $res = $sub; 
+                else $res = $sub->exportRegistry($recursive, $path);
+            } else {
+                $res = null;
+            }
+            
+        } else {
+            
+            $res = array();
+
+            foreach ($this->buffer as $key => $buf) {
+                if (is_object($buf)) {
+
+                    if ($buf instanceof Ac_Content_StructuredText_PlaceholderRef) {
+                        $buf = $buf->getPlaceholder();
+                        $key = $buf->getName();
+                        if ($recursive) $buf = $buf->exportRegistry(true);
+                    } elseif ($recursive && $buf instanceof Ac_I_Registry) {
+                        $buf = $buf->exportRegistry(true);
+                    }
+                }
+                if (is_int($key)) $res[] = $buf;
+                    else $res[$key] = $buf;
+            }
+            
+        }
+        
+        return $res;
+        
     }
     
     function mergeRegistry($value, $preserveExistingValues = false, $keyOrPath = null, $_ = null) {
         
         $path = func_get_args();
-        $path = Ac_Registry::flattenOnce($path);
         array_shift($path);
-        
+        array_shift($path);
+        $path = Ac_Registry::flattenOnce($path);
+
         if (count($path)) $this->getPlaceholder($path, true)->mergeRegistry($value);
         else {
 
             if (is_object($value) && $value instanceof Ac_Content_StructuredText) {
-                $this->mergeToSameClass($value);
+                $tmp = $value->cloneOnMerge;
+                $value->setCloneOnMerge(true);
+                $value->mergeToSameClass($this);
+                $value->setCloneOnMerge($tmp);
             } elseif (is_array($value)) {
                 foreach ($value as $k => $v) {
                     if (is_int($k)) $this->append ($v);
@@ -580,6 +627,19 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
         }
     }
     
+    function clearRegistry($keyOrPath = null, $_ = null) {    
+        $path = func_get_args();
+        $path = Ac_Registry::flattenOnce($path);
+        if (count($path)) {
+            if ($ph = $this->getPlaceholder($path, false)) {
+                $ph->clear();
+            }
+        } else {
+            $this->clear();
+        }
+        
+    }
+    
     function isMergeableWith($value) {
         return true;
     }
@@ -588,7 +648,38 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
         return $this->mergeRegistry($value, $preserveExistingValues);
     }
     
+    function isRightMergeableWith($value) {
+        return is_array($value);
+    }
+    
+    function rightMergeWith($value, $preserveExistingValues = false) {
+        return Ac_Registry::getMerged($value, $this->exportRegistry(true), $preserveExistingValues);
+    }
+    
+    
+    protected function getFullBufferWithStringObjects() {
+        
+        $res = array();
+        
+        $buf = $this->buffer;
+        
+        foreach ($buf as $item) {
+            if (is_object($item) && $item instanceof Ac_Content_StructuredText_PlaceholderRef) {
+                $res = array_merge($res, $item->getPlaceholder()->getFullBufferWithStringObjects());
+            } elseif (is_string($item)) {
+                $res = array_merge($res, Ac_StringObject::sliceStringWithObjects($item));
+            } else {
+                $res[] = $item;
+            }
+        }
+        
+        return $res;
+        
+    }
+
     function getConsolidated(array $path = array(), $forCaching = false, $_ = null) {
+
+        
         // 
         // Idea of StructuredText consolidation:
         //
@@ -603,11 +694,35 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
         // (if they will get somehow to the Output, it should do something with them)
         //
     
-        $buf = $this->getBuffer(true);
-        $res = array();
-        Ac_Util::setArrayByPath($res, $path, $buf);
-        return $res;
+        $buf = $this->getFullBufferWithStringObjects();
         
+        $hasObjects = false;
+        
+        $hasConsolidated = false;
+        
+        foreach ($buf as $item) {
+            if (is_object($item)) {
+                $hasObjects = true;
+                if ($item instanceof Ac_I_Consolidated) {
+                    $hasConsolidated = true;
+                    break;
+                }
+            }
+        }
+        
+        if (!$hasObjects) {
+            $res = implode('', $buf);
+        } elseif (!$hasConsolidated) {
+            $res = $buf;
+        } else {
+            $r = array();
+            $res = array();
+            Ac_Util::setArrayByPath($r, $path, $buf);
+            foreach($sl = Ac_Response::sliceWithConsolidatedObjects($r, $forCaching) as $chunk) {
+                $res = Ac_Registry::getMerged($res, $chunk, false);
+            }
+        }
+        return $res;
     }
     
 }

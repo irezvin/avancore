@@ -41,6 +41,12 @@ class Ac_Test_Registry extends Ac_Test_Base {
         $this->assertEqual($path, array('b3'));
         $this->assertReference($ptr['ptr'], $sam['b']);
         
+        $path = array('b', 'b3');
+        $this->assertTrue(Ac_Registry::arrayDive($sam, $path, $ptr, true));
+        $this->assertEqual($path, array());
+        $this->assertReference($ptr['ptr'], $sam['b']['b3']);
+        
+        
     }
     
     function getRegData1() {
@@ -141,6 +147,9 @@ class Ac_Test_Registry extends Ac_Test_Base {
         $reg2->setRegistry($data);
         $this->assertIdentical($reg->setRegistry($reg2, 'key2'), true);
         $this->assertIdentical($reg->getRegistry('key2'), $data);
+        
+        // With non-recursive exportRegistry we can retrieve internal Registry objects
+        $this->assertSame($reg->exportRegistry(false, 'key2'), $reg2);
     }
     
     function testExceptions() {
@@ -211,7 +220,7 @@ class Ac_Test_Registry extends Ac_Test_Base {
         
         $reg2 = new Ac_Registry();
         
-        $reg2->setRegistry($dest);
+          $reg2->setRegistry($dest);
         
         $reg1->mergeRegistry($reg2);
         
@@ -232,7 +241,7 @@ class Ac_Test_Registry extends Ac_Test_Base {
         
         $reg1->mergeRegistry($reg2, true);
         
-        $this->assertIdentical($new = $reg1->exportRegistry(), $a = array(
+        if (!$this->assertIdentical($new = $reg1->exportRegistry(), $a = array(
             'key1' => 'value1',
             'key2' => array(
                 'key2.1' => 'value2.1', 
@@ -243,7 +252,7 @@ class Ac_Test_Registry extends Ac_Test_Base {
             ),
             'extra3',
             'dest3'
-        ));
+        ))) var_dump($new);
         
     }
     

@@ -1,6 +1,6 @@
 <?php
 
-interface Ac_I_Registry extends Ac_I_Mergeable {
+interface Ac_I_Registry extends Ac_I_Mergeable, Ac_I_RightMergeable {
     
     function listRegistry($keyOrPath = null, $_ = null);
     
@@ -17,5 +17,7 @@ interface Ac_I_Registry extends Ac_I_Mergeable {
     function exportRegistry($recursive = false, $keyOrPath = null, $_ = null);
     
     function mergeRegistry($value, $preserveExistingValues = false, $keyOrPath = null, $_ = null);
+    
+    function clearRegistry($keyOrPath = null, $_ = null);
     
 }
