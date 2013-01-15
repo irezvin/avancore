@@ -15,6 +15,8 @@ class Ac_Mail {
      * @var array
      */
     var $_from = false;
+    
+    var $_bcc = false;
 
     var $replyTo = false;
     
@@ -93,8 +95,12 @@ class Ac_Mail {
     
     var $smtpPassword = false;
     
-    var $_emailFileContent = false;
+    var $debugFilename = false;
     
+    var $dontSaveErrors = false;
+    
+    var $_emailFileContent = false;
+
     /**
      * @return Ac_Mail
      */
@@ -167,6 +173,14 @@ class Ac_Mail {
     
     function setFrom($from) {
         $this->_from = $from;
+    }
+    
+    function setBcc($bcc) {
+        $this->_bcc = $bcc;
+    }
+    
+    function getBcc() {
+        return $this->_bcc;
     }
     
     function getFrom() {
@@ -273,11 +287,16 @@ class Ac_Mail {
                 foreach($to as $toAddress) {
                     $m->AddAddress($toAddress[0], (string) $toAddress[1]);
                 }
+                $bcc = $this->_getAddresses($this->_bcc);
+                foreach ($bcc as $addr) {
+                    $m->AddBcc($addr[0], (string) $addr[1]);
+                }
                 if (!$this->_htmlTemplate && !$this->_textTemplate && !strlen($this->htmlBody) && !strlen($this->textBody)) {
                     $this->_error = "No templates defined";
                     $res = false;
                 } else {
-                    $this->setSubject($this->defaultSubject);
+                    if (!strlen($this->_subject))
+                        $this->setSubject($this->defaultSubject);
 
                     $htmlBody = $this->getPreparedHtmlBody();
                     $textBody = $this->getPreparedTextBody();
@@ -297,7 +316,7 @@ class Ac_Mail {
                     $m->CharSet = $charset;
                     $m->Subject = $this->_subject;
                     $triedToSend = true;
-                    if (! ($this->_noSend || $m->Send())) {
+                    if (! ($this->_noSend || ($m->Send()) )) {
                         $this->_error = "Mailer error: ".$m->ErrorInfo;
                         $res = false;
                     } else {
@@ -415,24 +434,31 @@ class Ac_Mail {
     function _debugToFile(& $mailer, $saveEmail, $saveError = true) {
         $disp = & Ac_Dispatcher::getInstance();
         
-        if (isset($disp->config->emailsSavePath) && strlen($disp->config->emailsSavePath)) $dir = $disp->config->emailsSavePath;
-            else $dir = $disp->getDir().'/emails';
-            
-        if (!is_dir($dir)) mkdir($dir, 0777);
+        if (!strlen($this->debugFilename)) {
         
-        $fname = date("Y-m-d-h-i-s");
-        $suffix = -1;
+            if (isset($disp->config->emailsSavePath) && strlen($disp->config->emailsSavePath)) $dir = $disp->config->emailsSavePath;
+                else $dir = $disp->getDir().'/emails';
 
-        if($saveEmail || $saveError) {
-            do {
-                $suffix++;
-                $suff = $suffix? '-'.$suffix : '';
-                $emlFileName = $dir.'/'.$fname.$suff.'.eml';
-                $errFileName = $dir.'/'.$fname.$suff.'-error.txt';
-            } while (is_file($emlFileName) || is_file($errFileName));
-            if ($saveEmail) touch($emlFileName);
-            if ($this->_error && $saveError) touch($errFileName);
-        }        
+            if (!is_dir($dir)) mkdir($dir, 0777);
+            
+            $fname = date("Y-m-d-h-i-s");
+            $suffix = -1;
+
+            if($saveEmail || $saveError) {
+                do {
+                    $suffix++;
+                    $suff = $suffix? '-'.$suffix : '';
+                    $emlFileName = $dir.'/'.$fname.$suff.'.eml';
+                    $errFileName = $dir.'/'.$fname.$suff.'-error.txt';
+                } while (is_file($emlFileName) || is_file($errFileName));
+                if ($saveEmail) touch($emlFileName);
+                if ($this->_error && $saveError) touch($errFileName);
+            }        
+        } else {
+            $emlFileName = $this->debugFilename.'.eml';
+            $errFileName = $this->debugFilename.'-error.txt';
+        }
+        if ($this->_error && $saveError && !$this->dontSaveErrors) touch($errFileName);
             
         if(!empty($mailer->AltBody))
             $mailer->ContentType = "multipart/alternative";
@@ -464,5 +490,3 @@ class Ac_Mail {
     
     
 }
-
-?>

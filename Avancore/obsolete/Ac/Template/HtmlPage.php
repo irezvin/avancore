@@ -4,6 +4,7 @@ class Ac_Template_HtmlPage extends Ac_Template_Html {
 
     const doctypeTransitional = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
     const doctypeStrict = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
+    const doctypeHtml5 = '<!DOCTYPE html>';
     const doctypeNone = "";
     
     var $addXmlTag = true;

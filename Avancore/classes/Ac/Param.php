@@ -263,6 +263,7 @@ class Ac_Param extends Ac_Prototyped implements Ac_I_Param_WithSource {
     
     function reset() {
         $this->processed = false;
+        $this->hasValue = false;
     }
     
     protected function process() {

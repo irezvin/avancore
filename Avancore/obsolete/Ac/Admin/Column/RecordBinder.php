@@ -42,8 +42,8 @@ class Ac_Admin_Column_RecordBinder extends Ac_Admin_Column {
             _c.addRecords(<?php echo $jsHelper->toJson($this->_recordsJson, 16); ?>);
 <?php foreach ($this->_recordKeys as $i => $key) { ?>
             _c.getRecord(<?php echo $i; ?>)
-                .observe([_c.ShowSelected, _c.ToggleSelected], {element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->trIdPrefix.$key)); ?>})<?php 
-if ($this->canEdit) { ?>.observe([_c.EditRecord], {eventName: 'dblclick', element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->trIdPrefix.$key)); ?>}) <?php } ?>;
+                .observe([AvanControllers.ListController.ShowSelected, AvanControllers.ListController.ToggleSelected], {element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->trIdPrefix.$key)); ?>})<?php 
+if ($this->canEdit) { ?>.observe([AvanControllers.ListController.EditRecord], {eventName: 'dblclick', element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->trIdPrefix.$key)); ?>}) <?php } ?>;
 <?php } ?>
 
             delete _c;

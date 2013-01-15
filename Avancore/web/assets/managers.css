@@ -29,6 +29,10 @@
 
 .avantravel table.actions {margin-left: auto; margin-bottom: 0; border-collapse: collapse}
 /*.actions .beforeActions {background-image: url(images/corn.png); background-repeat: no-repeat; background-position: top right}*/
+
+.actions div.actionButton {display: inline-block; height: 32px; width: 32px; background-position: 0 0; background-repeat: no-repeat}
+.actions .disabled div.disabled {background-position: 0 -32px}
+
 .actions img.enabled {cursor: pointer}
 .actions span.disabled, div.disabled, a.disabled {color: darkgray}
 .actions a img {border: none}

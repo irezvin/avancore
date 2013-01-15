@@ -9,6 +9,9 @@ class Ac_Param_Std {
     function __construct(array $extraDefaults = array()) {
         $this->defaults = array(
         
+            'rawString' => array(
+            ),
+            
 			'simpleString' => array(
                 'description' => 'Simple string (trimmed, no tags allowed)',
 				'filters' => array('f1' => array(
@@ -66,6 +69,22 @@ class Ac_Param_Std {
         $res = isset($this->defaults[$paramName])? $this->defaults[$paramName] : array();
         if ($overrides) $res = $res? Ac_Util::m($res, $overrides) : $overrides;
         return $res;
+    }
+    
+    function simpleString() {
+        return $this->get('simpleString');
+    }
+    
+    function rawString() {
+        return $this->get('rawString');
+    }
+    
+    function bool() {
+        return $this->get('bool');
+    }
+    
+    function natural() {
+        return $this->get('natural');
     }
     
     /**

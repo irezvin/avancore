@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Sql_Part {
+class Ac_Sql_Part extends Ac_Prototyped {
     
     /**
      * @var Ac_Sql_Part
@@ -48,9 +48,8 @@ class Ac_Sql_Part {
      * @param array $options
      * @param string $baseClass
      * @return Ac_Sql_Part
-     * @static
      */
-    function & factory($options, $baseClass = 'Ac_Sql_Part') {
+    static function & factory($options, $baseClass = 'Ac_Sql_Part') {
         if (isset($options['class'])) 
             $class = $options['class']; 
             else $class = $baseClass;
@@ -65,6 +64,10 @@ class Ac_Sql_Part {
         foreach (array_intersect(array_keys(get_object_vars($this)), array_keys($options)) as $k)
             if ($k{0} != '_') $this->$k = $options[$k];
         $this->_doOnInitialize($options);
+    }
+    
+    function hasPublicVars() {
+        return true;
     }
     
     /**

@@ -18,6 +18,8 @@ class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
     var $queryCount = 0;
     var $queries = array();
     
+    var $throwExceptions = false;
+    
     function _doGetAccess() {
         return array(
             'user' => $this->_user, 
@@ -28,7 +30,7 @@ class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
         );
     }
         
-    function _doInitialize($options) {
+    function _doInitialize(array $options = array()) {
         foreach (array('host', 'user', 'password', 'db', 'charset', 'timezone', 'prefix') as $param) {
             if (isset($options[$param])) {
                 $myParam = '_'.$param;
@@ -50,7 +52,7 @@ class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
     
     function NameQuote($string) {
         if (is_a($string, 'Ac_Sql_Expression')) return $string->nameQuote($this);
-            else return "`$string`";
+            else return "`".str_replace("`", "``", $string)."`";
     }
     
     function setQuery($query, $offset = 0, $limit = 0, $prefix = '#__') {
@@ -67,7 +69,7 @@ class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
         $this->queryCount++;
         $res = mysql_query($this->_sql, $this->_getConnection());
         if ($res === false) error_log(($e = mysql_error($this->_getConnection())).' in '.$this->_sql);
-        if ($res === false) var_dump($e, $this->_sql);
+        if ($res === false && !$this->throwExceptions) var_dump($e, $this->_sql);
         return $res;
     }
     
@@ -144,8 +146,12 @@ class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
     }
     
     function handleError() {
-        error_log('Wrong query: '.$this->_sql."; error is '".mysql_error($this->_connection)."'");
-        trigger_error('Cannot run query', E_USER_ERROR);
+        if ($this->throwExceptions) {
+            throw new Ac_E_Database (array(mysql_error($this->_connection), $this->_sql), mysql_errno($this->_connection));
+        } else {
+            error_log('Wrong query: '.$this->_sql."; error is '".mysql_error($this->_connection)."'");
+            trigger_error('Cannot run query', E_USER_ERROR);
+        }
     }
     
     function getLastInsertId() {
@@ -155,9 +161,21 @@ class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
     function _getConnection() {
         if ($this->_connection === false) {
             $this->_connection = mysql_connect($this->_host, $this->_user, $this->_password, true);
-            if (!$this->_connection) trigger_error ("Cannot connect to database", E_USER_ERROR);
+            if (!$this->_connection) {
+                if ($this->throwExceptions) {
+                    throw new Ac_E_Database ("Cannot connect to database");
+                } else {
+                    trigger_error ("Cannot connect to database", E_USER_ERROR);
+                }
+            }
             if ($this->_db) {
-                if (!mysql_select_db($this->_db, $this->_connection)) trigger_error ("Cannot select db", E_USER_ERROR);
+                if (!mysql_select_db($this->_db, $this->_connection)) {
+                    if ($this->throwExceptions) {
+                        throw new Ac_E_Database ("Cannot select db '{$this->_db}'");
+                    } else {
+                        trigger_error ("Cannot select db '{$this->_db}", E_USER_ERROR);
+                    }
+                }
             }
             if ($this->_charset) {
                 $this->setQuery('SET NAMES '.$this->_charset);
@@ -227,6 +245,10 @@ class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
 		$res = exec($cmd, $out, $return);
 		return !$return;
 	}
+    
+    function getAffectedRows() {
+        return mysql_affected_rows($this->_connection);
+    }
     
 }
 

@@ -109,14 +109,14 @@ class Ac_Form_Helper {
     
     // ---------- Constructor ---------
     
-    function Ac_Form_Helper (& $src, $searchSrcCaps = false) {
+    function __construct ($src, $searchSrcCaps = false) {
         $this->setSrc ($src, $searchSrcCaps);
     }
     
     // ---------- Configuration methods ---------
     
-    function setSrc(& $src, $searchSrcCaps = false) {
-        $this->_src = & $src;
+    function setSrc($src, $searchSrcCaps = false) {
+        $this->_src = $src;
         $this->_allOptionsFromSrc = false;
         if ($this->_src && $searchSrcCaps) $this->searchSrcCaps();
     }

@@ -36,6 +36,34 @@ class Ac_File_Feature_Image extends Ac_File_Feature {
         return $this->getProcessor()->getHeight();
     }
     
+    function guessThumbSize($maxThumbWidth, $maxThumbHeight, $returnMaxDim = false) {
+            $res = array();
+            $imageHeight = $this->getHeight();
+            $imageWidth = $this->getWidth();
+
+            if ($maxThumbHeight && $imageHeight > $maxThumbHeight) {
+                $res['height'] = $maxThumbHeight;
+                $ratio = $maxThumbHeight / $imageHeight;
+                $res['width'] = (int) ($imageWidth*$ratio);
+            } else {
+                $res['width'] = $imageWidth;
+                $res['height'] = $imageHeight;
+            }
+
+            if ($maxThumbWidth && ($res['width'] > $maxThumbWidth)) {
+                $ratio = $maxThumbWidth / $res['width'];
+                $res['width'] = $maxThumbWidth;
+                $res['height'] = (int) ($res['height']*$ratio);
+            }
+            
+            if ($returnMaxDim) {
+                if ($res['width'] > $res['height']) unset($res['height']);
+                    else unset($res['width']);  
+            }
+            
+            return $res;
+    }
+    
     /**
      * @return string Path to the thumbnail file
      * @param string|array $size Key in $this->thumbSizes array or array(width, height)

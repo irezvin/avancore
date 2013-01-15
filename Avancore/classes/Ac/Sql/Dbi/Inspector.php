@@ -31,7 +31,7 @@ class Ac_Sql_Dbi_Inspector {
     function listTablesForDatabase($databaseName = false) {
         $dbName = $this->_getDbName($databaseName);
         $res = array();
-        foreach ($this->_db->fetchColumn('SHOW TABLES FROM '.$dbName) as $tableName) {
+        foreach ($this->_db->fetchColumn('SHOW TABLES FROM '.$databaseName) as $tableName) {
             $res[] = $tableName; 
         }
         return $res;

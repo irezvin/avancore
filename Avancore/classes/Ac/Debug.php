@@ -2,6 +2,25 @@
 
 class Ac_Debug {
     
+    static function savageMode() {
+        while(ob_get_level()) ob_end_clean();
+        ini_set('display_errors', 1);
+        ini_set('error_reporting', E_ALL & ~E_DEPRECATED & ~E_STRICT);
+    }
+    
+    static function fb($_) {
+        if (!headers_sent()) {
+            $args = func_get_args();
+            $call = array(Ac_Debug_FirePHP::getInstance(), 'fb');
+            return call_user_func_array($call, $args);
+        }
+    }
+    
+}
+<?php
+
+class Ac_Debug {
+    
     static $created = array();
     
     static $deleted = array();

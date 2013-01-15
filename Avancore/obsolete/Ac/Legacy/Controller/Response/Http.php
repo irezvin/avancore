@@ -27,6 +27,22 @@ class Ac_Legacy_Controller_Response_Http extends Ac_Legacy_Controller_Response {
             else $this->extraHeaders[] = array($header, $httpCode);
     }
     
+    /**
+     * Finds and returns last HTTP code explicitly added by addExtraHeader call
+     * or FALSE is nothing is found
+     * 
+     * @return number|boolean
+     */
+    function getHttpCode() {
+        $res = false;
+        foreach ($this->extraHeaders as $h) {
+            if (is_array($h) && isset($h[1])) {
+                $res = $h[1];
+            }
+        }
+        return $res;
+    }
+    
 }
 
 ?>

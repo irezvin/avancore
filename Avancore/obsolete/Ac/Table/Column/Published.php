@@ -46,15 +46,15 @@ class Ac_Table_Column_Published extends Ac_Table_Column {
         return $res;
     }
     
-    function getTitle() {
-        if (isset($this->settings['title'])) $res = $this->settings['title'];
-            else $res = "Published";
-        return $res;
-    }
+//    function getTitle() {
+//        if (isset($this->settings['title'])) $res = $this->settings['title'];
+//            else $res = "Published";
+//        return $res;
+//    }
     
     function getHeaderAttribs($rowCount, $rowNo = 1) {
         if (isset($this->settings['headerAttribs'])) $res = $this->settings['headerAttribs'];
-            else $res = array('align' => 'left', 'width' => '20');
+            else $res = array('align' => 'center'/*, 'width' => '20'*/);
         $res['rowspan'] = $this->getHeaderRowspan($rowCount, $rowNo);
         return $res;
     }

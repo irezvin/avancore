@@ -42,6 +42,9 @@ class Ac_Form_Control_Template_Placeholders extends Ac_Form_Control_Template_Bas
                     } else {
                         $val = '';
                     }
+                }  elseif (!strncmp($mc = trim($matches[1]), 'prop:', 5)) {
+                	$propId = substr($matches[1], 5);
+                    $val = Ac_Accessor::getObjectPropertyByPath($control, Ac_Util::pathToArray(trim($propId)));
                 } elseif (!strncmp($mc = trim($matches[1]), 'own:', 4)) {
                 	$propId = substr($matches[1], 4);
                     $val = Ac_Accessor::getObjectProperty($control, trim($propId));
@@ -56,6 +59,10 @@ class Ac_Form_Control_Template_Placeholders extends Ac_Form_Control_Template_Bas
                 } elseif (!strncmp($mc = trim($matches[1]), 'span:', 5)) {
                 	$id = trim(substr($matches[1], 5));
                     if (isset($controlsById[$id])) $val = $this->renderChildContainer($controlsById[$id], $controlsById, 'spanWrapper');
+                } elseif (preg_match('#w:(\w+):(.*)$#', $mc = trim($matches[1]), $matches2)) { // expamle: "{w:errorSpanWrapper:foo}"
+                    $wrapperId = $matches2[1];
+                    $id = $matches2[2];
+                    if (isset($controlsById[$id])) $val = $this->renderChildContainer($controlsById[$id], $controlsById, $wrapperId);
                 } else {
                     $id = trim($matches[1]);
                     if (isset($controlsById[$id])) $val = $this->renderChildContainer($controlsById[$id], $controlsById);

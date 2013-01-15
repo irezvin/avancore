@@ -27,7 +27,7 @@ class Ac_Legacy_Database_Pg extends Ac_Legacy_Database {
         );
     }
         
-    function _doInitialize($options) {
+    function _doInitialize(array $options = array()) {
         foreach (array('host', 'user', 'password', 'db', 'charset', 'timezone', 'prefix') as $param) {
             if (isset($options[$param])) {
                 $myParam = '_'.$param;

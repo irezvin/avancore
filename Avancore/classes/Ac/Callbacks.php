@@ -9,12 +9,12 @@ class Ac_Callbacks {
     /**
      * @return Ac_Callbacks
      */
-    function getInstance() {
+    static function getInstance() {
         if (!self::$instance) self::$instance = new Ac_Callbacks();
         return self::$instance;
     }
     
-    function setInstance(Ac_Callbacks $instance) {
+    static function setInstance(Ac_Callbacks $instance) {
         self::$instance = $instance;
     }
     
@@ -88,10 +88,9 @@ class Ac_Callbacks {
     /**
      * @param $callbackId
      * @param $params
-     * @static
      */
-    function call($callbackId, $params) {
-        if (!isset($this) || !is_a($this, 'Ac_Callbacks')) $cb = & Ac_Callbacks::getInstance();
+    static function call($callbackId, $params) {
+        if (!isset($this) || !is_a($this, 'Ac_Callbacks')) $cb = Ac_Callbacks::getInstance();
             else $cb = & $this;
             
         $res = null;

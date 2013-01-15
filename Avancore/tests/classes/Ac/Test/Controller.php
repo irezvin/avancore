@@ -63,7 +63,7 @@ class Ac_Test_Controller extends Ac_Test_Base {
             'Result content should be the same as expected and contain passed parameter \'id\' value'
         );
             
-        // Clear controller internals
+        // Clear controller state
         $c->reset();
         
         $this->assertEqual($c->getUrl().'', $base, "controller' getUrl() reverts to base after reset()");
