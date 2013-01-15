@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * Is created by Output to merge everything in the response tree before composing result HTML 
+ * or providing data to external application
+ */
 class Ac_Response_Consolidated extends Ac_Response {
     
     protected $titleImplodeChar = ' - ';

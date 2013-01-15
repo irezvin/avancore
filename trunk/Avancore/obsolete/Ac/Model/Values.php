@@ -115,7 +115,7 @@ class Ac_Model_Values {
     /**
      * @return Ac_Model_Values
      */
-    function & factoryIndependent($options = array()) {
+    function factoryIndependent($options = array()) {
         $data = null;
         $propName = false;
         $isStatic = true;
@@ -138,15 +138,15 @@ class Ac_Model_Values {
      * 
      * @return Ac_Model_Values
      */
-    function & factoryWithFormOptions (& $data, $propName, $formOptions = true, $isStatic = false) {
+    function factoryWithFormOptions (& $data, $propName, $formOptions = true, $isStatic = false, array $optionsOverride = array()) {
         $class = 'Ac_Model_Values';
-        if (!is_array($formOptions)) $formOptions = & $data->getFormOptions($propName, $isStatic);
+        if (!is_array($formOptions)) $formOptions = $data->getFormOptions($propName, $isStatic);
         if (isset($formOptions['values']) && is_array($formOptions['values'])) $options = $formOptions['values'];
         if (!isset($options['valueList']) && isset($formOptions['valueList'])) $options['valueList'] = $formOptions['valueList'];
         if (isset($options['class']) && $options['class']) {
             $class = $options['class'];
         }
-        $res = new $class($data, $propName, $options, $isStatic);
+        $res = new $class($data, $propName, $options, $isStatic, $optionsOverride);
         if (!is_a($res, 'Ac_Model_Values')) trigger_error ("Class '{$class}' is not derived from Ac_Model_Values", E_USER_ERROR);
         return $res; 
     }
@@ -157,12 +157,12 @@ class Ac_Model_Values {
      * @param Ac_Model_Property $prop
      * @return Ac_Model_Values
      */
-    function & factoryWithProperty (& $prop) {
+    function & factoryWithProperty (& $prop, array $optionsOverride = array()) {
         $propName = $prop->propName;
-        $data = & $prop->srcObject;
+        $data = $prop->srcObject;
         $formOptions = $prop->toFormOptions();
         $isStatic = $prop->isStatic;
-        $res = & Ac_Model_Values::factoryWithFormOptions($data, $propName, $formOptions, $isStatic);
+        $res = Ac_Model_Values::factoryWithFormOptions($data, $propName, $formOptions, $isStatic, $optionsOverride);
         return $res;
     }
     
@@ -171,16 +171,17 @@ class Ac_Model_Values {
      * @param string $propName name of model property
      * @param bool|array $formOptions Options of list. If non-array and valid Ac_Model_Data - propName pair is provided, they will be retrieved automatically.  
      */
-    function Ac_Model_Values (& $data, $propName = false, $options = true, $isStatic = false) {
+    function __construct ($data, $propName = false, $options = true, $isStatic = false, array $optionsOverride = array()) {
         if (!is_array($options) && is_a($data, 'Ac_Model_Data') && $propName) {
             $options = array();
             $formOptions = $data->getFormOptions($propName, $isStatic);
             if (isset($formOptions['values']) && is_array($formOptions['values'])) $options = $formOptions['values'];
             if (!isset($options['valueList']) && isset($formOptions['valueList'])) $options['valueList'] = $formOptions['valueList'];
         }
+        Ac_Util::ms($options, $optionsOverride);
         Ac_Util::simpleBind($options, $this);
         if (!isset($options['isStatic'])) $this->isStatic = $isStatic;
-        $this->data = & $data;
+        $this->data = $data;
         $this->propName = $propName;
     }
     
@@ -211,7 +212,7 @@ class Ac_Model_Values {
      * @param string $propName name of model property
      * @param bool|array $formOptions Options of that property. If true, they will be retrieved automatically. If false, they won't be changed.  
      */
-    function setData (& $data, $propName = false, $options = false) {
+    function setData ($data, $propName = false, $options = false) {
         if ($options === true && is_a($data, 'Ac_Model_Data') && $propName) {
             $options = array();
             $formOptions = $data->getFormOptions($propName, $isStatic);
@@ -226,7 +227,7 @@ class Ac_Model_Values {
                 if (get_class($this->data) !== get_class($data)) $this->_resetCache(); 
             }
         }
-        $this->data = & $data;
+        $this->data = $data;
         $this->propName = $propName;
     }
     
@@ -267,7 +268,7 @@ class Ac_Model_Values {
         elseif ((($allValues = $this->getValueList()) !== false) && $this->getDetails) {
             if ($this->returnDetailsByRef) {
                 foreach (array_keys($allValues) as $val) {
-                    $res[$val] = & $this->_callGetterRef($this->getDetails, $val);
+                    $res[$val] = $this->_callGetterRef($this->getDetails, $val);
                 }
             } else {
                 foreach (array_keys($allValues) as $val) {
@@ -295,24 +296,24 @@ class Ac_Model_Values {
      */
     function getDetails($value) {
         if (is_array($this->valueDetails)) {
-            if (strlen($value) && isset($this->valueDetails[$value])) $res = & $this->valueDetails[$value];
+            if (strlen($value) && isset($this->valueDetails[$value])) $res = $this->valueDetails[$value];
             else $res = false;
         } 
         elseif (is_array($this->_cachedValueDetails)) {
-            if (strlen($value) && isset($this->_cachedValueDetails[$value])) $res = & $this->_cachedValueDetails[$value];
+            if (strlen($value) && isset($this->_cachedValueDetails[$value])) $res = $this->_cachedValueDetails[$value];
             else $res = false;
         } 
         elseif ($this->getDetails) {
-            if ($this->returnDetailsByRef) $res = & $this->_callGetterRef($this->getDetails, $value);
+            if ($this->returnDetailsByRef) $res = $this->_callGetterRef($this->getDetails, $value);
             else $res = $this->_callGetter($this->getDetails, $value);
         }
         elseif ($this->getAllDetails && $strlen($value)) {
             $allDetails = $this->_callGetter($this->getAllDetails);
             if ($this->cache) $this->_cachedValueDetails = $allDetails;
-            if (isset($allDetails[$value])) $res = & $allDetails[$value];
+            if (isset($allDetails[$value])) $res = $allDetails[$value];
                 else $res = false;
         }
-        else $res = & $this->_doDefaultGetDetails($value);
+        else $res = $this->_doDefaultGetDetails($value);
         return $res;
     }
     
@@ -320,7 +321,7 @@ class Ac_Model_Values {
      * Default template method to retrieve value list 
      * @access protected
      */
-    function & _doDefaultGetDetails($value) {
+    function _doDefaultGetDetails($value) {
         $res = false;
         return $res;
     }
@@ -348,7 +349,7 @@ class Ac_Model_Values {
             if (isset($valueList[$value])) $res = $valueList[$value];
                 else $res = false;
         }
-        else $res = & $this->_doDefaultGetCaption($value);
+        else $res = $this->_doDefaultGetCaption($value);
         return $res;
     }
     
@@ -380,7 +381,7 @@ class Ac_Model_Values {
     }
     
     function _callGetter($cb) {
-        if ($this->provideSelfToGetters) $params = array(& $this);
+        if ($this->provideSelfToGetters) $params = array($this);
             else $params = array();
         $na = func_num_args();
         for($i = 1; $i < $na; $i++) $params[] = func_get_arg($i);
@@ -393,40 +394,16 @@ class Ac_Model_Values {
             
         } else $callback = $cb;
         
+        /*if (is_array($callback) && is_string($callback[0])) {
+            if (!class_exists($callback[0])) Ac_Dispatcher::loadClass($callback[0]);
+        }*/
+        
         $res = call_user_func_array($callback, $params);
         return $res;
     }
     
-    function & _callGetterRef($cb) {
-        $params = array(& $this);
-        $na = func_num_args();
-        for($i = 1; $i < $na; $i++) $params[] = func_get_arg($i);
-        if (is_array($cb)) {
-            if (($c = count($cb)) > 2) for($i = 1; $i < $na; $i++) $params[] = & $cb[$i];
-            if ($cb[0] === false) $callback = $cb[1];
-            elseif ($cb[0] === true) $callback = array(& $this->data, $cb[1]);
-            else $callback = array(& $cb[0], $cb[1]);
-            
-        } else $callback = $cb;
-        
-        if (is_array($callback)) {
-            if (is_object($callback[0])) {
-                $call = '$callback[0]->{$callback[1]}';
-            } else {
-                if (!Ac_Model_Values::isId($callback[0]) || !Ac_Model_Values::isId($callback[1]))
-                    trigger_error ("Valid class/method identifiers must be supplied in callback", E_USER_ERROR);
-                    
-                $call = $callback[0].'::'.$callback[1];
-            }
-        } else {
-            $call = '$callback';
-        }
-        
-        $p = array(); $pc = count($params);
-        for ($i = 0; $i < $pc; $i++) $p[] = '$params['.$i.']';
-        $php = '$res = & '.$call.'('.implode(', ' , $p).')';
-        eval($php); // I hate to do that!
-        return $res;
+    function _callGetterRef($cb) {
+        return $this->_callGetter($cb);
     }
     
     /**

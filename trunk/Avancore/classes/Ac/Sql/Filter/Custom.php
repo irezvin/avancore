@@ -24,6 +24,11 @@ class Ac_Sql_Filter_Custom extends Ac_Sql_Filter {
     var $params = array(
         'value' => null,
     );
+    
+    var $values = array(
+        
+    );
+    
     var $defaultParamName = 'value';
     var $placeholderStart = '{';
     var $placeholderEnd = '}';

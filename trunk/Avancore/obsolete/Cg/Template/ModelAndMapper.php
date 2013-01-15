@@ -126,7 +126,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         else $class = 'Cg_Template_Assoc_Strategy_One';
 
         //$class = 'Cg_Template_Assoc_Strategy';
-        $res = & new $class (array('relationId' => $relationId, 'prop' => & $prop, 'model' => & $this->model, 'template' => & $this));
+        $res = new $class (array('relationId' => $relationId, 'prop' => & $prop, 'model' => & $this->model, 'template' => & $this));
         return $res;
     }
 

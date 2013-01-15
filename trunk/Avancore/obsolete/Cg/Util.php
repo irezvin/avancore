@@ -2,9 +2,7 @@
 
 class Cg_Util {
     
-    
-    
-    function createDirPath($dirPath, $rights = 0777) {
+    static function createDirPath($dirPath, $rights = 0777) {
         $dirs = explode('/', $dirPath); 
         $dir='';
         foreach ($dirs as $part) {
@@ -15,7 +13,7 @@ class Cg_Util {
         }
     }
     
-    function createFilePath($filePath, $dirRights = 0777, $fileRights = 0666) {
+    static function createFilePath($filePath, $dirRights = 0777, $fileRights = 0666) {
         $dir = dirname($filePath);
         Cg_Util::createDirPath($dir, $dirRights);
         touch($filePath);
@@ -24,7 +22,7 @@ class Cg_Util {
         return $handle;
     }
     
-    function listDirContents($dirPath, $recursive = false, $files = array(), $fileRegex = false, $dirRegex = false, $includeDirNames = false) {
+    static function listDirContents($dirPath, $recursive = false, $files = array(), $fileRegex = false, $dirRegex = false, $includeDirNames = false) {
         if(!($res = opendir($dirPath))) trigger_error("$dirPath doesn't exist!", E_USER_ERROR);
         while($file = readdir($res)) {
             if($file != "." && $file != ".." && $file != ".svn") {
@@ -45,7 +43,7 @@ class Cg_Util {
         return $files;
     }
 
-    function cleanDir($dirName) {
+    static function cleanDir($dirName) {
         $dc = Cg_Util::listDirContents($dirName, true, array(), false, false, true);
         sort($dc);
         $dc = array_reverse($dc);
@@ -55,12 +53,12 @@ class Cg_Util {
         }
     }
     
-    function addSpacesBeforeCamelCase($string) {
+    static function addSpacesBeforeCamelCase($string) {
         $res = preg_replace('/\\B([A-Z])/', ' \\1', $string);
         return $res;
     }
     
-    function makeIdentifier($string, $ofClass = false) {
+    static function makeIdentifier($string, $ofClass = false) {
         if ($ofClass) {
             $res = preg_replace('/ +/', '_', ucwords($string));
         } else {
@@ -70,11 +68,11 @@ class Cg_Util {
         return $res;
     }
     
-    function className2fileName($className) {
+    static function className2fileName($className) {
         return 'classes/'.str_replace('_', '/', $className).'.php';
     }
     
-    function makeCaption ($string) {
+    static function makeCaption ($string) {
         $c = str_replace("_", " ", $string);
         $c = Cg_Util::addSpacesBeforeCamelCase($c);
         $c = preg_replace ("/ +/", " ", $c);
@@ -82,7 +80,7 @@ class Cg_Util {
         return $c;
     }
     
-    function copyDirRecursive($src, $dest, $overwrite = false, $move = false) {
+    static function copyDirRecursive($src, $dest, $overwrite = false, $move = false) {
         if (PATH_SEPARATOR == ';') { // it's WINDOWS
             $cmd = 'xcopy '.escapeshellarg($src).' '.escapeshellarg($dest).' /E';
             if ($overwrite === false ) {
@@ -97,7 +95,7 @@ class Cg_Util {
         } else {
             $cmd = 'cp -R'.($overwrite? 'f' : 'n').' '.escapeshellarg($src).'/* '.escapeshellarg($dest)/*.' --preserve=mode'*/;
         }
-        var_dump($cmd);
+        //var_dump($cmd);
         exec($cmd, $output, $res);
         $output = implode("\n", $output);
         

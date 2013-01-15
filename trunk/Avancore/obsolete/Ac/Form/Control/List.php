@@ -28,6 +28,8 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
     
     var $_valuesProviderPrototype = false;
     
+    var $valuesProviderOverride = array();
+    
     var $_valuesGetter = false;
     
     var $singleArrayValueToScalarValue = true;
@@ -70,14 +72,14 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
     /**
      * @return Ac_Model_Values
      */
-    function & _getValuesProvider() {
+    function _getValuesProvider() {
         if ($this->_valuesProvider === false) {
             if ($this->_valuesProviderPrototype) {
-                $this->_valuesProvider = & Ac_Model_Values::factoryIndependent($this->_valuesProviderPrototype);
+                $this->_valuesProvider = Ac_Model_Values::factoryIndependent($this->_valuesProviderPrototype, $this->valuesProviderOverride, $this->valuesProviderOverride);
             }
             elseif ($p = & $this->getModelProperty()) {
                 if (isset($p->values) && $p->values) {
-                    $this->_valuesProvider = & Ac_Model_Values::factoryWithProperty($p);
+                    $this->_valuesProvider = Ac_Model_Values::factoryWithProperty($p);
                 }
             }
             else $this->_valuesProvider = null;

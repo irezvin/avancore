@@ -1,0 +1,25 @@
+Devil's Rejects 01.2013
+
++./web/assets/avanManager.js.rej
++./web/assets/Ac/AjaxModule.js.rej
++./web/assets/Ac/AjaxModule/YuiPanelDialog.js.rej
++./web/assets/Ac/AjaxModule/ElementDialog.js.rej
++./web/assets/Ac/AjaxModule/Dialog.js.rej
++./web/assets/Ac/AjaxModule/Request.js.rej
++./classes/Ac/Debug/FirePHP.php.rej
++./classes/Ac/Prototyped.php.rej
++./classes/Ac/Sql/Db.php.rej
++./classes/Ac/Sql/Dbi/Table.php.rej
++./classes/Ac/Sql/Dbi/Inspector.php.rej
++./classes/Ac/Sql/Part.php.rej
++./obsolete/Ac/Model/Mapper.php.rej
++./obsolete/Ac/Model/Values.php.rej
++./obsolete/Ac/Model/Values/Records.php.rej
++./obsolete/Ac/Form/Control/List.php.rej
++./obsolete/Ac/Form/Control/Text.php.rej
++./obsolete/Ac/Admin/Template.php.rej // extra handwork will be needed
++./obsolete/Ac/Admin/Feature/Default.php.rej
++./obsolete/Ac/Admin/Manager.php.rej
+X./obsolete/Ac/Legacy/Adapter/Joomla15.php.rej // I don't currently know how to work this arround
++./obsolete/Ac/Legacy/Controller/Response/Http.php.rej
+

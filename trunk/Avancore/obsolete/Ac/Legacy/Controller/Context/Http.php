@@ -183,6 +183,13 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
         $this->_baseUrl = & $url;
         $this->_url = false;
     }
+
+    /**
+     * @return Ac_Url
+     */
+    function getBaseUrl() {
+        return $this->_baseUrl;
+    }
     
     /**
      * @return Ac_Url

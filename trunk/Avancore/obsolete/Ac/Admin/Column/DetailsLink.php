@@ -35,7 +35,7 @@ class Ac_Admin_Column_DetailsLink extends Ac_Admin_Column {
             var _c = <?php echo $this->manager->getJsListControllerRef() ?>;
 <?php foreach ($this->_recordKeys as $i => $key) { ?>
             _c.getRecord(<?php echo $i; ?>)
-                .observe([_c.EditRecord], {element: '<?php echo $this->_idPrefix.'_'.$i; ?>'});
+                .observe([AvanControllers.ListController.EditRecord], {element: '<?php echo $this->_idPrefix.'_'.$i; ?>'});
 <?php } ?>
             delete c;
         </script>

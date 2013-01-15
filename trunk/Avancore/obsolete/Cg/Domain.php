@@ -177,6 +177,12 @@ class Cg_Domain {
     var $captionsToPmtLangStrings = false;
     
     /**
+     * @var type List of columns with service information to be ignored for proper recognition of n-to-n relations
+     * Format: array(commonColName, commonColName, tableName => array(colName, colName), '' => array(colNamesForAllTablesNotListedHere))
+     */
+    var $ignoredColumnsInJunctionTables = array();
+    
+    /**
      * @param Cg_Generator $generator 
      */
     function Cg_Domain(& $generator, $name, $config = array()) {
@@ -254,7 +260,7 @@ class Cg_Domain {
             $autoConf = array();
             foreach ($autoTables as $tName) {
                 $tbl = $dbs->getTable($tName);
-                if (!$tbl->isBiJunctionTable()) {
+                if (!$tbl->isBiJunctionTable($this->getBiJunctionIgnore($tbl->name))) {
                     list ($name, $conf) = $this->getModelAutoConfig($tName);
                     $autoConf[$name] = $conf;
                 }
@@ -386,6 +392,22 @@ class Cg_Domain {
             
         if ($this->captionsToPmtLangStrings) $res['domainTemplates'] = array('Cg_Template_Domain', 'Cg_Template_Languages');
             
+        return $res;
+    }
+    
+    function getBiJunctionIgnore($tableName) {
+        $res = array();
+        
+        if (isset($this->ignoredColumnsInJunctionTables[$tableName]) && is_array($this->ignoredColumnsInJunctionTables[$tableName]))
+            $res = $this->ignoredColumnsInJunctionTables[$tableName];
+        else {
+            if (isset($this->ignoredColumnsInJunctionTables['']) && is_array($this->ignoredColumnsInJunctionTables['']))
+                $res = array_merge($res, $this->ignoredColumnsInJunctionTables['']);
+        }
+        
+        foreach ($this->ignoredColumnsInJunctionTables as $k => $v) {
+            if (is_numeric($k) && !is_array($v)) $res[] = $v;
+        }
         return $res;
     }
     

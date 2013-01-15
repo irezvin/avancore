@@ -143,12 +143,16 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      */
     var $templatePart = false;
     
+    var $templatePartParam = false;
+    
     /**
      * Template class to render the control's wrapper 
      * @access public
      * @var string|bool
      */
     var $wrapperTemplateClass = false;
+    
+    var $wrapperTemplateParam = false;
     
     /**
      * Name of template part (of given template class) of the control's wrapper.
@@ -257,6 +261,8 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     var $decorator = false;
     
+    var $debug = false;
+    
     function doInitProperties($options = array()) {
         if (isset($options['default'])) $this->setDefault($options['default']);
         if (isset($options['parent']) && is_a($options['parent'], 'Ac_Form_Control')) $this->_parent = & $options['parent'];
@@ -268,8 +274,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         if (isset($options['modelProperty'])) $this->setModelProperty($options['modelProperty']);
         if (is_a($this->_context, 'Ac_Form_Context')) {
             $this->_context->valueFirst = $this->valueFirstInContext;
-            //if (!$this->valueFirstInContext) var_dump("!!!");
-            //var_dump($this->_context->getData());
         }
         $this->init = true;
         $tmp = $options;
@@ -493,7 +497,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         }
         while ($curr && count($path)) {
             $segment = $path[0];
-            //var_dump(get_class($curr), get_class($curr->_parent), $segment);
             $path = array_slice($path, 1);
             if ($segment == '..') $curr = $curr->_parent;
             elseif (is_a($curr, 'Ac_Form_Control_Composite') && in_array($segment, $curr->listControls())) {
@@ -567,6 +570,10 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         } else {
             return false;
         }
+    }
+    
+    function renderWrapper($wrappedHtml) {
+        return $this->_renderWrapper($wrappedHtml);
     }
     
     function _renderWrapper($wrappedHtml) {
@@ -859,7 +866,9 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * @access protected
      */
     function _doGetTemplatePartParams() {
-        return array (& $this);
+        $res = array (& $this);
+        if ($this->templatePartParam !== false) $res[] = $this->templatePartParam;
+        return $res;
     }
     
     /**
@@ -867,7 +876,11 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * @access protected
      */
     function _doGetWrapperTemplatePartParams($representation) {
-        return array (& $this, $representation);
+        $res = array (& $this, $representation);
+        if (isset($this->wrapperTemplateParam) && $this->wrapperTemplateParam) {
+            $res[] = $this->wrapperTemplateParam;
+        }
+        return $res;
     }
     
     /**
@@ -936,8 +949,10 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
 
     function updateFromModel() {
-        $this->_value = $this->getDefault();
-        $this->_gotValue = true;
+        if ($this->getModel()) {
+            $this->_value = $this->getDefault();
+            $this->_gotValue = true;
+        }
     }
     
     function updateModel() {

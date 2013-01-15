@@ -3,7 +3,7 @@
 /**
  * Retrieves column comments and information about relations from INFORMATION_SCHEMA database (available from MySQL v. 5.0)
  */
-class Ac_Sql_Dbi_Inspector_Mysql5 extends Ac_Sql_Dbi_Inspector {
+class Ac_Sql_Dbi_Inspector_MySql5 extends Ac_Sql_Dbi_Inspector {
     
     function getColumnsForTable($tableName, $databaseName = false) {
         $cols = parent::getColumnsForTable($tableName, $databaseName);

@@ -3,6 +3,7 @@
 ini_set('include_path', 
       '.'
     . PATH_SEPARATOR .dirname(__FILE__).'/../classes'
+    . PATH_SEPARATOR .dirname(__FILE__).'/../obsolete'
 	. PATH_SEPARATOR . '.' 
 	. PATH_SEPARATOR . dirname(__FILE__)
 	. PATH_SEPARATOR . dirname(__FILE__) . '/classes'

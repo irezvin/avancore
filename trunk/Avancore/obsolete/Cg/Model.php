@@ -388,7 +388,7 @@ class Cg_Model {
         if ($isIncoming) $ot = $rel->ownTable; 
             else $ot = $rel->getForeignTable();
             
-        if ($rels = $ot->isBiJunctionTable()) {
+        if ($rels = $ot->isBiJunctionTable($this->_domain->getBiJunctionIgnore($ot->name))) {
             $otherRel = false;
             foreach (array_keys($rels) as $r) {
                 if (!Ac_Util::sameObject($rels[$r], $rel)) {

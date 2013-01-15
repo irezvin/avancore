@@ -140,6 +140,10 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
         return $this->_aeDb->getIfnullFunction();
     }
     
+    function getAffectedRows() {
+        return $this->_aeDb->getAffectedRows();
+    }
+    
 }
 
 ?>

@@ -158,8 +158,8 @@ class Ac_Util {
         return $string;
     }
 
-    static function date ($src, $format = null, $useGmt = false) {
-        return Ac_Model_DateTime::date($src, $format, $useGmt);
+    static function date ($src, $format = null, $useGmt = false, & $wasZeroDate = false) {
+        return Ac_Model_DateTime::date($src, $format, $useGmt, $wasZeroDate);
     }
 
     static function createDirPath($dirPath, $rights = 0777) {

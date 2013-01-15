@@ -37,9 +37,9 @@ class Ac_Admin_Column_Checked extends Ac_Admin_Column {
         <script type="text/javascript">
             var _c = <?php echo $this->manager->getJsListControllerRef() ?>; 
 <?php foreach ($this->_recordKeys as $i => $key) { ?>
-            _c.getRecord(<?php echo $i; ?>).observe([_c.ToggleSelected, _c.ShowSelected], {element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->togglePrefix.$key)); ?>});
+            _c.getRecord(<?php echo $i; ?>).observe([AvanControllers.ListController.ToggleSelected, AvanControllers.ListController.ShowSelected], {element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->togglePrefix.$key)); ?>});
 <?php } ?>
-            _c.observe([_c.ToggleAllSelected, _c.ShowAllSelected], {element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->toggleAllId)); ?>});
+            _c.observe([AvanControllers.ListController.ToggleAllSelected, AvanControllers.ListController.ShowAllSelected], {element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->toggleAllId)); ?>});
             delete _c;
         </script>
      <?php

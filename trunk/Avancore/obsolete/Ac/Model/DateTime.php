@@ -121,7 +121,7 @@ class Ac_Model_DateTime {
     }
     
     
-    function tsFromArray($array, $set = true, $useGmt = true) {
+    function tsFromArray($array, $set = true, $useGmt = true, & $wasZeroDate = null) {
         if (isset($array['mssql'])) {
             $array['mssql'] = preg_replace('/:[0-9]{3}/', '', $array['mssql']);
             $timestamp = strtotime($array['mssql']);
@@ -133,7 +133,7 @@ class Ac_Model_DateTime {
             }
         } else {
             
-            $isZeroDate = $this->detectZeroDate? $this->isZeroDate($array) : false;
+            $wasZeroDate = $isZeroDate = $this->detectZeroDate? $this->isZeroDate($array) : false;
             
             if (!$isZeroDate) {
                 static $defaults = array ('mday' => 1, 'month' => 1, 'year' => 1970, 'hours' => 0, 'minutes' => 0, 'seconds' => 0);
@@ -185,10 +185,13 @@ class Ac_Model_DateTime {
     }
     
     function _intMatch($inputString, $rx) {
-        if (is_array($rx)) foreach (array_reverse($rx) as $rk=>$subRx) {
-            if ($res = $this->_intMatch($inputString, $subRx)) {
-                return $res;
+        if (is_array($rx)) {
+            foreach (array_reverse($rx) as $rk=>$subRx) {
+                if ($res = $this->_intMatch($inputString, $subRx)) {
+                    return $res;
+                }
             }
+            return false;
         }
         $res = array();
         if (preg_match ("/^{$rx}\$/u", $inputString, $res)) {
@@ -265,11 +268,11 @@ class Ac_Model_DateTime {
         return $res;
     }
     
-    function fromString($string, $userMask = false, $useGmt = true) {
+    function fromString($string, $userMask = false, $useGmt = true, & $wasZeroDate = false) {
         $parser = & Ac_Model_DateTime::getInstance();
         if (!($res = $parser->match($string))) return false;
         $res = $parser->process($res, $userMask);
-        return $parser->tsFromArray($res, true, $useGmt);
+        return $parser->tsFromArray($res, true, $useGmt, $wasZeroDate);
     }
     
     function toString($format, $timestamp, $useGmt = true) {
@@ -291,13 +294,13 @@ class Ac_Model_DateTime {
     }
     
 
-    static function date ($src, $format = null, $useGmt = false) {
+    static function date ($src, $format = null, $useGmt = false, & $wasZeroDate = false) {
     	if (is_a($src, 'DateTime')) {
     		$srcTs = (int) $src->format('U');
     	} else {
 	        if (!is_int($src)) { 
 	            $dtp = & Ac_Model_DateTime::getInstance();
-	            $srcTs = $dtp->fromString($src, false, $useGmt); 
+	            $srcTs = $dtp->fromString($src, false, $useGmt, $wasZeroDate); 
 	        } else $srcTs = $src;
     	}
         

@@ -8,6 +8,12 @@ class Ac_Image_Processor_Gd extends Ac_Image_Processor {
     var $_resizer = false;
     
     /**
+     * {w} is width, {h} is height, {s} is src path, {d} is dest path
+     * @var string
+     */
+    var $magickCommand = false;    
+    
+    /**
      * @return Resizeimage
      */
     function & _getResizer() {
@@ -35,10 +41,23 @@ class Ac_Image_Processor_Gd extends Ac_Image_Processor {
     }
     
     function _doMakeThumbnail($thumbPath, $thumbWidth, $thumbHeight) {
-        $r = & $this->_getResizer();
-        $r->resize_limitwh($thumbWidth, $thumbHeight, $thumbPath);
-        $this->_thumbWidth = $r->newWidth;
-        $this->_thumbHeight = $r->newHeight;
+        
+        if (strlen($this->magickCommand)) {
+            
+            $command = strtr($this->magickCommand, array(
+                '{w}' => escapeshellarg($thumbWidth),
+                '{h}' => escapeshellarg($thumbHeight),
+                '{s}' => escapeshellarg($this->_filePath),
+                '{d}' => escapeshellarg($thumbPath)
+            ));
+            exec($command, $output, $return);
+            
+        } else  {
+            $r = & $this->_getResizer();
+            $r->resize_limitwh($thumbWidth, $thumbHeight, $thumbPath);
+            $this->_thumbWidth = $r->newWidth;
+            $this->_thumbHeight = $r->newHeight;
+        }
     }
     
 }

@@ -19,7 +19,7 @@ class Ac_Legacy_Database_Joomla extends Ac_Legacy_Database {
         );
     }
     
-    function _doInitialize($options) {
+    function _doInitialize(array $options = array()) {
         if (!defined('_VALID_MOS') || !isset($GLOBALS['database']) || !is_a($GLOBALS['database'], 'database')) 
             trigger_error ('No Joomla or Joomla Db detected', E_USER_ERROR);
             
@@ -122,7 +122,9 @@ class Ac_Legacy_Database_Joomla extends Ac_Legacy_Database {
         return $this->_db->getErrorMsg();
     }
     
-    
+    function getAffectedRows() {
+        return $this->_db->getAffectedRows();
+    }
     
 }
 

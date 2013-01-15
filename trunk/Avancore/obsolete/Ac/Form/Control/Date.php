@@ -68,8 +68,8 @@ class Ac_Form_Control_Date extends Ac_Form_Control {
     function getValue() {
         $res = parent::getValue();
         if (($if = $this->getInternalFormat()) !== false) {
-            $convertedValue = Ac_Util::date($res, $if, true);
-            if (strlen($convertedValue)) $res = $convertedValue;
+            $convertedValue = Ac_Util::date($res, $if, true, $wasZero);
+            if (!$wasZero && strlen($convertedValue)) $res = $convertedValue;
         }
         return $res;
     }
@@ -77,8 +77,8 @@ class Ac_Form_Control_Date extends Ac_Form_Control {
     function getDisplayValue() {
         $res = parent::getValue();
         if (($ef = $this->getExternalFormat()) !== false) {
-            $convertedValue = Ac_Util::date($res, $ef, true);
-            if (strlen($convertedValue)) $res = $convertedValue;
+            $convertedValue = Ac_Util::date($res, $ef, true, $wasZero);
+            if (!$wasZero && strlen($convertedValue)) $res = $convertedValue;
         }
         return $res;
     }

@@ -16,6 +16,8 @@ class Ac_Form_Control_Listable extends Ac_Form_Control {
     var $trim = true;
     
     var $inputCanBeArray = '?';
+
+    var $allowHtml = '?';
     
     /**
      * @access protected
@@ -28,6 +30,17 @@ class Ac_Form_Control_Listable extends Ac_Form_Control {
         if ($this->inputCanBeArray !== '?') $res = $this->inputCanBeArray; 
         else {
             $res = $this->isList();
+        }
+        return $res;
+    }
+    
+    function isHtmlAllowed() {
+        if ($this->allowHtml === '?') {
+            $p = & $this->getModelProperty();
+            if ($p && isset($p->allowHtml)) $res = $p->allowHtml;
+                else $res = false;
+        } else {
+            $res = $this->allowHtml;
         }
         return $res;
     }

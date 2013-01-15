@@ -95,7 +95,15 @@ class Ac_Form_Control_Repeater extends Ac_Form_Control_Composite {
             } else {
                 $form = $this->_getRootControl();
                 if ($form instanceof Ac_Form) {
-                    $submit = "document.".($form->getContext()->mapParam('')).".submit();";
+                    $ctx = $form->getContext();
+                    if ($ctx instanceof Ac_Form_Context) {
+                        $formName = $form->getContext()->mapParam('');
+                    } elseif (strlen($form->name)) {
+                        $formName = $ctx->mapParam($form->name);
+                    } else {
+                        trigger_error("Cannot determine form name for Ac_Form_Control_Repeater::getReloadCode()");
+                    }
+                    $submit = "document.{$formName}.submit();";
                 }
             }
         }
@@ -167,11 +175,17 @@ class Ac_Form_Control_Repeater extends Ac_Form_Control_Composite {
         if ($child->name !== 'addControl' && $this->canRemove($child)) {
             $id = $this->_context->mapIdentifier('remove_'.$child->index);
             $h = Ac_Util::mkElement('input', false, array('type' => 'hidden', 'id' => $id, 'name' => $this->_context->mapParam(array('remove', $child->index)), 'value' => ''));
-            $script = 'document.getElementById('.new Pm_Js_Val($id).').value = 1; '.$this->getReloadCode().' return false; ';
+            $script = 'document.getElementById('.new Ac_Js_Val($id).').value = 1; '.$this->getReloadCode().' return false; ';
             $content = $this->removeControlText;
             $attribs = Ac_Util::m(array('href' => '#', 'class' => 'removeControl', 'onclick' => $script), $this->removeControlAttribs);
             $a = $this->getRemoveControlLink($child, $content, $attribs);
-            $html = $h.$a.$html;
+            if (strpos($html, '##remove##') !== false) 
+                $html = str_replace('##remove##', $h.$a, $html);
+            else
+                $html = $h.$a.$html;
+        } else {
+            if (strpos($html, '##remove##') !== false) 
+                $html = str_replace('##remove##', '', $html);
         }
     }
     

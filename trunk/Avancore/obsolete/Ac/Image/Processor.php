@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Image_Processor {
+class Ac_Image_Processor extends Ac_Prototyped {
     
     var $_error = false;
     
@@ -17,6 +17,10 @@ class Ac_Image_Processor {
     var $_thumbHeight = false;
     
     var $_thumbPath = false;
+    
+    function hasPublicVars() {
+        return true;
+    }
     
     function setFile($filePath) {
         $nf = false;

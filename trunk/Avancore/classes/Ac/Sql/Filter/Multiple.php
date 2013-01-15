@@ -10,6 +10,8 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
      */
     var $isOr = false;
     
+    var $isNot = false;
+    
     var $differentFiltersForWhereAndHaving = false; // TODO: implement this...
     
     /**
@@ -78,7 +80,7 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
             $crit = array_slice($crit, 0, 1);
             $res = current($crit);
         } elseif (count($crit) > 1) {
-            $res = $this->_db->indent("\n(".implode($this->isOr? ")\nOR (" : ")\nAND (", $crit).")");
+            $res = $this->_db->indent("\n ".($this->isNot? 'NOT ' : '')." (".implode($this->isOr? ")\nOR (" : ")\nAND (", $crit).")");
         } else {
             $res = false;
         }

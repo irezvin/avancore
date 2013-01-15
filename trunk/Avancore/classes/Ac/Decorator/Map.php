@@ -2,6 +2,10 @@
 
 class Ac_Decorator_Map extends Ac_Decorator {
     
+    static $mapYes = array(
+        1 => 'Yes',
+    );
+    
     static $mapYesNo = array(
         1 => 'Yes',
         '' => 'No',

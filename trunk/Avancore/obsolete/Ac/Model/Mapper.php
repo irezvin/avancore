@@ -26,6 +26,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     var $recordClass = 'Ac_Model_Object';
 
     var $pk = null;
+    
 
     var $_prototype = false;
 
@@ -79,6 +80,8 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     var $_updateLevel = 0;
     
     var $_dateFormats = false;
+    
+    var $managerClass = false;    
     
     protected $columnNames = false;
     
@@ -355,8 +358,23 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
             else $res = null;
         return $res;
     }
+
+    /**
+     * @param array $rows Array of associative DB rows
+     * @return array
+     */
+    function loadFromRows(array $rows) {
+        $res = array();
+        $c = $this->recordClass;
+        foreach ($rows as $i => $row) {
+            $rec = new $c ($this->database);
+            $rec->load($row, null, true);
+            $res[$i] = $rec;
+        }
+        return $res;
+    }
     
-    function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false) {
+    function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
         $sql = "SELECT ".$this->database->NameQuote($this->tableName).".* FROM ".$this->database->NameQuote($this->tableName)." $joins  ";
         if ($where) $sql .= " WHERE ".$where;
         if ($order) $sql .= " ORDER BY ".$order;
@@ -372,7 +390,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         $result = $this->database->getResultResource();
         //var_dump($sql);
         
-        $res =  array();
+        $res = array();
 
         while($row = $this->database->fetchAssoc($result)) {
             $recId = $row[$this->pk];
@@ -395,7 +413,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
 
         return $res;
     }
-
+    
     function getRecordClass($row) {
         $res = $this->recordClass;
         return $res;

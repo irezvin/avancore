@@ -24,6 +24,8 @@ class Ac_Admin_Template extends Ac_Template_Html {
     var $actions = array();
     var $htmlIdsPrefix = false;
     
+    var $assets = array();
+    
     var $_showTableMtime = false;
     
     /**
@@ -91,8 +93,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
     
         var _m = <?php echo $mgrCon ?> = new AvanControllers.ManagerController({
             managerActionElement: <?php $this->d($h->jsQuote($aId), true) ?>,
-            managerProcessingElement: <?php $this->d($h->jsQuote($pId), true) ?>
-
+            managerProcessingElement: <?php $this->d($h->jsQuote($pId), true) ?> 
         });
         delete _m;
     // -->
@@ -131,9 +132,9 @@ class Ac_Admin_Template extends Ac_Template_Html {
 <?php foreach(array_keys($this->actions) as $a) { $act = & $this->actions[$a]; ?>
         
         _a.getAction('<?php echo $a; ?>')
-                .observe([_a.Click, _a.ShowCaption, _a.ShowHint], {element: '<?php echo $this->htmlIdsPrefix ?>_action_a_<?php echo $a; ?>'})
-                .observe([_a.Click, _a.ShowImage, _a.ShowHint], {element: '<?php echo $this->htmlIdsPrefix ?>_action_img_<?php echo $a; ?>'})
-                .observe([_a.EnabledDisabled, _a.Click], {element: '<?php echo $this->htmlIdsPrefix ?>_action_td_<?php echo $a; ?>'});
+                .observe([AvanControllers.ActionsController.Click, AvanControllers.ActionsController.ShowCaption, AvanControllers.ActionsController.ShowHint], {element: '<?php echo $this->htmlIdsPrefix ?>_action_a_<?php echo $a; ?>'})
+                .observe([AvanControllers.ActionsController.Click, AvanControllers.ActionsController.ShowImage, AvanControllers.ActionsController.ShowHint], {element: '<?php echo $this->htmlIdsPrefix ?>_action_img_<?php echo $a; ?>'})
+                .observe([AvanControllers.ActionsController.EnabledDisabled, AvanControllers.ActionsController.Click], {element: '<?php echo $this->htmlIdsPrefix ?>_action_td_<?php echo $a; ?>'});
 <?php } ?>
 
 <?php if ($this->manager->isList()) { ?>
@@ -223,9 +224,18 @@ class Ac_Admin_Template extends Ac_Template_Html {
             
     function showManagerWrapper($innerHtml, $isPart = false, $params = array()) {
         //$this->addJsLib('prototype.js');
+
+        // TODO: FIX this one because there is no more Adapter here in Ac0.3!
+        $this->addAssetLibs(
+            Ac_Dispatcher::getInstance()->adapter->getManagerJsAssets()
+        );
         
-        $this->addJsLib('{PAX}core.js');
-        $this->addJsLib('{AC}avanManager.js');
+        if ($this->assets) {
+            $this->addAssetLibs(
+                $this->assets
+            );
+        }
+        
         
         if ($isPart) $innerHtml = $this->fetch($innerHtml, $params);
         
@@ -315,6 +325,10 @@ class Ac_Admin_Template extends Ac_Template_Html {
             <?php echo $tcVar; ?>.setpersist(true);
             <?php echo $tcVar; ?>.setselectedClassTarget("link");
             <?php echo $tcVar; ?>.init();
+<?php       if (strlen($currTab = $ctx->getData('tab'))) { ?> 
+            <?php echo "{$tcVar}.expandtab({$tcVar}.tabs[{$currTab}]);" ?>
+<?php       } ?>
+                
         </script>
 
 <?php
