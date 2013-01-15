@@ -346,7 +346,7 @@ class Ac_Legacy_Controller {
                 }
                 $rc = $this->getResponseClass();
                 $this->_response = new $rc;
-                if ($this->doBeforeExecute() !== false) {
+                if ($this->doBeforeExecute($methodName) !== false) {
                     if ($m = $this->getMethodName()) {
                         $this->$m();
                     } else {
@@ -409,7 +409,7 @@ class Ac_Legacy_Controller {
     }
     
     function _getTplData() {
-        $res = Ac_Util::ms($this->templateExtraVars, $this->_tplData);
+        $res = Ac_Util::m($this->templateExtraVars, $this->_tplData);
         $res['controller'] = & $this;
         $res['context'] = & $this->getContext();
         $res['newUi'] = true;

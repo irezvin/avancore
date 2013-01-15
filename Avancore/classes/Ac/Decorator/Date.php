@@ -6,8 +6,12 @@ class Ac_Decorator_Date extends Ac_Decorator {
     
     var $useGmt = false;
     
+    var $skipEmptyValue = true;
+    
     function apply($value) {
-        $value = Ac_Util::date($value, $this->format, $this->useGmt);
+        if (strlen($value) || !$this->skipEmptyValue) {
+            $value = Ac_Util::date($value, $this->format, $this->useGmt);
+        }
         return $value;
     }
     

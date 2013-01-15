@@ -49,12 +49,12 @@ border-bottom-color: white;
 text-decoration: none;
 }
 
-.tabcontent{
-display:none; 
+@media print {
+    .tabContainer .tabcontent {
+        display:block !important;
+    }
 }
 
-@media print {
-.tabcontent {
-display:block !important;
-}
+.tabContainer .tabContent, .tabContainer .tabcontent {
+    display: none;
 }

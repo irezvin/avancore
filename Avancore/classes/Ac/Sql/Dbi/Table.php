@@ -170,7 +170,7 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
      * 
      * @return array|false
      */
-    function hasOnlyReferenceFields() {
+    function hasOnlyReferenceFields(array $ignoredOtherColumns = array()) {
         $columns = array();
         $relations = array();
         foreach ($this->listRelations() as $relId) {
@@ -182,7 +182,7 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
             $rel = $this->getIncomingRelation($relId);
             $columns = array_merge($columns, Ac_Util::array_values($rel->columns));
         }
-        if (!count(array_diff($this->listColumns(), $columns))) { // all fields are used in relations
+        if (!count($ad = array_diff($this->listColumns(), $columns, $ignoredOtherColumns))) { // all fields are used in relations
              $res = $relations;
         } else {
             $res = false;
@@ -196,8 +196,8 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
      * @see Ac_Sql_Dbi_Table::hasOnlyReferenceFields
      * @return array|false  
      */
-    function isBiJunctionTable() {
-        $res = $this->hasOnlyReferenceFields();
+    function isBiJunctionTable(array $ignoredOtherColumns = array()) {
+        $res = $this->hasOnlyReferenceFields($ignoredOtherColumns);
         if (is_array($res) && count($res) == 2) {
             $allAreOutgoing = true;
             $relFields = array();

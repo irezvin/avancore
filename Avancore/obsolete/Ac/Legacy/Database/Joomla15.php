@@ -25,7 +25,7 @@ class Ac_Legacy_Database_Joomla15 extends Ac_Legacy_Database_Joomla {
         return $res;
     }
     
-    function _doInitialize($options) {
+    function _doInitialize(array $options = array()) {
         if (!class_exists('JFactory')) 
             trigger_error ('No JFactory found', E_USER_ERROR);
             

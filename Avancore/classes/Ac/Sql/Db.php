@@ -103,6 +103,30 @@ abstract class Ac_Sql_Db {
         return $res;
     }
     
+    /**
+     * Makes all rows to have the same keys in same order
+     * Replaces missing values with new Ac_Sql_Expression('DEFAULT')
+     * 
+     * @param array $rows Two-dimensional associative array with insert data
+     */
+    function unifyInsertData($rows) {
+        $allKeys = array();
+        foreach ($rows as $row) {
+            $allKeys = array_unique(array_merge($allKeys, array_keys($row)));
+        }
+        $res = array();
+        $def = new Ac_Sql_Expression('DEFAULT');
+        foreach ($rows as $row) {
+            $newRow = array();
+            foreach ($allKeys as $key) {
+                if (array_key_exists($key, $row)) $newRow[$key] = $row[$key];
+                    else $newRow[$key] = $def;
+            }
+            $res[] = $newRow;
+        }
+        return $res;
+    }
+    
     function insertStatement($tableName, $fieldValues, $multipleInserts = false, $useReplace = false) {
         $res = false;
         $bigInserts = array();
@@ -125,8 +149,11 @@ abstract class Ac_Sql_Db {
             }
             $bigInserts[] = '('.implode(", ", $inserts).')';
         }
-        $action = $useReplace? "REPLACE" : "INSERT";
-        if (count($bigInserts)) $res = "{$action} INTO {$tableName} (".$this->n($keys, true).") VALUES ".implode(", ", $bigInserts);
+        
+        if (is_string($useReplace) && strlen($useReplace)) $action = $useReplace;
+        else $action = $useReplace === true? "REPLACE" : "INSERT";
+        
+        if (count($bigInserts)) $res = "{$action} INTO {$tableName} (".$this->n($keys, true).") VALUES \n".implode(",\n", $bigInserts);
         return $res;
     }
     
@@ -190,6 +217,13 @@ abstract class Ac_Sql_Db {
     
     abstract function getIfnullFunction();
     
+    function fetchObject($query, $default = null) {
+        $res = $this->fetchObjects($query);
+        if (count($res)) $res = $res[0];
+            else $res = $default;
+        return $res;
+    }
+    
     function getOrderDirection($orderPart) {
         if (is_array($orderPart)) {
             foreach ($orderPart as $k => $v) $res[$k] = $this->getOrderDirection($v);
@@ -219,6 +253,10 @@ abstract class Ac_Sql_Db {
         elseif (preg_match($pat = '#\sDESC\s*$#i', $strSqlOrderPart)) $d = preg_replace($pat, ' ASC', $strSqlOrderPart);
         else $d = $strSqlOrderPart.' DESC';
         return $d;
+    }
+    
+    function getAffectedRows() {
+        trigger_error("Call to abstract function", E_USER_ERROR);
     }
     
 }

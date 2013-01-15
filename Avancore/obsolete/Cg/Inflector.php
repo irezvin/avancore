@@ -8,7 +8,7 @@ class Cg_Inflector {
      *
      * @param string $string
      */
-    function explode($string) {
+    static function explode($string) {
         if (!is_string($string)) {
             if (is_array($string)) $res = Ac_Util::array_values($string);
             else $res = $string;
@@ -30,7 +30,7 @@ class Cg_Inflector {
      * @param bool $convertAll convert all parts of string/array
      * @return string|array
      */
-    function pluralToSingular($stringOrArray, $convertAll = false) {
+    static function pluralToSingular($stringOrArray, $convertAll = false) {
         return Cg_Inflector::_convert($stringOrArray, $convertAll, true);
     }
     
@@ -41,11 +41,11 @@ class Cg_Inflector {
      * @param bool $convertAll convert all parts of string/array
      * @return string|array
      */
-    function singularToPlural($stringOrArray, $convertAll = false) {
+    static function singularToPlural($stringOrArray, $convertAll = false) {
         return Cg_Inflector::_convert($stringOrArray, $convertAll, false);
     }
     
-    function _convert($stringOrArray, $convertAll, $toSingular) {
+    static function _convert($stringOrArray, $convertAll, $toSingular) {
         if ($convertAll) {
             $res = array();
             foreach (Cg_Inflector::explode(" ", $string) as $part) $res[] = Cg_Inflector::_convert($part, false, $toSingular);
@@ -68,7 +68,7 @@ class Cg_Inflector {
         return $res;
     }
     
-    function _toSingular($string) {
+    static function _toSingular($string) {
         if (substr($string, -3) == 'ies') {
             $res = substr($string, 0, -3).'y';
         } elseif (substr($string, -3) == 'ses') {
@@ -81,7 +81,7 @@ class Cg_Inflector {
         return $res;
     }
     
-    function _toPlural($string) {
+    static function _toPlural($string) {
         if (substr($string, -1) == 'y') {
             $res = substr($string, 0, -1).'ies';
         } elseif (substr($string, 0, -2) == 'ss') {
@@ -100,7 +100,7 @@ class Cg_Inflector {
      * @param string|array $identifier
      * @return string
      */
-    function pearize($identifier) {
+    static function pearize($identifier) {
         $parts = array();  
         foreach (Cg_Inflector::explode($identifier) as $part) $parts[] = ucfirst($part);
         return implode("_", $parts);
@@ -113,7 +113,7 @@ class Cg_Inflector {
      * @param bool $ucFirst Make first letter of the result identifier uppercase
      * @return string
      */
-    function camelize($identifier, $ucFirst = false) {
+    static function camelize($identifier, $ucFirst = false) {
         $parts = array();  
         foreach (Cg_Inflector::explode($identifier) as $part) $parts[] = ucfirst($part);
         $res = implode("", $parts);
@@ -128,7 +128,7 @@ class Cg_Inflector {
      * @param bool $ucFirst Whether convert first letter to upper case
      * @param unknown_type $ucOther Whether convert other parts to upper case
      */
-    function humanize($identifier, $ucFirst = true, $ucOther = false) {
+    static function humanize($identifier, $ucFirst = true, $ucOther = false) {
         $parts = Cg_Inflector::explode($identifier);
         if ($ucFirst) $start = 0; else $start = 1;
         $c = $ucOther? count($parts) : min(count($parts), 1);
@@ -142,7 +142,7 @@ class Cg_Inflector {
      *
      * @param string|array $identifier
      */
-    function definize($identifier) {
+    static function definize($identifier) {
         return strtoupper(implode("_", Cg_Inflector::explode($identifier)));
     }
     

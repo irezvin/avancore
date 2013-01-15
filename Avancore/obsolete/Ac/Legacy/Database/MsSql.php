@@ -36,7 +36,7 @@ class Ac_Legacy_Database_MsSql extends Ac_Legacy_Database {
         );
     }
         
-    function _doInitialize($options) {
+    function _doInitialize(array $options = array()) {
         foreach (array('host', 'port', 'user', 'password', 'db', 'charset', 'timezone', 'prefix', 'useSqlsrv') as $param) {
             if (isset($options[$param])) {
                 $myParam = '_'.$param;

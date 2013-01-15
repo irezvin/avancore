@@ -655,17 +655,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * @static
      */
     function listAllFeatureClasses() {
-        static $afc = false;
-        if ($afc === false) {
-            $files = glob($d = dirname(__FILE__).'/Feature/*.php');
-            $res = array();
-            foreach ($files as $file) if (is_file($file)) {
-                $fn = basename($file, ".php");
-                $res[] = 'Ac_Admin_Feature_'.$fn;
-            }
-            $afc = $res;
-        }
-        return $afc;
+        $res = array_unique(array_merge(array('Ac_Admin_Feature_Default'), array_keys($this->featureSettings)));
+        return $res;
     }
     
 /**
@@ -728,8 +719,12 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             foreach ($this->listAllFeatureClasses() as $fc) {
                 if (isset($this->featureSettings[$fc]) && is_array($this->featureSettings[$fc])) $featureSettings = $this->featureSettings[$fc];
                     else $featureSettings = array(); 
-                $feature = new $fc ($this, $featureSettings);
-                if ($feature->canBeApplied()) $this->_featureObjects[$fc] = & $feature;
+                $class = $fc;
+                if (isset($featureSettings['class']) && strlen($featureSettings['class'])) {
+                    $class = $featureSettings['class'];
+                }
+                $feature = new $class ($this, $featureSettings);
+                if ($feature->canBeApplied()) $this->_featureObjects[$fc] = $feature;
             }
         }
         return array_keys($this->_featureObjects);
@@ -762,7 +757,11 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                         if (!strlen($action->id)) $action->id = ''.$ak;
                         $this->_actions[$action->id] = & $a[$ak];
                     } elseif (is_array($a[$ak])) {
-                        $actionPrototypes[$ak] = $a[$ak];
+                        if (!isset($actionPrototypes[$ak])) {
+                            $actionPrototypes[$ak] = $a[$ak];
+                        } else {
+                            Ac_Util::ms($actionPrototypes[$ak], $a[$ak]);
+                        }
                     }
                 }
             }
@@ -808,7 +807,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             foreach ($this->listFeatures() as $f) {
                 $feat = & $this->getFeature($f);
                 foreach (array_keys($fps = $feat->getProcessings()) as $i) {
-                    $this->_processings[$i] = & $fps[$i];
+                    if (!isset($this->_processings[$i]))
+                        $this->_processings[$i] = $fps[$i];
+                    else Ac_Util::ms($this->_processings[$i], $fps[$i]);
                 }
             }
         }
@@ -1090,9 +1091,12 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $feat = & $this->getFeature($f);
                 $cs = $feat->getColumnSettings();
                 foreach ($cs as $c => $s) {  
-                    // subsequent features can't overwrite columns of previous ones
-                    if (!isset($this->_columnSettings[$c])) $this->_columnSettings[$c] = $s;
-                    $this->_columnSettings[$c]['manager'] = $this;
+                    // subsequent features CAN override columns of previous ones
+                    if (!isset($this->_columnSettings[$c])) {
+                        $this->_columnSettings[$c] = $s;
+                        $this->_columnSettings[$c]['manager'] = $this;
+                    }
+                    else Ac_Util::ms($this->_columnSettings[$c], $s);
                 }
             }
             if ($this->_datalink) $this->_datalink->onManagerColumnsPreset($this->_columnSettings);

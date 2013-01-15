@@ -50,7 +50,7 @@ class Cg_Frontend {
             }
             
             if ($this->showErrors) {
-                ini_set('error_reporting', E_ALL);
+                ini_set('error_reporting', E_ALL ^ E_STRICT);
                 ini_set('display_errors', 1);
                 ini_set('html_errors', 1);
             }
@@ -130,18 +130,18 @@ class Cg_Frontend {
 
     foreach ($gen->listDomains() as $domName) {
     
-        $dom = & $gen->getDomain($domName);
+        $dom = $gen->getDomain($domName);
         $this->showExpandable("<h2>".$domName."</h2>", false);
     
         foreach ($dom->listModels() as $modelName) {
-            $model = & $dom->getModel($modelName);
+            $model = $dom->getModel($modelName);
             $this->showExpandable("<h3>".$modelName."</h3>", false);
             $this->show($model);
             //var_dump($dom->analyzeTableName($model->table));
 ?>
 <?php       if ($ps = $model->listProperties()) { ?>
         		<ul>
-<?php           foreach ($ps as $p) { $prop = & $model->getProperty($p); ?>
+<?php           foreach ($ps as $p) { $prop = $model->getProperty($p); ?>
 <?php               // if (is_a($prop, 'Cg_Property_Object')) var_dump($prop->getOtherEntityName(), $prop->getOtherEntityName(false)); ?>
 <?php               $cmn = '$'.$prop->getClassMemberName(); if ($prop->pluralForList) $cmn .= '[]'; ?>
               		<li>
@@ -187,7 +187,7 @@ class Cg_Frontend {
     }
 // ---------------------------------------------------------------------------------------------------------->8    
 
-    function show(& $object, $buf = false, $showDefaults = false) {
+    function show($object, $buf = false, $showDefaults = false) {
         $r = array();
         if (!$showDefaults) $cv = get_class_vars(get_class($object));
         foreach (get_object_vars($object) as $k => $v) {

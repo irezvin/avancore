@@ -38,7 +38,7 @@ class Ac_Legacy_Config {
     var $backendDirOverride = false;
     var $frontendDirOverride = false;
     var $languagesDir = false;
-    var $dbClass;
+    var $dbClass = false;
     var $assetPlaceholders = array();
     var $jsDir = false;
     var $managerImagesUrl = false;
@@ -49,6 +49,8 @@ class Ac_Legacy_Config {
     var $useConfigFile = true;
 
     var $configFileRequired = false;
+    
+    var $useNativeDatabase = false;
     
     function Ac_Legacy_Config($configFilePath, $configOptions = array()) {
         if (isset($configOptions['configFilePath']) && strlen($configOptions['configFilePath']))

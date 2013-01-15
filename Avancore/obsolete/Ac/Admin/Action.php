@@ -28,6 +28,8 @@ class Ac_Admin_Action {
     
     var $managerProcessing = false;
     
+    var $kind = false;
+    
     function & factory($options = array()) {
         if (!is_array($options)) trigger_error ('$options must be an array, E_USER_ERROR');
         if (isset($options['class'])) $class = $options['class'];
@@ -40,28 +42,27 @@ class Ac_Admin_Action {
         Ac_Util::simpleBind($options, $this);
     }
     
-    function getImagePrefix() {
-        $imagePrefix = 'images';
-        $conf = Ac_Dispatcher::getInstance()->config;
-        if (isset($conf->managerImagesUrl) && strlen($u = $conf->managerImagesUrl)) {
-            $imagePrefix = $conf->managerImagesUrl;
-        }
-        $imagePrefix = rtrim($imagePrefix, '/').'/';
-        return $imagePrefix;
-    }
-    
     function getJson() {
+        
+        $adapter = Ac_Dispatcher::getInstance()->adapter;
+        
         $res = array();
-        $imagePrefix = $this->getImagePrefix();
+        $imagePrefix = $adapter->getImagePrefix();
         foreach (array_keys(get_object_vars($this)) as $k) {
             if ($k{0} != '_' && strlen($this->$k)) $res[$k] = & $this->$k;
         }
+        
+        $kind = $this->kind === false? $this->id : $this->kind;
+        $images = $adapter->getToolbarImagesMap($kind);
+        
         foreach (array('image', 'hoverImage', 'disabledImage') as $k) {
-            if (strlen($this->$k) && !preg_match('#^http(s?)://#', $this->$k)) {
-                $res[$k] = $imagePrefix.($this->$k);
-                $res[$k] = Ac_Dispatcher::getInstance()->adapter->unfoldAssetString($res[$k]);
+            if ($this->$k === false && isset($images[$k])) $res[$k] = $images[$k];
+            if (isset($res[$k]) && strlen($res[$k]) && !preg_match('#^http(s?)://#', $this->$k)) {
+                $res[$k] = $imagePrefix.($res[$k]);
+                $res[$k] = $adapter->unfoldAssetString($res[$k]);
             }
         }
+        
         return $res;
     }
     

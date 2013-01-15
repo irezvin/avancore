@@ -39,15 +39,15 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
 <?php
     }
     
-    function showTable($control) {
-        $this->utlShowControlsTable($control->getOrderedDisplayChildren(), true, $control->getHtmlAttribs());
+    function showTable($control, $extraParams = false) {
+        $this->utlShowControlsTable($control->getOrderedDisplayChildren(), true, $control->getHtmlAttribs(), $extraParams);
     }
     function showHTable($control) {
         $this->utlShowControlsTableHorizontal($control->getOrderedDisplayChildren(), true, $control->getHtmlAttribs());
     }
     
-    function showTableWithoutOuterTag($control) {
-        $this->utlShowControlsTable($control->getOrderedDisplayChildren(), false, $control->getHtmlAttribs());
+    function showTableWithoutOuterTag($control, $extraParams = false) {
+        $this->utlShowControlsTable($control->getOrderedDisplayChildren(), false, $control->getHtmlAttribs(), $extraParams);
     }
     
     /**
@@ -118,23 +118,32 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
     /**
      * @param Ac_Form_Control $control
      */
-    function utlShowControlsTable ($controls, $withTableTag = true, $tableAttribs = array()) {
+    function utlShowControlsTable ($controls, $withTableTag = true, $tableAttribs = array(), $extraParams = false) {
+        if (is_array($extraParams) && isset($extraParams['defaultTrWrapper'])) {
+            $trWrapperMethod = 'show'.ucfirst($extraParams['defaultTrWrapper']);
+        } else {
+            $trWrapperMethod = 'showTrWrapper';
+        }
         if ($withTableTag) { 
 ?>
 
     <table <?php echo Ac_Util::mkAttribs($tableAttribs); ?>>
 <?php
         }
-        foreach (array_keys($controls) as $k) { $cl = $controls[$k];
-?>
-<?php       if ($cl->showWrapper) { ?>
-            <?php echo $this->showTrWrapper($cl, $cl->fetchPresentation(false, false)); ?>
-<?php       } else { ?>
-            <?php echo $cl->fetchPresentation(false, false); ?>
-<?php       } ?>                        
-<?php } ?>
+        foreach (array_keys($controls) as $k) { 
+            $cl = $controls[$k];
+            if ($cl->showWrapper) {
+                if (strlen($cl->wrapperTemplatePart) && strlen($cl->wrapperTemplateClass)) {
+                    echo $cl->fetchWithWrapper();
+                } else {
+                    $this->$trWrapperMethod($cl, $cl->fetchPresentation(false, false), $cl->wrapperTemplateParam);
+                }
+            } else {
+                echo $cl->fetchPresentation(false, false);
+            }
+        }
+?>        
 <?php if ($withTableTag) { ?>
-
     </table>
 <?php }
     }
@@ -207,10 +216,33 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
     /**
      * @param Ac_Form_Control $control
      */
-    function showTrWrapper ($control, $html) {
+    function showErrorSpanWrapper ($control, $html) {
+?>
+    <span class='control<?php if($errors = $control->getErrors()) echo ' withErrors'; ?>'>
+        <span class='control'>
+            <?php echo $html; ?>
+            <?php if ($errors) { ?>
+            <span class='errors'>
+                <?php $this->_showErrors($errors); ?>
+            </span>
+            <?php } ?>
+        </span>
+    </span>
+<?php        
+    }
+       
+    /**
+     * @param Ac_Form_Control $control
+     */
+    function showTrWrapper ($control, $html, $extraParams) {
+        if (is_array($extraParams) && isset($extraParams['class'])) {
+            $extraClasses = ' '.$extraParams['class'];
+        } else {
+            $extraClasses = '';
+        }
 ?>
 
-    <tr class='control<?php if($errors = $control->getErrors()) echo ' withErrors'; ?>'>
+    <tr class='control<?php if($errors = $control->getErrors()) echo ' withErrors'; ?><?php echo $extraClasses; ?>'>
         <td class='caption'>
             <?php $this->_showCaption($control, true, "&nbsp;"); ?>
         </td>
@@ -226,6 +258,121 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             
         </td>
     </tr>
+<?php        
+    }
+       
+    /**
+     * @param Ac_Form_Control $control
+     */
+    function showTrWrapperSeparateErrors ($control, $html, $extraParams) {
+        if (is_array($extraParams) && isset($extraParams['class'])) {
+            $extraClasses = ' '.$extraParams['class'];
+        } else {
+            $extraClasses = '';
+        }
+?>
+
+    <tr class='control<?php if($errors = $control->getErrors()) echo ' withErrors separateErrors'; ?><?php echo $extraClasses; ?>'>
+        <td class='caption'>
+            <?php $this->_showCaption($control, true, "&nbsp;"); ?>
+        </td>
+        <td><?php if ($control->isRequired($control)) $this->_showCoolRequiredAsterisk($control); else echo "&nbsp;"; ?></td>
+        <td class='control'>
+<?php echo $html; ?>
+        </td>
+    </tr>
+<?php if ($errors) { ?>
+
+    <tr class='errors separateErrors'>
+        <td class='dummy'>&nbsp;</td>
+        <td></td>
+        <td class='control errors'>
+            <?php $this->_showErrors($errors); ?>
+        </td>
+    </tr>
+<?php } ?>
+    
+    
+<?php        
+    }
+       
+    /**
+     * @param Ac_Form_Control $control
+     */
+    function showTrColspanWrapper ($control, $html, $extraParams = false) {
+        if (is_array($extraParams) && isset($extraParams['class'])) {
+            $extraClasses = ' '.$extraParams['class'];
+        } else {
+            $extraClasses = '';
+        }
+?>
+
+    <tr class='control<?php if($errors = $control->getErrors()) echo ' withErrors'; ?><?php echo $extraClasses; ?>'>
+        <td class='spanned' colspan='3'>
+            <?php $this->showSpanWrapper($control, $html); ?>
+        </td>
+    </tr>
+<?php        
+    }
+       
+    /**
+     * @param Ac_Form_Control $control
+     */
+    function showTrRightCaptionWrapper ($control, $html, $extraParams = false) {
+        
+        if (is_array($extraParams) && isset($extraParams['class'])) {
+            $extraClasses = ' '.$extraParams['class'];
+        } else {
+            $extraClasses = '';
+        }
+        
+        $leftText = '&nbsp;';
+        $separateErrors = false;
+        
+        if (is_array($extraParams)) {
+            if (isset($extraParams['separateErrors'])) {
+                $separateErrors = true;
+            }
+            if (isset($extraParams['class'])) {
+                $extraClasses = ' '.$extraParams['class'];
+            }
+            if (isset($extraParams['leftText'])) {
+                $leftText = $extraParams['leftText'];
+            }
+        } else {
+            $extraClasses = '';
+        }
+?>
+
+    <tr class='control<?php if($errors = $control->getErrors()) echo ' withErrors'; if ($separateErrors) echo ' separateErrors' ?><?php echo $extraClasses; ?>'>
+        <td class='dummy'><?php echo $leftText; ?></td>
+        <td><?php if ($control->isRequired($control)) $this->_showCoolRequiredAsterisk($control); else echo "&nbsp;"; ?></td>
+        <td class='control'>
+<?php echo $html; ?>
+<?php   if (strlen($control->getCaption() && !$control->showsOwnCaption)) { ?>
+            <span class='caption'>
+<?php       $this->_showCaption($control, true, ""); ?>
+            </span>
+<?php   } ?>
+    <?php if (!$separateErrors && $errors) { ?>
+
+            <div class='errors'>
+                <?php $this->_showErrors($errors); ?>
+            </div>
+<?php } ?>
+            
+        </td>
+    </tr>
+<?php if ($separateErrors && $errors) { ?>
+
+    <tr class='errors separateErrors'>
+        <td class='dummy'>&nbsp;</td>
+        <td></td>
+        <td class='control errors'>
+            <?php $this->_showErrors($errors); ?>
+        </td>
+    </tr>
+<?php } ?>    
 <?php        
     }
     
@@ -262,7 +409,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             switch ($control->getType()) {
                 case 'textArea': $this->_showTextArea($control); break;
                 case 'rte':
-                    if (class_exists('JFactory')) {
+                    if (class_exists('JFactory', false)) {
                         $editor = JFactory::getEditor();
                         $ha = array_merge(array(
                             'size' => 75,
@@ -278,6 +425,9 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
                             $ha['rows'],
                             true
                         );                    
+                    } else {
+                        $a = $control->getRteAdapter();
+                        echo $a->getHtmlForEditor($control, $id, null);
                     }
                     break;
                 case 'password':
@@ -301,7 +451,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
     /**
      * @param Ac_Form_Control_Text $control
      */
-    function _showTextArea($control) {
+    function _showTextArea($control, & $id = null) {
             $name = $this->_mapNames($control, 'value');
             
             $attribs = array('cols' => $this->textAreaCols, 'rows' => $this->textAreaRows);
@@ -313,6 +463,12 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
                 'name' => $name,
             ));
             
+            if (!isset($attribs['id']) || $attribs['id'] === false) {
+                $id = $control->getContext()->mapIdentifier('value');
+                $attribs['id'] = $id;
+            } else {
+                $id = $attribs['id'];
+            }
 ?>
             <textarea <?php echo Ac_Util::mkAttribs($attribs); ?>><?php echo Ac_Util::htmlspecialchars($control->getOutputText(), ENT_QUOTES, $this->charset, $control->doubleEncodeInInput); ?></textarea>
 <?php
@@ -362,6 +518,11 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
                 'name' => $name,
             ));
             echo Ac_Util::mkElement('button', $control->getButtonCaption(), $attribs);
+        } elseif ($control->buttonType === 'link') {
+            $attribs = Ac_Util::m($this->_getAttribs($control), array(
+                'name' => $name,
+            ));
+            echo Ac_Util::mkElement('a', $control->getButtonCaption(), $attribs);
         } else {
             $name = $this->_mapNames($control, 'value');
             $attribs = Ac_Util::m($this->_getAttribs($control), array(
@@ -417,9 +578,9 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         
         <select <?php $this->attribs($elementAttribs); ?>>
 <?php foreach ($listItems as $item) { ?>
-            <option value="<?php $this->d($item['value']); ?>"<?php if($item['selected']) { ?> selected="selected"<?php } ?>><?php 
+            <option value="<?php $this->d($item['value'], $control->isHtmlAllowed()); ?>"<?php if($item['selected']) { ?> selected="selected"<?php } ?>><?php 
                 if (is_array($item['caption'])) $item['caption'] = implode(', ', $item['caption']);
-                if (strlen($item['caption'])) $this->d($item['caption']); else echo "&nbsp;"; ?></option>
+                if (strlen($item['caption'])) $this->d($item['caption'], $control->isHtmlAllowed()); else echo "&nbsp;"; ?></option>
 <?php } ?>
         </select>
 <?php
@@ -431,7 +592,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
     function _showReadOnlyList($control, $listItems) {
         $captions = array();
         foreach($listItems as $item) {
-            if ($item['selected']) $captions[] = htmlspecialchars($item['caption'], null, $this->charset);
+            if ($item['selected']) $captions[] = $control->isHtmlAllowed()? $item['caption'] : htmlspecialchars($item['caption'], null, $this->charset);
         }
 ?>
         
@@ -470,21 +631,16 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
      * @param Ac_Form_Control_Toggle $control
      */
     function showCheckbox($control) {
-        if (!$control->isReadOnly()) {
             $attribs = $control->getHtmlAttribs();
+            if ($control->isReadOnly()) {
+                $attribs['disabled'] = true;
+            }
             $attribs['name'] = $this->_mapNames($control, 'value');
             $attribs['value'] = 1;
             $attribs['type'] = 'checkbox';
             if ($control->getValue()) $attribs['checked'] = true;
 ?>
             <input <?php $this->attribs($attribs); ?> /><?php
-        } else {
-?>
-            <span class='readOnly'>
-                <?php if (strlen($control->getValue())) $this->d ($control->getValue()); else $this->d($control->getEmptyCaption()); ?>
-            </span>
-<?php       
-        }
     }
 
     

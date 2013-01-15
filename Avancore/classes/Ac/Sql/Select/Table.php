@@ -227,7 +227,7 @@ class Ac_Sql_Select_Table {
         else {
             $sqlSelect = & $this->getSqlSelect(true);
             //if (!$this->_sqlSelect) trigger_error("\'sqlSelect' property not set - call setSqlSelect() first", E_USER_ERROR);
-            if (!strlen($this->name)) trigger_error ("\$name must be provided for table '{$this->alias}'", E_USER_ERROR);
+            if ($this->name === false) trigger_error ("\$name must be provided for table '{$this->alias}'", E_USER_ERROR);
             //if (!strlen($this->alias)) trigger_error ("\$alias must be provided", E_USER_ERROR);
 
             if (strlen($this->joinsAlias)) {

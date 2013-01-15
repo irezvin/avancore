@@ -37,7 +37,7 @@ class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
      * @return Ac_I_Decorator
      */
     static function instantiate($decorator) {
-        if ($decorator instanceof Ac_I_Decorator) {
+        if (is_object($decorator) && $decorator instanceof Ac_I_Decorator) {
             $res = $decorator;
         } elseif ($decorator) {
             if (!is_array($decorator)) $decorator = array('class' => $decorator);

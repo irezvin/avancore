@@ -98,12 +98,11 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     }
     
     function getActions() {
+    
         return Ac_Util::m(array(
             'new' => array(
                 'id' => 'new',
                 'scope' => 'any',
-                'image' => 'new_f2.png', 
-                'disabledImage' => 'new.png',
                 'caption' => AC_ADMIN_CREATE_NEW_RECORD_CAPT, 
                 'description' => AC_ADMIN_CREATE_NEW_RECORD_DESCR, 
                 'managerAction' => 'new',
@@ -112,8 +111,6 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
             'edit' => array(
                 'id' => 'edit',
                 'scope' => 'one',
-                'image' => 'edit_f2.png', 
-                'disabledImage' => 'edit.png',
                 'caption' => AC_ADMIN_EDIT_RECORD_CAPT,
                 'description' => AC_ADMIN_EDIT_RECORD_DESCR,
                 'managerAction' => 'details',
@@ -122,8 +119,6 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
             'delete' => array(
                 'id' => 'delete',
                 'scope' => 'some',
-                'image' => 'delete_f2.png', 
-                'disabledImage' => 'delete.png',
                 'caption' => AC_ADMIN_DELETE_RECORD_CAPT,
                 'description' => AC_ADMIN_DELETE_RECORD_DESCR,
                 'confirmationText' => AC_ADMIN_DELETE_RECORD_CONFIRM,
@@ -133,8 +128,6 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
             'apply' => array(
                 'id' => 'apply',
                 'scope' => 'any',
-                'image' => 'apply_f2.png', 
-                'disabledImage' => 'apply.png',
                 'caption' => AC_ADMIN_APPLY_CAPT,
                 'description' => AC_ADMIN_APPLY_DESCR,
                 'managerAction' => 'apply',
@@ -143,8 +136,6 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
             'save' => array(
                 'id' => 'save',
                 'scope' => 'any',
-                'image' => 'save_f2.png', 
-                'disabledImage' => 'save.png',
                 'caption' => AC_ADMIN_SAVE_CAPT,
                 'description' => AC_ADMIN_SAVE_DESCR,
                 'managerAction' => 'save',
@@ -153,8 +144,6 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
             'saveAndAdd' => array(
                 'id' => 'saveAndAdd',
                 'scope' => 'any',
-                'image' => 'save_f2.png', 
-                'disabledImage' => 'save.png',
                 'caption' => AC_ADMIN_SAVE_ADD_CAPT,
                 'description' => AC_ADMIN_SAVE_ADD_DESCR,
                 'managerAction' => 'saveAndAdd',
@@ -163,8 +152,6 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
             'cancel' => array(
                 'id' => 'cancel',
                 'scope' => 'any',
-                'image' => 'cancel_f2.png', 
-                'disabledImage' => 'cancel.png',
                 'caption' => AC_ADMIN_CANCEL_CAPT,
                 'description' => AC_ADMIN_CANCEL_DESCR,
                 'managerAction' => 'cancel',

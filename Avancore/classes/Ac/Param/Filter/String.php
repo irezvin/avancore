@@ -17,6 +17,14 @@ class Ac_Param_Filter_String extends Ac_Param_Filter implements Ac_I_Decorator {
     
     var $addCSlashes = false;
     
+    const caseLower = 'caseLower';
+    
+    const caseUpper = 'caseUpper';
+    
+    const casePreserve = 'casePreserve';
+    
+    var $changeCase = self::casePreserve;
+    
     /**
      * @var array searchString => replacement
      */
@@ -70,8 +78,27 @@ class Ac_Param_Filter_String extends Ac_Param_Filter implements Ac_I_Decorator {
             $value = preg_replace("/([{$ds}])[{$ds}]+/", "\\1", $value);
         }
         
+        if ($this->changeCase !== self::casePreserve) {
+            $fn = false;
+            if ($this->changeCase == self::caseLower) {
+                $fn = 'strtolower';
+            } elseif ($this->changeCase == self::caseUpper) {
+                $fn = 'strtoupper';
+            }
+            if (strlen($fn)) {
+                if ($this->toEncoding) {
+                    $fn = 'mb_'.$fn;
+                    $value = $fn ($value, $this->toEncoding);
+                } else {
+                    $value = $fn($value);
+                }
+            }
+        }
+        
         if (is_array($this->replace)) {
-            if (!$this->usePregReplace) $value = strtr($value, $this->replace);
+            if (!$this->usePregReplace) {
+                $value = strtr($value, $this->replace);
+            }
             else foreach ($this->replace as $k => $v) {
                 $value = preg_replace($k, $v, $value);
             }

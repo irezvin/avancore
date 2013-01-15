@@ -61,7 +61,7 @@ class Ac_Legacy_Database {
         }
         if (isset($options['debug'])) $this->debug = $options['debug'];
         $this->initOptions = $options;
-        $this->_doInitialize($options); 
+        $this->_doInitialize($options);
     }
     
     function getPrefix() {
@@ -110,8 +110,7 @@ class Ac_Legacy_Database {
      * Template method that is called from the constructor
      * @access protected
      */
-    function _doInitialize($options = array()) {
-        
+    function _doInitialize(array $options = array()) {
     }
     
     function Quote($string) {
@@ -472,6 +471,10 @@ class Ac_Legacy_Database {
 	       $this->_t[md5($sql)] = $this->_time();
 	    }
 	}
+    
+    function getAffectedRows() {
+        trigger_error("Call to abstract function", E_USER_ERROR);
+    }
 	
 	function _debugAfterQuery($sql, $numRows = false, $isHandleReturned = false) {
 	    if ($this->debug) {

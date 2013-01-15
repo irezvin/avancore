@@ -231,15 +231,20 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
                 }
             }
             if (!$this->cacheSkip && $this->getCacheEnabled()) $this->saveToCache();
-        } catch (Pp_Exception $e) {
-            $this->_tplData['exception'] = $e;
-            $this->_response = false;
-            $res = parent::getResponse('executeError');
+        } catch (Ac_Legacy_Controller_Exception $e) {
+            $res = $this->handleException($e);
         }
 
         if ($this->_response) $res = $this->_response;
         else $res = false;
          
+        return $res;
+    }
+    
+    function handleException($e) {
+        $this->_tplData['exception'] = $e;
+        $this->_response = false;
+        $res = parent::getResponse('executeError');
         return $res;
     }
 

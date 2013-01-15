@@ -55,7 +55,7 @@ class Ac_Form_Control_Toggle extends Ac_Form_Control {
     }
     
     function _doGetValue() {
-        if (!($this->readOnly === true)) {
+        if (!$this->isReadOnly()) {
             if (isset($this->_rqData['value'])) {
                 $val = (bool) $this->_rqData['value'];
                 $res = $val? $this->trueValue : $this->falseValue;

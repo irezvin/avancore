@@ -1,7 +1,9 @@
 <?php
 
 class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
-	
+
+    var $separateToolbar = false;
+    
 	var $_templateClass = 'Ac_Legacy_Controller_Std_Admin_Template';
 	
 	var $stateVarName = true;
@@ -65,11 +67,19 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
             $this->applyState($context);
             
             $managerConfig = array('mapperClass' => $mapperId);
-            $manager = new Ac_Admin_Manager($context, $managerConfig, $px);
-            //$manager->separateToolbar = true;
+            $mapper = Ac_Dispatcher::getMapper($mapperId);
+            if (strlen($mapper->managerClass)) $class = $mapper->managerClass;
+                else $class = 'Ac_Admin_Manager';
+            $manager = new $class ($context, $managerConfig, $px);
+            if ($this->separateToolbar) $manager->separateToolbar = true;
             $response = & $manager->getResponse();
-            if ($manager->toolbarContent) {
-            	$GLOBALS['aeToolbar']->content = $manager->toolbarContent; 
+            if ($this->separateToolbar) {
+                if (strlen($manager->toolbarContent)) {
+                    Ac_Legacy_Output_Joomla15::addHtmlToJoomlaToolbar($manager->toolbarContent);
+                }
+                if (strlen($manager->toolbarHeader)) {
+                    JToolBarHelper::title($manager->toolbarHeader);
+                }
             }
             $this->_tplData['manager'] = $manager;
             $this->_tplData['managerResponse'] = $response;

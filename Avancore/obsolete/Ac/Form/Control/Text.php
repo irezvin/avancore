@@ -22,6 +22,8 @@ class Ac_Form_Control_Text extends Ac_Form_Control_Listable {
     var $inputCanBeArray = false;
     
     var $doubleEncodeInInput = false;
+    
+    var $rteAdapter = false;
 
     /**
      * @access protected
@@ -31,7 +33,8 @@ class Ac_Form_Control_Text extends Ac_Form_Control_Listable {
     }
     
     function getOutputText() {
-        return $this->formatValue($this->getValue());
+        $res = $this->formatValue($v = $this->getValue());
+        return $res;
     }
     
     function getType() {
@@ -53,16 +56,8 @@ class Ac_Form_Control_Text extends Ac_Form_Control_Listable {
     }
     
     function isHtmlAllowed() {
-        if ($this->allowHtml === '?') {
-            if ($this->getType() == 'rte') $res = true;
-            else {    
-                $p = & $this->getModelProperty();
-                if ($p && isset($p->allowHtml)) $res = $p->allowHtml;
-                    else $res = false;
-            } 
-        } else {
-            $res = $this->allowHtml;
-        }
+        if ($this->allowHtml === '?' && $this->getType() == 'rte') $res = true;
+        else $res = parent::isHtmlAllowed();
         return $res;
     }
     
@@ -87,6 +82,18 @@ class Ac_Form_Control_Text extends Ac_Form_Control_Listable {
             $res['size'] = max($ml, $this->defaultSize);
         }
         return $res;
+    }
+    
+    /**
+     * @return Ac_Form_RteAdapter 
+     */
+    function getRteAdapter() {
+        if (!$this->rteAdapter) {
+            $this->rteAdapter = Ac_Form_RteAdapter::getDefaultInstance();
+        } else {
+            if (!is_object($this->rteAdapter)) $this->rteAdapter = Ac_Prototyped::factory($this->rteAdapter, 'Ac_From_RteAdapter');
+        }
+        return $this->rteAdapter;
     }
     
 }

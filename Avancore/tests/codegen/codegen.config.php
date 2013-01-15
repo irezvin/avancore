@@ -3,6 +3,7 @@
 require(dirname(__FILE__).'/../sampleApp/deploy/app.config.php');
 
 $dbConf = $config['legacyDatabasePrototype']['__construct']['config'];
+var_dump($dbConf);
 
 
 $config = array(

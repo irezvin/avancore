@@ -36,10 +36,10 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
      */
     var $md5pk = true;
     
-    function Ac_Model_Values_Records (& $data, $propName = false, $options = true, $isStatic = false) {
-        parent::Ac_Model_Values($data, $propName, $options);
+    function __construct ($data, $propName = false, $options = true, $isStatic = false, array $optionsOverride = array()) {
+        parent::__construct($data, $propName, $options, $isStatic, $optionsOverride);
         if (!$this->mapperClass) trigger_error ('$mapperClass property must be provided', E_USER_ERROR);
-        $this->_mapper = & Ac_Model_Mapper::getMapper($this->mapperClass);
+        $this->_mapper = Ac_Model_Mapper::getMapper($this->mapperClass);
         if ($this->ordering === '?') {
             $this->ordering = $this->_mapper->getDefaultOrdering();
             if ($this->ordering === false && $this->_mapper->getTitleFieldName()) {
@@ -86,7 +86,7 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
     }
     
     function __wakeup() {
-        $this->_mapper = & Ac_Model_Mapper::getMapper($this->mapperClass);        
+        $this->_mapper = Ac_Model_Mapper::getMapper($this->mapperClass);        
     }
     
     // TODO: make getCaption() and check() methods

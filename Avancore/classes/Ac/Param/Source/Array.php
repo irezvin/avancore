@@ -29,7 +29,7 @@ class Ac_Param_Source_Array extends Ac_Prototyped implements Ac_I_Param_Destinat
             if (is_array($src) && isset($src[$key])) $src = & $src[$key];
                 else {
                     $hasValue = false;
-                    return $defaultValue;
+                    return $default;
                 }
         }
         return $src;

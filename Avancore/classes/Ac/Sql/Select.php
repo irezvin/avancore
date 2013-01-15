@@ -22,6 +22,10 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
     var $limitOffset = false;
     var $limitCount = false;
     
+    protected $parts = array();
+    
+    protected $state = array();
+    
     var $_allDeps = false;
     
     /**
@@ -113,9 +117,12 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
     }
     
     function getStatement() {
+        $this->pushState();
+        $this->applyParts();
         $parts[] = $this->getColumnsList(true, true);
         if (strlen($s = $this->getStatementTail(true))) $parts[] = $s;
         $res = implode("\n", $parts);
+        $this->popState();
         return $res;
     }
     
@@ -224,7 +231,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         $ob = Ac_Util::toArray($this->orderBy);
         if ($asArray) $res = $ob;
         else {
-            $res = implode(", ", $ob);
+            $res = Ac_Util::implode_r(", ", $ob);
             if ($withOrderByKeyword && strlen($res)) $res = 'ORDER BY '.$res;
         }
         return $res;
@@ -303,9 +310,13 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
     /**
      * @return Ac_Model_Collection
      */
-    function & createCollection($mapperClass = false, $pkName = false) {
+    function & createCollection($mapperClass = false, $pkName = false, $ignorePrimaryAlias = false) {
         if (!strlen($mapperClass) && !strlen($pkName)) trigger_error("Even mapper class or pk name must be provided", E_USER_ERROR);
         $res = new Ac_Model_Collection();
+        
+        $this->pushState();
+        $this->applyParts();
+        
         $orderedAliases = $this->_getOrderedAliases($this->getUsedAliases());
         if (!count($orderedAliases)) {
             $orderedAliases = array($this->getEffectivePrimaryAlias());
@@ -339,6 +350,8 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
             $res->setLimits($this->limitOffset, $this->limitCount);
         }
         
+        $this->popState();
+        
         return $res;
     }
     
@@ -370,6 +383,48 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
             $t->_sqlSelect = null;
         }
         parent::cleanupReferences();
+    }
+    
+    function setParts(array $parts) {
+        $this->parts = Ac_Prototyped::factoryCollection($parts, 'Ac_Sql_Part', array(), 'id', true);
+    }
+    
+    function addParts(array $parts) {
+        $this->parts = array_merge($this->parts, Ac_Prototyped::factoryCollection($parts, 'Ac_Sql_Part', array(), 'id', true));
+    }
+    
+    function listParts() {
+        return array_keys($this->parts);
+    }
+    
+    /**
+     * @return Ac_Sql_Part
+     */
+    function getPart($id, $dontThrow = false) {
+        $res = null;
+        if (isset($this->parts[$id])) $res = $this->parts[$id];
+            elseif (!$dontThrow) throw new Exception("No such part: '$id'");
+        return $res;
+    }
+    
+    protected function applyParts() {
+        foreach ($this->parts as $part)  {
+            $part->applyToSelect($this);
+        }
+    }
+    
+    protected function listStateVars() {
+        return array('_usedAliases', 'distinct', 'columns', 'otherJoins', 'otherJoinsAfter', 'orderBy', 'where', 'groupBy', 'having', 'limitOffset', 'limitCount');
+    }
+    
+    protected function pushState() {
+        $s = array();
+        foreach ($this->listStateVars() as $v) $s[$v] = $this->$v;
+        array_push($this->state, $s);
+    }
+    
+    protected function popState() {
+        foreach ( array_pop($this->state) as $k => $v) $this->$k = $v;
     }
     
 }
