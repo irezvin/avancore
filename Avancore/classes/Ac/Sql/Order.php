@@ -28,7 +28,7 @@ class Ac_Sql_Order extends Ac_Sql_Part {
      * @access protected
      * @param Ac_Sql_Select $select
      */
-    function _doApplyToSelect(& $select) {
+    function _doApplyToSelect($select) {
         parent::_doApplyToSelect($select);
         $select->orderBy = array_merge($select->orderBy, $this->getAppliedOrderBy());
     }

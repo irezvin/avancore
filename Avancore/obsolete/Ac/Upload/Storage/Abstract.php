@@ -13,14 +13,14 @@ class Ac_Upload_Storage_Abstract {
     /**
      * @return array | false
      */
-    function & loadInternalData($id) {
+    function loadInternalData($id) {
         trigger_error("Call to abstract method", E_USER_ERROR);
     }
     
     /**
      * @param Ac_Upload_File $upload
      */
-    function saveUpload(& $upload) {
+    function saveUpload($upload) {
         trigger_error("Call to abstract method", E_USER_ERROR);
     }
     

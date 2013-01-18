@@ -8,8 +8,8 @@ class Ac_Debug {
     
     static $misc = array();
     
-    static function savageMode() {
-        while(ob_get_level()) ob_end_clean();
+    static function savageMode($flush = false) {
+        while(ob_get_level()) $flush? ob_end_flush() : ob_end_clean();
         ini_set('display_errors', 1);
         ini_set('error_reporting', E_ALL & ~E_DEPRECATED & ~E_STRICT);
     }

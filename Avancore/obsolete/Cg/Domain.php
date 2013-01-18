@@ -185,7 +185,7 @@ class Cg_Domain {
     /**
      * @param Cg_Generator $generator 
      */
-    function Cg_Domain(& $generator, $name, $config = array()) {
+    function Cg_Domain($generator, $name, $config = array()) {
          $this->_gen = $generator;
          $this->$name = $name;
          Ac_Util::simpleBind($config, $this);

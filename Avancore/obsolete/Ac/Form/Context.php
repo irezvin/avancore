@@ -20,7 +20,6 @@ class Ac_Form_Context extends Ac_Legacy_Controller_Context_Http {
     /**
      * @param Ac_Legacy_Controller_Context_Http $context
      * @return Ac_Form_Context
-     * @static
      */
     static function spawnFrom($context, $subPath) {
         $res = new Ac_Form_Context();

@@ -65,7 +65,7 @@ class Ac_Table_Sequential extends Ac_Table {
     /**
      * @return Ac_Model_Object
      */
-    function & _fetchNextRecord() {
+    function _fetchNextRecord() {
         if ($this->_ptr >= count($this->_records)) {
             $res = false;
             if (!$this->_eof) {

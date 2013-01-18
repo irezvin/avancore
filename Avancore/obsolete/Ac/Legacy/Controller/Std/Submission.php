@@ -144,7 +144,7 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
         return $formPrototype;
     }
     
-    function doOnFormPrototype(& $prototype) {
+    function doOnFormPrototype($prototype) {
     }
 
     /**
@@ -230,7 +230,7 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
      * @param Ac_Legacy_Controller_Std_Submission_Sendout $sendout
      * @return bool
      */
-    function doBeforeSendMail(& $mail, & $sendout) {
+    function doBeforeSendMail($mail, $sendout) {
     }
 
     /**
@@ -243,7 +243,7 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
      * @param string $sendoutKey Key of sendout object in the settings array
      * @return bool
      */
-    function doHandleSendError(& $mail, & $sendout, $sendoutKey = false) {
+    function doHandleSendError($mail, $sendout, $sendoutKey = false) {
         $this->_errors['sendout_'.$sendoutKey] = $mail->getError();
     }
     

@@ -19,7 +19,7 @@ class Ac_Sql_Filter_Range extends Ac_Sql_Filter {
     
     var $valueRx = false;
     
-    function _filterValue(& $item) {
+    function _filterValue($item) {
         if ($this->valueRx !== false) {
             if (preg_match($this->valueRx, $item, $matches)) {
                 $item = $matches[0];

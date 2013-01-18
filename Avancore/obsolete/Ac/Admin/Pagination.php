@@ -217,7 +217,7 @@ class Ac_Admin_Pagination extends Ac_Legacy_Controller {
         return $res; 
     }
 
-    function orderUpIcon( $i, $condition=true, $task='orderup', $alt='Move up' ) {
+    function orderUpIcon($i, $condition=true, $task='orderup', $alt='Move up' ) {
         if (($i > 0 || ($i+$this->limitstart > 0)) && $condition) {
             return '<a href="#reorder" onClick="return listItemTask(\'cb'.$i.'\',\''.$task.'\')" title="'.$alt.'">
                 <img src="images/uparrow.png" width="12" height="12" border="0" alt="'.$alt.'" />
@@ -233,7 +233,7 @@ class Ac_Admin_Pagination extends Ac_Legacy_Controller {
 * @param string The alt text for the icon
 * @return string
 */
-    function orderDownIcon( $i, $n, $condition=true, $task='orderdown', $alt='Move down' ) {
+    function orderDownIcon($i, $n, $condition=true, $task='orderdown', $alt='Move down' ) {
         if (($i < $n-1 || $i+$this->limitstart < $this->total-1) && $condition) {
             return '<a href="#reorder" onClick="return listItemTask(\'cb'.$i.'\',\''.$task.'\')" title="'.$alt.'">
                 <img src="images/downarrow.png" width="12" height="12" border="0" alt="'.$alt.'" />
@@ -249,7 +249,7 @@ class Ac_Admin_Pagination extends Ac_Legacy_Controller {
      * @param string The alt text for the icon
      * @return string
      */
-    function orderUpIcon2( $id, $order, $condition=true, $task='orderup', $alt='#' ) {
+    function orderUpIcon2($id, $order, $condition=true, $task='orderup', $alt='#' ) {
         // handling of default value
         if ($alt = '#') {
             $alt = 'Move up';
@@ -282,7 +282,7 @@ class Ac_Admin_Pagination extends Ac_Legacy_Controller {
      * @param string The alt text for the icon
      * @return string
      */
-    function orderDownIcon2( $id, $order, $condition=true, $task='orderdown', $alt='#' ) {
+    function orderDownIcon2($id, $order, $condition=true, $task='orderdown', $alt='#' ) {
         // handling of default value
         if ($alt = '#') {
             $alt = 'Move down';

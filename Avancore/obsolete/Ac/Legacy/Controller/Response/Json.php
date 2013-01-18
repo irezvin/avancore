@@ -186,7 +186,7 @@ class Ac_Legacy_Controller_Response_Json extends Ac_Legacy_Controller_Response_H
 		return $res;
 	}
     
-    function mergeWithResponse (& $subResponse, $withTitleAndPathway = true, $putContent = false) {
+    function mergeWithResponse ($subResponse, $withTitleAndPathway = true, $putContent = false) {
         parent::mergeWithResponse($subResponse, $withTitleAndPathway, $putContent);
         if ($subResponse instanceof Ac_Legacy_Controller_Response_Json) {
             if ($subResponse->forwardUndeclaredVars) {

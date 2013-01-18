@@ -73,7 +73,7 @@ class Ac_Model_Property {
     
     var $skipValidation = false;
     
-    function Ac_Model_Property (& $srcObject, $propName, $isStatic, $formOptions = array()) {
+    function Ac_Model_Property ($srcObject, $propName, $isStatic, $formOptions = array()) {
         foreach (array_keys($formOptions) as $optionName) $this->$optionName = $formOptions[$optionName];
 
         $this->srcObject = $srcObject;

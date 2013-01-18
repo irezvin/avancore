@@ -33,18 +33,18 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
         if (is_array($this->_filters[$id])) {
             $options = $this->_filters[$id];
             $options['id'] = $id;
-            $options['parentPart'] = & $this;
-            $options['db'] = & $this->_db;
-            $this->_filters[$id] = & $this->factory($options, 'Ac_Sql_Filter');
+            $options['parentPart'] = $this;
+            $options['db'] = $this->_db;
+            $this->_filters[$id] = $this->factory($options, 'Ac_Sql_Filter');
         }
-        $res = & $this->_filters[$id];
+        $res = $this->_filters[$id];
         return $res;
     }
     
     /**
      * @param Ac_Sql_Db $db
      */
-    function setDb(& $db) {
+    function setDb($db) {
         parent::setDb($db);
         foreach (array_keys($this->_filters) as $f) if (is_object($this->_filters[$f])) $this->_filters[$f]->setDb($db);
     }
@@ -53,7 +53,7 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
      * @param array|Ac_Sql_Filter $filter
      * @param string $id
      */
-    function addFilter(& $filter, $id = false) {
+    function addFilter($filter, $id = false) {
         assert(
                 is_array($filter) && (strlen($id) || isset($filter['id']) && strlen($filter['id'])) 
             ||  is_a($filter, 'Ac_Sql_Filter') && (strlen($id) || strlen($filter->id))
@@ -61,7 +61,7 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
         $aId = is_array($filter)? (isset($filter['id'])? $filter['id'] : false) : $filter->id;
         if (!strlen($aId)) $aId = $id;
         if (isset($this->_filters[$aId])) trigger_error("Filter with id '{$id}' is already in the collection", E_USER_ERROR);
-        $this->_filters[$aId] = & $filter;
+        $this->_filters[$aId] = $filter;
         if (is_object($filter)) {
             $filter->setDb($this->_db);
         }
@@ -72,7 +72,7 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
         $res = 0;
         $crit = array();
         foreach ($this->listFilters() as $i) {
-            $f = & $this->getFilter($i);
+            $f = $this->getFilter($i);
             $f->isHaving = $this->isHaving;
             $crit = array_merge($crit, $this->isHaving? $f->getAppliedHaving() : $f->getAppliedWhere());
         }
@@ -96,7 +96,7 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
         }
     }
     
-    function _doBeforeExpandPaths(& $input) {
+    function _doBeforeExpandPaths($input) {
         $r = array();
         $c = false;
         foreach (array_keys($input) as $k) {
@@ -104,10 +104,10 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
                 $r[$input[$k]] = true;
                 $c = true;
             } else {
-                $r[$k] = & $input[$k];
+                $r[$k] = $input[$k];
             }
         }
-        if ($c) $input = & $r;
+        if ($c) $input = $r;
     }
     
     /**
@@ -116,7 +116,7 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
     function _doBind($input) {
         if ($this->setSameValueForAllChildren) {
             foreach ($this->listFilters() as $id) {
-                $f = & $this->getFilter($id);
+                $f = $this->getFilter($id);
                 $f->bind($input);
             }
         } else {
@@ -124,7 +124,7 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
                 $appliedFilters = array();
                 foreach ($this->listFilters() as $id) {
                     if (isset($input[$id])) {
-                        $f = & $this->getFilter($id);
+                        $f = $this->getFilter($id);
                         $f->bind($input[$id]);
                         $appliedFilters[] = $id;
                     }
@@ -166,7 +166,7 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
     function _doGetAppliedAliases() {
         $res = $this->aliases;
         foreach ($this->listFilters() as $i) {
-            $f = & $this->getFilter($i);
+            $f = $this->getFilter($i);
             $res = array_merge($res, $f->getAppliedAliases());
             //var_dump($f->id, $f->getAppliedAliases());
         }

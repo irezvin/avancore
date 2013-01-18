@@ -74,7 +74,7 @@ class Ac_Url {
     /**
      * @return Ac_Url
      */
-    function & cloneObject() {
+    function cloneObject() {
         $res = new Ac_Url();
         foreach (get_object_vars($this) as $f => $v) if ($f{0} != '_') $res->$f = $v;
         return $res;

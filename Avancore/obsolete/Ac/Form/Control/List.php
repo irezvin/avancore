@@ -58,7 +58,7 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
     /**
      * @param Ac_Model_Values $provider
      */
-    function setValuesProvider(& $provider) {
+    function setValuesProvider($provider) {
         if ($provider && !is_a($provider, 'Ac_Model_Values')) trigger_error ("\$provider should be instance of Ac_Model_Values", E_USER_ERROR);
         $this->_valuesProviderPrototype = false;
         $this->_valuesProvider = false;

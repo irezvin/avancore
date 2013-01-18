@@ -41,7 +41,7 @@ class Ac_Template_Html extends Ac_Template {
      * @param bool $noEscape Don't escape output with htmlspecialchars()
      * @param object $obj Object that supports toString() or show() methods
      */
-    function o(& $obj, $noEscape = false) {
+    function o($obj, $noEscape = false) {
         if ($noEscape) {
             if (method_exists($obj, 'toString')) echo $obj->toString();
             elseif (method_exists($obj, 'show')) $obj->show();
@@ -64,7 +64,7 @@ class Ac_Template_Html extends Ac_Template {
      * Outputs dump of any variable
      * @param mixed $anything 
      */
-    function p(& $anything) {
+    function p($anything) {
         echo '<pre>'.htmlspecialchars(print_r($anything, 1)).'</pre>';
     }
     
@@ -82,7 +82,7 @@ class Ac_Template_Html extends Ac_Template {
      * @param object $obj Object that supports toString() or show() methods
      * @param bool $noEscape Don't escape output with htmlspecialchars()
      */
-    function displayObject(& $obj, $noEscape = false) {
+    function displayObject($obj, $noEscape = false) {
         return $this->d($obj, $noEscape);
     }
     
@@ -170,7 +170,7 @@ class Ac_Template_Html extends Ac_Template {
      * @param bool $asString Return string instead of Ac_Url (has meaning only with $return == true) 
      * @return Ac_Url
      */
-    function & url($extraParams = array(), $noEscape = false, $return = false, $asString = false) {
+    function url($extraParams = array(), $noEscape = false, $return = false, $asString = false) {
         if (is_a($extraParams, 'Ac_Url')) $u = $extraParams;
         else { 
             $u = false;

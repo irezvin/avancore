@@ -388,7 +388,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * Adds new display child
      * @param Ac_Form_Control $control
      */
-    function addDisplayChild(& $control) {
+    function addDisplayChild($control) {
         if (($index = $this->searchDisplayChild($control)) === false) {
             $this->_orderedDisplayChildren = false;
             $index = count($this->_displayChildren);
@@ -404,7 +404,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * @param Ac_Form_Control $control
      * @return int|false
      */
-    function searchDisplayChild(& $control) {
+    function searchDisplayChild($control) {
         $res = false;
         foreach (array_keys($this->_displayChildren) as $c) {
             if (Ac_Util::sameObject($this->_displayChildren[$c], $control)) {
@@ -414,7 +414,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         return $res;
     }
     
-    function removeDisplayChild(& $control) {
+    function removeDisplayChild($control) {
         $idx = $this->searchDisplayChild($control);
         if ($idx !== false) {
             unset($this->_displayChildren[$control]);
@@ -449,7 +449,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * Checks whether given control is display child of current one
      * @param Ac_Form_Control $control
      */
-    function isDisplayChild(& $control) {
+    function isDisplayChild($control) {
         $res = false;
         foreach (array_keys($this->_displayChildren) as $k) {
             if (Ac_Util::sameObject($control, $this->_displayChildren[$k])) {
@@ -595,7 +595,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         return $res;
     }
     
-    function getWrapperForTheChild(& $displayChild) {
+    function getWrapperForTheChild($displayChild) {
         if (strlen($this->childWrapperTemplateClass) && $this->provideChildrenWithTemplateInstance) {
             $tpl = $this->getSpecificTemplate($this->childWrapperTemplateClass);
         } else {
@@ -803,7 +803,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      *      
      * @param Ac_Model_Property $property Null or false can also be provided.
      */
-    function setModelProperty(& $property) {
+    function setModelProperty($property) {
         if (!is_null($property) && ($property !== false) && !is_a($property, 'Ac_Model_Property')) 
             trigger_error ("\$property should be null, false or the instance of Ac_Model_Property", E_USER_ERROR);
         $this->_property = $property;
@@ -888,7 +888,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * @access protected
      * @param Ac_Form_Control_Template $template
      */
-    function _doInitializeTemplate (& $template) {
+    function _doInitializeTemplate ($template) {
         if ($this->htmlResponse) $template->htmlResponse = $this->htmlResponse;
     }
     
@@ -905,7 +905,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * @param Ac_Form_Control $control1
      * @param Ac_Form_Control $control2
      */
-    function _displayOrderCallback(& $control1, & $control2) {
+    function _displayOrderCallback($control1, $control2) {
         if ($control1->displayOrder > $control2->displayOrder) return 1;
         elseif ($control1->displayOrder < $control2->displayOrder) return -1;
         else {
@@ -932,7 +932,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * @return Ac_Form_Control
      * @param string $class Find parent control of specified class
      */
-    function & _getRootControl($class = false) {
+    function _getRootControl($class = false) {
         $curr = $this;
         while ($curr->_parent && ($class === false || !($curr instanceof $class)))
             $curr = $curr->_parent;

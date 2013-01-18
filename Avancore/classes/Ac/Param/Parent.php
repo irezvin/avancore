@@ -11,7 +11,7 @@ class Ac_Param_Parent extends Ac_Param {
      * 
      * @return Ac_I_Param_Source
      */
-    function getSourceForChild(Ac_Param $child, & $childSource, & $childPath) {
+    function getSourceForChild(Ac_Param $child, & $childSource, $childPath) {
         return $childSource? $childSource : $this->source;
     }
     
@@ -22,7 +22,7 @@ class Ac_Param_Parent extends Ac_Param {
      * 
      * @return Ac_I_Param_Destination
      */
-    function getDestinationForChild(Ac_Param $child, & $childDest, & $childPath) {
+    function getDestinationForChild(Ac_Param $child, & $childDest, $childPath) {
         return $childDest? $childDest : $this->destination;
     }
     

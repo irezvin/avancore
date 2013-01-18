@@ -114,7 +114,7 @@ class Ac_Finder_Criterion extends Ac_Prototyped {
      * Template method
      * @param Ac_Sql_Select $select
      */
-    function applyToSelect(Ac_Sql_Select & $select) { 
+    function applyToSelect(Ac_Sql_Select  $select) { 
         $selectPart = Ac_Sql_Part::factory($this->selectPartPrototype);
         $selectPart->bind($this->value);
         $selectPart->applyToSelect($select);

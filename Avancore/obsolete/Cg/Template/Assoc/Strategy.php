@@ -158,7 +158,7 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
      
      * @return <?php if ($prop->otherIsUnique) { ?><?php $this->d($thisClass); ?>|<?php } ?>array of <?php $this->d($thisClass); ?> objects  
      */
-    function & getOf<?php $this->d($ucOtherPlural); ?>(<?php $this->d($idOtherPlural); ?>) {
+    function getOf<?php $this->d($ucOtherPlural); ?>(<?php $this->d($idOtherPlural); ?>) {
         $rel = $this->getRelation(<?php $this->str($relationId); ?>);
         $res = $rel->getSrc(<?php $this->d($idOtherPlural); ?>); 
         return $res;

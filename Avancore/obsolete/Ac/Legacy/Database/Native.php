@@ -234,13 +234,13 @@ class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
         return array_diff(array_keys(get_object_vars($this)), array('_connection'));
     }
 
-    function canCopyToDest(& $db) {
+    function canCopyToDest($db) {
     	if (is_a($db, 'Ac_Legacy_Database_Native') && ($db->_db != $this->_db)) {
     		return true;
     	} else return false;
     }
     
-	function _doCopyToDest(& $db) {
+	function _doCopyToDest($db) {
 		$cmd = 'mysqldump '.$this->getMysqlArgs(true).' | mysql '.$db->getMysqlArgs(true);
 		$res = exec($cmd, $out, $return);
 		return !$return;

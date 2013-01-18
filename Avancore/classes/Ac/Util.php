@@ -270,14 +270,14 @@ class Ac_Util {
         return $res;
     }
     
-    static function getObjectProperty(& $object, $property, $default = false) {
+    static function getObjectProperty($object, $property, $default = false) {
         if (is_callable($getter = array(& $object, 'get'.ucFirst($property)))) $res = call_user_func($getter);
             elseif (isset($object->$property)) $res = $object->$property;
                 else $res = $default;
         return $res;
     }
 
-    static function stripSlashes( &$value ) {
+    static function stripSlashes($value ) {
         $res = '';
         if (is_string( $value )) {
             $res = stripslashes( $value );
@@ -294,7 +294,7 @@ class Ac_Util {
         return $res;
     }
     
-    static function bindArrayToObject ($array, &$obj, $ignore='', $prefix=NULL, $checkSlashes=false) {
+    static function bindArrayToObject ($array, $obj, $ignore='', $prefix=NULL, $checkSlashes=false) {
         if (!is_array($array) || !is_object($obj)) return (false);
         if (!is_array($ignore)) $ignore = explode(" ", $ignore);
         $gmq = get_magic_quotes_gpc();
@@ -315,31 +315,31 @@ class Ac_Util {
         return true;
     }
     
-    static function simpleBind ($array, & $obj) {
+    static function simpleBind ($array, $obj) {
         foreach (array_keys($array) as $k) if (($k{0} !== '_') && isset($obj->$k)) {
-            $obj->$k = & $array[$k];
+            $obj->$k = $array[$k];
         }
     }
     
-    static function simpleBindAll ($array, & $obj, $onlyKeys = false) {
+    static function simpleBindAll ($array, $obj, $onlyKeys = false) {
         if (is_array($onlyKeys)) $keys = array_intersect(array_keys($array), $onlyKeys);
             else $keys = array_keys($array);
         foreach ($keys as $k) if (($k{0} !== '_')) {
-            $obj->$k = & $array[$k];
+            $obj->$k = $array[$k];
         }
     }
     
-    static function simpleBindVeryAll ($array, & $obj, $onlyKeys = false) {
+    static function simpleBindVeryAll ($array, $obj, $onlyKeys = false) {
         if (is_array($onlyKeys)) $keys = array_intersect(array_keys($array), $onlyKeys);
             else $keys = array_keys($array);
         foreach ($keys as $k) {
-            $obj->$k = & $array[$k];
+            $obj->$k = $array[$k];
         }
     }
     
-    static function smartBind ($array, & $obj) {
+    static function smartBind ($array, $obj) {
         foreach (array_keys($array) as $k) if ($k{0} !== '_') {
-            if (isset($obj->$k)) $obj->$k = & $array[$k];
+            if (isset($obj->$k)) $obj->$k = $array[$k];
             elseif (method_exists($obj, $setter = 'set'.ucfirst($k))) $obj->$setter($array[$k]);
         }
     }
@@ -363,11 +363,11 @@ class Ac_Util {
      */
     static function getArrayByPath($arr, $arrPath, $defaultValue = null, & $found = false) {
         if (!is_array($arrPath)) $arrPath = array($arrPath);
-        $src = & $arr;
+        $src = $arr;
         $arrPath = array_reverse($arrPath);
         while ($arrPath) {
             $key = array_pop($arrPath);
-            if (is_array($src) && array_key_exists($key, $src)) $src = & $src[$key];
+            if (is_array($src) && array_key_exists($key, $src)) $src = $src[$key];
                 else {
                     $found = false;
                     return $defaultValue;
@@ -550,7 +550,7 @@ class Ac_Util {
         return $string;
     }
     
-    static function d(& $s) {
+    static function d($s) {
         echo '<pre>'.htmlspecialchars(print_r($s, 1)).'</pre>';
     }
     
@@ -628,10 +628,7 @@ class Ac_Util {
         return $res;
     }
 
-    /**
-     * @static 
-     */
-    static function bindAutoparams(& $obj, $options, $alsoSimpleBind = true, $firstOnes = false) {
+    static function bindAutoparams($obj, $options, $alsoSimpleBind = true, $firstOnes = false) {
         $bind = true;
         if (method_exists($obj, 'bindAutoparams')) { 
             if ($obj->bindAutoparams($options, $alsoSimpleBind, $firstOnes) === false) $bind = false;
@@ -651,7 +648,7 @@ class Ac_Util {
         }
     }
     
-    static function & factoryWithOptions ($options = array(), $baseClass, $classParam = 'class', $ensureBaseClass = true, $loadWithUnderscores = false) {
+    static function factoryWithOptions ($options = array(), $baseClass, $classParam = 'class', $ensureBaseClass = true, $loadWithUnderscores = false) {
         $className = $baseClass;
         if (strlen($classParam) && isset($options[$classParam]) && strlen($options[$classParam])) 
             $className = $options[$classParam];
@@ -832,7 +829,7 @@ class Ac_Util {
     		$res = array();
     		foreach (array_keys($src) as $k) {
     			if (is_object($src[$k]) && (!$rejectNonCompatible || is_callable(array($src[$k], $methodName)))) {
-    				$res[$k] = & $src[$k];
+    				$res[$k] = $src[$k];
     			}
     		}
     	} elseif (is_object($src)) {

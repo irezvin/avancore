@@ -22,7 +22,7 @@ class Ac_Admin_Column_Checked extends Ac_Admin_Column {
          ?><input type="checkbox" class='checkbox' id="<?php echo $this->_context->mapIdentifier($this->toggleAllId); ?>" /><?php
      }
      
-     function doShowCell(& $record, $rowNo) {
+     function doShowCell($record, $rowNo) {
          $this->_recordKeys[] = $key = $this->manager->getStrPk($record);
          ?>
             <input type="checkbox" class='checkbox' id="<?php echo $this->_context->mapIdentifier($this->togglePrefix.$key); ?>" name="<?php echo $this->_context->mapParam($this->keyParamName) ?>[]" value="<?php echo htmlspecialchars($key); ?>" />

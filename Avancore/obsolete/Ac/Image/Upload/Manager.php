@@ -44,7 +44,7 @@ class Ac_Image_Upload_Manager extends Ac_Upload_Manager {
     /**
      * @param Ac_Image_Processor $imageProcesor
      */
-    function setImageProcessor(& $imageProcesor) {
+    function setImageProcessor($imageProcesor) {
         $this->_imageProcessor = $imageProcesor;
     }
     

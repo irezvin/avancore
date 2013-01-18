@@ -13,18 +13,21 @@ class Ac_Test_Buffer extends Ac_Test_Base {
             'Foo', 
             'When buffering is diabled, output is done with the echo()'
         )) var_dump($s);
-        
+
         Ac_Buffer::begin(array($this, 'xxx'));
         Ac_Buffer::out($a1 = array('Aaa'), $a2 = array('Bbb'));
         echo($a3 = 'Ccc');
+        //Ac_Debug::savageMode();
         Ac_Buffer::out($a4 = array('Ddd'));
         Ac_Buffer::end();
+        
         
         if (!$this->assertEqual(
                 $this->a, 
                 array($a1, $a2, $a3, $a4),
                 'When buffering is enabled, echo() content is captured by the callback'
         )) var_dump($this->a);
+        
         
     }
     

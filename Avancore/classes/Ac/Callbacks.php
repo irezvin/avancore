@@ -91,7 +91,7 @@ class Ac_Callbacks {
      */
     static function call($callbackId, $params) {
         if (!isset($this) || !is_a($this, 'Ac_Callbacks')) $cb = Ac_Callbacks::getInstance();
-            else $cb = & $this;
+            else $cb = $this;
             
         $res = null;
 

@@ -86,7 +86,7 @@ class Ac_Table_Column {
      * @param string name of the column
      * @param array settings
      */
-    function Ac_Table_Column(& $table, $name, $settings = array()) {
+    function Ac_Table_Column($table, $name, $settings = array()) {
         $this->_table = $table;
         $this->_name = $name;
         $this->settings = $settings;
@@ -142,7 +142,7 @@ class Ac_Table_Column {
         return $res;
     }
     
-    function getRecordProperty(& $record, $fieldName) {
+    function getRecordProperty($record, $fieldName) {
         static $getters = array();
         $rc = get_class($record);
         if (!isset($getters[$rc]) || !isset($getters[$rc][$fieldName])) $getters[$rc][$fieldName] = $this->determineGetter($record, $fieldName);
@@ -154,7 +154,7 @@ class Ac_Table_Column {
         return $res;
     }
 
-    function determineGetter(& $record, $fn) {
+    function determineGetter($record, $fn) {
         if (is_a($record, 'Ac_Model_Data') && $this->useAeDataFacilities && $this->_staticMeta) return array('getWithGetField', null);
         elseif (method_exists($record, $getterName = 'get'.ucfirst($fn))) {
             if ($fn == $this->fieldName && is_array($this->methodParams) && count($this->methodParams))
@@ -167,31 +167,31 @@ class Ac_Table_Column {
         else return array('getWithNull', null);
     }
 
-    function getWithGetField(& $record, $fn, $p) {
+    function getWithGetField($record, $fn, $p) {
         return $record->getField($fn);
     }
 
-    function getWithGetter(& $record, $fn, $p) {
+    function getWithGetter($record, $fn, $p) {
         return $record->$p();
     }
 
-    function getWithGetterParams(& $record, $fn, $p) {
+    function getWithGetterParams($record, $fn, $p) {
         return call_user_func_array(array(& $record, $p[0]), $p[1]);
     }
 
-    function getWithGetProperty(& $record, $fn, $p) {
+    function getWithGetProperty($record, $fn, $p) {
         return $record->getProperty($fn);
     }
 
-    function getWithObjectVar(& $record, $fn, $p) {
+    function getWithObjectVar($record, $fn, $p) {
         return $record->$fn;
     }
 
-    function getWithOtherValues(& $record, $fn, $p) {
+    function getWithOtherValues($record, $fn, $p) {
         return $record->_otherValues[$fn];
     }
 
-    function getWithNull(& $record, $fn, $p) {
+    function getWithNull($record, $fn, $p) {
         return null;
     }
 
@@ -199,7 +199,7 @@ class Ac_Table_Column {
      * @return Ac_Model_Property
      * @param Ac_Model_Data $record
      */
-    function getPropertyInfo(& $record, $fieldName = false, $isStatic = false) {
+    function getPropertyInfo($record, $fieldName = false, $isStatic = false) {
         if (is_a($record, 'Ac_Model_Data') && $this->useAeDataFacilities) {
             if ($fieldName === false) $fieldName = $this->fieldName;
             if ($record->hasProperty($fieldName))
@@ -229,7 +229,7 @@ class Ac_Table_Column {
      * @param object record Database record
      * @param int rowNo number of current row in the table
      */
-    function getData(& $record, $rowNo, $fieldName) {
+    function getData($record, $rowNo, $fieldName) {
         $res = $this->getRecordProperty($record, $fieldName);
         return $res;
     }
@@ -256,7 +256,7 @@ class Ac_Table_Column {
     /**
      * Renders (echo's) column cell
      */
-    function showCell(& $record, $rowNo) {
+    function showCell($record, $rowNo) {
         if (!$this->staticAttribs) $this->updateAttribs();
         if (is_null($data = $this->getData($record, $rowNo, $this->fieldName))) $data = $this->nullText;
         if (!$this->hidden) echo '<td ', $this->_cellAttribs, '>', $data, '</td>';

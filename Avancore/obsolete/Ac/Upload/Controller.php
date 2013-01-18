@@ -272,7 +272,7 @@ class Ac_Upload_Controller extends Ac_Legacy_Controller {
         return $this->_uploadManager;
     }
     
-    function setUploadManager(& $uploadManager) {
+    function setUploadManager($uploadManager) {
         $this->_uploadManager = $uploadManager;
     }
     

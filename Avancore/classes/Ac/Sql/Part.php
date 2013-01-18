@@ -49,7 +49,7 @@ class Ac_Sql_Part extends Ac_Prototyped {
      * @param string $baseClass
      * @return Ac_Sql_Part
      */
-    static function & factory($options, $baseClass = 'Ac_Sql_Part') {
+    static function factory($options, $baseClass = 'Ac_Sql_Part') {
         if (isset($options['class'])) 
             $class = $options['class']; 
             else $class = $baseClass;
@@ -73,17 +73,17 @@ class Ac_Sql_Part extends Ac_Prototyped {
     /**
      * @param Ac_Sql_Db $db
      */
-    function setDb(& $db) {
+    function setDb($db) {
         assert($db === false || is_a($db, 'Ac_Sql_Db'));
-        $this->_db = & $db;
+        $this->_db = $db;
     }
 
     /**
      * @param Ac_Sql_Part $parentPart
      */
-    function setParentPart(& $parentPart) {
+    function setParentPart($parentPart) {
         assert($parentPart === false || is_a($parentPart, 'Ac_Sql_Part'));
-        $this->_parentPart = & $parentPart;
+        $this->_parentPart = $parentPart;
     }
     
     function getIdWithPrefix() {
@@ -133,7 +133,7 @@ class Ac_Sql_Part extends Ac_Prototyped {
      *
      * @param Ac_Sql_Select $select
      */
-    function applyToSelect(& $select) {
+    function applyToSelect($select) {
         assert(is_a($select, 'Ac_Sql_Select'));
         if (!$this->_db) $this->setDb($select->getDb());
         if ($this->doesApply()) {
@@ -147,7 +147,7 @@ class Ac_Sql_Part extends Ac_Prototyped {
      * @access protected
      * @param Ac_Sql_Select $select
      */
-    function _doApplyToSelect(& $select) {
+    function _doApplyToSelect($select) {
         $select->groupBy = array_merge($select->groupBy, $this->getAppliedGroupBy());
         $select->useAlias($this->getAppliedAliases());
     }

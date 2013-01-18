@@ -5,7 +5,7 @@ class Ac_Form_Control_Template_Table extends Ac_Form_Control_Template {
     /**
      * @param Ac_Form_Control_Table $table
      */
-    function showTable (& $table) {
+    function showTable ($table) {
         $this->addCssLib('{ACCSS}aeTableInput.css', false);
         $this->addJsLib('{AC}/aeTableData.js', false);
         $this->addJsLib('{AC}/aeTableInput.js', false);

@@ -15,23 +15,23 @@ class Ac_Test_Dbi extends Ac_Test_Base {
 	 * @param Ac_Sql_Dbi_Database $dbiDatabase
 	 * @return unknown_type
 	 */
-	function collectDbInfo(& $dbiDatabase) {
+	function collectDbInfo($dbiDatabase) {
 		$res = array();
 		foreach ($dbiDatabase->listTables() as $tableName) {
-			$table = & $dbiDatabase->getTable($tableName);
+			$table = $dbiDatabase->getTable($tableName);
 			$columns = array();
 			$indexes = array();
 			$relations = array();
 			foreach ($table->listColumns() as $colName) {
-				$col = & $table->getColumn($colName);
+				$col = $table->getColumn($colName);
 				$columns[$colName] = $col->getKnownProperties();
 			}
 			foreach ($table->listRelations() as $relName) {
-				$rel = & $table->getRelation($relName);
+				$rel = $table->getRelation($relName);
 				$relations[$relName] = $rel->getKnownProperties();
 			}
 			foreach ($table->listIndices() as $idxName) {
-				$idx = & $table->getIndex($idxName);
+				$idx = $table->getIndex($idxName);
 				$indexes[$idxName] = $idx->getKnownProperties();
 			}
 			$res['tables'][$tableName]['columns'] = $columns;
@@ -50,7 +50,7 @@ class Ac_Test_Dbi extends Ac_Test_Base {
 	/**
 	 * @return Ac_Sql_Dbi_Database
 	 */
-	function & createDbiDatabaseWithMySql5Inspector() {
+	function createDbiDatabaseWithMySql5Inspector() {
 		$sqlDb = $this->getAeDb();
 		$inspector = new Ac_Sql_Dbi_Inspector_MySql5($sqlDb, $this->getDbName());
 		$dbiDb = new Ac_Sql_Dbi_Database($inspector, $this->getDbName(), $this->getTablePrefix());
@@ -60,7 +60,7 @@ class Ac_Test_Dbi extends Ac_Test_Base {
 	/**
 	 * @return Ac_Sql_Dbi_Database
 	 */
-	function & createDbiDatabaseWithDefaultInspector() {
+	function createDbiDatabaseWithDefaultInspector() {
 		$sqlDb = $this->getAeDb();
 		$inspector = new Ac_Sql_Dbi_Inspector($sqlDb, $this->getDbName());
 		$dbiDb = new Ac_Sql_Dbi_Database($inspector, $this->getDbName(), $this->getTablePrefix());
@@ -70,7 +70,7 @@ class Ac_Test_Dbi extends Ac_Test_Base {
 	/**
 	 * @return Ac_Sql_Dbi_Database
 	 */
-	function & createDbiDatabaseWithLegacyInspector() {
+	function createDbiDatabaseWithLegacyInspector() {
 		
 		$lcl = new Ac_Util_LegacyAvancoreLoader(array('avancorePath' => dirname(__FILE__).'/../../../legacy'));
 		$lcl->load();
@@ -83,7 +83,7 @@ class Ac_Test_Dbi extends Ac_Test_Base {
 	// --------------------------------+ tests +-----------------------------------
 	
 	function testDbiWithDefaultInspector() {
-		$dbi = & $this->createDbiDatabaseWithDefaultInspector();
+		$dbi = $this->createDbiDatabaseWithDefaultInspector();
 		$tested = $this->collectDbInfo($dbi);
 		$standard = $this->getSampleDbInfo();
 		//$foo = $this->stripRightArrayToLeft($tested, $standard, '~^/tables(/[^/]+)?$~');
@@ -94,7 +94,7 @@ class Ac_Test_Dbi extends Ac_Test_Base {
 	}
 	
 	function testDbiWithMySql5Inspector() {
-		$dbi = & $this->createDbiDatabaseWithMySql5Inspector();
+		$dbi = $this->createDbiDatabaseWithMySql5Inspector();
 		$tested = $this->collectDbInfo($dbi);
 		$standard = $this->getSampleDbInfo();
 		//var_dump($tested);
@@ -108,7 +108,7 @@ class Ac_Test_Dbi extends Ac_Test_Base {
         // TODO: add Legacy Avancore Loader?
         return;
         
-		$dbi = & $this->createDbiDatabaseWithLegacyInspector();
+		$dbi = $this->createDbiDatabaseWithLegacyInspector();
 		$tested = $this->collectDbInfo($dbi);
 		$standard = $this->getSampleDbInfo();
 		

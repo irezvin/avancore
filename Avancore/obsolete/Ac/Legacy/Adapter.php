@@ -82,7 +82,7 @@ class Ac_Legacy_Adapter {
     /**
      * @access protected
      */
-    function & _instantiateConfig ($configClass) {
+    function _instantiateConfig ($configClass) {
         if (strlen($this->configPath)) 
             $configPath = str_replace('%a%', Ac_Dispatcher::getAppDir(), $this->configPath);
         else $configPath = false;
@@ -90,7 +90,7 @@ class Ac_Legacy_Adapter {
         return $res;
     }
     
-    function & createPageNav($total, $limitstart, $limit) {
+    function createPageNav($total, $limitstart, $limit) {
         $pnc = $this->pageNavClass;
         $res = new $pnc ($total, $limitstart, $limit);
         return $res;

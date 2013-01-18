@@ -16,12 +16,12 @@ class Ac_Js {
         return "'".addcslashes($string, "'\n\r\t\0\\")."'";
     }
     
-    static protected function isArraySimple (& $arr) {
+    static protected function isArraySimple ($arr) {
         foreach (array_keys($arr) as $k) if (!is_scalar($arr[$k])) return false;
         return true;   
     }
     
-    static protected function areOnlyNumericKeys (& $arr) {
+    static protected function areOnlyNumericKeys ($arr) {
         foreach (array_keys($arr) as $k) if (!is_numeric($k)) return false;
         return true;
     }

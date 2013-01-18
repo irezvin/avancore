@@ -110,11 +110,11 @@ class Ac_Dispatcher {
         ini_set('include_path', implode(PATH_SEPARATOR, $paths)); 
     }
     
-    function & instantiate($appName = null, $isBackend = false, $language = false, $adapterClass = 'Ac_Joomla_Adapter', $dispatcherClass = 'Ac_Dispatcher', $adapterExtraSettings = array()) {
+    function instantiate($appName = null, $isBackend = false, $language = false, $adapterClass = 'Ac_Joomla_Adapter', $dispatcherClass = 'Ac_Dispatcher', $adapterExtraSettings = array()) {
         if (!isset($GLOBALS['avsDispatcher']) || !is_a($GLOBALS['avsDispatcher'], 'Ac_Dispatcher')) {
             $GLOBALS['avsDispatcher'] = new Ac_Dispatcher($appName, $isBackend, $language, $adapterClass, $adapterExtraSettings);
         }
-        $res = & $GLOBALS['avsDispatcher'];
+        $res = $GLOBALS['avsDispatcher'];
         $res->init();
         return $res;
     }
@@ -173,8 +173,8 @@ class Ac_Dispatcher {
         if (!$this->_init) {
             $this->_init = true;
             $this->adapter = new $this->_adapterClass($this->_adapterExtraSettings);
-            $this->database = & $this->adapter->database;
-            $this->config = & $this->adapter->config;
+            $this->database = $this->adapter->database;
+            $this->config = $this->adapter->config;
             if ($this->_initLanguage === false) $this->language = $this->_getDefaultLanguage();
                 else $this->language = $this->_initLanguage;
             $this->_loadLanguage();
@@ -256,9 +256,8 @@ class Ac_Dispatcher {
     
     /**
      * @return string
-     * @static
      */
-    function getAppDir() {
+    static function getAppDir() {
         return dirname(__FILE__).'/../..';
     }
     
@@ -319,7 +318,7 @@ class Ac_Dispatcher {
             $GLOBALS['avsDispatcher'] = new Ac_Dispatcher(); 
         }
             
-        $res = & $GLOBALS['avsDispatcher'];
+        $res = $GLOBALS['avsDispatcher'];
         
         return $res;            
     }
@@ -366,7 +365,7 @@ class Ac_Dispatcher {
      * @return Ac_Legacy_User
      */
     function getUser() {
-        $res = & $this->adapter->getUser();
+        $res = $this->adapter->getUser();
         return $res;
     }
     
@@ -374,7 +373,7 @@ class Ac_Dispatcher {
      * @return Ac_Legacy_Session
      */
     function getSession() {
-        $res = & $this->adapter->getSession();
+        $res = $this->adapter->getSession();
         return $res;
     }
     
@@ -403,31 +402,31 @@ class Ac_Dispatcher {
         return $this->_cache;
     }
     
-    static function & cacheGet($key, $cacheGroup = 'default') {
-        $disp = & Ac_Dispatcher::getInstance();
-        $c = & $disp->getCache();
+    static function cacheGet($key, $cacheGroup = 'default') {
+        $disp = Ac_Dispatcher::getInstance();
+        $c = $disp->getCache();
         $res = $c->get($key, $cacheGroup);
         $disp->cacheCleanup(0.01);
         return $res;
     }
     
     static function cacheRemove($key, $cacheGroup = 'default') {
-        $disp = & Ac_Dispatcher::getInstance();
-        $c = & $disp->getCache();
+        $disp = Ac_Dispatcher::getInstance();
+        $c = $disp->getCache();
         $res = $c->remove($key, 'default');
         return $res;
     }
     
     static function cacheClean($cacheGroup = 'default') {
-        $disp = & Ac_Dispatcher::getInstance();
-        $c = & $disp->getCache();
+        $disp = Ac_Dispatcher::getInstance();
+        $c = $disp->getCache();
         $res = $c->clean($cacheGroup);
         return $res;
     }
 
     static function cacheSet($key, $value, $cacheGroup = 'default') {
-        $disp = & Ac_Dispatcher::getInstance();
-        $c = & $disp->getCache();
+        $disp = Ac_Dispatcher::getInstance();
+        $c = $disp->getCache();
         $disp->cacheCleanup(0.01);
         return $c->save($value, $key, $cacheGroup);
     }
@@ -436,7 +435,7 @@ class Ac_Dispatcher {
         if (is_float($probability) && $probability != 0) {
             if (!(rand(0, ceil(1 / abs($probability))) == 1)) return false; 
         }
-        $disp = & Ac_Dispatcher::getInstance();
+        $disp = Ac_Dispatcher::getInstance();
         $cacheDir = $this->getCacheDir();
         if ($cl = $this->getConfig('cacheLifeTime')) {
             $lifeTime = $cl;

@@ -24,7 +24,7 @@ class Ac_Admin_Feature {
      * @param array $options extra settings of the feature
      * @return Ac_Admin_Feature
      */
-    function Ac_Admin_Feature (& $manager, $options = array()) {
+    function Ac_Admin_Feature ($manager, $options = array()) {
         if (!is_a($manager, 'Ac_Admin_Manager'))
             trigger_error ('$manager must be instance of Ac_Admin_Manager', E_USER_ERROR);
         Ac_Util::simpleBind($options, $this);
@@ -77,7 +77,7 @@ class Ac_Admin_Feature {
      *  
      * @param Ac_Form $form
      */
-    function applyToForm(& $form) {
+    function applyToForm($form) {
     }
     
     /**
@@ -86,7 +86,7 @@ class Ac_Admin_Feature {
      *  
      * @param Ac_Form $filterForm
      */
-    function applyToFilterForm(& $filterForm) {
+    function applyToFilterForm($filterForm) {
     }
     
     function getOrderPrototypes() {
@@ -127,7 +127,7 @@ class Ac_Admin_Feature {
      * @param Ac_Admin_Manager $subManager 
      * @param array $smConfig Configuration that was used to create subManager
      */
-    function onSubManagerCreated($id, & $subManager, $smConfig = array()) {
+    function onSubManagerCreated($id, $subManager, $smConfig = array()) {
     }
     
     function onCollectionCreated(Ac_Model_Collection $collection) {

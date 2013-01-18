@@ -12,8 +12,8 @@ class Ac_Test_ModelSql extends Ac_Test_Base {
 	/**
 	 * @return Ac_Sql_Select
 	 */
-	function & createSelect() {
-		$m = & Ac_Test_Model::getAeTestModelPeopleMapper();
+	function createSelect() {
+		$m = Ac_Test_Model::getAeTestModelPeopleMapper();
 		$sel = new Ac_Sql_Select($this->getAeDb(), array(
 			'tables' => array(
 				't' => array(
@@ -31,10 +31,10 @@ class Ac_Test_ModelSql extends Ac_Test_Base {
 	}
 	
 	function testAutoTables() {
-		$sel = & $this->createSelect();
+		$sel = $this->createSelect();
 		$sel->useAlias(array('outgoingRelations[otherPerson]', 'outgoingRelations[relationType]'));
 		$sel->columns = array('t.name', '`outgoingRelations[otherPerson]`.`name` AS `otherName`', '`outgoingRelations[relationType]`.`title`');
-		$sqlDb = & $this->getAeDb();
+		$sqlDb = $this->getAeDb();
 		
 		$rightStatement = "
 			SELECT t.name, `outgoingRelations[otherPerson]`.`name` AS `otherName`, `outgoingRelations[relationType]`.`title`
@@ -49,7 +49,7 @@ class Ac_Test_ModelSql extends Ac_Test_Base {
 		$this->assertTrue(count($sqlDb->fetchArray($sel)));
 		Ac_Dispatcher::loadClass('Ac_Sql_Select_Expression');
 		
-		$sel2 = & Ac_Model_Sql_TableProvider::createSelect('Ac_Test_Model_People_Mapper', $db);
+		$sel2 = Ac_Model_Sql_TableProvider::createSelect('Ac_Test_Model_People_Mapper', $db);
 		$sel2->columns = array(
 			't.name', 
 			'otherName' => new Ac_Sql_Select_Expression('outgoingRelations[otherPerson].name', true),

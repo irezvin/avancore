@@ -259,7 +259,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     /**
      * @return Ac_Model_Relation
      */
-    function & factory($config = array()) {
+    function factory($config = array()) {
         return Ac_Prototyped::factory($config, 'Ac_Model_Relation');
     }
     
@@ -328,7 +328,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @param mixed $defaultValue Value to be returned for missing rows when $matchMode is AMR_ALL_ORIGINAL_KEYS or when $srcData is an object. By default it is null if $this->destIsUnique and empty array() if not.
      * @return Ac_Model_Data|array
      */
-    function getDest (& $srcData, $matchMode = AMR_PLAIN_RESULT, $defaultValue = null) {
+    function getDest ($srcData, $matchMode = AMR_PLAIN_RESULT, $defaultValue = null) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         $hasDef = func_num_args() >= 3;
         $res = $this->_getSrcOrDest ($srcData, $matchMode, $defaultValue, $hasDef, $this->fieldLinks, $this->fieldLinks2, $this->destIsUnique, $this->destTableName, '_destInstance', $this->destOrdering, $this->destExtraJoins, $this->destWhere);
@@ -339,7 +339,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @param Ac_Model_Data|object|array $srcData
      * @return Ac_Model_Collection
      */
-    function getDestCollection(& $srcData, $matchKeys = false) {
+    function getDestCollection($srcData, $matchKeys = false) {
         trigger_error ('Method not implemented yet', E_USER_ERROR);
     }
     
@@ -347,7 +347,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @param Ac_Model_Collection $srcCollection
      * @return Ac_Model_Collection 
      */
-    function getDestCollectionForCollection(& $srcCollection) {
+    function getDestCollectionForCollection($srcCollection) {
         trigger_error ('Method not implemented yet', E_USER_ERROR);
     }
     
@@ -360,7 +360,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @param mixed $defaultValue Value to be returned for missing rows when $matchMode is AMR_ALL_ORIGINAL_KEYS or when $srcData is an object. By default it is null if $this->destIsUnique and empty array() if not.
      * @return Ac_Model_Data|array
      */ 
-    function getSrc (& $destData, $matchMode = AMR_PLAIN_RESULT, $defaultValue = null) {
+    function getSrc ($destData, $matchMode = AMR_PLAIN_RESULT, $defaultValue = null) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         $hasDef = func_num_args() >= 3;
         $res = $this->_getSrcOrDest ($destData, $matchMode, $defaultValue, $hasDef, $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcIsUnique, $this->srcTableName, '_srcInstance', $this->srcOrdering, $this->srcExtraJoins, $this->srcWhere);
@@ -371,7 +371,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @param Ac_Model_Data|object|array $destData
      * @return Ac_Model_Collection
      */
-    function getSrcCollection(& $destData, $matchKeys = false) {
+    function getSrcCollection($destData, $matchKeys = false) {
         trigger_error ('Method not implemented', E_USER_ERROR);
     }
     
@@ -379,33 +379,33 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @param Ac_Model_Collection $destCollection
      * @return Ac_Model_Collection 
      */
-    function getSrcCollectionForCollection(& $destCollection) {
+    function getSrcCollectionForCollection($destCollection) {
         trigger_error ('Method not implemented', E_USER_ERROR);
     }
     
     // ------------------------ count / delete / load methods -------
     
-    function countDest (& $srcData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
+    function countDest ($srcData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         return $this->_countSrcOrDest($srcData, $separate, $matchMode, $this->fieldLinks, $this->fieldLinks2, $this->destIsUnique, $this->destTableName);
     }
     
-    function countSrc (& $destData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
+    function countSrc ($destData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         return $this->_countSrcOrDest($destData, $separate, $matchMode, $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcIsUnique, $this->srcTableName);
     }
     
-    function deleteDest (& $srcData) {
+    function deleteDest ($srcData) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         return $this->_deleteSrcOrDest($srcData, $this->fieldLinks, $this->fieldLinks2, $this->destTableName, $this->destWhere);
     }
     
-    function deleteSrc (& $destData) {
+    function deleteSrc ($destData) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         return $this->_deleteSrcOrDest($destData, $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcTableName, $this->srcWhere);
     }
     
-    function loadDest (& $srcData, $ignoreLoaded = true, $biDirectional = true) {
+    function loadDest ($srcData, $ignoreLoaded = true, $biDirectional = true) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         //if (!$this->srcVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $srcVarName is not set');
         $defaultValue = $this->destIsUnique? null : array();
@@ -415,7 +415,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function loadSrc (& $destData, $ignoreLoaded = true, $biDirectional = true) {
+    function loadSrc ($destData, $ignoreLoaded = true, $biDirectional = true) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         if (!$this->destVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $destVarName is not set');
         $defaultValue = $this->srcIsUnique? null : array();
@@ -424,7 +424,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcIsUnique, $this->destIsUnique, $this->srcTableName, '_srcInstance', $this->srcOrdering, $this->srcExtraJoins, $this->srcWhere);
     }
     
-    function loadDestNNIds(& $srcData, $ignoreLoaded = true) {
+    function loadDestNNIds($srcData, $ignoreLoaded = true) {
         if (!$this->midTableName) trigger_error("This function is only applicable to relations with midTableName set", E_USER_ERROR);
         if (!strlen($this->srcNNIdsVarName)) trigger_error("Property \$srcNNIdsVarName should be set to non-empty string to use this method", E_USER_ERROR); 
         $relConfig = array(
@@ -444,7 +444,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         $this->_fixNNIds($srcData, array_keys($this->fieldLinks2), $this->srcNNIdsVarName);
     }
     
-    function loadSrcNNIds(& $destData, $ignoreLoaded = true) {
+    function loadSrcNNIds($destData, $ignoreLoaded = true) {
         if (!$this->midTableName) trigger_error("This function is only applicable to relations with midTableName set", E_USER_ERROR);
         if (!strlen($this->destNNIdsVarName)) trigger_error("Property \$destNNIdsVarName should be set to non-empty string to use this method", E_USER_ERROR);
         $relConfig = array(
@@ -467,7 +467,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     /**
      * Counts destination objects and stores result in $srcCountVarName of each corresponding $srcData object
      */
-    function loadDestCount (& $srcData, $ignoreLoaded = true) {
+    function loadDestCount ($srcData, $ignoreLoaded = true) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         if (!$this->srcCountVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $srcCountVarName is not set');
         return $this->_loadSrcOrDestCount ($srcData, $this->srcCountVarName, $ignoreLoaded, 
@@ -477,7 +477,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     /**
      * Counts source objects and stores result in $destCountVarName of each corresponding $destData object
      */
-    function loadSrcCount (& $destData, $ignoreLoaded = true) {
+    function loadSrcCount ($destData, $ignoreLoaded = true) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         if (!$this->destCountVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $destCountVarName is not set');
         return $this->_loadSrcOrDestCount ($destData, $this->destCountVarName, $ignoreLoaded, 
@@ -489,7 +489,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @see Ac_Model_Relation::$onDeleteSrc
      * @see Ac_Model_Relation::$onDeleteSrcParam
      */
-    function handleSrcDeleted (& $srcData) {
+    function handleSrcDeleted ($srcData) {
         trigger_error ('Method not implemented yet', E_USER_ERROR);
     }
     
@@ -498,7 +498,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @see Ac_Model_Relation::$onDeleteDest
      * @see Ac_Model_Relation::$onDeleteDestParam
      */
-        function handleDestDeleted (& $destData) {
+        function handleDestDeleted ($destData) {
         trigger_error ('Method not implemented yet', E_USER_ERROR);
     }
     
@@ -524,14 +524,14 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function getCritForSrcOfDest (& $dest, $srcAlias = '', $default = '0') {
+    function getCritForSrcOfDest ($dest, $srcAlias = '', $default = '0') {
         if ($this->midTableName) trigger_error ("This method cannot be used when midTableName is set!", E_USER_ERROR);
         if (!$this->srcTableName) trigger_error ("Cannot ".__FUNCTION__."() with non-persistent source!", E_USER_ERROR);
         $res = $this->_makeCritForSrcOrDest($dest, $srcAlias, $this->_fieldLinksRev, $default);
         return $res;        
     }
     
-    function getCritForDestOfSrc (& $src, $destAlias = '', $default = '0') {
+    function getCritForDestOfSrc ($src, $destAlias = '', $default = '0') {
         if ($this->midTableName) trigger_error ("This method cannot be used when midTableName is set!", E_USER_ERROR);
         if (!$this->destTableName) trigger_error ("Cannot ".__FUNCTION__."() with non-persistent destination!", E_USER_ERROR);
         $res = $this->_makeCritForSrcOrDest($src, $destAlias, $this->fieldLinks, $default);
@@ -573,7 +573,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         }
     }
     
-    function _getAllValues(& $source, & $values, $keys) {
+    function _getAllValues(& $source, $values, $keys) {
         $values = array();
         foreach (array_keys($source) as $k) {
 //            if ($this->_isFull($gv = $this->_getValues($source[$k], $keys, false, false))) $values[] = $gv;
@@ -581,7 +581,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         }
     }
     
-    function & _getSrcOrDest (& $data, $matchMode, $defaultValue, $hasDefaultValue, $fieldLinks, $fieldLinks2, $isUnique, $tableName, $instanceFunc, $ordering, $extraJoins, $extraWhere) {
+    function _getSrcOrDest ($data, $matchMode, $defaultValue, $hasDefaultValue, $fieldLinks, $fieldLinks2, $isUnique, $tableName, $instanceFunc, $ordering, $extraJoins, $extraWhere) {
         $keys = array_keys($fieldLinks);
         if (is_array($data)) { // we assume that this array is of objects or rows
             $values = array();
@@ -632,7 +632,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function _countSrcOrDest (& $data, $separate = true, $matchMode = AMR_PLAIN_RESULT, $fieldLinks, $fieldLinks2, $isUnique, $tableName) {
+    function _countSrcOrDest ($data, $separate = true, $matchMode = AMR_PLAIN_RESULT, $fieldLinks, $fieldLinks2, $isUnique, $tableName) {
         $keys = array_keys($fieldLinks);
         if (is_array($data)) { // we assume that this is array of objects or array of rows
             $values = array();
@@ -681,7 +681,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function _deleteSrcOrDest (& $data, $fieldLinks, $fieldLinks2, $tableName, $where = false) {
+    function _deleteSrcOrDest ($data, $fieldLinks, $fieldLinks2, $tableName, $where = false) {
         $keys = array_keys($fieldLinks);
         if (is_object($data)) {
             $xd = array(& $data);
@@ -711,7 +711,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function _loadSrcOrDest (& $data, $defaultValue, $varName, $otherVarName, $ignoreLoaded, $biDirectional, $fieldLinks, $fieldLinks2, $isUnique, $otherIsUnique, $tableName, $instanceFunc, $ordering = false, $extraJoins = false, $extraWhere = false) {
+    function _loadSrcOrDest ($data, $defaultValue, $varName, $otherVarName, $ignoreLoaded, $biDirectional, $fieldLinks, $fieldLinks2, $isUnique, $otherIsUnique, $tableName, $instanceFunc, $ordering = false, $extraJoins = false, $extraWhere = false) {
         $keys = array_keys($fieldLinks);
         $res = array();
         if (is_array($data)) { // we assume that this array is of objects or rows
@@ -769,7 +769,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function _loadSrcOrDestCount (& $data, $varName, $ignoreLoaded, $fieldLinks, $fieldLinks2, $tableName) {
+    function _loadSrcOrDestCount ($data, $varName, $ignoreLoaded, $fieldLinks, $fieldLinks2, $tableName) {
         $keys = array_keys($fieldLinks);
         if (is_array($data)) { // we assume that this array is of objects or rows
             $values = array();
@@ -810,7 +810,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         }
     }
     
-    function & _getWithValues ($values, $keys, $multipleValues, $unique, $byKeys, $tableName, $ifun, $orderByKeys = false, $retSql = false, $midTableName = '', $ordering = false, $extraJoins = false, $extraWhere = false) {
+    function _getWithValues ($values, $keys, $multipleValues, $unique, $byKeys, $tableName, $ifun, $orderByKeys = false, $retSql = false, $midTableName = '', $ordering = false, $extraJoins = false, $extraWhere = false) {
         if (!$extraJoins) {
             $ta = '';
             $asTa = '';
@@ -1029,12 +1029,12 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $this->database->query();
     }
 
-    function & _destInstance($row) {
+    function _destInstance($row) {
         $res = $this->_recordInstance($row, $this->destRecordClass, $this->_destMapper);
         return $res;
     }
     
-    function & _srcInstance($row) {
+    function _srcInstance($row) {
         $res = $this->_recordInstance($row, $this->srcRecordClass, $this->_srcMapper);
         return $res;
     }
@@ -1073,7 +1073,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }    
         
-    function _makeCritForSrcOrDest (& $data, $otherAlias, $fieldLinks, $default) {
+    function _makeCritForSrcOrDest ($data, $otherAlias, $fieldLinks, $default) {
         $keys = array_keys($fieldLinks);
         if (is_object($data)) $d = array(& $data);
         else $d = $d;
@@ -1089,7 +1089,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $crit;
     }
     
-    function _fixNNIds(& $data, $fields, $varName) {
+    function _fixNNIds($data, $fields, $varName) {
         $isSingle = false;
         if (is_object($data)) {
             $isSingle = true;

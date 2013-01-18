@@ -40,21 +40,21 @@ class Ac_Sql_RefChecker {
 		Ac_Util::bindAutoparams($this, $options, true);
 	}
 	
-	function _setDb(& $db) {
+	function _setDb($db) {
 		if (!is_a($db, 'Ac_Sql_Db')) trigger_error("\$db must be an instance of Ac_Sql_Db", E_USER_ERROR);
-		$this->_db = & $db;
+		$this->_db = $db;
 	}
 	
-	function _setSchema(& $schema) {
+	function _setSchema($schema) {
 		if (!is_a($schema, 'Ac_Sql_Dbi_Database')) trigger_error("\$schema must be an instance of Ac_Sql_Dbi_Database", E_USER_ERROR);
-		$this->_schema = & $schema;
+		$this->_schema = $schema;
 	}
 	
 	function _getRelationsToCheck() {
 		if ($this->_relationsToCheck === false) {
 			$this->_relationsToCheck = array();
 			foreach ($this->_schema->listTables() as $i) {
-				$t = & $this->_schema->getTable($i);
+				$t = $this->_schema->getTable($i);
 				foreach ($t->listRelations() as $j) {
 					$rel = $t->getRelation($j);
 					$this->_relationsToCheck[$i][$rel->table][] = $rel; 
@@ -77,7 +77,7 @@ class Ac_Sql_RefChecker {
 		return $res;
 	}
 	
-	function & createSelect($tableName, $alias = false, $otherTableName = false, $otherRelName = false, $type = 'INNER JOIN', $obeyNonRefValues = false) {
+	function createSelect($tableName, $alias = false, $otherTableName = false, $otherRelName = false, $type = 'INNER JOIN', $obeyNonRefValues = false) {
 		if (!$alias) $alias = $tableName;
 		$tablePrototypes = array(
 			$alias => array(
@@ -88,7 +88,7 @@ class Ac_Sql_RefChecker {
 		if (isset($rtc[$tableName])) {
 			foreach (array_keys($rtc[$tableName]) as $relTableName) {
 				foreach (array_keys($rtc[$tableName][$relTableName]) as $i) {
-					$rel = & $rtc[$tableName][$relTableName][$i];
+					$rel = $rtc[$tableName][$relTableName][$i];
 					$suffix = count($rtc[$tableName][$relTableName]) > 1? '_'.($i + 1) : '';
 					if (($otherTableName !== false) && ($rel->table !== $otherTableName)) {
 						continue;	
@@ -128,11 +128,11 @@ class Ac_Sql_RefChecker {
 	 * @param $concatFunction
 	 * @return unknown_type
 	 */
-	function & applyOuterWhere(& $selectForRelatedTables, $whereKey = 'outerWhere', $forMissingRecords = true, $concatFunction = "\n    AND", $obeyNonRefValues = false) {
-		$s = & $selectForRelatedTables;
+	function applyOuterWhere($selectForRelatedTables, $whereKey = 'outerWhere', $forMissingRecords = true, $concatFunction = "\n    AND", $obeyNonRefValues = false) {
+		$s = $selectForRelatedTables;
 		$where = array();
 		foreach ($s->getUsedAliases() as $i) {
-			$t = & $s->getTable($i);
+			$t = $s->getTable($i);
 			if (is_array($t->joinsOn))
 				$where[] = $this->_getForeignRecordMissingCriterion($s->getTable($i), $obeyNonRefValues);
 		}
@@ -147,18 +147,18 @@ class Ac_Sql_RefChecker {
 	 * @param Ac_Sql_Select_Table $selTable
 	 * @return unknown_type
 	 */
-	function _getForeignRecordMissingCriterion(& $selTable, $obeyNonRefValues = false) {
-			$t = & $selTable;
-			$tInfo = & $this->_schema->getTable($t->name);
+	function _getForeignRecordMissingCriterion($selTable, $obeyNonRefValues = false) {
+			$t = $selTable;
+			$tInfo = $this->_schema->getTable($t->name);
 			$pkf = $tInfo->listPkFields();
 			foreach ($pkf as $f) {
 				$crit[] = 'ISNULL('.$this->_db->n(array($t->getIdentifier(), $f)).')';
 			}
 			if ($obeyNonRefValues) {
 				$myFields = array();
-				$sqs = & $selTable->getSqlSelect(true);
+				$sqs = $selTable->getSqlSelect(true);
 				$epa = $sqs->getEffectivePrimaryAlias();
-				$prim = & $sqs->getTable($epa); 
+				$prim = $sqs->getTable($epa); 
 				$crit[] = $this->_getNonRefCriterion($selTable, $prim->name, $epa);
 			}
 			if (count($crit) > 1) {
@@ -179,13 +179,13 @@ class Ac_Sql_RefChecker {
 		
 	}
 	
-	function listStatColumns(& $select, $tableName = false) {
+	function listStatColumns($select, $tableName = false) {
 		$res = array();
 		$this->_getRelationsToCheck();
 		$primaryAlias = $select->getEffectivePrimaryAlias();
-		$primaryTable = & $select->getTable($primaryAlias);
+		$primaryTable = $select->getTable($primaryAlias);
 		foreach ($select->listTables() as $i) {
-			$t = & $select->getTable($i);
+			$t = $select->getTable($i);
 			if (!is_array($t->joinsOn)) continue;
 			if ($tableName !== false && ($t->name !== $tableName)) continue;
 			$refsToTable = $this->_relationsToCheck[$primaryTable->name][$t->name];
@@ -208,7 +208,7 @@ class Ac_Sql_RefChecker {
 		return $res;
 	}
 
-	function _getNonRefCriterion(& $t, $tableName, $primaryAlias) {
+	function _getNonRefCriterion($t, $tableName, $primaryAlias) {
 		foreach($t->joinsOn as $otherColName => $myColName) {
 			if (is_a($myColName, 'Ac_Sql_Expression')) continue;
 			if (is_numeric($otherColName)) $otherColName = $myColName;
@@ -238,12 +238,12 @@ class Ac_Sql_RefChecker {
 	 * @param false|true|'flat' $asArray 
 	 * @return array
 	 */
-	function getRelStatColumns(& $select, $asArray = false) {
+	function getRelStatColumns($select, $asArray = false) {
 		$res = array();
-		$primaryTable = & $select->getTable($select->getEffectivePrimaryAlias());
+		$primaryTable = $select->getTable($select->getEffectivePrimaryAlias());
 		$primaryAlias = $select->getEffectivePrimaryAlias();
 		foreach ($select->listTables() as $i) {
-			$t = & $select->getTable($i);
+			$t = $select->getTable($i);
 			if (!is_array($t->joinsOn)) continue;
 			$refSrc = $this->_getNonRefCriterion($t, $primaryTable->name, $primaryAlias);
 			$refDest = $this->_getForeignRecordMissingCriterion($t);
@@ -260,9 +260,9 @@ class Ac_Sql_RefChecker {
 		return $res; 
 	}
 	
-	function _getRelName(& $select, & $selectTable) {
+	function _getRelName(& $select, $selectTable) {
 		$primaryAlias = $select->getEffectivePrimaryAlias();
-		$primaryTable = & $select->getTable($primaryAlias);
+		$primaryTable = $select->getTable($primaryAlias);
 		$rtc = $this->_getRelationsToCheck();
 		$n = $selectTable->name;
 		$refsToTable = $this->_relationsToCheck[$primaryTable->name][$selectTable->name];
@@ -280,11 +280,11 @@ class Ac_Sql_RefChecker {
 	 * @return array
 	 */
 	function listBadRefValues($tableName, $otherTableName = false, $relName = false) {
-		$select = & $this->createSelect($tableName, 't', $otherTableName, $relName, 'LEFT JOIN', true);
+		$select = $this->createSelect($tableName, 't', $otherTableName, $relName, 'LEFT JOIN', true);
 		$primaryAlias = $select->getEffectivePrimaryAlias();
 		$res = array(); 
 		foreach ($select->listTables() as $i) {
-			$t = & $select->getTable($i);
+			$t = $select->getTable($i);
 			if (!is_array($t->joinsOn)) continue;
 			$cols = array();
 			foreach (array_values($t->joinsOn) as $colName) {
@@ -309,10 +309,10 @@ class Ac_Sql_RefChecker {
 	
 	function fixRecords($tableName, $otherTableName = false, $relName = false, $action = AC_RC_FIX_DELETE, $getSql = false) {
 		$sql = array();
-		$select = & $this->createSelect($tableName, 't', $otherTableName, $relName, 'LEFT JOIN', true);
+		$select = $this->createSelect($tableName, 't', $otherTableName, $relName, 'LEFT JOIN', true);
 		$primaryAlias = $select->getEffectivePrimaryAlias();
 		foreach ($select->listTables() as $i) {
-			$t = & $select->getTable($i);
+			$t = $select->getTable($i);
 			if (!is_array($t->joinsOn)) continue;
 			$cols = array();
 			$colsToFix = array();

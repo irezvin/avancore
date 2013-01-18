@@ -18,7 +18,7 @@ class Ac_Test_Mssql extends Ac_Test_Base {
 	/**
 	 * @return Ac_Ms_Database
 	 */
-	function & getMssqlDb() {
+	function getMssqlDb() {
 		if ($this->_db === false) {
 			$this->_db = new Ac_Ms_Database(array(
 				'user' => 'irezvin',
@@ -32,7 +32,7 @@ class Ac_Test_Mssql extends Ac_Test_Base {
 	}
 	
 	function testBasic() {
-		$db = & $this->getMssqlDb();
+		$db = $this->getMssqlDb();
 		$db->setQuery('SELECT * FROM table_sts ORDER BY code_id');
 		var_dump($db->loadAssocList());
 		$offset = 2;

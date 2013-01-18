@@ -38,7 +38,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
      *
      * @param Ac_Admin_Manager $manager
      */
-    function setManager(& $manager) {
+    function setManager($manager) {
         $this->manager = $manager;
         $context = $manager->getContext();
         if ($context->isInForm) {
@@ -58,7 +58,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
     }
     
     function showToolbar() {
-        $this->addJsLib('{AC}/overlib_mini.js');
+        $this->addJsLib('{AC}/vendor/overlib_mini.js');
         
         if (count($this->actions)) {
 ?>
