@@ -96,7 +96,7 @@ abstract class <?php $this->d($this->domainGenClass); ?> extends <?php $this->d(
      * @static
 <?php } ?>
      */
-    <?php if ($this->generator->php5) echo "static "; ?>function & <?php $this->d($modelClass); ?> (& $object) {
+    <?php if ($this->generator->php5) echo "static "; ?>function <?php $this->d($modelClass); ?> (& $object) {
         return $object;
     }
 <?php } ?>

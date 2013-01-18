@@ -71,7 +71,7 @@ class Ac_Finder_Criterion_SearchByProperties extends Ac_Finder_Criterion {
     /**
      * @param Ac_Sql_Select $select
      */
-    function applyToSelect(Ac_Sql_Select & $select) {
+    function applyToSelect(Ac_Sql_Select  $select) {
     	if (count($this->propNames) && strlen($this->substring)) {
     		
  			$aliases = array();

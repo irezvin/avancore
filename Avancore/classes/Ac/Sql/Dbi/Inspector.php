@@ -13,7 +13,7 @@ class Ac_Sql_Dbi_Inspector {
     
     var $defaultDatabaseName = false;
 
-    function Ac_Sql_Dbi_Inspector(& $sqlDb, $defaultDatabaseName = false) {
+    function Ac_Sql_Dbi_Inspector($sqlDb, $defaultDatabaseName = false) {
         if (is_a($sqlDb, 'Ac_Legacy_Database')) {
             $this->_db = new Ac_Sql_Db_Ae($sqlDb);
         } else {

@@ -185,7 +185,7 @@ class Ac_Accessor_PathRef extends Ac_Accessor_Path {
 
      * @return Ac_Accessor_PathRef
      */
-    static function chain($src, $options) {
+    static function chain($src) {
         return new Ac_Accessor_PathRef($src, array());
     }
     

@@ -8,7 +8,7 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 	/**
 	 * @return Ac_Sql_Select
 	 */
-	function & createMySelect() {
+	function createMySelect() {
 		$res = new Ac_Sql_Select($this->getAeDb(), array(
 			'tables' => array(
 				'people' => array(
@@ -68,9 +68,9 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 
 	function testBasics() {
 		
-		$db = & $this->getAeDb();
+		$db = $this->getAeDb();
 		
-		$select = & $this->createMySelect();
+		$select = $this->createMySelect();
 		$select->setUsedAliases('otherPeople');
 		$this->assertEqual($this->normalizeStatement($from = $select->getFromClause()), $this->normalizeStatement($rightStatement1 = "
 			`#__people` AS `people` 
@@ -94,16 +94,16 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 		$this->assertEqual($this->normalizeStatement($from = $select->getFromClause()), $this->normalizeStatement($rightStatement2, true));
 		$this->assertTrue(is_array($db->fetchArray("SELECT * FROM ".$from)), "valid query");
 		
-		$t = & $select->getTable('otherPeople');
+		$t = $select->getTable('otherPeople');
 		$t->joinsOn = "ON `relations`.`otherPersonId` = `otherPeople`.`personId`";
 		$this->assertEqual($this->normalizeStatement($select->getFromClause()), $this->normalizeStatement($rightStatement2, true));
 		
-		$t = & $select->getTable('otherPeople');
+		$t = $select->getTable('otherPeople');
 		$t->joinsOn = "`relations`.`otherPersonId` = `otherPeople`.`personId`";
 		$this->assertEqual($this->normalizeStatement($select->getFromClause()), $this->normalizeStatement($rightStatement2, true));
 		
 		$select->setUsedAliases(array('people', 'otherPeople'));
-		$t = & $select->getTable('relations');
+		$t = $select->getTable('relations');
 		$t->joinType = 'LEFT JOIN';
 		$select->autoLoosenJoins = true;
 		$rightStatement3 = "
@@ -123,7 +123,7 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 		$this->assertEqual($this->normalizeStatement($select->getFromClause()), $this->normalizeStatement($rightStatement4, true));
 		
 		$select->setUsedAliases(array('people', 'relations'));
-		$t = & $select->getTable('relations');
+		$t = $select->getTable('relations');
 		$t->joinType = '';
 		$t->joinsOn = '';
 		
@@ -135,7 +135,7 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 	}
 	
 	function testSupplementaryFunctions() {
-		$sqlSelect = & $this->createMySelect();
+		$sqlSelect = $this->createMySelect();
 		//$this->assertTrue($sqlSelect->hasTable('people'));
 		$this->assertIsA($sqlSelect->getTable('people'), 'Ac_Sql_Select_Table');
 		$this->expectError(new PatternExpectation('/is already in tables collection/i'));
@@ -147,9 +147,9 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 		$sqlSelect->getTable('foobar');
 		
 		unset($sqlSelect);
-		$sqlSelect = & $this->createMySelect();
+		$sqlSelect = $this->createMySelect();
 		
-		$t = & $sqlSelect->getTable('relations');
+		$t = $sqlSelect->getTable('relations');
 		$t->joinType = false;
 		$sqlSelect->useAlias('relations');
 		$this->expectError(new PatternExpectation('/type join don\'t needs \\$joinsOn, but it\'s provided/i'));

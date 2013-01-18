@@ -9,7 +9,7 @@ class Ac_Form_Converter {
     /**
      * @param Ac_Model_Property $property
      */
-    function getControlSettings(& $property) {
+    function getControlSettings($property) {
         $conf = array();
         
         if (isset($property->controlType) && strlen($property->controlType)) 

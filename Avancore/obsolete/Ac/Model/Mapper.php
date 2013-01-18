@@ -422,12 +422,11 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     /**
      * Helper function to create search criterias for Joomla searchbots
      *
-     * @static
      * @param string $searchText text to search (words are split by whitespace); false to turn the search off
      * @param string $searchMode matching option (exact|any|all)
      */
 
-    function getSearchCriteria ($fieldNames, $searchText, $searchMode) {
+    static function getSearchCriteria ($fieldNames, $searchText, $searchMode) {
         if (!in_array($searchMode, array('exact', 'any', 'all'))) {
             trigger_error ('Invalid searchMode, \'exact\'|\'any\'|\'all\' expected, assuming \'exact\'', E_USER_WARNING);
             $searchMode = 'exact';
@@ -516,12 +515,12 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
 
     // --------------------------- in-memory records registry functions ---------------------------
 
-    function _memorize(& $record) {
+    function _memorize($record) {
         $this->_newRecords[$record->_imId] = $record;
         //var_dump("Memorizing (".get_class($this).") ".$record->_imId." / total ".count($this->_newRecords));
     }
 
-    function _forget(& $record) {
+    function _forget($record) {
         if (isset($this->_newRecords[$record->_imId])) {
             //var_dump("Forgetting (".get_class($this).") ".$record->_imId." / total ".count($this->_newRecords));
             unset($this->_newRecords[$record->_imId]);
@@ -709,7 +708,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * On comparsion with new records:
      * - since new records don't have primary keys, links of their instances will be returned instead of PKs
      */
-    function checkRecordPresence(& $record, $dontReturnOwnKey = false, $usingIndices=array(), $customIndices=array(), $withNewRecords = false) {
+    function checkRecordPresence($record, $dontReturnOwnKey = false, $usingIndices=array(), $customIndices=array(), $withNewRecords = false) {
     	$res = array();
         $pkCols = array();
         if (!$usingIndices) $usingIndices = array_merge($this->listUniqueIndices(), array_keys($customIndices));
@@ -835,7 +834,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
 
     // TODO: make this work!
     /*
-     function loadRelationCascade(& $left, $relations) {
+     function loadRelationCascade($left, $relations) {
      if (!is_array($relations)) $relations = array($relations);
      $na = func_num_args();
      if ($na > 2) for ($i = 2; $i < $na - 1; $i++) $relations[] = func_get_arg($i);
@@ -855,7 +854,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     }
 
     // TODO: Add suport for records that are in random access collections (invoke methods listAssocFor(), loadAssocFor(), countAssocFor() for all records of collection)
-    function loadAssocFor (& $record, $relId) {
+    function loadAssocFor ($record, $relId) {
         $rel = $this->getRelation($relId);
         $rel->loadDest($record);
     }
@@ -864,26 +863,26 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * Loads associated records keys for $record
      * Currently this function works same as loadAssocFor()
      */
-    function listAssocFor (& $record, $relId) {
+    function listAssocFor ($record, $relId) {
         $rel = $this->getRelation($relId);
         $rel->loadDest($record);
     }
 
-    function loadAssocCountFor (& $record, $relId) {
+    function loadAssocCountFor ($record, $relId) {
         $rel = $this->getRelation($relId);
         $rel->loadDestCount($record);
     }
 
-    function loadAssocNNIdsFor (& $record, $relId) {
+    function loadAssocNNIdsFor ($record, $relId) {
         $rel = $this->getRelation($relId);
         $rel->loadDestNNIds($record);
     }
     
-    function canDelete (& $record) {
+    function canDelete ($record) {
         // TODO: canDelete()
     }
 
-    function beforeDelete (& $record) {
+    function beforeDelete ($record) {
         // TODO: beforeDelete()
     }
 
@@ -893,7 +892,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @param Ac_Model_Object $record
      * @param array $dest
      */
-    function putToArrayByPk(& $record, & $dest) {
+    function putToArrayByPk(& $record, $dest) {
         $dest[$record->{$this->pk}] = $record;
     }
 
@@ -902,7 +901,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @param string $pk
      * @return Ac_Model_Object or $default if it is not found
      */
-    function getFromArrayByPk(& $src, $pk, $default = null) {
+    function getFromArrayByPk($src, $pk, $default = null) {
         $res = $default;
         if (isset($src[$pk])) $res = $src[$pk];
         return $res;
@@ -912,7 +911,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @param array $src
      * @return array(array($pk1, & $rec1), array($pk2, & $rec2), ...)
      */
-    function getFlatArrayWithPks(& $src) {
+    function getFlatArrayWithPks($src) {
         $res = array();
         foreach (array_keys($src) as $pk) {
             $res[] = array($pk, & $src[$pk]);
@@ -929,7 +928,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @param Ac_Model_Object $record
      * @return string|false
      */
-    function _indexCrtieria(& $record, $fieldNames, $mustBeFull) {
+    function _indexCrtieria($record, $fieldNames, $mustBeFull) {
         $vals = $record->getDataFields($fieldNames, !$mustBeFull);
         if ($mustBeFull && (count($vals) < count($fieldNames))) return false;
         $cr = array();

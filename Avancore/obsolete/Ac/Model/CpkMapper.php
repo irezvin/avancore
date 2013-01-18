@@ -44,7 +44,7 @@ class Ac_Model_CpkMapper extends Ac_Model_Mapper {
     /**
      * Loads record(s) -- id can be key or an array of keys
      */
-    function & loadRecord($pk) {
+    function loadRecord($pk) {
         $res = null;
         if (!is_array($pk)) trigger_error('Compound primary key can be given only as an array', E_USER_ERROR);
         $pk = array_slice($pk);
@@ -182,7 +182,7 @@ class Ac_Model_CpkMapper extends Ac_Model_Mapper {
      * @param Ac_Model_Object $record
      * @param array $dest
      */
-    function putToArrayByPk(& $record, & $dest) {
+    function putToArrayByPk(& $record, $dest) {
         Ac_Util::simpleSetArrayByPath($dest, $record->getPrimaryKey(), $record, true);
     }
     
@@ -191,7 +191,7 @@ class Ac_Model_CpkMapper extends Ac_Model_Mapper {
      * @param array $pk
      * @return Ac_Model_Object or $default if it is not found
      */
-    function getFromArrayByPk(& $src, $pk, $default = null) {
+    function getFromArrayByPk($src, $pk, $default = null) {
         $res = Ac_Util::simpleGetArrayByPath($src, $pk, $default);
         return $res;        
     }
@@ -200,13 +200,13 @@ class Ac_Model_CpkMapper extends Ac_Model_Mapper {
      * @param array $src
      * @return array(array($pk1, & $rec1), array($pk2, & $rec2), ...) 
      */
-    function getFlatArrayWithPks(& $src) {
+    function getFlatArrayWithPks($src) {
         $res = array();
         Ac_Model_CpkMapper::_iterateRecursive($res, $src, array(), count($this->pk));
         return $res;
     }
     
-    function _iterateRecursive(& $res, & $src, $prefix, $height) {
+    function _iterateRecursive(& $res, $src, $prefix, $height) {
         $height--;
         if ($height <= 0) {
              foreach(array_keys($src) as $k) {

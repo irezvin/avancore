@@ -134,11 +134,9 @@ class Ac_Model_Values {
      * @param Ac_Model_Data $data
      * @param string $propName name of model property
      * @param bool|array $formOptions Options of that property. If true, they will be retrieved automatically  
-     * @static
-     * 
      * @return Ac_Model_Values
      */
-    function factoryWithFormOptions (& $data, $propName, $formOptions = true, $isStatic = false, array $optionsOverride = array()) {
+    static function factoryWithFormOptions ($data, $propName, $formOptions = true, $isStatic = false, array $optionsOverride = array()) {
         $class = 'Ac_Model_Values';
         if (!is_array($formOptions)) $formOptions = $data->getFormOptions($propName, $isStatic);
         if (isset($formOptions['values']) && is_array($formOptions['values'])) $options = $formOptions['values'];
@@ -157,7 +155,7 @@ class Ac_Model_Values {
      * @param Ac_Model_Property $prop
      * @return Ac_Model_Values
      */
-    function & factoryWithProperty (& $prop, array $optionsOverride = array()) {
+    function factoryWithProperty ($prop, array $optionsOverride = array()) {
         $propName = $prop->propName;
         $data = $prop->srcObject;
         $formOptions = $prop->toFormOptions();
@@ -406,10 +404,7 @@ class Ac_Model_Values {
         return $this->_callGetter($cb);
     }
     
-    /**
-     * @static
-     */
-    function isId($foo) {
+    static function isId($foo) {
         return preg_match("/^[a-zA-Z_][0-9a-zA-Z_]*$/", $foo);
     }
     

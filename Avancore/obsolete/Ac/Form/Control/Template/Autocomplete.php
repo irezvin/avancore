@@ -9,7 +9,7 @@ class Ac_Form_Control_Template_Autocomplete extends Ac_Form_Control_Template {
     /**
      * @param Ac_Form_Control_Text $control
      */
-    function showTextInput(& $control) {
+    function showTextInput($control) {
         if (!$control->isReadOnly()) {
             switch ($control->getType()) {
                 case 'textArea': $this->_showTextArea($control); break;
@@ -27,7 +27,7 @@ class Ac_Form_Control_Template_Autocomplete extends Ac_Form_Control_Template {
     /**
      * @param Ac_Form_Control_Text_Autocomplete $control
      */
-    function _showTextArea(& $control) {
+    function _showTextArea($control) {
             $name = $this->_mapNames($control, 'value');
             
             $attribs = array('cols' => $this->textAreaCols, 'rows' => $this->textAreaRows);
@@ -49,7 +49,7 @@ class Ac_Form_Control_Template_Autocomplete extends Ac_Form_Control_Template {
     /**
      * @param Ac_Form_Control_Text_Autocomplete $control
      */
-    function _showTextInput(& $control) {
+    function _showTextInput($control) {
             $name = $this->_mapNames($control, 'value');
             $attribs = Ac_Util::m($this->_getAttribs($control), array(
                 'type' => 'text',
@@ -67,7 +67,7 @@ class Ac_Form_Control_Template_Autocomplete extends Ac_Form_Control_Template {
     /**
      * @param Ac_Form_Control_Text_Autocomplete $control
      */
-    function _showAutocompleterScript(& $control) {
+    function _showAutocompleterScript($control) {
         if ($control->loadScripts) {
             $this->addJsLib('{AC}/prototype.js', false);
             $this->addJsLib('{AC}/scriptaculous/scriptaculous.js', false);

@@ -19,7 +19,7 @@ class Ac_Form_Control_Template extends Ac_Template_Html {
     /**
      * @param Ac_Form_Control $control
      */
-    function _showCaption(& $control, $dontShowCaptionIfShownByControl = true, $substituteWhenNoCaption = "&nbsp;") {
+    function _showCaption($control, $dontShowCaptionIfShownByControl = true, $substituteWhenNoCaption = "&nbsp;") {
         if ($dontShowCaptionIfShownByControl && $control->showsOwnCaption) echo $substituteWhenNoCaption;
         else {
             if ($this->showDescriptions && strlen($control->getDescription()) ) $this->_showCaptionWithDescription($control);
@@ -33,7 +33,7 @@ class Ac_Form_Control_Template extends Ac_Template_Html {
      * @param Ac_Form_Control $control
      */
     function _showCaptionWithDescription(& $control) {
-        $this->addJsLib('{AC}/overlib_mini.js');
+        $this->addJsLib('{AC}/vendor/overlib_mini.js');
 ?><span class='captionWithDesc' onmouseover='overlib("<?php echo addcslashes(htmlspecialchars($control->getDescription()), "\n\r\'\""); ?>");' onmouseout="nd();"><?php ?>
 <?php     echo $control->getCaption(); ?></span><?php ?>
 <?php            

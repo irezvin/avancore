@@ -79,11 +79,11 @@ class Ac_Upload_Manager {
     /**
      * @param Ac_Upload_File $upload
      */
-    function storeUpload(& $upload) {
+    function storeUpload($upload) {
         return $this->_doStoreUpload($upload);
     }
     
-    function tempStoreUpload(& $upload) {
+    function tempStoreUpload($upload) {
         return $this->_cacheUpload($upload);
     }
     
@@ -109,7 +109,7 @@ class Ac_Upload_Manager {
     /**
      * @param Ac_Upload_File $upload
      */
-    function _doStoreUpload(& $upload) {
+    function _doStoreUpload($upload) {
         if ($s = $this->getStorage()) {
             $res = $s->saveUpload($upload);
         } else {
@@ -132,7 +132,7 @@ class Ac_Upload_Manager {
     /**
      * @param Ac_Upload_File $upload
      */
-    function _cacheUpload(& $upload) {
+    function _cacheUpload($upload) {
         if (!strlen($id = $upload->getId())) {
             $upload->setId($id = $this->getNextUploadId());
         }
@@ -196,14 +196,14 @@ class Ac_Upload_Manager {
     /**
      * @param Ac_Upload_Storage_Abstract $storage
      */
-    function setStorage(& $storage) {
+    function setStorage($storage) {
         $this->_storage = $storage;
     }
     
     /**
      * @return Ac_Upload_File
      */
-    function & factory ($options = array()) {
+    function factory ($options = array()) {
         $options['uploadManager'] = $this;
         $res = Ac_Util::factoryWithOptions($options, $this->_uploadClass);
         return $res;

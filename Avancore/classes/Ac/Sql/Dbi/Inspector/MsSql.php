@@ -9,11 +9,11 @@ class Ac_Sql_Dbi_Inspector_MsSql extends Ac_Sql_Dbi_Inspector {
     
     var $defaultDatabaseName = false;
 
-    function Ac_Sql_Dbi_Inspector_MsSql(& $sqlDb, $defaultDatabaseName = false) {
+    function Ac_Sql_Dbi_Inspector_MsSql($sqlDb, $defaultDatabaseName = false) {
     	if (is_a($sqlDb, 'Ac_Legacy_Database')) {
     		$this->_db = new Ac_Sql_Db_Ae($sqlDb);
     	} elseif (!is_a($sqlDb, 'Ac_Sql_Db')) trigger_error("\$sqlDb must be an instance of Ac_Sql_Db");
-    	else $this->_db = & $sqlDb;
+    	else $this->_db = $sqlDb;
         $this->defaultDatabaseName = $defaultDatabaseName;
     }
     
@@ -52,7 +52,7 @@ class Ac_Sql_Dbi_Inspector_MsSql extends Ac_Sql_Dbi_Inspector {
 			";
         $cols = $this->_db->fetchArray($q, "name");
         foreach (array_keys($cols) as $i) {
-        	$col = & $cols[$i];
+        	$col = $cols[$i];
         	$col['autoInc'] = (bool) (int) $col['autoInc'];
         	$col['nullable'] = (bool) (int) $col['nullable'];
         }

@@ -275,7 +275,7 @@ class Cg_Generator {
     /**
      * @return Cg_Strategy
      */
-    function & createStrategyForDomain($domainName) {
+    function createStrategyForDomain($domainName) {
         $class = Ac_Util::getArrayByPath($this->staticConfig, array('domains', $domainName, 'strategyClass'), 'Cg_Strategy');
         if (is_array($this->strategySettings)) $ss = $this->strategySettings; else $ss = array();
         $ss['genNonEditable'] = $this->genNonEditable;

@@ -17,18 +17,18 @@ class Ac_Sql_Order_Multiple extends Ac_Sql_Order {
         if (is_array($this->_orders[$id])) {
             $options = $this->_orders[$id];
             $options['id'] = $id;
-            $options['parentPart'] = & $this;
-            $options['db'] = & $this->_db;
-            $this->_orders[$id] = & $this->factory($options, 'Ac_Sql_Order');
+            $options['parentPart'] = $this;
+            $options['db'] = $this->_db;
+            $this->_orders[$id] = $this->factory($options, 'Ac_Sql_Order');
         }
-        $res = & $this->_orders[$id];
+        $res = $this->_orders[$id];
         return $res;
     }
     
     /**
      * @param Ac_Sql_Db $db
      */
-    function setDb(& $db) {
+    function setDb($db) {
         parent::setDb($db);
         foreach (array_keys($this->_orders) as $o) if (is_object($this->_orders[$o])) $this->_orders[$o]->setDb($db);
     }
@@ -37,7 +37,7 @@ class Ac_Sql_Order_Multiple extends Ac_Sql_Order {
      * @param array|Ac_Sql_Order $order
      * @param string $id
      */
-    function addOrder(& $order, $id = false) {
+    function addOrder($order, $id = false) {
         assert(
                 is_array($order) && (strlen($id) || isset($order['id']) && strlen($order['id'])) 
             ||  is_a($order, 'Ac_Sql_Order') && (strlen($id) || strlen($order->id))
@@ -45,7 +45,7 @@ class Ac_Sql_Order_Multiple extends Ac_Sql_Order {
         $aId = is_array($order)? (isset($order['id'])? $order['id'] : false) : $order->id;
         if (!strlen($aId)) $aId = $id;
         if (isset($this->_orders[$aId])) trigger_error("Order with id '{$id}' is already in the collection", E_USER_ERROR);
-        $this->_orders[$aId] = & $order;
+        $this->_orders[$aId] = $order;
         if (is_object($order)) {
             $order->setDb($this->_db);
         }
@@ -56,7 +56,7 @@ class Ac_Sql_Order_Multiple extends Ac_Sql_Order {
         $res = 0;
         $ord = array();
         foreach ($this->listOrders() as $i) {
-            $o = & $this->getOrder($i);
+            $o = $this->getOrder($i);
             $ord = array_merge($ord, $o->getAppliedOrderBy());
         }
         if (count($ord) == 1) {
@@ -79,7 +79,7 @@ class Ac_Sql_Order_Multiple extends Ac_Sql_Order {
         }
     }
     
-    function _doBeforeExpandPaths(& $input) {
+    function _doBeforeExpandPaths($input) {
         $r = array();
         $c = false;
         foreach (array_keys($input) as $k) {
@@ -87,10 +87,10 @@ class Ac_Sql_Order_Multiple extends Ac_Sql_Order {
                 $r[$input[$k]] = true;
                 $c = true;
             } else {
-                $r[$k] = & $input[$k];
+                $r[$k] = $input[$k];
             }
         }
-        if ($c) $input = & $r;
+        if ($c) $input = $r;
     }
     
     /**
@@ -106,7 +106,7 @@ class Ac_Sql_Order_Multiple extends Ac_Sql_Order {
             $appliedOrders = array();
             foreach ($this->listOrders() as $id) {
                 if (isset($input[$id])) {
-                    $o = & $this->getOrder($id);
+                    $o = $this->getOrder($id);
                     $o->bind($input[$id]);
                     $appliedOrders[] = $id;
                 }
@@ -133,7 +133,7 @@ class Ac_Sql_Order_Multiple extends Ac_Sql_Order {
     function _doGetAppliedAliases() {
         $res = $this->aliases;
         foreach ($this->listOrders() as $i) {
-            $o = & $this->getOrder($i);
+            $o = $this->getOrder($i);
             $res = array_merge($res, $o->getAppliedAliases());
         }
         $res = array_unique($res);

@@ -105,7 +105,7 @@ class Ac_Mail {
      * @return Ac_Mail
      */
     
-    function & factory($templateName, $to, $defaultSubject = false, $from = false, $data = array(), $textTemplate = false) {
+    function factory($templateName, $to, $defaultSubject = false, $from = false, $data = array(), $textTemplate = false) {
         $res = new Ac_Mail($templateName, $to, $defaultSubject, $from, $data, $textTemplate);
         return $res;
     }
@@ -132,7 +132,7 @@ class Ac_Mail {
     /**
      * @param PhpMailer $mailer
      */
-    function configureMailer(& $mailer) {
+    function configureMailer($mailer) {
         if ($this->method === true) {
             $disp = Ac_Dispatcher::getInstance();
             $method = $disp->config->mailer;
@@ -371,7 +371,7 @@ class Ac_Mail {
     /**
      * @return PHPMailer
      */
-    function & createPhpMailer() {
+    function createPhpMailer() {
         if (!class_exists('PHPMailer', false)) {
             require($this->getMailerDir().'/class.phpmailer.php');
         }
@@ -383,7 +383,7 @@ class Ac_Mail {
     /**
      * @return html2text
      */
-    function & createHtml2Text() {
+    function createHtml2Text() {
         if (!class_exists('html2text', false)) {
             $disp = Ac_Dispatcher::getInstance();
             require($disp->getVendorDir().'/html2text/html2text.php');
@@ -407,7 +407,7 @@ class Ac_Mail {
         return $res;
     }
     
-    function _getAddress(& $entry) {
+    function _getAddress($entry) {
         $title = false;
         $email = false;
         if (is_string($entry)) {
@@ -431,7 +431,7 @@ class Ac_Mail {
     /**
      * @param PhpMailer $mailer
      */
-    function _debugToFile(& $mailer, $saveEmail, $saveError = true) {
+    function _debugToFile($mailer, $saveEmail, $saveError = true) {
         $disp = Ac_Dispatcher::getInstance();
         
         if (!strlen($this->debugFilename)) {

@@ -36,8 +36,6 @@ class Ac_Model_Data {
     }
     
     /**
-     * Should be overridden in concrete class. This function should be static.  
-     * @static
      * @return array
      */
     function getOwnPropertiesInfo() {
@@ -294,7 +292,7 @@ class Ac_Model_Data {
         $val->model = $f;
     }
     
-    function doBeforeCheckOwnFields(& $fieldsToCheck) {
+    function doBeforeCheckOwnFields($fieldsToCheck) {
     }
     
     function _checkOwnAssociations() {
@@ -345,7 +343,7 @@ class Ac_Model_Data {
      * @return Ac_Model_Validator
      * @access protected
      */
-    function & _createValidator() {
+    function _createValidator() {
         $res = new Ac_Model_Validator($this);
         return $res;
     }
@@ -353,7 +351,7 @@ class Ac_Model_Data {
     /**
      * @access private
      */
-    function _setErrorByPathCallback ($currPath, & $element, $value) {
+    function _setErrorByPathCallback ($currPath, $element, $value) {
         $element = array($element);    
     }
     
@@ -403,10 +401,10 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeGetAssociatedField($head, $tail, $key, & $value) {
+    function doBeforeGetAssociatedField($head, $tail, $key, $value) {
     }
     
-    function doAfterGetAssociatedField($head, $tail, $key, $subKey, & $targetObject, & $value) {
+    function doAfterGetAssociatedField($head, $tail, $key, $subKey, & $targetObject, $value) {
     }
     
     /**
@@ -499,10 +497,10 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeListAssociatedProperty($head, $tail, & $list) {
+    function doBeforeListAssociatedProperty($head, $tail, $list) {
     }
     
-    function doAfterListAssociatedProperty($head, $tail, $subKey, & $target, & $value) {
+    function doAfterListAssociatedProperty($head, $tail, $subKey, & $target, $value) {
     }
     
     /**
@@ -581,10 +579,10 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeCountAssociatedProperty($head, $tail, & $count) {
+    function doBeforeCountAssociatedProperty($head, $tail, $count) {
     }
     
-    function doAfterCountAssociatedProperty($head, $tail, $subKey, & $target, & $count) {
+    function doAfterCountAssociatedProperty($head, $tail, $subKey, & $target, $count) {
     }
     
     /**
@@ -629,10 +627,10 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeCheckHasAssociatedAssoc($head, $tail, & $has) {
+    function doBeforeCheckHasAssociatedAssoc($head, $tail, $has) {
     }
     
-    function doAfterCheckHasAssociatedAssoc($head, $tail, $subKey, & $target, & $has) {
+    function doAfterCheckHasAssociatedAssoc($head, $tail, $subKey, & $target, $has) {
     }
     
     /**
@@ -708,10 +706,10 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeCheckAssociatedAssocLoaded($head, $tail, & $has) {
+    function doBeforeCheckAssociatedAssocLoaded($head, $tail, $has) {
     }
     
-    function doAfterCheckAssociatedAssocLoaded($head, $tail, $subKey, & $target, & $has) {
+    function doAfterCheckAssociatedAssocLoaded($head, $tail, $subKey, & $target, $has) {
     }
     
     /**
@@ -803,7 +801,7 @@ class Ac_Model_Data {
     function doBeforeSetAssociatedListProperty($head, $tail, $list) {
     }
     
-    function doAfterSetAssociatedListProperty($head, $tail, $subKey, & $target, $list) {
+    function doAfterSetAssociatedListProperty($head, $tail, $subKey, $target, $list) {
     }
     
     /**
@@ -887,7 +885,7 @@ class Ac_Model_Data {
     function doBeforeDeleteAssociatedPropItem($head, $tail) {
     }
     
-    function doAfterDeleteAssociatedPropItem($head, $tail, $subKey, & $target) {
+    function doAfterDeleteAssociatedPropItem($head, $tail, $subKey, $target) {
     }
     
     function _deleteAssociatedPropItem($head, $tail, $key) {
@@ -955,17 +953,17 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function notifyDissociated(& $assocObject, $assocName, $hisKey) {
+    function notifyDissociated($assocObject, $assocName, $hisKey) {
         $assocObject->handleDissociated($this, $assocName, $hisKey);
     }
     
-    function handleDissociated(& $dissocObject, $assocName, $myKey) {
+    function handleDissociated($dissocObject, $assocName, $myKey) {
     }
     
     function doBeforeDeleteAssociatedAssoc($head, $tail, $key) {
     }
     
-    function doAfterDeleteAssociatedAssoc($head, $tail, $subKey, $key, & $target) {
+    function doAfterDeleteAssociatedAssoc($head, $tail, $subKey, $key, $target) {
     }
     
     function _deleteAssociatedAssoc($head, $tail, $key) {
@@ -1059,7 +1057,7 @@ class Ac_Model_Data {
     function doBeforeSetAssociatedField($head, $tail, $key, $value) {
     }
     
-    function doAfterSetAssociatedField($head, $tail, $key, $subKey, & $target, $value) {
+    function doAfterSetAssociatedField($head, $tail, $key, $subKey, $target, $value) {
     }
     
     /**
@@ -1136,16 +1134,16 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeGetAssociatedAssoc($head, $tail, $key, & $assocObject) {
+    function doBeforeGetAssociatedAssoc($head, $tail, $key, $assocObject) {
     }
     
-    function doAfterGetAssociatedAssoc($head, $tail, $subKey, $key, & $target, & $assocObject) {
+    function doAfterGetAssociatedAssoc($head, $tail, $subKey, $key, & $target, $assocObject) {
     }
     
     /**
      * @return Ac_Model_Data
      */
-    function & _getAssociatedAssoc($head, $tail, $key) {
+    function _getAssociatedAssoc($head, $tail, $key) {
         $res = null;
         $b = $this->doBeforeGetAssociatedAssoc($head, $tail, $key, $res);
         if ($b === true) {
@@ -1177,7 +1175,7 @@ class Ac_Model_Data {
     /**
      * @return Ac_Model_Data
      */
-    function & _getOwnAssoc($head, $key, $plural) {
+    function _getOwnAssoc($head, $key, $plural) {
         $vn = '_'.$plural;
         if (strlen($key)) {
             if (($m = $this->_getMethod('get', $head.'Item')) || ($m = $this->_getMethod('get', $head))) {
@@ -1214,7 +1212,7 @@ class Ac_Model_Data {
     
     // +----------------------------------- setAssoc -------------------------------------+
     
-    function setAssoc($propName, & $assocObject, $key = false) {
+    function setAssoc($propName, $assocObject, $key = false) {
         if (is_array($assocObject)) {
             if (strlen($key)) trigger_error ('Key must not be specified when setting multiple associated items of '.get_class($this).'::'.$propName, E_USER_ERROR);
             return $this->setListAssoc($propName, $assocObject);
@@ -1250,23 +1248,23 @@ class Ac_Model_Data {
     }
     
     
-    function notifyAssociated(& $assocObject, $assocName, $hisKey) {
+    function notifyAssociated($assocObject, $assocName, $hisKey) {
         $assocObject->handleAssociated($this, $assocName, $hisKey);
     }
     
-    function handleAssociated(& $dissocObject, $assocName, $myKey) {
+    function handleAssociated($dissocObject, $assocName, $myKey) {
     }
     
-    function doBeforeSetAssociatedAssoc($head, $tail, $key, & $assocObject) {
+    function doBeforeSetAssociatedAssoc($head, $tail, $key, $assocObject) {
     }
     
-    function doAfterSetAssociatedAssoc($head, $tail, $subKey, $key, & $target, & $assocObject) {
+    function doAfterSetAssociatedAssoc($head, $tail, $subKey, $key, & $target, $assocObject) {
     }
     
     /**
      * @access private
      */
-    function _setAssociatedAssoc($head, $tail, $key, & $assocObject) {
+    function _setAssociatedAssoc($head, $tail, $key, $assocObject) {
         $b = $this->doBeforeSetAssociatedAssoc($head, $tail, $key, $assocObject);
         if ($b === true) {
         } else {
@@ -1286,7 +1284,7 @@ class Ac_Model_Data {
     /**
      * @access private
      */
-    function _setOwnAssocItem($head, $plural, $key, & $assocObject) {
+    function _setOwnAssocItem($head, $plural, $key, $assocObject) {
         if ($m = $this->_getMethod('set', $head.'Item')) return $this->$m($assocObject, $key);
         elseif ($m = $this->_getMethod('set', $head)) return $this->$m($assocObject, $key);
         else {
@@ -1310,7 +1308,7 @@ class Ac_Model_Data {
     /**
      * @access private
      */
-    function _setOwnAssoc($head, & $assocObject) {
+    function _setOwnAssoc($head, $assocObject) {
         if ($m = $this->_getMethod('set', $head)) return $this->$m($assocObject);
         else {
             if ($this->_hasOwnAssoc($head, false)) $this->_deleteOwnAssoc($head, false, false);
@@ -1335,7 +1333,7 @@ class Ac_Model_Data {
     /**
      * @return Ac_Model_Data
      */
-    function & createAssociable($ownAssocName) {
+    function createAssociable($ownAssocName) {
         if (!($assocClass = $this->_getAssocClass($ownAssocName))) trigger_error('Unknown own association: '.$ownAssocName);
         $object = false;
         if (!$this->doCreateAssociable($ownAssocName, $assocClass, $object)) {
@@ -1344,7 +1342,7 @@ class Ac_Model_Data {
         return $object;
     }
     
-    function doCreateAssociable($ownAssocName, $assocClass, & $object) {
+    function doCreateAssociable($ownAssocName, $assocClass, $object) {
     }
     
     // +----------------------------------- getPropertyInfo ------------------------------+
@@ -1373,7 +1371,7 @@ class Ac_Model_Data {
         return ($this->_getStaticPropertyInfoArr(Ac_Util::pathToArray($propName), false, false) !== false);
     }
     
-    function doAfterGetPropertyInfo(& $propInfo) {
+    function doAfterGetPropertyInfo($propInfo) {
     }
     
     function _getStaticPropertyInfoArr ($arrPath, $abstract = false, $trigger = true) {
@@ -1500,7 +1498,7 @@ class Ac_Model_Data {
     
     //---------------------------- SUPPLEMENTARY STATIC METHODS --------------------------+
 
-    function isFieldEmpty(& $formOptions, $value = false) {
+    function isFieldEmpty($formOptions, $value = false) {
         if (is_a($formOptions, 'Ac_Model_Property')) {
             $fo = $formOptions->toFormOptions();
         } elseif(is_array($formOptions)) {

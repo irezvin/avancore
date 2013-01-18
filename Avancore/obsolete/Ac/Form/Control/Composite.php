@@ -144,7 +144,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
      * @param Ac_Form_Control $child
      * @return string
      */
-    function getPropertyPrefixForTheChild(& $child) {
+    function getPropertyPrefixForTheChild($child) {
         if ($this->_hasOwnModel) {
             $res = $this->modelPropertyBase;
         } else {
@@ -160,7 +160,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
      * @param bool $move Whether to remove found errors from own array if $this->moveErrorsToTheChilren is true
      * @return array|bool
      */
-    function getErrorsForTheChild(& $child, $move = false) {
+    function getErrorsForTheChild($child, $move = false) {
         $this->getErrors();
         $res = false;
         if (is_array($this->errors) && isset($this->errors[$child->name])) {
@@ -176,7 +176,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
      * @param Ac_Form_Control $child
      * @return Ac_Model_Data
      */
-    function getModelForTheChild(& $child) {
+    function getModelForTheChild($child) {
         $res = $this->getModel();
         return $res;
     }
@@ -201,7 +201,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     /**
      * @return Ac_Legacy_Controller_Context_Http
      */
-    function & _createSubContext($name) {
+    function _createSubContext($name) {
         $res = Ac_Form_Context::spawnFrom($this->_context, $name);
         return $res;
     }
@@ -213,7 +213,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
      * @param array $settings
      * @return Ac_Form_Control
      */
-    function & _createControl($name, $settings = array()) {
+    function _createControl($name, $settings = array()) {
         if (isset($settings['class']) && strlen($settings['class'])) {
             $class = $settings['class'];
         } else {

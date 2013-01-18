@@ -12,6 +12,8 @@ class Ac_Buffer {
     
     protected static $lock = false;
     
+    protected static $protect = false;
+    
     public static $ignoreNext = false;
     
     /**
@@ -37,6 +39,10 @@ class Ac_Buffer {
      * @param mixed $_  Any number of additional arguments
      */
     static function out($item, $_ = null) {
+        if (self::$protect) {
+            ob_end_clean();
+            throw new Exception("Recursion detected: fix bugs in Ac_Buffer::out()");
+        }
         $args = array();
         for($i = 0; $i < func_num_args(); $i++) {
             $arg = func_get_arg($i);
@@ -45,7 +51,10 @@ class Ac_Buffer {
         }
         if (count($args)) {
             if (self::$curr) {
-                if (!self::$lock) ob_flush();
+                if (!self::$lock) {
+                    self::$protect = true;
+                    ob_flush();
+                }
                 self::$lock = true;
                 ob_clean();
                 $n = func_num_args();

@@ -29,7 +29,7 @@ class Ac_Admin_Column_SaveOrder extends Ac_Table_Column_SaveOrder {
         <?php
     }
     
-    function showCell(& $record, $rowNo) {
+    function showCell($record, $rowNo) {
         $fieldName = $this->manager->getContext()->mapParam(array('processingParams', $this->paramName, $this->manager->getStrPk($record)));
         $data = $this->getData($record, $rowNo, $this->fieldName);
         if (is_null($data)) $data = 0;

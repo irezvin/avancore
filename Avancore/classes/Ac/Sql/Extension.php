@@ -8,8 +8,8 @@ class Ac_Sql_Extension {
 	
 	var $_knownProperties = array();
 	
-	function & factory($options = array(), $class = 'Ac_Sql_Extension') {
-		$res = & Ac_Util::factoryWithOptions($options, $class);
+	function factory($options = array(), $class = 'Ac_Sql_Extension') {
+		$res = Ac_Util::factoryWithOptions($options, $class);
 		return $res;
 	}
 	
@@ -28,8 +28,8 @@ class Ac_Sql_Extension {
     	return $res;
 	}
 	
-	function _setParentObject(& $parentObject) {
-		$this->_parentObject = & $parentObject;
+	function _setParentObject($parentObject) {
+		$this->_parentObject = $parentObject;
 	}
 	
 	function getParentObject() {

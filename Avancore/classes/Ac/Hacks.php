@@ -106,7 +106,6 @@ class Ac_Hacks {
 	}
 	
 	/**
-	 * @static
 	 * @access protected
 	 * @param string $className Name of Ac_Hacks descendant
 	 * @return object
@@ -122,7 +121,7 @@ class Ac_Hacks {
 	 * 		}
 	 * </code>
 	 */
-	function & _hck_getInstance($className) {
+	static function & _hck_getInstance($className) {
 		$varName = '_aeHacks_'.$className;
 		if (!isset($GLOBALS[$varName]) || !is_a($GLOBALS[$varName], $className)) $GLOBALS[$varName] = new $className();
 		$res = & $GLOBALS[$varName];

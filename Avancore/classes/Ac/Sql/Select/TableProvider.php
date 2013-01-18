@@ -33,13 +33,13 @@ class Ac_Sql_Select_TableProvider {
      * @param string $alias Alias of primary table
      * @return Ac_Sql_Select
      */
-    static function createSelect($mapperClass, & $db, $alias = 't') {
+    static function createSelect($mapperClass, $db, $alias = 't') {
 		if (empty($db)) {
 			$aDb = Ac_Application::getDefaultInstance()->getDb();
 		} else {
-			$aDb = & $db;
+			$aDb = $db;
 		}
-		$m = & Ac_Model_Mapper::getMapper($mapperClass);
+		$m = Ac_Model_Mapper::getMapper($mapperClass);
 		$res = new Ac_Sql_Select($aDb, array(
 			'tables' => array(
 				$alias => array(
@@ -79,17 +79,17 @@ class Ac_Sql_Select_TableProvider {
     /**
      * @param Ac_Sql_Select_TableProvider $tableProvider
      */
-    function setParent(& $tableProvider) {
+    function setParent($tableProvider) {
         //if ($this->_tableProvider) trigger_error ("Can set 'tableProvider' property only once", E_USER_ERROR);
         if (!is_a($tableProvider, 'Ac_Sql_Select_TableProvider'))  trigger_error("\$tableProvider must be an instance of Ac_Sql_Select_TableProvider", E_USER_ERROR);
-        $this->_parent = & $tableProvider;
+        $this->_parent = $tableProvider;
     }
     
     /**
      * @return Ac_Sql_Select_TableProvider
      */
     function getParent() {
-    	$res = & $this->_parent;
+    	$res = $this->_parent;
     	return $res;
     }
     
@@ -100,7 +100,7 @@ class Ac_Sql_Select_TableProvider {
      * @param string $alias
      * @return Ac_Sql_Select_Table
      */
-    function & addTable($options, $alias = false) {
+    function addTable($options, $alias = false) {
     	if (is_a($options, 'Ac_Sql_Select_Table')) {
             $t = $options;
             $t->setTableProvider($this);
@@ -130,20 +130,20 @@ class Ac_Sql_Select_TableProvider {
      * @return Ac_Sql_Select_TableProvider
      */
 
-    function & addTableProvider(& $options, $id = false) {
+    function addTableProvider($options, $id = false) {
     	if (is_a($options, 'Ac_Sql_Select_TableProvider')) {
-    		$t = & $options;
+    		$t = $options;
     		$t->setParent($this);
     	} else {
     		if (!is_array($options)) trigger_error("\$options must be an array or an Ac_Sql_Select_TableProvider instance", E_USER_ERROR);
     		if (strlen($id)) $options['id'] = $id;
     		if (!isset($options['id']) || !strlen($options['id'])) $options['id'] = count($this->_tableProviders) + 1;
-    		$options['parent'] = & $this;
-    		$t = & Ac_Util::factoryWithOptions ($options, 'Ac_Sql_Select_TableProvider', 'class', true, true);
+    		$options['parent'] = $this;
+    		$t = Ac_Util::factoryWithOptions ($options, 'Ac_Sql_Select_TableProvider', 'class', true, true);
     	}
     	$id = $t->getId();
     	if (isset($this->_tableProviders[$id])) trigger_error("table provider with id '{$id}' is already in table providers collection", E_USER_ERROR);
-    	$this->_tableProviders[$id] = & $t;
+    	$this->_tableProviders[$id] = $t;
     	return $t;
     }
 
@@ -168,14 +168,14 @@ class Ac_Sql_Select_TableProvider {
 		return $res;
 	}
 	
-	function & _searchTable($alias, $returnTable, & $found) {
+	function _searchTable($alias, $returnTable, $found) {
 		$res = null;
 		
 		$found = false;
 		if (isset($this->_foundTables[$alias])) {
 			$found = true;
 			if ($returnTable) {
-				$res = & $this->_tableProviders[$this->_foundTables[$alias]]->getTable($alias);
+				$res = $this->_tableProviders[$this->_foundTables[$alias]]->getTable($alias);
 			}		
 		} else {
 			foreach (array_keys($this->_tableProviders) as $i) {
@@ -183,7 +183,7 @@ class Ac_Sql_Select_TableProvider {
 					$found = true;
 					$this->_foundTables[$alias] = $i;
 					if ($returnTable) {
-						$res = & $this->_tableProviders[$i]->getTable($alias);
+						$res = $this->_tableProviders[$i]->getTable($alias);
 					}
 					break;
 				}
@@ -196,7 +196,7 @@ class Ac_Sql_Select_TableProvider {
 		return false;
 	}
 	
-	function & _doGetTable($alias) {
+	function _doGetTable($alias) {
 		$res = null;
 		return $res;
 	}
@@ -209,19 +209,19 @@ class Ac_Sql_Select_TableProvider {
     function getTable($alias, $dontTriggerError = false) {
     	$res = null;
 		if (isset($this->_tables[$alias])) {
-			$res = & $this->_tables[$alias];
+			$res = $this->_tables[$alias];
 		} else {
 			if ($this->_lookInProvidersBeforeCheckOwn) {
-				if ($res = & $this->_doGetTable($alias)) {
-					if (!isset($this->_tables[$alias])) $this->_tables[$alias] = & $res;
+				if ($res = $this->_doGetTable($alias)) {
+					if (!isset($this->_tables[$alias])) $this->_tables[$alias] = $res;
 				} else {
-					$res = & $this->_searchTable($alias, true, $found);
+					$res = $this->_searchTable($alias, true, $found);
 				}
 			} else {
-				$res = & $this->_searchTable($alias, true, $found);
+				$res = $this->_searchTable($alias, true, $found);
 				if (!$found) {
-					$res = & $this->_doGetTable($alias);
-					if ($res) if (!isset($this->_tables[$alias]))  $this->_tables[$alias] = & $res;
+					$res = $this->_doGetTable($alias);
+					if ($res) if (!isset($this->_tables[$alias]))  $this->_tables[$alias] = $res;
 				}
 			}
 		}

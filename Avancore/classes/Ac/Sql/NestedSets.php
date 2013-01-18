@@ -45,14 +45,14 @@ class Ac_Sql_NestedSets {
     /**
      * @param Ac_Legacy_Database|Ac_Sql_Db $db
      */
-    function setDb(& $db) {
+    function setDb($db) {
         if (!is_null($db) && !is_a($db, 'Ac_Sql_Db') && !is_a($db, 'Ac_Legacy_Database'))
             trigger_error('\$db must be either null, Ac_Legacy_Database or Ac_Sql_Db instance', E_USER_ERROR);
             
         if (is_a($db, 'Ac_Legacy_Database')) {
             $this->_db = new Ac_Sql_Db_Ae($db);
         }
-        $this->_db = & $db;
+        $this->_db = $db;
     }
     
     /**
@@ -65,9 +65,9 @@ class Ac_Sql_NestedSets {
     /**
      * @param Ac_Sql_Blocker $blocker
      */
-    function setBlocker(& $blocker) {
+    function setBlocker($blocker) {
         if (!is_a($blocker, 'Ac_Sql_Blocker')) trigger_error("\$blocker must be an instance of Ac_Sql_Blocker", E_USER_ERROR);
-        $this->_blocker = & $blocker;
+        $this->_blocker = $blocker;
     }
     
     function ensureTransaction() {
@@ -83,7 +83,7 @@ class Ac_Sql_NestedSets {
         ));
     }
     
-    function & _stmt($parts, $params = array(), $useCache = null) {
+    function _stmt($parts, $params = array(), $useCache = null) {
         if (is_null($useCache)) $useCache = $this->cacheStatements;
         if ($useCache) {
             $md = md5(serialize($parts));
@@ -711,34 +711,34 @@ class Ac_Sql_NestedSets {
         $top = array();
         $minLevel = false;
         foreach (array_keys($nodes) as $k) {
-            $nodes[$k][$childMemberName] = & $this->_findChildren($nodes, $nodes[$k], $preserveKeys);
+            $nodes[$k][$childMemberName] = $this->_findChildren($nodes, $nodes[$k], $preserveKeys);
             $level = intval($nodes[$k][$this->levelCol]);
             if ($minLevel === false) $minLevel = $level;
                 else $minLevel = $minLevel < $level? $minLevel : $level;
         }
         foreach ($nodes as $k => & $v) {
             if (intval($v[$this->levelCol]) === $minLevel) {
-                if ($preserveKeys) $top[$k] = & $v;
-                    else $top[] = & $v;
+                if ($preserveKeys) $top[$k] = $v;
+                    else $top[] = $v;
             }
         }
         return $top;
     }
     
-    function & _findChildren(& $nodes, $parentNode, $preserveKeys) {
+    function _findChildren($nodes, $parentNode, $preserveKeys) {
         $res = array();
         $parentId = $parentNode[$this->idCol];
         foreach (array_keys($nodes) as $k) {
             if ($nodes[$k][$this->parentCol] === $parentId) {
-                if ($preserveKeys) $res[$k] = & $nodes[$k];
-                    else $res[] = & $nodes[$k];
+                if ($preserveKeys) $res[$k] = $nodes[$k];
+                    else $res[] = $nodes[$k];
             }
         }
         return $res;
     }
     
     function getJoinClause ($modelColumn, $nsTableAlias = null, $joinType = 'INNER JOIN') {
-        $db = & $this->_db;
+        $db = $this->_db;
         if (is_null($nsTableAlias)) $nsTableAlias = $this->alias;
         if (strlen($nsTableAlias)) $a = $nsTableAlias;
             else $a = $this->tableName;

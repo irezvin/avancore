@@ -92,8 +92,8 @@ class Ac_Sql_Select_Table {
      * @param Ac_Sql_Select_TableProvider $tableProvider
      * @return Ac_Sql_Select_Table
      */
-    function Ac_Sql_Select_Table(& $tableProvider, $options = array()) {
-        if ($tableProvider) $options['tableProvider'] = & $tableProvider;
+    function Ac_Sql_Select_Table($tableProvider, $options = array()) {
+        if ($tableProvider) $options['tableProvider'] = $tableProvider;
         Ac_Util::bindAutoparams($this, $options, true);
     }
     
@@ -101,18 +101,18 @@ class Ac_Sql_Select_Table {
      * @param Ac_Sql_Select $sqlSelect
      */
     function getSqlSelect($required = false) {
-    	$res = & $this->_tableProvider;
+    	$res = $this->_tableProvider;
     	while ($res && !is_a($res, 'Ac_Sql_Select')) {
-    		$res = & $res->getParent();
+    		$res = $res->getParent();
     	}
     	if ($required && !$res) trigger_error("Cannot retrieve an instance of Ac_Sql_Select (it isn't in any of table' parents)", E_USER_ERROR);
     	return $res;
     }
     
     function getDb($required = false) {
-    	$s = & $this->getSqlSelect($required);
+    	$s = $this->getSqlSelect($required);
     	$res = null;
-    	if ($s) $res = & $s->getDb();
+    	if ($s) $res = $s->getDb();
     	if ($required && !$res) trigger_error('Cannot retreive an instance of Ac_Sql_Db', E_USER_ERROR);
     	return $res;
     }
@@ -120,14 +120,14 @@ class Ac_Sql_Select_Table {
     /**
      * @param Ac_Sql_Select $sqlSelect
      */
-    function setSqlSelect(& $sqlSelect) {
+    function setSqlSelect($sqlSelect) {
         if (!is_a($sqlSelect, 'Ac_Sql_Select'))  trigger_error("\$sqlSelect must be an instance of Ac_Sql_Select", E_USER_ERROR);
-        $this->_tableProvider = & $sqlSelect;
+        $this->_tableProvider = $sqlSelect;
     }
     
-    function setTableProvider(& $tableProvider) {
+    function setTableProvider($tableProvider) {
     	if (!is_a($tableProvider, 'Ac_Sql_Select_TableProvider')) triggerError("\$tableProvider must be an instance of Ac_Sql_Select_TableProvider", E_USER_ERROR);
-    	$this->_tableProvider = & $tableProvider;
+    	$this->_tableProvider = $tableProvider;
     }
     
     /**
@@ -144,12 +144,12 @@ class Ac_Sql_Select_Table {
 	    	switch ($this->autoLoosenJoinType) {
 	    		case AC_LOOSEN_JOIN_NEVER: $loosen = false; break;
 	    		case AC_LOOSEN_JOIN_ALWAYS: $loosen = true; break;
-	    		case AC_LOOSEN_JOIN_GLOBAL: $s = & $this->getSqlSelect(); if ($s && $s->autoLoosenJoins) $loosen = true; else $loosen = false; break;
+	    		case AC_LOOSEN_JOIN_GLOBAL: $s = $this->getSqlSelect(); if ($s && $s->autoLoosenJoins) $loosen = true; else $loosen = false; break;
 	    	}
 	    	if ($loosen) {
-	    		if ($s === false) $s = & $this->getSqlSelect();
+	    		if ($s === false) $s = $this->getSqlSelect();
 	    		if ($s) {
-	    			$joinTable = & $s->getTable($this->joinsAlias);
+	    			$joinTable = $s->getTable($this->joinsAlias);
 	    			$otherJoin = $joinTable->getEffectiveJoinType();
 	    			if (preg_match('/^(left|right)\s+join$/i', trim($otherJoin), $matches)) {
 	    				if (!strncasecmp($matches[1], 'left', 1)) $res = 'LEFT JOIN';
@@ -161,7 +161,7 @@ class Ac_Sql_Select_Table {
     	return $res;
     }
     
-    function _detectUsing(& $sqs) {
+    function _detectUsing($sqs) {
     	$res =
     		is_numeric(implode('', array_keys($this->joinsOn))) 
     			&& 
@@ -177,8 +177,8 @@ class Ac_Sql_Select_Table {
     function getJoinsOn() {
         // get kind of join
         if (is_array($this->joinsOn)) {
-        	$sqs = & $this->getSqlSelect(true);
-        	$db = & $sqs->getDb();
+        	$sqs = $this->getSqlSelect(true);
+        	$db = $sqs->getDb();
     		// it's USING-type join
         	if ($this->_detectUsing($sqs)) $joinsOn = ' USING('.$db->nameQuote($this->joinsOn, true).')';
         	else {
@@ -225,7 +225,7 @@ class Ac_Sql_Select_Table {
     function getJoinClausePart() {
         if ($this->omitInFromClause) $res = '';
         else {
-            $sqlSelect = & $this->getSqlSelect(true);
+            $sqlSelect = $this->getSqlSelect(true);
             //if (!$this->_sqlSelect) trigger_error("\'sqlSelect' property not set - call setSqlSelect() first", E_USER_ERROR);
             if ($this->name === false) trigger_error ("\$name must be provided for table '{$this->alias}'", E_USER_ERROR);
             //if (!strlen($this->alias)) trigger_error ("\$alias must be provided", E_USER_ERROR);
@@ -282,7 +282,7 @@ class Ac_Sql_Select_Table {
     
     function getAllRequiredAliases() {
         if ($this->_allRequiredAliases === false) {
-        	$sqlSelect = & $this->getSqlSelect(true);
+        	$sqlSelect = $this->getSqlSelect(true);
             
             $aliasList = array();
             $deps = array();
@@ -293,7 +293,7 @@ class Ac_Sql_Select_Table {
                 $c = $checkAliases[0];
                 $checkedAliases[] = $c;
                 $checkAliases = array_slice($checkAliases, 1);
-                $t = & $sqlSelect->getTable($c);
+                $t = $sqlSelect->getTable($c);
                 $aliasList = array_unique(array_merge($dra = $t->getDirectRequiredAliases(), $aliasList));
                 $deps[$c] = $dra;
                 $checkAliases = array_merge($checkAliases, array_diff($dra, $checkedAliases));

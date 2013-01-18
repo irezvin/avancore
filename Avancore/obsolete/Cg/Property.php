@@ -24,7 +24,7 @@ class Cg_Property {
     
     var $extraPropertyInfo = array();
     
-    function Cg_Property (& $model, $name, $config = array()) {
+    function Cg_Property ($model, $name, $config = array()) {
         $this->_model = $model;
         $this->name = $name;
         Ac_Util::simpleBindAll($config, $this);

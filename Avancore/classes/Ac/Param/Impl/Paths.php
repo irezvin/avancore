@@ -16,11 +16,10 @@ class Ac_Param_Impl_Paths {
     }
     
     /**
-     * @static
      * @param string $strPath
      * @return string
      */
-    function getPath(& $item, $asString = false, $id = 'id', $parent = 'getParent') {
+    static function getPath($item, $asString = false, $id = 'id', $parent = 'getParent') {
         $res = array();
         $curr = & $item;
         while (($p = & $curr->$parent)) {
@@ -32,41 +31,37 @@ class Ac_Param_Impl_Paths {
     }
     
     /**
-     * @static
      * @param string $strPath
      * @return string
      */
-    function pathToArray($strPath) {
+    static function pathToArray($strPath) {
         if (!is_array($path)) $res = explode('/', $strPath);
             else $res = $strPath;
         return $res;
     }
     
     /**
-     * @static
      * @param $arrPath
      * @return unknown_type
      */
-    function pathToString($arrPath) {
+    static function pathToString($arrPath) {
         if (!is_array($arrPath)) $res = $arrPath;
             else $res = implode('/', $arrPath);
         return $res;
     }
     
     /**
-     * @static
      * @param $item
      * @param $parent
      * @return unknown_type
      */
-    function & getRoot(& $item, $parent = '_parent') {
+    static function getRoot($item, $parent = '_parent') {
         $res = & $item;
         while ($p = & $res->$parent) $res = & $p;
         return $res; 
     }
     
     /**
-     * @static
      * @param $item
      * @param $path
      * @param $parent
@@ -74,7 +69,7 @@ class Ac_Param_Impl_Paths {
      * @param $hasChildMethod
      * @return unknown_type
      */
-    function & getByPath(& $item, $path, $parent = '_parent', $getChildMethod, $hasChildMethod = false) {
+    static function getByPath($item, $path, $parent = '_parent', $getChildMethod, $hasChildMethod = false) {
         $path = Param_Impl_Paths::pathToArray($path);
         $curr = & $item;
         $res = false;

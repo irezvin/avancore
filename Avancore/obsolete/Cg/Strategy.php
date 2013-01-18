@@ -59,7 +59,7 @@ class Cg_Strategy {
      * @param Cg_Generator $generator
      * @param string $domainName
      */
-    function Cg_Strategy(& $generator, $domainName, $outputDir, $genEditable, $overwriteEditable, $extraOptions = array()) {
+    function Cg_Strategy($generator, $domainName, $outputDir, $genEditable, $overwriteEditable, $extraOptions = array()) {
         Ac_Util::simpleBind($extraOptions, $this);
         $this->_gen = $generator;
         $this->_dom = $generator->getDomain($domainName);
@@ -101,7 +101,7 @@ class Cg_Strategy {
      * @param Cg_Model $model
      * @return string Name and path of pagemap file 
      */
-    function getPagemapFileName(& $model) {
+    function getPagemapFileName($model) {
         $res = 'pagemap/'.$model->getModelBaseName().'.config.php';
         return $res;
     }
@@ -110,7 +110,7 @@ class Cg_Strategy {
      * Instantiates a template (if $modelName is given, this must be model-wise template, and domain-wise in other case)
      * @return Cg_Template
      */
-    function & _createTemplate($templateName, $modelName = false) {
+    function _createTemplate($templateName, $modelName = false) {
         $tpl = new $templateName;
         $tpl->generator = $this->_gen;
         if (strlen($modelName)) {

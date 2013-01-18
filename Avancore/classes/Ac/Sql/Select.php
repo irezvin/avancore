@@ -45,14 +45,14 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
      * @param Ac_Sql_Db $db
      * @return Ac_Sql_Select
      */
-    function Ac_Sql_Select(& $db, $options) {
-    	$options['db'] = & $db;
+    function Ac_Sql_Select($db, $options) {
+    	$options['db'] = $db;
     	parent::Ac_Sql_Select_TableProvider($options);
     }
 
-    function setDb(& $db) {
+    function setDb($db) {
     	if (!is_a($db, 'Ac_Sql_Db')) trigger_error("\$db must be an instance of Ac_Sql_Db", E_USER_ERROR);;
-    	$this->_db = & $db;
+    	$this->_db = $db;
     }
     
     /**
@@ -164,7 +164,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         if ($this->otherJoins) $res .= implode("\n", $this->otherJoins);
         if (!$withFirstAlias) $skipAliases[] = $orderedAliases[0];
         foreach (array_diff($orderedAliases, $skipAliases) as $a) {
-            $tbl = & $this->getTable($a);
+            $tbl = $this->getTable($a);
             $jcp = $tbl->getJoinClausePart();
             if (strlen($jcp)) {
             	if ($jcp{0} == ',') $res = $res.",\n".substr($jcp, 1);
@@ -257,7 +257,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
             $usedAliases = array($this->getEffectivePrimaryAlias());
         }
         foreach ($usedAliases as $alias) {
-            $t = & $this->getTable($alias);
+            $t = $this->getTable($alias);
             if (is_object($t)) $allRequiredAliases = array_merge($allRequiredAliases, $t->getAllRequiredAliases());
         }
         $allRequiredAliases = array_unique($allRequiredAliases);
@@ -274,7 +274,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
     function _getDeps($tableAliases) {
         $res = array();
         foreach ($tableAliases as $ta) {
-            $t = & $this->getTable($ta);
+            $t = $this->getTable($ta);
             $res[$ta] = $t->getDirectRequiredAliases();
         }
         return $res;
@@ -301,7 +301,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         if ($this->primaryAlias !== false) $res = $this->primaryAlias;
         else {
             $l = $this->listTables();
-            $t = & $this->getTable($l[0]);
+            $t = $this->getTable($l[0]);
             $res = $t->getIdentifier(); 
         }
         return $res;
@@ -310,7 +310,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
     /**
      * @return Ac_Model_Collection
      */
-    function & createCollection($mapperClass = false, $pkName = false, $ignorePrimaryAlias = false) {
+    function createCollection($mapperClass = false, $pkName = false, $ignorePrimaryAlias = false) {
         if (!strlen($mapperClass) && !strlen($pkName)) trigger_error("Even mapper class or pk name must be provided", E_USER_ERROR);
         $res = new Ac_Model_Collection();
         
@@ -321,10 +321,10 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         if (!count($orderedAliases)) {
             $orderedAliases = array($this->getEffectivePrimaryAlias());
         }
-        $t = & $this->getTable($this->getEffectivePrimaryAlias());
+        $t = $this->getTable($this->getEffectivePrimaryAlias());
             
         if ($mapperClass) {
-            $mapper = & Ac_Model_Mapper::getMapper($mapperClass);
+            $mapper = Ac_Model_Mapper::getMapper($mapperClass);
             if ($mapper->tableName !== $t->name) 
                 trigger_error("Table of '{$mapperClass}' is '{$mapper->tableName}' and does not match name of primary table '{$t->name}'", E_USER_WARNING);
             $res->useMapper($mapperClass);
@@ -335,7 +335,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         $res->setAlias($orderedAliases[0]);
         foreach ($this->otherJoins as $j) $res->addJoin($j);
         for ($i = 1; $i < count($orderedAliases); $i++) {
-            $tbl = & $this->getTable($orderedAliases[$i]);
+            $tbl = $this->getTable($orderedAliases[$i]);
             $res->addJoin($tbl->getJoinClausePart());
         }
         foreach ($this->otherJoinsAfter as $j) $res->addJoin($j);

@@ -34,14 +34,14 @@ if ( defined('HACKS_SAMPLE')) { if (!class_exists('HacksSample', false)) require
 class Ac_Test_Hacks extends UnitTestCase {
 
 	function testSimpleHacks() {
-		$instance1 = & HacksSample::_hck_getInstance();
+		$instance1 = HacksSample::_hck_getInstance();
 		$this->assertIsA($instance1, 'HacksSample');
-		$instance2 = & HacksSample::_hck_getInstance();
+		$instance2 = HacksSample::_hck_getInstance();
 		$this->assertReference($instance1, $instance2);
 		
 		
 		// Let's go...
-		$h = & $instance1;
+		$h = $instance1;
 		
 		
 		// 23 and 12 are just random numbers that don't make any sense
@@ -76,7 +76,7 @@ class Ac_Test_Hacks extends UnitTestCase {
 
 function hackedFunc($arg1, $arg2) {
 	/*<aeh>*/ 
-		if ( defined('HACKS_SAMPLE')) { if (!class_exists('HacksSample', false)) require(HACKS_SAMPLE); $_hck_ = & HacksSample::_hck_getInstance(); 
+		if ( defined('HACKS_SAMPLE')) { if (!class_exists('HacksSample', false)) require(HACKS_SAMPLE); $_hck_ = HacksSample::_hck_getInstance(); 
 		$_hck_ctx = isset($this)? $this : null; if($_hck_->_hck_auto($_hck_ctx, $_hck_result)) return $_hck_result; } 
 	/*</aeh>*/ 
 		
@@ -96,7 +96,7 @@ class AllPublicClass {
 	
 	function decorate($string, $tagName = false) {
 		/*<aeh>*/ 
-			if ( defined('HACKS_SAMPLE')) { if (!class_exists('HacksSample', false)) require(HACKS_SAMPLE); $_hck_ = & HacksSample::_hck_getInstance(); 
+			if ( defined('HACKS_SAMPLE')) { if (!class_exists('HacksSample', false)) require(HACKS_SAMPLE); $_hck_ = HacksSample::_hck_getInstance(); 
 			$_hck_ctx = isset($this)? $this : null; if($_hck_->_hck_auto($_hck_ctx, $_hck_result)) return $_hck_result; } 
 		/*</aeh>*/
 		
@@ -107,7 +107,7 @@ class AllPublicClass {
 	
 	function getConcat($glue, $tagName = false) {
 		/*<aeh>*/ 
-			if ( defined('HACKS_SAMPLE')) { if (!class_exists('HacksSample', false)) require(HACKS_SAMPLE); $_hck_ = & HacksSample::_hck_getInstance(); 
+			if ( defined('HACKS_SAMPLE')) { if (!class_exists('HacksSample', false)) require(HACKS_SAMPLE); $_hck_ = HacksSample::_hck_getInstance(); 
 			$_hck_ctx = isset($this)? $this : null; if($_hck_->_hck_auto($_hck_ctx, $_hck_result)) return $_hck_result; } 
 		/*</aeh>*/
 		
@@ -118,7 +118,7 @@ class AllPublicClass {
 	
 	function staticConcat($foo, $bar) {
 		/*<aeh>*/ 
-			if ( defined('HACKS_SAMPLE')) { if (!class_exists('HacksSample', false)) require(HACKS_SAMPLE); $_hck_ = & HacksSample::_hck_getInstance(); 
+			if ( defined('HACKS_SAMPLE')) { if (!class_exists('HacksSample', false)) require(HACKS_SAMPLE); $_hck_ = HacksSample::_hck_getInstance(); 
 			$_hck_ctx = isset($this)? $this : null; if($_hck_->_hck_auto($_hck_ctx, $_hck_result)) return $_hck_result; } 
 		/*</aeh>*/
 			

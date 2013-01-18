@@ -120,7 +120,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
      * @param Cg_Property_Object $prop
      * @return Cg_Template_Assoc_Strategy
      */
-    function getAssocStrategy($relationId, & $prop) {
+    function getAssocStrategy($relationId, $prop) {
         if ($prop->isList() && $prop->isManyToMany()) $class = 'Cg_Template_Assoc_Strategy_ManyToMany';
         elseif ($prop->isList()) $class = 'Cg_Template_Assoc_Strategy_Many';
         else $class = 'Cg_Template_Assoc_Strategy_One';
@@ -133,7 +133,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     /**
      * @param Cg_Property_Object $prop
      */
-    function _showModelMethodsForAssociation($relationId, & $prop) {
+    function _showModelMethodsForAssociation($relationId, $prop) {
         $strategy = $this->getAssocStrategy($relationId, $prop);
         $strategy->showGenModelMethods();
     }
@@ -170,7 +170,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     /**
      * @param Cg_Property_Object $prop
      */
-    function _showMapperMethodsForAssociation($relationId, & $prop) {
+    function _showMapperMethodsForAssociation($relationId, $prop) {
         $strategy = $this->getAssocStrategy($relationId, $prop);
         $strategy->showGenMapperMethods();
     }

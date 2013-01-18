@@ -27,7 +27,7 @@ class Ac_Admin_Column_RecordBinder extends Ac_Admin_Column {
          $attribs['id'] = $this->_context->mapIdentifier($this->trIdPrefix.$this->manager->getStrPk($record));
      }
      
-     function showCell(& $record, $rowNo) {
+     function showCell($record, $rowNo) {
          $this->_recordsJson[] = array('key' => $key = $this->manager->getStrPk($record));
          $this->_recordKeys[] = $key;
      }

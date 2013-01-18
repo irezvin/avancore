@@ -212,7 +212,7 @@ class Cg_Model {
      */
     var $hasUniformPropertiesInfo = false;
     
-    function Cg_Model(& $domain, $name, $config = array()) {
+    function Cg_Model($domain, $name, $config = array()) {
         $this->_domain = $domain;
         $this->name = $name;
         Ac_Util::simpleBindAll($config, $this);
@@ -382,7 +382,7 @@ class Cg_Model {
      * 
      * @return Ac_Sql_Dbi_Relation Other relation that is involved in the junction
      */
-    function & _determineJunctionRelation (& $rel, $isIncoming, $toModelsOnly) {
+    function _determineJunctionRelation ($rel, $isIncoming, $toModelsOnly) {
         $res = false;
         
         if ($isIncoming) $ot = $rel->ownTable; 
@@ -509,7 +509,7 @@ class Cg_Model {
     /**
      * @return Cg_Property
      */
-    function & searchPropertyByRelation($relName) {
+    function searchPropertyByRelation($relName) {
         $this->init();
         $res = null;
         if (isset($this->_relations[$relName])) {
@@ -521,7 +521,7 @@ class Cg_Model {
     /**
      * @return Cg_Property
      */
-    function & _searchPropertyByRelation($relName) {
+    function _searchPropertyByRelation($relName) {
         $res = null;
         foreach ($this->listProperties() as $name) {
             $prop = $this->getProperty($name);
@@ -536,7 +536,7 @@ class Cg_Model {
     /**
      * @param Ac_Model_Property $prop
      */
-    function searchRelationIdByProperty(& $prop) {
+    function searchRelationIdByProperty($prop) {
         $res = false;
         foreach ($this->_relations as $k => $v) {
             if ($v[0] == $prop->relation) {
@@ -576,7 +576,7 @@ class Cg_Model {
      * Returns prototype for creating Ac_Model_Relation
      * @return array
      */
-    function getNonModelRelationPrototype($relName, $isIncoming, & $otherRel) {
+    function getNonModelRelationPrototype($relName, $isIncoming, $otherRel) {
         $this->init();
         $res = array();
         $res['srcRecordClass'] = $this->className;
@@ -605,7 +605,7 @@ class Cg_Model {
      * @param Cg_Model $otherModel
      * @return array
      */
-    function getCommonSubsystemPrefixes(& $otherModel) {
+    function getCommonSubsystemPrefixes($otherModel) {
         $myPrefixes = $this->subsystemPrefixes;
         $otherPrefixes = $otherModel->subsystemPrefixes;
         $res = array();

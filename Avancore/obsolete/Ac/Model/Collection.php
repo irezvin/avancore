@@ -584,7 +584,7 @@ class Ac_Model_Collection {
     /**
      * @param Ac_Legacy_Database $database
      */
-    function setDatabase(& $database) {
+    function setDatabase($database) {
         if (!$this->_canSetLimits) trigger_error ("Can't change params of collection that is already open", E_USER_ERROR);
         $this->_db = $database;
     }

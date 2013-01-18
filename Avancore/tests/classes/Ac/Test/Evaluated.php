@@ -239,23 +239,6 @@ class ExampleEvaluator2 extends ExampleEvaluator {
     
 }
 
-class ExampleEvaluator3 extends ExampleEvaluator {
-    
-    protected $supportedClasses = array('ExampleEvaluated');
-    
-    function doGetEvaluationResults(array $objects, ExampleContextMutable $context = null) {
-        $foo = $context->getFoo();
-        $res = array();
-        foreach ($objects as $k => $v) {
-            if (isset($v->add) && is_object($v->add) && $v->add instanceof ExampleEvaluated) $context->addValue($v->add);
-            $ev = $v->evaluateDefault($context->dateFormat);
-            $res[$k] = $context->isHtml? "<h1>{$foo} {$ev}</h1>" : "=== {$foo} {$ev} ===";
-        }
-        return $res;
-    }
-    
-}
-
 class ExampleContextMutable extends ExampleContext implements Ac_I_EvaluationContext_Mutable {
         
     protected $added = array();
@@ -305,3 +288,22 @@ class ExampleContextCache extends ExampleContext implements Ac_I_EvaluationConte
     }
     
 }
+
+
+class ExampleEvaluator3 extends ExampleEvaluator {
+    
+    protected $supportedClasses = array('ExampleEvaluated');
+    
+    function doGetEvaluationResults(array $objects, Ac_I_EvaluationContext $context = null) {
+        $foo = $context->getFoo();
+        $res = array();
+        foreach ($objects as $k => $v) {
+            if (isset($v->add) && is_object($v->add) && $v->add instanceof ExampleEvaluated) $context->addValue($v->add);
+            $ev = $v->evaluateDefault($context->dateFormat);
+            $res[$k] = $context->isHtml? "<h1>{$foo} {$ev}</h1>" : "=== {$foo} {$ev} ===";
+        }
+        return $res;
+    }
+    
+}
+

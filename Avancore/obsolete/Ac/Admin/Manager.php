@@ -200,7 +200,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $disp->cacheSet($cid, $data, $this->_getCacheGroup());
     }
     
-    function & _getFormResponse() {
+    function _getFormResponse() {
         if ($this->_formResponse === false) {
             $template = $this->getTemplate();
             $form = $this->getForm();
@@ -212,7 +212,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $this->_formResponse;
     }
     
-    function & _getFilterFormResponse() {
+    function _getFilterFormResponse() {
         if ($this->_filterFormResponse === false) {
             $template = $this->getTemplate();
             $form = $this->getFilterForm();
@@ -426,7 +426,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * @param Ac_Model_Object $record
      * @return bool
      */
-    function canProcessRecord(& $record) {
+    function canProcessRecord($record) {
         return true;        
     }
     
@@ -593,7 +593,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     /**
      * @param Ac_Model_Datalink $datalink
      */
-    function setDatalink(& $datalink) {
+    function setDatalink($datalink) {
         if (is_object($datalink)) {
             if (!is_a($datalink, 'Ac_Admin_Datalink')) 
                 trigger_error ("\$datalink should be Ac_Admin_Datalink instance", E_USER_ERROR);
@@ -659,9 +659,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $res;
     }
     
-    /**
-     * @static
-     */
     function listAllFeatureClasses() {
         $res = array_unique(array_merge(array('Ac_Admin_Feature_Default'), array_keys($this->featureSettings)));
         return $res;
@@ -916,7 +913,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      *
      * @param Ac_Model_Record $record
      */
-    function getStrPk(& $record) {
+    function getStrPk($record) {
         if ($this->onlyRecord) $res = '1';
         else {
             if (is_array($pk = $record->getPrimaryKey())) $res = serialize($pk);
@@ -980,7 +977,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     /**
      * @return Ac_Legacy_Controller_Context
      */
-    function & _createFormContext() {
+    function _createFormContext() {
         $res = $this->_context->spawn('form');
         if ($this->_context->isInForm) $res->isInForm = $this->_context->isInForm; 
             else $res->isInForm = $this->getManagerFormName();
@@ -990,7 +987,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     /**
      * @return Ac_Legacy_Controller_Context
      */
-    function & _createFilterFormContext() {
+    function _createFilterFormContext() {
         $res = $this->_context->spawn('filterForm');
         if ($this->_context->isInForm) $res->isInForm = $this->_context->isInForm; 
             else $res->isInForm = $this->getManagerFormName();
@@ -1063,7 +1060,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * @param string $id Sub manager id
      * @return Ac_Legacy_Controller_Context_Http
      */
-    function & _createSubManagerContext($id) {
+    function _createSubManagerContext($id) {
         $ctx = $this->_context->spawn('sm_'.$id);
         return $ctx;
     }
@@ -1071,7 +1068,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
 	/**
      * @return Ac_Legacy_Controller_Context_Http
      */
-    function & _createProcessingContext($processingId) {
+    function _createProcessingContext($processingId) {
         $ctx = $this->_context->spawn('processingParams');
         $url = $this->getManagerUrl('processing', array('processing' => $processingId));
         $d = $ctx->getData();
@@ -1126,7 +1123,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * @return Ac_Sql_Filter
      * @access protected
      */
-    function & _getSqlFilter() {
+    function _getSqlFilter() {
         if ($this->_sqlFilter === false) {
             $allFilters = array();
             foreach ($this->listFeatures() as $i) {
@@ -1154,7 +1151,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * @return Ac_Sql_Order
      * @access protected
      */
-    function & _getSqlOrder() {
+    function _getSqlOrder() {
         if ($this->_sqlOrder === false) {
             $allOrders = array();
             foreach ($this->listFeatures() as $i) {
@@ -1183,7 +1180,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * @return Ac_Sql_Select
      * @access protected
      */
-    function & _getSqlSelect() {
+    function _getSqlSelect() {
         if ($this->_sqlSelect === false) {
             $options = array();
             $mapper = $this->getMapper();
@@ -1228,7 +1225,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     /**
      * @return Ac_Model_Collection
      */
-    function & _getRecordsCollection() {
+    function _getRecordsCollection() {
         if ($this->_recordsCollection === false) {
             if ($this->_collectionCanBeUsed()) {
                 $this->_recordsCollection = new Ac_Model_Collection($this->mapperClass, false, $this->_getWhere(), $this->_getOrder(), $this->_getJoins(), $this->_getExtraColumns());

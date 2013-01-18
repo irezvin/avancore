@@ -161,7 +161,7 @@ class Ac_Legacy_Database {
         trigger_error ("Call to abstract method", E_USER_ERROR);
     }
     
-    function loadObject (& $row) {
+    function loadObject ($row) {
         $al = $this->loadAssocList();
         if (count($al)) {
             if (!is_object($row)) $row = new stdClass();
@@ -386,21 +386,21 @@ class Ac_Legacy_Database {
     /**
      * @return Ac_Legacy_Database
      */
-    function & cloneObject() {
+    function cloneObject() {
     	$res = unserialize(serialize($this));
     	return $res;
     }
     
-    function canCopyToDest(& $db) {
+    function canCopyToDest($db) {
     	trigger_error ("Call to abstract method", E_USER_ERROR);
     }
     
-	function copyToDest(& $db) {
+	function copyToDest($db) {
 		if (!$this->canCopyToDest($db)) trigger_error ("Cannot copy to destination database; use canCopyToDest() to check this next time", E_USER_ERROR);
 		return $this->_doCopyToDest($db);
 	}
 	
-	function _doCopyToDest(& $db) {
+	function _doCopyToDest($db) {
 		trigger_error ("Call to abstract method", E_USER_ERROR);
 	}
 	

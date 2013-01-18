@@ -38,7 +38,7 @@ class Ac_Template {
      * @param array $vars Initial values for template variables
      * @return Ac_Template
      */
-    function & factory($className, $vars = array()) {
+    function factory($className, $vars = array()) {
         $res = new $className($vars);
         return $res;
     }
@@ -139,7 +139,7 @@ class Ac_Template {
      * Outputs object
      * @param object $obj Object that supports toString() or show() methods
      */
-    function o(& $obj) {
+    function o($obj) {
         if (method_exists($obj, 'toString')) echo $obj->toString();
         elseif (method_exists($obj, 'show')) $obj->show();
     }
@@ -148,7 +148,7 @@ class Ac_Template {
      * Outputs dump of any variable
      * @param mixed $anything 
      */
-    function p(& $anything) {
+    function p($anything) {
         print_r($anything);
     }
     
@@ -156,7 +156,7 @@ class Ac_Template {
      * Otputs dump of any variable
      * @param mixed $anything 
      */
-    function dump(& $anything) {
+    function dump($anything) {
         return $this->p($anything);
     }
     
@@ -172,7 +172,7 @@ class Ac_Template {
      * Outputs object
      * @param object $obj Object that supports toString() or show() methods
      */
-    function displayObject(& $obj) {
+    function displayObject($obj) {
         return $this->d($obj);
     }
     

@@ -233,7 +233,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
      * @param Ac_Admin_Manager $subManager 
      * @param array $smConfig Configuration that was used to create subManager
      */
-    function onSubManagerCreated($id, & $subManager, $smConfig = array()) {
+    function onSubManagerCreated($id, $subManager, $smConfig = array()) {
         if (isset($smConfig['_relId'])) {
             $dl = new Ac_Admin_Datalink_Subrecord();
             $subManager->setDatalink($dl);

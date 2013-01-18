@@ -15,7 +15,7 @@ class Ac_Test_Base extends UnitTestCase {
 	/**
 	 * @return Ac_Sql_Db_Ae
 	 */
-	function & getAeDb() {
+	function getAeDb() {
 		if ($this->aeDb === false) $this->aeDb = new Ac_Sql_Db_Ae($this->getLegacyDb());
 		return $this->aeDb;
 	}

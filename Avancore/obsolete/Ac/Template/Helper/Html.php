@@ -7,21 +7,21 @@ class Ac_Template_Helper_Html extends Ac_Template_Helper {
         return $res;
     }
     
-    function toJson(& $value, $indent = 0, $indentStep = 4, $newLines = true, $withNumericKeys = true) {
+    function toJson($value, $indent = 0, $indentStep = 4, $newLines = true, $withNumericKeys = true) {
         return $this->_toJson($value, $indent, $indentStep, $newLines, $withNumericKeys);
     }
     
-    function _arrayIsSimple (& $arr) {
+    function _arrayIsSimple ($arr) {
         foreach (array_keys($arr) as $k) if (!is_scalar($arr[$k])) return false;
         return true;   
     }
     
-    function _onlyNumericKeys (& $arr) {
+    function _onlyNumericKeys ($arr) {
         foreach (array_keys($arr) as $k) if (!is_numeric($k)) return false;
         return true;
     }
     
-    function _toJson(& $value, $indent = 0, $indentStep = 4, $newLines = true, $withNumericKeys = true) {
+    function _toJson($value, $indent = 0, $indentStep = 4, $newLines = true, $withNumericKeys = true) {
         if (!is_array($value)) {
             if (is_int($value) || is_float($value)) $res = (string) $value;
             elseif (is_object($value)) {

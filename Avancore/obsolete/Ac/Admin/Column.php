@@ -8,7 +8,7 @@ class Ac_Admin_Column extends Ac_Table_Column {
      */
     var $manager = false;
     
-    function Ac_Admin_Column(& $table, $name, $settings = array()) {
+    function Ac_Admin_Column($table, $name, $settings = array()) {
         parent::Ac_Table_Column($table, $name, $settings);
         if (!$this->manager && isset($table->_manager) && $table->_manager) $this->manager = $table->_manager;
     }
@@ -24,14 +24,14 @@ class Ac_Admin_Column extends Ac_Table_Column {
         echo $this->getTitle();
     }
     
-    function showCell(& $record, $rowNo) {
+    function showCell($record, $rowNo) {
         if (!$this->staticAttribs) $this->updateAttribs();
         echo '<td ', $this->_cellAttribs, '>';
         $this->doShowCell($record, $rowNo);
         echo '</td>';
     }
     
-    function doShowCell(& $record, $rowNo) {
+    function doShowCell($record, $rowNo) {
         if (is_null($data = $this->getData($record, $rowNo, $this->fieldName))) $data = $this->nullText;
         echo $data;
     }
