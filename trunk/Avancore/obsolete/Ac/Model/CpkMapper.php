@@ -53,7 +53,7 @@ class Ac_Model_CpkMapper extends Ac_Model_Mapper {
             else $many = true;
         } else $many = false;
         if (!$many) {
-            if ($this->useRecordsCollection && ($res = & $this->getFromArrayByPk($this->_recordsCollection, $pk))) {
+            if ($this->useRecordsCollection && ($res = $this->getFromArrayByPk($this->_recordsCollection, $pk))) {
             } else {
                 $sql = "SELECT * FROM {$this->tableName} WHERE ".$this->_pkCriteria($pk);
                 $this->database->setQuery($sql);                
@@ -66,7 +66,7 @@ class Ac_Model_CpkMapper extends Ac_Model_Mapper {
                 } else {
                     $record = null;
                 }
-                $res = & $record;
+                $res = $record;
                 if ($this->useRecordsCollection && $res) $this->putToArrayByPk($record, $this->_recordsCollection);
             }
         } else {
@@ -108,7 +108,7 @@ class Ac_Model_CpkMapper extends Ac_Model_Mapper {
         $res =  array();
         
         while($row = $this->database->fetchAssoc($result)) {
-            if ($this->useRecordsCollection && ($res = & $this->getFromArrayByPk($this->_recordsCollection, $pk))) {
+            if ($this->useRecordsCollection && ($res = $this->getFromArrayByPk($this->_recordsCollection, $pk))) {
             } else {
                 $className = $this->dispatcher->loadClass($this->getRecordClass($row));
                 $rec = new $className ($this->database);
@@ -119,7 +119,7 @@ class Ac_Model_CpkMapper extends Ac_Model_Mapper {
             if ($keysToList) {
                 $this->putToArrayByPk($rec, $res);
             } else {
-                $res[] = & $rec;
+                $res[] = $rec;
             }
         }
         $this->database->freeResultResource($result);
@@ -192,7 +192,7 @@ class Ac_Model_CpkMapper extends Ac_Model_Mapper {
      * @return Ac_Model_Object or $default if it is not found
      */
     function getFromArrayByPk(& $src, $pk, $default = null) {
-        $res = & Ac_Util::simpleGetArrayByPath($src, $pk, $default);
+        $res = Ac_Util::simpleGetArrayByPath($src, $pk, $default);
         return $res;        
     }
     

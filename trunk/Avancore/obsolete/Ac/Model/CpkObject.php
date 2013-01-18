@@ -62,7 +62,7 @@ class Ac_Model_CpkObject extends Ac_Model_Object {
         if (!$missingPk) $replace = true;
         else {
             $replace = false;
-            $mapper = & $this->getMapper();
+            $mapper = $this->getMapper();
             if ((count($missingPk) == 1) && $missingPk[0] === $mapper->getAutoincFieldName()) $useAutoinc = $mapper->getAutoincFieldName();
             else $canStore = false;
         }

@@ -42,9 +42,9 @@ class Ac_Form_Converter {
             
             case $property->controlType === 'selectList':
                 $conf['class'] = 'Ac_Form_Control_List';
-                $rec = & $property->srcObject;
+                $rec = $property->srcObject;
                 if (isset($property->objectPropertyName) && strlen($opn = $property->objectPropertyName)) {
-                    $op = & $rec->getPropertyInfo($opn);
+                    $op = $rec->getPropertyInfo($opn);
                     if (strlen($op->caption)) $conf['caption'] = $op->caption;
                     if (isset($op->description) && strlen($op->description)) $conf['description'] = $op->description;
                 }

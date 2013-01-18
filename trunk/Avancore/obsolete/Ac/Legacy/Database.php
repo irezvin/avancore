@@ -52,7 +52,7 @@ class Ac_Legacy_Database {
     function __construct($options = array()) {
         if (get_class($this) == 'Ac_Legacy_Database') trigger_error ("Attempt to instantiate abstract class Ac_Legacy_Database", E_USER_ERROR);
         if (isset($options['config']) && is_a($options['config'], 'Ac_Legacy_Config')) {
-            $this->_config = & $options['config']; 
+            $this->_config = $options['config']; 
         }
         if (isset($options['tmpDir'])) {
             $this->_tmpDir = $options['tmpDir'];
@@ -234,7 +234,7 @@ class Ac_Legacy_Database {
         // TODO: Optimization 1: remove duplicates from values! (how??? sort keys??? make a tree???)
         // TODO: Optimization 2: make nested criterias depending on values cardinality
         $values = Ac_Util::array_unique($values); 
-        $db = & $this;
+        $db = $this;
         $qAlias = strlen($alias)? $alias.'.' : $alias;
         if (is_array($keyFields)) {
             if (count($keyFields) === 1) {

@@ -38,7 +38,7 @@ class Ac_Upload_Manager {
     }
     
     function validateId($id) {
-        if ($s = & $this->getStorage()) {
+        if ($s = $this->getStorage()) {
             $res = $s->validateId($id);
         } else {
             $res = preg_match('#^\w+$#', $id);
@@ -62,11 +62,11 @@ class Ac_Upload_Manager {
                 $r = unserialize(file_get_contents($fn));
                 if (is_a($r, $this->_uploadClass)) {
                     $r->setUploadManager($this);
-                    $res = & $r;
+                    $res = $r;
                 }
             } else if ($load && ($internalData = $this->_doLoadInternalData($id))) {
 //                Ac_Debug_FirePHP::getInstance()->log($fn, 'loading internal data');
-                $res = & $this->factory(array('internalData' => $internalData));
+                $res = $this->factory(array('internalData' => $internalData));
                 $this->_cacheUpload($res);
             }
 //            Ac_Debug_FirePHP::getInstance()->log($fn, 'getUpload()');
@@ -97,7 +97,7 @@ class Ac_Upload_Manager {
     }
     
     function _doLoadInternalData($id) {
-        if ($s = & $this->getStorage()) {
+        if ($s = $this->getStorage()) {
             $res = $s->loadInternalData($id);
         } else {
             trigger_error ("Attempt to getUpload() with unitialized storage", E_USER_WARNING);
@@ -110,7 +110,7 @@ class Ac_Upload_Manager {
      * @param Ac_Upload_File $upload
      */
     function _doStoreUpload(& $upload) {
-        if ($s = & $this->getStorage()) {
+        if ($s = $this->getStorage()) {
             $res = $s->saveUpload($upload);
         } else {
             trigger_error ("Attempt to storeUpload() with unitialized storage", E_USER_WARNING);
@@ -120,7 +120,7 @@ class Ac_Upload_Manager {
     }
     
     function _doDeleteUpload($id) {
-        if ($s = & $this->getStorage()) {
+        if ($s = $this->getStorage()) {
             $res = $s->deleteUpload($id);
         } else {
             trigger_error ("Attempt to deleteUpload() with unitialized storage", E_USER_WARNING);
@@ -188,7 +188,7 @@ class Ac_Upload_Manager {
      */
     function getStorage() {
         if ($this->_storage === false) {
-            if (is_array($this->storageOptions)) $this->_storage = & Ac_Util::factoryWithOptions($this->storageOptions, 'Ac_Upload_Storage', 'class', false);
+            if (is_array($this->storageOptions)) $this->_storage = Ac_Util::factoryWithOptions($this->storageOptions, 'Ac_Upload_Storage', 'class', false);
         }
         return $this->_storage;
     }
@@ -204,7 +204,7 @@ class Ac_Upload_Manager {
      * @return Ac_Upload_File
      */
     function & factory ($options = array()) {
-        $options['uploadManager'] = & $this;
+        $options['uploadManager'] = $this;
         $res = Ac_Util::factoryWithOptions($options, $this->_uploadClass);
         return $res;
     }

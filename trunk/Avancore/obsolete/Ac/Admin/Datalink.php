@@ -42,7 +42,7 @@ class Ac_Admin_Datalink {
     * @param Ac_Admin_Manager $manager
     */
    function setManager(& $manager) {
-       $this->_manager = & $manager;
+       $this->_manager = $manager;
    }
    
    /**
@@ -50,7 +50,7 @@ class Ac_Admin_Datalink {
     * @param Ac_Admin_Processing $processing
     */
    function & setProcessing(& $processing) {
-       $this->_processing = & $processing;
+       $this->_processing = $processing;
    }
    
    /**

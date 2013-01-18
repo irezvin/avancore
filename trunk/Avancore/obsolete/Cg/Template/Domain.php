@@ -17,7 +17,7 @@ class Cg_Template_Domain extends Cg_Template {
         $this->domainBaseClass = $this->domain->appBaseClass;
         $this->mappers = array();
         foreach ($this->domain->listModels() as $m) {
-            $mod = & $this->domain->getModel($m);
+            $mod = $this->domain->getModel($m);
             $modName = $mod->getModelBaseName();
             if (!$mod->noUi) {
                 $this->adminMenu[$modName.'_List'] = $mod->pluralCaption;

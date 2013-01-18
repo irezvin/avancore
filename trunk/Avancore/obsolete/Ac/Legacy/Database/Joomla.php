@@ -23,7 +23,7 @@ class Ac_Legacy_Database_Joomla extends Ac_Legacy_Database {
         if (!defined('_VALID_MOS') || !isset($GLOBALS['database']) || !is_a($GLOBALS['database'], 'database')) 
             trigger_error ('No Joomla or Joomla Db detected', E_USER_ERROR);
             
-        $this->_db = & $GLOBALS['database'];     
+        $this->_db = $GLOBALS['database'];     
     }
     
     function Quote($string) {
@@ -33,7 +33,7 @@ class Ac_Legacy_Database_Joomla extends Ac_Legacy_Database {
     
     function NameQuote($string) {
         if (is_a($string, 'Ac_Sql_Expression')) return $string->nameQuote($this);
-            else return $this->_db->NameQuote($string);
+            else return $this->_db->quoteName($string);
     }
     
     function setQuery($query, $offset = 0, $limit = 0, $prefix = '#__') {
@@ -89,7 +89,7 @@ class Ac_Legacy_Database_Joomla extends Ac_Legacy_Database {
         return $this->_db->insertid();
     }
     
-    function getResultResource() {
+    function getResultResource($unbuffered = false) {
         $this->_debugBeforeQuery($this->_db->_sql);
         $res = $this->_db->query();
         $this->_debugAfterQuery($this->_db->_sql, false, true);
@@ -105,7 +105,8 @@ class Ac_Legacy_Database_Joomla extends Ac_Legacy_Database {
     }
     
     function freeResultResource($resultResource) {
-        return mysql_free_result($resultResource);
+        if (is_resource($resultResource)) return mysql_free_result($resultResource);
+            else return false;
     }
     
     function _pushQuery() {

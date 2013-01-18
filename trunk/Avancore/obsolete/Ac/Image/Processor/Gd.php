@@ -18,7 +18,7 @@ class Ac_Image_Processor_Gd extends Ac_Image_Processor {
      */
     function & _getResizer() {
         if (!class_exists('Resizeimage', false)) {
-            $disp = & Ac_Dispatcher::getInstance();
+            $disp = Ac_Dispatcher::getInstance();
             require($disp->getVendorDir().'/resizeimage.inc.php');
         }
         if ($this->_resizer === false) $this->_resizer = new Resizeimage();
@@ -26,7 +26,7 @@ class Ac_Image_Processor_Gd extends Ac_Image_Processor {
     }
     
     function _doOnSetFile() {
-        $r = & $this->_getResizer();
+        $r = $this->_getResizer();
         $r->setImage($this->_filePath);
         if (strlen($e = $r->error())) $this->_error = $e;
         $this->_type = $r->imgType;
@@ -53,7 +53,7 @@ class Ac_Image_Processor_Gd extends Ac_Image_Processor {
             exec($command, $output, $return);
             
         } else  {
-            $r = & $this->_getResizer();
+            $r = $this->_getResizer();
             $r->resize_limitwh($thumbWidth, $thumbHeight, $thumbPath);
             $this->_thumbWidth = $r->newWidth;
             $this->_thumbHeight = $r->newHeight;

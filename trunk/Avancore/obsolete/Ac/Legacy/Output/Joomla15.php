@@ -5,7 +5,7 @@ class Ac_Legacy_Output_Joomla15 extends Ac_Legacy_Output_Joomla {
     var $removePathwayDuplicates = true;
 
     function __construct() {
-        $this->mainframe =  &JFactory::getApplication();
+        $this->mainframe = JFactory::getApplication();
     }
     
     function setPageTitle($pageTitle) {
@@ -13,7 +13,7 @@ class Ac_Legacy_Output_Joomla15 extends Ac_Legacy_Output_Joomla {
         $doc->setTitle($pageTitle);
     }
     
-    function outputResponse(Ac_Legacy_Controller_Response_Http $response, $asModule = false) {
+    function outputResponse(Ac_Legacy_Controller_Response_Html $response, $asModule = false) {
         if ($response->redirectUrl) {
             $permanent = ($response->redirectType == Ac_Legacy_Controller_Response_Http::redirPermanent);
             $this->mainframe->redirect(''.$response->redirectUrl, '', 'message', $permanent);
@@ -23,7 +23,7 @@ class Ac_Legacy_Output_Joomla15 extends Ac_Legacy_Output_Joomla {
     
     function showPathway(Ac_Legacy_Controller_Response_Html $response) {
         if ($response->pathway) {
-            $pw = & $this->mainframe->getPathway();
+            $pw = $this->mainframe->getPathway();
             $pathway = $response->pathway;
             foreach ($pw->getPathway() as $item) {
                 foreach ($pathway as $k => $v) {
@@ -53,9 +53,9 @@ class Ac_Legacy_Output_Joomla15 extends Ac_Legacy_Output_Joomla {
     }
     
     static function addHtmlToJoomlaToolbar($html) {
+        Ac_Dispatcher::loadClass('Ac_Joomla_15_AnyHtmlButton');
         $bar = JToolBar::getInstance('toolbar');
         $bar->appendButton('AnyHtml', $html);
-        
     }
     
     

@@ -85,7 +85,7 @@ class Ac_Finder_Criterion_SearchByProperties extends Ac_Finder_Criterion {
     			$aliases = array_merge($aliases, $expr->aliases);	
     		}
     		
-    		$selectPart = & Ac_Sql_Part::factory(array(
+    		$selectPart = Ac_Sql_Part::factory(array(
     			'class' => 'Ac_Sql_Filter_Substring',
     			'patBefore' => $this->patBefore,
     			'aliases' => array_unique($aliases),

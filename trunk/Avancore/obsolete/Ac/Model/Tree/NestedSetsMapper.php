@@ -97,7 +97,7 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
      * @return Ac_Model_Relation
      */
     function getNsRelation() {
-    	$ns = & $this->getNestedSets();
+    	$ns = $this->getNestedSets();
         if ($this->_nsRelation === false) {
             $this->_nsRelation = new Ac_Model_Relation(array(
                 'srcTableName' => $ns->tableName,

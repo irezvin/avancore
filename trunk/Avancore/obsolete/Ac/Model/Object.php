@@ -96,13 +96,13 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     function _describeIndex($indexName, $indexFields = false) {
         if ($indexFields === false) {
-            $m = & $this->getMapper();
+            $m = $this->getMapper();
             $indexFields = $m->listUniqueIndexFields($indexName);
         }
         $r = array();
         foreach ($indexFields as $f) {
             if (!$this->hasProperty($f)) continue;
-            $p = & $this->getPropertyInfo($f);
+            $p = $this->getPropertyInfo($f);
             $r[] = "'".($p->caption? $p->caption : $f)."'";
         }
         return implode(", ", $r);
@@ -112,7 +112,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         parent::_checkOwnFields();
         $dbp = $this->checkDatabasePresence(true);
         if ($dbp) {
-            $m = & $this->getMapper();
+            $m = $this->getMapper();
             foreach ($dbp as $indexName => $pks) {
                 $ff = $m->listUniqueIndexFields($indexName);
                 $fn = current($ff);
@@ -125,9 +125,9 @@ class Ac_Model_Object extends Ac_Model_Data {
     // Models that have same properties use common validator (stored in the mapper). This preserves memory and time required for initial metadata retrieval. 
     function & _createValidator() {
         if ($this->hasUniformPropertiesInfo()) {
-            $m = & $this->getMapper();
-            $res = & $m->getCommonValidator();
-            $res->model = & $this;
+            $m = $this->getMapper();
+            $res = $m->getCommonValidator();
+            $res->model = $this;
         } else {
             $res = new Ac_Model_Validator($this);
         }
@@ -179,7 +179,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             //$this->reset();
             $this->_otherValues = array();
             if ($this->_db->hasToConvertDatesOnLoad()) {
-                $m = & $this->getMapper();
+                $m = $this->getMapper();
                 $oid = $this->_db->convertDates($oid, $m->getDateFormats()); 
             }
             foreach ($oid as $k=>$v) {
@@ -203,7 +203,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             $this->_origPk = $res? $this->getPrimaryKey() : null;
         }
         if ($this->isPersistent()) {
-            $m = & $this->getMapper();
+            $m = $this->getMapper();
             $m->_forget($this);
         }
         if ($this->tracksChanges()) $this->_memorizeFields();
@@ -236,7 +236,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             $res = true;
             $row = $rows[0];
             if ($this->_db->hasToConvertDatesOnLoad()) {
-                $m = & $this->getMapper();
+                $m = $this->getMapper();
                 $row = $this->_db->convertDates($row, $m->getDateFormats()); 
             }
             foreach ($this->listOwnProperties() as $propName) {
@@ -252,7 +252,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     function _legacyStore($updateNulls) {
         $k = $this->_pk;
-        $mapper = & $this->getMapper();
+        $mapper = $this->getMapper();
         //if ($this->_isReference && !$this->isPersistent()) $this->_loadReference();
         
         $kv = array();
@@ -307,7 +307,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function forget() {
-        $m = & $this->getMapper();
+        $m = $this->getMapper();
         $m->_foreget($this);
     }
     
@@ -386,7 +386,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         }
         if (!$res) {
             if (!$mapperClass) trigger_error (__FILE__."::".__FUNCTION__." - mapperClass not specified", E_USER_ERROR);
-            $res = & Ac_Model_Mapper::getMapper($mapperClass);
+            $res = Ac_Model_Mapper::getMapper($mapperClass);
         }
         return $res;
     }
@@ -496,7 +496,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     function reset() {
         $vars = get_class_vars(get_class($this));
         foreach ($this->listOwnProperties() as $propName) if (isset($vars[$propName])) $this->$propName = $vars[$propName];
-        $m = & $this->getMapper();
+        $m = $this->getMapper();
         $this->setDefaultFields();
         $m->_memorize($this);
         $this->_origPk = null;
@@ -731,7 +731,7 @@ class Ac_Model_Object extends Ac_Model_Data {
      * @see Ac_Model_Mapper::checkRecordUniqueness
      */    
     function checkDatabasePresence($dontReturnOwnKey = false, $checkNewRecords = false) {
-       $mapper = & $this->getMapper();
+       $mapper = $this->getMapper();
        return $mapper->checkRecordPresence($this, $dontReturnOwnKey, array(), array(), $checkNewRecords); 
     }
     
@@ -759,7 +759,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         $where = array();
         foreach ($iData as $idx => $f) $where = array_merge($where, $f);
         if (count($where)) {
-            $m = & $this->getMapper();
+            $m = $this->getMapper();
             $s = $this->_db->getSqlDb();
             $r = $m->loadRecordsByCriteria($c = $s->valueCriterion($where));
             if (count($r) == 1) {
@@ -767,7 +767,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                 $rec = $r[0];
                 
                 if ($this->_db->hasToConvertDatesOnLoad()) {
-                    $m = & $this->getMapper();
+                    $m = $this->getMapper();
                     $rec = $this->_db->convertDates($rec, $m->getDateFormats()); 
                 }
                 
@@ -801,7 +801,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function _getCompleteUniqueIndices() {
-        $m = & $this->getMapper();
+        $m = $this->getMapper();
         $res = array();
         foreach ($m->listUniqueIndices() as $idx) {
             $d = array();
@@ -837,7 +837,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             if (is_array($recordOrRecords)) $r = $recordOrRecords;
                 else $r = array(& $recordOrRecords);
             foreach (array_keys($r) as $k) {
-                $rec = & $r[$k];
+                $rec = $r[$k];
                 if ((!$rec->isPersistent() || $rec->getChanges())) {
                     if (!$rec->store()) {
                         $this->_errors[$errorKey][$k] = $rec->getErrors();
@@ -859,7 +859,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             if (is_array($recordOrRecords)) $r = $recordOrRecords;
                 else $r = array(& $recordOrRecords);
             foreach (array_keys($r) as $k) {
-                $rec = & $r[$k];
+                $rec = $r[$k];
                 foreach ($fieldLinks as $sf => $df) $rec->$df = $this->$sf;
                 if ($rec->getChanges() && !$rec->_isDeleted) {
                     if (!$rec->store()) {
@@ -880,7 +880,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                 else $r = array(& $recordOrRecords);
                 
             foreach (array_keys($r) as $k) {
-                $rec = & $r[$k];
+                $rec = $r[$k];
                 if ((!$rec->isPersistent() || $rec->getChanges())) {
                     if (!$rec->store()) {
                         $this->_errors[$errorKey][$k] = $rec->getErrors();
@@ -939,8 +939,8 @@ class Ac_Model_Object extends Ac_Model_Data {
      * @return Ac_Model_Object
      */
     function & copy($asReference = null, $withPk = false) {
-        $m = & $this->getMapper();
-        $copy = & $m->factory();
+        $m = $this->getMapper();
+        $copy = $m->factory();
         $flds = array_diff($this->_listOwnPublicVars(), $this->doListNonCopiedFields());
         if (!$asReference && !$withPk) $flds = array_diff($flds, $m->listPkFields());
         if ($withPk) $flds = array_merge($flds, $m->listPkFields());
@@ -1026,8 +1026,8 @@ class Ac_Model_Object extends Ac_Model_Data {
         $c1 = get_class($this);
         $c2 = get_class($otherObject);
         
-        $a1 = & $this->getAssoc($assocName);
-        $a2 = & $otherObject->getAssoc($assocName);
+        $a1 = $this->getAssoc($assocName);
+        $a2 = $otherObject->getAssoc($assocName);
         
         //var_dump($a1, $a2);
         
@@ -1102,7 +1102,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             if (is_object($this->$k) && Ac_Util::sameObject($this->$k, $otherObject)) {
                 $this->$k = null;
             } elseif (is_array($this->$k)) {
-                $tmp = & $this->$k;
+                $tmp = $this->$k;
                 foreach (array_keys($tmp) as $kk) {
                     if (is_object($tmp[$kk]) && Ac_Util::sameObject($tmp[$kk], $otherObject)) {
                         unset($tmp[$kk]);
@@ -1115,14 +1115,14 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     function cleanupMembers() {
         $vars = get_class_vars(get_class($this));
-        $m = & $this->getMapper();
+        $m = $this->getMapper();
         $m->_forget($this);
         foreach (get_class_vars(get_class($this)) as $k => $v) if (isset($this->$k)) {
             if (is_array($this->$k)) {
-                $tmp = & $this->$k;
+                $tmp = $this->$k;
                 foreach (array_keys($tmp) as $kk) {
                     if (is_a($tmp[$kk], 'Ac_Model_Object')) {
-                        $o = & $tmp[$kk];
+                        $o = $tmp[$kk];
                         $o->cleanupReferences($this);
                         unset($o);
                         unset($tmp[$kk]);
@@ -1131,11 +1131,11 @@ class Ac_Model_Object extends Ac_Model_Data {
                 unset($tmp);
             }
             if (is_a($this->$k, 'Ac_Model_Object')) {
-                $o = & $this->$k;
+                $o = $this->$k;
                 $o->cleanupReferences($this);
                 unset($o);
             }
-            if (is_object($this->$k)) $this->$k = & $vars[$k];      
+            if (is_object($this->$k)) $this->$k = $vars[$k];      
         }
     }
     

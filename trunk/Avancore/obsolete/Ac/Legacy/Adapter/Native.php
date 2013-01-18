@@ -43,7 +43,7 @@ class Ac_Legacy_Adapter_Native extends Ac_Legacy_Adapter {
     }
     
     function getUser() {
-        $res = & $this->_user;
+        $res = $this->_user;
         return $res;
     }
     

@@ -261,7 +261,7 @@ class Ac_Model_DateTime {
     
     function arrayFromString($string, $userMask = false) {
     	if (is_a($string, 'DateTime')) $res = getdate(@$string->format('U')); else {
-	        $parser = & Ac_Model_DateTime::getInstance();
+	        $parser = Ac_Model_DateTime::getInstance();
 	        if (!($res = $parser->match($string))) return false;
 	        $res = $parser->process($res, $userMask);
     	}
@@ -269,7 +269,7 @@ class Ac_Model_DateTime {
     }
     
     function fromString($string, $userMask = false, $useGmt = true, & $wasZeroDate = false) {
-        $parser = & Ac_Model_DateTime::getInstance();
+        $parser = Ac_Model_DateTime::getInstance();
         if (!($res = $parser->match($string))) return false;
         $res = $parser->process($res, $userMask);
         return $parser->tsFromArray($res, true, $useGmt, $wasZeroDate);
@@ -299,7 +299,7 @@ class Ac_Model_DateTime {
     		$srcTs = (int) $src->format('U');
     	} else {
 	        if (!is_int($src)) { 
-	            $dtp = & Ac_Model_DateTime::getInstance();
+	            $dtp = Ac_Model_DateTime::getInstance();
 	            $srcTs = $dtp->fromString($src, false, $useGmt, $wasZeroDate); 
 	        } else $srcTs = $src;
     	}

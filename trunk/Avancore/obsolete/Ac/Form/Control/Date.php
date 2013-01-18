@@ -31,7 +31,7 @@ class Ac_Form_Control_Date extends Ac_Form_Control {
     
     function getCalendarDateFormat() {
         if ($this->calendarDateFormat === false) {
-            if ($prop = & $this->getModelProperty()) {
+            if ($prop = $this->getModelProperty()) {
                 if (isset($prop->calendarDateFormat) && strlen($prop->calendarDateFormat))
                     $res = $prop->calendarDateFormat;
                 elseif (isset($prop->outputDateFormat) && ($prop->outputDateFormat)) $res = $this->convertToCalendarFormat($prop->outputDateFormat);
@@ -45,7 +45,7 @@ class Ac_Form_Control_Date extends Ac_Form_Control {
     
     function getExternalFormat() {
         if ($this->externalFormat === false) {
-            if ($prop = & $this->getModelProperty() && strlen($prop->outputDateFormat)) {
+            if ($prop = $this->getModelProperty() && strlen($prop->outputDateFormat)) {
                 $res = $prop->outputDateFormat;
             } else {
                 $res = $this->defaultExternalFormat;
@@ -56,7 +56,7 @@ class Ac_Form_Control_Date extends Ac_Form_Control {
     
     function getInternalFormat() {
         if ($this->internalFormat === false) {
-            if ($prop = & $this->getModelProperty() && strlen($prop->internalDateFormat)) {
+            if ($prop = $this->getModelProperty() && strlen($prop->internalDateFormat)) {
                 $res = $prop->internalDateFormat;
             } else {
                 $res = $this->defaultInternalFormat;

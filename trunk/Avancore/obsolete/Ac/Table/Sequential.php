@@ -10,10 +10,10 @@ class Ac_Table_Sequential extends Ac_Table {
     var $_eof = false;
     var $_ptr = 0;
 
-    function Ac_Table_Sequential ($columnSettings, & $collection, & $pageNav, $tableAttribs = array(), $recordClass = false) {
+    function Ac_Table_Sequential ($columnSettings, $collection, $pageNav, $tableAttribs = array(), $recordClass = false) {
         $this->_columnSettings = $columnSettings;
-        $this->_collection = & $collection;
-        $this->_pageNav = & $pageNav;
+        $this->_collection = $collection;
+        $this->_pageNav = $pageNav;
         $this->tableAttribs = $tableAttribs;
         $this->recordClass = $recordClass;
         if (!isset($this->tableAttribs['class'])) $this->tableAttribs['class'] = 'adminlist';
@@ -28,7 +28,7 @@ class Ac_Table_Sequential extends Ac_Table {
             echo "<tr>"; 
         
             foreach($this->listColumns() as $colName) {
-                $col = & $this->getColumn($colName);
+                $col = $this->getColumn($colName);
                 if ($headerRowNo < $col->getHeaderRowCount()) 
                     $col->showHeader($headerRowCount, $headerRowNo);
             }
@@ -40,14 +40,14 @@ class Ac_Table_Sequential extends Ac_Table {
         
         $cols = array();
         foreach($this->listColumns() as $colName) {
-            $cols[] = & $this->getColumn($colName);
+            $cols[] = $this->getColumn($colName);
         }
         $nCols = count($cols);
         
-        $coll = & $this->_collection;
+        $coll = $this->_collection;
         $coll->rewind();
         
-        while($record = & $this->_fetchNextRecord()) {
+        while($record = $this->_fetchNextRecord()) {
             $rMod = $row % 2;
             $trAttribs = array('class' => 'row'.$rMod);
             echo "<tr ".Ac_Util::mkAttribs($this->_trAttribs($record, $trAttribs)).">"; 
@@ -69,8 +69,8 @@ class Ac_Table_Sequential extends Ac_Table {
         if ($this->_ptr >= count($this->_records)) {
             $res = false;
             if (!$this->_eof) {
-		        $res = & $this->_collection->getNext();
-		        if ($res) $this->_records[] = & $res;
+		        $res = $this->_collection->getNext();
+		        if ($res) $this->_records[] = $res;
 		            else $this->_eof = true;
             }            
         } else {
@@ -83,8 +83,8 @@ class Ac_Table_Sequential extends Ac_Table {
     
     function _fetchAll() {
         if (!$this->_eof) {
-            while ($rec = & $this->_collection->getNext()) {
-                $this->_records[] = & $rec;
+            while ($rec = $this->_collection->getNext()) {
+                $this->_records[] = $rec;
                 unset($rec);
             }            
             $this->_eof = true;
@@ -102,7 +102,7 @@ class Ac_Table_Sequential extends Ac_Table {
     
     function getRecord($key) {
         if (!$this->_eof) $this->_fetchAll();
-        $res = & parent::getRecord($key);
+        $res = parent::getRecord($key);
         return $res;
     }
     

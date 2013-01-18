@@ -3,7 +3,7 @@
 if (!class_exists('Ac_Util', false)) require_once(dirname(__FILE__).'/../Util.php');
 if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/../Autoparams.php');
 
-class Ac_Application_Adapter extends Ac_Prototyped {
+class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvider {
 
     protected $appClass = false;
     
@@ -23,6 +23,8 @@ class Ac_Application_Adapter extends Ac_Prototyped {
     
     protected $configPath = false;
     
+    protected $services = array();
+    
     function getEnvName() {
         if ($this->envName === false) {
             if (defined('AVANCORE_ENV')) $this->envName = AVANCORE_ENV;
@@ -36,7 +38,7 @@ class Ac_Application_Adapter extends Ac_Prototyped {
         $this->envName = $value;
     }
     
-    protected function setAppClassFile($value) {
+    function setAppClassFile($value) {
         $this->appClassFile = $value;
     }
     
@@ -73,6 +75,7 @@ class Ac_Application_Adapter extends Ac_Prototyped {
     }
     
     function __construct(array $options = array()) {
+        if ($s = $this->doGetDefaultServices()) $this->setServices($s);
         foreach ($gotKeys = $this->initFromPrototype($options, false) as $key) {
             unset($options[$key]);
         }
@@ -125,8 +128,15 @@ class Ac_Application_Adapter extends Ac_Prototyped {
         if (!isset($this->config[$configKey])) {
             if (!$this->config['checkDirs'] || is_dir($autoValue)) $this->config[$configKey] = $autoValue;
         } else {
-            if ($this->config['checkDirs'] && !is_dir($this->config[$configKey])) {
-                throw new Exception("Directory not found: '{$this->config[$configKey]}' (specified in the configuration key '{$configKey}')");
+            if ($this->config['checkDirs']) {
+                if (is_array($this->config[$configKey])) {
+                    foreach ($this->config[$configKey] as $i => $dir) {
+                        if (!is_dir($dir))
+                            throw new Exception("Directory not found: '{$this->config[$configKey]}' (specified in the configuration key '{$configKey}.{$i}')");
+                    }
+                } else {
+                    if (!is_dir($this->config[$configKey])) throw new Exception("Directory not found: '{$this->config[$configKey]}' (specified in the configuration key '{$configKey}')");
+                }
             }
         }
         return isset($this->config[$configKey]);
@@ -358,6 +368,45 @@ class Ac_Application_Adapter extends Ac_Prototyped {
     
     function getLogEnabled() {
         return (bool) $this->intGetConfigValue(substr(__FUNCTION__, 3));
+    }
+    
+    protected function doGetDefaultServices() {
+        return array(
+            'managerConfigService' => 'Ac_Admin_ManagerConfigService',
+        );
+    }
+    
+    function listServices() {
+        return array_keys($this->services);
+    }
+    
+    function setServices(array $services, $removeExisting = false) {
+        if ($removeExisting) $this->services = $services;
+        else Ac_Util::ms($this->services, $services);
+    }
+    
+    function getServices() {
+        return $this->services;
+    }
+    
+    function setService($id, $prorotypeOrInstance, $overwrite = false) {
+        if (isset($this->services[$id]) && !$overwrite) throw new Exception("Service '\$id' is already registered");
+        $this->services[$id] = $prorotypeOrInstance;
+    }
+    
+    function deleteService($id, $dontThrow = false) {
+        if (isset($this->services[$id])) unset($this->services[$id]); 
+            elseif (!$dontThrow) throw new Exception("No such service: '\$id'");
+    }
+    
+    function getService($id, $dontThrow = false) {
+        $res = false;
+        if (isset($this->services[$id])) {
+            if (!is_object($this->services[$id])) $this->services[$id] = Ac_Prototyped::factory($this->services[$id]);
+            $res = $this->services[$id];
+        }
+        elseif (!$dontThrow) throw new Exception("No such service: '\$id'");
+        return $res;
     }
     
 }

@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Joomla_Adapter extends Ac_Legacy_Adapter {
+class Ac_Legacy_Adapter_Joomla extends Ac_Legacy_Adapter {
 
     var $_user = false;
     
@@ -25,7 +25,7 @@ class Ac_Joomla_Adapter extends Ac_Legacy_Adapter {
                 'password' => $GLOBALS['mosConfig_password'],
                 'prefix' => $GLOBALS['mosConfig_dbprefix'],
         ) : $this->dbSettings;
-        $dbSettings['config'] = & $this->config;
+        $dbSettings['config'] = $this->config;
             
         if ($this->useNativeDatabase) {
             $this->database = new Ac_Legacy_Database_Native(
@@ -41,7 +41,7 @@ class Ac_Joomla_Adapter extends Ac_Legacy_Adapter {
         }
         
         $josUser = null;
-        if (isset($GLOBALS['my']) && is_object($GLOBALS['my'])) $josUser = & $GLOBALS['my'];
+        if (isset($GLOBALS['my']) && is_object($GLOBALS['my'])) $josUser = $GLOBALS['my'];
         $this->_user = new Ac_Legacy_User_Joomla($josUser);
         
     }
@@ -51,7 +51,7 @@ class Ac_Joomla_Adapter extends Ac_Legacy_Adapter {
     }
     
     function getUser() {
-        $res = & $this->_user;
+        $res = $this->_user;
         return $res;
     }
     
@@ -62,7 +62,7 @@ class Ac_Joomla_Adapter extends Ac_Legacy_Adapter {
             if ($this->config->jsDir !== false) {
                 $prefix = $this->config->jsDir;
             } else {
-                $disp = & Ac_Dispatcher::getInstance();
+                $disp = Ac_Dispatcher::getInstance();
                 $prefix = $disp->isBackend()? '/administrator/components/'.$disp->getAppName() : '/components/'.$disp->getAppName();
                 $prefix .= '/js/';
                 $prefix = $this->config->liveSite.$prefix;
@@ -74,7 +74,7 @@ class Ac_Joomla_Adapter extends Ac_Legacy_Adapter {
     function getCssUrlStr ($cssLib, $isLocal) {
         $cssLib = $this->unfoldAssetString($cssLib);
         if (strncasecmp('http://', $cssLib, 7) && strncasecmp('https://', $cssLib, 8)) {
-            $disp = & Ac_Dispatcher::getInstance();
+            $disp = Ac_Dispatcher::getInstance();
             $prefix = $disp->isBackend()? '/administrator/components/'.$disp->getAppName() : '/components/'.$disp->getAppName();
             $prefix .= '/';
             $prefix = $this->config->liveSite.$prefix;

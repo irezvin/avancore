@@ -18,7 +18,7 @@ class Ac_Admin_Column_Checked extends Ac_Admin_Column {
      var $_recordKeys = array();
      
      function doShowHeader() {
-         $this->_context = & $this->manager->getContext();
+         $this->_context = $this->manager->getContext();
          ?><input type="checkbox" class='checkbox' id="<?php echo $this->_context->mapIdentifier($this->toggleAllId); ?>" /><?php
      }
      
@@ -30,8 +30,8 @@ class Ac_Admin_Column_Checked extends Ac_Admin_Column {
      }
      
      function showHint() {
-        $tpl = & $this->manager->getTemplate();
-        $jsHelper = & $tpl->getHtmlHelper();
+        $tpl = $this->manager->getTemplate();
+        $jsHelper = $tpl->getHtmlHelper();
      ?>
      
         <script type="text/javascript">

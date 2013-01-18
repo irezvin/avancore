@@ -17,7 +17,7 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
     function __construct (array $prototype = array()) {
         $this->initFromPrototype($prototype);
     }
-
+    
     protected function initFromPrototype(array $prototype = array(), $strictParams = null) {
         
         if (isset($prototype['__initialize']) && is_array($prototype['__initialize'])) {

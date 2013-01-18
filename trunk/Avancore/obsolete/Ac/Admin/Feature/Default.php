@@ -45,8 +45,8 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     function getColumnSettings() {
         if ($this->_columnSettings === false) {
             $this->_preloadRelations = array();
-            $prot = & $this->manager->getRecordPrototype();
-            $map = & $this->manager->getMapper();
+            $prot = $this->manager->getRecordPrototype();
+            $map = $this->manager->getMapper();
             $tf = $map->getTitleFieldName();
             $res = array();
             $res['_recordBinder_'] = array(
@@ -64,12 +64,12 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
                 'cellAttribs' => array ('class' => 'w20 ctr'),
             );
             foreach ($prot->listOwnFields() as $f) {
-                $pi = & $prot->getPropertyInfo($f, true);
+                $pi = $prot->getPropertyInfo($f, true);
                 $s = false;
                 if (isset($pi->objectPropertyName) && strlen($opn = $pi->objectPropertyName)) {
-                    $op = & $prot->getPropertyInfo($opn, true);
+                    $op = $prot->getPropertyInfo($opn, true);
                     if (isset($op->mapperClass) && strlen($mc = $op->mapperClass)) {
-                        $mpr = & Ac_Model_Mapper::getMapper($mc);
+                        $mpr = Ac_Model_Mapper::getMapper($mc);
                         if ($tfn = $mpr->getTitleFieldName()) {
                             $s = array('fieldName' => "{$opn}[{$tfn}]");
                             if (strlen($op->caption)) $s['title'] = $op->caption;
@@ -162,14 +162,14 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     
     
     function applyToFormSettings(& $formSettings) {
-        $rec = & $this->manager->getRecord();
-        $mpr = & $this->manager->getMapper();
+        $rec = $this->manager->getRecord();
+        $mpr = $this->manager->getMapper();
         if ($mpr) $aif = $mpr->getAutoincFieldName();
             else $aif = false;
         $conv = new Ac_Form_Converter();
         $do = $this->displayOrderStart;
         foreach ($rec->listOwnFields() as $p) {
-            $prop = & $rec->getPropertyInfo($p, true);
+            $prop = $rec->getPropertyInfo($p, true);
             if (isset($prop->showInForm) && !$prop->showInForm) continue;
             $conf = Ac_Util::m($this->formFieldDefaults, $conv->getControlSettings($prop));
             if ($do !== false) {
@@ -205,19 +205,19 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     
     function getSubManagersConfig() {
         $res = array();
-        $rec = & $this->manager->getRecord();
-        $mpr = & $this->manager->getMapper();
+        $rec = $this->manager->getRecord();
+        $mpr = $this->manager->getMapper();
         if ($mpr) {
             $listProps = array_keys($rec->listOwnLists());
             $assocProps = array_keys($rec->listOwnAssociations());
             $aLists = array_intersect($listProps, $assocProps);
             foreach ($aLists as $propName) {
-                $p = & $rec->getPropertyInfo($propName, true);
+                $p = $rec->getPropertyInfo($propName, true);
                 if (isset($p->mapperClass) && strlen($mc = $p->mapperClass) && isset($p->relationId) && strlen($rid = $p->relationId)) {
-                    $rel = & $mpr->getRelation($rid);
+                    $rel = $mpr->getRelation($rid);
                     if (!$rel->midTableName) {
-                        $subMapper = & Ac_Model_Mapper::getMapper($mc);
-                        $i = & $subMapper->getInfo();
+                        $subMapper = Ac_Model_Mapper::getMapper($mc);
+                        $i = $subMapper->getInfo();
                         $asm = $i->allowSubManagers;
                         $res[$propName] = array('mapperClass' => $mc, 'allowSubManagers' => $asm, '_relId' => $p->relationId);
                     }      
@@ -238,7 +238,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
             $dl = new Ac_Admin_Datalink_Subrecord();
             $subManager->setDatalink($dl);
             $dl->setRelationId($this->manager->mapperClass, $smConfig['_relId']);
-            $rec = & $this->manager->getRecord();
+            $rec = $this->manager->getRecord();
             $dl->setParentRecord($rec);
         }
     }

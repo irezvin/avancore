@@ -369,9 +369,9 @@ class Ac_Legacy_Controller {
                         else $v = 'content';
                     $this->_response->$v = ob_get_clean().$this->_response->content;
                 }
-                $res = & $this->_response;
+                $res = $this->_response;
             } else {
-                $res = & $this->_response;
+                $res = $this->_response;
             }
         } else {
             $res = false;
@@ -392,7 +392,7 @@ class Ac_Legacy_Controller {
                         $this->_response = new $rc;
                     }
                 }
-                $this->_template->htmlResponse = & $this->_response;
+                $this->_template->htmlResponse = $this->_response;
                 $this->_template->setVars($this->_getTplData());
                 $this->doPopulateTemplate();
             }
@@ -410,8 +410,8 @@ class Ac_Legacy_Controller {
     
     function _getTplData() {
         $res = Ac_Util::m($this->templateExtraVars, $this->_tplData);
-        $res['controller'] = & $this;
-        $res['context'] = & $this->getContext();
+        $res['controller'] = $this;
+        $res['context'] = $this->getContext();
         $res['newUi'] = true;
         $myVars = array_keys(get_object_vars($this));
         foreach ($this->_listAutoTplVars() as $myVar => $tplVar) {

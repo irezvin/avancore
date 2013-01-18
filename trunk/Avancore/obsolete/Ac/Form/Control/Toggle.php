@@ -31,7 +31,7 @@ class Ac_Form_Control_Toggle extends Ac_Form_Control {
     function getTrueLabel() {
         $res = $this->trueLabel;
         if ($res === false) {
-            if ($p = & $this->getModelProperty() && isset($p->valueList) && is_array($v = & $p->valueList)) {
+            if ($p = $this->getModelProperty() && isset($p->valueList) && is_array($v = $p->valueList)) {
                 if (isset($v[1])) $res = $v[1];
             }
             if ($res === false) {
@@ -44,7 +44,7 @@ class Ac_Form_Control_Toggle extends Ac_Form_Control {
     function getFalseLabel() {
         $res = $this->falseLabel;
         if ($res === false) {
-            if ($p = & $this->getModelProperty() && isset($p->valueList) && is_array($v = & $p->valueList)) {
+            if ($p = $this->getModelProperty() && isset($p->valueList) && is_array($v = $p->valueList)) {
                 if (isset($v[0])) $res = $v[0];
             }
             if ($res === false) {

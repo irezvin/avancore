@@ -28,7 +28,7 @@ class Ac_Legacy_Output_Native extends Ac_Legacy_Output {
         
         $t = $this->templateClass;
         $tpl = new $t($this->htmlTemplateSettings);
-        $tpl->htmlResponse = & $r;
+        $tpl->htmlResponse = $r;
         if (!$r->contentType) $r->contentType = $this->defaultContentType;
         $redir = false;
         if ($r->redirectUrl) {

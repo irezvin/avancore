@@ -25,7 +25,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     
     protected $modelUpdated = false;
     
-    function doInitProperties($options) {
+    function doInitProperties($options = array()) {
         $this->_iid = round(rand()*100);
         parent::doInitProperties($options);
         if (!isset($options['controls'])) $options['controls'] = array();
@@ -92,9 +92,9 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
         if (!in_array($name, $this->listControls())) trigger_error ("No such control: '{$name}'", E_USER_ERROR);
         if (is_array($this->_controls[$name])) {
             $controlSettings = $this->_controls[$name];
-            $this->_controls[$name] = & $this->_createControl($name, $controlSettings);
+            $this->_controls[$name] = $this->_createControl($name, $controlSettings);
         }
-        $res = & $this->_controls[$name];
+        $res = $this->_controls[$name];
         return $res;
     }
     
@@ -106,7 +106,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     function getControlsValues() {
         $res = array();
         foreach ($this->listControls() as $k) {
-            $control = & $this->getControl($k);
+            $control = $this->getControl($k);
             if ($control->hasValue && $control->isEnabled()) {
                 $resultPath = $control->getResultPath();
                 Ac_Util::setArrayByPath($res, Ac_Util::pathToArray($resultPath), $control->getValue(), true);
@@ -177,7 +177,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
      * @return Ac_Model_Data
      */
     function getModelForTheChild(& $child) {
-        $res = & $this->getModel();
+        $res = $this->getModel();
         return $res;
     }
     
@@ -188,7 +188,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     function _doGetValue() {
         if ($this->getDefaultFromModel) {
             if (!($this->readOnly === true) && isset($this->_rqData) && $this->_rqData) {
-                $res = & $this->getControlsValues();
+                $res = $this->getControlsValues();
             } else {
                 $res = $this->getDefault();
             }
@@ -202,7 +202,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
      * @return Ac_Legacy_Controller_Context_Http
      */
     function & _createSubContext($name) {
-        $res = & Ac_Form_Context::spawnFrom($this->_context, $name);
+        $res = Ac_Form_Context::spawnFrom($this->_context, $name);
         return $res;
     }
     
@@ -219,8 +219,8 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
         } else {
             $class = 'Ac_Form_Control'; 
         }
-        $context = & $this->_createSubContext($name);
-        $settings['parent'] = & $this;
+        $context = $this->_createSubContext($name);
+        $settings['parent'] = $this;
         if (isset($settings['name']) && ($settings['name'] !== $name)) 
             trigger_error ("Name in the settings of the sub control ('{$settings['name']}') does not match key in the array ('{$name}')", E_USER_WARNING);
         $settings['name'] = $name;
@@ -235,12 +235,12 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     
     function _doInitDisplayChildren() {
         foreach ($this->listControls() as $c) {
-            $con = & $this->getControl($c);
+            $con = $this->getControl($c);
         }
     }
     
     function _doGetDefault() {
-        if (($m = & $this->getModel()) && !$this->dontGetDefaultFromModel) {
+        if (($m = $this->getModel()) && !$this->dontGetDefaultFromModel) {
             if (strlen($p = $this->getPropertyName())) $res = $m->getField($p);
             elseif ($this->useGetterIfPossible && $g = $this->getGetterName()) $res = $m->$g();
             else $res = null;

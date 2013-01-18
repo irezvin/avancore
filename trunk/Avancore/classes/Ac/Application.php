@@ -3,7 +3,7 @@
 if (!class_exists('Ac_Util', false)) require_once(dirname(__FILE__).'/Util.php');
 if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/Prototyped.php');
 
-abstract class Ac_Application extends Ac_Prototyped {
+abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvider {
     
     private static $instances = array();
     
@@ -37,7 +37,9 @@ abstract class Ac_Application extends Ac_Prototyped {
     
     protected $defaultControllerId = false;
     
-    protected $mappers = array();
+    protected $mappers = false;
+    
+    protected $services = array();
     
     /**
      * To be redefined in concrete subclasses.
@@ -92,7 +94,7 @@ abstract class Ac_Application extends Ac_Prototyped {
         return self::$defaultInstance;
     }
     
-    static function getInstance($className, $id = null) {
+    static function getApplicationInstance($className, $id = null) {
         if (!isset($className)) throw new Exception("\$className not provided");
         $res = self::findInstance($className, $id);
         if (!$res) $res = new $className(array('id' => is_null($id)? false : $id/*, 'autoRegister' => true*/));
@@ -113,6 +115,7 @@ abstract class Ac_Application extends Ac_Prototyped {
     function setAdapter(Ac_Application_Adapter $adapter) {
         if ($this->adapter) throw new Exception("Can setAdapter() only once");
         $this->adapter = $adapter;
+        $this->adapter->setAppClassFile($this->getAppClassFile());
         if (is_array($io = $this->adapter->getAppInitOptions())) $this->initFromPrototype($io);
         if ($this->autoInitialize && $this->stage == self::stInitializing) $this->initialize();
     }
@@ -339,5 +342,41 @@ abstract class Ac_Application extends Ac_Prototyped {
     function createDefaultContext(Ac_Cr_Controller $forController) {
         return new Ac_Cr_Context();
     }
+    
+    
+    function listServices() {
+        return array_keys($this->services);
+    }
+    
+    function setServices(array $services, $removeExisting = false) {
+        if ($removeExisting) $this->services = $services;
+        else Ac_Util::ms($this->services, $services);
+    }
+    
+    function getServices() {
+        return $this->services;
+    }
+    
+    function setService($id, $prorotypeOrInstance, $overwrite = false) {
+        if (isset($this->services[$id]) && !$overwrite) throw new Exception("Service '\$id' is already registered");
+        $this->services[$id] = $prorotypeOrInstance;
+    }
+    
+    function deleteService($id, $dontThrow = false) {
+        if (isset($this->services[$id])) unset($this->services[$id]); 
+            elseif (!$dontThrow) throw new Exception("No such service: '\$id'");
+    }
+    
+    function getService($id, $dontThrow = false) {
+        $res = false;
+        if (isset($this->services[$id])) {
+            if (!is_object($this->services[$id])) $this->services[$id] = Ac_Prototyped::factory($this->services[$id]);
+            $res = $this->services[$id];
+        } elseif ($this->adapter && $s = $this->adapter->getService($id, true)) {
+            $res = $s;
+        } elseif (!$dontThrow) throw new Exception("No such service: '\$id'");
+        return $res;
+    }
+    
     
 }

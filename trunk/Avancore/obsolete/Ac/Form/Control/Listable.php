@@ -36,7 +36,7 @@ class Ac_Form_Control_Listable extends Ac_Form_Control {
     
     function isHtmlAllowed() {
         if ($this->allowHtml === '?') {
-            $p = & $this->getModelProperty();
+            $p = $this->getModelProperty();
             if ($p && isset($p->allowHtml)) $res = $p->allowHtml;
                 else $res = false;
         } else {
@@ -47,7 +47,7 @@ class Ac_Form_Control_Listable extends Ac_Form_Control {
     
     function isList() {
         if ($this->isList === '?') {
-            if (($p = & $this->getModelProperty()) && ($p->plural || $p->arrayValue)) $res = true;
+            if (($p = $this->getModelProperty()) && ($p->plural || $p->arrayValue)) $res = true;
             elseif (is_array($this->getDefault())) $res = true;
             else $res = false;             
         } else $res = $this->isList;
@@ -57,7 +57,7 @@ class Ac_Form_Control_Listable extends Ac_Form_Control {
     function getListSeparator() {
         $res = '';
         if ($this->listSeparator === false) {
-            if ($p = & $this->getModelProperty()) {
+            if ($p = $this->getModelProperty()) {
                 if (isset($p->listSeparator) && strlen($p->listSeparator)) $res = $p->listSeparator;
                 elseif($p->arrayValue && in_array($p->controlType, $this->_getControlTypesForList())) $res = "\n";
             }

@@ -156,7 +156,7 @@ class Ac_Model_Collection {
         $this->_mapperClass = $mapperClass;
         $this->_mapper = false;
         if (!$pkName) {
-            $mapper = & Ac_Model_Mapper::getMapper($mapperClass);
+            $mapper = Ac_Model_Mapper::getMapper($mapperClass);
             $pkName = $mapper->listPkFields();
             if (is_array($pkName) && count($pkName) == 1) $pkName = $pkName[0];
         }
@@ -209,13 +209,13 @@ class Ac_Model_Collection {
             $this->_mapperClass = $mapperClass->getId();
         } else {
             $this->_mapperClass = $mapperClass;
-            $this->_mapper = & Ac_Model_Mapper::getMapper($mapperClass);
+            $this->_mapper = Ac_Model_Mapper::getMapper($mapperClass);
         }
         $this->_tableName = $this->_mapper->tableName;
         $this->_recordClass = false;
         $this->_rcFun = false;
         $this->_pkName = $this->_mapper->listPkFields();
-        $this->_db = & $this->_mapper->database;
+        $this->_db = $this->_mapper->getDatabase();
     }
     
     function areMatchingKeys() {
@@ -572,7 +572,7 @@ class Ac_Model_Collection {
                 $cp = $this->_currPos;
                 $ck = $this->_currKey = $this->_keys[$cp];
                 if (!is_object($this->_records[$this->_currKey])) $res = $this->getRecord($this->_currKey);
-                    else $res = & $this->_records[$this->_currKey];
+                    else $res = $this->_records[$this->_currKey];
                 $this->_currPos = $cp;
                 $this->_currPos++;
                 $this->_currKey = $ck;
@@ -586,7 +586,7 @@ class Ac_Model_Collection {
      */
     function setDatabase(& $database) {
         if (!$this->_canSetLimits) trigger_error ("Can't change params of collection that is already open", E_USER_ERROR);
-        $this->_db = & $database;
+        $this->_db = $database;
     }
 
     function getRecords() {

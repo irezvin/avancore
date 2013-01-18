@@ -90,7 +90,7 @@ class Ac_Template_Html extends Ac_Template {
      * Shows site URL
      */
     function site($noEscape = false) {
-        $disp = & Ac_Dispatcher::getInstance();
+        $disp = Ac_Dispatcher::getInstance();
         $this->d($disp->config->liveSite, $noEscape);
     }
     
@@ -148,7 +148,7 @@ class Ac_Template_Html extends Ac_Template {
      * @return Ac_Template_Helper_Html
      */
     function getHtmlHelper () {
-        $res = & $this->getHelper ('Ac_Template_Helper_Html');
+        $res = $this->getHelper ('Ac_Template_Helper_Html');
         return $res; 
     }
     
@@ -171,10 +171,10 @@ class Ac_Template_Html extends Ac_Template {
      * @return Ac_Url
      */
     function & url($extraParams = array(), $noEscape = false, $return = false, $asString = false) {
-        if (is_a($extraParams, 'Ac_Url')) $u = & $extraParams;
+        if (is_a($extraParams, 'Ac_Url')) $u = $extraParams;
         else { 
             $u = false;
-            if ($this->controller) $u = & $this->controller->getUrl($extraParams);
+            if ($this->controller) $u = $this->controller->getUrl($extraParams);
         }
         
         if ($u) {
@@ -183,7 +183,7 @@ class Ac_Template_Html extends Ac_Template {
                     $res = $u->toString();
                     if (!$noEscape) $res = Ac_Util::htmlspecialchars($res, $this->quoteStyle, $this->charset);
                 } else {
-                    $res = & $u;
+                    $res = $u;
                 }
                 return $res;
             } else {
@@ -195,7 +195,7 @@ class Ac_Template_Html extends Ac_Template {
     
     function openFormElement($extraParams = array(), $formAttribs = array(), $urlsParamsToHiddenFields = true, $return = false) {
         if ($return) ob_start();
-        $u = & $this->url($extraParams, false, true);
+        $u = $this->url($extraParams, false, true);
         if (!isset($formAttribs['action'])) $formAttribs['action'] = $u->toString(!$urlsParamsToHiddenFields);
         echo '<form '.Ac_Util::mkAttribs($formAttribs).'>'; 
         if ($urlsParamsToHiddenFields) echo "\n".$u->getHidden()."\n";
@@ -206,7 +206,7 @@ class Ac_Template_Html extends Ac_Template {
     }
     
     function echoJson($value, $indent = 0, $indentStep = 4, $newLines = true, $withNumericKeys = true) {
-        $h = & $this->getHtmlHelper();
+        $h = $this->getHtmlHelper();
         echo $h->toJson($value, $indent, $indentStep, $newLines, $withNumericKeys);
     }
 

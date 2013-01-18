@@ -15,6 +15,9 @@ class JButtonAnyHtml extends JButton {
 
 }            
 
+class JToolbarButtonAnyHtml extends JButtonAnyHtml {
+}            
+
 
 class Ac_Joomla_15_AnyHtmlButton extends JButtonAnyHtml {
 }
