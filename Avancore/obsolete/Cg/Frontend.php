@@ -219,12 +219,14 @@ class Cg_Frontend {
     }
 
     function getGenDeployPath() {
+        $ds = DIRECTORY_SEPARATOR;
         if ($this->genDeployPath !== false) {
             $res = $this->genDeployPath;
         } else {
             if (defined('_DEPLOY_GEN_PATH')) $res = dirname(_DEPLOY_GEN_PATH);
-            else {
-                $ds = DIRECTORY_SEPARATOR;
+            if (is_dir($d = "..{$ds}gen")) {
+                $res = $d;
+            } else {
                 $res = "..{$ds}..{$ds}gen";
             }
         }

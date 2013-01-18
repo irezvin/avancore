@@ -20,8 +20,11 @@ class Ac_Avancore extends Ac_Application {
         return self::$version;
     }
     
+    /**
+     * @return Ac_Avancore
+     */
     static function getInstance($id = null) {
-        return Ac_Application::getInstance('Ac_Avancore', $id);
+        return Ac_Application::getApplicationInstance('Ac_Avancore', $id);
     }
     
     protected function doOnInitialize() {

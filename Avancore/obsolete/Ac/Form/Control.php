@@ -265,7 +265,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     function doInitProperties($options = array()) {
         if (isset($options['default'])) $this->setDefault($options['default']);
-        if (isset($options['parent']) && is_a($options['parent'], 'Ac_Form_Control')) $this->_parent = & $options['parent'];
+        if (isset($options['parent']) && is_a($options['parent'], 'Ac_Form_Control')) $this->_parent = $options['parent'];
         //if (isset($options['displayParent'])) $this->setDisplayParent($options['displayParent']);
         //    elseif ($this->_parent) $this->setDisplayParent($this->_parent);
         if (isset($options['model'])) {
@@ -350,7 +350,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      */
     function isReadOnly() {
         if ($this->readOnly === '?') {
-            $p = & $this->getModelProperty();
+            $p = $this->getModelProperty();
             if ($p) $res = $p->readOnly;
                 else $res = false;
         } else {
@@ -374,7 +374,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      */
     function setDisplayParent($parent) {
         if ($parent !== false) {
-            $p = & $this->searchControlByPathRef($parent);
+            $p = $this->searchControlByPathRef($parent);
             if (!$p) {
                 trigger_error ("Control '".($this->_getPath())."{$this->id}': display parent's path '{$parent}' points to non-existent control", E_USER_ERROR);
             }
@@ -392,8 +392,8 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         if (($index = $this->searchDisplayChild($control)) === false) {
             $this->_orderedDisplayChildren = false;
             $index = count($this->_displayChildren);
-            $this->_displayChildren[$index] = & $control;
-            $control->_displayParent = & $this;
+            $this->_displayChildren[$index] = $control;
+            $control->_displayParent = $this;
         }
         return $index;
     }
@@ -437,8 +437,8 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
             $this->_doInitDisplayChildren();
             $this->_orderedDisplayChildren = array();
             foreach (array_keys($this->_displayChildren) as $i) {
-                $child = & $this->_displayChildren[$i];
-                if ($child->isVisible()) $this->_orderedDisplayChildren[$i] = & $child;
+                $child = $this->_displayChildren[$i];
+                if ($child->isVisible()) $this->_orderedDisplayChildren[$i] = $child;
             }
             uasort($this->_orderedDisplayChildren, array(& $this, '_displayOrderCallback'));
         }
@@ -469,9 +469,9 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * @return Ac_Form_Control 
      */
     function getDisplayChildByPath($path, $dontTriggerError = false) {
-        $control = & $this->searchControlByPath($path);
+        $control = $this->searchControlByPath($path);
         $res = false;
-        if ($control && $this->isDisplayChild($control)) $res = & $control;
+        if ($control && $this->isDisplayChild($control)) $res = $control;
         if (!$res && !$dontTriggerError) trigger_error ("No such display child: '{$path}'", E_USER_ERROR);
         return $res;
     }
@@ -540,7 +540,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
             } else {
                 if ($this->_presentation === false || $refresh) {
                     if (!strlen($this->templatePart)) trigger_error ("Cannot retrieve template to render the control '".$this->_getPath()."' - templatePart property is not set", E_USER_ERROR);
-                    $template = & $this->getTemplate();
+                    $template = $this->getTemplate();
                     $template->setVars($this->tplExtras);
                     $this->_presentation = $template->fetch($this->templatePart, $this->_doGetTemplatePartParams());
                     $this->postProcessPresentation($this->_presentation);
@@ -581,13 +581,13 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         if (!strlen($this->wrapperTemplateClass) || !strlen($this->wrapperTemplatePart)) {
             if (is_a($this->_displayParent, 'Ac_Form_Control') && $this->getWrapperFromDisplayParent) {
                 $wp = $this->_displayParent->getWrapperForTheChild($this);
-                if (!strlen($wcp[0])) $wcp[0] = & $wp[0];
+                if (!strlen($wcp[0])) $wcp[0] = $wp[0];
                 if (!strlen($wcp[1])) $wcp[1] = $wp[1]; 
             }
         }
         if ((is_object($wcp[0]) || strlen($wcp[0])) && strlen($wcp[1])) {
-            if (is_a($wcp[0], 'Ac_Template')) $tpl = & $wcp[0];
-                else $tpl = & $this->getSpecificTemplate($wcp[0]);
+            if (is_a($wcp[0], 'Ac_Template')) $tpl = $wcp[0];
+                else $tpl = $this->getSpecificTemplate($wcp[0]);
             $res = $tpl->fetch($wcp[1], $this->_doGetWrapperTemplatePartParams($wrappedHtml));
         } else {
             $res = $wrappedHtml;
@@ -597,7 +597,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     function getWrapperForTheChild(& $displayChild) {
         if (strlen($this->childWrapperTemplateClass) && $this->provideChildrenWithTemplateInstance) {
-            $tpl = & $this->getSpecificTemplate($this->childWrapperTemplateClass);
+            $tpl = $this->getSpecificTemplate($this->childWrapperTemplateClass);
         } else {
             $tpl = $this->childWrapperTemplateClass;
         }
@@ -610,7 +610,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     function getTemplate($templateClass = false) {
         if ($templateClass === false) $templateClass = $this->templateClass;
         if (!strlen($templateClass)) trigger_error ("Cannot retrieve template to render the control '".$this->_getPath()."' - templateClass property is not set", E_USER_ERROR);
-        $res = & $this->getSpecificTemplate($templateClass);
+        $res = $this->getSpecificTemplate($templateClass);
         return $res;
     }
     
@@ -623,14 +623,14 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     function getSpecificTemplate($templateClass) {
         if (!isset($this->_template[$templateClass])) {
             $res = false;
-            if (!$this->hasOwnTemplates && $this->_displayParent) $res = & $this->_displayParent->getSpecificTemplate($templateClass);
+            if (!$this->hasOwnTemplates && $this->_displayParent) $res = $this->_displayParent->getSpecificTemplate($templateClass);
             if (!is_object($res)) {
                 $this->_templates[$templateClass] = new $templateClass (array('control' => & $this));
                 $this->_doInitializeTemplate($this->_templates[$templateClass]);
-                $res = & $this->_templates[$templateClass];
+                $res = $this->_templates[$templateClass];
             }
         } else {
-            $res = & $this->_template[$templateClass];
+            $res = $this->_template[$templateClass];
         }
         return $res;
     }
@@ -650,7 +650,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     function getCaption() {
         if ($this->caption === false) {
             $res = ucfirst($this->name);
-            if ($p = & $this->getModelProperty()) {
+            if ($p = $this->getModelProperty()) {
                 if (strlen($p->caption)) $res = $p->caption;
             }
         } else {
@@ -663,7 +663,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     function getEmptyCaption() {
         $res = false;
         if ($this->emptyCaption === false) {
-            if ($p = & $this->getModelProperty()) {
+            if ($p = $this->getModelProperty()) {
                 if (isset($p->emptyCaption) && $p->emptyCaption !== false) $res = $p->emptyCaption;
             }
         } else {
@@ -675,7 +675,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     function getDescription() {
         if ($this->description === false) {
             $res = false;
-            if (($p = & $this->getModelProperty()) && isset($p->description) && strlen($p->description)) $res = str_replace("\n", "<br />", htmlspecialchars($p->description));
+            if (($p = $this->getModelProperty()) && isset($p->description) && strlen($p->description)) $res = str_replace("\n", "<br />", htmlspecialchars($p->description));
         } else $res = $this->description;
         return $res;
     }
@@ -687,7 +687,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      */
     function isRequired() {
         if ($this->required === '?') {
-            $p = & $this->getModelProperty();
+            $p = $this->getModelProperty();
             if ($p) $res = $p->required;
                 else $res = false;
         } else {
@@ -698,7 +698,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     function getErrors() {
         if ($this->errors === false) {
-            if (($this->getErrorsFromModel) && ($m = & $this->getModel()) && ($p = $this->getPropertyName())) {
+            if (($this->getErrorsFromModel) && ($m = $this->getModel()) && ($p = $this->getPropertyName())) {
                 if ($m->isChecked() || $this->forceModelCheck) {
                     $this->errors = $m->getErrors($p, false);
                 }
@@ -710,7 +710,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
     
     function getHtmlAttribs() {
-        $p = & $this->getModelProperty();
+        $p = $this->getModelProperty();
         if ($p && isset($p->attribs) && is_array($p->attribs)) $res = $p->attribs;
             else $res = array();
         if (!isset($res['id']) && strlen($id = $this->getId())) $res['id'] = $id;
@@ -726,7 +726,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     function getModel() {
         if ($this->_model === false) {
             $this->_model = null;
-            if ($this->getModelFromParent && $this->_parent) $this->_model = & $this->_parent->getModelForTheChild($this);
+            if ($this->getModelFromParent && $this->_parent) $this->_model = $this->_parent->getModelForTheChild($this);
         }
         return $this->_model;
     }
@@ -737,7 +737,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     function setModel($model) {
         if (!is_null($model) && ($model !== false) && !is_a($model, 'Ac_Model_Data')) 
             trigger_error ("\$model should be null, false or the instance of Ac_Model_Data", E_USER_ERROR);
-        $this->_model = & $model;
+        $this->_model = $model;
         if ($this->_model) $this->_hasOwnModel = true;
             else $this->_hasOwnModel = false;
     }
@@ -786,9 +786,9 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     function getModelProperty() {
         if ($this->_property === false) {
             $this->_property = null;
-            if (strlen($p = $this->getPropertyName()) && ($m = & $this->getModel())) {
+            if (strlen($p = $this->getPropertyName()) && ($m = $this->getModel())) {
                 if ($m->hasProperty($p))
-                    $this->_property = & $m->getPropertyInfo($p, !($this->forceDynamicPropInfo || $m->isBound()));
+                    $this->_property = $m->getPropertyInfo($p, !($this->forceDynamicPropInfo || $m->isBound()));
                 else
                     $this->_property = null;
             }
@@ -806,7 +806,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     function setModelProperty(& $property) {
         if (!is_null($property) && ($property !== false) && !is_a($property, 'Ac_Model_Property')) 
             trigger_error ("\$property should be null, false or the instance of Ac_Model_Property", E_USER_ERROR);
-        $this->_property = & $property;
+        $this->_property = $property;
         if (is_a($property, 'Ac_Model_Property') && is_a($property->srcObject, 'Ac_Model_Data')) {
             $this->setModel($property->srcObject);
             $this->modelPropertyName = $property->propName;
@@ -830,7 +830,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * Should return default value
      */
     function _doGetDefault() {
-        if (($m = & $this->getModel()) && !$this->dontGetDefaultFromModel) {
+        if (($m = $this->getModel()) && !$this->dontGetDefaultFromModel) {
             if (strlen($p = $this->getPropertyName())) {
                 $res = $m->getField($p);
             }
@@ -846,7 +846,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      */
     function _doGetValue() {
         if (!($this->readOnly === true) && isset($this->_rqData['value'])) {
-            $res = & $this->_rqData['value'];
+            $res = $this->_rqData['value'];
         } else {
             $res = $this->getDefault();
         }
@@ -889,7 +889,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * @param Ac_Form_Control_Template $template
      */
     function _doInitializeTemplate (& $template) {
-        if ($this->htmlResponse) $template->htmlResponse = & $this->htmlResponse;
+        if ($this->htmlResponse) $template->htmlResponse = $this->htmlResponse;
     }
     
     /**
@@ -933,9 +933,9 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * @param string $class Find parent control of specified class
      */
     function & _getRootControl($class = false) {
-        $curr = & $this;
+        $curr = $this;
         while ($curr->_parent && ($class === false || !($curr instanceof $class)))
-            $curr = & $curr->_parent;
+            $curr = $curr->_parent;
         if ($class !== false && !($curr instanceof $class)) $curr = null;
         return $curr;
     }

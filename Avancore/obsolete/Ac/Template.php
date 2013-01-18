@@ -50,7 +50,7 @@ class Ac_Template {
      */
     function getVars() {
         $res = array();
-        foreach (array_keys($vars = get_object_vars($this)) as $k) if ($k{0} != '_') $res[$k] = & $vars[$k];
+        foreach (array_keys($vars = get_object_vars($this)) as $k) if ($k{0} != '_') $res[$k] = $vars[$k];
         return $res;
     }
     
@@ -62,7 +62,7 @@ class Ac_Template {
     function setVars($vars) {
         $v = array();
         foreach (array_diff(array_keys($vars), $this->_privateVars) as $k) {
-            $v[$k] = & $vars[$k];
+            $v[$k] = $vars[$k];
         }
         Ac_Util::bindAutoparams($this, $vars);
     }
@@ -76,7 +76,7 @@ class Ac_Template {
      * @param array $extraParams Parameters to pass to template function
      */
     function showTemplate($className, $vars = array(), $partName = 'default', $extraParams = array()) {
-        $tpl = & Ac_Template::factory($className, $vars);
+        $tpl = Ac_Template::factory($className, $vars);
         return $tpl->show($partName, $extraParams);
     }
     
@@ -91,7 +91,7 @@ class Ac_Template {
      * @return string rendered template part 
      */
     function fetchTemplate($className, $vars = array(), $partName = 'default', $extraParams = array()) {
-        $tpl = & Ac_Template::factory($className, $vars);
+        $tpl = Ac_Template::factory($className, $vars);
         return $tpl->fetch($partName, $extraParams);
     }
         

@@ -23,7 +23,7 @@ class Ac_Image_Upload extends Ac_Upload_File {
         $this->_error = false;
         parent::_setUserData($data);
         if (!$data['error'] && !$this->_error && $this->_downloadPath) {
-            $p = & $this->getProcessor();
+            $p = $this->getProcessor();
             $p->setFile($this->_downloadPath);
             $this->_error = $p->getError();
             $this->_width = $p->getWidth();
@@ -59,7 +59,7 @@ class Ac_Image_Upload extends Ac_Upload_File {
     function _doOnStore() {
         if ($this->_contentPath && !$this->_thumbPath) {
             $tp = $this->getThumbPath();
-            $p = & $this->getProcessor();
+            $p = $this->getProcessor();
             $p->setFile($this->_contentPath);
 
             // Do not increase images that are smaller than thumbnails

@@ -228,16 +228,19 @@ class Ac_Url {
      * @param string glue string to put between input's
      */    
     function getHidden($query = null, $var_name="", $glue = "\n") {
-        if (is_null($query)) $query = $this->query;
+        return self::queryToHidden($this->query, $var_name, $glue);
+    }
+    
+    static function queryToHidden($query, $var_name = "", $glue = "\n") {
         $ret = "";
         if (is_array($query)) {
             foreach ($query as $key => $value) {
                 if (is_object($value) && is_a($value, 'Ac_Url')) $value = $value->toString();
                 if (is_array($value)) {
                     if ($var_name) {
-                        $ret .= Ac_Url::getHidden($value, "{$var_name}[{$key}]");
+                        $ret .= self::queryToHidden($value, "{$var_name}[{$key}]");
                     } else {
-                        $ret .= Ac_Url::getHidden($value, "{$key}");
+                        $ret .= self::queryToHidden($value, "{$key}");
                     }
                 } else {
                     if ($var_name) 
@@ -252,7 +255,7 @@ class Ac_Url {
             $ret = substr($ret,0,strlen($ret)-strlen($glue));
         }
         return $ret;
-    }   
+    }
     
     function toSingleButtonForm($buttonAttribs = array(), $formAttribs = array()) {
         $buttonAttribs = Ac_Util::m(array('type' => 'submit'), $buttonAttribs);

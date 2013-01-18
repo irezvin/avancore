@@ -293,12 +293,12 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         Ac_Accessor::setObjectProperty($this, $config);
         
         if (($this->srcTableName === false) && strlen($this->srcMapperClass)) {
-            $this->_srcMapper = & Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->application);
+            $this->_srcMapper = Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->application);
             $this->srcTableName = $this->_srcMapper->tableName;
             if ($this->srcOrdering === false) $this->srcOrdering = $this->_srcMapper->getDefaultOrdering();
         }
         if (($this->destTableName === false) && strlen($this->destMapperClass)) {
-            $this->_destMapper = & Ac_Model_Mapper::getMapper($this->destMapperClass, $this->application);
+            $this->_destMapper = Ac_Model_Mapper::getMapper($this->destMapperClass, $this->application);
             $this->destTableName = $this->_destMapper->tableName;
             if ($this->destOrdering === false) $this->destOrdering = $this->_destMapper->getDefaultOrdering();
         }
@@ -331,7 +331,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function getDest (& $srcData, $matchMode = AMR_PLAIN_RESULT, $defaultValue = null) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         $hasDef = func_num_args() >= 3;
-        $res = & $this->_getSrcOrDest ($srcData, $matchMode, $defaultValue, $hasDef, $this->fieldLinks, $this->fieldLinks2, $this->destIsUnique, $this->destTableName, '_destInstance', $this->destOrdering, $this->destExtraJoins, $this->destWhere);
+        $res = $this->_getSrcOrDest ($srcData, $matchMode, $defaultValue, $hasDef, $this->fieldLinks, $this->fieldLinks2, $this->destIsUnique, $this->destTableName, '_destInstance', $this->destOrdering, $this->destExtraJoins, $this->destWhere);
         return $res;
     }
     
@@ -363,7 +363,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function getSrc (& $destData, $matchMode = AMR_PLAIN_RESULT, $defaultValue = null) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         $hasDef = func_num_args() >= 3;
-        $res = & $this->_getSrcOrDest ($destData, $matchMode, $defaultValue, $hasDef, $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcIsUnique, $this->srcTableName, '_srcInstance', $this->srcOrdering, $this->srcExtraJoins, $this->srcWhere);
+        $res = $this->_getSrcOrDest ($destData, $matchMode, $defaultValue, $hasDef, $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcIsUnique, $this->srcTableName, '_srcInstance', $this->srcOrdering, $this->srcExtraJoins, $this->srcWhere);
         return $res;
     }
     
@@ -547,7 +547,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         $map = array();
         $values = array();
         foreach(array_keys($source) as $k) {
-            $srcItem = & $source[$k];
+            $srcItem = $source[$k];
             $vals = $this->_getValues($srcItem, $keys, false, false);
             //if (!$this->_isFull($vals)) continue;
             //foreach ($vals as $v) if ($v === false) continue 2;
@@ -561,7 +561,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         $map = array();
         $values = array();
         foreach(array_keys($source) as $k) {
-            $srcItem = & $source[$k];
+            $srcItem = $source[$k];
             if (is_array($srcItem)) $varFalse = isset($srcItem[$varName]) && ($srcItem[$varName] === false);
                 else $varFalse = isset($srcItem->$varName) && ($srcItem->$varName === false);
             if (!$varFalse) {    
@@ -598,17 +598,17 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 if (count($keys) === 1) {
                     foreach ($map as $m) {
                         if ($matchMode == AMR_ALL_ORIGINAL_KEYS) {
-                            if (isset($rows[$rowKey = $m[0][0]])) $res[$m[1]] = & $rows[$rowKey]; else $res[$m[1]] = $defaultValue; 
+                            if (isset($rows[$rowKey = $m[0][0]])) $res[$m[1]] = $rows[$rowKey]; else $res[$m[1]] = $defaultValue; 
                         } else {
-                            if (isset($rows[$rowKey = $m[0][0]])) $res[$m[1]] = & $rows[$rowKey];
+                            if (isset($rows[$rowKey = $m[0][0]])) $res[$m[1]] = $rows[$rowKey];
                         } 
                     }
                 } else {
                     $rowPath = $m[0];
                     foreach ($map as $m) {
-                        $row = & Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
+                        $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
                         if ($row !== false)
-                            $res[$m[1]] = & $row;
+                            $res[$m[1]] = $row;
                         elseif ($matchMode == AMR_ALL_ORIGINAL_KEYS) 
                             $res[$m[1]] = $row; 
                     }
@@ -651,17 +651,17 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                     if (count($keys) === 1) {
                         foreach ($map as $m) {
                             if ($matchMode == AMR_ALL_ORIGINAL_KEYS) {
-                                if (isset($counts[$countKey = $m[0][0]])) $res[$m[1]] = & $counts[$countKey]; else $res[$m[1]] = 0; 
+                                if (isset($counts[$countKey = $m[0][0]])) $res[$m[1]] = $counts[$countKey]; else $res[$m[1]] = 0; 
                             } else {
-                                if (isset($counts[$countKey = $m[0][0]])) $res[$m[1]] = & $counts[$countKey];
+                                if (isset($counts[$countKey = $m[0][0]])) $res[$m[1]] = $counts[$countKey];
                             } 
                         }
                     } else {
                         $countPath = $m[0];
                         foreach ($map as $m) {
-                            $countValue = & Ac_Util::simpleGetArrayByPath($counts, $countPath, false);
+                            $countValue = Ac_Util::simpleGetArrayByPath($counts, $countPath, false);
                             if ($countValue !== false)
-                                $res[$m[1]] = & $countValue;
+                                $res[$m[1]] = $countValue;
                             elseif ($matchMode == AMR_ALL_ORIGINAL_KEYS) 
                                 $res[$m[1]] = 0; 
                         }
@@ -729,9 +729,9 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 foreach ($map as $m) {
                     $dataKey = $m[1];
                     if (isset($rows[$rowKey = $m[0][0]])) {
-                        $toSet = & $rows[$rowKey];
+                        $toSet = $rows[$rowKey];
                         if ($biDirectional) $this->_linkBack($rows[$rowKey], $data[$dataKey], $otherVarName, !$isUnique, $otherIsUnique); 
-                    } else $toSet = & $defaultValue;
+                    } else $toSet = $defaultValue;
                     $this->_setRef($data[$dataKey], $varName, $toSet);
                 }
             } else {
@@ -739,17 +739,17 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 foreach ($map as $m) {
                     $rowPath = $m[0];
                     $dataKey = $m[1];
-                    $row = & Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
+                    $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
                     if ($row !== false) {
-                       $toSet = & $row;
+                       $toSet = $row;
                        if ($biDirectional) $this->_linkBack($row, $data[$dataKey], $otherVarName, !$isUnique, $otherIsUnique);
                     }
                     else
-                    $toSet = & $defaultValue;
+                    $toSet = $defaultValue;
                     $this->_setRef($data[$dataKey], $varName, $toSet, $add);
                 }
             }
-            $res = & $rows;
+            $res = $rows;
         } elseif (is_a($data, 'Ac_Model_Collection')) {
             trigger_error ('Collection as $srcData/$destData is not implemented yet', E_USER_ERROR);
         } elseif (is_object($data)) {
@@ -757,10 +757,10 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 $values = $this->_getValues($data, $keys, false, false);
                 $rows = $this->_getWithValues($values, $this->midTableName? array($fieldLinks, $fieldLinks2) : Ac_Util::array_values($fieldLinks), false, $isUnique, false, $tableName, $instanceFunc, false, false, $this->midTableName, $ordering, $extraJoins, $extraWhere);
                 if ($rows) {
-                    $toSet = & $rows;
+                    $toSet = $rows;
                     if ($biDirectional) $this->_linkBack($rows, $data, $otherVarName, !$isUnique, $otherIsUnique);
                 } else $toSet = $defaultValue;
-                if (strlen($varName)) $data->$varName = & $toSet;
+                if (strlen($varName)) $data->$varName = $toSet;
                 if ($isUnique) $res = array(& $rows); else $res = $rows;
             }
         } else {
@@ -794,7 +794,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 $countPath = $m[0];
                 $dataKey = $m[1];
                 foreach ($map as $m) {
-                    $count = & Ac_Util::simpleGetArrayByPath($counts, $countPath, 0);
+                    $count = Ac_Util::simpleGetArrayByPath($counts, $countPath, 0);
                     $this->_setLoaded($data[$dataKey], $varName, $count);
                 }
             }
@@ -880,7 +880,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                     $key = $keys[0];
                     if ($unique) {
                         while($row = $this->database->fetchAssocByTables($rr, $fi)) 
-                            $res[$row['_mid_'][$key]] = & $this->$ifun ($row[$tn]);
+                            $res[$row['_mid_'][$key]] = $this->$ifun ($row[$tn]);
                     } else {
                         //$res = array();
                         //return $res;
@@ -889,33 +889,33 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                             $kf = $rightKeyFields[0];
                             while($row = $this->database->fetchAssocByTables($rr, $fi)) {
                                 $rowKey = $row[$tn][$kf];
-                                if (isset($instances[$rowKey])) $instance = & $instances[$rowKey];
+                                if (isset($instances[$rowKey])) $instance = $instances[$rowKey];
                                 else {
-                                    $instance = & $this->$ifun ($row[$tn]);
-                                    $instances[$rowKey] = & $instance;
+                                    $instance = $this->$ifun ($row[$tn]);
+                                    $instances[$rowKey] = $instance;
                                 }
-                                $res[$row['_mid_'][$key]][] = & $instance;
+                                $res[$row['_mid_'][$key]][] = $instance;
                             }
                         } else {
                             while($row = $this->database->fetchAssocByTables($rr, $fi)) {
                                 $rowKey = $this->_getValues($row[$tn], $rightKeyFields);
-                                $instance = & Ac_Util::simpleGetArrayByPath($instances, $rowKey, false);
+                                $instance = Ac_Util::simpleGetArrayByPath($instances, $rowKey, false);
                                 if (!$instance) {
-                                    Ac_Util::simpleSetArrayByPath($instances, $rowKey, $instance = & $this->$ifun ($row[$tn]));
+                                    Ac_Util::simpleSetArrayByPath($instances, $rowKey, $instance = $this->$ifun ($row[$tn]));
                                 }
-                                $res[$row['_mid_'][$key]][] = & $instance;
+                                $res[$row['_mid_'][$key]][] = $instance;
                             }
                         }
                     }
                 } else {
                     while($row = $this->database->fetchAssocByTables($rr, $fi)) {
-                        $instance = & $this->$ifun ($row[$tableName]);
+                        $instance = $this->$ifun ($row[$tableName]);
                         Ac_Util::simpleSetArrayByPath($res, $row['_mid_'], $instance, $unique);
                     }
                 }
             } else {
                 while($row = $this->database->fetchAssoc($rr)) { 
-                    $res[] = & $this->$ifun ($row);     
+                    $res[] = $this->$ifun ($row);     
                 }
             }
         } else {
@@ -925,16 +925,16 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                     $key = $keys[0];
                     if ($unique) {
                         while($row = $this->database->fetchAssoc($rr)) {
-                            $res[$row[$key]] = & $this->$ifun ($row);
+                            $res[$row[$key]] = $this->$ifun ($row);
                         }
                     } else {
                         while($row = $this->database->fetchAssoc($rr)) { 
-                            $res[$row[$key]][] = & $this->$ifun ($row);
+                            $res[$row[$key]][] = $this->$ifun ($row);
                         }
                     }
                 } else {
                     while($row = $this->database->fetchAssoc($rr)) {
-                        $instance = & $this->$ifun ($row);
+                        $instance = $this->$ifun ($row);
                         $this->_putRowToArray($row, $instance, $res, $keys, $unique);        
                     }
                 }
@@ -943,15 +943,15 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 
                 while($row = $this->database->fetchAssoc($rr)) {
                     // that's it - The Circular Reference Creator -- 26.03.2009
-                    $res[] = & $this->$ifun ($row);     
+                    $res[] = $this->$ifun ($row);     
                 }
             }
         
         }
         $this->database->freeResultResource($rr);
         if (!$multipleValues && $unique && count($res)) {
-            // $res = & $res[0] // crashes PHP 4.3.9, works in PHP 4.4.x
-            $tmp = & $res[0];
+            // $res = $res[0] // crashes PHP 4.3.9, works in PHP 4.4.x
+            $tmp = $res[0];
             return $tmp;
         }
         
@@ -1014,7 +1014,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 $res[] = $row[$cntColumn];     
         }
         $this->database->freeResultResource($rr);
-        if (!$multipleValues) $res = & $res[0];
+        if (!$multipleValues) $res = $res[0];
         return $res;
     }
     
@@ -1030,12 +1030,12 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     }
 
     function & _destInstance($row) {
-        $res = & $this->_recordInstance($row, $this->destRecordClass, $this->_destMapper);
+        $res = $this->_recordInstance($row, $this->destRecordClass, $this->_destMapper);
         return $res;
     }
     
     function & _srcInstance($row) {
-        $res = & $this->_recordInstance($row, $this->srcRecordClass, $this->_srcMapper);
+        $res = $this->_recordInstance($row, $this->srcRecordClass, $this->_srcMapper);
         return $res;
     }
     
@@ -1056,7 +1056,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * $keyN and $fieldN are taken from $fieldNames 
      */
     function _getJoin ($joinType, $leftAlias, $rightTable, $rightAlias, $fieldNames) {
-        $db = & $this->database;
+        $db = $this->database;
         $la = $db->NameQuote($leftAlias);
         $ra = $db->NameQuote($rightAlias);
         $res = $joinType.' JOIN '.$db->NameQuote($rightTable);
@@ -1076,7 +1076,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function _makeCritForSrcOrDest (& $data, $otherAlias, $fieldLinks, $default) {
         $keys = array_keys($fieldLinks);
         if (is_object($data)) $d = array(& $data);
-        else $d = & $d;
+        else $d = $d;
         if (is_array($data)) { // we assume that this array is of objects or rows
             $values = array();
             $this->_getAllValues($data, $values, $keys);
@@ -1095,7 +1095,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $isSingle = true;
             $d = array(& $data);
             foreach (array_keys($d) as $k) {
-                $row = & $d[$k];
+                $row = $d[$k];
                 $val = $this->_getValue($row, $varName);
                 if (is_array($val)) {
                     $newVal = array();

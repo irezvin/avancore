@@ -19,7 +19,7 @@ class Ac_Form_Control_Static extends Ac_Form_Control {
         if ($this->allowHtml === '?') {
             if ($this->getType() == 'rte') $res = true;
             else {    
-                $p = & $this->getModelProperty();
+                $p = $this->getModelProperty();
                 if ($p && isset($p->allowHtml)) $res = $p->allowHtml;
                     else $res = false;
             } 

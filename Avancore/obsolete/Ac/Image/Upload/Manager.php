@@ -36,7 +36,7 @@ class Ac_Image_Upload_Manager extends Ac_Upload_Manager {
      */
     function getImageProcessor() {
         if ($this->_imageProcessor === false) {
-            $this->_imageProcessor = & Ac_Util::factoryWithOptions($this->_imageProcessorConfig, 'Ac_Image_Processor_Gd');
+            $this->_imageProcessor = Ac_Util::factoryWithOptions($this->_imageProcessorConfig, 'Ac_Image_Processor_Gd');
         }
         return $this->_imageProcessor;
     }
@@ -45,7 +45,7 @@ class Ac_Image_Upload_Manager extends Ac_Upload_Manager {
      * @param Ac_Image_Processor $imageProcesor
      */
     function setImageProcessor(& $imageProcesor) {
-        $this->_imageProcessor = & $imageProcesor;
+        $this->_imageProcessor = $imageProcesor;
     }
     
     function setThumbLink($v) {

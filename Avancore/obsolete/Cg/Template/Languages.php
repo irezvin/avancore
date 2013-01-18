@@ -12,10 +12,10 @@ class Cg_Template_Languages extends Cg_Template {
         $this->langFile = 'languages/en.php';
         
         foreach ($this->domain->listModels() as $m) {
-            $mod = & $this->domain->getModel($m);
+            $mod = $this->domain->getModel($m);
             
             foreach ($mod->listProperties() as $p) {
-                $prop = & $mod->getProperty($p);
+                $prop = $mod->getProperty($p);
                 $this->langStrings[$prop->getLangStringName()] = $prop->caption;
             }
         }

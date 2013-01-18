@@ -33,7 +33,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
      * @param Ac_Model_Relation $relation
      */
     function setRelation(& $relation) {
-        $this->_relation = & $relation;
+        $this->_relation = $relation;
         $this->_mapperClass = false;
         $this->_relationId = false;
     }
@@ -45,7 +45,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     }
     
     function setParentRecord(& $record) {
-        $this->_parentRecord = & $record;
+        $this->_parentRecord = $record;
     }
     
     /**
@@ -54,8 +54,8 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     function getRelation() {
         if ($this->_relation === false) {
             if (!strlen($this->_mapperClass) || !strlen($this->_relationId)) trigger_error ("call setRelationId() first", E_USER_ERROR);
-            $mapper = & Ac_Model_Mapper::getMapper($this->_mapperClass);
-            $this->_relation = & $mapper->getRelation($this->_relationId);
+            $mapper = Ac_Model_Mapper::getMapper($this->_mapperClass);
+            $this->_relation = $mapper->getRelation($this->_relationId);
         } else {
             if (is_array($this->_relation)) {
                 $c = $this->_relation;
@@ -72,7 +72,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
         if ($this->_parentRecord === false) {
             $this->_parentRecord = null;
             if ($this->_manager) {
-                $this->_parentRecord = & $this->_manager->getRecord();
+                $this->_parentRecord = $this->_manager->getRecord();
                 if (!$this->_parentRecord) var_dump("No record in manager ".$this->_manager->_instanceId);
             } else {
                 var_dump("No manager");
@@ -82,7 +82,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     }
     
     function setRecordDefaults(& $record) {
-        if (($rec = & $this->getRecord()) && ($rel = & $this->getRelation())) {
+        if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {
                 foreach ($rel->fieldLinks as $srcField => $destField) {
                     $record->$destField = $rec->$srcField;
@@ -99,7 +99,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     
     function getSqlCriteria() {
         $res = false;
-        if (($rel = & $this->getRelation()) && ($rec = & $this->getRecord()) ) {
+        if (($rel = $this->getRelation()) && ($rec = $this->getRecord()) ) {
             $a = array(& $rec);
             $res = $rel->getCritForDestOfSrc($a, 't');
         } else {
@@ -119,12 +119,12 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     * @param Ac_Form $form
     */
    function onManagerFormCreated(& $form) {
-        if (($rec = & $this->getRecord()) && ($rel = & $this->getRelation())) {
+        if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {
                 $f = Ac_Util::array_values($rel->fieldLinks);
                 foreach ($form->listControls() as $c) {
                     if (in_array($c, $f)) {
-                        $con = & $form->getControl($c);
+                        $con = $form->getControl($c);
                         $con->readOnly = true;
                     }
                 }
@@ -138,7 +138,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     * @param array $columns
     */
    function onManagerColumnsPreset(& $columns) {
-        if (($rec = & $this->getRecord()) && ($rel = & $this->getRelation())) {
+        if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {
                 $f = Ac_Util::array_values($rel->fieldLinks);
                 foreach ($f as $fn) {

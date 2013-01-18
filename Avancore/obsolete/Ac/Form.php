@@ -59,7 +59,7 @@ class Ac_Form extends Ac_Form_Control_Composite {
             if ($withWrapper) $res = $this->fetchWithWrapper($refresh);
             else {
                 if ($this->_presentationWithForm === false || $refresh) {
-                    $formTemplate = & $this->getTemplate($this->formTemplateClass);
+                    $formTemplate = $this->getTemplate($this->formTemplateClass);
                     $html = parent::fetchPresentation($refresh, false);
                     $this->_presentationWithForm = $formTemplate->fetch($this->formTemplatePart, array(& $this, $html));
                 }

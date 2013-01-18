@@ -13,9 +13,9 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
     }
     
     function _setRef(& $dest, $varName, & $ref) {
-        if (is_array($dest)) $dest[$varName] = & $ref;
+        if (is_array($dest)) $dest[$varName] = $ref;
         elseif (method_exists($dest, $setter = 'set'.ucfirst($varName))) $dest->$setter($ref);
-        else $dest->$varName = & $ref;
+        else $dest->$varName = $ref;
     }
     
     function _setVal(& $dest, $varName, $val) {
@@ -25,7 +25,7 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
     }
     
     /**
-     * $linkTo->$varName = & $linked or $linkTo[$varName] = & $linked
+     * $linkTo->$varName = $linked or $linkTo[$varName] = $linked
      *
      * @param object|array $linkTo - object or array to which we are linking $linked object 
      * @param object|array $linked - object that we are adding
@@ -36,38 +36,38 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
     function _linkBack(& $linkTo, & $linked, $varName, $toIsArray, $linkedIsUnique) {
         if ($toIsArray) {
             foreach (array_keys($linkTo) as $k) {
-                $lt = & $linkTo[$k];
+                $lt = $linkTo[$k];
                 if (is_object($lt)) {
                     if ($linkedIsUnique) {
-                        $lt->$varName = & $linked;
+                        $lt->$varName = $linked;
                     } else {
                         if (!isset($lt->$varName) || !is_array($lt->$varName)) $lt->$varName = array();
-                        $lt->{$varName}[] = & $linked;
+                        $lt->{$varName}[] = $linked;
                     }
                 } elseif (is_array($lt)) {
                     if ($linkedIsUnique) {
-                        $lt[$varName] = & $linked;
+                        $lt[$varName] = $linked;
                     } else {
                         if (!isset($lt[$varName]) || !is_array($lt[$varName])) $lt[$varName] = array();
-                        $lt[$varName][] = & $linked;
+                        $lt[$varName][] = $linked;
                     }
                 }
             }
         } else {
-            $lt = & $linkTo;
+            $lt = $linkTo;
             if (is_object($lt)) {
                 if ($linkedIsUnique) {
-                    $lt->$varName = & $linked;
+                    $lt->$varName = $linked;
                 } else {
                     if (!isset($lt->$varName) || !is_array($lt->$varName)) $lt->$varName = array();
-                    $lt->{$varName}[] = & $linked;
+                    $lt->{$varName}[] = $linked;
                 }
             } elseif (is_array($lt)) {
                 if ($linkedIsUnique) {
-                    $lt[$varName] = & $linked;
+                    $lt[$varName] = $linked;
                 } else {
                     if (!isset($lt[$varName]) || !is_array($lt[$varName])) $lt[$varName] = array();
-                    $lt[$varName][] = & $linked;
+                    $lt[$varName][] = $linked;
                 }
             }
         }
@@ -87,19 +87,19 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
             $res = new $recordClass($mapper);
             $res->load($row, null, true);
         } elseif ($recordClass === '') {
-            $res = & $row;
+            $res = $row;
         } elseif ($mapper) {
             //$res = new Nc_Element_Version;
-            $res = & $mapper->factory($mapper->getRecordClass($row));
+            $res = $mapper->factory($mapper->getRecordClass($row));
             $res->load($row, null, true);
         } else {
-            $res = & $row;
+            $res = $row;
         }
         return $res;
     }
     
     function & _rowInstance($row) {
-        $res = & $row;
+        $res = $row;
         return $res;
     }
     

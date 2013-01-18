@@ -5,11 +5,11 @@ class Ac_Form_Control_Template_Tabs extends Ac_Form_Control_Template {
     function showTabs (Ac_Form_Control_Tabs $tabs) {
         $controls = $tabs->getOrderedDisplayChildren();
         $this->addCssLib('{ACCSS}tabcontent.css', false);
-        $this->addJsLib('{AC}tabcontent.js', false);
-        $ctx = & $tabs->getContext();
+        $this->addJsLib('{AC}/tabcontent.js', false);
+        $ctx = $tabs->getContext();
         $tcId = $ctx->mapIdentifier('tabs');
         $tcVar = $tcId.'_o';
-        $h = & $this->getHtmlHelper();
+        $h = $this->getHtmlHelper();
 ?>
         <div <?php echo Ac_Util::mkAttribs($tabs->getHtmlAttribs()); ?>>
             <ul id="<?php $this->d($tcId); ?>" class="shadetabs">

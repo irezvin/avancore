@@ -97,19 +97,19 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
             $src = array();
             foreach ($varName as $v) {
                 switch($v) {
-                    case 'get': $s = & $_GET; break;
-                    case 'post': $s = & $_POST; break;
-                    case 'cookie': $s = & $_COOKIE; break;
-                    case 'request': $s = & $_REQUEST; break;
+                    case 'get': $s = $_GET; break;
+                    case 'post': $s = $_POST; break;
+                    case 'cookie': $s = $_COOKIE; break;
+                    case 'request': $s = $_REQUEST; break;
                 }
                 $src = Ac_Util::m($src, $s);
             }
         } else {
             switch ($varName) {
-                case 'get': $src = & $_GET; break;
-                case 'post': $src = & $_POST; break;
-                case 'cookie': $src = & $_COOKIE; break;
-                case 'request': $src = & $_REQUEST; break;
+                case 'get': $src = $_GET; break;
+                case 'post': $src = $_POST; break;
+                case 'cookie': $src = $_COOKIE; break;
+                case 'request': $src = $_REQUEST; break;
                 default: trigger_error ("Unknown request variable '$varName'; use 'get', 'post', 'cookie' or 'request'", E_USER_ERROR);
             }
         }
@@ -180,7 +180,7 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
      * @param Ac_Url $url
      */
     function setBaseUrl(& $url) {
-        $this->_baseUrl = & $url;
+        $this->_baseUrl = $url;
         $this->_url = false;
     }
 
@@ -199,7 +199,7 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
             trigger_error ("Base Url is not set - call setBaseUrl() first", E_USER_ERROR);
         }
 //        if ($this->_url === false) {
-//            $this->_url = & $this->_baseUrl->cloneObject();
+//            $this->_url = $this->_baseUrl->cloneObject();
 //            $data = $this->_data;
 //            Ac_Util::ms($data, $extraParams);
 //            if ($this->_state && $this->stateVarName && !$this->stateIsExternal) $data[$this->stateVarName] = $this->_state;
@@ -209,7 +209,7 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
 //        }
 //        return $this->_url;
 
-        $res = & $this->_baseUrl->cloneObject();
+        $res = $this->_baseUrl->cloneObject();
         if (strlen($this->pathInfo)) $res->pathInfo .= $this->pathInfo;
         if ($withData) $data = $this->_data;
         Ac_Util::ms($data, $extraParams);
@@ -222,8 +222,8 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
     }
     
     function getStringUrl() {
-        $u = & $this->getUrl();
-        $res = & $u->toString();
+        $u = $this->getUrl();
+        $res = $u->toString();
         return $res;
     }
     
@@ -235,7 +235,7 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
      * @return Ac_Legacy_Controller_Context_Http
      */
     function & cloneObject() {
-        $res = & parent::cloneObject();
+        $res = parent::cloneObject();
         return $res;
     }
     

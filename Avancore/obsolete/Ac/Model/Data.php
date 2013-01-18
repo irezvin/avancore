@@ -86,10 +86,9 @@ class Ac_Model_Data {
     }
     
     /**
-     * @final
      * @return array
      */
-    function listProperties($onlyOwn = true, $useWildcards = false) {
+    function listProperties() {
         return array();
     }
     
@@ -150,7 +149,7 @@ class Ac_Model_Data {
                 Ac_Util::unsetArrayByPath($src, Ac_Util::pathToArray($ignorePath));
             }
         
-        if ($ctob = $this->hasToConvertTypesOnBind()) $v = & $this->_createValidator();
+        if ($ctob = $this->hasToConvertTypesOnBind()) $v = $this->_createValidator();
             else $v = false;
 
         $this->mustRevalidate();
@@ -160,26 +159,26 @@ class Ac_Model_Data {
                 else $srcKey = $propName;
             
             if (isset($src[$srcKey]) || array_key_exists($srcKey, $src)) {
-                $p = & $this->getPropertyInfo($propName, true);
+                $p = $this->getPropertyInfo($propName, true);
                 if ($p->noBind) continue;
                 if ($this->_getAssocClass($propName)) {
                     if ($plural = $this->_getPlural($propName)) {
                         $this->setListProperty($propName, array());
                         if (is_array($src[$srcKey])) {
                             foreach ($src[$srcKey] as $key => $value) if (is_array($value)) {
-                                $assocObject = & $this->createAssociable($propName);
+                                $assocObject = $this->createAssociable($propName);
                                 $assocObject->bind($value);
                                 $this->setAssoc($propName, $assocObject, $key);
                             }
                         }
                     } else {
                         if ($this->_isAggregate($propName)) {
-                            $assocObject = & $this->getAssoc($propName);
+                            $assocObject = $this->getAssoc($propName);
                             $assocObject->bind($src[$propName]);
                         } else {
                             if ($this->hasAssoc($propName)) $this->deleteAssoc($propName);
                             if (is_array($src[$srcKey])) {
-                                $assocObject = & $this->createAssociable($propName);
+                                $assocObject = $this->createAssociable($propName);
                                 $assocObject->bind($src[$propName]);
                                 $this->setAssoc($propName, $assocObject);
                             } else {
@@ -277,7 +276,7 @@ class Ac_Model_Data {
     }
     
     function _checkOwnFields() {
-        $val = & $this->_createValidator();
+        $val = $this->_createValidator();
         $fieldsToCheck = false;
         $val->fieldList = array();
         foreach ($this->listOwnFields() as $propName) {
@@ -292,7 +291,7 @@ class Ac_Model_Data {
             $this->_mergeErrors($val->errors);
         }
         $f = false;
-        $val->model = & $f;
+        $val->model = $f;
     }
     
     function doBeforeCheckOwnFields(& $fieldsToCheck) {
@@ -305,7 +304,7 @@ class Ac_Model_Data {
                 if ($pi->plural) {
                     foreach ($this->listProperty($propName) as $key) {
                         if ($pi->loadToCheck || $this->isAssocLoaded($propName, $key)) {
-                            $assocObject = & $this->getAssoc($propName, $key);
+                            $assocObject = $this->getAssoc($propName, $key);
                             if (is_a($assocObject, 'Ac_Model_Data')) {
                                 if (!$assocObject->_beingChecked && ($pi->checkIfUnbound || $assocObject->_bound)) { 
                                     $assocObject->check();
@@ -316,7 +315,7 @@ class Ac_Model_Data {
                         }
                     }
                 } else {
-                    $assocObject = & $this->getAssoc($propName);
+                    $assocObject = $this->getAssoc($propName);
                     if (!is_null($assocObject))
                     if (!is_null($assocObject) && !$assocObject->_beingChecked && ($pi->checkIfUnbound || $assocObject->_bound)) {
                         $assocObject->check();
@@ -468,7 +467,7 @@ class Ac_Model_Data {
             } else {
                 $subKey = false;
             }
-            $target = & $this->_getOwnAssoc($head, $subKey, $plural);
+            $target = $this->_getOwnAssoc($head, $subKey, $plural);
             if (!$target) $value = null; else {
                 $value = $target->getField($tail, $key);
             }
@@ -521,8 +520,8 @@ class Ac_Model_Data {
             } else {
                 $subKey = false;
             }
-            //$target = & $this->getAssoc($head, $subKey);
-            $target = & $this->_getOwnAssoc($head, $subKey, $plural);
+            //$target = $this->getAssoc($head, $subKey);
+            $target = $this->_getOwnAssoc($head, $subKey, $plural);
             $value = $target->listProperty($tail);
             $this->doAfterListAssociatedProperty($head, $tail, $subKey, $target, $value);
         }
@@ -603,8 +602,8 @@ class Ac_Model_Data {
             } else {
                 $subKey = false;
             }
-            //$target = & $this->getAssoc($head, $subKey);
-            $target = & $this->_getOwnAssoc($head, $subKey, $plural);
+            //$target = $this->getAssoc($head, $subKey);
+            $target = $this->_getOwnAssoc($head, $subKey, $plural);
             $value = $target->countProperty($tail);
             $this->doAfterCountAssociatedProperty($head, $tail, $subKey, $target, $value);
         }
@@ -651,8 +650,8 @@ class Ac_Model_Data {
             } else {
                 $subKey = false;
             }
-            //$target = & $this->getAssoc($head, $subKey);
-            $target = & $this->_getOwnAssoc($head, $subKey, $plural);
+            //$target = $this->getAssoc($head, $subKey);
+            $target = $this->_getOwnAssoc($head, $subKey, $plural);
             $has = $target->hasAssoc($tail, $key);
             $this->doAfterCheckAssociatedAssoc($head, $tail, $key, $subKey, $target, $value);
         }
@@ -676,7 +675,7 @@ class Ac_Model_Data {
             if (strlen($key)) trigger_error ('List key specified for non-list association '.get_class($this).'::'.$head, E_USER_ERROR);
             if ($m = $this->_getMethod('has', $head)) $res = $this->$m();
                 else {
-                    $assocObject = & $this->_getOwnAssoc($head, $key, $this->_getPlural($head));
+                    $assocObject = $this->_getOwnAssoc($head, $key, $this->_getPlural($head));
                     $res = !is_null($assocObject);
                 }
         }
@@ -730,8 +729,8 @@ class Ac_Model_Data {
             } else {
                 $subKey = false;
             }
-            //$target = & $this->getAssoc($head, $subKey);
-            $target = & $this->_getOwnAssoc($head, $subKey, $plural);
+            //$target = $this->getAssoc($head, $subKey);
+            $target = $this->_getOwnAssoc($head, $subKey, $plural);
             $has = $target->isAssocLoaded($tail, $key);
             $this->doAfterCheckAssociatedAssocLoaded($head, $tail, $key, $subKey, $target, $has);
         }
@@ -821,8 +820,8 @@ class Ac_Model_Data {
             } else {
                 $subKey = false;
             }
-            //$target = & $this->getAssoc($head, $subKey);
-            $target = & $this->_getOwnAssoc($head, $subKey, $plural);
+            //$target = $this->getAssoc($head, $subKey);
+            $target = $this->_getOwnAssoc($head, $subKey, $plural);
             $value = $target->setListProperty($tail, $list);
             $this->doAfterSetAssociatedListProperty($head, $tail, $subKey, $target, $list);
         }
@@ -838,7 +837,7 @@ class Ac_Model_Data {
         } else {
             foreach ($this->listProperty($head) as $key) $this->_deleteOwnAssoc($head, $key, $plural);
             foreach (array_keys($list) as $key) {
-                $item = & $list[$key];
+                $item = $list[$key];
                 $this->_setOwnAssocItem($head, $plural, $key, $item);
             }
         }
@@ -854,7 +853,7 @@ class Ac_Model_Data {
         } else {
             foreach ($this->listProperty($head) as $key) $this->_deleteOwnField($propName, $key);
             foreach (array_keys($list) as $key) {
-                $item = & $list[$key];
+                $item = $list[$key];
                 $this->_setOwnListFieldItem($head, $key, $plural, $item);
             }
         }
@@ -902,8 +901,8 @@ class Ac_Model_Data {
             } else {
                 $subKey = false;
             }
-            //$target = & $this->getAssoc($head, $subKey);
-            $target = & $this->_getOwnAssoc($head, $subKey, $plural);
+            //$target = $this->getAssoc($head, $subKey);
+            $target = $this->_getOwnAssoc($head, $subKey, $plural);
             $res = $target->deletePropItem($tail, $key);
             $this->doAfterDeleteAssociatedPropItem($head, $tail, $key, $subKey, $target);
         }
@@ -980,8 +979,8 @@ class Ac_Model_Data {
             } else {
                 $subKey = false;
             }
-            //$target = & $this->getAssoc($head, $subKey);
-            $target = & $this->_getOwnAssoc($head, $subKey, $plural);
+            //$target = $this->getAssoc($head, $subKey);
+            $target = $this->_getOwnAssoc($head, $subKey, $plural);
             $target->deleteAssoc($tail, $key);
             $this->doAfterDeleteAssociatedAssoc($head, $tail, $subKey, $target, $list);
         }
@@ -992,10 +991,10 @@ class Ac_Model_Data {
             if (($m = $this->_getMethod('delete', $head.'Item')) || ($m = $this->_getMethod('delete', $head))) {
                 $res = $this->$m($key);
             } else {
-                if (!$this->_isOwnAssocLoaded($head, $key)) $dissocObject = & $this->_getOwnAssoc($head, $key, $plural);
+                if (!$this->_isOwnAssocLoaded($head, $key)) $dissocObject = $this->_getOwnAssoc($head, $key, $plural);
                 if ((isset($this->$plural) || $this->_hasVar($plural)) && is_array($this->$plural) && isset($this->{$plural}[$key])) {
-                    if (is_object($this->{$plural}[$key])) $dissocObject = & $this->{$plural}[$key];
-                        else $dissocObject = & $this->_getOwnAssoc($head, $key, $plural);
+                    if (is_object($this->{$plural}[$key])) $dissocObject = $this->{$plural}[$key];
+                        else $dissocObject = $this->_getOwnAssoc($head, $key, $plural);
                     $this->notifyDissociated($dissocObject, $head, $key);
                     unset($this->{$plural}[$key]);
                 } elseif (is_array($items = $this->_getOwnAssocList($head, $plural)) && isset($items[$key])) {
@@ -1096,8 +1095,8 @@ class Ac_Model_Data {
             } else {
                 $subKey = false;
             }
-            //$target = & $this->getAssoc($head, $subKey);
-            $target = & $this->_getOwnAssoc($head, $subKey, $plural);
+            //$target = $this->getAssoc($head, $subKey);
+            $target = $this->_getOwnAssoc($head, $subKey, $plural);
             $value = $target->setField($tail, $value, $key);
             $this->doAfterSetAssociatedField($head, $tail, $key, $subKey, $target, $value);
         }
@@ -1116,19 +1115,19 @@ class Ac_Model_Data {
             if ($tail) {
                 if (($plural = $this->_getPlural($head)) && !strlen($key)) {
                     list ($newTail, $newKey) = Ac_Util::pathBodyTail($tail);
-                    if (strlen($newTail)) $res = & $this->_getAssociatedAssoc($head, $tail, $key);
-                        else $res = & $this->_getOwnAssoc($head, $newKey, $plural);
-                } else $res = & $this->_getAssociatedAssoc($head, $tail, $key);
+                    if (strlen($newTail)) $res = $this->_getAssociatedAssoc($head, $tail, $key);
+                        else $res = $this->_getOwnAssoc($head, $newKey, $plural);
+                } else $res = $this->_getAssociatedAssoc($head, $tail, $key);
             } else {
                 if ($plural = $this->_getPlural($head)) {
                     if (!strlen($key)) $res = $this->_getOwnAssocList($head, $plural);
                         else {
                             if (!$this->_hasOwnAssoc($head, $key)) trigger_error ('Wrong key specified for getAssoc() for '.get_class($this).'::'.$propName, E_USER_ERROR);
-                            $res = & $this->_getOwnAssoc($head, $key, $plural);
+                            $res = $this->_getOwnAssoc($head, $key, $plural);
                         }
                 } else {
                     if (strlen($key)) trigger_error ('Key must not be specified for deleteAssoc() of non-list association '.get_class($this).'::'.$propName, E_USER_ERROR);
-                    $res = & $this->_getOwnAssoc($head, $key, $plural);
+                    $res = $this->_getOwnAssoc($head, $key, $plural);
                 }
             }
         } else {
@@ -1158,9 +1157,9 @@ class Ac_Model_Data {
             } else {
                 $subKey = false;
             }
-            //$target = & $this->getAssoc($head, $subKey);
-            $target = & $this->_getOwnAssoc($head, $subKey, $plural);
-            $res = & $target->getAssoc($tail, $key);
+            //$target = $this->getAssoc($head, $subKey);
+            $target = $this->_getOwnAssoc($head, $subKey, $plural);
+            $res = $target->getAssoc($tail, $key);
             $this->doAfterGetAssociatedAssoc($head, $tail, $subKey, $key, $target, $res);
         }
         return $res;
@@ -1170,7 +1169,7 @@ class Ac_Model_Data {
         if ($m = $this->_getMethod('get', $head.'Items') || $m = $this->_getMethod('get', $head)) $res = $this->$m();
         else {
             $res = array();
-            foreach ($this->_listOwnProperty($head, $plural) as $key) $res[$key] = & $this->_getOwnAssoc($head, $key, $plural);
+            foreach ($this->_listOwnProperty($head, $plural) as $key) $res[$key] = $this->_getOwnAssoc($head, $key, $plural);
         }
         return $res;
     }
@@ -1182,7 +1181,7 @@ class Ac_Model_Data {
         $vn = '_'.$plural;
         if (strlen($key)) {
             if (($m = $this->_getMethod('get', $head.'Item')) || ($m = $this->_getMethod('get', $head))) {
-                $res = & $this->$m($key);
+                $res = $this->$m($key);
             } else {
                 if (!$this->_isOwnAssocLoaded($head, $key)) {
                     if (($m = $this->_getMethod('load', $head.'Item')) || ($m = $this->_getMethod('load', $head))) $this->$m($key);
@@ -1190,14 +1189,14 @@ class Ac_Model_Data {
                     else trigger_error ('Cannot load item of associated list '.get_class($this).'::'.$head.'; consider implementing load/loadItem/loadItems method', E_USER_ERROR);
                 }
                 if ((isset($this->$vn) || $this->_hasVar($vn)) && is_array($this->$vn) && isset($this->{$vn}[$key]) && is_object($this->{$vn}[$key])) {
-                    $res = & $this->{$vn}[$key];
+                    $res = $this->{$vn}[$key];
                 } else {
                     trigger_error ('Cannot retrieve item of associated list '.get_class($this).'::'.$head.'; please check accessor methods for consistence', E_USER_ERROR);
                 }
             }
         } else {
             if ($m = $this->_getMethod('get', $head)) {
-                $res = & $this->$m();
+                $res = $this->$m();
             } else {
                 if (!$this->_isOwnAssocLoaded($head, $key)) {
                     if ($m = $this->_getMethod('load', $head)) $this->$m();
@@ -1206,7 +1205,7 @@ class Ac_Model_Data {
                         }
                 }
                 $vn = '_'.$head;
-                if ((isset($this->$vn) || $this->_hasVar($vn)) && (is_object($this->$vn) || is_null($this->$vn))) $res = & $this->$vn;
+                if ((isset($this->$vn) || $this->_hasVar($vn)) && (is_object($this->$vn) || is_null($this->$vn))) $res = $this->$vn;
                     else trigger_error ('Cannot retrieve associated object '.get_class($this).'::'.$head.' - consider implementing get.. method or corresponding member', E_USER_ERROR);
             }
         }
@@ -1277,8 +1276,8 @@ class Ac_Model_Data {
             } else {
                 $subKey = false;
             }
-            //$target = & $this->getAssoc($head, $subKey);
-            $target = & $this->_getOwnAssoc($head, $subKey, $plural);
+            //$target = $this->getAssoc($head, $subKey);
+            $target = $this->_getOwnAssoc($head, $subKey, $plural);
             $value = $target->setAssoc($tail, $assocObject, $key);
             $this->doAfterSetAssociatedAssoc($head, $tail, $key, $subKey, $target, $assocObject);
         }
@@ -1299,7 +1298,7 @@ class Ac_Model_Data {
                 }
                 if (!is_array($this->$plural)) trigger_error ('Cannot load associated list '.get_class($this).'::'.$head.' - consider implementing loadItems or get.. method', E_USER_ERROR);
                     else {
-                        $this->{$plural}[$key] = & $assocObject;
+                        $this->{$plural}[$key] = $assocObject;
                         $this->notifyAssociated($assocObject, $head, $key);
                     }
             } else {
@@ -1323,7 +1322,7 @@ class Ac_Model_Data {
                 if (is_object($this->$head)) {
                     $this->notifyDissociated($this->$head, $head, false);
                 } elseif (!is_null($this->$head)) trigger_error ('Cannot load associated object '.get_class($this).'::'.$head.' - consider implementing load.. or get.. method', E_USER_ERROR);
-                $this->$head = & $assocObject;
+                $this->$head = $assocObject;
                 $this->notifyAssociated($assocObject, $head, false);
             } else {
                 trigger_error ('Cannot set associated object '.get_class($this).'::'.$head.' - consider implementing set.. method, or provide corresponding member', E_USER_ERROR);
@@ -1361,7 +1360,7 @@ class Ac_Model_Data {
         $arrPropInfo['srcClass'] = get_class($this);
         if (!$onlyStatic) {
             if (isset($arrPropInfo['isAbstract']) && $arrPropInfo['isAbstract']) trigger_error ('Only static info can be retrieved on abstract property '.get_class($this).'::'.$propName);
-            if (isset($arrPropInfo['assocClass']) && $arrPropInfo['assocClass']) $arrPropInfo['value'] = & $this->getAssoc($propName);
+            if (isset($arrPropInfo['assocClass']) && $arrPropInfo['assocClass']) $arrPropInfo['value'] = $this->getAssoc($propName);
                 else $arrPropInfo['value'] = $this->getField($propName);
             if ($errors = $this->getErrors($propName, false, false)) $arrPropInfo['error'] = $errors;
         }
@@ -1454,14 +1453,14 @@ class Ac_Model_Data {
                     if ($trigger) trigger_error('Cannot use concrete key after empty path segment for '.get_class($this)."::{$head}[{$key}][".implode('][', $arrTail).']', E_USER_ERROR);
                     else return false;
                 }
-                $target = & $this->_getOwnAssoc($head, $key, $plural);
+                $target = $this->_getOwnAssoc($head, $key, $plural);
             } else {
-                $target = & $this->createAssociable($head);
+                $target = $this->createAssociable($head);
                 $abstract = true;
             }
         } else {
-             $target = & $this->_getOwnAssoc($head, false, false);
-             if (!$target) $target = & $this->createAssociable($head);
+             $target = $this->_getOwnAssoc($head, false, false);
+             if (!$target) $target = $this->createAssociable($head);
         }
         $info = $target->_getStaticPropertyInfoArr($arrTail, $abstract);
         return $info;
@@ -1476,7 +1475,7 @@ class Ac_Model_Data {
         if ($assocClass = $this->_getAssocClass($head)) $arrInfo['assocClass'] = $assocClass;
         
         if ($abstract) $arrInfo['isAbstract'] = true;
-            else $arrInfo['implObject'] = & $this;
+            else $arrInfo['implObject'] = $this;
         
         $arrInfo['implClass'] = get_class($this);
         
@@ -1484,7 +1483,7 @@ class Ac_Model_Data {
     }
     
     function getFormOptions($propName, $onlyStatic = true) {
-        $pi = & $this->getPropertyInfo($propName);
+        $pi = $this->getPropertyInfo($propName);
         return $pi->toFormOptions();
     }
     

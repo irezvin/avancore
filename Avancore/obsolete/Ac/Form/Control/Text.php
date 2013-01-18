@@ -40,7 +40,7 @@ class Ac_Form_Control_Text extends Ac_Form_Control_Listable {
     function getType() {
         if ($this->type === '?') {
             $res = false;
-            $p = & $this->getModelProperty();
+            $p = $this->getModelProperty();
             if ($p) {
                 if (isset($p->controlType) && ($p->controlType == 'textArea' || $p->controlType == 'rte')) $res = $p->controlType;
                 elseif (($p->plural || $p->arrayValue) && isset($p->listSeparator) && ($p->listSeparator == "\n")) {

@@ -184,7 +184,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     /**
      * @return Ac_Model_Mapper
      */
-    function getMapper ($mapperClass, $application = null) {
+    static function getMapper ($mapperClass, $application = null) {
         if (is_object($mapperClass) && $mapperClass instanceof Ac_Model_Mapper) {
             $res = $mapperClass;
         } else {
@@ -196,7 +196,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
             }
             foreach(Ac_Application::listInstances() as $className => $ids) {
                 foreach ($ids as $appId) {
-                    $app = Ac_Application::getInstance($className, $appId);
+                    $app = Ac_Application::getApplicationInstance($className, $appId);
                     if ($app->hasMapper($mapperClass)) {
                         $res = $app->getMapper($mapperClass);
                     }
@@ -224,13 +224,13 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     /**
      * @return Ac_Model_Object
      */
-    function & factory($className = false) {
+    function factory($className = false) {
         if ($className === false) $className = $this->recordClass;
         if ($this->useProto) {
             if (!isset($this->_proto[$className])) {
                 $this->_proto[$className] = new $className($this);
             }
-            $proto = & $this->_proto[$className];
+            $proto = $this->_proto[$className];
             $res = $proto;
         } else {
             $res = new $this->recordClass($this);
@@ -244,8 +244,8 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @param array $values
      * @return Ac_Model_Object
      */
-    function & reference($values = array()) {
-        $res = & $this->factory();
+    function reference($values = array()) {
+        $res = $this->factory();
         $res->setIsReference(true);
         foreach ($values as $k => $v) $res->{$k} = $v;
         return $res;
@@ -275,12 +275,12 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * Loads record(s) -- id can be an array
      * @return Ac_Model_Object
      */
-    function & loadRecord($id) {
+    function loadRecord($id) {
         $res = null;
         if (is_array($id) && count($id) == 1) $id = array_pop($id);
         if (is_scalar($id) && strlen($id)) {
             if ($this->useRecordsCollection && isset($this->_recordsCollection[$id])) {
-                $res = & $this->_recordsCollection[$id];
+                $res = $this->_recordsCollection[$id];
             } else {
                 $sql = "SELECT * FROM {$this->tableName} WHERE {$this->pk} = ".$this->database->Quote($id);
                 $this->database->setQuery($sql);
@@ -292,8 +292,8 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
                 } else {
                     $record = null;
                 }
-                $res = & $record;
-                if ($this->useRecordsCollection && $res) $this->_recordsCollection[$id] = & $res;
+                $res = $record;
+                if ($this->useRecordsCollection && $res) $this->_recordsCollection[$id] = $res;
             }
         } else {
             if (is_array($id)) {
@@ -323,7 +323,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
             foreach ($ids as $id) {
                 if (isset($recs[$id])) {
                     if ($keysToList) $res[$id] = $recs[$id];
-                    else $res[] = & $recs[$id];
+                    else $res[] = $recs[$id];
                 }
             }
             else $res = $recs;
@@ -456,7 +456,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     }
 
     function listModelProperties() {
-        $proto = & $this->getPrototype();
+        $proto = $this->getPrototype();
         return $proto->listPublicProperties();
     }
 
@@ -465,7 +465,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      */
     function getPrototype() {
         if ($this->_prototype === false) {
-            $this->_prototype = & $this->factory();
+            $this->_prototype = $this->factory();
         }
         return $this->_prototype;
     }
@@ -517,7 +517,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     // --------------------------- in-memory records registry functions ---------------------------
 
     function _memorize(& $record) {
-        $this->_newRecords[$record->_imId] = & $record;
+        $this->_newRecords[$record->_imId] = $record;
         //var_dump("Memorizing (".get_class($this).") ".$record->_imId." / total ".count($this->_newRecords));
     }
 
@@ -531,7 +531,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     function _find($fields) {
         $res = array();
         foreach (array_keys($this->_newRecords) as $k) {
-            if ($this->_newRecords[$k]->matchesFields($fields)) $res[$k] = & $this->_newRecords[$k];
+            if ($this->_newRecords[$k]->matchesFields($fields)) $res[$k] = $this->_newRecords[$k];
         }
         return $res;
     }
@@ -556,7 +556,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         return "(".implode(" AND ", $cr).")";
     }
 
-    function & locateRecord($fields, $where = false, $mustBeUnique = false, $searchNewRecords = false) {
+    function locateRecord($fields, $where = false, $mustBeUnique = false, $searchNewRecords = false) {
         if (strlen($where)) $searchNewRecords = false;
         $crit = $this->indexCrtieria($fields);
         if (strlen($where)) $crit = "($crit) AND ($where)";
@@ -564,11 +564,11 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         //var_dump($crit);
         if ($searchNewRecords) {
             $newRecs = $this->_find($fields);
-            foreach (array_keys($newRecs) as $k) $recs[] = & $newRecs[$k];
+            foreach (array_keys($newRecs) as $k) $recs[] = $newRecs[$k];
         }
         $res = null;
         if (count($recs)) {
-            if (!$mustBeUnique || count($recs) == 1) $res = & $recs[0];
+            if (!$mustBeUnique || count($recs) == 1) $res = $recs[0];
         }
         if (!$res) {
             //var_dump($fields, count($this->_newRecords));
@@ -630,8 +630,8 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
             $coll = new Ac_Model_Collection(get_class($this), false, $where, $ordering, $extraJoins);
             $coll->setSequential();
             $coll->useCursor();
-            while ($rec = & $coll->getNext()) {
-                if ($valueFieldName === false) $pk = & $rec->getPrimaryKey();
+            while ($rec = $coll->getNext()) {
+                if ($valueFieldName === false) $pk = $rec->getPrimaryKey();
                 else {
                     $pk = array();
                     if ($valueIsProperty) foreach ($vf as $f) $pk[] = $rec->getField($f);
@@ -733,7 +733,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
             if ($withNewRecords) {
                 $newRecords = $this->_find($record->getDataFields($idxFields));
                 if ($dontReturnOwnKey && isset($newRecords[$record->_imId])) unset($newRecords[$record->_imId]);
-                foreach (array_keys($newRecords) as $k) $res[$idxName][] = & $newRecords[$k];
+                foreach (array_keys($newRecords) as $k) $res[$idxName][] = $newRecords[$k];
             }
         }
         return $res;
@@ -799,7 +799,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     /**
      * @return Ac_Model_Relation
      */
-    function & createRelation($relId) {
+    function createRelation($relId) {
         $proto = $this->getRelationPrototype($relId);
         
         // Replace mapper classes with mapper instances, if possible
@@ -809,7 +809,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         } elseif (isset($proto['destMapperClass']) && $proto['destMapperClass'] == $this->getId()) {
             $proto['destMapper'] = $this;
         }
-        $res = & Ac_Model_Relation::factory($proto);
+        $res = Ac_Model_Relation::factory($proto);
         return $res;
     }
 
@@ -827,9 +827,9 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      */
     function getRelation($relId) {
         if (!isset($this->_relations[$relId])) {
-            $res = & $this->createRelation($relId);
-            if ($this->remembersRelations()) $this->_relations[$relId] = & $res;
-        } else $res = & $this->_relations[$relId];
+            $res = $this->createRelation($relId);
+            if ($this->remembersRelations()) $this->_relations[$relId] = $res;
+        } else $res = $this->_relations[$relId];
         return $res;
     }
 
@@ -839,13 +839,13 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      if (!is_array($relations)) $relations = array($relations);
      $na = func_num_args();
      if ($na > 2) for ($i = 2; $i < $na - 1; $i++) $relations[] = func_get_arg($i);
-     $m = & $this;
-     $curr = & $left;
+     $m = $this;
+     $curr = $left;
      foreach ($relations as $r) {
-     $relation = & $m->getRelation($r);
+     $relation = $m->getRelation($r);
      $recs = $relation->loadDest($curr);
      $curr = Ac_Util::flattenArray($recs);
-     $m = & Ac_Model_Mapper::getMapper($relation->destMapperClass);
+     $m = Ac_Model_Mapper::getMapper($relation->destMapperClass);
      }
      }
      */
@@ -856,7 +856,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
 
     // TODO: Add suport for records that are in random access collections (invoke methods listAssocFor(), loadAssocFor(), countAssocFor() for all records of collection)
     function loadAssocFor (& $record, $relId) {
-        $rel = & $this->getRelation($relId);
+        $rel = $this->getRelation($relId);
         $rel->loadDest($record);
     }
 
@@ -865,17 +865,17 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * Currently this function works same as loadAssocFor()
      */
     function listAssocFor (& $record, $relId) {
-        $rel = & $this->getRelation($relId);
+        $rel = $this->getRelation($relId);
         $rel->loadDest($record);
     }
 
     function loadAssocCountFor (& $record, $relId) {
-        $rel = & $this->getRelation($relId);
+        $rel = $this->getRelation($relId);
         $rel->loadDestCount($record);
     }
 
     function loadAssocNNIdsFor (& $record, $relId) {
-        $rel = & $this->getRelation($relId);
+        $rel = $this->getRelation($relId);
         $rel->loadDestNNIds($record);
     }
     
@@ -894,7 +894,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @param array $dest
      */
     function putToArrayByPk(& $record, & $dest) {
-        $dest[$record->{$this->pk}] = & $record;
+        $dest[$record->{$this->pk}] = $record;
     }
 
     /**
@@ -976,7 +976,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     function getDateFormats() {
         if ($this->_dateFormats === false) {
             $this->_dateFormats = array();
-            $p = & $this->getPrototype();
+            $p = $this->getPrototype();
             foreach ($p->listOwnFields(true) as $f) {
                 $pi = $p->getPropertyInfo($f, true);
                 if (strlen($pi->internalDateFormat)) $this->_dateFormats[$f] = $pi->internalDateFormat;

@@ -87,12 +87,12 @@ class Ac_Table_Column {
      * @param array settings
      */
     function Ac_Table_Column(& $table, $name, $settings = array()) {
-        $this->_table = & $table;
+        $this->_table = $table;
         $this->_name = $name;
         $this->settings = $settings;
         
         foreach (array_diff(array_keys(get_object_vars($this)), array('settings', 'defaultHint', 'nullText')) as $propName) {
-            if (($propName{0} != '_')  && isset($settings[$propName])) $this->$propName = & $settings[$propName];
+            if (($propName{0} != '_')  && isset($settings[$propName])) $this->$propName = $settings[$propName];
         }
 
         if (!$this->fieldName) $this->fieldName = $this->_name;
@@ -216,7 +216,7 @@ class Ac_Table_Column {
     function getStaticPropertyInfo($fieldName = false) {
         if ($this->_staticMeta === false) {
             if (!$this->useAeDataFacilities) $res = null; else {
-                $record = & $this->_table->getRecordPrototype(); 
+                $record = $this->_table->getRecordPrototype(); 
                 $res = $this->getPropertyInfo($record, $fieldName, true);        
             }
             $this->_staticMeta = $res;
@@ -239,7 +239,7 @@ class Ac_Table_Column {
      */
     function getTitle() {
         if (isset($this->settings['title'])) $res = $this->settings['title'];
-        elseif ($pi = & $this->getStaticPropertyInfo() && $pi->caption) {
+        elseif (($pi = $this->getStaticPropertyInfo()) && $pi->caption) {
             $res = $pi->caption;
         } else $res = $this->_name;
         return $res;

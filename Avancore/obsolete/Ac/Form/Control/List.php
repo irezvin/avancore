@@ -64,7 +64,7 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
         $this->_valuesProvider = false;
         $this->_valuesGetter = false;
         if ($provider) {
-            $this->_valuesProvider = & $provider;
+            $this->_valuesProvider = $provider;
             $this->valueList = false;
         }
     }
@@ -77,7 +77,7 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
             if ($this->_valuesProviderPrototype) {
                 $this->_valuesProvider = Ac_Model_Values::factoryIndependent($this->_valuesProviderPrototype, $this->valuesProviderOverride, $this->valuesProviderOverride);
             }
-            elseif ($p = & $this->getModelProperty()) {
+            elseif ($p = $this->getModelProperty()) {
                 if (isset($p->values) && $p->values) {
                     $this->_valuesProvider = Ac_Model_Values::factoryWithProperty($p);
                 }
@@ -90,7 +90,7 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
     function getDummyCaption() {
         $res = false;
         if ($this->dummyCaption === false) {
-            if ($p = & $this->getModelProperty() && isset($p->dummyCaption) && ($p->dummyCaption !== false)) {
+            if ($p = $this->getModelProperty() && isset($p->dummyCaption) && ($p->dummyCaption !== false)) {
                 $res = $p->dummyCaption;
             }
         } else $res = $this->dummyCaption;
@@ -100,7 +100,7 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
     function getDummyValue() {
         $res = false;
         if ($this->dummyValue === false) {
-            if ($p = & $this->getModelProperty() && isset($p->dummyValue) && ($p->dummyValue !== false)) {
+            if ($p = $this->getModelProperty() && isset($p->dummyValue) && ($p->dummyValue !== false)) {
                 $res = $p->dummyValue;
             }
         } else $res = $this->dummyValue;
@@ -126,9 +126,9 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
                      return call_user_func($this->_valuesGetter);
                  }
              }
-             elseif ($vp = & $this->_getValuesProvider()) {
+             elseif ($vp = $this->_getValuesProvider()) {
                  $res = $vp->getValueList();
-             } elseif ($p = & $this->getModelProperty()) {
+             } elseif ($p = $this->getModelProperty()) {
                  if (isset($p->valueList) && is_array($p->valueList))
                     $res = $p->valueList;
              }

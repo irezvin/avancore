@@ -7,6 +7,8 @@ class Ac_Legacy_Database_Joomla15 extends Ac_Legacy_Database_Joomla {
      */
     var $_db = false;
     
+    var $useMysqli = false;
+    
     function _doGetAccess() {
         
         // Create J15 config (not providing config file) if the class is created without Dispatcher
@@ -29,7 +31,24 @@ class Ac_Legacy_Database_Joomla15 extends Ac_Legacy_Database_Joomla {
         if (!class_exists('JFactory')) 
             trigger_error ('No JFactory found', E_USER_ERROR);
             
-        $this->_db = &JFactory::getDBO();     
+        $this->_db = JFactory::getDBO();
+        $this->useMysqli = $this->_db instanceof JDatabaseDriverMysqli;
     }
+    
+    function fetchAssoc($resultResource) {
+        if ($this->useMysqli) return mysqli_fetch_assoc($resultResource);
+        return mysql_fetch_assoc($resultResource);
+    }
+    
+    function fetchObject($resultResource, $className = null) {
+        if ($this->useMysqli) return $className? mysqli_fetch_object($resultResource, $className) : mysqli_fetch_object($resultResource);
+        return $className? mysql_fetch_object($resultResource, $className) : mysql_fetch_object($resultResource);
+    }
+    
+    function freeResultResource($resultResource) {
+        if ($this->useMysqli) return mysqli_free_result($resultResource); 
+        else return mysql_free_result($resultResource);
+    }
+    
 	
 }

@@ -62,7 +62,7 @@ class Ac_Table_Column_Link extends Ac_Table_Column {
             
             if ($this->fastUrl) {
                 if ($this->_urlStaticPart === false) {
-                    $url = & $this->getUrl();
+                    $url = $this->getUrl();
                     Ac_Util::unsetArrayByPath($url->query, Ac_Util::pathToArray($this->idUrlName));
                     $this->_urlStaticPart = $url->toString();
                     if (!$url->query) $this->_urlStaticPart .= "?"; else $this->_urlStaticPart .= "&";
@@ -71,7 +71,7 @@ class Ac_Table_Column_Link extends Ac_Table_Column {
                 }
                 $res = $this->_urlStaticPart.htmlspecialchars($this->getRecordProperty($record, $this->idColumnName));
             } else {
-                $url = & $this->getUrl();
+                $url = $this->getUrl();
                 Ac_Util::setArrayByPath($url->query, Ac_Util::pathToArray($this->idColumnName), $this->getRecordProperty($record, $this->idColumnName));
                 $res = $url->toString();
             }
@@ -81,8 +81,8 @@ class Ac_Table_Column_Link extends Ac_Table_Column {
     }
     
     function getUrl() {
-        $disp = & Ac_Dispatcher::getInstance();
-        $url = & $disp->getUrl();
+        $disp = Ac_Dispatcher::getInstance();
+        $url = $disp->getUrl();
         if (isset($GLOBALS['Itemid']) && $GLOBALS['Itemid']) $url->query['Itemid'] = $GLOBALS['Itemid'];
         $url->query['task'] = $this->taskName;
         if ($this->hideMainMenu) $url->query['hidemainmenu'] = 1;

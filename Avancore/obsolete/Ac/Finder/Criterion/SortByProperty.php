@@ -69,7 +69,7 @@ class Ac_Finder_Criterion_SortByProperty extends Ac_Finder_Criterion {
     function applyToSelect(Ac_Sql_Select & $select) {
  		$db = new Ac_Sql_Db_Ae();
  		if (is_array($this->propName)&&($this->propName) || strlen($this->propName)) {
-    		$selectPart = & Ac_Sql_Part::factory(array(
+    		$selectPart = Ac_Sql_Part::factory(array(
     			'class' => 'Ac_Sql_Order_Simple',
  			));
             if (is_string($this->propName) || is_object($this->propName)) {

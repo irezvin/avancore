@@ -386,7 +386,7 @@ class Ac_Model_Values {
         $na = func_num_args();
         for($i = 1; $i < $na; $i++) $params[] = func_get_arg($i);
         if (is_array($cb)) {
-            if (($c = count($cb)) > 2) for($i = 2; $i < $c; $i++) $params[] = & $cb[$i];
+            if (($c = count($cb)) > 2) for($i = 2; $i < $c; $i++) $params[] = $cb[$i];
             
             if ($cb[0] === false) $callback = $cb[1];
             elseif ($cb[0] === true) $callback = array(& $this->data, $cb[1]);

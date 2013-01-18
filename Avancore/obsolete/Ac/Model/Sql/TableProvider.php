@@ -32,14 +32,14 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 	
 	function _setMapper(& $mapper) {
 		if (!is_a($mapper, 'Ac_Model_Mapper')) trigger_error("\$mapper should be an instance of Ac_Model_Mapper", E_USER_ERROR);
-		$this->_mapper = & $mapper; 
+		$this->_mapper = $mapper; 
 	}
 	
 	function getMapper($required = false) {
 		if (!$this->_mapper && strlen($this->_mapperClass)) {
-			$this->_mapper = & Ac_Model_Mapper::getMapper($this->_mapperClass);
+			$this->_mapper = Ac_Model_Mapper::getMapper($this->_mapperClass);
 		}
-		$res = & $this->_mapper;
+		$res = $this->_mapper;
 		if ($required && !$res) trigger_error("Neither \$mapper nor \$mapperClass are provided", E_USER_ERROR);
 		return $res;
 	}
@@ -60,10 +60,10 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 				$baseInfo = array('mapperClass' => $this->getMapperClass());
 			}
 			if ($baseInfo) {
-				$mapper = & Ac_Model_Mapper::getMapper($baseInfo['mapperClass']);
+				$mapper = Ac_Model_Mapper::getMapper($baseInfo['mapperClass']);
                 if (!$mapper) throw new Exception("Mapper '{$baseInfo['mapperClass']}' not found");
-				$proto = & $mapper->getPrototype();
-				$pi = & $proto->getPropertyInfo($last, true);
+				$proto = $mapper->getPrototype();
+				$pi = $proto->getPropertyInfo($last, true);
 				if (isset($pi->mapperClass) && $pi->mapperClass && isset($pi->relationId) && ($pi->relationId)) {
 					$info = array('propName' => $last, 'mapperClass' => $pi->mapperClass, 'relationId' => $pi->relationId);
 					if (count($path) > 1) $info['prevAlias'] = $baseAlias;
@@ -85,18 +85,18 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 	function & _doGetTable($alias) {
 		$p = $this->_searchPath($alias);
 		if ($p) {
-			$m = & Ac_Model_Mapper::getMapper($p['mapperClass']);
+			$m = Ac_Model_Mapper::getMapper($p['mapperClass']);
 			if (isset($p['prevAlias'])) {
 				$prevPath = $this->_searchPath($p['prevAlias']);
-				$prevMapper = & Ac_Model_Mapper::getMapper($prevPath['mapperClass']);
+				$prevMapper = Ac_Model_Mapper::getMapper($prevPath['mapperClass']);
 				$joinsAlias = $p['prevAlias'];	
 			}
 			else {
-				$sqs = & $this->getSqlSelect(true);
+				$sqs = $this->getSqlSelect(true);
 				$joinsAlias = $sqs->getEffectivePrimaryAlias();
-				$prevMapper = & $this->getMapper(true);
+				$prevMapper = $this->getMapper(true);
 			}
-			$rel = & $prevMapper->getRelation($p['relationId']);
+			$rel = $prevMapper->getRelation($p['relationId']);
 			$protos = array();
 			if ($rel->midTableName) {
 				$midAlias = 'mid-'.$alias;
@@ -115,9 +115,9 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 				'joinsOn' => $rel->midTableName? array_flip($rel->fieldLinks2) : array_flip($rel->fieldLinks)
 			);
 			foreach ($protos as $alias => $proto) {
-				$t = & $this->addTable($proto, $alias);
+				$t = $this->addTable($proto, $alias);
 			}
-			$res = & $this->_tables[$alias];
+			$res = $this->_tables[$alias];
 		} else {
 			$res = null;
 		}
@@ -128,9 +128,9 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
      * @param Ac_Sql_Select $sqlSelect
      */
     function getSqlSelect($required = false) {
-    	$res = & $this->getParent();
+    	$res = $this->getParent();
     	while ($res && !is_a($res, 'Ac_Sql_Select')) {
-    		$res = & $res->getParent();
+    		$res = $res->getParent();
     	}
     	if ($required && !$res) trigger_error("Cannot retrieve an instance of Ac_Sql_Select (it isn't in any of the parents)", E_USER_ERROR);
     	return $res;

@@ -449,7 +449,7 @@ class Ac_Form_Helper {
         if (!is_array($valueList) || !count($valueList)) {
             // Check if we can use Ac_Data_List here...
             if (isset($options['values']) && is_array($options['values'])) {
-                $vls = & Ac_Model_Values::factoryWithFormOptions($this->_src, $name, $options);
+                $vls = Ac_Model_Values::factoryWithFormOptions($this->_src, $name, $options);
                 $valueList = array('0' => & $vls); 
             }
         }
@@ -554,7 +554,7 @@ class Ac_Form_Helper {
         $attribs['name'] = Ac_Util::concatPaths($this->fieldNamePrefix, $name);
         $mv = false; 
         if (isset($valueList[0]) && is_a($valueList[0], 'Ac_Model_Values')) {
-            $mv = & $valueList[0];
+            $mv = $valueList[0];
             $valueList = $mv->getValueList();
         }
         if ($useInputs) {

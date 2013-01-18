@@ -93,8 +93,8 @@ class Ac_Template_JoomlaPage extends Ac_Template_Html {
     }
     
     function _showQueries() {
-        $disp = & Ac_Dispatcher::getInstance();
-        $db = & $disp->database;
+        $disp = Ac_Dispatcher::getInstance();
+        $db = $disp->database;
         if (is_a($db, 'Ac_Legacy_Database_Native') && $db->trackQueries) {
             foreach ($db->queries as $q) echo '<hr /><pre>'.htmlspecialchars($q).'</pre>';
         }

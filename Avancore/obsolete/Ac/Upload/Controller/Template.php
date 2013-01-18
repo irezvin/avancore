@@ -129,8 +129,8 @@ class Ac_Upload_Controller_Template extends Ac_Template_Html {
     function showUploadItem() {
         
             $readOnly = $this->readOnly;
-            $upload = & $this->upload;
-            $newUpload = & $this->newUpload;
+            $upload = $this->upload;
+            $newUpload = $this->newUpload;
             $paramName = $this->paramName;
             $valueId = $paramName.'_value';
             $titleId = $paramName.'_title';

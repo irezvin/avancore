@@ -39,8 +39,8 @@ class Ac_Admin_Template extends Ac_Template_Html {
      * @param Ac_Admin_Manager $manager
      */
     function setManager(& $manager) {
-        $this->manager = & $manager;
-        $context = & $manager->getContext();
+        $this->manager = $manager;
+        $context = $manager->getContext();
         if ($context->isInForm) {
             $this->formId = $context->isInForm;
             $this->requestMethod = $context->requestMethod;
@@ -48,17 +48,17 @@ class Ac_Admin_Template extends Ac_Template_Html {
             $this->formId = 'managerForm';
             $this->requestMethod = 'post'; 
         }
-        $this->url = & $context->getUrl();
+        $this->url = $context->getUrl();
         $this->actionParam = $context->mapParam('action');
         $this->processingParam = $context->mapParam('processing');
         $this->recordKeyParam = $context->mapParam('recordKey');
         $this->htmlIdsPrefix = $context->mapIdentifier('_');
         $this->actions = array();
-        foreach ($this->manager->listActions() as $a) $this->actions[$a] = & $this->manager->getAction($a);
+        foreach ($this->manager->listActions() as $a) $this->actions[$a] = $this->manager->getAction($a);
     }
     
     function showToolbar() {
-        $this->addJsLib('{AC}overlib_mini.js');
+        $this->addJsLib('{AC}/overlib_mini.js');
         
         if (count($this->actions)) {
 ?>
@@ -66,7 +66,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
     <table class='actions'>
         <tr>
             <td class="beforeActions">&nbsp;</td>
-<?php foreach(array_keys($this->actions) as $a) { $act = & $this->actions[$a]; ?>
+<?php foreach(array_keys($this->actions) as $a) { $act = $this->actions[$a]; ?>
             <td id="<?php echo $this->htmlIdsPrefix ?>_action_td_<?php echo $a; ?>" >
                 <img id="<?php echo $this->htmlIdsPrefix ?>_action_img_<?php echo $a; ?>" />
                 <div><a href="#" id="<?php echo $this->htmlIdsPrefix ?>_action_a_<?php echo $a; ?>">&nbsp;</a></div>
@@ -82,8 +82,8 @@ class Ac_Admin_Template extends Ac_Template_Html {
     
     function showCreateManagerController() {
         $mgrCon = $this->manager->getJsManagerControllerRef();
-        $ctx = & $this->manager->getContext();
-        $h = & $this->getHtmlHelper();
+        $ctx = $this->manager->getContext();
+        $h = $this->getHtmlHelper();
         $sd = $this->manager->getStateData();        
 ?>
 
@@ -105,8 +105,8 @@ class Ac_Admin_Template extends Ac_Template_Html {
     function showJsBindings() {
         
         $mgrCon = $this->manager->getJsManagerControllerRef();
-        $h = & $this->getHtmlHelper();
-        $ctx = & $this->manager->getContext();
+        $h = $this->getHtmlHelper();
+        $ctx = $this->manager->getContext();
 ?>
 
         <script type="text/javascript">
@@ -120,7 +120,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
 <?php        
         if (count($this->actions)) {
             $actionsJson = array();
-            $hlp = & $this->getHtmlHelper();
+            $hlp = $this->getHtmlHelper();
             foreach (array_keys($this->actions) as $a) {
                 $actionsJson[] = $this->actions[$a]->getJson();
             }
@@ -129,7 +129,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
         var _a = <?php echo $act; ?> = new AvanControllers.ActionsController( {
             actions: <?php echo $hlp->toJson($actionsJson, 14, 4, true, false); ?>
         } );
-<?php foreach(array_keys($this->actions) as $a) { $act = & $this->actions[$a]; ?>
+<?php foreach(array_keys($this->actions) as $a) { $act = $this->actions[$a]; ?>
         
         _a.getAction('<?php echo $a; ?>')
                 .observe([AvanControllers.ActionsController.Click, AvanControllers.ActionsController.ShowCaption, AvanControllers.ActionsController.ShowHint], {element: '<?php echo $this->htmlIdsPrefix ?>_action_a_<?php echo $a; ?>'})
@@ -144,7 +144,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
         
         _m.setActionsController(_a);
         
-<?php if ($form = & $this->manager->getForm()) { $fcr = $this->manager->getJsFormControllerRef(); ?>
+<?php if ($form = $this->manager->getForm()) { $fcr = $this->manager->getJsFormControllerRef(); ?>
         
         var _f = <?php echo $fcr; ?> = new AvanControllers.FormController();
         _m.setFormController(_f);
@@ -170,11 +170,11 @@ class Ac_Admin_Template extends Ac_Template_Html {
     }
     
     function showFilterForm() {
-        $f = & $this->manager->getFilterForm();
+        $f = $this->manager->getFilterForm();
 ?>
     <div class='filters'>
 <?php
-        $r = & $this->manager->_getFilterFormResponse();
+        $r = $this->manager->_getFilterFormResponse();
         echo $r->content;
         $this->htmlResponse->mergeWithResponse($r);
 ?>
@@ -184,9 +184,9 @@ class Ac_Admin_Template extends Ac_Template_Html {
     }        
     
     function showManagerList() {
-        $table = & $this->manager->getTable();
-        $pager = & $this->manager->getPagination();
-        $filterForm = & $this->manager->getFilterForm();
+        $table = $this->manager->getTable();
+        $pager = $this->manager->getPagination();
+        $filterForm = $this->manager->getFilterForm();
 ?>
     <script type='text/javascript'>
         <?php $this->d($this->manager->getJsManagerControllerRef(), true); ?>.setListController( 
@@ -203,7 +203,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
     }
     
     function showManagerDetails() {
-        $ctx = & $this->manager->getContext();
+        $ctx = $this->manager->getContext();
 ?>   
     <div class='details' id='<?php echo $ctx->mapIdentifier('formContainer') ?>'>   
     <?php $this->showFormContent(); ?>   
@@ -217,7 +217,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
     }
     
     function showFormContent() {
-        $r = & $this->manager->_getFormResponse();
+        $r = $this->manager->_getFormResponse();
         echo $r->content;
         $this->htmlResponse->mergeWithResponse($r);   
     }
@@ -226,8 +226,9 @@ class Ac_Admin_Template extends Ac_Template_Html {
         //$this->addJsLib('prototype.js');
 
         // TODO: FIX this one because there is no more Adapter here in Ac0.3!
+        
         $this->addAssetLibs(
-            Ac_Dispatcher::getInstance()->adapter->getManagerJsAssets()
+            $this->controller->getConfigService()->getManagerJsAssets()
         );
         
         if ($this->assets) {
@@ -239,12 +240,12 @@ class Ac_Admin_Template extends Ac_Template_Html {
         
         if ($isPart) $innerHtml = $this->fetch($innerHtml, $params);
         
-        $context = & $this->manager->getContext();
+        $context = $this->manager->getContext();
         $formName = $this->manager->getManagerFormName();
         
         if (!$context->isInForm) {
             
-            $url = & $this->manager->getManagerUrl();
+            $url = $this->manager->getManagerUrl();
         
 ?>
     <form action="<?php $this->d($url->toString(false)); ?>" method="<?php $this->d($context->requestMethod); ?>" id="<?php $this->d($formName); ?>" name="<?php $this->d($formName); ?>" enctype="multipart/form-data" >
@@ -256,7 +257,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
             $stateData = $this->manager->getStateData();
             unset($stateData['action']);
             $adp = $this->manager->_context->getDataPath();
-            echo $foo = Ac_Url::getHidden($stateData, /*Ac_Util::arrayToPath($adp)*/ $adp );
+            echo $foo = Ac_Url::queryToHidden($stateData, /*Ac_Util::arrayToPath($adp)*/ $adp );
         } ?>
 
     <div class='manager'>
@@ -269,7 +270,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
     <?php $this->showJsBindings(); ?>
     </div>
     
-    <?php if ($this->_showTableMtime && ($m = & $this->manager->getMapper())) var_dump(date("Y-m-d H:i:s", $m->getMtime())); ?>
+    <?php if ($this->_showTableMtime && ($m = $this->manager->getMapper())) var_dump(date("Y-m-d H:i:s", $m->getMtime())); ?>
     
 <?php if (!$context->isInForm) { ?>
     
@@ -278,12 +279,12 @@ class Ac_Admin_Template extends Ac_Template_Html {
     }
     
     function _showSubManagers() {
-        $this->addCssLib('{ACCSS}tabcontent.css', false);
-        $this->addJsLib('{AC}tabcontent.js', false);
-        $ctx = & $this->manager->getContext();
+        $this->addCssLib('{AC}/tabcontent.css', false);
+        $this->addJsLib('{AC}/tabcontent.js', false);
+        $ctx = $this->manager->getContext();
         $tcId = $ctx->mapIdentifier('smTabs');
         $tcVar = $tcId.'_o';
-        $h = & $this->getHtmlHelper();
+        $h = $this->getHtmlHelper();
         
 ?>
 
@@ -292,8 +293,8 @@ class Ac_Admin_Template extends Ac_Template_Html {
         <ul id="<?php $this->d($tcId); ?>" class="shadetabs">
 <?php foreach ($this->manager->listSubManagers() as $id) { 
         $smId = $ctx->mapIdentifier('smTab_'.$id); 
-        $sm = & $this->manager->getSubManager($id);
-        $resp = & $sm->getResponse();
+        $sm = $this->manager->getSubManager($id);
+        $resp = $sm->getResponse();
 ?>
     
         <li><a href="#" rel="<?php $this->d($smId); ?>"><?php $this->d($sm->getPluralCaption()); ?></a></li>
@@ -303,8 +304,8 @@ class Ac_Admin_Template extends Ac_Template_Html {
         <div class='tabContainer'>
 <?php foreach ($this->manager->listSubManagers() as $id) { 
     $smId = $ctx->mapIdentifier('smTab_'.$id); 
-    $sm = & $this->manager->getSubManager($id);
-    $resp = & $sm->getResponse();
+    $sm = $this->manager->getSubManager($id);
+    $resp = $sm->getResponse();
     
 ?>
     

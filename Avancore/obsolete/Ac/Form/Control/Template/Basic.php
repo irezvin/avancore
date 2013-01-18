@@ -68,13 +68,13 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
 <?php
         }
         
-        $ctx = & $form->getContext();
+        $ctx = $form->getContext();
         if (!$ctx->isInForm) { 
             $attribs = array();
             $ownAttribs = $form->getHtmlAttribs();
-            // FIXME $url = & $ctx->getUrl();
+            // FIXME $url = $ctx->getUrl();
             if (!isset($ownAttribs['action'])) {
-                $url = & $ctx->_baseUrl;
+                $url = $ctx->_baseUrl;
                 $attribs['action'] = $url->toString($form->baseUrlToAction);
             }
             $attribs['method'] = $ctx->requestMethod;
@@ -663,8 +663,8 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
      * @param Ac_Form_Control_Parameters $params
      */    
     function showParameters($params) {
-        $mp = & $params->getMosParameters();
-        $ctx = & $params->getContext();
+        $mp = $params->getMosParameters();
+        $ctx = $params->getContext();
         echo $mp->render($ctx->mapParam('value')); 
     }
     
@@ -672,7 +672,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
      * @param Ac_Form_Control_Date $date
      */
     function showDate($date) {
-        $context = & $date->getContext();
+        $context = $date->getContext();
         $id = $date->getId();    
         $name = $this->_mapNames($date, 'value');
             $attribs = Ac_Util::m($this->_getAttribs($date), array(
@@ -687,9 +687,9 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             <input <?php echo Ac_Util::mkAttribs($attribs); ?> />
 <?php
         if ($date->showCalendar && !$date->isReadOnly()) {
-            $this->addJsLib('{AC}calendar/calendar_stripped.js');
-            $this->addJsLib('{AC}calendar/calendar-setup_stripped.js');
-            $this->addJsLib('{AC}calendar/lang/calendar-'.(defined('AC_LANG_ID')? AC_LANG_ID : 'en').'.js');
+            $this->addJsLib('{AC}/calendar/calendar_stripped.js');
+            $this->addJsLib('{AC}/calendar/calendar-setup_stripped.js');
+            $this->addJsLib('{AC}/calendar/lang/calendar-'.(defined('AC_LANG_ID')? AC_LANG_ID : 'en').'.js');
             if ($date->calendarSkin) {
                 $this->addCssLib('{ACCSS}js/calendar/calendar-'.$date->calendarSkin.'.css');
             }
@@ -699,7 +699,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             );
             if ($df = $date->getCalendarDateFormat()) $json['ifFormat'] = $df;
             Ac_Util::ms($json, $date->getExtraJson());
-            $helper = & $this->getHtmlHelper();
+            $helper = $this->getHtmlHelper();
 ?>
             <script type='text/javascript'>
                 Calendar.setup(<?php echo $helper->toJson($json, 16); ?>);

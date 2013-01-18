@@ -7,13 +7,13 @@ class Ac_Form_Control_Template_Table extends Ac_Form_Control_Template {
      */
     function showTable (& $table) {
         $this->addCssLib('{ACCSS}aeTableInput.css', false);
-        $this->addJsLib('{AC}aeTableData.js', false);
-        $this->addJsLib('{AC}aeTableInput.js', false);
+        $this->addJsLib('{AC}/aeTableData.js', false);
+        $this->addJsLib('{AC}/aeTableInput.js', false);
         $hh = $this->getHtmlHelper();
         $jsnData = $hh->toJson($table->getDataJson(), 8, 4, true, false);
         //Ac_Util::d($table->getDataJson());
         $jsnOptions = $hh->toJson($table->getTableJson(), 8, 4, true, false); 
-        $ctx = & $table->getContext();
+        $ctx = $table->getContext();
         $tcId = $ctx->mapIdentifier('ctr');
         $jsDataId = $ctx->mapIdentifier('data');
         $jsTableId = $ctx->mapIdentifier('table');

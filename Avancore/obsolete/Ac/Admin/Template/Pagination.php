@@ -70,7 +70,7 @@ class Ac_Admin_Template_Pagination extends Ac_Template_Html {
      */
     function populate(& $pagination, & $context, $numPages, $limitsList) {
         $this->formId = strlen($context->isInForm)? $context->isInForm : $context->mapIdentifier('form');
-        $this->formUrl = & $context->getUrl();
+        $this->formUrl = $context->getUrl();
         $this->pageParamName = $context->mapParam('pageNo');
         $this->limitParamName = $context->mapParam('recordsPerPage');
         $this->numPages = $numPages;
@@ -85,12 +85,12 @@ class Ac_Admin_Template_Pagination extends Ac_Template_Html {
         $this->showTotals = $pagination->showTotals;
         $this->showFormTag = $pagination->showFormTag;
         if ($pagination->putUrlsToLinks) {
-            $context = & $pagination->getContext();
-            $otherContext = & $context->cloneObject();
+            $context = $pagination->getContext();
+            $otherContext = $context->cloneObject();
             $otherContext->setState(false);
             $otherContext->stateIsExternal = true;
             $otherContext->_url = false;
-            $this->baseUrl = & $otherContext->getUrl();
+            $this->baseUrl = $otherContext->getUrl();
         }
     }
     
@@ -103,7 +103,7 @@ class Ac_Admin_Template_Pagination extends Ac_Template_Html {
             if (!$pageNo) $pageNo = 0;
             if ($url !== false) {
                 if ($url == true) {
-                    $myUrl = & $this->baseUrl->cloneObject();
+                    $myUrl = $this->baseUrl->cloneObject();
                     //var_dump($myUrl->query);
                     Ac_Util::setArrayByPath($myUrl->query, Ac_Util::pathToArray($this->pageParamName), $pageNo, true);
                 } else {
@@ -151,7 +151,7 @@ class Ac_Admin_Template_Pagination extends Ac_Template_Html {
         
 ?>
     <div class='pagination'>
-        <?php if ($this->showFormTag) { $u = & $this->formUrl(); ?>
+        <?php if ($this->showFormTag) { $u = $this->formUrl(); ?>
             <form method="<?php $this->d($this->context->requestMethod); ?>" action="<?php $this->d($u->toString(false)); ?>" name="<?php $this->d($fid); ?>">
         <?php } ?>
             <input type='hidden' name='<?php $this->d($this->pageParamName); ?>' value='<?php $this->d($this->currPage); ?>' />

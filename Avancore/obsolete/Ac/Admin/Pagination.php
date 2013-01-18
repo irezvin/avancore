@@ -172,14 +172,14 @@ class Ac_Admin_Pagination extends Ac_Legacy_Controller {
     }
     
     function doPopulateResponse() {
-        //$tpl = & $this->_template;
-        //$resp = & $this->_response;
+        //$tpl = $this->_template;
+        //$resp = $this->_response;
         //$resp->content = $tpl->fetch();
     }
     
     function show() {
-        $resp = & $this->getResponse();
-        $tpl = & $this->getTemplate();
+        $resp = $this->getResponse();
+        $tpl = $this->getTemplate();
         $resp->content = $tpl->show();
         echo $resp->content;
     }

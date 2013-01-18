@@ -14,7 +14,7 @@ class Ac_Legacy_Output_Joomla extends Ac_Legacy_Output {
     var $shownJs = array();
     
     function __construct() {
-        $this->mainframe = & $GLOBALS['mainframe'];
+        $this->mainframe = $GLOBALS['mainframe'];
     }
     
     function setPageTitle($pageTitle) {
@@ -22,7 +22,7 @@ class Ac_Legacy_Output_Joomla extends Ac_Legacy_Output {
     }
     
     function addCustomHeadTag($tag, $unique = false) {
-        $document=& JFactory::getDocument();
+        $document = JFactory::getDocument();
 		if($document->getType() == 'html') {
 		    $ok = true;
 		    if ($unique) {
@@ -36,7 +36,7 @@ class Ac_Legacy_Output_Joomla extends Ac_Legacy_Output {
     /**
      * @param Ac_Legacy_Controller_Response_Html $response
      */
-    function outputResponse(Ac_Legacy_Controller_Response_Html $response) {
+    function outputResponse(Ac_Legacy_Controller_Response_Html $response, $asModule = false) {
         
         if (func_num_args() > 1) {
             $asModule = func_get_arg(1);
@@ -135,7 +135,7 @@ class Ac_Legacy_Output_Joomla extends Ac_Legacy_Output {
     /**
      * @param Ac_Legacy_Controller_Response_Html $response
      */
-    function showPathway($response) {
+    function showPathway(Ac_Legacy_Controller_Response_Html $response) {
             if ($response->pathway) {
                 $pw = $response->pathway;
                 foreach ($pw as $urlAndText) {

@@ -102,7 +102,7 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
     /**
      * @param Ac_Legacy_Controller_Response_Html $subResponse
      */
-    function mergeWithResponse (& $subResponse, $withTitleAndPathway = true, $putContent = false) {
+    function mergeWithResponse ($subResponse, $withTitleAndPathway = true, $putContent = false) {
         if ($subResponse === $this) throw new Exception("Response cannot merge with itself");
         if ($subResponse->noWrap) {
                 $this->noWrap = true;

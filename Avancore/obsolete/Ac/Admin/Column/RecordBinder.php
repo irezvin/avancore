@@ -20,7 +20,7 @@ class Ac_Admin_Column_RecordBinder extends Ac_Admin_Column {
 
      function showHeader($rowCount, $rowNo = 1) {
          $this->_table->trAttribsCallback = array(& $this, 'trAttribsCallback');
-         $this->_context = & $this->manager->getContext();
+         $this->_context = $this->manager->getContext();
      }
      
      function trAttribsCallback(& $record, & $attribs) {
@@ -33,8 +33,8 @@ class Ac_Admin_Column_RecordBinder extends Ac_Admin_Column {
      }
      
      function showHint() {
-        $tpl = & $this->manager->getTemplate();
-        $jsHelper = & $tpl->getHtmlHelper();
+        $tpl = $this->manager->getTemplate();
+        $jsHelper = $tpl->getHtmlHelper();
         ?>
      
         <script type="text/javascript">

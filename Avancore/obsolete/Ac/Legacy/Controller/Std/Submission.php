@@ -95,8 +95,8 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
             $this->_form = null;
             if ($this->_model === false) {
                 if ($this->mapperClass) {
-                    $mapper = & Ac_Model_Mapper::getMapper($this->mapperClass);
-                    $this->_model = & $mapper->factory();
+                    $mapper = Ac_Model_Mapper::getMapper($this->mapperClass);
+                    $this->_model = $mapper->factory();
                 } else {
                     assert(strlen($this->modelClass));
                     $this->_model = new $this->modelClass;
@@ -106,20 +106,20 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
             $ppf = $this->publicPropertyFlag;
             $conv = new Ac_Form_Converter();
             foreach ($this->_model->listProperties() as $propName) {
-                $prop = & $this->_model->getPropertyInfo($propName);
+                $prop = $this->_model->getPropertyInfo($propName);
                 if (!$ppf || isset($prop->$ppf) && $prop->$ppf) {
                     $fieldSettings= $conv->getControlSettings($prop);
                     $formPrototype['controls'][$propName] = $fieldSettings;
                 }
             }
             $this->doOnFormPrototype($prototype);
-            $feContext = & $this->_context->cloneObject();
+            $feContext = $this->_context->cloneObject();
             $pp = $this->getPersistentParameters();
             $path = Ac_Util::pathToArray($feContext->mapParam(array()));
             $d = array();
             Ac_Util::setArrayByPath($d, $path, $pp);
             Ac_Util::ms($feContext->_baseUrl->query, $pp);
-            $formContext = & $feContext->spawn('form');
+            $formContext = $feContext->spawn('form');
             $this->_form = new Ac_Form($formContext, $formPrototype, 'form');
             $this->_form->setModel($this->_model);
         }
@@ -161,7 +161,7 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
     
     function isAdmin() {
         $res = false;
-        $disp = & Ac_Dispatcher::getInstance();
+        $disp = Ac_Dispatcher::getInstance();
         if (isset($GLOBALS['my']) && is_a($GLOBALS['my'], 'mosUser') && $GLOBALS['my']->usertype == 'Super Administrator') $res = true;
         elseif ($disp->config->debug) $res = true;
         return $res;
@@ -169,13 +169,13 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
 
     function executeDefault() {
         $this->getTemplate();
-        $this->_template->frontend = & $this;
+        $this->_template->frontend = $this;
         
-        $form = & $this->getForm();
-        $model = & $this->getModelObject();
-        $this->_template->model = & $model;
+        $form = $this->getForm();
+        $model = $this->getModelObject();
+        $this->_template->model = $model;
         
-        foreach (array_keys($this->modelExtraVars) as $k) $model->$k = & $this->modelExtraVars[$k];
+        foreach (array_keys($this->modelExtraVars) as $k) $model->$k = $this->modelExtraVars[$k];
         $ok = false;
         if ($form->isSubmitted()) {
             $data = $form->getValue();
@@ -250,7 +250,7 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
     function notifyRecipients() {
         foreach ($this->doGetSendouts() as $sendoutPrototype) {
             $sendout = new Ac_Legacy_Controller_Std_Submission_Sendout($this, $this->getModelObject(), $this->getTemplate(), $sendoutPrototype);
-            $mail = & $sendout->getMail();
+            $mail = $sendout->getMail();
             if ($mail) {
                 if ($this->doBeforeSendMail($mail, $sendout) !== false) {
                     if (!$mail->send()) {
@@ -264,7 +264,7 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
     
     function doBeforeExecute() {
         $this->getTemplate();
-        $this->_template->submission = & $this; 
+        $this->_template->submission = $this; 
     }
     
     
