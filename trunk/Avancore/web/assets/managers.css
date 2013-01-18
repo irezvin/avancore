@@ -91,14 +91,27 @@ td.w20, th.w20 {width: 20px}
 span.captionWithDesc {border-bottom: 1px dashed silver; cursor: help}
 span.captionWithDesc:hover {border-bottom: 1px solid silver;]}
 
-.btn-toolbar .actions {
+body.admin .btn-toolbar .actions {
     font-size: 14px;
+    line-height: 14px;
 }
 
-.pagination .position select {
+body.admin .pagination .position select {
     width: 50px;
 }
 
-.pagination {
+body.admin .pagination {
     margin-top: 1em!important;
+}
+
+body.admin div.btn-group {
+    line-height: 0;
+}
+
+body.admin #toolbar {
+    margin-bottom: 0;
+}
+
+body.admin td.enabled {
+    cursor: pointer;
 }
