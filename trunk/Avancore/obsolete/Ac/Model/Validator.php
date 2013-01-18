@@ -96,7 +96,7 @@ class Ac_Model_Validator {
      * @param bool|array $fieldsInfo Array with fields metadata (array('fieldName' => array(...))) or FALSE (metadata will be taken from $model)
      * @return Ac_Model_Validator
      */
-    function & factory (& $model, $fieldsInfo = false) {
+    function factory ($model, $fieldsInfo = false) {
         $res = new Ac_Model_Validator($model, $fieldsInfo);
         return $res;
     }
@@ -105,7 +105,7 @@ class Ac_Model_Validator {
      * @param object|array $model Model that we work with (can be object or associative array)
      * @param bool|array $fieldsInfo Array with fields metadata (array('fieldName' => array(...))) or FALSE (metadata will be taken from $model)
      */
-    function Ac_Model_Validator(& $model, $fieldsInfo = false) {
+    function Ac_Model_Validator($model, $fieldsInfo = false) {
         $this->model = $model;
         $this->fieldsInfo = $fieldsInfo;
         if (!is_object($model) && !$fieldsInfo) trigger_error ('Model is not an object and won\'t be able to return any metadata; $fieldsInfo is also empty.', E_USER_WARNING);
@@ -157,7 +157,7 @@ class Ac_Model_Validator {
         return $res;
     }
     
-    function _getMethod(& $target, $prefix, $suffix = '') {
+    function _getMethod($target, $prefix, $suffix = '') {
         $methodName = $prefix.ucfirst($suffix);
         if (method_exists($target, $methodName)) $res = $methodName;
             else $res = false;

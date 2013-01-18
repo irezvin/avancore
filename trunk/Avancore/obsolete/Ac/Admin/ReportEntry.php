@@ -30,7 +30,7 @@ class Ac_Admin_ReportEntry {
     /**
      * @param Ac_Admin_ReportEntry $entry
      */
-    function addChildEntry(& $entry) {
+    function addChildEntry($entry) {
         $this->_entries[] = $entry;
     }
     

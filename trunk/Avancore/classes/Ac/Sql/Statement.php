@@ -32,7 +32,7 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
      * @return Ac_Sql_Statement
      */
     
-    function & factory($parts, $params = array(), $extraOptions = array()) {
+    function factory($parts, $params = array(), $extraOptions = array()) {
         if (!is_array($parts)) $parts = array('expression' => $parts);
         $options = array(
             'parts' => $parts,
@@ -97,10 +97,10 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
                 $i = 0;
                 $newParts = array();
                 foreach (array_keys($this->parts) as $k) {
-                    if ($i === $pos) $newParts[$key] = & $this->parts[$key];
+                    if ($i === $pos) $newParts[$key] = $this->parts[$key];
                     if ($key !== $k) {
-                        if (is_numeric($k)) $newParts[] = & $this->parts[$k];
-                            else $newParts[$k] = & $this->parts[$k];
+                        if (is_numeric($k)) $newParts[] = $this->parts[$k];
+                            else $newParts[$k] = $this->parts[$k];
                     }
                     $i++;
                 }
@@ -124,7 +124,7 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
         return $res;
     }
     
-    function addPartByRef(& $part, $key = false, $atPos = false, $params = array()) {
+    function addPartByRef($part, $key = false, $atPos = false, $params = array()) {
         if ($key === false) {
             $key = count($this->parts);
         }
@@ -133,9 +133,9 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
         $i = 0;
         if (!is_numeric($key) && array_key_exists($key, $this->parts)) unset($this->parts[$key]);
         foreach (array_keys($this->parts) as $k) {
-            if ($i === $atPos) $newParts[$key] = & $part;
-            if (is_numeric($k)) $newParts[] = & $this->parts[$k];
-                else $newParts[$k] = & $this->parts[$k];
+            if ($i === $atPos) $newParts[$key] = $part;
+            if (is_numeric($k)) $newParts[] = $this->parts[$k];
+                else $newParts[$k] = $this->parts[$k];
         }
         $this->parts = $newParts;
         if (count($params)) $this->applyParams($params);
@@ -191,14 +191,14 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
     /**
      * @param Ac_Legacy_Database|Ac_Sql_Db $db
      */
-    function setDb(& $db) {
+    function setDb($db) {
         if (!is_null($db) && !is_a($db, 'Ac_Sql_Db') && !is_a($db, 'Ac_Legacy_Database'))
             trigger_error('\$db must be either null, Ac_Legacy_Database or Ac_Sql_Db instance', E_USER_ERROR);
             
         if (is_a($db, 'Ac_Legacy_Database')) {
             $this->_db = new Ac_Sql_Db_Ae($db);
         }
-        $this->_db = & $db;
+        $this->_db = $db;
         $this->_expr = false;
     }
     
@@ -206,10 +206,10 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
         return array_diff(array_keys(get_object_vars($this)), array('_db'));
     }
     
-    function getExpression(& $db = null) {
+    function getExpression($db = null) {
         if ($this->_expr === false) {
             if (!is_null($db)) {
-                $tmp = & $this->_db;
+                $tmp = $this->_db;
                 $this->setDb($db);
             }
             if (!$this->_db) {
@@ -219,13 +219,13 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
             $this->_expr = $this->_quotePart($this->parts, $this->_getQParams());
             if (!isset($GLOBALS['sum'])) $GLOBALS['sum'] = 0; 
             if (!is_null($db)) {
-                $this->_db = & $tmp;
+                $this->_db = $tmp;
             }
         }
         return $this->_expr;
     }
     
-    function nameQuote(& $db) {
+    function nameQuote($db) {
         return $this->getExpression($db);
     }
     
@@ -233,7 +233,7 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
         $n = 0;
         foreach (array_diff(array_keys($this->params), array_keys($this->_qp)) as $k) {
             $n++;
-            $v = & $this->params[$k];
+            $v = $this->params[$k];
             if (is_a($v, 'Ac_Sql_Expression') && method_exists($v, 'applyGlobalParams')) {
                 $gParams = $this->params;
                 $qParams = $this->_qParams;
@@ -248,7 +248,7 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
         return $this->_qParams;
     }
     
-    function _quotePart(& $part, $qParams) {
+    function _quotePart($part, $qParams) {
         if (is_string($part)) {
             $res = strtr($part, $qParams);
         } elseif (is_array($part)) {

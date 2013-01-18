@@ -27,7 +27,7 @@ class Ac_Sql_Dbi_TableProvider extends Ac_Sql_Select_TableProvider {
 	
 	function getPrimaryTable() {
 	    if ($this->_primaryTable === false) {
-	        $select = & $this->getSqlSelect();
+	        $select = $this->getSqlSelect();
 	        $primaryAlias = $select->getEffectivePrimaryAlias();
 	        $this->_primaryTable = $select->getTableName($primaryAlias)->name;	        
 	    }
@@ -51,9 +51,9 @@ class Ac_Sql_Dbi_TableProvider extends Ac_Sql_Select_TableProvider {
 				$baseInfo = array('mapperClass' => $this->getMapperClass());
 			}
 			if ($baseInfo) {
-				$mapper = & Ac_Model_Mapper::getMapper($baseInfo['mapperClass']);
-				$proto = & $mapper->getPrototype();
-				$pi = & $proto->getPropertyInfo($last, true);
+				$mapper = Ac_Model_Mapper::getMapper($baseInfo['mapperClass']);
+				$proto = $mapper->getPrototype();
+				$pi = $proto->getPropertyInfo($last, true);
 				if (isset($pi->mapperClass) && $pi->mapperClass && isset($pi->relationId) && ($pi->relationId)) {
 					$info = array('propName' => $last, 'mapperClass' => $pi->mapperClass, 'relationId' => $pi->relationId);
 					if (count($path) > 1) $info['prevAlias'] = $baseAlias;
@@ -72,21 +72,21 @@ class Ac_Sql_Dbi_TableProvider extends Ac_Sql_Select_TableProvider {
 		return $this->_searchPath($alias) !== false;
 	}
 	
-	function & _doGetTable($alias) {
+	function _doGetTable($alias) {
 		$p = $this->_searchPath($alias);
 		if ($p) {
-			$m = & Ac_Model_Mapper::getMapper($p['mapperClass']);
+			$m = Ac_Model_Mapper::getMapper($p['mapperClass']);
 			if (isset($p['prevAlias'])) {
 				$prevPath = $this->_searchPath($p['prevAlias']);
-				$prevMapper = & Ac_Model_Mapper::getMapper($prevPath['mapperClass']);
+				$prevMapper = Ac_Model_Mapper::getMapper($prevPath['mapperClass']);
 				$joinsAlias = $p['prevAlias'];	
 			}
 			else {
-				$sqs = & $this->getSqlSelect(true);
+				$sqs = $this->getSqlSelect(true);
 				$joinsAlias = $sqs->getEffectivePrimaryAlias();
-				$prevMapper = & $this->getMapper(true);
+				$prevMapper = $this->getMapper(true);
 			}
-			$rel = & $prevMapper->getRelation($p['relationId']);
+			$rel = $prevMapper->getRelation($p['relationId']);
 			$protos = array();
 			if ($rel->midTableName) {
 				$midAlias = 'mid-'.$alias;
@@ -105,9 +105,9 @@ class Ac_Sql_Dbi_TableProvider extends Ac_Sql_Select_TableProvider {
 				'joinsOn' => $rel->midTableName? array_flip($rel->fieldLinks2) : array_flip($rel->fieldLinks)
 			);
 			foreach ($protos as $alias => $proto) {
-				$t = & $this->addTable($proto, $alias);
+				$t = $this->addTable($proto, $alias);
 			}
-			$res = & $this->_tables[$alias];
+			$res = $this->_tables[$alias];
 		} else {
 			$res = null;
 		}
@@ -118,9 +118,9 @@ class Ac_Sql_Dbi_TableProvider extends Ac_Sql_Select_TableProvider {
      * @param Ac_Sql_Select $sqlSelect
      */
     function getSqlSelect($required = false) {
-    	$res = & $this->getParent();
+    	$res = $this->getParent();
     	while ($res && !is_a($res, 'Ac_Sql_Select')) {
-    		$res = & $res->getParent();
+    		$res = $res->getParent();
     	}
     	if ($required && !$res) trigger_error("Cannot retrieve an instance of Ac_Sql_Select (it isn't in any of the parents)", E_USER_ERROR);
     	return $res;

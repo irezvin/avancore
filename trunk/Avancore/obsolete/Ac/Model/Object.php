@@ -123,7 +123,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     // Models that have same properties use common validator (stored in the mapper). This preserves memory and time required for initial metadata retrieval. 
-    function & _createValidator() {
+    function _createValidator() {
         if ($this->hasUniformPropertiesInfo()) {
             $m = $this->getMapper();
             $res = $m->getCommonValidator();
@@ -513,7 +513,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         //return $this->listOwnFields();
     }
 
-    function move( $dirn, $where='' ) {
+    function move($dirn, $where='' ) {
         $k = $this->_pk;
 
         $sql = "SELECT $this->_pk, ordering FROM $this->_tableName";
@@ -831,7 +831,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     /**
      * Stores upstanding records and populates this record foreign keys.
      */
-    function _autoStoreUpstanding(& $recordOrRecords, $fieldLinks, $errorKey) {
+    function _autoStoreUpstanding($recordOrRecords, $fieldLinks, $errorKey) {
         $res = true;
         if ($recordOrRecords !== false && !is_null($recordOrRecords)) {
             if (is_array($recordOrRecords)) $r = $recordOrRecords;
@@ -853,7 +853,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     /**
      * Populates downstanding records' foreign keys from this record keys and stores them
      */
-    function _autoStoreDownstanding(& $recordOrRecords, $fieldLinks, $errorKey) {
+    function _autoStoreDownstanding($recordOrRecords, $fieldLinks, $errorKey) {
         $res = true;
         if ($recordOrRecords !== false && !is_null($recordOrRecords)) {
             if (is_array($recordOrRecords)) $r = $recordOrRecords;
@@ -872,7 +872,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
-    function _autoStoreNNRecords(& $recordOrRecords, & $ids, $fieldLinks, $fieldLinks2, $midTableName, $errorKey) {
+    function _autoStoreNNRecords(& $recordOrRecords, $ids, $fieldLinks, $fieldLinks2, $midTableName, $errorKey) {
         $res = true;
         if ($recordOrRecords !== false && !is_null($recordOrRecords)) {
             $ids = array();
@@ -938,7 +938,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     /**
      * @return Ac_Model_Object
      */
-    function & copy($asReference = null, $withPk = false) {
+    function copy($asReference = null, $withPk = false) {
         $m = $this->getMapper();
         $copy = $m->factory();
         $flds = array_diff($this->_listOwnPublicVars(), $this->doListNonCopiedFields());
@@ -960,7 +960,7 @@ class Ac_Model_Object extends Ac_Model_Data {
      * @param Ac_Model_Object $otherObject
      * @param array|false $assocList List and order of associations to compare. 'False' means default (doListDefaultComparedAssociations()). Can be recursive, i.e. ('assoc1', 'assoc2', 'assoc3' => array('assoc3.1', 'assoc3.2', ...)) 
      */
-    function equals(& $otherObject, $assocList = false) {
+    function equals($otherObject, $assocList = false) {
         
         // prevent recursion
         if ($this->_isBeingCompared) return true;
@@ -1019,7 +1019,7 @@ class Ac_Model_Object extends Ac_Model_Data {
      * @param string $assocName Name of association property
      * @param array|false subAssocList List and order of associations to compare in associated objects (is passed as second parameter to Ac_Model_Object::equals() call). False means 'use default'
      */
-    function _compareAssociation(& $otherObject, $assocName, $subAssocList = false) {
+    function _compareAssociation($otherObject, $assocName, $subAssocList = false) {
         $c1 = get_class($this);
         $c2 = get_class($otherObject);
         
@@ -1088,16 +1088,16 @@ class Ac_Model_Object extends Ac_Model_Data {
      * @param Ac_Model_Object $otherObject
      * @return mixed|bool The method should return FALSE if comparison fails (otherwise objec will be considered matching) 
      */
-    function doOnExtraCompare (& $otherObject) {
+    function doOnExtraCompare ($otherObject) {
     }
     
     /**
      * @param Ac_Model_Object $copy
      */
-    function doOnCopy(& $copy) {
+    function doOnCopy($copy) {
     }
 
-    function cleanupReferences(& $otherObject) {
+    function cleanupReferences($otherObject) {
         foreach (array_keys(get_object_vars($this)) as $k) {
             if (is_object($this->$k) && Ac_Util::sameObject($this->$k, $otherObject)) {
                 $this->$k = null;

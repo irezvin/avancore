@@ -277,7 +277,7 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
         return $res;
     }
 
-    protected function replacePlaceholder($placeholder, Ac_Content_StructuredText $replaceWith = null, $refsOnly = false, & $buffer = null) {
+    protected function replacePlaceholder($placeholder, Ac_Content_StructuredText $replaceWith = null, $refsOnly = false, $buffer = null) {
         $res = false;
         $ph = null;
         if ($placeholder === false) $ph = $this;
@@ -338,7 +338,8 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
         $this->placeholders = array();
     }
     
-    protected function mergeToSameClass(Ac_Content_StructuredText $content) {
+    protected function mergeToSameClass(Ac_Content $content) {
+        if (!Ac_Content instanceof Ac_Content_StructuredText) throw Ac_E_InvalidCall::wrongType('content', $content, 'Ac_Content_StructuredText');
         if ($this->mergeMode == self::mergeAppend) {
             // Temporarily remove the name to avoid the collisions in $content' placeholders
             $tmp = $this->name;

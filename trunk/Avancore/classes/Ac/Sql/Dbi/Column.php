@@ -17,7 +17,7 @@ class Ac_Sql_Dbi_Column extends Ac_Sql_Dbi_Object {
     var $unsigned = false;
     var $nullable = false;
     
-    function Ac_Sql_Dbi_Column(& $inspector, $name, & $table, $data) {
+    function Ac_Sql_Dbi_Column(& $inspector, $name, $table, $data) {
         $data['name'] = $name;
     	//Ac_Util::simpleBind($data, $this);
     	$this->_assignProperties($data);
@@ -28,7 +28,7 @@ class Ac_Sql_Dbi_Column extends Ac_Sql_Dbi_Object {
     /**
      * @return Ac_Sql_Dbi_Column 
      */
-    function & pointsToSingleForeignColumn() {
+    function pointsToSingleForeignColumn() {
         $fcs = array();
         foreach ($this->_table->listRelations() as $r) {
             $rel = $this->_table->getRelation($r);

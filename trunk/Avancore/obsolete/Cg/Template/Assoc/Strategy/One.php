@@ -12,7 +12,7 @@ class Cg_Template_Assoc_Strategy_One extends Cg_Template_Assoc_Strategy {
     /**
      * @return <?php $this->d($prop->className); ?> 
      */
-    function & get<?php $this->d($ucSingle); ?>() {
+    function get<?php $this->d($ucSingle); ?>() {
         if (<?php $this->d($varId); ?> === false) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, <?php $this->str($relationId); ?>);
@@ -41,7 +41,7 @@ class Cg_Template_Assoc_Strategy_One extends Cg_Template_Assoc_Strategy {
     /**
      * @return <?php $this->d($prop->className); ?>  
      */
-    function & create<?php $this->d($ucSingle); ?>($values = array(), $isReference = false) {
+    function create<?php $this->d($ucSingle); ?>($values = array(), $isReference = false) {
         $m = $this->getMapper(<?php $this->str($this->prop->mapperClass); ?>);
         $res = $m->factory();
         if ($values) $res->bind($values);

@@ -14,7 +14,7 @@ class Ac_Admin_Column_Reorder extends Ac_Table_Column_Reorder {
     /**
      * Renders (echo's) column cell
      */
-    function showCell(& $record, $rowNo) {
+    function showCell($record, $rowNo) {
         
         $upJavascript = false;
         $downJavascript = false;

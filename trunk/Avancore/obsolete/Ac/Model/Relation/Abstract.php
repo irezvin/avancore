@@ -12,7 +12,7 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
         return true;
     }
     
-    function _setRef(& $dest, $varName, & $ref) {
+    function _setRef(& $dest, $varName, $ref) {
         if (is_array($dest)) $dest[$varName] = $ref;
         elseif (method_exists($dest, $setter = 'set'.ucfirst($varName))) $dest->$setter($ref);
         else $dest->$varName = $ref;
@@ -82,7 +82,7 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
         return true;
     }
     
-    function & _recordInstance($row, $recordClass, & $mapper) {
+    function _recordInstance($row, $recordClass, $mapper) {
         if ($recordClass) {
             $res = new $recordClass($mapper);
             $res->load($row, null, true);
@@ -98,7 +98,7 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
         return $res;
     }
     
-    function & _rowInstance($row) {
+    function _rowInstance($row) {
         $res = $row;
         return $res;
     }
@@ -113,20 +113,20 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
         Ac_Util::simpleSetArrayByPath($array, $path, $instance, $unique);
     }
     
-    function _getFromArray(& $src, $fieldName) {
+    function _getFromArray($src, $fieldName) {
         return $src[$fieldName];
     }
     
-    function _getFromMember(& $src, $fieldName) {
+    function _getFromMember($src, $fieldName) {
         return $src->$fieldName;
     }
     
-    function _getFromGetter(& $src, $fieldName) {
+    function _getFromGetter($src, $fieldName) {
         $m = 'get'.ucfirst($fieldName);
         return $src->$m();
     }
     
-    function _getFromAeData(& $src, $fieldName) {
+    function _getFromAeData($src, $fieldName) {
         return $src->getField($fieldName);
     }
     
@@ -134,7 +134,7 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
      * Retrieves field value from source object or array. Caches retrieval strategy for different classes in static variable (as in Ac_Table_Column).
      * Triggers error if retrieval is not possible.
      */
-    function _getValue(& $src, $fieldName) {
+    function _getValue($src, $fieldName) {
         static $g = array();
         if (is_array($src)) {
             if (!isset($src[$fieldName])) trigger_error('Cannot extract field \''.$fieldName.'\' from an array', E_USER_ERROR);
@@ -176,7 +176,7 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
      * @return array Field values
      * @access private 
      */
-    function _getValues(& $src, $fieldNames, $originalKeys = false, $single = false) {
+    function _getValues($src, $fieldNames, $originalKeys = false, $single = false) {
         $res = array();
         if ($single) {
             $res = $this->_getValue($src, $fieldNames);

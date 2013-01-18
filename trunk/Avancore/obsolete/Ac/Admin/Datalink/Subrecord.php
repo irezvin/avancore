@@ -32,7 +32,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     /**
      * @param Ac_Model_Relation $relation
      */
-    function setRelation(& $relation) {
+    function setRelation($relation) {
         $this->_relation = $relation;
         $this->_mapperClass = false;
         $this->_relationId = false;
@@ -44,7 +44,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
         $this->_relationId = $relationId; 
     }
     
-    function setParentRecord(& $record) {
+    function setParentRecord($record) {
         $this->_parentRecord = $record;
     }
     
@@ -81,7 +81,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
         return $this->_parentRecord;
     }
     
-    function setRecordDefaults(& $record) {
+    function setRecordDefaults($record) {
         if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {
                 foreach ($rel->fieldLinks as $srcField => $destField) {
@@ -93,7 +93,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
         }
     }
     
-    function doAfterBindRecord(& $record, & $requestData) {
+    function doAfterBindRecord(& $record, $requestData) {
         $this->setRecordDefaults($record);
     }
     
@@ -118,7 +118,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
    /**
     * @param Ac_Form $form
     */
-   function onManagerFormCreated(& $form) {
+   function onManagerFormCreated($form) {
         if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {
                 $f = Ac_Util::array_values($rel->fieldLinks);
@@ -137,7 +137,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
    /**
     * @param array $columns
     */
-   function onManagerColumnsPreset(& $columns) {
+   function onManagerColumnsPreset($columns) {
         if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {
                 $f = Ac_Util::array_values($rel->fieldLinks);

@@ -31,7 +31,7 @@ class Ac_Upload_Storage {
     /**
      * @param Ac_Upload_File $upload
      */
-    function saveUpload(& $upload) {
+    function saveUpload($upload) {
         if (!strlen($id = $upload->getId())) $upload->setId($id = $this->_getAutoId());
         $res = file_put_contents($this->_id2filename($id), serialize($upload->getInternalData()));
         return $res;
@@ -40,7 +40,7 @@ class Ac_Upload_Storage {
     /**
      * @return array | false
      */
-    function & loadInternalData($id) {
+    function loadInternalData($id) {
         $n = $this->_id2filename($id);
 //        Ac_Debug_FirePHP::getInstance()->log($n, "id2filename");
         $res = false;

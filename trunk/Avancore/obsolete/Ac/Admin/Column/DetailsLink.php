@@ -17,7 +17,7 @@ class Ac_Admin_Column_DetailsLink extends Ac_Admin_Column {
          parent::doShowHeader();
      }
      
-     function doShowCell(& $record, $rowNo) {
+     function doShowCell($record, $rowNo) {
          $u = $this->manager->getDetailsUrl($record); 
          $this->_recordKeys[$rowNo] = $this->manager->getStrPk($record);
          ?>

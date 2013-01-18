@@ -68,7 +68,7 @@ class Ac_Admin_Template_Pagination extends Ac_Template_Html {
      * @param Ac_Legacy_Controller_Context_Http $context
      * @param array $limitsList
      */
-    function populate(& $pagination, & $context, $numPages, $limitsList) {
+    function populate(& $pagination, $context, $numPages, $limitsList) {
         $this->formId = strlen($context->isInForm)? $context->isInForm : $context->mapIdentifier('form');
         $this->formUrl = $context->getUrl();
         $this->pageParamName = $context->mapParam('pageNo');

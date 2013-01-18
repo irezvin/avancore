@@ -68,7 +68,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
         $this->_mapperClass = $mapperClass;
     }
     
-    function setDatalink(& $datalink) {
+    function setDatalink($datalink) {
         $this->_datalink = false;
         if ($datalink) {
             if (!is_a($datalink, 'Ac_Admin_Datalink')) 
@@ -113,7 +113,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
      * @access protected
      * @param Ac_Model_Object $record
      */
-    function _doProcessRecord(& $record) {
+    function _doProcessRecord($record) {
         
     }
     
@@ -138,13 +138,13 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
         $this->_records = $records;
     }
     
-    function setRecordsCollection(& $recordsCollection) {
+    function setRecordsCollection($recordsCollection) {
         $this->setNoRecords();
         $this->_noRecords = false;
         $this->_recordsCollection = $recordsCollection;
     }
     
-    function canProcessRecord(& $record) {
+    function canProcessRecord($record) {
         if ($this->_datalink) $res = $this->_datalink->canProcessRecord($record);
             else $res = true;
         return $res;
@@ -155,7 +155,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
      * Returns record source that will actually be used to access records 
      * @return Ac_Model_Collection
      */
-    function & _doGetRecordsCollection() {
+    function _doGetRecordsCollection() {
         if ($this->_recordsCollection === false) {
             if (!$this->_extRecords) $this->_recordKeys = $this->_getRecordKeysFromRequest();
             if ($this->_noRecords || is_array($this->_recordKeys) && !count($this->_recordKeys)) $this->_records = array();
@@ -181,7 +181,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     /**
      * @return Ac_Model_Mapper
      */
-    function & _getMapper() {
+    function _getMapper() {
         if ($this->_mapper === false) {
             if (!strlen($this->_mapperClass)) 
                 trigger_error ('Mapper class not provided - call setMapperClass() or provide \'mapperClass\' entry in the config array first', E_USER_ERROR);
@@ -227,7 +227,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     /**
      * @param Ac_Admin_ReportEntry $reportEntry
      */
-    function setReport (& $reportEntry) {
+    function setReport ($reportEntry) {
         if ($reportEntry && !is_a($reportEntry, 'Ac_Admin_ReportEntry'))
             trigger_error ("\$reportEntry should be instance of Ac_Admin_ReportEntry");
         
@@ -241,7 +241,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
         return $this->_report;    
     }
     
-    function addToReport (& $reportEntry) {
+    function addToReport ($reportEntry) {
         if (!$this->_report) $this->_report = $this->_createReportHeader();
         $this->_report->addChildEntry($reportEntry); 
     }
@@ -251,7 +251,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
      * @param string $description
      * @param string $type message|warning|error Message type
      */
-    function reportRecord(& $record, $description, $type = 'message', $dateTime = false, $isAvailable = true) {
+    function reportRecord($record, $description, $type = 'message', $dateTime = false, $isAvailable = true) {
         if (is_a($record, 'Ac_Model_Object') && ($m = $record->getMapper()) && ($tf = $m->getTitleFieldName())) $title = $record->getField($tf);
         elseif ($record->hasProperty('title') && ($p = $record->getPropertyInfo('title')) && !$p->assocClass && !$p->plural) 
             $title = $record->getField('title');
@@ -267,7 +267,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
      * @param bool $forceCheck 
      * @param Ac_Model_Data $record
      */
-    function reportRecordErrors(& $record, $forceCheck = false) {
+    function reportRecordErrors($record, $forceCheck = false) {
         if ($forceCheck || $record->isChecked()) {
             if ($errs = $record->getErrors()) {
                 $this->reportRecord($record, nl2br(htmlspecialchars(Ac_Util::implode_r("\n", $errs))), 'error');
@@ -279,7 +279,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
      * @return Ac_Admin_ReportEntry
      * @access protected
      */
-    function & _createReportHeader() {
+    function _createReportHeader() {
         $header = str_replace('{title}', $this->title, $this->header);
         $res = new Ac_Admin_ReportEntry($header, 'message', time());
         return $res;

@@ -18,7 +18,7 @@ class Ac_Admin_Datalink {
     */
    var $_processing = false;
 
-   function & factory ($params = array()) {
+   function factory ($params = array()) {
        $class = 'Ac_Admin_Datalink';
        if (isset($params['class']) && strlen($params['class'])) {
            $class = $params['class'];
@@ -41,7 +41,7 @@ class Ac_Admin_Datalink {
     * Sets manager that datalink will be used with 
     * @param Ac_Admin_Manager $manager
     */
-   function setManager(& $manager) {
+   function setManager($manager) {
        $this->_manager = $manager;
    }
    
@@ -49,7 +49,7 @@ class Ac_Admin_Datalink {
     * Sets processing that datalink will be used with 
     * @param Ac_Admin_Processing $processing
     */
-   function & setProcessing(& $processing) {
+   function setProcessing($processing) {
        $this->_processing = $processing;
    }
    
@@ -59,7 +59,7 @@ class Ac_Admin_Datalink {
     * @param Ac_Model_Object $record
     * @return bool
     */ 
-   function canProcessRecord(& $record) {
+   function canProcessRecord($record) {
        return true; 
    }
    
@@ -68,7 +68,7 @@ class Ac_Admin_Datalink {
     *
     * @param Ac_Model_Object $record
     */
-   function setRecordDefaults(& $record) {
+   function setRecordDefaults($record) {
    }
    
    /**
@@ -78,7 +78,7 @@ class Ac_Admin_Datalink {
     * @param Ac_Model_Object $record
     * @param array $requestData Data from the form (not bound to the record yet)
     */
-   function doBeforeBindRecord(& $record, & $requestData) {
+   function doBeforeBindRecord(& $record, $requestData) {
        
    }
    
@@ -89,7 +89,7 @@ class Ac_Admin_Datalink {
     * @param Ac_Model_Object $record
     * @param array $requestData Data from the form (that was already bound to the record)
     */
-   function doAfterBindRecord(& $record, & $requestData) {
+   function doAfterBindRecord(& $record, $requestData) {
        
    }
    
@@ -117,19 +117,19 @@ class Ac_Admin_Datalink {
    /**
     * @param array $formPreset
     */
-   function onManagerFormPreset(& $formPreset) {
+   function onManagerFormPreset($formPreset) {
    }
    
    /**
     * @param Ac_Form $form
     */
-   function onManagerFormCreated(& $form) {
+   function onManagerFormCreated($form) {
    }
    
    /**
     * @param array $columns
     */
-   function onManagerColumnsPreset(& $columns) {
+   function onManagerColumnsPreset($columns) {
        
    }
     

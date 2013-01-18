@@ -78,7 +78,7 @@ abstract class Ac_Param_Source {
      * @return string
      */
     function getPath($asString = false) {
-        $res = & Ac_Param_Impl_Paths::getPath($this, $asString, 'key', '_parent');
+        $res = Ac_Param_Impl_Paths::getPath($this, $asString, 'key', '_parent');
         return $res;
     }
     
@@ -129,19 +129,19 @@ abstract class Ac_Param_Source {
         $a = $this->pathToArray($path);
         $left = array_splice($path, 0, count($path) - 1, array());
         $last = $path[count($path) - 1];
-        $src = & Ac_Param_Impl_Paths::getByPath($this, $path, '_parent', 'getSource', 'isSource');
+        $src = Ac_Param_Impl_Paths::getByPath($this, $path, '_parent', 'getSource', 'isSource');
         $res = false;
         if ($src) {
             if ($src->hasKey($last)) {
                 if ($mustBeValue) {
                     if (!$src->isSource($last)) {
-                        $result = & $src->getSource($last);
+                        $result = $src->getSource($last);
                         $res = true;
                     }
                 } else {
                     $res = true;
                     if ($src->isSource($last)) {
-                        $result = & $src->getSource($last);
+                        $result = $src->getSource($last);
                     } else {
                         $result = $src->getKey($last);
                     }
@@ -183,7 +183,7 @@ abstract class Ac_Param_Source {
      * @param mixed $data
      */
     function setData(& $data) {
-        $this->_data = & $data;
+        $this->_data = $data;
     }
     /**
      * @param array $options Configuration array. Can contain keys 'parent', 'key' and 'data' to set respective properties.

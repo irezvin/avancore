@@ -110,7 +110,7 @@ class Ac_Legacy_Controller_Context {
     /**
      * @return Ac_Legacy_Controller_Context
      */
-    function & cloneObject() {
+    function cloneObject() {
         $className = Ac_Util::fixClassName(get_class($this));
         $res = new $className();
         $res->assign($this);
@@ -124,7 +124,7 @@ class Ac_Legacy_Controller_Context {
     function doAfterCopy() {
     }
     
-    function assign(& $otherContext) {
+    function assign($otherContext) {
         $options = array_diff(array_keys(get_object_vars($otherContext)), $this->getCopyExclude());
         foreach ($options as $o) {
             if (is_object($otherContext->$o) && is_callable(array($otherContext->$o, 'cloneObject'))) $this->$o = $otherContext->$o->cloneObject(); 

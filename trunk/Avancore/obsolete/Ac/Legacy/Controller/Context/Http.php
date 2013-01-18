@@ -125,7 +125,7 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
      * @param string $subClass Class of the new context
      * @return Ac_Legacy_Controller_Context 
      */
-    function & spawn($subPath, $subClass = false, $paramsToUrl = array()) {
+    function spawn($subPath, $subClass = false, $paramsToUrl = array()) {
         if ($subClass === false) $subClass = Ac_Util::fixClassName(get_class($this));
         $res = new $subClass;
         $res->assign($this);
@@ -179,7 +179,7 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
     /**
      * @param Ac_Url $url
      */
-    function setBaseUrl(& $url) {
+    function setBaseUrl($url) {
         $this->_baseUrl = $url;
         $this->_url = false;
     }
@@ -234,7 +234,7 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
     /**
      * @return Ac_Legacy_Controller_Context_Http
      */
-    function & cloneObject() {
+    function cloneObject() {
         $res = parent::cloneObject();
         return $res;
     }

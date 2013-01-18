@@ -7,7 +7,7 @@ class Ac_Admin_Column_Published extends Ac_Table_Column_Published {
      */
     var $manager = false;
     
-    function getData(& $record, $rowNo) {
+    function getData($record, $rowNo) {
         $data = intval(Ac_Table_Column::getData($record, $rowNo, $this->fieldName));
         $img = $data? $this->getPublishedImg() : $this->getUnpublishedImg();
         $alt = $data? $this->getPublishedAlt() : $this->getUnpublishedAlt();

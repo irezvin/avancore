@@ -52,7 +52,7 @@ class Ac_Sql_Select_Expression extends Ac_Sql_Expression {
 		$this->aliases = $aliases;
 	}
 	
-	function getExpression(& $db) {
+	function getExpression($db) {
 		if ($this->isColumn) {
 			if ($this->aliases) {
 				if ($db) {
@@ -69,7 +69,7 @@ class Ac_Sql_Select_Expression extends Ac_Sql_Expression {
 		return $res;
 	}
     
-	function nameQuote(& $db) {
+	function nameQuote($db) {
 		return $this->getExpression($db);
 	}
 	

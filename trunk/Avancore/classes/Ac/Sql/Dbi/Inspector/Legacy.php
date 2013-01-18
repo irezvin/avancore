@@ -38,7 +38,7 @@ class Ac_Sql_Dbi_Inspector_Legacy extends Ac_Sql_Dbi_Inspector {
     /**
      * @return ormDatabaseTable
      */
-    function & _findTableBySqlName(& $sqlName) {
+    function _findTableBySqlName($sqlName) {
     	$res = null;
     	
     	$n = $sqlName;

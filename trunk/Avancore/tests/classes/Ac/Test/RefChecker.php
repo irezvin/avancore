@@ -34,8 +34,8 @@ class Ac_Test_RefChecker extends Ac_Test_Base {
 	/**
 	 * @return Ac_Sql_Dbi_Database
 	 */
-	function & getDbi() {
-		$sqlDb = & $this->getSqlDb();
+	function getDbi() {
+		$sqlDb = $this->getSqlDb();
 		$inspector = new Ac_Sql_Dbi_Inspector_MySql5($sqlDb, $this->getDbName());
 		$dbiDb = new Ac_Sql_Dbi_Database($inspector, $this->getDbName(), $this->getTablePrefix());
 		return $dbiDb;
@@ -44,16 +44,16 @@ class Ac_Test_RefChecker extends Ac_Test_Base {
 	/**
 	 * @return Ac_Sql_Db
 	 */
-	function & getSqlDb() {
+	function getSqlDb() {
 		return $this->getAeDb();
 	}
 
 	/**
 	 * @return Ac_Sql_RefChecker
 	 */
-	function & createRefChecker() {
-		$dbi = & $this->getDbi();
-		$sdb = & $this->getSqlDb();
+	function createRefChecker() {
+		$dbi = $this->getDbi();
+		$sdb = $this->getSqlDb();
 		$rc = new Ac_Sql_RefChecker(array(
 			'db' => & $sdb,
 			'schema' => & $dbi
@@ -62,9 +62,9 @@ class Ac_Test_RefChecker extends Ac_Test_Base {
 	}
 	
 	function testRefChecker() {
-		$rc = & $this->createRefChecker();
+		$rc = $this->createRefChecker();
 		$this->assertEqual(array_diff($rc->listTablesWithRelations(), array('#__people', '#__people_tags', '#__relations')), array());
-		$select = & $rc->createSelect('#__relations');
+		$select = $rc->createSelect('#__relations');
 		
 		$rightStatement = "
 			`#__relations` AS `#__relations`
@@ -74,7 +74,7 @@ class Ac_Test_RefChecker extends Ac_Test_Base {
      	";
 		$this->assertEqual($this->normalizeStatement($select->getFromClause()), $this->normalizeStatement($rightStatement, true));
 		
-		$select2 = & $rc->createSelect('#__relations', 't', '#__people', false, 'LEFT JOIN');
+		$select2 = $rc->createSelect('#__relations', 't', '#__people', false, 'LEFT JOIN');
 		$rightStatement2 = "
 			`#__relations` AS `t`
     			LEFT JOIN `#__people` AS `rel_#__people_1` ON `t`.`personId` = `rel_#__people_1`.`personId`
@@ -82,8 +82,8 @@ class Ac_Test_RefChecker extends Ac_Test_Base {
 		";
 		$this->assertEqual($this->normalizeStatement($select2->getFromClause()), $this->normalizeStatement($rightStatement2, true));
 		
-		$select3 = & $rc->createSelect('#__relations', 't', false, false, 'LEFT JOIN');
-		$sdb = & $this->getSqlDb();
+		$select3 = $rc->createSelect('#__relations', 't', false, false, 'LEFT JOIN');
+		$sdb = $this->getSqlDb();
 		$select3->columns = $rc->getRelStatColumns($select3);
 		$statement3 = "\n".$select3->getStatement()."\n";
 		$stats3 = $sdb->fetchRow($statement3);
@@ -97,7 +97,7 @@ class Ac_Test_RefChecker extends Ac_Test_Base {
 		');
 		$vals[] = null;
 		$rc->globalValidNonRefValues = array_unique($vals);
-		$select4 = & $rc->createSelect('#__relations', 't', false, false, 'LEFT JOIN', true);
+		$select4 = $rc->createSelect('#__relations', 't', false, false, 'LEFT JOIN', true);
 		$select4->columns = $rc->getRelStatColumns($select4);
 		$statement4 = "\n".$select4->getStatement()."\n";
 		$stats4 = $sdb->fetchRow($statement4);

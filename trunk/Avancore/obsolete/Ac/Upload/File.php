@@ -117,7 +117,7 @@ class Ac_Upload_File {
     /**
      * @param Ac_Upload_Manager $manager
      */
-    function setUploadManager(& $manager) {
+    function setUploadManager($manager) {
         if ($manager !== false && !is_a($manager, 'Ac_Upload_Manager')) trigger_error('$manager should be either FALSE or an instance of Ac_Upload_Manager');
         $this->_manager = $manager;
     }

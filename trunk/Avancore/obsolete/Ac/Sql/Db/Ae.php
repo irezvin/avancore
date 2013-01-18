@@ -11,7 +11,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
      * @param Ac_Legacy_Database$aeDb
      * @return Ac_Sql_Db_Ae
      */
-    function Ac_Sql_Db_Ae (& $aeDb = null) {
+    function Ac_Sql_Db_Ae ($aeDb = null) {
         if (!$aeDb) {
         	$aeDb = Ac_Legacy_Database::getDefaultInstance();
         }
@@ -59,7 +59,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
         return $res;
     }
 
-    function _convert(& $query) {
+    function _convert($query) {
         if(is_a($query, 'Ac_Sql_Expression')) {
         	if (function_exists('xdebug_time_index')) {
             	if (!isset($GLOBALS['_exprTime'])) $GLOBALS['_exprTime'] = 0;

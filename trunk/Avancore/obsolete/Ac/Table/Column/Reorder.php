@@ -63,7 +63,7 @@ class Ac_Table_Column_Reorder extends Ac_Table_Column {
         return $res;
     }
 
-    function getOrderPropertyValue(& $record, $rowNo) {
+    function getOrderPropertyValue($record, $rowNo) {
         $op = $this->getOrderProperty ();
         if ($op !== false) {
             $res = $this->getData($record, $rowNo, $op);
@@ -74,7 +74,7 @@ class Ac_Table_Column_Reorder extends Ac_Table_Column {
         return $res;
     }
     
-    function canOrderUp (& $record, $rowNo) {
+    function canOrderUp ($record, $rowNo) {
         if (strlen($m = $this->canOrderUpMethod)) $res = $record->$m();
         else {
             $res = $rowNo > 0 && $this->getOrderPropertyValue($record, $rowNo) === $this->getPrevOrderProp($rowNo);
@@ -82,7 +82,7 @@ class Ac_Table_Column_Reorder extends Ac_Table_Column {
         return $res;
     }
     
-    function canOrderDown (& $record, $rowNo) {
+    function canOrderDown ($record, $rowNo) {
         if (strlen($m = $this->canOrderDownMethod)) $res = $record->$m();
         else {
             $res = ($rowNo < count($this->_table->listRecords()) - 1) 
@@ -95,7 +95,7 @@ class Ac_Table_Column_Reorder extends Ac_Table_Column {
     /**
      * Renders (echo's) column cell
      */
-    function showCell(& $record, $rowNo) {
+    function showCell($record, $rowNo) {
         echo "<td ".Ac_Util::mkAttribs($this->getCellAttribs()).">".$this->_table->_pageNav->orderUpIcon($rowNo, $this->canOrderUp($record, $rowNo), $this->getOrderUpTask())."</td>";
         echo "<td ".Ac_Util::mkAttribs($this->getCellAttribs()).">".$this->_table->_pageNav->orderDownIcon($rowNo, count($this->_table->listRecords()), $this->canOrderDown($record, $rowNo), $this->getOrderDownTask())."</td>";
     }

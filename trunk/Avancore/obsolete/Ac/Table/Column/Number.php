@@ -16,7 +16,7 @@ class Ac_Table_Column_Number extends Ac_Table_Column {
         return $res;
     }
     
-    function getData(& $record, $rowNo, $fieldName) {
+    function getData($record, $rowNo, $fieldName) {
         $res = $this->_table->_pageNav->rowNumber($rowNo);
         return $res;
     }    

@@ -27,7 +27,7 @@ class Ac_Table_Column_Checked extends Ac_Table_Column {
         return $res;
     }
     
-    function getData(& $record, $rowNo) {
+    function getData($record, $rowNo) {
         if ($this->getCheckoutProcessing()) {
             $res = $this->checkedOutProcessing ($record, $rowNo);
         } else {
@@ -45,13 +45,13 @@ class Ac_Table_Column_Checked extends Ac_Table_Column {
         return $res;
     }
     
-    function checkedOut(& $row) {
+    function checkedOut($row) {
         if (class_exists('mosCommonHTML')) $res = mosCommonHTML::checkedOut($row);
             else $res = 'Checked out';
         return $res;
     }
     
-    function checkedOutProcessing (& $record, $rowNo) {
+    function checkedOutProcessing ($record, $rowNo) {
         $disp = Ac_Dispatcher::getInstance();
         if ( $record->checked_out) {
             $checked = $this->checkedOut($record);
