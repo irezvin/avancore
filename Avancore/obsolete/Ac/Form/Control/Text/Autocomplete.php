@@ -56,7 +56,7 @@ class Ac_Form_Control_Text_Autocomplete extends Ac_Form_Control_Text {
         $this->_valuesProviderPrototype = false;
         $this->_valuesProvider = false;
         if ($provider) {
-            $this->_valuesProvider = & $provider;
+            $this->_valuesProvider = $provider;
             $this->valueList = false;
         }
     }
@@ -67,11 +67,11 @@ class Ac_Form_Control_Text_Autocomplete extends Ac_Form_Control_Text {
     function & _getValuesProvider() {
         if ($this->_valuesProvider === false) {
             if ($this->_valuesProviderPrototype) {
-                $this->_valuesProvider = & Ac_Model_Values::factoryIndependent($this->_valuesProviderPrototype);
+                $this->_valuesProvider = Ac_Model_Values::factoryIndependent($this->_valuesProviderPrototype);
             }
-            elseif ($p = & $this->getModelProperty()) {
+            elseif ($p = $this->getModelProperty()) {
                 if (isset($p->values) && $p->values) {
-                    $this->_valuesProvider = & Ac_Model_Values::factoryWithProperty($p);
+                    $this->_valuesProvider = Ac_Model_Values::factoryWithProperty($p);
                 }
             }
             else $this->_valuesProvider = null;
@@ -82,9 +82,9 @@ class Ac_Form_Control_Text_Autocomplete extends Ac_Form_Control_Text {
     function getValueList() {
          if (!is_array($this->valueList)) {
              $res = array();
-             if ($vp = & $this->_getValuesProvider()) {
+             if ($vp = $this->_getValuesProvider()) {
                  $res = $vp->getValueList();
-             } elseif ($p = & $this->getModelProperty()) {
+             } elseif ($p = $this->getModelProperty()) {
                  if (isset($p->valueList) && is_array($p->valueList))
                     $res = $p->valueList;
              }

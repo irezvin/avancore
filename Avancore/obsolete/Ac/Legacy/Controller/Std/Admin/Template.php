@@ -25,7 +25,7 @@ class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Template_Html {
 	}
 	
 	function _showWrapper($content) {
-        $this->htmlResponse->addCssLib('{ACCSS}/managers.css', true);
+        $this->htmlResponse->addCssLib('{AC}/managers.css', true);
 ?>
 
 		<div class='main'>

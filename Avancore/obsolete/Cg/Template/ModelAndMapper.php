@@ -59,7 +59,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         $this->parentMapperClass = $this->model->parentMapperClassName;
         
         foreach ($this->model->listProperties() as $name) {
-            $prop = & $this->model->getProperty($name);
+            $prop = $this->model->getProperty($name);
             if (!$prop->isEnabled()) continue;
             //foreach ($gacm = $prop->getAllClassMembers() as $cm) if (!$cm) var_dump($prop->name, $gacm);
             $this->vars = array_merge($this->vars, $prop->getAllClassMembers());
@@ -73,7 +73,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         $this->tableName = $this->model->tableObject->name;
         
         foreach ($this->model->tableObject->listColumns() as $cn) {
-            $col = & $this->model->tableObject->getColumn($cn);
+            $col = $this->model->tableObject->getColumn($cn);
             if ($col->autoInc) {
                 $this->autoincFieldName = $cn;
                 break;
@@ -104,8 +104,8 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         foreach ($this->model->listAeModelRelations() as $r) {
             $prot = $this->model->getAeModelRelationPrototype($r);
             $key = isset($prot['srcVarName'])? $prot['srcVarName'] : count($this->relationPrototypes);
-            if ($prop = & $this->model->searchPropertyByRelation($r)) {
-                $this->assocProperties[$prop->getClassMemberName()] = & $prop;
+            if ($prop = $this->model->searchPropertyByRelation($r)) {
+                $this->assocProperties[$prop->getClassMemberName()] = $prop;
             } else {
                 var_dump("Prop by relation not found:", $r);
             }
@@ -134,7 +134,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
      * @param Cg_Property_Object $prop
      */
     function _showModelMethodsForAssociation($relationId, & $prop) {
-        $strategy = & $this->getAssocStrategy($relationId, $prop);
+        $strategy = $this->getAssocStrategy($relationId, $prop);
         $strategy->showGenModelMethods();
     }
     
@@ -159,7 +159,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
      */
     function loadBy<?php $this->d($funcSfx); ?> (<?php $this->d($params); ?>) {
         $recs = $this->loadRecordsByCriteria('<?php $this->d($sqlCrit); ?>');
-        if (count($recs)) $res = & $recs[0];
+        if (count($recs)) $res = $recs[0];
             else $res = null;
         return $res;
     }
@@ -171,7 +171,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
      * @param Cg_Property_Object $prop
      */
     function _showMapperMethodsForAssociation($relationId, & $prop) {
-        $strategy = & $this->getAssocStrategy($relationId, $prop);
+        $strategy = $this->getAssocStrategy($relationId, $prop);
         $strategy->showGenMapperMethods();
     }
     
@@ -180,8 +180,8 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         $down = '';
         $nn = '';
         foreach (array_keys($this->assocProperties) as $relId) { 
-            $prop = & $this->assocProperties[$relId];
-            $strat = & $this->getAssocStrategy($relId, $prop);
+            $prop = $this->assocProperties[$relId];
+            $strat = $this->getAssocStrategy($relId, $prop);
             ob_start(); $r = $strat->showStoreUpstandingPart(); $part = ob_get_clean(); if ($r !== false) $up .= $part;
             ob_start(); $r = $strat->showStoreDownstandingPart(); $part = ob_get_clean(); if ($r !== false) $down .= $part;
             ob_start(); $r = $strat->showStoreNNPart(); $part = ob_get_clean(); if ($r !== false) $nn .= $part;  
@@ -191,7 +191,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
 
     function _storeUpstandingRecords() {
         $res = parent::_storeUpstandingRecords() !== false;
-        $mapper = & $this->getMapper();
+        $mapper = $this->getMapper();
 <?php   echo $up; ?> 
         return $res;
     }
@@ -202,7 +202,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
 
     function _storeDownstandingRecords() {
         $res = parent::_storeDownstandingRecords() !== false;
-        $mapper = & $this->getMapper();
+        $mapper = $this->getMapper();
 <?php   echo $down; ?>
         return $res; 
     }
@@ -213,7 +213,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
 
     function _storeNNRecords() {
         $res = parent::_storeNNRecords() !== false;
-        $mapper = & $this->getMapper();
+        $mapper = $this->getMapper();
 <?php   echo $nn; ?>
         return $res; 
     }
@@ -354,7 +354,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
      * @return <?php $this->d($this->modelClass); ?> 
      */ 
     function factory ($className = false) {
-        $res = & parent::factory($className);
+        $res = parent::factory($className);
         return $res;
     }
     

@@ -33,7 +33,7 @@ class Ac_Form_Control_Template extends Ac_Template_Html {
      * @param Ac_Form_Control $control
      */
     function _showCaptionWithDescription(& $control) {
-        $this->addJsLib('{AC}overlib_mini.js');
+        $this->addJsLib('{AC}/overlib_mini.js');
 ?><span class='captionWithDesc' onmouseover='overlib("<?php echo addcslashes(htmlspecialchars($control->getDescription()), "\n\r\'\""); ?>");' onmouseout="nd();"><?php ?>
 <?php     echo $control->getCaption(); ?></span><?php ?>
 <?php            
@@ -55,7 +55,7 @@ class Ac_Form_Control_Template extends Ac_Template_Html {
      * @param Ac_Form_Control $control
      */
     function _mapNames(& $control, $names, $asArrays = false) {
-        $ctx = & $control->getContext();
+        $ctx = $control->getContext();
         if (!is_array($names)) $res = $ctx->mapParam($names, $asArrays);
         else {
             $res = array();

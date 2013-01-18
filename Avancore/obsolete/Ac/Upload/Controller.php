@@ -100,8 +100,8 @@ class Ac_Upload_Controller extends Ac_Legacy_Controller {
     function getUpload() {
         if ($this->_upload === false) {
             if (($uid = $this->getUploadId()) !== false) {
-                $m = & $this->getUploadManager();
-                $this->_upload = & $m->getUpload($uid, true);
+                $m = $this->getUploadManager();
+                $this->_upload = $m->getUpload($uid, true);
             }
         }
         return $this->_upload;
@@ -113,8 +113,8 @@ class Ac_Upload_Controller extends Ac_Legacy_Controller {
     function getNewUpload() {
         if ($this->_newUpload === false) {
             if (($uid = $this->newUploadId) !== false) {
-                $m = & $this->getUploadManager();
-                $this->_newUpload = & $m->getUpload($uid);
+                $m = $this->getUploadManager();
+                $this->_newUpload = $m->getUpload($uid);
             }
         }
         return $this->_newUpload;
@@ -160,28 +160,28 @@ class Ac_Upload_Controller extends Ac_Legacy_Controller {
     
     function executeDownload() {
         if ($this->canDownload) {
-            if ($u = & $this->getUpload()) $this->_templatePart = 'download';
+            if ($u = $this->getUpload()) $this->_templatePart = 'download';
                 else $this->_templatePart = '404'; 
         } else $this->_templatePart = '404';
     }
     
     function executeView() {
         if ($this->canView) {
-            if ($u = & $this->getUpload()) $this->_templatePart = 'view';
+            if ($u = $this->getUpload()) $this->_templatePart = 'view';
                 else $this->_templatePart = '404'; 
         } else $this->_templatePart = '404';
     }
     
     function executeOk() {
-        if ($u = & $this->getUpload()) {
+        if ($u = $this->getUpload()) {
             //if ($n = $u->getName()) $this->app->purgeUploads($n);
             $this->_templatePart = 'retVal';
         } else $this->executeUpload();
     }
     
     function executeCancel() {
-        if ($u = & $this->getUpload()) {
-            $m = & $this->getUploadManager();            
+        if ($u = $this->getUpload()) {
+            $m = $this->getUploadManager();            
             if ($id = $u->getId()) $m->purgeUploads($id);
         }
         $this->_templatePart = 'close';
@@ -196,18 +196,18 @@ class Ac_Upload_Controller extends Ac_Legacy_Controller {
     
     function executeUpload() {
         $f = false;
-        $m = & $this->getUploadManager();
+        $m = $this->getUploadManager();
         $paramPath = $this->_context->mapParam('file', true);
         $fileData = false;
         $this->_templatePart = 'default';
         $fileData = $this->getFileData();
         if ($fileData && (!isset($fileData['error']) || !$fileData['error']) ) {
-            if ($u = & $this->getUpload()) {
+            if ($u = $this->getUpload()) {
                 $m->purgeUploads($u->getId());
                 $this->_upload = $this->_uploadId = false;
             }
             $options = array('userData' => $fileData);
-            $this->upload = & $m->factory($options);
+            $this->upload = $m->factory($options);
             if ($this->upload->getError()) {
                 $this->_error = sprintf($this->uploadErrorMessage, $this->upload->getFilename());
             } else {
@@ -239,7 +239,7 @@ class Ac_Upload_Controller extends Ac_Legacy_Controller {
     }
     
     function getPartialUrlWithOpenParam($paramName, $attribs = array()) {
-        $url = & $this->getUrl($attribs);
+        $url = $this->getUrl($attribs);
         $iip = $this->_context->mapParam($paramName);
         if ($url->query) {
             Ac_Util::unsetArrayByPath($url->query, Ac_Util::pathToArray($iip));
@@ -267,13 +267,13 @@ class Ac_Upload_Controller extends Ac_Legacy_Controller {
      */
     function getUploadManager() {
         if ($this->_uploadManager === false) {
-            $this->_uploadManager = & Ac_Util::factoryWithOptions($this->_getPreparedUploadManagerOptions(), $this->defaultUploadManagerClass, 'class', false);
+            $this->_uploadManager = Ac_Util::factoryWithOptions($this->_getPreparedUploadManagerOptions(), $this->defaultUploadManagerClass, 'class', false);
         }
         return $this->_uploadManager;
     }
     
     function setUploadManager(& $uploadManager) {
-        $this->_uploadManager = & $uploadManager;
+        $this->_uploadManager = $uploadManager;
     }
     
     function getUploadManagerOptions() {

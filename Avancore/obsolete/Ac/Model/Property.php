@@ -74,21 +74,21 @@ class Ac_Model_Property {
     var $skipValidation = false;
     
     function Ac_Model_Property (& $srcObject, $propName, $isStatic, $formOptions = array()) {
-        foreach (array_keys($formOptions) as $optionName) $this->$optionName = & $formOptions[$optionName];
+        foreach (array_keys($formOptions) as $optionName) $this->$optionName = $formOptions[$optionName];
 
-        $this->srcObject = & $srcObject;
+        $this->srcObject = $srcObject;
         $this->propName = $propName;
         $this->isStatic = $isStatic;
     }
     
     function _updateData($formOptions = array()) {
-        foreach (array_diff(array_keys($formOptions), array('srcObject', 'implObject', 'propName', 'isStatic')) as $optionName) $this->$optionName = & $formOptions[$optionValue];
+        foreach (array_diff(array_keys($formOptions), array('srcObject', 'implObject', 'propName', 'isStatic')) as $optionName) $this->$optionName = $formOptions[$optionValue];
     }
     
     function toFormOptions() {
         $res = array();
         foreach (array_keys(get_object_vars($this)) as $varName) {
-            if ($varName{0} != '_' && $varName != 'srcObject' && $varName != 'implObject' && !is_null($this->$varName)) $res[$varName] = & $this->$varName;  
+            if ($varName{0} != '_' && $varName != 'srcObject' && $varName != 'implObject' && !is_null($this->$varName)) $res[$varName] = $this->$varName;  
         }
         return $res;
     }

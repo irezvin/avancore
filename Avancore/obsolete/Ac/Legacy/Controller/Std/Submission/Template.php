@@ -40,7 +40,7 @@ class Ac_Legacy_Controller_Std_Submission_Template extends Ac_Template_Html {
         <h1><?php $this->d($this->submission->title); ?></h1>
 <?php   } ?>  
 <?php           
-        $form = & $this->frontend->getForm();
+        $form = $this->frontend->getForm();
         echo $form->fetchPresentation();
 ?>    
     </div>
@@ -81,7 +81,7 @@ class Ac_Legacy_Controller_Std_Submission_Template extends Ac_Template_Html {
 ?>
     <table border='1'>
 <?php    foreach ($this->model->listProperties() as $p) { ?>
-<?php        $propInfo = & $this->model->getPropertyInfo($p, true); ?>
+<?php        $propInfo = $this->model->getPropertyInfo($p, true); ?>
 <?php        if (!($flag = $this->currentSendout->propertyFlag) || isset($propInfo->$flag) && $propInfo->$flag) { ?>
 <?php             $val = $this->model->getField($p); $capt = strlen($propInfo->caption)? $propInfo->caption : $p; ?>
 <?php             if (strlen($val)) { ?>

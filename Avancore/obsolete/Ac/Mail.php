@@ -116,14 +116,14 @@ class Ac_Mail {
         $this->_to = $to;
         $this->_from = $from;
         $this->_data = $data;
-        $disp = & Ac_Dispatcher::getInstance();
+        $disp = Ac_Dispatcher::getInstance();
         if ($this->_from === false) {
             $this->_from = array($disp->config->mailFrom, $disp->config->fromName);
         }
         if ($defaultSubject !== false) $this->defaultSubject = $defaultSubject;
         if ($this->_noSend === '?') {
             if (class_exists('Ac_Dispatcher')) {
-                $disp = & Ac_Dispatcher::getInstance();
+                $disp = Ac_Dispatcher::getInstance();
                 $this->_noSend = !$disp->config->sendEmails;
             }
         }
@@ -134,7 +134,7 @@ class Ac_Mail {
      */
     function configureMailer(& $mailer) {
         if ($this->method === true) {
-            $disp = & Ac_Dispatcher::getInstance();
+            $disp = Ac_Dispatcher::getInstance();
             $method = $disp->config->mailer;
             $smtpHost = $disp->config->smtpHost;
             $smtpSecure = $disp->config->smtpSecure;
@@ -242,7 +242,7 @@ class Ac_Mail {
 
                 } else {
                     if (strlen($htmlBody = $this->getPreparedHtmlBody()) && $this->autoTextBody) {
-                        $h2t = & $this->createHtml2Text();
+                        $h2t = $this->createHtml2Text();
                         $h2t->set_html($htmlBody);
                         $textBody = $h2t->get_text(); 
                     } else $textBody = false;
@@ -261,7 +261,7 @@ class Ac_Mail {
     function send() {
         $triedToSend = false;
         
-        $m = & $this->createPhpMailer();
+        $m = $this->createPhpMailer();
         $this->configureMailer($m);
         
         $from = $this->_getAddresses(array($this->_from), true);
@@ -329,7 +329,7 @@ class Ac_Mail {
         $this->_debugToFile($m, $triedToSend && $this->_storeSentMail);
         
         if ($this->_error) {
-            $disp = & Ac_Dispatcher::getInstance();
+            $disp = Ac_Dispatcher::getInstance();
             if ($disp->config->debug) {
                 trigger_error($this->getError(), E_USER_WARNING);
             }
@@ -343,7 +343,7 @@ class Ac_Mail {
     }
     
     function showTemplate($templateName, $vars = array()) {
-        $disp = & Ac_Dispatcher::getInstance();
+        $disp = Ac_Dispatcher::getInstance();
         $filename = $disp->getDir()."/templates/".$templateName.".tpl.php";
         extract($vars);
         require($filename);
@@ -364,7 +364,7 @@ class Ac_Mail {
     }
         
     protected function getMailerDir() {
-        $disp = & Ac_Dispatcher::getInstance();
+        $disp = Ac_Dispatcher::getInstance();
         return $this->useNewMailer? $disp->getVendorDir().'/PHPMailerNew' : $disp->getVendorDir().'/PHPMailer';
     } 
     
@@ -385,7 +385,7 @@ class Ac_Mail {
      */
     function & createHtml2Text() {
         if (!class_exists('html2text', false)) {
-            $disp = & Ac_Dispatcher::getInstance();
+            $disp = Ac_Dispatcher::getInstance();
             require($disp->getVendorDir().'/html2text/html2text.php');
         }
         $res = new html2text();
@@ -432,7 +432,7 @@ class Ac_Mail {
      * @param PhpMailer $mailer
      */
     function _debugToFile(& $mailer, $saveEmail, $saveError = true) {
-        $disp = & Ac_Dispatcher::getInstance();
+        $disp = Ac_Dispatcher::getInstance();
         
         if (!strlen($this->debugFilename)) {
         

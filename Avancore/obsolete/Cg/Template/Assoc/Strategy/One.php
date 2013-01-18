@@ -14,7 +14,7 @@ class Cg_Template_Assoc_Strategy_One extends Cg_Template_Assoc_Strategy {
      */
     function & get<?php $this->d($ucSingle); ?>() {
         if (<?php $this->d($varId); ?> === false) {
-            $mapper = & $this->getMapper();
+            $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, <?php $this->str($relationId); ?>);
         }
         return <?php $this->d($varId); ?>;
@@ -29,7 +29,7 @@ class Cg_Template_Assoc_Strategy_One extends Cg_Template_Assoc_Strategy {
         else {
             if (!is_a($<?php $this->d($this->single); ?>, <?php $this->str($prop->className); ?>)) trigger_error('$<?php $this->d($this->single); ?> must be an instance of <?php $this->d($prop->className); ?>', E_USER_ERROR);
             if (!is_object($this-><?php $this->d($this->var); ?>) && !Ac_Util::sameObject($this-><?php $this->d($this->var); ?>, $<?php $this->d($this->single); ?>)) { 
-                $this-><?php $this->d($this->var); ?> = & $<?php $this->d($this->single); ?>;
+                $this-><?php $this->d($this->var); ?> = $<?php $this->d($this->single); ?>;
             }
         }
     }
@@ -42,8 +42,8 @@ class Cg_Template_Assoc_Strategy_One extends Cg_Template_Assoc_Strategy {
      * @return <?php $this->d($prop->className); ?>  
      */
     function & create<?php $this->d($ucSingle); ?>($values = array(), $isReference = false) {
-        $m = & $this->getMapper(<?php $this->str($this->prop->mapperClass); ?>);
-        $res = & $m->factory();
+        $m = $this->getMapper(<?php $this->str($this->prop->mapperClass); ?>);
+        $res = $m->factory();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->set<?php $this->d($ucSingle); ?>($res);
@@ -59,7 +59,7 @@ class Cg_Template_Assoc_Strategy_One extends Cg_Template_Assoc_Strategy {
 ?>
 
         if (is_object($this-><?php $this->d($this->var); ?>)) {
-            $rel = & $mapper->getRelation(<?php $this->str($this->relationId); ?>);
+            $rel = $mapper->getRelation(<?php $this->str($this->relationId); ?>);
             if (!$this->_autoStoreUpstanding($this-><?php $this->d($this->var); ?>, $rel->fieldLinks, <?php $this->str($this->single); ?>)) $res = false;
         }
 <?php   

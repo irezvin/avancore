@@ -296,7 +296,7 @@ $pageMap = array_merge($pageMap, array(
     // --------------------------- formTemplate -------------------------
 
     function showFormTemplate() {
-?><?php $this->phpOpen(); ?> $record = & $this->getRecord(); <?php $this->phpClose(); ?> 
+?><?php $this->phpOpen(); ?> $record = $this->getRecord(); <?php $this->phpClose(); ?> 
 
 <input type="hidden" name="<?php $this->d($this->singlePkColumn); ?>" value="<?php $this->phpOpen(); ?> echo $record-><?php $this->d($this->singlePkColumn); ?> <?php $this->phpClose(); ?>" />
 

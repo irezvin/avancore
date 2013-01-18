@@ -2,10 +2,22 @@
 
 class Ac_Debug {
     
+    static $created = array();
+    
+    static $deleted = array();
+    
+    static $misc = array();
+    
     static function savageMode() {
         while(ob_get_level()) ob_end_clean();
         ini_set('display_errors', 1);
         ini_set('error_reporting', E_ALL & ~E_DEPRECATED & ~E_STRICT);
+    }
+    
+    static function enableAllErrors() {
+        ini_set('error_reporting', E_ALL);
+        ini_set('display_errors', 1);
+        ini_set('html_errors', 1);
     }
     
     static function fb($_) {
@@ -15,17 +27,6 @@ class Ac_Debug {
             return call_user_func_array($call, $args);
         }
     }
-    
-}
-<?php
-
-class Ac_Debug {
-    
-    static $created = array();
-    
-    static $deleted = array();
-    
-    static $misc = array();
     
     static function clear() {
         self::$created = array();
@@ -63,12 +64,6 @@ class Ac_Debug {
             $res[$c]['existing'] = $res[$c]['created'] - $res[$c]['deleted'];
         }
         return $res;
-    }
-    
-    static function savageMode() {
-        while(ob_get_level()) ob_end_clean();
-        ini_set('display_errors', 1);
-        ini_set('error_reporting', E_ALL);
     }
     
 }

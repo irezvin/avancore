@@ -120,7 +120,7 @@ class Ac_Tree_Provider implements Ac_I_Tree_Provider {
             if ($nodes[$k]) {
                 $nodeId = $nodes[$k]->getNodeId();
                 if (strlen($nodeId) && isset($this->allNodes[$nodeId])) {
-                    $tmp = & $this->allNodes[$nodeId];
+                    $tmp = $this->allNodes[$nodeId];
                     unset($this->allNodes[$nodeId]);
                     $tmp->setTreeProvider(null);
                 }
@@ -138,7 +138,7 @@ class Ac_Tree_Provider implements Ac_I_Tree_Provider {
             }
         }
         $nodes = array();
-        foreach ($ids as $id) if (isset($this->allNodes[$id]) && $this->allNodes[$id]) $nodes[] = & $this->allNodes[$id];
+        foreach ($ids as $id) if (isset($this->allNodes[$id]) && $this->allNodes[$id]) $nodes[] = $this->allNodes[$id];
         return $nodes;
     }
     
@@ -167,7 +167,7 @@ class Ac_Tree_Provider implements Ac_I_Tree_Provider {
     
     function destroyAllNodes() {
         foreach (array_keys($this->allNodes) as $k) {
-            $tmp = & $this->allNodes[$k];
+            $tmp = $this->allNodes[$k];
             unset($this->allNodes[$k]);
             $tmp->setTreeProvider(null);
             $tmp->destroy();

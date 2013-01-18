@@ -98,9 +98,9 @@ class Ac_Legacy_Controller_Std_Submission_Sendout {
      * @return Ac_Legacy_Controller_Std_Submission_Sendout 
      */
     function Ac_Legacy_Controller_Std_Submission_Sendout (& $submission, & $modelObject, & $template, $prototype = array()) {
-        $this->_submission = & $submission;
-        $this->_modelObject = & $modelObject;
-        $this->_template = & $template;
+        $this->_submission = $submission;
+        $this->_modelObject = $modelObject;
+        $this->_template = $template;
         Ac_Util::simpleBind($prototype, $this);
     }
     
@@ -110,7 +110,7 @@ class Ac_Legacy_Controller_Std_Submission_Sendout {
     function getRecipients() {
         if ($this->recipients) $res = $this->recipients;
         elseif ($this->recipientsAreAdmins) {
-            $mapper = & Ac_Model_Mapper::getMapper('Mos_User_Mapper');
+            $mapper = Ac_Model_Mapper::getMapper('Mos_User_Mapper');
             $res = $mapper->getMailAdmins();
         } else $res = array();
         return $res;
@@ -127,7 +127,7 @@ class Ac_Legacy_Controller_Std_Submission_Sendout {
                  $this->_mail = new Ac_Mail(false, $rcpt, $this->subject, $this->from);
                  Ac_Util::simpleBind($this->mailExtraSettings, $this->_mail);
                  if ($this->replyTo) $this->_mail->replyTo = $this->replyTo;
-                 $this->_template->currentSendout = & $this;
+                 $this->_template->currentSendout = $this;
                  $this->_mail->htmlBody = $this->_template->fetch($this->templatePart);
              } else $this->_mail = null;
         }

@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Legacy_Adapter_Joomla15 extends Ac_Joomla_Adapter {
+class Ac_Legacy_Adapter_Joomla15 extends Ac_Legacy_Adapter_Joomla {
     
     var $configClass = 'Ac_Legacy_Config_Joomla15';
     
@@ -16,7 +16,7 @@ class Ac_Legacy_Adapter_Joomla15 extends Ac_Joomla_Adapter {
                 'prefix' => $this->config->getNative('dbprefix'),
         ) : $this->dbSettings;
         
-        $dbSettings['config'] = & $this->config;
+        $dbSettings['config'] = $this->config;
         
         if ($this->useNativeDatabase) {
             $this->database = new Ac_Legacy_Database_Native($dbSettings);
@@ -29,8 +29,8 @@ class Ac_Legacy_Adapter_Joomla15 extends Ac_Joomla_Adapter {
             }
         }
         
-        $session = & JFactory::getSession();
-        $josUser = & $session->get('user');
+        $session = JFactory::getSession();
+        $josUser = $session->get('user');
         $this->_user = new Ac_Legacy_User_Joomla($josUser);
         
         $this->userstate = new Ac_Joomla_Userstate();
@@ -41,7 +41,7 @@ class Ac_Legacy_Adapter_Joomla15 extends Ac_Joomla_Adapter {
         if (!is_array($directories)) $directories = array($directories);
         $classes = array();
         if ($useCache) {
-            $disp = & Ac_Dispatcher::getInstance();
+            $disp = Ac_Dispatcher::getInstance();
             $classes = $disp->cacheGet($cacheKey = md5(implode(PATH_SEPARATOR, $directories)), __FUNCTION__);
             if (strlen($classes)) $classes = unserialize($classes);
         }

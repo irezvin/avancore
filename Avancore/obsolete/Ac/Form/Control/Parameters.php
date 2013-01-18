@@ -20,7 +20,7 @@ class Ac_Form_Control_Parameters extends Ac_Form_Control {
     
     function getXmlFilePath() {
         if ($this->xmlFilePath === false) {
-            $p = & $this->getModelProperty();
+            $p = $this->getModelProperty();
             if ($p && isset($p->xmlFilePath) && strlen($p->xmlFilePath)) {
                 $res = $p->xmlFilePath;
             } else {
@@ -35,7 +35,7 @@ class Ac_Form_Control_Parameters extends Ac_Form_Control {
     
     function getReturnsArray() {
         if ($this->returnsArray === '?') {
-            if (($p = & $this->getModelProperty()) && ($p->plural || $p->arrayValue)) $res = true;
+            if (($p = $this->getModelProperty()) && ($p->plural || $p->arrayValue)) $res = true;
             else $res = false;
         } else {
             $res = $this->returnsArray;
@@ -49,7 +49,7 @@ class Ac_Form_Control_Parameters extends Ac_Form_Control {
     function getMosParameters() {
         if ($this->_mosParameters === false) {
             $this->_loadMosParametersClass();
-            $disp = & Ac_Dispatcher::getInstance();
+            $disp = Ac_Dispatcher::getInstance();
             $xfp = $this->getXmlFilePath();
             if (strlen($xfp)) $xfp = $disp->getDir().'/'.$xfp;
             $this->_mosParameters = new mosParameters($this->getStringParams(), $xfp, 'module');
@@ -71,7 +71,7 @@ class Ac_Form_Control_Parameters extends Ac_Form_Control {
                 require_once($GLOBALS['mosConfig_absolute_path'].'/includes/joomla.xml.php');
             }
             else {
-                $disp = & Ac_Dispatcher::getInstance();
+                $disp = Ac_Dispatcher::getInstance();
                 $GLOBALS['mosConfig_absolute_path'] = $disp->getDir();
                 require ($disp->getDir().'/vendor/joomla.xml.php');    
             }

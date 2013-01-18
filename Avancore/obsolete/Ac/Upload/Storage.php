@@ -10,7 +10,7 @@ class Ac_Upload_Storage {
     function Ac_Upload_Storage ($options = array()) {
         Ac_Util::bindAutoparams($this, $options);
         if ($this->storagePath === false && class_exists('Ac_Dispatcher')) {
-            $d = & Ac_Dispatcher::getInstance();
+            $d = Ac_Dispatcher::getInstance();
             if ($d) {
                 $this->storagePath = $d->getCacheDir() . '/';
             }

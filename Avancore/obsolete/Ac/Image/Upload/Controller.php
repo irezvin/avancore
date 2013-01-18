@@ -18,7 +18,7 @@ class Ac_Image_Upload_Controller extends Ac_Upload_Controller {
     
     function executeThumb() {
         if ($this->canShowThumbs) {
-            if ($u = & $this->getUpload()) $this->_templatePart = 'thumb';
+            if ($u = $this->getUpload()) $this->_templatePart = 'thumb';
                 else $this->_templatePart = '404'; 
         } else $this->_templatePart = '404';
     }

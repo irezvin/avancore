@@ -66,9 +66,9 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
 
         $this->var = $this->prop->getClassMemberName();
         $this->varId = '$this->'.$this->var;
-        $this->otherModel = & $this->prop->getOtherModel();
+        $this->otherModel = $this->prop->getOtherModel();
         
-//        $om = & $prop->getOtherModel();
+//        $om = $prop->getOtherModel();
 //        $single = Cg_Util::makeIdentifier($om->single);
 //        $ucSingle = ucfirst($single).$prop->idrSuffixSingle; 
 //        $singleId = '$this->'.$single; 
@@ -159,8 +159,8 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
      * @return <?php if ($prop->otherIsUnique) { ?><?php $this->d($thisClass); ?>|<?php } ?>array of <?php $this->d($thisClass); ?> objects  
      */
     function & getOf<?php $this->d($ucOtherPlural); ?>(<?php $this->d($idOtherPlural); ?>) {
-        $rel = & $this->getRelation(<?php $this->str($relationId); ?>);
-        $res = & $rel->getSrc(<?php $this->d($idOtherPlural); ?>); 
+        $rel = $this->getRelation(<?php $this->str($relationId); ?>);
+        $res = $rel->getSrc(<?php $this->d($idOtherPlural); ?>); 
         return $res;
     }
     
@@ -170,7 +170,7 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
      
      */
     function loadFor<?php $this->d($ucOtherPlural); ?>(<?php $this->d($idOtherPlural); ?>) {
-        $rel = & $this->getRelation(<?php $this->str($relationId); ?>);
+        $rel = $this->getRelation(<?php $this->str($relationId); ?>);
         return $rel->loadSrc(<?php $this->d($idOtherPlural); ?>); 
     }
 
@@ -180,7 +180,7 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
      
      */
     function load<?php $this->d($ucOtherPlural); ?>For(<?php $this->d($idThisPlural); ?>) {
-        $rel = & $this->getRelation(<?php $this->str($relationId); ?>);
+        $rel = $this->getRelation(<?php $this->str($relationId); ?>);
         return $rel->loadDest(<?php $this->d($idThisPlural); ?>); 
     }
 

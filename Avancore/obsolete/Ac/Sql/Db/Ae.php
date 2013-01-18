@@ -13,10 +13,10 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
      */
     function Ac_Sql_Db_Ae (& $aeDb = null) {
         if (!$aeDb) {
-        	$aeDb = & Ac_Legacy_Database::getDefaultInstance();
+        	$aeDb = Ac_Legacy_Database::getDefaultInstance();
         }
     	assert(is_a($aeDb, 'Ac_Legacy_Database'));
-        $this->_aeDb = & $aeDb;
+        $this->_aeDb = $aeDb;
     }
     
     protected function implValueQuote($value) {
@@ -124,10 +124,6 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
         return $res;
     }
     
-    function getLastInsertId() {
-        return $this->_aeDb->getLastInsertId();
-    }
-    
     function applyLimits($statement, $count, $offset = false, $orderBy = false) {
         return $this->_aeDb->applyLimits($statement, $count, $offset, $orderBy);
     }
@@ -142,6 +138,10 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     
     function getAffectedRows() {
         return $this->_aeDb->getAffectedRows();
+    }
+    
+    function getLastInsertId() {
+        return $this->_aeDb->getLastInsertId();
     }
     
 }

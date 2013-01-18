@@ -23,7 +23,7 @@ class Ac_Legacy_Config_Joomla extends Ac_Legacy_Config {
         if ($this->frontendDirOverride !== false) {
         	$res = $this->frontendDirOverride;
         } else {
-	    	$disp = & Ac_Dispatcher::getInstance();
+	    	$disp = Ac_Dispatcher::getInstance();
 	        $res = $this->absolutePath.'/components/'.$disp->getAppName();
         }
         return $res; 
@@ -33,7 +33,7 @@ class Ac_Legacy_Config_Joomla extends Ac_Legacy_Config {
         if ($this->backendDirOverride !== false) {
         	$res = $this->backendDirOverride;
         } else {
-	    	$disp = & Ac_Dispatcher::getInstance();
+	    	$disp = Ac_Dispatcher::getInstance();
 	        $res = $this->absolutePath.'/administrator/components/'.$disp->getAppName(); 
         }
         return $res;

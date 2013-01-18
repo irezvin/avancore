@@ -7,7 +7,7 @@ class Ac_Legacy_Config_Joomla15 extends Ac_Legacy_Config_Joomla {
     function Ac_Legacy_Config_Joomla15($configFilePath, $configOptions = array()) {
     	
     	$this->_jConfig = new JConfig();
-    	$jUri = & JURI::getInstance();
+    	$jUri = JURI::getInstance();
     	
         parent::Ac_Legacy_Config($configFilePath, $configOptions);
         

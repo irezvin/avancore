@@ -12,13 +12,13 @@ class Ac_Admin_Column_DetailsLink extends Ac_Admin_Column {
      var $_recordKeys = array();
 
      function doShowHeader() {
-         $this->_context = & $this->manager->getContext();
+         $this->_context = $this->manager->getContext();
          $this->_idPrefix = $this->_context->mapIdentifier('_details_link_');
          parent::doShowHeader();
      }
      
      function doShowCell(& $record, $rowNo) {
-         $u = & $this->manager->getDetailsUrl($record); 
+         $u = $this->manager->getDetailsUrl($record); 
          $this->_recordKeys[$rowNo] = $this->manager->getStrPk($record);
          ?>
             <a href="<?php echo htmlspecialchars($u->toString()); ?>" id="<?php echo $this->_idPrefix.'_'.$rowNo; ?>"><?php parent::doShowCell($record, $rowNo); ?></a>
@@ -27,8 +27,8 @@ class Ac_Admin_Column_DetailsLink extends Ac_Admin_Column {
      
      function showHint() {
         
-        $tpl = & $this->manager->getTemplate();
-        $jsHelper = & $tpl->getHtmlHelper();
+        $tpl = $this->manager->getTemplate();
+        $jsHelper = $tpl->getHtmlHelper();
      ?>
      
         <script type="text/javascript">

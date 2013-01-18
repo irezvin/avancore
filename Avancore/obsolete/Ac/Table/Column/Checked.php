@@ -52,11 +52,11 @@ class Ac_Table_Column_Checked extends Ac_Table_Column {
     }
     
     function checkedOutProcessing (& $record, $rowNo) {
-        $disp = & Ac_Dispatcher::getInstance();
+        $disp = Ac_Dispatcher::getInstance();
         if ( $record->checked_out) {
             $checked = $this->checkedOut($record);
         } else {
-            $user = & $disp->getUser();
+            $user = $disp->getUser();
             $checked = $this->getIdBox( $i, $row->id, ($row->checked_out && $row->checked_out != $user->id ) );
         }
         return $checked;

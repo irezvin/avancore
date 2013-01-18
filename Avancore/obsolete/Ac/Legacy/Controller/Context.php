@@ -127,7 +127,7 @@ class Ac_Legacy_Controller_Context {
     function assign(& $otherContext) {
         $options = array_diff(array_keys(get_object_vars($otherContext)), $this->getCopyExclude());
         foreach ($options as $o) {
-            if (is_object($otherContext->$o) && is_callable(array($otherContext->$o, 'cloneObject'))) $this->$o = & $otherContext->$o->cloneObject(); 
+            if (is_object($otherContext->$o) && is_callable(array($otherContext->$o, 'cloneObject'))) $this->$o = $otherContext->$o->cloneObject(); 
                 else $this->$o = $otherContext->$o;
         }
         $this->doAfterCopy();

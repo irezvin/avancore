@@ -106,7 +106,7 @@ class Ac_Model_Validator {
      * @param bool|array $fieldsInfo Array with fields metadata (array('fieldName' => array(...))) or FALSE (metadata will be taken from $model)
      */
     function Ac_Model_Validator(& $model, $fieldsInfo = false) {
-        $this->model = & $model;
+        $this->model = $model;
         $this->fieldsInfo = $fieldsInfo;
         if (!is_object($model) && !$fieldsInfo) trigger_error ('Model is not an object and won\'t be able to return any metadata; $fieldsInfo is also empty.', E_USER_WARNING);
         
@@ -214,15 +214,15 @@ class Ac_Model_Validator {
         }
         elseif (is_array($this->model)) {
             $tail = $fieldName;
-            $val = & $this->model;
+            $val = $this->model;
             do {
                 if (is_array($val) && isset($val[$head])) {
-                    $val = & $val[$head];
+                    $val = $val[$head];
                 } else {
                     $val[$head] = array();
                 }
             } while ($found && strlen($tail));
-            $val = & $value;                
+            $val = $value;                
         }
     }
     
@@ -276,7 +276,7 @@ class Ac_Model_Validator {
         }
         if(!isset($res['valueList']) && isset($res['values']) && is_array($res['values']) && is_object($this->model)) {
             $vals = Ac_Model_Values::factoryIndependent($res['values']);
-            $vals->data = & $this->model;
+            $vals->data = $this->model;
             
             $valueList = $vals->getValueList();
             $res['valueList'] = $valueList;

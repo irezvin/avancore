@@ -22,7 +22,7 @@ class Ac_Form_Context extends Ac_Legacy_Controller_Context_Http {
      * @return Ac_Form_Context
      * @static
      */
-    function & spawnFrom(& $context, $subPath) {
+    static function spawnFrom($context, $subPath) {
         $res = new Ac_Form_Context();
         $res->assign($context);
         $arrSubPath  = is_array($subPath)? $subPath : Ac_Util::pathToArray($subPath); 

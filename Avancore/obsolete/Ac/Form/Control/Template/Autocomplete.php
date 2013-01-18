@@ -69,11 +69,11 @@ class Ac_Form_Control_Template_Autocomplete extends Ac_Form_Control_Template {
      */
     function _showAutocompleterScript(& $control) {
         if ($control->loadScripts) {
-            $this->addJsLib('{AC}prototype.js', false);
-            $this->addJsLib('{AC}scriptaculous/scriptaculous.js', false);
+            $this->addJsLib('{AC}/prototype.js', false);
+            $this->addJsLib('{AC}/scriptaculous/scriptaculous.js', false);
         }
         
-        $hh = & $this->getHtmlHelper();
+        $hh = $this->getHtmlHelper();
         $inputId = $hh->jsQuote($control->getInputId());
         $listId = $hh->jsQuote($control->getAutocompleteListId());
         $acParams = $hh->toJson($control->getAutocompleteListJson(), 0, 4, false, false);

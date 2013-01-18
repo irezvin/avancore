@@ -74,7 +74,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
             if (!is_a($datalink, 'Ac_Admin_Datalink')) 
                 trigger_error("\$datalink must be instance of Ac_Admin_Datalink", E_USER_ERROR);
             else {
-                $this->_datalink = & $datalink;
+                $this->_datalink = $datalink;
                 $this->_datalink->setProcessing($this);
             }
         }
@@ -84,8 +84,8 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     
     function executeProcess() {
         if ($this->_doBeforeProcess() !== false) {
-            $coll = & $this->_doGetRecordsCollection();
-            while ($rec = & $coll->getNext()) {
+            $coll = $this->_doGetRecordsCollection();
+            while ($rec = $coll->getNext()) {
                 if ($this->canProcessRecord($rec))
                     if ($this->_doProcessRecord($rec) === false) break;
             }
@@ -141,7 +141,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     function setRecordsCollection(& $recordsCollection) {
         $this->setNoRecords();
         $this->_noRecords = false;
-        $this->_recordsCollection = & $recordsCollection;
+        $this->_recordsCollection = $recordsCollection;
     }
     
     function canProcessRecord(& $record) {
@@ -185,7 +185,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
         if ($this->_mapper === false) {
             if (!strlen($this->_mapperClass)) 
                 trigger_error ('Mapper class not provided - call setMapperClass() or provide \'mapperClass\' entry in the config array first', E_USER_ERROR);
-            $this->_mapper = & Ac_Model_Mapper::getMapper($this->_mapperClass);
+            $this->_mapper = Ac_Model_Mapper::getMapper($this->_mapperClass);
         }
         return $this->_mapper;
     }
@@ -193,7 +193,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     function _getRecordKeysFromRequest() {
         $res = array();
         if (isset($this->_rqWithState['keys']) && is_array($this->_rqWithState['keys'])) {
-            $mapper = & $this->_getMapper();
+            $mapper = $this->_getMapper();
             $pkl = count($mapper->listPkFields());
             foreach ($this->_rqWithState['keys'] as $key) {
                 if (is_string($key)) {
@@ -231,7 +231,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
         if ($reportEntry && !is_a($reportEntry, 'Ac_Admin_ReportEntry'))
             trigger_error ("\$reportEntry should be instance of Ac_Admin_ReportEntry");
         
-        $this->_report = & $reportEntry;
+        $this->_report = $reportEntry;
     }
     
     /**
@@ -242,7 +242,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     }
     
     function addToReport (& $reportEntry) {
-        if (!$this->_report) $this->_report = & $this->_createReportHeader();
+        if (!$this->_report) $this->_report = $this->_createReportHeader();
         $this->_report->addChildEntry($reportEntry); 
     }
     
@@ -252,8 +252,8 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
      * @param string $type message|warning|error Message type
      */
     function reportRecord(& $record, $description, $type = 'message', $dateTime = false, $isAvailable = true) {
-        if (is_a($record, 'Ac_Model_Object') && ($m = & $record->getMapper()) && ($tf = $m->getTitleFieldName())) $title = $record->getField($tf);
-        elseif ($record->hasProperty('title') && ($p = & $record->getPropertyInfo('title')) && !$p->assocClass && !$p->plural) 
+        if (is_a($record, 'Ac_Model_Object') && ($m = $record->getMapper()) && ($tf = $m->getTitleFieldName())) $title = $record->getField($tf);
+        elseif ($record->hasProperty('title') && ($p = $record->getPropertyInfo('title')) && !$p->assocClass && !$p->plural) 
             $title = $record->getField('title');
         else $title = false;
         if (is_a($record, 'Ac_Model_Object')) $key = $record->getPrimaryKey();

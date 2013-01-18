@@ -31,7 +31,7 @@ class Ac_Admin_ReportEntry {
      * @param Ac_Admin_ReportEntry $entry
      */
     function addChildEntry(& $entry) {
-        $this->_entries[] = & $entry;
+        $this->_entries[] = $entry;
     }
     
     function listChildEntries() {
@@ -40,7 +40,7 @@ class Ac_Admin_ReportEntry {
     
     function getChildEntry($index) {
         if (!in_array($index, $this->listChildEntries())) trigger_error ("Unknown node: '{$index}'", E_USER_ERROR);
-        $res = & $this->_entries[$index];
+        $res = $this->_entries[$index];
         return $res;
     }
     

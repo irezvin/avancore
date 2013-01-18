@@ -71,8 +71,9 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
             if (strlen($mapper->managerClass)) $class = $mapper->managerClass;
                 else $class = 'Ac_Admin_Manager';
             $manager = new $class ($context, $managerConfig, $px);
+            $manager->setApplication($this->getApplication());
             if ($this->separateToolbar) $manager->separateToolbar = true;
-            $response = & $manager->getResponse();
+            $response = $manager->getResponse();
             if ($this->separateToolbar) {
                 if (strlen($manager->toolbarContent)) {
                     Ac_Legacy_Output_Joomla15::addHtmlToJoomlaToolbar($manager->toolbarContent);

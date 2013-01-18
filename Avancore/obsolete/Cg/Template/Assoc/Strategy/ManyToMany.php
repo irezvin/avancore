@@ -11,7 +11,7 @@ class Cg_Template_Assoc_Strategy_ManyToMany extends Cg_Template_Assoc_Strategy_M
 
     function get<?php $this->d($ucSingle); ?>Ids() {
         if ($this-><?php $this->d($imn) ?> === false) {
-            $mapper = & $this->getMapper();
+            $mapper = $this->getMapper();
             $mapper->loadAssocNNIdsFor($this, <?php $this->str($relationId); ?>);
         }
         return $this-><?php $this->d($imn) ?>;
@@ -37,7 +37,7 @@ class Cg_Template_Assoc_Strategy_ManyToMany extends Cg_Template_Assoc_Strategy_M
 ?>        
 <?php   if (strlen($this->mirrorVar)) { ?>
         if (is_array($<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>) && !Ac_Util::sameInArray($this, $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>)) {
-                $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>[] = & $this;
+                $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>[] = $this;
         }
 <?php   } ?>
 <?php  
@@ -54,13 +54,13 @@ class Cg_Template_Assoc_Strategy_ManyToMany extends Cg_Template_Assoc_Strategy_M
 <?php       if (strlen($imn = $this->prop->getIdsMemberName())) { ?>
         
         if (is_array($this-><?php $this->d($this->var); ?>) || is_array($this-><?php $this->d($imn); ?>)) {
-            $rel = & $mapper->getRelation(<?php $this->str($this->relationId); ?>);
+            $rel = $mapper->getRelation(<?php $this->str($this->relationId); ?>);
             if (!$this->_autoStoreNNRecords($this-><?php $this->d($this->var); ?>, $this-><?php $this->d($imn); ?>, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, <?php $this->str($this->plural); ?>)) 
                 $res = false;
         }
 <?php       } else { ?>
         if (is_array($this-><?php $this->d($this->var); ?>)) {
-            $rel = & $mapper->getRelation(<?php $this->str($this->relationId); ?>);
+            $rel = $mapper->getRelation(<?php $this->str($this->relationId); ?>);
             $ids = false;
             if (!$this->_autoStoreNNRecords($this-><?php $this->d($this->var); ?>, $ids, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, <?php $this->str($this->plural); ?>)) 
                 $res = false;
