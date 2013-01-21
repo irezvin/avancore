@@ -112,7 +112,7 @@ class Cg_Generator {
      * Add static keywords and type hinting in appropriate places.
      * @var bool
      */
-    var $php5 = false;
+    var $php5 = true;
     
     /**
      * Generate <App>_<Model>_<Finder> class extends Pmt_Finder for each model.

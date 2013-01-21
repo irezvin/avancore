@@ -411,6 +411,10 @@ class Cg_Domain {
         return $res;
     }
     
+    function getAppClass() {
+        return strlen($this->appClass)? $this->appClass : $this->appName;
+    }
+    
 }
 
 ?>

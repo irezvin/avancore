@@ -259,7 +259,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     /**
      * @return Ac_Model_Relation
      */
-    function factory($config = array()) {
+    static function factory($config = array()) {
         return Ac_Prototyped::factory($config, 'Ac_Model_Relation');
     }
     
@@ -1076,7 +1076,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function _makeCritForSrcOrDest ($data, $otherAlias, $fieldLinks, $default) {
         $keys = array_keys($fieldLinks);
         if (is_object($data)) $d = array(& $data);
-        else $d = $d;
+        else $d = $data;
         if (is_array($data)) { // we assume that this array is of objects or rows
             $values = array();
             $this->_getAllValues($data, $values, $keys);

@@ -279,8 +279,8 @@ class Ac_Admin_Template extends Ac_Template_Html {
     }
     
     function _showSubManagers() {
-        $this->addCssLib('{AC}/tabcontent.css', false);
-        $this->addJsLib('{AC}/tabcontent.js', false);
+        $this->addCssLib('{AC}/vendor/tabcontent.css', false);
+        $this->addJsLib('{AC}/vendor/tabcontent.js', false);
         $ctx = $this->manager->getContext();
         $tcId = $ctx->mapIdentifier('smTabs');
         $tcVar = $tcId.'_o';
