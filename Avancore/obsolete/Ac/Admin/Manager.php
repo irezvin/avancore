@@ -875,6 +875,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $class = $conf['class'];
             } else $class = 'Ac_Admin_Manager';
             $sm = new $class ($ctx, $conf, $this->_instanceId.'_'.$id);
+            $sm->setApplication($this->getApplication());
             $this->_subManagers[$id] = $sm;
             foreach ($this->listFeatures() as $f) {
                 $feat = $this->getFeature($f);
