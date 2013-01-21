@@ -4,8 +4,8 @@ class Ac_Form_Control_Template_Tabs extends Ac_Form_Control_Template {
     
     function showTabs (Ac_Form_Control_Tabs $tabs) {
         $controls = $tabs->getOrderedDisplayChildren();
-        $this->addCssLib('{ACCSS}tabcontent.css', false);
-        $this->addJsLib('{AC}/tabcontent.js', false);
+        $this->addCssLib('{AC}/vendor/tabcontent.css', false);
+        $this->addJsLib('{AC}/vendor/tabcontent.js', false);
         $ctx = $tabs->getContext();
         $tcId = $ctx->mapIdentifier('tabs');
         $tcVar = $tcId.'_o';

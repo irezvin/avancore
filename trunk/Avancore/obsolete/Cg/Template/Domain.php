@@ -12,7 +12,8 @@ class Cg_Template_Domain extends Cg_Template {
     var $adminMenu = array();
     
     function doInit() {
-        $this->domainClass = strlen($this->domain->appClass)? $this->domain->appClass : $this->domain->appName;
+        
+        $this->domainClass = $this->domain->getAppClass();
         $this->domainGenClass = $this->domain->appName.'_DomainBase';
         $this->domainBaseClass = $this->domain->appBaseClass;
         $this->mappers = array();
@@ -59,7 +60,7 @@ class <?php $this->d($this->domainClass); ?> extends <?php $this->d($this->domai
     }
 
     static function getInstance($id = null) {
-        return Ac_Application::getInstance(<?php $this->export($this->domainClass); ?>, $id);
+        return Ac_Application::getApplicationInstance(<?php $this->export($this->domainClass); ?>, $id);
     }
 
 }

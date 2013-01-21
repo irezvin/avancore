@@ -115,7 +115,7 @@ class Ac_Model_Values {
     /**
      * @return Ac_Model_Values
      */
-    function factoryIndependent($options = array()) {
+    static function factoryIndependent($options = array()) {
         $data = null;
         $propName = false;
         $isStatic = true;
@@ -151,11 +151,10 @@ class Ac_Model_Values {
     
     /**
      * Creates Ac_Model_Values using meta-property object. Concrete class can be specified by $prop->values['class'].  
-     * 
      * @param Ac_Model_Property $prop
      * @return Ac_Model_Values
      */
-    function factoryWithProperty ($prop, array $optionsOverride = array()) {
+    static function factoryWithProperty ($prop, array $optionsOverride = array()) {
         $propName = $prop->propName;
         $data = $prop->srcObject;
         $formOptions = $prop->toFormOptions();

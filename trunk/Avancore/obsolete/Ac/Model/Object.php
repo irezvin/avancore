@@ -59,7 +59,24 @@ class Ac_Model_Object extends Ac_Model_Data {
      */
     var $_origPk = null;
     
+    /**
+     * @var Ac_Model_Mapper
+     */
     protected $mapper = false;
+    
+    /**
+     * @return Ac_Application
+     */
+    function getApplication() {
+        return $this->mapper->getApplication();
+    }
+    
+    /**
+     * @return Ae_Sql_Db
+     */
+    function getSqlDb() {
+        return $this->getMapper()->getSqlDb();
+    }
     
     function doAfterLoad() {
     }
