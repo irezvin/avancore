@@ -144,6 +144,9 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
         $p = array_merge(array(), $prototypes);
         if ($keyToCollection === true) $keyToCollection = $keyToProperty;
         foreach ($prototypes as $k => $v) {
+            if (is_string($v)) {
+                $v = array('class' => $v);
+            }
             if (is_array($v)) {
 	            $proto = Ac_Util::m($defaults, $v);
 	            if ($keyToProperty !== false && !($treatNumericKeysAsEmpty && is_numeric($k)) && !isset($proto[$keyToProperty])) $proto[$keyToProperty] = $k;

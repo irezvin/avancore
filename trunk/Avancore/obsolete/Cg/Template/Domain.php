@@ -59,6 +59,9 @@ class <?php $this->d($this->domainClass); ?> extends <?php $this->d($this->domai
         return __FILE__;
     }
 
+    /**
+     * @return <?php echo $this->domainClass; ?> 
+     */
     static function getInstance($id = null) {
         return Ac_Application::getApplicationInstance(<?php $this->export($this->domainClass); ?>, $id);
     }

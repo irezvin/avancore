@@ -193,8 +193,8 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
             if (isset($u)) {
                 $u->query = array();
                 if (substr($u->path, -1) !== '/') $u->path = dirname($u->path).'/';
-                $this->config['webAssetsUrl'] = $u->toString().'assets';
-                $this->config['adminImagesUrl'] = $u->toString().'images';
+                if (!isset($this->config['webAssetsUrl'])) $this->config['webAssetsUrl'] = $u->toString().'assets';
+                if (!isset($this->config['adminImagesUrl']))$this->config['adminImagesUrl'] = $u->toString().'images';
             }
         }
     }
