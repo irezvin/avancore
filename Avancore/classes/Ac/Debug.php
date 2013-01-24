@@ -14,6 +14,16 @@ class Ac_Debug {
         ini_set('error_reporting', E_ALL & ~E_DEPRECATED & ~E_STRICT);
     }
     
+    /**
+     * Stands for "dump data and die"
+     */
+    static function ddd($_ = null) {
+        self::savageMode();
+        $a = func_get_args();
+        call_user_func_array('var_dump', $a);
+        die();
+    }
+    
     static function enableAllErrors() {
         ini_set('error_reporting', E_ALL);
         ini_set('display_errors', 1);

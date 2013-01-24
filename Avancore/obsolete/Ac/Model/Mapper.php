@@ -367,7 +367,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         $res = array();
         $c = $this->recordClass;
         foreach ($rows as $i => $row) {
-            $rec = new $c ($this->database);
+            $rec = new $c ($this);
             $rec->load($row, null, true);
             $res[$i] = $rec;
         }
@@ -398,8 +398,8 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
             if ($this->useRecordsCollection && isset($this->_recordsCollection[$recId])) {
                 $rec = $this->_recordsCollection[$recId];
             } else {
-                $className = $this->dispatcher->loadClass($this->getRecordClass($row));
-                $rec = new $className ($this->database);
+                $className = $this->getRecordClass($row);
+                $rec = new $className ($this);
                 $rec->load($row, null, true);
                 if ($this->useRecordsCollection) $this->_recordsCollection[$recId] = $rec;
             }

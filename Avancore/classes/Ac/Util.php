@@ -13,7 +13,7 @@ if (!defined('AC_PHP_VERSION_MAJOR') && !defined('AC_PHP_VERSION_MINOR')) {
 
 if (!defined('AC_UTIL_DEFAULT_CHARSET')) define('AC_UTIL_DEFAULT_CHARSET', 'utf-8');
 
-class Ac_Util {
+abstract class Ac_Util {
     
     static function implementsInterface($classOrObject, $interfaceName) {
         static $cache = array();
