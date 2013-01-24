@@ -597,10 +597,14 @@ Ajs_Util = {
         var res = document.createElement(tagName);
         if (typeof attribs === 'object') {
             for (var i in attribs)
-                if (YAHOO.lang.hasOwnProperty(attribs, i) && i !== '_content' && i !== '_tagName' && i !== '_html' && i !== '_id') {
-                    YAHOO.util.Dom.setAttribute(res, i, attribs[i]);
+                if (attribs.hasOwnProperty(i) && i !== '_content' && i !== '_tagName' && i !== '_html' && i !== '_id') {
+                    if (attribs[i] !== false)
+                        res.setAttribute(i, attribs[i]);
                 }
-            if (attribs['_id'] && namedElements && typeof namedElements == 'object' ) namedElements[attribs['_id']] = res;
+            if (attribs['_id'] && namedElements && typeof namedElements == 'object' ) {
+                if (attribs['_id'] instanceof Array) Ajs_Util.setByPath(namedElements, attribs['_id'], res);
+                    else namedElements[attribs['_id']] = res;
+            }
             if (attribs['_html']) res.innerHTML = attribs['_html'];
             if (content === undefined && attribs['_content'] !== undefined) content = attribs['_content'];
         }
@@ -615,9 +619,9 @@ Ajs_Util = {
                     for (var i = 0; i < content.length; i++)
                         Ajs_Util.appendElementContent(element, content[i], namedElements);
                 } else {
-                    if  (content._tagName) {
-                        if (!content._ignore) {
-                            element.appendChild(Ajs_Util.createElement(content._tagName, content, undefined, namedElements));
+                    if  (content['_tagName']) {
+                        if (!content['_ignore']) {
+                            element.appendChild(Ajs_Util.createElement(content['_tagName'], content, undefined, namedElements));
                         }
                     } else {
                         if (content.parentNode !== undefined) element.appendChild(content);
