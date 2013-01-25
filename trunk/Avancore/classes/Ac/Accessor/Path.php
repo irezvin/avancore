@@ -18,11 +18,14 @@ class Ac_Accessor_Path {
     
     protected $cache = false;
     
-    function __construct($src, $path, $default = null, $cache = false) {
+    protected $decorator = false;
+    
+    function __construct($src, $path, $default = null, $cache = false, $decorator = false) {
         if (!(is_array($src) || is_object($src))) throw Ac_E_InvalidCall::wrongType('src', $src, array('array', 'object'));
         $this->src = $src;
         $this->path = is_array($path)? $path : Ac_Util::pathToArray($path);
         $this->default = $default;
+        $this->decorator = $decorator;
         if ($cache) {
             if ($this->path) $this->cache = $cache;
             else throw new Ac_E_InvalidCall("Cannot \$cache with empty \$path");
@@ -68,6 +71,7 @@ class Ac_Accessor_Path {
     protected function doOnGotValue($res) {
         if ($this->cache) {
             $this->src = null; // We don't need it anymore so lets free up some memory
+            $this->decorator = null; // Same for decorator
             $this->gotValue = true;
             $this->value = $res;
         }        
@@ -81,13 +85,16 @@ class Ac_Accessor_Path {
         if ($this->gotValue === false) {
             $src = $this->src;
             if (is_object($src) && $src instanceof Ac_Accessor_Path) $src = $src->getValue();
-            
             if ($this->path) {
                 if (is_array($src)) $res = Ac_Util::getArrayByPath($src, $this->path, $this->default);
                 elseif (is_object($src)) $res = $this->doGetFromObject($src, $this->default);
                 else $res = $this->default;
             } else {
                 $res = $this->src;
+            }
+            if ($this->decorator) {
+                if ($res instanceof Ac_Accessor_Path) $res = $res->getValue();
+                $res = Ac_Decorator::decorate ($this->decorator, $res, $this->decorator);
             }
             $this->doOnGotValue($res);
         } else {
@@ -124,6 +131,11 @@ class Ac_Accessor_Path {
      */
     function __get($path) {
         $res = new Ac_Accessor_Path($this, $path, $this->cache);
+        return $res;
+    }
+    
+    function decorate($decorator) {
+        $res = new Ac_Accessor_Path($this, array(), $this->default, false, $decorator);
         return $res;
     }
     

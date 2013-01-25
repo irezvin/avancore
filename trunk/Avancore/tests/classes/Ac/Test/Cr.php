@@ -165,6 +165,15 @@ class Ac_Test_Cr extends Ac_Test_Base {
         $ap = new Ac_Accessor_Path($rq5->get, 'nonExistent');
         if (!$this->assertEqual($v = $ap->value(), null)) var_dump($v);
         
+        $rq5 = new Ac_Request();
+        $v = $rq5->get->nonExistent;
+        if (!$this->assertEqual($v, null)) var_dump($v);
+        
+        $empty = array();
+        $rq6 = new Ac_Request();
+        $ap = new Ac_Accessor_Path($empty, 'nonExistent');
+        if (!$this->assertEqual($v = $ap->value(), null)) var_dump($v);
+        
     }
      
     function testUrl() {
