@@ -163,6 +163,34 @@ class Ac_Test_AccessorPath extends Ac_Test_Base {
        $srcMock->expectCallCount('setValue', 2, 'Non-cacheable method is called every time');
    }
    
+   function testDecorate() {
+       
+       $data = array(
+           'foo' => array(10, 20, 'bogus', 30, 35, 10),
+       );
+       
+       $dec = Ac_Decorator::factory(array(
+           'class' => 'Ac_Param_Filter_Array', 
+           'stripKeys' => true, 
+           'toArray' => true,
+           'conditions' => array(
+               array(
+                   'class' => 'Ac_Param_Condition_Enum', 
+                   'values' => array(10, 20, 30)
+               )
+           )
+      ));
+       
+       $val = Ac_Accessor_Path::chain($data)->foo->decorate($dec)->value();
+       
+       $this->assertEqual($val, array(10, 20, 30, 10));
+       
+       $val2 = Ac_Accessor_Path::chain($data)->onExistent->decorate($dec)->value();
+       
+       $this->assertEqual($val2, array());
+       
+   }
+   
 }
 
 class ParamSrc {
