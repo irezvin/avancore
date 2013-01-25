@@ -84,7 +84,7 @@ class Ac_Accessor_Path {
             
             if ($this->path) {
                 if (is_array($src)) $res = Ac_Util::getArrayByPath($src, $this->path, $this->default);
-                elseif (is_object($src)) $res = $this->doGetFromObject($src, $this->path, $this->default);
+                elseif (is_object($src)) $res = $this->doGetFromObject($src, $this->default);
                 else $res = $this->default;
             } else {
                 $res = $this->src;
