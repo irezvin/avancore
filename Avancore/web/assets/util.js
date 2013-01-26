@@ -599,7 +599,7 @@ Ajs_Util = {
             for (var i in attribs)
                 if (attribs.hasOwnProperty(i) && i !== '_content' && i !== '_tagName' && i !== '_html' && i !== '_id') {
                     if (attribs[i] !== false)
-                        res.setAttribute(i, attribs[i]);
+                        res.setAttribute(i, attribs[i] === true? i : attribs[i]);
                 }
             if (attribs['_id'] && namedElements && typeof namedElements == 'object' ) {
                 if (attribs['_id'] instanceof Array) Ajs_Util.setByPath(namedElements, attribs['_id'], res);

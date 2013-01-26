@@ -385,27 +385,27 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     
     // ------------------------ count / delete / load methods -------
     
-    function countDest ($srcData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
+    function countDest (& $srcData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         return $this->_countSrcOrDest($srcData, $separate, $matchMode, $this->fieldLinks, $this->fieldLinks2, $this->destIsUnique, $this->destTableName);
     }
     
-    function countSrc ($destData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
+    function countSrc (& $destData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         return $this->_countSrcOrDest($destData, $separate, $matchMode, $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcIsUnique, $this->srcTableName);
     }
     
-    function deleteDest ($srcData) {
+    function deleteDest (& $srcData) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         return $this->_deleteSrcOrDest($srcData, $this->fieldLinks, $this->fieldLinks2, $this->destTableName, $this->destWhere);
     }
     
-    function deleteSrc ($destData) {
+    function deleteSrc (& $destData) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         return $this->_deleteSrcOrDest($destData, $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcTableName, $this->srcWhere);
     }
     
-    function loadDest ($srcData, $ignoreLoaded = true, $biDirectional = true) {
+    function loadDest (& $srcData, $ignoreLoaded = true, $biDirectional = true) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         //if (!$this->srcVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $srcVarName is not set');
         $defaultValue = $this->destIsUnique? null : array();
@@ -415,7 +415,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function loadSrc ($destData, $ignoreLoaded = true, $biDirectional = true) {
+    function loadSrc (& $destData, $ignoreLoaded = true, $biDirectional = true) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         if (!$this->destVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $destVarName is not set');
         $defaultValue = $this->srcIsUnique? null : array();
@@ -711,7 +711,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function _loadSrcOrDest ($data, $defaultValue, $varName, $otherVarName, $ignoreLoaded, $biDirectional, $fieldLinks, $fieldLinks2, $isUnique, $otherIsUnique, $tableName, $instanceFunc, $ordering = false, $extraJoins = false, $extraWhere = false) {
+    function _loadSrcOrDest (& $data, $defaultValue, $varName, $otherVarName, $ignoreLoaded, $biDirectional, $fieldLinks, $fieldLinks2, $isUnique, $otherIsUnique, $tableName, $instanceFunc, $ordering = false, $extraJoins = false, $extraWhere = false) {
         $keys = array_keys($fieldLinks);
         $res = array();
         if (is_array($data)) { // we assume that this array is of objects or rows
