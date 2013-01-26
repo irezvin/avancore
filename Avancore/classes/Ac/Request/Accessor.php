@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Request_Accessor implements Ac_I_Accessor {
+class Ac_Request_Accessor implements Ac_I_Accessor, Ac_I_Param_Source {
     
     protected $src = false;
     
@@ -78,5 +78,16 @@ class Ac_Request_Accessor implements Ac_I_Accessor {
     function listProperties() {
         return false;
     }
+
+    // --- Ac_I_Param_Source implementation
+    function hasValue(array $path) {
+        $this->get($path, null, $found);
+        return $found;
+    }
+    
+    function getValue(array $path, $default = null, & $found = null) {
+        return $this->get($path, $default, $found);
+    }
+    
    
 }
