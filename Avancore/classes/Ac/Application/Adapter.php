@@ -188,6 +188,7 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
             $u->query = array();
             $this->config['webUrl'] = $u->toString();
         }
+        
         if (!isset($this->config['webAssetsUrl']) || !isset($this->config['adminImagesUrl'])) {
             if (!isset($u) && isset($this->config['webUrl'])) $u = new Ac_Url($this->config['webUrl']);
             if (isset($u)) {

@@ -22,12 +22,12 @@ class Ac_Param_Source_Object extends Ac_Prototyped implements Ac_I_Param_Destina
         $this->data = $data;
     }
     
-    function hasValue(array $path) {
-        $this->getValue($path, null, $res);
+    function hasParamValue(array $path) {
+        $this->getParamValue($path, null, $res);
         return $res;
     }
     
-    function getValue(array $path, $default = null, & $found = null) {
+    function getParamValue(array $path, $default = null, & $found = null) {
         if (count($path)) {
             $curr = $this->data;
             $p = array_values($path);
@@ -49,12 +49,12 @@ class Ac_Param_Source_Object extends Ac_Prototyped implements Ac_I_Param_Destina
         return $res;
     }
     
-    function setValue(array $path, $value) {
+    function setParamValue(array $path, $value) {
         $res = true;
         if (count($path)) {
             $p = $path;
             $prop = array_splice($p, count($p) - 1, 1);
-            $target = $this->getValue($p, null, $found);
+            $target = $this->getParamValue($p, null, $found);
             if ($target) $res = Ac_Accessor::setObjectProperty($target, $prop, $value); 
                 else $res = false;
         } else {
@@ -63,7 +63,7 @@ class Ac_Param_Source_Object extends Ac_Prototyped implements Ac_I_Param_Destina
         return $res;
     }
     
-    function deleteValue(array $path) {
+    function deleteParamValue(array $path) {
         Ac_Util::unsetArrayByPath($this->data, $path);
     }
     

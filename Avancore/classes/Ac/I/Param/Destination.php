@@ -2,8 +2,8 @@
 
 interface Ac_I_Param_Destination extends Ac_I_Param_Source {
     
-    function setValue(array $path, $value);
+    function setParamValue(array $path, $value);
     
-    function deleteValue(array $path);
+    function deleteParamValue(array $path);
     
 }
