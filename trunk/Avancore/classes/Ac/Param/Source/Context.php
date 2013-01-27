@@ -21,13 +21,13 @@ class Ac_Param_Source_Context extends Ac_Prototyped implements Ac_I_Param_Destin
         $this->data = $data;
     }
     
-    function hasValue(array $path) {
+    function hasParamValue(array $path) {
         $r = $this->data->getData($path, $this->tmp);
         $res = $path !== $this->tmp;
         return $res;
     }
     
-    function getValue(array $path, $default = null, & $found = null) {
+    function getParamValue(array $path, $default = null, & $found = null) {
         $res = $this->data->getData($path, $this->tmp);
         if (!($found = !($res === $this->tmp))) { 
             $res = $default;
@@ -35,13 +35,13 @@ class Ac_Param_Source_Context extends Ac_Prototyped implements Ac_I_Param_Destin
         return $res;
     }
     
-    function setValue(array $path, $value) {
+    function setParamValue(array $path, $value) {
         $tmp = $this->data->getData();
         Ac_Util::simpleSetArrayByPath($tmp, $path, $value);
         $this->data->setData($tmp);
     }
     
-    function deleteValue(array $path) {
+    function deleteParamValue(array $path) {
         $tmp = $this->data->getData();
         Ac_Util::unsetArrayByPath($tmp, $path);
         $this->data->setData($tmp);

@@ -87,6 +87,8 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     
     protected $defaults = false;
     
+    protected $allRecords = false;
+    
     function Ac_Model_Mapper(array $options = array()) {
         if ($options) Ac_Accessor::setObjectProperty ($this, $options);
 /*     
@@ -982,6 +984,25 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
             }
         }
         return $this->_dateFormats;
+    }
+    
+    function getAllRecords($key = false) {
+        if ($this->allRecords === false) {
+            $this->allRecords = $this->loadRecordsByCriteria('', true);
+        }
+        if ($key === false) {
+            $res = $this->allRecords;
+        } else {
+            if (is_array($key)) {
+                $res = array();
+                foreach ($key as $k) {
+                    if (isset($this->allRecords[$k])) $res[$k] = $this->allRecords[$k];
+                }
+            }
+            elseif (isset($this->allRecords[$key])) $res = $this->allRecords[$key];
+                else $res = null;
+        }
+        return $res;
     }
     
 }

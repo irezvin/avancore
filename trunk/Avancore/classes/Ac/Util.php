@@ -44,11 +44,13 @@ abstract class Ac_Util {
     static function array_merge_recursive2($paArray1, $paArray2, $preserveNumeric  = false) {
         if (!is_array($paArray1) or !is_array($paArray2)) { return $paArray2; }
             foreach ($paArray2 AS $sKey2 => $sValue2) {
-                if (!isset($paArray1[$sKey2])) $paArray1[$sKey2] = null;
                 if (is_int($sKey2) && !$preserveNumeric) {
-                    $paArray1[] = Ac_Util::array_merge_recursive2($paArray1[$sKey2], $sValue2);
+                    $paArray1[] = $sValue2;
                 }
-                else $paArray1[$sKey2] = Ac_Util::array_merge_recursive2($paArray1[$sKey2], $sValue2, $preserveNumeric);
+                else {
+                    if (!isset($paArray1[$sKey2])) $paArray1[$sKey2] = null;
+                    $paArray1[$sKey2] = Ac_Util::array_merge_recursive2($paArray1[$sKey2], $sValue2, $preserveNumeric);
+                }
             }
         return $paArray1;
     }

@@ -80,12 +80,12 @@ class Ac_Request_Accessor implements Ac_I_Accessor, Ac_I_Param_Source {
     }
 
     // --- Ac_I_Param_Source implementation
-    function hasValue(array $path) {
+    function hasParamValue(array $path) {
         $this->get($path, null, $found);
         return $found;
     }
     
-    function getValue(array $path, $default = null, & $found = null) {
+    function getParamValue(array $path, $default = null, & $found = null) {
         return $this->get($path, $default, $found);
     }
     

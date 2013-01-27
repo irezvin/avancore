@@ -4,7 +4,7 @@
  * @TODO There is a limitation on Ac_Accessor::getObjectPropertyByPath because it cannot through the arrays
  * (same for Ac_Util::getArrayByPath which cannot pass through the objects)
  */
-class Ac_Accessor_Path {
+class Ac_Accessor_Path implements Ac_I_Param_Source {
     
     protected $src = false;
     
@@ -147,6 +147,15 @@ class Ac_Accessor_Path {
      */
     static function chain($src) {
         return new Ac_Accessor_Path($src, array());
+    }
+
+    // --- Ac_I_Param_Source implementation
+    function hasParamValue(array $path) {
+        // TODO
+    }
+    
+    function getParamValue(array $path, $default = null, & $found = null) {
+        // TODO
     }
     
 }

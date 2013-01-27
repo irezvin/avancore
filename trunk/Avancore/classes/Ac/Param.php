@@ -275,7 +275,7 @@ class Ac_Param extends Ac_Prototyped implements Ac_I_Param_WithSource {
             if ($this->parent) $this->actualSrc = $this->parent->getSourceForChild($this, $this->actualSrc, $this->actualSrcPath);
             if (!$this->actualSrc) throw new Exception("Cannot retrieve source for param '".$this->getIdPath()."'");
             
-            $this->value = $this->actualSrc->getValue($this->actualSrcPath, $this->default, $this->hasValue);
+            $this->value = $this->actualSrc->getParamValue($this->actualSrcPath, $this->default, $this->hasValue);
             
             $this->actualDest = $this->destination;
             $this->actualDestPath = $this->destPath === false? $this->actualSrcPath : $this->destPath;

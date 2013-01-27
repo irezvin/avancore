@@ -15,12 +15,12 @@ class Ac_Param_Source_Array extends Ac_Prototyped implements Ac_I_Param_Destinat
         $this->data = & $data;
     }
     
-    function hasValue(array $path) {
-        $this->getValue($path, null, $res);
+    function hasParamValue(array $path) {
+        $this->getParamValue($path, null, $res);
         return $res;
     }
     
-    function getValue(array $path, $default = null, & $found = null) {
+    function getParamValue(array $path, $default = null, & $found = null) {
         $src = & $this->data;
         $path = array_values($path);
         $found = true;
@@ -35,11 +35,11 @@ class Ac_Param_Source_Array extends Ac_Prototyped implements Ac_I_Param_Destinat
         return $src;
     }
     
-    function setValue(array $path, $value) {
+    function setParamValue(array $path, $value) {
         Ac_Util::simpleSetArrayByPath($this->data, $path, $value);
     }
     
-    function deleteValue(array $path) {
+    function deleteParamValue(array $path) {
         Ac_Util::unsetArrayByPath($this->data, $path);
     }
     
