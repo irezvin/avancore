@@ -444,7 +444,7 @@ Ajs_Util = {
 		} else if (typeof data == 'function') {
 			data.apply(context, args);
 		} else if (typeof data == 'string') {
-			(function(d){ eval(d); }).call(context, data);
+			(function(d){eval(d);}).call(context, data);
 		}
 	},
 
@@ -635,6 +635,16 @@ Ajs_Util = {
                 element.appendChild(document.createTextNode(content));
             }
         }
+    },
+    
+    /**
+     * Returns array with members of hash 
+     * @type {Array}
+     */
+    getHashItems: function(hash) {
+        var res = [];
+        for (var i in hash) if (hash.hasOwnProperty(i)) res.push(hash[i]);
+        return res;
     }
     
 };
