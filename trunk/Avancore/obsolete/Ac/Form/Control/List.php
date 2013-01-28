@@ -90,7 +90,7 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
     function getDummyCaption() {
         $res = false;
         if ($this->dummyCaption === false) {
-            if ($p = $this->getModelProperty() && isset($p->dummyCaption) && ($p->dummyCaption !== false)) {
+            if (($p = $this->getModelProperty()) && isset($p->dummyCaption) && ($p->dummyCaption !== false)) {
                 $res = $p->dummyCaption;
             }
         } else $res = $this->dummyCaption;
@@ -100,7 +100,7 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
     function getDummyValue() {
         $res = false;
         if ($this->dummyValue === false) {
-            if ($p = $this->getModelProperty() && isset($p->dummyValue) && ($p->dummyValue !== false)) {
+            if (($p = $this->getModelProperty()) && isset($p->dummyValue) && ($p->dummyValue !== false)) {
                 $res = $p->dummyValue;
             }
         } else $res = $this->dummyValue;
