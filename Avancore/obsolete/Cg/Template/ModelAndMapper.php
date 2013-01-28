@@ -236,6 +236,11 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
 <?php } ?>
     
     var $_mapperClass = <?php $this->str($this->mapperClass); ?>;
+    
+    /**
+     * @var <?php echo $this->mapperClass; ?> 
+     */
+    protected $mapper = false;
 
     /**
      * @return <?php echo $this->domain->getAppClass(); ?> 

@@ -378,7 +378,10 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     
     function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
         $sql = "SELECT ".$this->database->NameQuote($this->tableName).".* FROM ".$this->database->NameQuote($this->tableName)." $joins  ";
-        if ($where) $sql .= " WHERE ".$where;
+        if ($where) {
+            if (is_array($where)) $where = $this->sqlDb->valueCriterion($where);
+            $sql .= " WHERE ".$where;
+        }
         if ($order) $sql .= " ORDER BY ".$order;
         if (is_numeric($limitCount) && !is_numeric($limitOffset)) $limitOffet = false;
         if (is_numeric($limitCount)) {
