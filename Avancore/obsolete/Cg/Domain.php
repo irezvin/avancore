@@ -117,6 +117,14 @@ class Cg_Domain {
     var $subsystemPrefixAppearsOnlyOnce = true;
     
     /**
+     * Replacements that is done on table names to convert them to model names
+     * @var array regex => replacement
+     */
+    var $tableNameFixes = array();
+    
+    var $dontPrefixClassesWithAppName = false;
+    
+    /**
      * @var Cg_Generator
      */
     var $_gen = false;
@@ -353,6 +361,9 @@ class Cg_Domain {
         } else {
             // no prefix or replacement - leave name as is
             $res['tableNameWithPrefix'] = $aName;
+        }
+        foreach ($this->tableNameFixes as $regex => $replacement) {
+            $aName = preg_replace($regex, $replacement, $aName);
         }
         $nameParts = Cg_Inflector::explode($aName);
         $ssPrefixes = array();
