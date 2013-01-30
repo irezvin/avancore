@@ -151,7 +151,7 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
 	            $proto = Ac_Util::m($defaults, $v);
 	            if ($keyToProperty !== false && !($treatNumericKeysAsEmpty && is_numeric($k)) && !isset($proto[$keyToProperty])) $proto[$keyToProperty] = $k;
 	            $item = self::factory($proto, $baseClass);
-	            if ($keyToCollection !== false) $collectionKey = self::getObjectProperty($item, $keyToCollection, $k);
+	            if ($keyToCollection !== false) $collectionKey = Ac_Accessor::getObjectProperty($item, $keyToCollection, $k);
 	                else $collectionKey = $k;
 	            if (!is_null($resArray)) $resArray[$collectionKey] = $item;
 	            $res[$collectionKey] = $item;
@@ -162,10 +162,10 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
                     else {
                         $item = $v;
 		                if (!is_null($resArray)) $resArray[$collectionKey] = $item;
-			            if ($keyToCollection !== false) $collectionKey = self::getObjectProperty($item, $keyToCollection, $k, $strictParams);
+			            if ($keyToCollection !== false) $collectionKey = Ac_Accessor::getObjectProperty($item, $keyToCollection, $k, $strictParams);
 			                else $collectionKey = $k;
                         if ($setObjectPropertiesToDefaults) 
-                            self::setObjectProperty($item, $defaults, null, $strictParams);
+                            Ac_Accessor::setObjectProperty($item, $defaults, null, $strictParams);
 			            $res[$collectionKey] = $item;
                     }
                 }
