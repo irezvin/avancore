@@ -281,7 +281,10 @@ class Cg_Model {
             if ($this->$myProp === '?') {
                 $this->$myProp = false;
                 if ($domainDefault && isset($this->_domain->$domainDefault) && ($dd = $this->_domain->$domainDefault)) {
-                    if (in_array($dd, $this->listProperties())) $this->$myProp = $dd;
+                    if (!is_array($dd)) $dd = Ac_Util::toArray($dd);
+                    if ($a = array_intersect($dd, $this->listProperties())) {
+                        $this->$myProp = array_shift($a);
+                    }
                 }
             }
         }
@@ -290,7 +293,7 @@ class Cg_Model {
     function getModelBaseName() {
         $res = $this->single;
         if ($this->subsystemPrefixes) $res = implode(' ', $this->subsystemPrefixes).' '.$res;
-        if ($this->_domain->appName) $res = $this->_domain->appName.' '.$res;
+        if ($this->_domain->appName && !$this->_domain->dontPrefixClassesWithAppName) $res = $this->_domain->appName.' '.$res;
         $res = Cg_Inflector::pearize($res);
         return $res;
     }

@@ -991,7 +991,10 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     
     function getAllRecords($key = false) {
         if ($this->allRecords === false) {
-            $this->allRecords = $this->loadRecordsByCriteria('', true);
+            if (strlen($t = $this->getTitleFieldName())) $ord = $t.' ASC';
+                else $ord = '';
+                
+            $this->allRecords = $this->loadRecordsByCriteria('', true, $ord);
         }
         if ($key === false) {
             $res = $this->allRecords;

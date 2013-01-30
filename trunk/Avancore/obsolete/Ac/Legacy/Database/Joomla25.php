@@ -11,7 +11,7 @@ class Ac_Legacy_Database_Joomla25 extends Ac_Legacy_Database_Joomla15 {
     
     function loadResultArray($numInArray = 0) {
         $this->_debugBeforeQuery($this->_db->getQuery());
-        $res = $this->_db->loadResultArray($numInArray);
+        $res = $this->_db->loadColumn($numInArray);
         $this->_debugAfterQuery($this->_db->getQuery(), count($res));
         return $res;
     }
