@@ -1001,8 +1001,8 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         } else {
             if (is_array($key)) {
                 $res = array();
-                foreach ($key as $k) {
-                    if (isset($this->allRecords[$k])) $res[$k] = $this->allRecords[$k];
+                foreach (array_intersect(array_keys($this->allRecords), $key) as $k) {
+                    $res[$k] = $this->allRecords[$k];
                 }
             }
             elseif (isset($this->allRecords[$key])) $res = $this->allRecords[$key];

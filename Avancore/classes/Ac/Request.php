@@ -5,12 +5,17 @@
 // TODO: add FILES?
 
 /**
- * @property Ac_Request_Accessor get
- * @property Ac_Request_Accessor post
- * @property Ac_Request_Accessor server
- * @property Ac_Request_Accessor env
- * @property Ac_Request_Accessor cookie
- * @property Ac_Request_Accessor request
+ * 
+ */
+
+/**
+ * @property Ac_Request_Accessor $value
+ * @property Ac_Request_Accessor $get
+ * @property Ac_Request_Accessor $post
+ * @property Ac_Request_Accessor $server
+ * @property Ac_Request_Accessor $env
+ * @property Ac_Request_Accessor $cookie
+ * @property Ac_Request_Accessor $request
  */
 class Ac_Request {
     
