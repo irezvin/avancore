@@ -8,6 +8,37 @@ class Ac_Debug {
     
     static $misc = array();
     
+    protected static $estack = array();
+    
+    static function getIni(array $options) {
+        $res = array();
+        foreach ($options as $v) $res[$v] = ini_get($v);
+        return $res;
+    }
+    
+    static function setIni(array $optionsValues) {
+        foreach ($optionsValues as $k => $v) {
+            ini_set($k, $v);
+        }
+    }
+    
+    static function pushErrors($enable = false) {
+        $ini = self::getIni(array('display_errors', 'error_reporting', 'html_errors'));
+        array_push(self::$estack, $ini);
+        if ($enable) self::enableAllErrors();
+    }
+    
+    static function popErrors() {
+        if (count(self::$estack)) {
+            $ini = array_pop(self::$estack);
+            self::setIni($ini);
+            $res = true;
+        } else {
+            $res = false;
+        }
+        return $res;
+    }
+    
     static function savageMode($flush = false) {
         while(ob_get_level()) $flush? ob_end_flush() : ob_end_clean();
         ini_set('display_errors', 1);

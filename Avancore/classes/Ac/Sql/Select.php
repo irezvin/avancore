@@ -116,7 +116,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         return $this->_db->nameQuote($str);
     }
     
-    function getStatement() {
+    function getStatement() { /** @TODO: fix issue when otherJoins are put BEFORE primary alias! */
         $this->pushState();
         $this->applyParts();
         $parts[] = $this->getColumnsList(true, true);
@@ -176,7 +176,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         }
         $res = trim($this->_db->indent($res));
         if ($withFromKeyword && strlen($res)) $res = 'FROM '.$res;
-        if ($this->otherJoinsAfter) $res .= implode("\n", $this->otherJoinsAfter);
+        if ($this->otherJoinsAfter) $res .= ' '.implode("\n", $this->otherJoinsAfter);
         return $res;
     }
     
