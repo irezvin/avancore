@@ -3,7 +3,7 @@
 /**
  * Controller for Avancore 0.2 -- presentation controller 
  */
-class Ac_Legacy_Controller {
+class Ac_Legacy_Controller implements Ac_I_Prototyped {
 
     /**
      * @var Ac_Application
@@ -112,6 +112,10 @@ class Ac_Legacy_Controller {
     var $_autoStateVars = array();
     
     var $templateExtraVars = array();
+    
+    function hasPublicVars() {
+        return true;
+    }
     
     /**
      * @param Ac_Legacy_Controller_Context $context

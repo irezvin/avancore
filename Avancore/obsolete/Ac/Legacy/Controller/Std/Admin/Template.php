@@ -11,6 +11,11 @@ class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Template_Html {
 	 * @var Ac_Legacy_Controller_Response_Http
 	 */
 	var $managerResponse = false;
+    
+    /**
+     * @var Ac_Legacy_Controller_Std_Admin
+     */
+    var $controller = false;
 	
 	
 	function showStart() {

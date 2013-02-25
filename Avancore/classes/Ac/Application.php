@@ -42,6 +42,11 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     protected $services = array();
     
     /**
+     * @var Ac_Legacy_Controller_Context
+     */
+    protected $defaultLegacyContext = false;
+    
+    /**
      * To be redefined in concrete subclasses.
      * Placeholder that will link to current application' assets dir by default
      * @var string
@@ -272,6 +277,17 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     function listControllers() {
         return array_keys($this->controllers);
     }
+
+    function setDefaultLegacyContext(Ac_Legacy_Controller_Context $defaultLegacyContext) {
+        $this->defaultLegacyContext = $defaultLegacyContext;
+    }
+
+    /**
+     * @return Ac_Legacy_Controller_Context
+     */
+    function getDefaultLegacyContext() {
+        return $this->defaultLegacyContext;
+    }    
     
     /**
      * @return Ac_Legacy_Controller
@@ -281,6 +297,7 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
             if (!is_object($this->controllers[$id])) {
                     $proto = $this->controllers[$id];
                     if (!is_array($proto)) $proto = array('class' => $proto);
+                    if ($this->defaultLegacyContext && !isset($proto['context'])) $proto['context'] = $this->defaultLegacyContext->cloneObject();
                     if (!isset($proto['application'])) $proto['application'] = $this;
                     $this->controllers[$id] = Ac_Prototyped::factory($proto, 'Ac_Legacy_Controller');
             }

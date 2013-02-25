@@ -707,6 +707,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $p = $this->getPagination();
             $c = $this->_getRecordsCollection();
             $c->setLimits($p->getOffset(), $p->getNumberOfRecordsPerPage());
+            $this->_preloadRelations();            
         }
         return $this->_table;
     }
@@ -1088,9 +1089,10 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $this->_preloadRelations = array();
             foreach ($this->listFeatures() as $f) {
                 $feat = $this->getFeature($f);
-                Ac_Util::ms($this->_preloadRelations, $feat->getPreloadRelations());
+                $this->_preloadRelations = array_unique(array_merge($this->_preloadRelations, $feat->getPreloadRelations()));
             }
         }
+        return $this->_preloadRelations;
     }
     
     function _getColumnSettings() {
@@ -1195,13 +1197,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $disp = Ac_Dispatcher::getInstance();
                 $db = $disp->database;
                 $sqlDb = new Ac_Sql_Db_Ae($db);
-	            $options = Ac_Util::m(array(
-	                'tables' => array(
-	                    't' => array(
-	                    	'name' => $mapper->tableName,
-	                    ),
-	                ),
-	            ), $options);
+	            $options = $this->getMapper()->getSqlSelectPrototype('t');
                 $this->_sqlSelect = new Ac_Sql_Select($sqlDb, $options);
                 if ($ff = $this->getFilterForm()) {
                     $fVal = $ff->getValue();
@@ -1223,6 +1219,28 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $this->_sqlSelect;
     }
     
+    function _preloadRelations() {
+        if ($pr = $this->_getPreloadRelations()) {
+            $myRecs = array();
+            while ($rec = $this->_recordsCollection->getNext()) {
+                $myRecs[] = $rec;
+            }
+            foreach ($pr as $relId) {
+                $recs = $myRecs;
+                $mpr = $this->getMapper();
+                $relId = Ac_Util::toArray($relId);
+                while (($id = array_shift($relId)) !== null) {
+                    $rel = $mpr->getRelation($id);
+                    $recs = $rel->loadDest($recs);
+                    if (count($relId)) {
+                        $mpr = $this->application->getMapper($rel->destMapperClass);
+                        $recs = Ac_Util::flattenArray($recs);
+                    }
+                }
+            }
+        }
+    }
+        
     /**
      * @return Ac_Model_Collection
      */
@@ -1238,22 +1256,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             }
         }
         
-        // TODO: implement working relations pre-loader
-        //var_dump($this->_getPreloadRelations());
-        /**
-        if ($pr = $this->_getPreloadRelations()) {
-            
-            $recs = array();
-            $this->_recordsCollection->listRecords();
-            //while ($rec = $this->_recordsCollection->getNext()) $recs[] = $rec;
-            $mpr = $this->getMapper();
-            foreach (array_keys($pr) as $relId) {
-                $rel = $mpr->getRelation($relId);
-                // $rel->loadDest($recs);
-                $rel->loadDest($this->_recordsCollection->_records);
-            }
-        }
-        **/
         return $this->_recordsCollection;
     }
     
