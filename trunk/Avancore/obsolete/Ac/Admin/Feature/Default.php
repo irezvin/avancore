@@ -7,7 +7,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     
     var $priority = 0;
     
-    var $_preloadRelations = false;
+    var $preloadRelations = false;
     
     var $_columnSettings = false;
     
@@ -38,13 +38,15 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     }
     
     function getPreloadRelations() {
-        if ($this->_preloadRelations === false) $this->getColumnSettings();
-        return $this->_preloadRelations;
+        if ($this->preloadRelations === false) {
+            $this->getColumnSettings();
+        }
+        return array_unique($this->preloadRelations);
     }
     
     function getColumnSettings() {
         if ($this->_columnSettings === false) {
-            $this->_preloadRelations = array();
+            if ($this->preloadRelations === false) $this->preloadRelations = array();
             $prot = $this->manager->getRecordPrototype();
             $map = $this->manager->getMapper();
             $tf = $map->getTitleFieldName();

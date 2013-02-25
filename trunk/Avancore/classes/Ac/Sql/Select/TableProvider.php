@@ -168,7 +168,7 @@ class Ac_Sql_Select_TableProvider {
 		return $res;
 	}
 	
-	function _searchTable($alias, $returnTable, $found) {
+	function _searchTable($alias, $returnTable, & $found) {
 		$res = null;
 		
 		$found = false;

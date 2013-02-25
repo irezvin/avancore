@@ -1011,6 +1011,23 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         return $res;
     }
     
+    function getSqlSelectPrototype($primaryAlias = 't') {
+        $res = array(
+			'tables' => array(
+				$primaryAlias => array(
+					'name' => $this->tableName, 
+				),
+			),
+			'tableProviders' => array(
+				'model' => array(
+					'class' => 'Ac_Model_Sql_TableProvider',
+					'mapper' => $this,
+				),
+			),
+        );
+        return $res;
+    }
+    
 }
 
 ?>

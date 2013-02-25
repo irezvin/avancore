@@ -516,7 +516,7 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
 			        'filterFormSettings' => array(
 			        	'controls' => array(
 				        	'substring' => array(
-			        			'class' => 'Ae_Form_Control_Text',
+			        			'class' => 'Ac_Form_Control_Text',
 			        			'caption' => 'Filter',
 			        			'htmlAttribs' => array(	
 			        				'onchange' => 'document.aForm.submit();',
