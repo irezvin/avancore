@@ -55,6 +55,15 @@ class Ac_Debug {
         die();
     }
     
+    /**
+     * Stands for "dump data"
+     */
+    static function dd($_ = null) {
+        self::savageMode();
+        $a = func_get_args();
+        call_user_func_array('var_dump', $a);
+    }
+    
     static function enableAllErrors() {
         ini_set('error_reporting', E_ALL);
         ini_set('display_errors', 1);
