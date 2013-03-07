@@ -70,11 +70,18 @@ class Ac_Debug {
         ini_set('html_errors', 1);
     }
     
-    static function fb($_) {
-        if (!headers_sent()) {
-            $args = func_get_args();
-            $call = array(Ac_Debug_FirePHP::getInstance(), 'fb');
-            return call_user_func_array($call, $args);
+    /**
+     * @return FirePHP
+     */
+    static function fb($_ = null) {
+        $args = func_get_args();
+        if (count($args)) {
+            if (!headers_sent()) {
+                $call = array(Ac_Debug_FirePHP::getInstance(), 'fb');
+                return call_user_func_array($call, $args);
+            }
+        } else {
+            return Ac_Debug_FirePHP::getInstance();
         }
     }
     
