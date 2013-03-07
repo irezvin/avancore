@@ -896,6 +896,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if (is_array($this->_processings[$p])) {
             $prot = $this->_processings[$p];
             $prot['manager'] = $this;
+            $prot['application'] = $this->application;
             if (isset($prot['class']) && strlen($prot['class'])) {
                 $class = $prot['class'];
             } else {
