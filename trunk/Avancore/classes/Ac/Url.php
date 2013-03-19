@@ -279,6 +279,10 @@ class Ac_Url {
      * @return Ac_Url
      */
     static function guess($withPathInfo = false) {
+        if (!isset($_SERVER['SERVER_PROTOCOL'])) {
+            // TODO: fix me
+            return new Ac_Url("http://localhost/");
+        }
         $protocol = explode('/', strtolower($_SERVER['SERVER_PROTOCOL']));
         $res = new Ac_Url($protocol[0].'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
         if ($withPathInfo) {
