@@ -19,7 +19,7 @@ class Ac_Legacy_Output_Native extends Ac_Legacy_Output {
     /**
      * @param Ac_Legacy_Controller_Response_Html $r
      */
-    function outputResponse(Ac_Legacy_Controller_Response_Html $r) {
+    function outputResponse(Ac_Legacy_Controller_Response_Html $r, $asModule = false) {
         
         if (class_exists('Ac_Legacy_Controller_Response_Global', false)) {
             $glob = Ac_Legacy_Controller_Response_Global::getInstance();
