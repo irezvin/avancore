@@ -89,7 +89,12 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
         $this->_mapper = Ac_Model_Mapper::getMapper($this->mapperClass);        
     }
     
-    // TODO: make getCaption() and check() methods
+    function getCaption($value) {
+        if (!$this->_cachedValueList) $this->_cachedValueList = $this->getValueList ();
+        return parent::getCaption($value);
+    }
+    
+    // TODO: make check() method
     
 }
 
