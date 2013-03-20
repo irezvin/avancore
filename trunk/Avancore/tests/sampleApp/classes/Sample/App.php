@@ -16,7 +16,7 @@ class Sample_App extends Ac_Application {
      * @return Sample_App
      */
     static function getInstance($id = null) {
-        return Ac_Application::getInstance('Sample_App', $id);
+        return Ac_Application::getApplicationInstance('Sample_App', $id);
     }
     
 }

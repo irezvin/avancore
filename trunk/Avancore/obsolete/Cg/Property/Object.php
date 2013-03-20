@@ -37,6 +37,7 @@ class Cg_Property_Object extends Cg_Property {
     
     var $otherModelIdInMethodsSingle = false;
     var $otherModelIdInMethodsPlural = false;
+    var $otherModelIdInMethodsPrefix = false;
     
     var $mapperClass = false;
     var $relationId = false;
@@ -58,7 +59,14 @@ class Cg_Property_Object extends Cg_Property {
     var $_other = false;
     
     function listPassthroughVars() {
-        return array_merge(array('className', 'mapperClass', 'relationId', 'otherModelIdInMethodsSingle', 'otherModelIdInMethodsPlural'), parent::listPassthroughVars());
+        return array_merge(array(
+            'className', 
+            'mapperClass', 
+            'relationId', 
+            'otherModelIdInMethodsSingle', 
+            'otherModelIdInMethodsPlural', 
+            'otherModelIdInMethodsPrefix'
+        ), parent::listPassthroughVars());
     }
     
     function _init() {
@@ -181,6 +189,7 @@ class Cg_Property_Object extends Cg_Property {
             $res = $this->getOtherEntityName(!$this->isList());
         //if ($this->varNameHasConflicts()) $res .= '__!!!';
         //var_dump($this->name);
+        if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
         return $res;
     }
     
@@ -197,6 +206,7 @@ class Cg_Property_Object extends Cg_Property {
                     
             }
         }
+        if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
         return $res;
     }
     

@@ -19,7 +19,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     /**
      * @var Ac_Sql_Db
      */
-    protected $sqlDb = false;
+    protected $db = false;
 
     var $tableName = null;
 
@@ -27,17 +27,16 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
 
     var $pk = null;
     
-
-    var $_prototype = false;
+    protected $prototype = false;
 
     /**
      * Use records collection (records that already were loaded will not be loaded again)
      */
     var $useRecordsCollection = false;
      
-    var $_recordsCollection = array();
+    protected $recordsCollection = array();
     
-    var $_fieldToSqlColMap = false;
+    protected $fieldToSqlColMap = false;
 
     /**
      * Records that are not stored (only those that are created with Ac_Model_Mapper::factory() method).
@@ -47,39 +46,39 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      *
      * @var array
      */
-    var $_newRecords = array();
+    protected $newRecords = array();
 
     /**
      * Relations that were created (used only if $this->remembersRelations())
      * @var array of Ac_Model_Relation
      */
-    var $_relations = array();
+    protected $relations = array();
 
     /**
      * @var array ('indexName' => array('fieldName1', 'fieldName2'), ...)
      */
-    var $_indexData = false;
+    protected $indexData = false;
 
     var $useProto = false;
 
-    var $_proto = array();
+    protected $proto = array();
 
-    var $_relationPrototypes = false;
+    protected $relationPrototypes = false;
 
     /**
      * @var Ac_Model_MapperInfo
      */
-    var $_info = false;
+    protected $info = false;
 
-    var $_titleFieldExpression = false;
+    protected $titleFieldExpression = false;
     
-    var $_validator = false;
+    protected $validator = false;
     
-    var $_updateMark = false;
+    protected $updateMark = false;
     
-    var $_updateLevel = 0;
+    protected $updateLevel = 0;
     
-    var $_dateFormats = false;
+    protected $dateFormats = array();
     
     var $managerClass = false;    
     
@@ -124,9 +123,9 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
 
     function setApplication(Ac_Application $application) {
         $this->application = $application;
-        if (!$this->database && !$this->sqlDb) {
-            $this->setDatabase($this->application->getLegacyDatabase());
-            $this->sqlDb = $this->application->getDb();
+        if (!$this->database && !$this->db) {
+            //$this->setDatabase($this->application->getLegacyDatabase());
+            $this->setDb($this->application->getDb());
         }
     }
 
@@ -137,13 +136,12 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         return $this->application;
     }
 
-    function setDatabase(Ac_Legacy_Database $database) {
-        $this->database = $database;
-        if (!$this->sqlDb) $this->sqlDb = new Ac_Sql_Db_Ae($this->database);
+    function setDb(Ac_Sql_Db $db) {
+        $this->db = $db;
         if (!strlen($this->pk)) {
-            $dbi = $this->database->getInspector();
-            $idxs = $dbi->getIndicesForTable($this->database->replacePrefix($this->tableName));
-            $this->_indexData = array();
+            $dbi = $this->db->getInspector();
+            $idxs = $dbi->getIndicesForTable($this->db->replacePrefix($this->tableName));
+            $this->indexData = array();
             foreach ($idxs as $name => $idx) {
                 if (isset($idx['primary']) && $idx['primary']) {
                     if (count($idx['columns']) == 1) {
@@ -154,7 +152,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
                     }
                 }
                 if (isset($idx['unique']) && $idx['unique'] || isset($idx['primary']) && $idx['primary']) {
-                    $this->_indexData[$name] = array_values($idx['columns']);
+                    $this->indexData[$name] = array_values($idx['columns']);
                 }
             }
             if (!(is_array($this->pk) && $this->pk || strlen($this->pk))) trigger_error (__FILE__."::".__FUNCTION__." - pk missing", E_USER_ERROR);
@@ -162,23 +160,12 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     }
 
     /**
-     * @return Ac_Legacy_Database
-     */
-    function getDatabase() {
-        return $this->database;
-    }
-
-    function setSqlDb(Ac_Sql_Db $sqlDb) {
-        $this->sqlDb = $sqlDb;
-    }
-
-    /**
      * @return Ac_Sql_Db
      */
-    function getSqlDb() {
-        return $this->sqlDb;
+    function getDb() {
+        return $this->db;
     }
-    
+
     function hasPublicVars() {
         return true;
     }
@@ -210,7 +197,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     
     function getColumnNames() {
         if ($this->columnNames === false) {
-            $cols = $this->database->getInspector()->getColumnsForTable($this->database->replacePrefix($this->tableName));
+            $cols = $this->db->getInspector()->getColumnsForTable($this->db->replacePrefix($this->tableName));
             $this->defaults = array();
             foreach ($cols as $nm => $col) {
                 $this->defaults[$nm] = $col['default'];
@@ -229,15 +216,15 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     function factory($className = false) {
         if ($className === false) $className = $this->recordClass;
         if ($this->useProto) {
-            if (!isset($this->_proto[$className])) {
-                $this->_proto[$className] = new $className($this);
+            if (!isset($this->proto[$className])) {
+                $this->proto[$className] = new $className($this);
             }
-            $proto = $this->_proto[$className];
+            $proto = $this->proto[$className];
             $res = $proto;
         } else {
             $res = new $this->recordClass($this);
         }
-        $this->_memorize($res);
+        $this->memorize($res);
         return $res;
     }
     
@@ -255,9 +242,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     
 
     function listRecords() {
-        $sql = "SELECT ".$this->database->NameQuote($this->pk)."  FROM ".$this->database->NameQuote($this->tableName);
-        $this->database->setQuery($sql);
-        $res = $this->database->loadResultArray();
+        $res = $this->db->fetchColumn("SELECT ".$this->db->n($this->pk)."  FROM ".$this->db->n($this->tableName));
         return $res;
     }
 
@@ -266,9 +251,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      */
     function recordExists($ids) {
         if ($ids) {
-            $sql = "SELECT COUNT(".$this->database->NameQuote($this->pk).") FROM ".$this->database->NameQuote($this->tableName)." WHERE $this->pk ".$this->_sqlEqCriteria($ids);
-            $this->database->setQuery($sql);
-            $res = intval($this->database->loadResult());
+            $res = (int) $this->db->fetchValue("SELECT COUNT(".$this->db->n($this->pk).") FROM ".$this->db->n($this->tableName)." WHERE $this->pk ".$this->db->eqCriterion($ids));
         } else $res = false;
         return $res;
     }
@@ -281,21 +264,20 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         $res = null;
         if (is_array($id) && count($id) == 1) $id = array_pop($id);
         if (is_scalar($id) && strlen($id)) {
-            if ($this->useRecordsCollection && isset($this->_recordsCollection[$id])) {
-                $res = $this->_recordsCollection[$id];
+            if ($this->useRecordsCollection && isset($this->recordsCollection[$id])) {
+                $res = $this->recordsCollection[$id];
             } else {
-                $sql = "SELECT * FROM {$this->tableName} WHERE {$this->pk} = ".$this->database->Quote($id);
-                $this->database->setQuery($sql);
-                $rows = $this->database->loadAssocList();
+                $sql = "SELECT * FROM ".$this->db->n($this->tableName)." WHERE ".$this->db->n($this->pk)." = ".$this->db->q($id);
+                $rows = $this->db->fetchArray($sql);
                 if ($rows && $arrayRow = $rows[0]) {
                     $className = $this->getRecordClass ($arrayRow);
                     $record = new $className($this);
-                    $record->load ($arrayRow, null, true);
+                    $record->load ($arrayRow, true);
                 } else {
                     $record = null;
                 }
                 $res = $record;
-                if ($this->useRecordsCollection && $res) $this->_recordsCollection[$id] = $res;
+                if ($this->useRecordsCollection && $res) $this->recordsCollection[$id] = $res;
             }
         } else {
             if (is_array($id)) {
@@ -313,7 +295,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     function loadRecordsArray($ids, $keysToList = false, $ordering = false) {
         if (!is_array($ids)) trigger_error (__FILE__."::".__FUNCTION__.'$ids must be an array', E_USER_ERROR);
         if ($ids) {
-            $where = $this->database->NameQuote($this->pk)." ".$this->_sqlEqCriteria($ids);
+            $where = $this->db->n($this->pk)." ".$this->db->eqCriterion($ids);
             $recs = $this->loadRecordsByCriteria($where, true, $ordering);
             $res = array();
 
@@ -370,14 +352,14 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         $c = $this->recordClass;
         foreach ($rows as $i => $row) {
             $rec = new $c ($this);
-            $rec->load($row, null, true);
+            $rec->load($row, true);
             $res[$i] = $rec;
         }
         return $res;
     }
     
     function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
-        $sql = "SELECT ".$this->database->NameQuote($this->tableName).".* FROM ".$this->database->NameQuote($this->tableName)." $joins  ";
+        $sql = "SELECT ".$this->db->n($this->tableName).".* FROM ".$this->db->n($this->tableName)." $joins  ";
         if ($where) {
             if (is_array($where)) $where = $this->sqlDb->valueCriterion($where);
             $sql .= " WHERE ".$where;
@@ -385,28 +367,22 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         if ($order) $sql .= " ORDER BY ".$order;
         if (is_numeric($limitCount) && !is_numeric($limitOffset)) $limitOffet = false;
         if (is_numeric($limitCount)) {
-            //$sql .= $this->database->getLimitsClause($limitCount, $limitOffset);
-            $sql = $this->database->applyLimits($sql, $limitCount, $limitOffset, strlen($order)? $order : false);
+            $sql = $this->db->getDialect()->applyLimits($sql, $limitCount, $limitOffset, strlen($order)? $order : false);
         }
-        
-        $this->database->setQuery($sql);
-        //$objectList = $this->database->loadAssocList();
-
-        $result = $this->database->getResultResource();
-        //var_dump($sql);
         
         $res = array();
 
-        while($row = $this->database->fetchAssoc($result)) {
+        foreach($this->db->fetchArray($sql) as $row) {
             $recId = $row[$this->pk];
 
-            if ($this->useRecordsCollection && isset($this->_recordsCollection[$recId])) {
-                $rec = $this->_recordsCollection[$recId];
+            if ($this->useRecordsCollection && isset($this->recordsCollection[$recId])) {
+                $rec = $this->recordsCollection[$recId];
             } else {
                 $className = $this->getRecordClass($row);
                 $rec = new $className ($this);
-                $rec->load($row, null, true);
+                $rec->load($row, true);
                 if ($this->useRecordsCollection) $this->_recordsCollection[$recId] = $rec;
+
             }
             if ($keysToList) {
                 $res[$rec->{$this->pk}] = $rec;
@@ -414,8 +390,6 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
                 $res[] = $rec;
             }
         }
-        $this->database->freeResultResource($result);
-
         return $res;
     }
     
@@ -468,16 +442,16 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @return Ac_Model_Object
      */
     function getPrototype() {
-        if ($this->_prototype === false) {
-            $this->_prototype = $this->factory();
+        if ($this->prototype === false) {
+            $this->prototype = $this->factory();
         }
-        return $this->_prototype;
+        return $this->prototype;
     }
 
     // ----------------------------------- Cache support functions --------------------------------
 
     function getMtime() {
-        return $this->database->getTime($this->tableName);
+        return $this->application->getFlags()->getMtime('mapper.'.$this->id);
     }
     
     function getLastUpdateTime() {
@@ -485,21 +459,21 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     }
     
     function markUpdated() {
-    	if (!$this->_updateLevel) {
-    		$this->database->touch($this->tableName);
-    		$this->_updateMark = false;
+    	if (!$this->updateLevel) {
+    		$this->application->getFlags()->touch('mapper.'.$this->id);
+    		$this->updateMark = false;
     	} else {
-    		$this->_updateMark = true;
+    		$this->updateMark = true;
     	}
     }
     
     function beginUpdate() {
-    	$this->_updateLevel++;
+    	$this->updateLevel++;
     }
     
     function endUpdate() {
-    	if ($this->_updateLevel > 0) $this->_updateLevel--;
-    	if (!$this->_updateLevel && $this->_updateMark) $this->markUpdated();
+    	if ($this->updateLevel > 0) $this->updateLevel--;
+    	if (!$this->updateLevel && $this->updateMark) $this->markUpdated();
     }
 
     // -------------------------------- Metadata retrieval functions ------------------------------
@@ -508,10 +482,10 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @return Ac_Model_MapperInfo
      */
     function getInfo() {
-        if ($this->_info === false) {
-            $this->_info = new Ac_Model_MapperInfo(Ac_Util::fixClassName(get_class($this)), $this->_doGetInfoParams());
+        if ($this->info === false) {
+            $this->info = new Ac_Model_MapperInfo(Ac_Util::fixClassName(get_class($this)), $this->doGetInfoParams());
         }
-        return $this->_info;
+        return $this->info;
     }
 
     function _doGetInfoParams() {
@@ -520,22 +494,20 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
 
     // --------------------------- in-memory records registry functions ---------------------------
 
-    function _memorize($record) {
-        $this->_newRecords[$record->_imId] = $record;
-        //var_dump("Memorizing (".get_class($this).") ".$record->_imId." / total ".count($this->_newRecords));
+    function memorize($record) {
+        $this->newRecords[$record->_imId] = $record;
     }
 
-    function _forget($record) {
-        if (isset($this->_newRecords[$record->_imId])) {
-            //var_dump("Forgetting (".get_class($this).") ".$record->_imId." / total ".count($this->_newRecords));
-            unset($this->_newRecords[$record->_imId]);
+    function forget($record) {
+        if (isset($this->newRecords[$record->_imId])) {
+            unset($this->newRecords[$record->_imId]);
         }
     }
 
     function _find($fields) {
         $res = array();
-        foreach (array_keys($this->_newRecords) as $k) {
-            if ($this->_newRecords[$k]->matchesFields($fields)) $res[$k] = $this->_newRecords[$k];
+        foreach (array_keys($this->newRecords) as $k) {
+            if ($this->newRecords[$k]->matchesFields($fields)) $res[$k] = $this->newRecords[$k];
         }
         return $res;
     }
@@ -547,15 +519,15 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      */
     function getKeysCriterion($keys, $tableAlias = false, $default = '0') {
         if (is_array($keys) && !count($keys)) return $default;
-        $fieldName = $this->database->NameQuote($this->pk);
-        if ($tableAlias !== false) $fieldName = $this->database->NameQuote($tableAlias).'.'.$fieldName;
-        $res = $fieldName.$this->_sqlEqCriteria($keys);
+        $fieldName = $this->db->n($this->pk);
+        if ($tableAlias !== false) $fieldName = $this->db->n($tableAlias).'.'.$fieldName;
+        $res = $fieldName.$this->db->eqCriterion($keys);
         return $res;
     }
 
     function indexCrtieria($fields) {
         foreach ($fields as $f => $v) {
-            $cr[] = $this->database->NameQuote($f).' = '.$this->database->Quote($v);
+            $cr[] = $this->db->n($f).' = '.$this->db->q($v);
         }
         return "(".implode(" AND ", $cr).")";
     }
@@ -567,7 +539,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         $recs = $this->loadRecordsByCriteria($crit);
         //var_dump($crit);
         if ($searchNewRecords) {
-            $newRecs = $this->_find($fields);
+            $newRecs = $this->find($fields);
             foreach (array_keys($newRecs) as $k) $recs[] = $newRecs[$k];
         }
         $res = null;
@@ -575,7 +547,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
             if (!$mustBeUnique || count($recs) == 1) $res = $recs[0];
         }
         if (!$res) {
-            //var_dump($fields, count($this->_newRecords));
+            //var_dump($fields, count($this->newRecords));
         }
         return $res;
     }
@@ -598,8 +570,8 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     function getRecordTitles($where = false, $ordering = false, $extraJoins = false, $titleFieldName = false, $titleIsProperty = '?', $valueFieldName = false, $valueIsProperty = false) {
         
         if ($titleFieldName === false) {
-            if (!strlen($this->_titleFieldExpression)) $titleFieldName = $this->getTitleFieldName();
-            else $titleFieldName = $this->_titleFieldExpression;
+            if (!strlen($this->titleFieldExpression)) $titleFieldName = $this->getTitleFieldName();
+            else $titleFieldName = $this->titleFieldExpression;
         }
         if ($titleIsProperty == '?') $titleIsProperty = $this->isTitleAProperty();
         if (!$titleFieldName) {
@@ -608,23 +580,21 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         }
         $qpkf = array();
         if ($valueFieldName === false)
-        foreach ($this->listPkFields() as $pkf) $qpkf[] = $this->database->NameQuote('t').'.'.$this->database->NameQuote($pkf);
+        foreach ($this->listPkFields() as $pkf) $qpkf[] = $this->db->n('t').'.'.$this->db->n($pkf);
         else {
             $vf = $valueFieldName;
             if (!is_array($vf)) $vf = array($vf);
-            foreach ($vf as $pkf) $qpkf[] = $this->database->NameQuote('t').'.'.$this->database->NameQuote($pkf);
+            foreach ($vf as $pkf) $qpkf[] = $this->db->n('t').'.'.$this->db->n($pkf);
         }
         $spk = count($qpkf) == 1;
         $qpkf = implode(", ", $qpkf);
         if (!$titleIsProperty && !$valueIsProperty) {
-            $sql = "SELECT DISTINCT t.".$titleFieldName." AS _title_, ".$qpkf." FROM ".$this->database->NameQuote($this->tableName)." AS t";
+            $sql = "SELECT DISTINCT t.".$titleFieldName." AS _title_, ".$qpkf." FROM ".$this->db->n($this->tableName)." AS t";
             if ($extraJoins) $sql .= " ".$extraJoins;
             if ($where) $sql .= " WHERE ".$where;
             if ($ordering) $sql .= " ORDER BY ".$ordering;
-            $this->database->setQuery($sql);
-            $rr = $this->database->getResultResource();
             $res = array();
-            while ($row = $this->database->fetchAssoc($rr)) {
+            foreach ($this->db->fetchArray($sql) as $row) {
                 $title = $row['_title_'];
                 $pk = Ac_Util::array_values(array_slice($row, 1));
                 if ($spk) $pk = $pk[0];
@@ -658,13 +628,13 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * Note: PRIMARY index (primary key) is also listed!
      */
     function listUniqueIndices() {
-        if ($this->_indexData === false) $this->_indexData = $this->_doGetUniqueIndexData();
-        return array_keys($this->_indexData);
+        if ($this->indexData === false) $this->indexData = $this->doGetUniqueIndexData();
+        return array_keys($this->indexData);
     }
 
     function listUniqueIndexFields($indexName) {
         if (!in_array($indexName, $this->listUniqueIndices())) trigger_error("No such index: '{$indexName}'", E_USER_ERROR);
-        return $this->_indexData[$indexName];
+        return $this->indexData[$indexName];
     }
 
     /**
@@ -686,10 +656,10 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @param array|string $fieldNameOrNames Names of fields to check
      */
     function identifiesRecordBy($fieldNameOrNames) {
-        if ($this->_indexData === false) $this->_indexData = $this->_doGetUniqueIndexData();
+        if ($this->indexData === false) $this->indexData = $this->doGetUniqueIndexData();
         if (!is_array($fieldNameOrNames)) $fieldNameOrNames = array($fieldNameOrNames);
         $res = false;
-        foreach ($this->_indexData as $fieldsOfIndex) {
+        foreach ($this->indexData as $fieldsOfIndex) {
             if (!array_diff($fieldsOfIndex, $fieldNameOrNames)) {
                 $res = true;
                 break;
@@ -719,23 +689,22 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         if (!$usingIndices) $usingIndices = array_merge($this->listUniqueIndices(), array_keys($customIndices));
         // If we don't have to return own key, it doesn't  matter whether we will find own instance by primary key or not
         // if ($dontReturnOwnKey) $usingIndices = array_diff($usingIndices, array('PRIMARY'));
-        foreach ($this->listPkFields() as $pkf) $pkCols[] = $this->database->NameQuote($pkf);
+        foreach ($this->listPkFields() as $pkf) $pkCols[] = $this->db->n($pkf);
         $cpk = count($pkCols) > 1;
         $pkCols = implode(", ", $pkCols);
         foreach ($usingIndices as $idxName) {
             $idxFields = isset($customIndices[$idxName])? $customIndices[$idxName] : $this->listUniqueIndexFields($idxName);
-            $crit = $this->_indexCrtieria($record, $idxFields, true);
+            $crit = $this->indexCrtieria($record, $idxFields, true);
             if ($crit) {
-                $sql = "SELECT ".$pkCols." FROM ".$this->database->NameQuote($this->tableName)." WHERE ".$crit;
-                $this->database->setQuery($sql);
-                $pks = $cpk? $this->database->loadAssocList() : $this->database->loadResultArray();
+                $sql = "SELECT ".$pkCols." FROM ".$this->db->n($this->tableName)." WHERE ".$crit;
+                $pks = $cpk? $this->db->fetchArray($sql) : $this->db->fetchColumn($sql);
                 if ($dontReturnOwnKey) {
                     foreach (array_keys($pks) as $i) if ($record->matchesPk($pks[$i])) unset($pks[$i]);
                 }
                 if ($pks) $res[$idxName] = $pks;
             }
             if ($withNewRecords) {
-                $newRecords = $this->_find($record->getDataFields($idxFields));
+                $newRecords = $this->find($record->getDataFields($idxFields));
                 if ($dontReturnOwnKey && isset($newRecords[$record->_imId])) unset($newRecords[$record->_imId]);
                 foreach (array_keys($newRecords) as $k) $res[$idxName][] = $newRecords[$k];
             }
@@ -770,21 +739,21 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @return array(modelFieldName => '{t}.colName', modelFieldName2 => 'SOME_FUNC({t}.colName1, {t}.colName2)'
      */
     function getFieldToSqlColMap() {
-    	if ($this->_fieldToSqlColMap === false) $this->_fieldToSqlColMap = $this->_doGetFieldToSqlColMap();
-    	return $this->_fieldToSqlColMap;
+    	if ($this->fieldToSqlColMap === false) $this->fieldToSqlColMap = $this->doGetFieldToSqlColMap();
+    	return $this->fieldToSqlColMap;
     }
     
     // --------------- Function that work with associations and relations ---------------
 
     function listRelations() {
-        if ($this->_relationPrototypes === false) $this->_relationPrototypes = $this->_getRelationPrototypes();
-        return array_keys($this->_relationPrototypes);
+        if ($this->relationPrototypes === false) $this->relationPrototypes = $this->getRelationPrototypes();
+        return array_keys($this->relationPrototypes);
     }
 
     function listIncomingRelations() {
-        if ($this->_relationPrototypes === false) $this->_relationPrototypes = $this->_getRelationPrototypes();
+        if ($this->relationPrototypes === false) $this->relationPrototypes = $this->getRelationPrototypes();
         $res = array();
-        foreach ($this->_relationPrototypes as $n => $p) {
+        foreach ($this->relationPrototypes as $n => $p) {
             if (!isset($p['srcOutgoing']) || !$p['srcOutgoing']) $res[] = $n;
         }
         return $res;
@@ -797,7 +766,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
 
     function getRelationPrototype($relId) {
         if (!in_array($relId, $this->listRelations())) trigger_error ("No such relation: '{$relId}' in mapper ".get_class($this), E_USER_ERROR);
-        return $this->_relationPrototypes[$relId];
+        return $this->relationPrototypes[$relId];
     }
 
     /**
@@ -830,10 +799,10 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @return Ac_Model_Relation
      */
     function getRelation($relId) {
-        if (!isset($this->_relations[$relId])) {
+        if (!isset($this->relations[$relId])) {
             $res = $this->createRelation($relId);
-            if ($this->remembersRelations()) $this->_relations[$relId] = $res;
-        } else $res = $this->_relations[$relId];
+            if ($this->remembersRelations()) $this->relations[$relId] = $res;
+        } else $res = $this->relations[$relId];
         return $res;
     }
 
@@ -938,55 +907,133 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         if ($mustBeFull && (count($vals) < count($fieldNames))) return false;
         $cr = array();
         foreach ($fieldNames as $fn) {
-            $cr[] = $this->database->NameQuote($fn).' = '.$this->database->Quote($vals[$fn]);
+            $cr[] = $this->db->n($fn).' = '.$this->db->q($vals[$fn]);
         }
         return "(".implode(" AND ", $cr).")";
     }
 
     /**
-     * @param mixed ids Scalar or Array
-     * @returns string " = 'Scalar'" or " IN ('Array[1]', 'Array[2]', 'Array[3]')";
-     */
-    function _sqlEqCriteria($ids) {
-        if (!is_array($ids)) {
-            $res = " = ".$this->database->Quote($ids);
-        } else {
-            foreach ($ids as $i => $id) $ids[$i] = $this->database->Quote($id);
-            $ids = array_unique($ids);
-            $res = " IN (".implode(", ", $ids).")";
-        }
-        return $res;
-    }
-
-    function _quoteNames($fieldNames) {
-        $res = array();
-        foreach($fieldNames as $fieldName) $res[] = $this->database->NameQuote($fieldName);
-        return $res;
-    }
-    
-    /**
      * @return Ac_Model_Validator
      */
     function getCommonValidator() {
-        if ($this->_validator === false) {
-            $this->_validator = new Ac_Model_Validator($this->getPrototype(), $this->getPrototype()->getOwnPropertiesInfo());
+        if ($this->validator === false) {
+            $this->validator = new Ac_Model_Validator($this->getPrototype(), $this->getPrototype()->getOwnPropertiesInfo());
         }
-        return $this->_validator;
+        return $this->validator;
     }
     
     /**
 	 * @return Parameter $columnFormats for Ac_Legacy_Database::convertDates
      */
-    function getDateFormats() {
-        if ($this->_dateFormats === false) {
-            $this->_dateFormats = array();
+    function getDateFormats($dataTypes = false) {
+        if (!isset($this->dateFormats[$dataTypes])) {
+            $this->dateFormats = array();
             $p = $this->getPrototype();
             foreach ($p->listOwnFields(true) as $f) {
                 $pi = $p->getPropertyInfo($f, true);
-                if (strlen($pi->internalDateFormat)) $this->_dateFormats[$f] = $pi->internalDateFormat;
+                if ($dataTypes) {
+                    static $a = array('date', 'time', 'dateTime');
+                    if (in_array($pi->dataType, $a)) $this->dateFormats[$dataTypes][$f] = $pi->dataType;
+                } else {
+                    if (strlen($pi->internalDateFormat)) {
+                        $this->$this->dateFormats[$dataTypes][$f] = $pi->internalDateFormat;
+                    }
+                }
             }
         }
-        return $this->_dateFormats;
+        return $this->dateFormats[$dataTypes];
+    }
+
+    function isMyRecord($rec, $throw = false) {
+        $res = $rec instanceof $this->recordClass;
+        if ($throw && !$rec) {
+            throw new Ac_E_InvalidUsage("\$rec is of class ".get_class($rec).", must be an instance of ".$this->recordClass." to be supported by persistence functions of ".get_class($this));
+        }
+        return $res;
+    }
+    
+    /**
+     * @param mixed $primaryKey
+     * @return array with persistence data | FALSE if record not found
+     */
+    function peLoad($primaryKey, & $error = null) {
+        $data = $this->db->fetchRow('SELECT * FROM '.$this->db->n($this->tableName).' WHERE '.$this->pk.' = '.$this->db->q($primaryKey));
+        return $data;
+    }
+
+    /**
+     * @param mixed $hyData Persistence data
+     * @return mixed persistence data on success, FALSE on failure
+     */
+    function peSave($hyData, $exists = null, & $error = null) {
+        if (is_null($exists)) $exists = array_key_exists($this->pk, $hyData);
+        if ($exists) {
+            $query = $this->db->updateStatement($this->tableName, $hyData, $this->pk, false);
+            if ($this->db->query($query)) $res = $hyData;
+                else $res = false;
+        } else {
+            $query = $this->db->insertStatement($this->tableName, $hyData);
+            if ($this->db->query($query)) {
+                if (strlen($this->autoincFieldName)) {
+                    $hyData[$this->autoincFieldName] = $this->db->getLastInsertId();
+                }
+                $res = $hyData;
+            } else {
+                $res = false;
+            }
+        }
+        return $res;
+    }
+    
+    /**
+     * @param type $hyData 
+     * @return bool
+     */
+    function peDelete($hyData, & $error = null) {
+        $key = $hyData[$this->pk];
+        $res = (bool) $this->db->query("DELETE FROM ".$this->db->n($this->tableName)." WHERE ".$this->db->n($this->pk)." ".$this->db->eqCriterion($key));
+        return $res;
+    }
+    
+    function peConvertForLoad($hyData) {
+        $res = $hyData;
+        $d = $this->db->getDialect();
+        if ($d->hasToConvertDatesOnLoad()) {
+            $res = $this->convertDates($oid, $this->getDateFormats()); 
+        }
+        return $res;
+    }
+    
+    function peConvertForSave($hyData) {
+        $res = $hyData;
+        $d = $this->db->getDialect();
+        $df = $this->getDateFormats(true);
+        if ($df) {
+            foreach ($df as $prop => $type) {
+                if (array_key_exists($prop, $res)) {
+                    $res[$prop] = $d->convertDateForStore($res[$prop], $type);
+                }
+            }
+        }
+        return $res;
+    }
+    
+    function peReplaceNNRecords($rowProto, $rows, $midTableName, & $errors = array()) {
+        $res = true;
+        if (count($rowProto)) {
+            $sqlDb = $this->db;
+            if (!$sqlDb->query('DELETE FROM '.$sqlDb->n($midTableName).' WHERE '.$sqlDb->valueCriterion($rowProto))) {
+                $errors['idsDelete'] = 'Cannot clear link records';
+                $res = false;
+            }
+            if (count($rows)) {
+                if (!$sqlDb->query($sqlDb->insertStatement($midTableName, $rows, true))) {
+                    $errors['idsInsert'] = 'Cannot store link records';
+                    $res = false;
+                }
+            }
+        }
+        return $res;
     }
     
     function getAllRecords($key = false) {
@@ -1029,5 +1076,6 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     }
     
 }
+    
+    
 
-?>

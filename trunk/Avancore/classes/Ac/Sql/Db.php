@@ -1,12 +1,27 @@
 <?php
 
-abstract class Ac_Sql_Db {
+abstract class Ac_Sql_Db extends Ac_Prototyped {
 
     var $defaultIndent = 4;
     
     var $triggerErrorsOnSqlErrors = true;
     
     var $checkIfNameQuoted = true;
+    
+    protected $inspector = false;
+    
+    abstract function getDbPrefix();
+    
+    abstract function getDbName();
+    
+    /**
+     * @return Ac_Sql_Dialect 
+     */
+    abstract function getDialect();
+    
+    function replacePrefix($string) {
+        return str_replace('#__', $this->getDbPrefix(), $string);
+    }
     
     function quote($value, $asArray = false) {
         return $this->q($value);        
@@ -19,6 +34,8 @@ abstract class Ac_Sql_Db {
             $r = array();
             foreach ($value as $v) $r[] = $this->q($v, $asArray);
             return $asArray? $r: implode(", ", $r);
+        } elseif (is_null($value)) {
+            $res = 'NULL';
         } else {
             $res = $this->implValueQuote($value);
         }
@@ -257,6 +274,20 @@ abstract class Ac_Sql_Db {
     
     function getAffectedRows() {
         trigger_error("Call to abstract function", E_USER_ERROR);
+    }
+    
+    function replaceDbPrefix($string) {
+        return str_replace('#__', $this->getDbPrefix(), $string);
+    }
+    
+    /**
+     * @return Ac_Sql_Dbi_Inspector
+     */
+    function getInspector() {
+        if ($this->inspector === false) {
+            $this->inspector = $this->getDialect()->createInspector($this);
+        }
+        return $this->inspector;
     }
     
 }

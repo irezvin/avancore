@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Util {
+abstract class Cg_Util {
     
     static function createDirPath($dirPath, $rights = 0777) {
         $dirs = explode('/', $dirPath); 
@@ -117,6 +117,26 @@ class Cg_Util {
         }
         
         return array($cmd, $output, $res);
+    }
+    
+    static function findCommonPrefix(array $strings) {
+        $res = '';
+        if (count($strings)) {
+            do {
+                $match = true;
+                $s = false;
+                foreach ($strings as $string) {
+                    $s1 = substr($string, 0, strlen($res) + 1);
+                    if ($s === false) $s = $s1;
+                    elseif ($s != $s1) {
+                        $match = false;
+                        break;
+                    }
+                }
+                if ($match) $res = $s;
+            } while ($match);
+        }
+        return $res;
     }
     
 }

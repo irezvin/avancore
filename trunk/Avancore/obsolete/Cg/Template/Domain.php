@@ -8,6 +8,7 @@ class Cg_Template_Domain extends Cg_Template {
     var $mappers = array();
     var $mapperPrototypes = array();
     var $modelClasses = array();
+    var $modelMethodSuffixes = array();
     var $optName = false;
     var $adminMenu = array();
     
@@ -28,7 +29,8 @@ class Cg_Template_Domain extends Cg_Template {
             //$mapperMethodSuffix{0} = strtolower($mapperMethodSuffix{0});
             $this->mapperPrototypes[$mod->getMapperClass()] = array('class' => $mod->getMapperClass());
             $this->mappers[$mapperMethodSuffix] = $mod->getMapperClass();
-            $this->modelClasses[] = $mod->className;  
+            $this->modelClasses[$mod->getMapperClass()] = $mod->className;  
+            $this->modelMethodSuffixes[$mod->getMapperClass()] = str_replace("_", "", $mod->className);
         }
         $this->optName = 'com_'.$this->domain->josComId;
     }
@@ -67,7 +69,7 @@ class <?php $this->d($this->domainClass); ?> extends <?php $this->d($this->domai
     }
 
 }
-<?php $this->phpClose(); ?>
+<?php //$this->phpClose(); ?>
 <?php } 
 
     // --------------------------- domainGenFile -----------------------
@@ -93,16 +95,24 @@ abstract class <?php $this->d($this->domainGenClass); ?> extends <?php $this->d(
     
 <?php } ?>
 <?php if (count($this->modelClasses)) { ?>
-<?php foreach ($this->modelClasses as $modelClass) { ?> 
+<?php foreach ($this->modelClasses as $mapperClass => $modelClass) { ?> 
     /**
      * @return <?php $this->d($modelClass); ?> 
 <?php if (!$this->generator->php5) { ?>
      * @static
 <?php } ?>
      */
-    <?php if ($this->generator->php5) echo "static "; ?>function <?php $this->d($modelClass); ?> (& $object) {
+    <?php if ($this->generator->php5) echo "static "; ?>function <?php $this->d($modelClass); ?> (<?php if (!$this->generator->php5) echo "& "; ?>$object = null) {
         return $object;
     }
+    
+    /**
+     * @return <?php $this->d($modelClass); ?> 
+     */
+    function create<?php $this->d($this->modelMethodSuffixes[$mapperClass]); ?> () {
+        return $this->getMapper(<?php $this->str($mapperClass); ?>)->factory();
+    }
+    
 <?php } ?>
 
 <?php } ?>

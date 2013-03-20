@@ -113,7 +113,7 @@ class Ac_Model_DateTime {
         }
     }
     
-    function getInstance() {
+    static function getInstance() {
         if (!isset($GLOBALS['_dateTimeParserSingleton']) || !is_a($GLOBALS['_dateTimeParserSingleton'], 'Ac_Model_DateTime')) {
             $GLOBALS['_dateTimeParserSingleton'] = new Ac_Model_DateTime();
         }

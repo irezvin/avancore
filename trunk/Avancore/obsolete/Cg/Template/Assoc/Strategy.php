@@ -103,6 +103,17 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
         
         if ($this->prop->otherModelIdInMethodsSingle) $this->otherSingle = $this->prop->otherModelIdInMethodsSingle;
         if ($this->prop->otherModelIdInMethodsPlural) $this->otherPlural = $this->prop->otherModelIdInMethodsPlural; 
+        
+        if (strlen($px = $this->prop->otherModelIdInMethodsPrefix)) {
+            $this->single = $px.ucfirst($this->single);
+            $this->plural = $px.ucfirst($this->plural);
+            $this->ucSingle = ucfirst($px).$this->ucSingle;
+            $this->ucPlural = ucfirst($px).$this->ucPlural;
+            $this->otherSingle = $px.ucfirst($this->otherSingle);
+            $this->otherPlural = $px.ucfirst($this->otherPlural); 
+        }
+        
+        
         $this->idThisPlural = '$'.$this->thisPlural;
         $this->idOtherPlural = '$'.$this->otherPlural;      
         $this->ucThisPlural = ucfirst($this->thisPlural);
@@ -110,13 +121,13 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
         $this->thisClass = $this->template->modelClass;
         $this->otherClass = $this->otherModel->className;
         if (($this->mirrorProp = $this->prop->getMirrorProperty()) && $this->mirrorProp->isEnabled()) {
-            
+       
             $this->mirrorSingle = $this->mirrorProp->otherModelIdInMethodsSingle;
-            if ($this->mirrorProp->otherModelIdInMethodsSingle) $this->mirrorSingle  = $this->mirrorProp->otherModelIdInMethodsSingle;
+            if ($this->mirrorProp->otherModelIdInMethodsSingle) $this->mirrorSingle  = $this->mirrorProp->otherModelIdInMethodsSingle.$sfx;
             $this->ucMirrorSingle = ucfirst($this->mirrorSingle);
             
             $this->mirrorPlural = $this->mirrorProp->otherModelIdInMethodsPlural;
-            if ($this->mirrorProp->otherModelIdInMethodsPlural) $this->mirrorPlural  = $this->mirrorProp->otherModelIdInMethodsPlural;
+            if ($this->mirrorProp->otherModelIdInMethodsPlural) $this->mirrorPlural  = $this->mirrorProp->otherModelIdInMethodsPlural.$sfx;
             $this->ucMirrorPlural = ucfirst($this->mirrorPlural);
             
             if ($this->mirrorProp->isList()) {
@@ -132,6 +143,7 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
             
             //$this->mirrorMethod = $this->prop->isList()? 'set'.ucfirst($this->mirrorProp->
         }
+        
     }
     
     function showGenModelMethods() {

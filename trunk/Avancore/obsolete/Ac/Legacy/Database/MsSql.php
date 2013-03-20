@@ -1,6 +1,8 @@
 <?php
 
 class Ac_Legacy_Database_MsSql extends Ac_Legacy_Database {
+
+    var $dialectClass = 'Ac_Sql_Dialect_Mssql';
     
     protected $inspectorClass = 'Ac_Sql_Dbi_Inspector_MsSql';
     
@@ -330,18 +332,10 @@ class Ac_Legacy_Database_MsSql extends Ac_Legacy_Database {
         $res = array_diff($res, array('_connection'));
         return $res;
     }
-    
-    function getConcatExpression($expressions) {
-        return '('.implode(' || ', $expressions).')';
-    }
 
     function isNameQuoted($name) {
         return ($l = strlen($name)) > 2 && $name{0} == '[' && $name{$l-1} == ']';
     }
-	
-	function getIfnullFunction() {
-	    return 'COALESCE';
-	}
 	
 	function applyLimits($statement, $count, $offset, $orderBy = false) {
 	    // Find keywords after the SELECT clause
@@ -398,6 +392,14 @@ class Ac_Legacy_Database_MsSql extends Ac_Legacy_Database {
 	    }
 	    return $res;
         
+	}
+    
+    function getConcatExpression($expressions) {
+        return '('.implode(' || ', $expressions).')';
+    }
+	
+	function getIfnullFunction() {
+	    return 'COALESCE';
 	}
 	
 	function ifStatement($if, $then, $else, $close = true) {

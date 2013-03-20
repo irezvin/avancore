@@ -2,6 +2,8 @@
 
 class Ac_Legacy_Database_Joomla extends Ac_Legacy_Database {
 
+    var $dialectClass = 'Ac_Sql_Dialect_Mysql';
+
     protected $inspectorClass = 'Ac_Sql_Dbi_Inspector_MySql5';    
     
     /**
@@ -125,6 +127,11 @@ class Ac_Legacy_Database_Joomla extends Ac_Legacy_Database {
     
     function getAffectedRows() {
         return $this->_db->getAffectedRows();
+    }
+    
+    function getPrefix() {
+        $a = $this->getAccess();
+        return $a['prefix'];
     }
     
 }
