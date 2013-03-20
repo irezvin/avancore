@@ -473,7 +473,7 @@ class Ac_Model_Collection {
                 } else {
                     $this->_records[$key] = new $rc;
                 }
-                $this->_records[$key]->load($row, null, true);    
+                $this->_records[$key]->load($row, true);    
             } else {
                 $this->_records[$key] = $row;
             }
@@ -539,7 +539,7 @@ class Ac_Model_Collection {
                 if ($this->_useCursor) {
                     if ($cls = $this->_getRecordClass($row)) {
                         if (!isset($this->_cursor[$cls])) $this->_cursor[$cls] = ($this->_mapper? new $cls($this->_mapper) : new $cls);
-                        $this->_cursor[$cls]->load($row, null, true);
+                        $this->_cursor[$cls]->load($row, true);
                         $res = $this->_cursor[$cls];
                     } else {
                         $res = $row;
@@ -548,7 +548,7 @@ class Ac_Model_Collection {
                 } else {
                     if ($rc = $this->_getRecordClass($row)) {
                         $res = $this->_mapper?  new $rc($this->_mapper) : new $rc();
-                        $res->load($row, null, true);
+                        $res->load($row, true);
                     } else $res = $row;
                     return $res;
                 }

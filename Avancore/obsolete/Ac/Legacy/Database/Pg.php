@@ -1,6 +1,9 @@
 <?php
 
 class Ac_Legacy_Database_Pg extends Ac_Legacy_Database {
+
+    var $dialectClass = 'Ac_Sql_Dialect_Pgsql';
+    
     var $_sql = false;
     
     var $_connection = false;

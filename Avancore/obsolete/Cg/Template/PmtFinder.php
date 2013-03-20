@@ -44,7 +44,7 @@ class Cg_Template_PmtFinder extends Cg_Template {
 class <?php $this->d($this->finderClass); ?> extends <?php $this->d($this->genFinderClass); ?> {
 }
     
-<?php $this->phpClose(); ?><?php
+<?php //$this->phpClose(); ?><?php
     }
     
     function showPmtGenFinder() {
@@ -79,7 +79,7 @@ class <?php $this->d($this->finderClass); ?> extends <?php $this->d($this->genFi
 	}
 }
     
-<?php $this->phpClose(); ?><?php
+<?php //$this->phpClose(); ?><?php
     }
     
 }

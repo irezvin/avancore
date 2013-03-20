@@ -1,6 +1,8 @@
 <?php
 
 class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
+
+    var $dialectClass = 'Ac_Sql_Dialect_Mysql';
     
     protected $inspectorClass = 'Ac_Sql_Dbi_Inspector_MySql5';
     

@@ -294,7 +294,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     
 }
 
-<?php $this->phpClose(); ?><?php        
+<?php //$this->phpClose(); ?><?php        
     }
     
     function showModelObject() {  
@@ -341,7 +341,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 <?php } ?>
 }
 
-<?php $this->phpClose(); ?><?php
+<?php //$this->phpClose(); ?><?php
     }
     
     function showGenMapper() {
@@ -439,7 +439,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     
 }
 
-<?php $this->phpClose(); ?><?php
+<?php //$this->phpClose(); ?><?php
     }
     
     function showMapper() {  
@@ -555,7 +555,7 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
 }
     
 <?php } ?>  
-<?php $this->phpClose(); ?><?php
+<?php //$this->phpClose(); ?><?php
     }
     
 }

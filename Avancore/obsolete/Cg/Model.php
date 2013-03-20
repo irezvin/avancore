@@ -243,12 +243,6 @@ class Cg_Model {
             else $cls = 'Cg_Property_Simple';
             $this->_properties[$name] = new $cls ($this, $name, $this->_properties[$name]);
         }
-
-        // Resolving conflicts
-        foreach ($pNames as $name) {
-            $prop = $this->_properties[$name];
-            $prop->resolveConflicts();       
-        }
         
     }
     
@@ -621,6 +615,54 @@ class Cg_Model {
     
     function listSystems() {
         return array_merge($this->subsystemPrefixes, array($this->name));
+    }
+    
+    function getConflictsInfo($unresolved = false) {
+        $res = array();
+        $props = array();
+        foreach ($this->listProperties() as $i) {
+            $prop = $this->getProperty($i);
+            if ($prop instanceof Cg_Property_Object) {
+                if (!isset($props[$prop->className])) {
+                    $props[$prop->className] = array('props' => array(), 'byVarName' => array(), 'unresolved' => 0);
+                }
+                $props[$prop->className]['props'][] = $i;
+                if (!isset($props[$prop->className]['byVarName'][$v = $prop->getDefaultVarName()])) {
+                    $props[$prop->className]['byVarName'][$v][] = 1;
+                } else {
+                    $props[$prop->className]['byVarName'][$v]++;
+                    $props[$prop->className]['unresolved'] = 1;
+                }
+            }
+        }
+        foreach ($props as $className => $p) {
+            if (count($p['props']) > 1 && $p['unresolved']) {
+                $props[$className]['suffixes'] = $this->findRelationSuffixes($p['props']);
+            }
+        }
+        foreach ($props as $className => $p) {
+            if (count($p['props']) > 1) {
+                if (!$unresolved || $p['unresolved']) {
+                    $res[$className] = $p;
+                }
+            }
+        }
+        return $res;
+    }
+
+    function findRelationSuffixes($propsList) {
+        $rels = array();
+        foreach ($propsList as $prop) {
+            if (!is_object($prop)) $prop = $this->getProperty($prop);
+            if (!($prop instanceof Cg_Property_Object)) throw new Exception("items of \$propsList shuld be either Cg_Property_Object instances or their IDs");
+            $rels[$prop->name] = $prop->getRelation()->name;
+        }
+        $cp = Cg_Util::findCommonPrefix($rels);
+        $res = array();
+        foreach ($rels as $propName => $relName) {
+            $res[$propName] = substr($relName, strlen($cp));
+        }
+        return $res;
     }
     
 }

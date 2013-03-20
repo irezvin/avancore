@@ -26,6 +26,8 @@ class Ac_Sql_Dbi_Relation extends Ac_Sql_Dbi_Object {
     
     var $_otherRecordUnique = '?';
     
+    var $comment = false;
+    
     function Ac_Sql_Dbi_Relation(& $inspector, $name, $table, $data) {
         //Ac_Util::simpleBind($data, $this);
         $data['name'] = $name;

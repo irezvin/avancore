@@ -337,7 +337,11 @@ class Cg_Generator {
         $this->log('Generator finished: '.$this->getOutputBytes().' bytes in '.$this->getOutputFiles().' files ----------------');
         
         foreach ($oldSettings as $s => $v) {
-            ini_set($s, $v); 
+            if ($s == "error_log" && strlen(ini_get("open_basedir")) && !strlen($v)) {
+                // workaround for open_basedir warning when restoring error_log option back to empty
+                ini_restore($s);
+            }
+                else ini_set($s, $v); 
         }
         
     }

@@ -4,6 +4,8 @@ define('CALLBACK_AE_DATABASE_AFTER_QUERY', 'Ac_Legacy_Database.afterQuery');
 
 class Ac_Legacy_Database {
 
+    var $dialectClass = 'Ac_Sql_Dialect';
+    
     protected static $defaultInstance = null;
     
     /**
@@ -17,7 +19,6 @@ class Ac_Legacy_Database {
         if (!self::$defaultInstance) self::$defaultInstance = Ac_Application::getDefaultInstance()->getLegacyDatabase();
         return self::$defaultInstance;
     }
-    
     
     static function setDefaultInstance(Ac_Legacy_Database $defaultInstance) {
         self::$defaultInstance = $defaultInstance;
@@ -365,10 +366,6 @@ class Ac_Legacy_Database {
         return $res;
     }
     
-    function getConcatExpression($expressions) {
-        return 'CONCAT('.implode(', ', $expressions).')';
-    }
-    
     /**
      * @return Ac_Sql_Db
      */
@@ -403,6 +400,10 @@ class Ac_Legacy_Database {
 	function _doCopyToDest($db) {
 		trigger_error ("Call to abstract method", E_USER_ERROR);
 	}
+    
+    function getConcatExpression($expressions) {
+        return 'CONCAT('.implode(', ', $expressions).')';
+    }
 	
 	function getIfnullFunction() {
 	    return 'IFNULL';
