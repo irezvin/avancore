@@ -218,8 +218,31 @@ class Cg_Domain {
             foreach ($this->_calculateModelsConfig() as $name => $config) {
                  $this->{$l}[$name] = $config; 
             }
+            $this->resolveConflicts();
         }
         return array_keys($this->$l);
+    }
+    
+    protected function resolveConflicts() {
+        $ci = array();
+        foreach ($this->listModels() as $i) {
+            if ($c = $this->getModel($i)->getConflictsInfo(true)) {
+                $ci[$i] = $c;
+            }
+        }
+
+        foreach ($ci as $modelId => $cc) {
+            $mod = $this->getModel($modelId);
+            foreach ($cc as $c) {
+                foreach ($c['props'] as $name) {
+                    $p = $mod->getProperty($name);
+                    $p->otherModelIdInMethodsPrefix = $c['suffixes'][$name];
+                    $p->varName = $p->getDefaultVarName();
+                    $p->pluralForList = $p->getDefaultPluralForList();
+                }
+            }
+        }
+
     }
     
     /**

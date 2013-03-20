@@ -67,7 +67,7 @@ class Cg_Frontend {
     }
     
     function getTitle() {
-        $res = "Avancore CodeGen v.0.0.3 &copy; 2008 &mdash; 2011 Ilya Rezvin";
+        $res = "Avancore CodeGen v.0.0.4 &copy; 2008 &mdash; 2013 Ilya Rezvin";
         return $res;
     }
     
@@ -119,14 +119,14 @@ class Cg_Frontend {
         <?php $hlp->showCheckbox('cnf', $createNonEditableFiles, false, array(), true); ?> Create non-editable files <br /> 
         <?php $hlp->showCheckbox('cpg', $copyGen, false, array(), true); ?> Deploy non-editable files after generation <br />
         <p style='text-align: center'> 
-        	<input type='submit' name='submit' style='height: 30px; width: 100px; font-weight: bold' value='Run!' />
+        	<input type='submit' name='submit' style='height: 30px; width: 100px; font-weight: bold' value='Generate' />
        	</p>
     </form>
     <br style='clear: both' />
 
 <?php
 
-    $this->show($gen);
+    //$this->show($gen);
 
     foreach ($gen->listDomains() as $domName) {
     
@@ -137,6 +137,8 @@ class Cg_Frontend {
             $model = $dom->getModel($modelName);
             $this->showExpandable("<h3>".$modelName."</h3>", false);
             $this->show($model);
+            //ini_set('xdebug.var_display_max_data', 102)
+            var_dump($model->getConflictsInfo());
             //var_dump($dom->analyzeTableName($model->table));
 ?>
 <?php       if ($ps = $model->listProperties()) { ?>

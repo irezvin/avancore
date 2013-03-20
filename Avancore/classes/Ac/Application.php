@@ -391,9 +391,15 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
             $res = $this->services[$id];
         } elseif ($this->adapter && $s = $this->adapter->getService($id, true)) {
             $res = $s;
-        } elseif (!$dontThrow) throw new Exception("No such service: '\$id'");
+        } elseif (!$dontThrow) throw new Exception("No such service: '{$id}");
         return $res;
     }
     
+    /**
+     * @return Ac_Flags
+     */
+    function getFlags() {
+        return $this->getService('flags');
+    }
     
 }

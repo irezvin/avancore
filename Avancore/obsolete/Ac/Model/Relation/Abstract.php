@@ -85,13 +85,13 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
     function _recordInstance($row, $recordClass, $mapper) {
         if ($recordClass) {
             $res = new $recordClass($mapper);
-            $res->load($row, null, true);
+            $res->load($row, true);
         } elseif ($recordClass === '') {
             $res = $row;
         } elseif ($mapper) {
             //$res = new Nc_Element_Version;
             $res = $mapper->factory($mapper->getRecordClass($row));
-            $res->load($row, null, true);
+            $res->load($row, true);
         } else {
             $res = $row;
         }

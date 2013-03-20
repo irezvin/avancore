@@ -20,20 +20,10 @@ class Ac_Model_Object extends Ac_Model_Data {
     var $_imId = 0;
     
     /**
-     * @var Ac_Legacy_Database
-     */
-    var $_db = false;
-    
-    /**
      * Name of primary key column
      * @var string
      */
     var $_pk = false;
-    
-    /**
-     * @var string
-     */
-    var $_tableName = false;
     
     var $_error = false;
     
@@ -176,7 +166,6 @@ class Ac_Model_Object extends Ac_Model_Data {
         
         if (!strlen($this->_mapperClass)) $this->_mapperClass = $mapper->getId();
         
-        $this->_db = $mapper->getDatabase();
         $this->_pk = $mapper->pk;
         $this->_tableName = $mapper->tableName;
         $this->doOnCreate();
@@ -186,26 +175,21 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     /**
      * @param mixed oid null, primary key or associative array with row 
-     * @param string prefix In case when $oid is an array, it's a "prefix" param that is used in mosBindArrayToObject function 
      * @param bool $isRow Whether to treat first parameter as an associative row
      */
-    function load ($oid = null, $prefix = null, $isRow = false) {
+    function load ($oid = null, $isRow = false) {
         
         if ($isRow) {
             $k = $this->_pk;
-            //$this->reset();
             $this->_otherValues = array();
-            if ($this->_db->hasToConvertDatesOnLoad()) {
-                $m = $this->getMapper();
-                $oid = $this->_db->convertDates($oid, $m->getDateFormats()); 
-            }
-            foreach ($oid as $k=>$v) {
-                if (($k{0} !== '_') && (isset($this->$k) || $this->_hasVar($k))) {
-                    $this->$k = $v;
-                } else {
-                    $this->_otherValues[$k] = $v;
+            $hyData = $this->mapper->peConvertForLoad($oid);
+            foreach ($this->listOwnProperties() as $propName) {
+                if (array_key_exists($propName, $hyData)) {
+                    $this->$propName = $oid[$propName];
+                    unset($oid[$propName]);
                 }
             }
+            $this->_otherValues = $oid;
             $this->doAfterLoad();
             $res = true;
         } else {
@@ -221,7 +205,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         }
         if ($this->isPersistent()) {
             $m = $this->getMapper();
-            $m->_forget($this);
+            $m->forget($this);
         }
         if ($this->tracksChanges()) $this->_memorizeFields();
         return $res;
@@ -242,82 +226,70 @@ class Ac_Model_Object extends Ac_Model_Data {
         
         $this->reset();
         
-        $query = "SELECT *"
-        . "\n FROM $this->_tableName"
-        . "\n WHERE $this->_pk = " . $this->_db->Quote( $oid )
-        ;
-        $this->_db->setQuery( $query );
         $props = $this->listOwnProperties();
-        $rows = $this->_db->loadAssocList();
-        if (count($rows)) {
-            $res = true;
-            $row = $rows[0];
-            if ($this->_db->hasToConvertDatesOnLoad()) {
-                $m = $this->getMapper();
-                $row = $this->_db->convertDates($row, $m->getDateFormats()); 
-            }
+        
+        if ($hyData = $this->mapper->peLoad($this->getPrimaryKey())) {
+            $hyData = $this->mapper->peConvertForLoad($hyData);
             foreach ($this->listOwnProperties() as $propName) {
-                if (isset($row[$propName])) {
-                    $this->$propName = $row[$propName];
+                if (array_key_exists($propName, $hyData)) {
+                    $this->$propName = $hyData[$propName];
                 }
             }
+            $res = true;
         } else {
             $res = false;
+        }
+        
+        return $res;
+    }
+    
+    protected function getHyData() {
+        $sf = $this->_storesFalseValues(); 
+        $res = array();
+        foreach ($this->_listSavedMembers() as $propName) {
+            $val = $this->$propName;  
+            if ($sf || ($val !== false)) {
+                $res[$propName] = $val;
+            }
         }
         return $res;
     }
     
-    function _legacyStore($updateNulls) {
+    function _legacyStore() {
         $k = $this->_pk;
         $mapper = $this->getMapper();
-        //if ($this->_isReference && !$this->isPersistent()) $this->_loadReference();
-        
         $kv = array();
         $tpk = $this->tracksPk();
-        $convertsDates = $this->_db->hasToConvertDatesOnStore();
-        $sf = $this->_storesFalseValues(); 
-        foreach ($this->_listSavedMembers() as $propName) {
-            $val = $this->$propName;  
-            if ($sf || ($val !== false)) {
-                if ($this->hasProperty($propName)) {
-                    $pi = $this->getPropertyInfo($propName, true);
-                    if (in_array($pi->dataType, array('date', 'time', 'dateTime')) && $convertsDates) {
-                        $val = $this->_db->convertDateForStore($val, $pi->dataType);
-                    }
-                }
-                if ($tpk || ($propName != $k)) $kv[$this->_db->NameQuote($propName)] = $this->_db->Quote($val);
-            }
-        }
+        $hyData = $this->getHyData();
         
         if ($this->isPersistent()) {
             
-            $set = array();
-            foreach ($kv as $field => $v) $set[] = $field.' = '.$v;
-            $whereVal = $tpk? $this->_origPk : $this->$k;
-            $sql = "UPDATE ".$this->_db->NameQuote($this->_tableName)." SET ".implode(", ", $set)." WHERE ".$this->_db->NameQuote($k).'='.$this->_db->Quote($whereVal);
-            $this->_db->setQuery($sql);
-            $res = $this->_db->query();
-            $this->_db->touch($this->_tableName);
+            $hyData[$k] = $tpk? $this->_origPk : $this->$k;
+            $hyData = $this->mapper->peConvertForSave($hyData);
+            $res = (bool) $this->mapper->peSave($hyData, true, $error);
+            if ($res) $this->mapper->markUpdated();
         
         } else {
             
             $skipKey = ($aif = $mapper->getAutoincFieldName()) == $k;
-            if ($skipKey) unset($kv[$this->_db->NameQuote($k)]);
+            if ($skipKey) unset($hyData[$k]);
             
-            $sql = "INSERT INTO ".$this->_db->NameQuote($this->_tableName)." (".implode(", ", array_keys($kv)).") VALUES (".implode(", ", $kv).")";
-            
-            $this->_db->setQuery($sql);
-            if ($res = $this->_db->query()) {
-                $this->_db->touch($this->_tableName);
-                if ($aif) $this->$k = $this->_db->getLastInsertId();
+            $hyData = $this->mapper->peConvertForSave($hyData);
+            $newData = $this->mapper->peSave($hyData, false, $error);
+            if ($newData) {
+                $this->mapper->markUpdated();
+                if ($aif) $this->$k = $newData[$k];
+                $res = true;
+            } else {
+                $res = false;
             }
             
         }
 
-        if( !$res ) {
-            $this->_error = strtolower(get_class( $this ))."::store failed <br />" . $this->_db->getErrorMsg();
+        if (!$res) {
+            $this->_error = strtolower(get_class($this))."::store failed <br />".$error;
         } else {
-            $mapper->_forget($this);
+            $mapper->forget($this);
             if (($t = $this->tracksChanges()) && ($t !== AC_CHANGES_AFTER_SAVE)) $this->_memorizeFields();
         }
         return $res;
@@ -325,10 +297,10 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     function forget() {
         $m = $this->getMapper();
-        $m->_foreget($this);
+        $m->forget($this);
     }
     
-    function store($updateNulls = false) {
+    function store() {
         if (!$this->_isBeingStored) { // we have to prevent recursion while saving complex in-memory record graphs
             $this->_isBeingStored = true;
             if (($this->doBeforeSave() !== false)) {
@@ -336,7 +308,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                 $res = true;
                 
                 $res = $res && ($this->_storeUpstandingRecords() !== false);
-                $res = $res && $this->_legacyStore($updateNulls);
+                $res = $res && $this->_legacyStore();
                 $res = $res && ($this->_storeDownstandingRecords() !== false);
                 $res = $res && ($this->_storeNNRecords() !== false);
                 if ($res) {
@@ -344,7 +316,6 @@ class Ac_Model_Object extends Ac_Model_Data {
                     if ($this->doAfterSave() === false) $res = false;
                     if (($t = $this->tracksChanges()) && ($t === AC_CHANGES_AFTER_SAVE)) $this->_memorizeFields();
                 } else {
-                    $this->_error = "Store() failed - ".$this->_db->getErrorMsg();
                     $this->doOnSaveFailed();
                 }
             }
@@ -374,22 +345,15 @@ class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
-    function _legacyDelete($oid = false) {
-        $k = $this->_pk;
-        if ($oid) {
-            $this->$k = intval( $oid );
-        }
-
-        $query = "DELETE FROM {$this->_tableName} WHERE {$this->_pk} = ".$this->_db->Quote($this->$k);
-        $this->_db->setQuery( $query );
-
-        if ($this->_db->query()) {
-            $this->_db->touch($this->_tableName);
-            return true;
+    function _legacyDelete() {
+        $hyData = $this->getHyData();
+        $res = (bool) $this->mapper->peDelete($hyData, $error);
+        if ($res) {
+            $this->mapper->markUpdated();
         } else {
-            $this->_error = $this->_db->getErrorMsg();
-            return false;
+            $this->_error = $error;
         }
+        return $res;
     }
     
     /**
@@ -415,17 +379,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     function bind($array, $ignore = '') {
         if (is_array($ignore)) $ignore = array_merge($ignore, $this->getBindIgnore());
             else $ignore .= $this->getBindIgnore();
-        if (!$this->_hasOldBehaviour()) {
-            $res = parent::bind($array, $ignore);
-        }
-        else {
-            if (!is_array( $array )) {
-                $this->_error = strtolower(get_class( $this ))."::bind failed.";
-                return false;
-            } else {
-                return Ac_Util::bindArrayToObject( $array, $this, $ignore );
-            }
-        }
+        $res = parent::bind($array, $ignore);
         $this->doOnBind($array, $ignore);
     }
     
@@ -502,20 +456,13 @@ class Ac_Model_Object extends Ac_Model_Data {
         if ($errors = $this->getErrors()) return Ac_Util::implode_r(";\n", $errors);
         if ($this->_error) return $this->_error;
     }
-
-    /**
-     * Rely on own bind() and check() methods against Ac_Model_Data ones
-     */
-    function _hasOldBehaviour() {
-        return false;
-    }
     
     function reset() {
         $vars = get_class_vars(get_class($this));
         foreach ($this->listOwnProperties() as $propName) if (isset($vars[$propName])) $this->$propName = $vars[$propName];
         $m = $this->getMapper();
         $this->setDefaultFields();
-        $m->_memorize($this);
+        $m->memorize($this);
         $this->_origPk = null;
     }
     
@@ -530,143 +477,6 @@ class Ac_Model_Object extends Ac_Model_Data {
         //return $this->listOwnFields();
     }
 
-    function move($dirn, $where='' ) {
-        $k = $this->_pk;
-
-        $sql = "SELECT $this->_pk, ordering FROM $this->_tableName";
-
-        if ($dirn < 0) {
-            $sql .= "\n WHERE ordering < " . (int) $this->ordering;
-            $sql .= ($where ? "\n   AND $where" : '');
-            $sql .= "\n ORDER BY ordering DESC";
-            $sql .= "\n LIMIT 1";
-        } else if ($dirn > 0) {
-            $sql .= "\n WHERE ordering > " . (int) $this->ordering;
-            $sql .= ($where ? "\n   AND $where" : '');
-            $sql .= "\n ORDER BY ordering";
-            $sql .= "\n LIMIT 1";
-        } else {
-            $sql .= "\nWHERE ordering = " . (int) $this->ordering;
-            $sql .= ($where ? "\n AND $where" : '');
-            $sql .= "\n ORDER BY ordering";
-            $sql .= "\n LIMIT 1";
-        }
-
-        $this->_db->setQuery( $sql );
-
-        $row = null;
-        if ($this->_db->loadObject( $row )) {
-            
-            $query = "UPDATE $this->_tableName"
-            . "\n SET ordering = " . (int) $row->ordering
-            . "\n WHERE $this->_pk = " . $this->_db->Quote( $this->$k )
-            ;
-            $this->_db->setQuery( $query );
-
-            if (!$this->_db->query()) {
-                $err = $this->_db->getErrorMsg();
-                die( $err );
-            }
-            
-
-            $query = "UPDATE $this->_tableName"
-            . "\n SET ordering = " . (int) $this->ordering
-            . "\n WHERE $this->_pk = " . $this->_db->Quote( $row->$k )
-            ;
-            $this->_db->setQuery( $query );
-
-            if (!$this->_db->query()) {
-                $err = $this->_db->getErrorMsg();
-                die( $err );
-            }
-
-            $this->ordering = $row->ordering;
-        } else {
-            $query = "UPDATE $this->_tableName"
-            . "\n SET ordering = " . (int) $this->ordering
-            . "\n WHERE $this->_pk = " . $this->_db->Quote( $this->$k )
-            ;
-            $this->_db->setQuery( $query );
-
-            if (!$this->_db->query()) {
-                $err = $this->_db->getErrorMsg();
-                die( $err );
-            }
-        }
-    }
-    
-    /**
-    * Compacts the ordering sequence of the selected records
-    * @param string Additional where query to limit ordering to a particular subset of records. This is expected to be a valid (and safe!) SQL expression
-    */
-    function updateOrder($where='') {
-        $k = $this->_pk;
-
-        if (!array_key_exists( 'ordering', get_class_vars( strtolower(get_class( $this )) ) )) {
-            $this->_error = "WARNING: ".strtolower(get_class( $this ))." doesn't support reordering.";
-            return false;
-        }
-
-        if ($this->_tableName == "#__content_frontpage") {
-            $order2 = ", content_id DESC";
-        } else {
-            $order2 = '';
-        }
-
-        $query = "SELECT $this->_pk, ordering"
-        . "\n FROM $this->_tableName"
-        . ( $where ? "\n WHERE $where" : '' )
-        . "\n ORDER BY ordering$order2 "
-        ;
-        $this->_db->setQuery( $query );
-        if (!($orders = $this->_db->loadObjectList())) {
-            $this->_error = $this->_db->getErrorMsg();
-            return false;
-        }
-        // first pass, compact the ordering numbers
-        for ($i=0, $n=count( $orders ); $i < $n; $i++) {
-            if ($orders[$i]->ordering >= 0) {
-                $orders[$i]->ordering = $i+1;
-            }
-        }
-
-        $shift = 0;
-        $n=count( $orders );
-        for ($i=0; $i < $n; $i++) {
-            if ($orders[$i]->$k == $this->$k) {
-                // place 'this' record in the desired location
-                $orders[$i]->ordering = min( $this->ordering, $n );
-                $shift = 1;
-            } else if ($orders[$i]->ordering >= $this->ordering && $this->ordering > 0) {
-                $orders[$i]->ordering++;
-            }
-        }
-        // compact once more until I can find a better algorithm
-        for ($i=0, $n=count( $orders ); $i < $n; $i++) {
-            if ($orders[$i]->ordering >= 0) {
-                $orders[$i]->ordering = $i+1;
-                $query = "UPDATE $this->_tableName"
-                . "\n SET ordering = " . (int) $orders[$i]->ordering
-                . "\n WHERE $k = " . $this->_db->Quote( $orders[$i]->$k )
-                ;
-                $this->_db->setQuery( $query);
-                $this->_db->query();
-            }
-        }
-
-        // if we didn't reorder the current record, make it last
-        if ($shift == 0) {
-            $order = $n+1;
-            $query = "UPDATE $this->_tableName"
-            . "\n SET ordering = " . (int) $order
-            . "\n WHERE $k = " . $this->_db->Quote( $this->$k )
-            ;
-            $this->_db->setQuery( $query );
-            $this->_db->query();
-        }
-        return true;
-    }
-    
     function _listOwnPublicVars() {
         $res = array();
         foreach (Ac_Util::getPublicVars($this) as $f => $v) if ($f{0} !== '_') $res[] = $f;
@@ -775,18 +585,14 @@ class Ac_Model_Object extends Ac_Model_Data {
         $iData = $this->_getCompleteUniqueIndices();
         $where = array();
         foreach ($iData as $idx => $f) $where = array_merge($where, $f);
+        
         if (count($where)) {
             $m = $this->getMapper();
-            $s = $this->_db->getSqlDb();
+            $s = $getSqlDb();
             $r = $m->loadRecordsByCriteria($c = $s->valueCriterion($where));
             if (count($r) == 1) {
                 $res = true;
                 $rec = $r[0];
-                
-                if ($this->_db->hasToConvertDatesOnLoad()) {
-                    $m = $this->getMapper();
-                    $rec = $this->_db->convertDates($rec, $m->getDateFormats()); 
-                }
                 
                 /*
                  * Often the reference is changed before it's loaded (especially when it's loaded from the store() method).
@@ -807,7 +613,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                     }
                 }
             }
-            if ($this->isPersistent()) $m->_forget($this);
+            if ($this->isPersistent()) $m->forget($this);
         }
         return $res;
     }
@@ -933,18 +739,10 @@ class Ac_Model_Object extends Ac_Model_Data {
                     $rows[] = array_merge($row, $id);                   
                 }
             }
-            if (count($rowProto)) {
-                $sqlDb = $this->_db->getSqlDb();
-                $this->_db->setQuery('DELETE FROM '.$this->_db->NameQuote($midTableName).' WHERE '.$sqlDb->valueCriterion($rowProto));
-                if (!$this->_db->query()) {
-                    $this->_errors[$errorKey]['idsDelete'] = 'Cannot clear link records';
-                }
-                if (count($rows)) {
-                    $this->_db->setQuery($sqlDb->insertStatement($midTableName, $rows, true));
-                    if (!$this->_db->query()) {
-                        $this->_errors[$errorKey]['idsInsert'] = 'Cannot store link records';
-                    }
-                }
+            $this->mapper->peReplaceNNRecords($rowProto, $rows, $midTableName, $errors);
+            if ($errors) {
+                $this->_errors[$errorKey] = $errors;
+                return $res;
             }
         }
         return $res;
@@ -1133,7 +931,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     function cleanupMembers() {
         $vars = get_class_vars(get_class($this));
         $m = $this->getMapper();
-        $m->_forget($this);
+        $m->forget($this);
         foreach (get_class_vars(get_class($this)) as $k => $v) if (isset($this->$k)) {
             if (is_array($this->$k)) {
                 $tmp = $this->$k;

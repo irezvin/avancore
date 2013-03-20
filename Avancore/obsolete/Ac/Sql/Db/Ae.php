@@ -17,6 +17,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
         }
     	assert(is_a($aeDb, 'Ac_Legacy_Database'));
         $this->_aeDb = $aeDb;
+        $this->dialect = new $this->_aeDb->dialectClass;
     }
     
     protected function implValueQuote($value) {
@@ -144,6 +145,31 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
         return $this->_aeDb->getLastInsertId();
     }
     
-}
+    function getDbPrefix() {
+        return $this->_aeDb->getPrefix();
+    }
+    
+    function getDbName() {
+        $a = $this->_aeDb->getAccess();
+        return $a['db'];
+    }
 
-?>
+    /**
+     * @return Ac_Sql_Dialect
+     */
+    function getDialect() {
+        return $this->dialect;
+    }
+    
+    /**
+     * @return Ac_Sql_Dbi_Inspector
+     */
+    function getInspector() {
+        if ($this->inspector === false) {
+            $this->inspector = $this->_aeDb->getInspector();
+        }
+        return $this->inspector;
+    }
+    
+    
+}

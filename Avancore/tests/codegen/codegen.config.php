@@ -3,8 +3,6 @@
 require(dirname(__FILE__).'/../sampleApp/deploy/app.config.php');
 
 $dbConf = $config['legacyDatabasePrototype']['__construct']['config'];
-var_dump($dbConf);
-
 
 $config = array(
     'generator' => array(
@@ -24,11 +22,11 @@ $config = array(
             'charset' => 'utf8',
         ),
     ),
-    'domains.AcTestModel' => array(
+    'domains.Sample' => array(
         'strategyClass' => 'Cg_Strategy',
-        'appName' => 'Ac_Test_Model',
+        'appName' => 'Sample',
         'dbName' => $dbConf['db'],
-        'caption' => 'Test_Avancore',
+        'caption' => 'Avancore_Sample',
         'josComId' => 'ac',
         'tablePrefix' => $dbConf['prefix'],
         'subsystemPrefixes' => array(),

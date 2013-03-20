@@ -47,6 +47,10 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         $this->configFiles = $value;
     }
     
+    function setOverrideValue($option, $value) {
+        $this->overrides[$option] = $value;
+    }
+    
     function getConfigFiles() {
         if ($this->configFiles === false) {
             $this->configFiles = array();
@@ -114,7 +118,9 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         $res = false;
         if (strlen($this->appClassFile)) {
             $s = $this->appClassFile;
-            while (basename($s) !== 'classes') $s = dirname($s);
+            while (basename($s) !== 'classes') {
+                $s = dirname($s);
+            }
             if (strlen($s) > 1) $res = $s;
         }
         return $res;
@@ -180,6 +186,11 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         $this->guessDatabase();
         $this->guessCache();
         $this->guessOutputPrototype();
+        
+        if (isset($this->services['flags']) && is_array($this->services['flags']) && !array_key_exists('dir', $this->services['flags'])) {
+            $this->services['flags']['dir'] = $this->getVarFlagsPath();
+        }
+        
     }
     
     protected function guessUrls() {
@@ -374,6 +385,7 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     protected function doGetDefaultServices() {
         return array(
             'managerConfigService' => 'Ac_Admin_ManagerConfigService',
+            'flags' => array('class' => 'Ac_Flags')
         );
     }
     
