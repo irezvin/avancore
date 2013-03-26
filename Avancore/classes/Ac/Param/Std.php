@@ -13,7 +13,7 @@ class Ac_Param_Std {
             ),
             
 			'simpleString' => array(
-                'description' => 'Simple string (trimmed, no tags allowed)',
+                //'description' => 'Simple string (trimmed, no tags allowed)',
 				'filters' => array('f1' => array(
 					'class' => 'Ac_Param_Decorator',
 					'decorator' => array(
@@ -25,7 +25,7 @@ class Ac_Param_Std {
 			),
             
 			'natural' => array(
-			    'description' => 'Natural number, greater than zero',
+			    //'description' => 'Natural number, greater than zero',
 				'conditions' => array('c1' => array(
 					'class' => 'Ac_Param_Condition_Number',
 					'type' => Ac_Param_Condition_Number::typeInt,

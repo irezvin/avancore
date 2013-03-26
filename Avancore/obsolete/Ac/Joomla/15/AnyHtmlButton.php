@@ -1,7 +1,7 @@
 <?php
 
         
-if (!class_exists('JButton')) jimport('joomla.html.toolbar');
+if (!class_exists('JButton')) jimport('joomla.html.toolbar.button');
 
 class JButtonAnyHtml extends JButton {
 

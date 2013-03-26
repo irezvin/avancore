@@ -20,6 +20,8 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
     
     var $headTags = array();
     
+    protected $assetPlaceholders = false;
+    
     function addPageTitle($title) {
         $this->pageTitle[] = $title;
     }
@@ -69,14 +71,25 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
         $this->pathway = array_merge(array(array($url, $text)), $this->pathway);
     }
     
+    function setAssetPlaceholders(array $assetPlaceholders) {
+        $this->assetPlaceholders = $assetPlaceholders;
+    }
+    
+    function getAssetPlaceholders() {
+        if ($this->assetPlaceholders === false) {
+            $this->assetPlaceholders = $this->getApplication()->getAssetPlaceholders(true);
+        }
+        return $this->assetPlaceholders;
+    }
+    
     function getJsScriptTag($jsLib, $isLocal) {
-        $url = self::unfoldAssetString($jsLib, $this->getApplication()->getAssetPlaceholders());
+        $url = self::unfoldAssetString($jsLib, $this->getAssetPlaceholders());
         $res = '<script type="text/javascript" src="'.$url.'"> </script>';
         return $res;
     }
     
     function getCssLibTag($cssLib, $isLocal) {
-        $url = self::unfoldAssetString($cssLib, $this->getApplication()->getAssetPlaceholders());
+        $url = self::unfoldAssetString($cssLib, $this->getAssetPlaceholders());
         $res = '<link rel="stylesheet" type="text/css" href="'.$url.'" />';
         return $res;
     }

@@ -7,6 +7,8 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
      */
     var $_aeDb = false;
     
+    protected $dialect = false;
+    
     /**
      * @param Ac_Legacy_Database$aeDb
      * @return Ac_Sql_Db_Ae
@@ -150,14 +152,16 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
     
     function getDbName() {
-        $a = $this->_aeDb->getAccess();
-        return $a['db'];
+        return $this->_aeDb->getAccess('db');
     }
-
-    /**
-     * @return Ac_Sql_Dialect
-     */
+    
     function getDialect() {
+        if ($this->dialect === false) {
+            if ($this->_aeDb instanceof Ac_Legacy_Database_Joomla) $this->dialect = new Ac_Sql_Dialect_Mysql;
+            elseif ($this->_aeDb instanceof Ac_Legacy_Database_Native) $this->dialect = new Ac_Sql_Dialect_Mysql;
+            elseif ($this->_aeDb instanceof Ac_Legacy_Database_Pg) $this->dialect = new Ac_Sql_Dialect_Pgsql;
+            elseif ($this->_aeDb instanceof Ac_Legacy_Database_MsSql) $this->dialect = new Ac_Sql_Dialect_Mssql();
+        } 
         return $this->dialect;
     }
     
