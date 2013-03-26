@@ -109,7 +109,7 @@ class Ac_Model_Collection {
     
     /**
      * Database driver
-     * @var Ac_Legacy_Database
+     * @var Ac_Sql_Db
      */
     var $_db = false;
     
@@ -163,7 +163,7 @@ class Ac_Model_Collection {
         if (!$this->_db) {
             throw new Exception("Database not provided, call setDatabase() first");
         }
-        $this->setWhere($this->_db->sqlKeysCriteria($keys, $pkName));
+        $this->setWhere($pkName.$this->_db->eqCriterion($keys));
     }
     
     /**
@@ -215,7 +215,7 @@ class Ac_Model_Collection {
         $this->_recordClass = false;
         $this->_rcFun = false;
         $this->_pkName = $this->_mapper->listPkFields();
-        $this->_db = $this->_mapper->getDatabase();
+        $this->_db = $this->_mapper->getDb();
     }
     
     function areMatchingKeys() {
@@ -413,8 +413,7 @@ class Ac_Model_Collection {
                     $countStmt = "SELECT COUNT(DISTINCT ".implode(", ", $what).") ".$tail;
                 }
             } 
-            $this->_db->setQuery($countStmt);
-            $this->_count = $this->_db->loadResult();
+            $this->_count = $this->_db->fetchValue($countStmt);
             //var_dump($this->_count.' '.$countStmt); 
         }
         return $this->_count;
@@ -461,11 +460,9 @@ class Ac_Model_Collection {
     function _loadAllRecords() {
         $this->_canSetLimits = false;
         $stmt = $this->_getStatementTail(true, true, true, true);
-        $this->_db->setQuery($stmt);
         $this->_records = array();
         $i = count ($this->_records);
-        $rr = $this->_db->getResultResource($this->_unbuffered);
-        while ($row = $this->_db->fetchAssoc($rr)) {
+        foreach ($this->_db->fetchArray($stmt) as $row) {
             $key = $this->_matchKeys? $row[$this->_pkName] : $i;
             if ($rc = $this->_getRecordClass($row)) {
                 if ($this->_mapper) {
@@ -480,7 +477,7 @@ class Ac_Model_Collection {
             $i++;
         }
         $this->_keys = array_keys($this->_records);
-        $this->_db->freeResultResource($rr);
+        //$this->_db->freeResultResource($rr);
     }
     
     function _loadKeys() {
@@ -496,7 +493,7 @@ class Ac_Model_Collection {
         if ($this->_sequential) {
             $this->_canSetLimits = false;
             if ($this->_dbResult !== false) {
-                $this->_db->freeResultResource($this->_dbResult);
+                //$this->_db->freeResultResource($this->_dbResult);
             }
             $this->_sqRewind();
         } else {
@@ -553,7 +550,7 @@ class Ac_Model_Collection {
                     return $res;
                 }
             } else {
-                $this->_db->freeResultResource($this->_dbResult);
+                //$this->_db->freeResultResource($this->_dbResult);
                 
                 $res = null;
                 $this->_currPos++;
