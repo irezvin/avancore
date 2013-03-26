@@ -1,6 +1,7 @@
 <?php
 
 if (!class_exists('Ac_Util', false)) require_once(dirname(__FILE__).'/Util.php');
+if (!class_exists('Ac_I_ServiceProvider', false)) require_once(dirname(__FILE__).'/I/ServiceProvider.php');
 if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/Prototyped.php');
 
 abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvider {
@@ -64,7 +65,7 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
                 self::$defaultInstanceIds[$class] = $id;
     }
     
-    function setDefaultInstance(Ac_Application $instance) {
+    static function setDefaultInstance(Ac_Application $instance) {
         self::$defaultInstance = $instance;
     }
     
@@ -351,8 +352,18 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
         return $res;
     }
     
-    function getAssetPlaceholders() {
+    function getAssetPlaceholders($fromAllApplications = false) {
         $res = array_merge($this->getDefaultAssetPlaceholders(), $this->adapter->getAssetPlaceholders());
+        if ($fromAllApplications) {
+            $r = $res;
+            foreach (Ac_Application::listInstances() as $cn => $list) {
+                foreach ($list as $id) {
+                    $instance = Ac_Application::getApplicationInstance($cn, $id);
+                    $r = array_merge($instance->getAssetPlaceholders(false), $r);
+                }
+            }
+            $res = $r;
+        }
         return $res;
     }
     

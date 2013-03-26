@@ -723,6 +723,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             }
         }
         if ($res && is_array($ids)) {
+            $ids = array_unique($ids); //TODO: check why sometimes we receive duplicate IDs...
             $rows = array();
             $rowProto = array();
             foreach ($fieldLinks as $s => $d) $rowProto[$d] = $this->$s;

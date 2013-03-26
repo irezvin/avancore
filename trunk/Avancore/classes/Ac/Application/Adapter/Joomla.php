@@ -2,6 +2,8 @@
 
 class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
     
+    protected $liveSite = false;
+    
     protected function guessOutput() {
         if (!isset($this->config[$k = 'output'])) {
             $this->config[$k] = array('class' => 'Ac_Legacy_Output_Joomla15');
@@ -34,6 +36,16 @@ class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
         return Ac_Util::m(parent::doGetDefaultServices(), array(
             'managerConfigService' => 'Ac_Admin_ManagerConfigService_J25',
         ));
+    }
+    
+    function getLiveSite() {
+        if ($this->liveSite === false) {
+            $uri = JUri::getInstance();
+            $uri = $uri->base(array('scheme', 'host', 'path'));
+            $uri = preg_replace('#(/administrator)?(/index\.php)?$#', '', $uri);
+            $this->liveSite = $uri;
+        }
+        return $this->liveSite;
     }
     
 }
