@@ -149,7 +149,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
             $params = '$'.implode(', $', $idxFields);
             $sqlCrit = array();
             foreach ($idxFields as $f) {
-                $sqlCrit[] = "'.\$this->database->NameQuote('$f').' = '.\$this->database->Quote(\${$f}).'";
+                $sqlCrit[] = "'.\$this->getDb()->n('$f').' = '.\$this->getDb()->q(\${$f}).'";
             }
             $sqlCrit = implode(" AND ", $sqlCrit);
 ?>
@@ -415,22 +415,22 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     <?php } ?>
     <?php if ($this->relationPrototypes) { ?>
     
-    function _getRelationPrototypes() {
+    protected function getRelationPrototypes() {
 <?php   if (!in_array($this->genMapperClass, array('Ac_Model_Mapper', 'Ac_Model_CpkMapper'))) { ?>
-        return Ac_Util::m(parent::_getRelationPrototypes(), <?php $this->exportArray($this->relationPrototypes, 8); ?>);
+        return Ac_Util::m(parent::getRelationPrototypes(), <?php $this->exportArray($this->relationPrototypes, 8); ?>);
 <?php   } else { ?>
         return <?php $this->exportArray($this->relationPrototypes, 8); ?>;
 <?php   } ?>        
     }
     <?php } ?>
     
-    function _doGetInfoParams() {
+    protected function doGetInfoParams() {
         return <?php $this->exportArray($this->model->getMapperInfoParams(), 8); ?>;
     }
     
     <?php if ($this->uniqueIndexData) { ?>
     
-    function _doGetUniqueIndexData() {
+    protected function doGetUniqueIndexData() {
         return <?php $this->exportArray($this->uniqueIndexData, 8); ?>;
     }
     <?php } ?>
@@ -455,9 +455,9 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
     
     /*
     
-	function _doGetInfoParams() {
+	protected function doGetInfoParams() {
         
-		$res = Ac_Util::m(parent::_doGetInfoParams(), array(
+		$res = Ac_Util::m(parent::doGetInfoParams(), array(
         	'singleCaption' => '',
         	'pluralCaption' => '',
 		
@@ -538,8 +538,8 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
 		return $res;
 	}    
     
-    function _getRelationPrototypes() {
-        return Ac_Util::m(parent::_getRelationPrototypes(), array(
+    protected function getRelationPrototypes() {
+        return Ac_Util::m(parent::getRelationPrototypes(), array(
             '' => array(
                 'srcMapperClass' => <?php $this->str($this->mapperClass); ?>,
                 'destMapperClass' => '',

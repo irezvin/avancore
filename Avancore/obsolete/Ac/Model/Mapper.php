@@ -361,7 +361,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
         $sql = "SELECT ".$this->db->n($this->tableName).".* FROM ".$this->db->n($this->tableName)." $joins  ";
         if ($where) {
-            if (is_array($where)) $where = $this->sqlDb->valueCriterion($where);
+            if (is_array($where)) $where = $this->db->valueCriterion($where);
             $sql .= " WHERE ".$where;
         }
         if ($order) $sql .= " ORDER BY ".$order;
@@ -381,7 +381,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
                 $className = $this->getRecordClass($row);
                 $rec = new $className ($this);
                 $rec->load($row, true);
-                if ($this->useRecordsCollection) $this->_recordsCollection[$recId] = $rec;
+                if ($this->useRecordsCollection) $this->recordsCollection[$recId] = $rec;
 
             }
             if ($keysToList) {
@@ -488,7 +488,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         return $this->info;
     }
 
-    function _doGetInfoParams() {
+    protected function doGetInfoParams() {
         return array();
     }
 
@@ -523,13 +523,6 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         if ($tableAlias !== false) $fieldName = $this->db->n($tableAlias).'.'.$fieldName;
         $res = $fieldName.$this->db->eqCriterion($keys);
         return $res;
-    }
-
-    function indexCrtieria($fields) {
-        foreach ($fields as $f => $v) {
-            $cr[] = $this->db->n($f).' = '.$this->db->q($v);
-        }
-        return "(".implode(" AND ", $cr).")";
     }
 
     function locateRecord($fields, $where = false, $mustBeUnique = false, $searchNewRecords = false) {
@@ -640,7 +633,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     /**
      * @return array ('indexName' => array('fieldName1', 'fieldName2'), ...)
      */
-    function _doGetUniqueIndexData() {
+    protected function doGetUniqueIndexData() {
         return array();
     }
     
@@ -731,7 +724,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     /**
      * @return array(modelFieldName => '{t}.colName', modelFieldName2 => 'SOME_FUNC({t}.colName1, {t}.colName2)'
      */
-    function _doGetFieldToSqlColMap() {
+    protected function doGetFieldToSqlColMap() {
     	return array();
     }
     
@@ -764,7 +757,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         return $res;
     }
 
-    function getRelationPrototype($relId) {
+    protected function getRelationPrototype($relId) {
         if (!in_array($relId, $this->listRelations())) trigger_error ("No such relation: '{$relId}' in mapper ".get_class($this), E_USER_ERROR);
         return $this->relationPrototypes[$relId];
     }
@@ -823,7 +816,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      }
      */
 
-    function _getRelationPrototypes() {
+    protected function getRelationPrototypes() {
         return array();
     }
 
@@ -902,7 +895,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @param Ac_Model_Object $record
      * @return string|false
      */
-    function _indexCrtieria($record, $fieldNames, $mustBeFull) {
+    protected function indexCrtieria($record, $fieldNames, $mustBeFull) {
         $vals = $record->getDataFields($fieldNames, !$mustBeFull);
         if ($mustBeFull && (count($vals) < count($fieldNames))) return false;
         $cr = array();
