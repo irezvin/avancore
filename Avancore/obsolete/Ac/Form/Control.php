@@ -51,6 +51,14 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      */
     var $jsExtras = array();
     
+    var $jsConstructor = false;
+    
+    var $jsPropMap = array();
+    
+    var $assetLibs = array();
+    
+    var $presentationDecorator = false;
+    
     /**
      * Extra values that are intended to be picked up by the template
      * @var array
@@ -543,6 +551,13 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
                     $template = $this->getTemplate();
                     $template->setVars($this->tplExtras);
                     $this->_presentation = $template->fetch($this->templatePart, $this->_doGetTemplatePartParams());
+                    if ($l = $this->getAssetLibs()) {
+                        Ac_Legacy_Controller_Response_Global::r()->addAssetLibs($l);
+                    }
+                    if ($js = $this->createJsObject()) { 
+                        $script = new Ac_Js_Script($js->init());
+                        $this->_presentation .= $script;
+                    }
                     $this->postProcessPresentation($this->_presentation);
                 }
                 $res = $this->_presentation;
@@ -557,6 +572,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
     
     protected function postProcessPresentation(& $html) {
+        if ($this->presentationDecorator) $html = Ac_Decorator::decorate($this->presentationDecorator, $html, $this->presentationDecorator);
         if ($this->_parent) $this->_parent->postProcessChildPresentation($html, $this);
     }
     
@@ -994,6 +1010,62 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
             }
             $res = call_user_func_array($callback, $args);
         }
+        return $res;
+    }
+    
+    /**
+     * @return array jsProperty => phpProperty
+     */
+    function getJsPropMap() {
+        if ($this->jsPropMap === false) return array();
+            else return $this->jsPropMap;
+    }
+    
+    protected function getJsInitializerData() {
+        $res = array();
+        foreach ($this->getJsPropMap() as $k => $v) {
+            if (is_numeric($k)) $k = $v;
+            if (is_string($v)) {
+                if (method_exists('', $m = 'getJs'.$v)) {
+                    $val = $this->$m();
+                } else {
+                    $val = Ac_Accessor::getObjectProperty($this, $k);
+                }
+            } elseif (is_callable($v)) {
+                $val = call_user_func($v, $k, $this);
+            } else {
+                throw new Exception("getJsInitializerData('{$k}'): don't know what to do with php property name/getter ".gettype($v));
+            }
+            $res[$k] = $val;
+        }
+        if (is_array($this->jsExtras) && $this->jsExtras) {
+            Ac_Util::ms($res, $this->jsExtras);
+        }
+        return $res;
+    }
+    
+    function getJsObjectId() {
+        if ($this->jsConstructor !== false) $res = 'js_'.$this->_context->mapIdentifier('');
+            else $res = false;
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Js_Object
+     */
+    function createJsObject() {
+        $res = false;
+        if ($this->jsConstructor !== false) {
+            $data = $this->getJsInitializerData();
+            $args = array();
+            if ($data = $this->getJsInitializerData()) $args[0] = $data;
+            $res = new Ac_Js_Object($this->getJsObjectId(), $this->jsConstructor, $args);
+        }
+        return $res;
+    }
+    
+    function getAssetLibs() {
+        $res = Ac_Util::toArray($this->assetLibs);
         return $res;
     }
     

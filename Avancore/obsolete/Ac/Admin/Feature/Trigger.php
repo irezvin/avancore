@@ -51,8 +51,7 @@ class Ac_Admin_Feature_Trigger extends Ac_Admin_Feature {
             ($pc = $this->colName.'Publish') => array(
                 'id' => $pc,
                 'scope' => 'some',
-                'image' => 'publish_f2.png', 
-                'disabledImage' => 'publish.png',
+                'image' => 'icon-32-publish.png', 
                 'caption' => 'Включить',
                 'managerProcessing' => $pc,
                 'listOnly' => true,
@@ -60,8 +59,7 @@ class Ac_Admin_Feature_Trigger extends Ac_Admin_Feature {
             ($upc = $this->colName.'Unpublish') => array(
                 'id' => $upc,
                 'scope' => $this->colName.'some',
-                'image' => 'unpublish_f2.png', 
-                'disabledImage' => 'unpublish.png',
+                'image' => 'icon-32-unpublish.png', 
                 'caption' => 'Выключить',
                 'managerProcessing' => $upc,
                 'listOnly' => true,
