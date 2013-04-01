@@ -310,8 +310,21 @@ class Cg_Property_Object extends Cg_Property {
      * Name of member that holds foreign IDs for many-to-many relations
      */
     function getIdsMemberName() {
-        if ($this->isManyToMany()) $res = '_'.$this->getOtherEntityName(true).'Ids';
-            else $res = false;
+        $p = $this->getIdsPropertyName();
+        if (strlen($p)) {
+            $res = '_'.$p;
+        } else {
+            $res = false;
+        }
+        return $res;
+    }
+    
+    function getIdsPropertyName() {
+        if ($this->isManyToMany()) {
+            if (strlen($this->otherModelIdInMethodsSingle)) 
+                $res = $this->otherModelIdInMethodsSingle.'Ids';
+            else $res = $this->getOtherEntityName(true).'Ids';
+        } else $res = false;
         return $res;
     }
     
@@ -356,7 +369,7 @@ class Cg_Property_Object extends Cg_Property {
         if ($this->getIdsMemberName() !== false) {
             $res = array(
                 $this->varName => parent::getAeModelPropertyInfo(),
-                $this->getOtherEntityName(true).'Ids' => array(
+                $this->getIdsPropertyName() => array(
                     'dataType' => 'int',
                     'arrayValue' => true,
                     //'caption' => $this->_other->pluralCaption,

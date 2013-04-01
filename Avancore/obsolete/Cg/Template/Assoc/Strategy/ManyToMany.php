@@ -9,7 +9,7 @@ class Cg_Template_Assoc_Strategy_ManyToMany extends Cg_Template_Assoc_Strategy_M
 ?>
 <?php   if (($imn = $this->prop->getIdsMemberName()) !== false) { ?>
 
-    function get<?php $this->d($ucSingle); ?>Ids() {
+    function get<?php $this->d(ucfirst($this->prop->getIdsPropertyName())); ?>() {
         if ($this-><?php $this->d($imn) ?> === false) {
             $mapper = $this->getMapper();
             $mapper->loadAssocNNIdsFor($this, <?php $this->str($relationId); ?>);
@@ -17,9 +17,9 @@ class Cg_Template_Assoc_Strategy_ManyToMany extends Cg_Template_Assoc_Strategy_M
         return $this-><?php $this->d($imn) ?>;
     }
     
-    function set<?php $this->d($ucSingle); ?>Ids($<?php $this->d($single); ?>Ids) {
-        if (!is_array($<?php $this->d($single); ?>Ids)) trigger_error('$<?php $this->d($single); ?>Ids must be an array', E_USER_ERROR);
-        $this-><?php $this->d($imn); ?> = $<?php $this->d($single); ?>Ids;
+    function set<?php $this->d(ucfirst($this->prop->getIdsPropertyName())); ?>($<?php $this->d($this->prop->getIdsPropertyName()); ?>) {
+        if (!is_array($<?php $this->d($this->prop->getIdsPropertyName()); ?>)) trigger_error('$<?php $this->d($this->prop->getIdsPropertyName()); ?> must be an array', E_USER_ERROR);
+        $this-><?php $this->d($imn); ?> = $<?php $this->d($this->prop->getIdsPropertyName()); ?>;
         <?php $this->d($varId); ?> = false; 
     }
 <?php   } ?>

@@ -923,13 +923,14 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
             $this->dateFormats = array();
             $p = $this->getPrototype();
             foreach ($p->listOwnFields(true) as $f) {
+                $this->dateFormats[$dataTypes] = array();
                 $pi = $p->getPropertyInfo($f, true);
                 if ($dataTypes) {
                     static $a = array('date', 'time', 'dateTime');
                     if (in_array($pi->dataType, $a)) $this->dateFormats[$dataTypes][$f] = $pi->dataType;
                 } else {
                     if (strlen($pi->internalDateFormat)) {
-                        $this->$this->dateFormats[$dataTypes][$f] = $pi->internalDateFormat;
+                        $this->dateFormats[$dataTypes][$f] = $pi->internalDateFormat;
                     }
                 }
             }
@@ -1000,7 +1001,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     function peConvertForSave($hyData) {
         $res = $hyData;
         $d = $this->db->getDialect();
-        $df = $this->getDateFormats(true);
+        $df = $this->getDateFormats();
         if ($df) {
             foreach ($df as $prop => $type) {
                 if (array_key_exists($prop, $res)) {
