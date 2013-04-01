@@ -176,7 +176,7 @@ class Ac_Model_Collection {
      * 
      * $recordClassCallback function should accept parameter $row, and return corresponding record class (false to create an array)
      */
-    function useNoMapper($tableName, $pkName, $recordClass = false, $recordClassCallback = null, Ac_Legacy_Database $database = null) {
+    function useNoMapper($tableName, $pkName, $recordClass = false, $recordClassCallback = null, Ac_Sql_Db $database = null) {
         if ($this->_open !== false) trigger_error ("Can't change params of collection that is already open", E_USER_ERROR);
         $this->_tableName = $tableName;
         $this->_pkName = $pkName;
@@ -223,6 +223,7 @@ class Ac_Model_Collection {
     }
     
     function setSequential($sequential = true) {
+        return; // not supported yet
         if ($this->_open !== false) trigger_error ("Can't change params of collection that is already open", E_USER_ERROR);
         $this->_sequential = $sequential;
     }
@@ -230,6 +231,7 @@ class Ac_Model_Collection {
     function isSequential() { return $this->_sequential; }
     
     function setUnbuffered($unbuffered = true) {
+        return; // not supported yet
         if ($this->_open !== false) trigger_error ("Can't change params of collection that is already open", E_USER_ERROR);
         $this->_unbuffered = $unbuffered;
     }
@@ -409,7 +411,7 @@ class Ac_Model_Collection {
                 }
                 if (($distinct) && $this->_pkName) {
                     $what = array();
-                    foreach ($this->_pkName as $n) $what[] = $this->_db->NameQuote($this->_alias).'.'.$this->_db->NameQuote($n);
+                    foreach ($this->_pkName as $n) $what[] = $this->_db->n($this->_alias).'.'.$this->_db->n($n);
                     $countStmt = "SELECT COUNT(DISTINCT ".implode(", ", $what).") ".$tail;
                 }
             } 
@@ -483,9 +485,8 @@ class Ac_Model_Collection {
     function _loadKeys() {
         $this->_canSetLimits = false;
         $keysStmt = $this->_getStatementTail(true, true, true, $this->_alias.'.'.$this->_pkName);
-        $this->_db->setQuery($keysStmt);
         $this->_records = array();
-        foreach (($this->_keys = $mapper->database->loadResultArray()) as $key) $this->_records[$key] = false;
+        foreach (($this->_keys = $this->_db->fetchColumn($keysStmt)) as $key) $this->_records[$key] = false;
         $_currKey = false;
     }
     
@@ -579,9 +580,9 @@ class Ac_Model_Collection {
     }
     
     /**
-     * @param Ac_Legacy_Database $database
+     * @param Ac_Sql_Db $database
      */
-    function setDatabase($database) {
+    function setDatabase(Ac_Sql_Db $database) {
         if (!$this->_canSetLimits) trigger_error ("Can't change params of collection that is already open", E_USER_ERROR);
         $this->_db = $database;
     }
