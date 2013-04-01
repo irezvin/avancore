@@ -367,7 +367,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         if ($order) $sql .= " ORDER BY ".$order;
         if (is_numeric($limitCount) && !is_numeric($limitOffset)) $limitOffet = false;
         if (is_numeric($limitCount)) {
-            $sql = $this->db->getDialect()->applyLimits($sql, $limitCount, $limitOffset, strlen($order)? $order : false);
+            $sql = $this->db->applyLimits($sql, $limitCount, $limitOffset, strlen($order)? $order : false);
         }
         
         $res = array();

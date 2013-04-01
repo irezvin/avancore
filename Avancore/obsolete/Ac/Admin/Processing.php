@@ -161,7 +161,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
             if ($this->_noRecords || is_array($this->_recordKeys) && !count($this->_recordKeys)) $this->_records = array();
             if (!$this->_recordsCollection) {
                 $this->_recordsCollection = new Ac_Model_Collection();
-                $this->_recordsCollection->setDatabase($this->application->getLegacyDatabase());
+                $this->_recordsCollection->setDatabase($this->application->getDb());
                 // Most straightforward way
                 if (is_array($this->_records)) {
                     $this->_recordsCollection->setRecords($this->_records);
