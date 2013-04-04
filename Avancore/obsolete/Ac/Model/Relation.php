@@ -573,7 +573,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         }
     }
     
-    function _getAllValues(& $source, $values, $keys) {
+    function _getAllValues(& $source, & $values, $keys) {
         $values = array();
         foreach (array_keys($source) as $k) {
 //            if ($this->_isFull($gv = $this->_getValues($source[$k], $keys, false, false))) $values[] = $gv;
