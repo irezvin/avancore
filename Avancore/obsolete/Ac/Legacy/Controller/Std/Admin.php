@@ -70,6 +70,9 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
             $mapper = Ac_Dispatcher::getMapper($mapperId);
             if (strlen($mapper->managerClass)) $class = $mapper->managerClass;
                 else $class = 'Ac_Admin_Manager';
+            if ($extra = $mapper->getManagerConfig()) {
+                Ac_Util::ms($managerConfig, $extra);
+            }
             $manager = new $class ($context, $managerConfig, $px);
             $manager->setApplication($this->getApplication());
             if ($this->separateToolbar) $manager->separateToolbar = true;

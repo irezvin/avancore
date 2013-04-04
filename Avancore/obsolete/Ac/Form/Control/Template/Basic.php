@@ -136,7 +136,11 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
                 if (strlen($cl->wrapperTemplatePart) && strlen($cl->wrapperTemplateClass)) {
                     echo $cl->fetchWithWrapper();
                 } else {
-                    $this->$trWrapperMethod($cl, $cl->fetchPresentation(false, false), $cl->wrapperTemplateParam);
+                    if (!is_array($trWrapperMethod)) {
+                        $this->$trWrapperMethod($cl, $cl->fetchPresentation(false, false), $cl->wrapperTemplateParam);
+                    } else {
+                        call_user_func($trWrapperMethod, $cl, $cl->fetchPresentation(false, false), $cl->wrapperTemplateParam);
+                    }
                 }
             } else {
                 echo $cl->fetchPresentation(false, false);

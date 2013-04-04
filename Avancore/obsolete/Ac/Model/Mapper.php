@@ -1069,6 +1069,10 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         return $res;
     }
     
+    function getManagerConfig() {
+        return array();
+    }
+    
 }
     
     
