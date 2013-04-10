@@ -1090,7 +1090,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $this->_preloadRelations = array();
             foreach ($this->listFeatures() as $f) {
                 $feat = $this->getFeature($f);
-                $this->_preloadRelations = array_unique(array_merge($this->_preloadRelations, $feat->getPreloadRelations()));
+                $this->_preloadRelations = Ac_Util::array_unique(array_merge($this->_preloadRelations, $feat->getPreloadRelations()));
             }
         }
         return $this->_preloadRelations;
