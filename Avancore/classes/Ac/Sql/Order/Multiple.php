@@ -79,7 +79,7 @@ class Ac_Sql_Order_Multiple extends Ac_Sql_Order {
         }
     }
     
-    function _doBeforeExpandPaths($input) {
+    function _doBeforeExpandPaths(& $input) {
         $r = array();
         $c = false;
         foreach (array_keys($input) as $k) {
