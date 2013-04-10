@@ -83,7 +83,8 @@ abstract class Ac_Sql_Dialect {
 	        }
 	    }
 	    else {
-	        throw new Ac_E_InvalidCall("\$type should be of ".implode('|', array_keys($dsf)));
+            $res = Ac_Util::date($date, $type);
+	        //throw new Ac_E_InvalidCall("\$type should be of ".implode('|', array_keys($dsf)));
 	    }
 	    return $res;
 	}
