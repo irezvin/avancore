@@ -249,6 +249,13 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         return parent::getApplication();
     }
     
+    /**
+     * @return <?php echo $this->mapperClass; ?> 
+     */
+    function getMapper($mapperClass = false) {
+        return parent::getMapper($mapperClass);
+    }
+    
     function listOwnProperties() {
 <?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
     return array_merge(parent::listOwnProperties(), <?php $this->exportArray($this->ownProperties, 0, false, true); ?>);

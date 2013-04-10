@@ -486,12 +486,12 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             if ($control->getType() === 'password') $type = 'password';
             elseif ($control->getType() === 'hidden') $type = 'hidden';
             else $type = 'text';
-            $attribs = Ac_Util::m($this->_getAttribs($control), array(
+            $attribs = Ac_Util::m(array(
                 'type' => $type,
                 'name' => $name,
                 'maxlength' => $control->getMaxLength(), 
                 'value' => $control->getOutputText(),
-            ));
+            ), $this->_getAttribs($control));
 ?>
             <input <?php echo Ac_Util::mkAttribs($attribs, '"', ENT_QUOTES, $this->charset, $control->doubleEncodeInInput); ?> />
 <?php

@@ -110,6 +110,7 @@ class Ac_Form_Control_Listable extends Ac_Form_Control {
         } else {
             $res = $value;
         }
+        if (!is_array($res) && $this->isList()) $res = Ac_Util::toArray($res);
         return $res;
     }
     
