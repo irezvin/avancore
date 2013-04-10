@@ -41,7 +41,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
         if ($this->preloadRelations === false) {
             $this->getColumnSettings();
         }
-        return array_unique($this->preloadRelations);
+        return Ac_Util::array_unique($this->preloadRelations);
     }
     
     function getColumnSettings() {

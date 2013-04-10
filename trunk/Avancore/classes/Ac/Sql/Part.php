@@ -44,20 +44,6 @@ class Ac_Sql_Part extends Ac_Prototyped {
     
     var $_idWithPrefix = false;
     
-    /**
-     * @param array $options
-     * @param string $baseClass
-     * @return Ac_Sql_Part
-     */
-    static function factory($options, $baseClass = 'Ac_Sql_Part') {
-        if (isset($options['class'])) 
-            $class = $options['class']; 
-            else $class = $baseClass;
-        $res = new $class($options);
-        assert(is_a($res, $baseClass));
-        return $res;
-    }
-    
     function Ac_Sql_Part($options = array()) {
         if (isset($options['db'])) $this->setDb($options['db']);
         if (isset($options['parentPart'])) $this->setParentPart($options['parentPart']);
