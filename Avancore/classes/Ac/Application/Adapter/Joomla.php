@@ -53,6 +53,7 @@ class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
         if (!$this->getConfigValue('ignoreJoomlaCacheSettings')) {
             // TODO: create specialized cache that works through Joomla
             $res['enabled'] = (bool) JFactory::getConfig()->get('caching');
+            $res['lifetime'] = intval(JFactory::getConfig()->get('cachetime'))*60;
         }
         return $res;
     }
