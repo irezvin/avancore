@@ -223,7 +223,7 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     function getCache() {
         if ($this->cache === null) {
             $cache = $this->adapter->getCachePrototype();
-            if ($cache) $this->cache = Ac_Prototyped::factory ($cache, 'Ac_Cache');
+            if (is_array($cache) || strlen($cache)) $this->cache = Ac_Prototyped::factory ($cache, 'Ac_Cache');
         }
         return $this->cache;
     }
