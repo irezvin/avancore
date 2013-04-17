@@ -61,7 +61,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
      */
     protected $responses = array();
 
-    protected function collectProperties(array $list) {
+    protected function collectProperties(array $list, $forCache = false) {
         $res = array();
         $cv = array_keys(get_class_vars(get_class($this)));
         foreach ($list as $propName) {
@@ -72,6 +72,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
                 if (method_exists($this, $m = 'get'.ucfirst($propName))) $val = $this->$m();
                 else $val = $this->$propName;
             }
+            if ($forCache && $val instanceof Ac_Model_Object) $val = $val->getDataFields();
             $res[$propName] = $val;
         }
         return $res;
@@ -88,11 +89,12 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
                 elseif (is_array($v) && ($k == $m)) $cacheParamsList = array_merge($cacheParamsList, $v);
             }
             // params list received - now get params values
-            $res = array_merge($extra, $this->collectProperties($cacheParamsList));
-            $disp = Ac_Dispatcher::getInstance();
-            $res['_liveSite'] = $disp->config->liveSite;
-            //$jc = new JConfig();
-            //$res['_db'] = $jc->db;
+            $res = array_merge($extra, $this->collectProperties($cacheParamsList, true));
+            $app = $this->getApplication();
+            $adapter = $app->getAdapter();
+            if (method_exists($adapter, 'getLiveSite')) {
+                $res['_liveSite'] = $adapter->getLiveSite();
+            }
             $res['_method'] = get_class($this).'::'.$m;
             if (!$asArray) $res = md5(serialize($res));
         } else {
@@ -123,8 +125,6 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
         $val = false;
         if ($c = $this->getCache()) {
             $val = $c->get($id, $cacheGroup);
-        } else {
-            $val = Ac_Dispatcher::cacheGet($id, $cacheGroup);
         }
         return $val;
     }
@@ -132,8 +132,6 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
     protected function doSaveToCache($id, $cacheGroup, $content) {
         if ($c = $this->getCache()) {
             $res = $c->put($id, $content, $this->getCacheGroup($this->getMethodName()));
-        } else {
-            $res = Ac_Dispatcher::cacheSet($id, $content, $cacheGroup);
         }
         return $res;
     }
@@ -173,7 +171,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
         if (!$this->loadedFromCache) {
             if (strlen($id = $this->getCacheId())) {
                 $cdm = $this->getCacheDataMap();
-                $pv = $this->collectProperties(array_keys($cdm));
+                $pv = $this->collectProperties(array_keys($cdm), true);
                 $res = array();
                 foreach ($pv as $k => $v) {
                     $res[$cdm[$k]] = $v;
@@ -295,7 +293,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
     function getCache() {
         if (!is_object($this->aeCache)) {
             if ($this->aeCache !== false) {
-                if ($this->aeCache === true) $this->aeCache = Ac_Cache::getDefaultPrototype();
+                if ($this->aeCache === true) $this->aeCache = $this->getApplication()->getCache();
                 elseif (is_array($this->aeCache)) $this->aeCache = Ac_Util::m(Ac_Cache::getDefaultPrototype(), $this->aeCache);
                 $this->aeCache = Ac_Prototyped::factory($this->aeCache, 'Ac_Cache');
             }

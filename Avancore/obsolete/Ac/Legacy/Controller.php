@@ -445,6 +445,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped {
      * @return Ac_Application
      */
     function getApplication() {
+        if (!$this->application) return Ac_Application::getDefaultInstance();
         return $this->application;
     }    
     

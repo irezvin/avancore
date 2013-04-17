@@ -47,5 +47,14 @@ class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
         }
         return $this->liveSite;
     }
+
+    protected function getDefaultCachePrototype() {
+        $res = array('cacheDir' => $this->getVarCachePath());
+        if (!$this->getConfigValue('ignoreJoomlaCacheSettings')) {
+            // TODO: create specialized cache that works through Joomla
+            $res['enabled'] = (bool) JFactory::getConfig()->get('caching');
+        }
+        return $res;
+    }
     
 }

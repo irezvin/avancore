@@ -367,7 +367,16 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     }
     
     function getCachePrototype() {
-        return $this->intGetConfigValue(substr(__FUNCTION__, 3));
+        $res = $this->intGetConfigValue(substr(__FUNCTION__, 3));
+        if (is_null($res)) $res = array();
+        if (is_array($res)) {
+            $res = Ac_Util::m($this->getDefaultCachePrototype(), $res);
+        }
+        return $res;
+    }
+    
+    protected function getDefaultCachePrototype() {
+        return array('cacheDir' => $this->getVarCachePath());
     }
     
     function getOutputPrototype() {
