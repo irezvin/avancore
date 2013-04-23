@@ -23,7 +23,7 @@ class Cg_Template_Assoc_Strategy_One extends Cg_Template_Assoc_Strategy {
     /**
      * @param <?php $this->d($prop->className); ?> $<?php $this->d($this->single); ?> 
      */
-    function set<?php $this->d($ucSingle); ?>(& $<?php $this->d($this->single); ?>) {
+    function set<?php $this->d($ucSingle); ?>($<?php $this->d($this->single); ?>) {
         if ($<?php $this->d($this->single); ?> === false) $this-><?php $this->d($this->var); ?> = false;
         elseif ($<?php $this->d($this->single); ?> === null) $this-><?php $this->d($this->var); ?> = null;
         else {

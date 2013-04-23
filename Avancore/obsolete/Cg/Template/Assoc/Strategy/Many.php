@@ -43,7 +43,7 @@ class Cg_Template_Assoc_Strategy_Many extends Cg_Template_Assoc_Strategy {
     /**
      * @param <?php $this->d($prop->className); ?> $<?php $this->d($single); ?> 
      */
-    function add<?php $this->d($ucSingle); ?>(& $<?php $this->d($single); ?>) {
+    function add<?php $this->d($ucSingle); ?>($<?php $this->d($single); ?>) {
         if (!is_a($<?php $this->d($this->single); ?>, <?php $this->str($prop->className); ?>)) trigger_error('$<?php $this->d($this->single); ?> must be an instance of <?php $this->d($prop->className); ?>', E_USER_ERROR);
         $this->list<?php $this->d($ucPlural); ?>();
         <?php $this->d($varId); ?>[] = $<?php $this->d($single); ?>;
