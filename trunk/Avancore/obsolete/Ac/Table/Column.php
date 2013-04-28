@@ -156,7 +156,7 @@ class Ac_Table_Column {
 
     function determineGetter($record, $fn) {
         if (is_a($record, 'Ac_Model_Data') && $this->useAeDataFacilities && $this->_staticMeta) return array('getWithGetField', null);
-        elseif (method_exists($record, $getterName = 'get'.ucfirst($fn))) {
+        elseif (method_exists($record, $getterName = 'get'.$fn)) {
             if ($fn == $this->fieldName && is_array($this->methodParams) && count($this->methodParams))
             return array('getWithGetterParams', array($getterName, $this->methodParams));
             else return array('getWithGetter', $getterName);

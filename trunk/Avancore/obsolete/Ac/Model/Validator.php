@@ -158,7 +158,7 @@ class Ac_Model_Validator {
     }
     
     function _getMethod($target, $prefix, $suffix = '') {
-        $methodName = $prefix.ucfirst($suffix);
+        $methodName = $prefix.$suffix;
         if (method_exists($target, $methodName)) $res = $methodName;
             else $res = false;
         return $res;

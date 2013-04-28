@@ -50,7 +50,7 @@ class Cg_Property {
         $res = array();
         foreach ($this->listPassthroughVars() as $ptv) {
             $val = false;
-            if (method_exists($this, $getter = 'get'.ucfirst($ptv))) $val = $this->$getter();
+            if (method_exists($this, $getter = 'get'.$ptv)) $val = $this->$getter();
                 else $val = $this->$ptv;
             if ($val && (!is_array($val) || count($val)))
             $res[$ptv] = $val;
