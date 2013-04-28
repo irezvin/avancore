@@ -69,7 +69,7 @@ class Cg_Template extends Ac_Template {
         $partName = $this->_filesList[$id]['templatePart'];
         $path = $this->getFilePath($id, $basePath);
         Cg_Util::createDirPath(dirname($path));
-        if (method_exists($this, $mtdName = 'show'.ucfirst($partName))) {
+        if (method_exists($this, $mtdName = 'show'.$partName)) {
              $f = fopen($path, "w");
              if ($f === false) trigger_error ("Cannot open file '$path' for write", E_USER_ERROR);
              if (($bytes = fputs($f, $this->fetch($partName))) === false) {

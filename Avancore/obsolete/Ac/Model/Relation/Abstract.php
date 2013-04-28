@@ -14,13 +14,13 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
     
     function _setRef(& $dest, $varName, $ref) {
         if (is_array($dest)) $dest[$varName] = $ref;
-        elseif (method_exists($dest, $setter = 'set'.ucfirst($varName))) $dest->$setter($ref);
+        elseif (method_exists($dest, $setter = 'set'.$varName)) $dest->$setter($ref);
         else $dest->$varName = $ref;
     }
     
     function _setVal(& $dest, $varName, $val) {
         if (is_array($dest)) $dest[$varName] = $val;
-        elseif (method_exists($dest, $setter = 'set'.ucfirst($varName))) $dest->$setter($val);
+        elseif (method_exists($dest, $setter = 'set'.$varName)) $dest->$setter($val);
         else $dest->$varName = $val;
     }
     
@@ -145,7 +145,7 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
             else {
                 switch(true) {
                     case in_array($fieldName, array_keys(get_class_vars($cls))): $getter = '_getFromMember'; break;
-                    case method_exists($src, 'get'.ucfirst($fieldName)): $getter = '_getFromGetter'; break;
+                    case method_exists($src, 'get'.$fieldName): $getter = '_getFromGetter'; break;
                     case is_a($src, 'Ac_Model_Data'): $getter = '_getFromAeData'; break;
                     default:
                         trigger_error('Cannot extract field \''.$fieldName.'\' from an object', E_USER_ERROR);

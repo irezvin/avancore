@@ -172,7 +172,7 @@ class Ac_Accessor implements Ac_I_Accessor {
             $args = explode(':', $propertyName);
             $propertyName = $args[0];
             $args = array_slice($args, 1);
-            if (strlen($propertyName) && method_exists($item, $g = 'get'.ucFirst($propertyName))) {
+            if (strlen($propertyName) && method_exists($item, $g = 'get'.$propertyName)) {
                 $res = call_user_func_array(array($item, $g), $args); 
             } elseif ($item instanceof Ac_Model_Data && $item->hasProperty($propertyName)) {
                 $pi = $item->getPropertyInfo($propertyName, true);
@@ -262,7 +262,7 @@ class Ac_Accessor implements Ac_I_Accessor {
         } elseif ($propertyName instanceof Ac_I_Getter) {
             $res = $propertyName->get($item, $defaultValue);
         } else {
-            if (strlen($propertyName) && method_exists($item, $g = 'get'.ucFirst($propertyName))) {
+            if (strlen($propertyName) && method_exists($item, $g = 'get'.$propertyName)) {
                 $res = true;
             } elseif ($item instanceof Ac_Model_Data && $item->hasProperty($propertyName)) {
                 $res = $item->hasProperty($propertyName);
@@ -289,7 +289,7 @@ class Ac_Accessor implements Ac_I_Accessor {
                     $res += self::setObjectProperty($item, $k, $v, $strictParams);
                 }
             } else {
-	            if (strlen($propertyName) && method_exists($item, $s = 'set'.ucFirst($propertyName))) {
+	            if (strlen($propertyName) && method_exists($item, $s = 'set'.$propertyName)) {
 	                $res = true;
 	                $item->$s($value);
 	            } elseif (($item instanceof Ac_Model_Data) && $item->hasProperty($propertyName)) {

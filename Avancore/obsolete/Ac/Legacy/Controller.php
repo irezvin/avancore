@@ -423,7 +423,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped {
             if (!isset($res[$tplVar])) {
                 $val = false;
                 $res[$tplVar] = false;
-                if (is_callable(array($this, $methodName = 'get'.ucfirst($myVar)))) {
+                if (is_callable(array($this, $methodName = 'get'.$myVar))) {
                     $val = $this->$methodName();
                 } elseif(in_array($myVar, $myVars)) {
                     $val = $this->$myVar; 

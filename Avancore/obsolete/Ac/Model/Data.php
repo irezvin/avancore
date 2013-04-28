@@ -129,7 +129,7 @@ class Ac_Model_Data {
     }
     
     function _getMethod($prefix, $suffix) {
-        if (!method_exists($this, $methodName = $prefix.ucfirst($suffix))) return false; 
+        if (!method_exists($this, $methodName = $prefix.$suffix)) return false; 
         return $methodName;
     }
     
@@ -426,7 +426,7 @@ class Ac_Model_Data {
      */
     function _getListFieldItems($head, $plural) {
         if ($m = $this->_getMethod('get', $head.'Items')) $res = $this->$m();
-        elseif ($m = $this->_getMethod('get', ucfirst($head))) $res = $this->$m();
+        elseif ($m = $this->_getMethod('get', $head)) $res = $this->$m();
         elseif (isset($this->$plural) || $this->_hasVar($plural) && is_array($this->$plural)) $res = $this->$plural;
         else trigger_error ('Cannot retrieve list field '.get_class($this).'::'.$head.' - consider implementing get<Prop>Items() method', E_USER_ERROR);
         return $res;         

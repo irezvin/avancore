@@ -108,7 +108,7 @@ class Ac_Template {
      * @param array $extraParams Parameters to pass to template function
      */
     function show($partName = 'default', $extraParams = array()) {
-        if (method_exists($this, $mtdName = 'show'.ucfirst($partName))) {
+        if (method_exists($this, $mtdName = 'show'.$partName)) {
             return call_user_func_array(array(& $this, $mtdName), $extraParams);
         } else {
             trigger_error('Template part \''.$partName.'\' not exists', E_USER_ERROR);

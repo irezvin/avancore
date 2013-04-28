@@ -120,7 +120,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
      */
     function utlShowControlsTable ($controls, $withTableTag = true, $tableAttribs = array(), $extraParams = false) {
         if (is_array($extraParams) && isset($extraParams['defaultTrWrapper'])) {
-            $trWrapperMethod = 'show'.ucfirst($extraParams['defaultTrWrapper']);
+            $trWrapperMethod = 'show'.$extraParams['defaultTrWrapper'];
         } else {
             $trWrapperMethod = 'showTrWrapper';
         }
