@@ -140,8 +140,6 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
             
             $this->mirrorVar = $this->mirrorProp->varName;
             if ($this->mirrorProp->isPrivateVar && strlen($this->mirrorVar)) $this->mirrorVar = '_'.$this->mirrorVar;
-            
-            //$this->mirrorMethod = $this->prop->isList()? 'set'.ucfirst($this->mirrorProp->
         }
         
     }

@@ -57,7 +57,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
      * @return Ac_Cr_Url
      */
     function getUrl($params = array(), $fullOverride = false) {
-        return $this->getContext()->createUrl($params);
+        return $this->getContext()->createUrl($params, $fullOverride);
     }
 
     function setAction($action) {
@@ -295,7 +295,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
             throw new Exception("Action path not implemented yet");
         } elseif (is_string($action)) {
             if (strlen($action)) {
-                if (method_exists($this, $method = 'action'.ucfirst($action))) {
+                if (method_exists($this, $method = 'action'.$action)) {
                     $res = $method;
                 } elseif (in_array($action, $this->listActionControllers())) {
                     $res = $this->getActionController($action);
