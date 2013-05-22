@@ -67,8 +67,6 @@ class Cg_Property_Simple extends Cg_Property {
         $numeric = false;
         $default = false;
         
-        //var_dump($this->name, $this->_col->default);
-        
         /*if (!is_null($this->_col->default))*/ $default = $this->_col->default;
         
         switch (strtoupper($this->_col->type)) {

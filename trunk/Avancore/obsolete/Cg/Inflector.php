@@ -11,7 +11,7 @@ class Cg_Inflector {
     static function explode($string) {
         if (!is_string($string)) {
             if (is_array($string)) $res = Ac_Util::array_values($string);
-            else $res = $string;
+            else $res = array();
         } else {
             $string = str_replace('_', ' ', $string);
             $string = preg_replace ('/([A-Z])/', ' \1', $string);

@@ -1,6 +1,11 @@
 <?php
 
 class Ac_Facet_Set extends Ac_Prototyped {
+
+    /**
+     * @var bool
+     */
+    protected $debug = false;
     
     /**
      * @var array
@@ -143,6 +148,25 @@ class Ac_Facet_Set extends Ac_Prototyped {
     
     function getValueOrder() {
         return $this->valueOrder;
+    }
+    
+    function setDebug($debug) {
+        $this->debug = (bool) $debug;
+    }
+
+    function getDebug() {
+        return $this->debug;
+    }    
+    
+    function getDebugData() {
+        $res = array();
+        $items = array();
+        foreach ($this->listItems() as $i) {
+            $d = $this->getItem($i)->getDebugData();
+            if ($d) $items[$i] = $d;
+        }
+        if ($items) $res['items'] = $items;
+        return $res;
     }
     
 }

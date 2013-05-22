@@ -113,8 +113,6 @@ class Cg_Property_Object extends Cg_Property {
         
         if ($this->_other) $this->mapperClass = $this->_other->getMapperClass();
         
-        //var_dump($this->name.' enabled: '.$this->isEnabled());
-        
     }
     
     function varNameHasConflicts() {
@@ -187,8 +185,6 @@ class Cg_Property_Object extends Cg_Property {
         }
         if (!strlen($res))
             $res = $this->getOtherEntityName(!$this->isList());
-        //if ($this->varNameHasConflicts()) $res .= '__!!!';
-        //var_dump($this->name);
         if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
         return $res;
     }
@@ -324,6 +320,7 @@ class Cg_Property_Object extends Cg_Property {
             if (strlen($this->otherModelIdInMethodsSingle)) 
                 $res = $this->otherModelIdInMethodsSingle.'Ids';
             else $res = $this->getOtherEntityName(true).'Ids';
+            if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);        
         } else $res = false;
         return $res;
     }
@@ -336,7 +333,7 @@ class Cg_Property_Object extends Cg_Property {
     }
     
     /**
-     * @return Ac_Sql_Dbi_Relation
+     * @return Ac_Sql_Dbi_Relationc
      */
     function getRelation() {
         return $this->_rel;
@@ -373,10 +370,12 @@ class Cg_Property_Object extends Cg_Property {
                     'dataType' => 'int',
                     'arrayValue' => true,
                     //'caption' => $this->_other->pluralCaption,
+                    'controlType' => 'selectList',
                     'values' => array(
                         'class' => 'Ac_Model_Values_Records',
                         'mapperClass' => $this->_other->getMapperClass(),
                     ),
+                    'showInTable' => false,
                 ),
             );
         } else {
