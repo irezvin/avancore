@@ -21,7 +21,7 @@ class Ac_Facet_View_Item_SelectList extends Ac_Facet_ItemView {
     }
 
     function getDummyCaption() {
-        return strlen($this->dummyCaption)? $this->dummyCaption : '- '.$this->item->getCaption().' -';
+        return $this->dummyCaption !== false? $this->dummyCaption : '- '.$this->item->getCaption().' -';
     }
     
     function renderItem(Ac_Legacy_Controller_Response_Html $response) {
@@ -52,7 +52,7 @@ class Ac_Facet_View_Item_SelectList extends Ac_Facet_ItemView {
             <option value=""><?php echo $this->getDummyCaption(); ?></option>
 <?php } ?>
 <?php       foreach ($v as $val => $item) { $t = $this->getCaption($item); ?>
-            <option value="<?php echo htmlspecialchars($val); ?>" <?php if (strlen($val) && (in_array($val, $av))) { ?> selected="selected"<?php } ?>><?php echo htmlspecialchars($t); ?></option>
+            <option value="<?php echo htmlspecialchars($val); ?>" <?php if (strlen($val) && (in_array($val, $av))) { ?> selected="selected"<?php } ?>><?php echo htmlspecialchars(strip_tags($t)); ?></option>
 <?php       } ?> 
         </select>
 <?php

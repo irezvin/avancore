@@ -78,6 +78,15 @@ Ajs_Util = {
     extend: function(subClass, baseClass) {
     	for (var i in baseClass.prototype) if (!subClass.prototype[i]) subClass.prototype[i] = baseClass.prototype[i];
     },
+    
+    initFromOptions: function(object, proto) {
+        var setter;
+        for (var i in proto) if (proto.hasOwnProperty(i)) {
+            setter = 'set' + Ajs_Util.ucFirst(i);
+            if (object[setter] && typeof (object[setter] == 'function')) object[setter].call(object, proto[i]);
+            else object[i] = proto[i];
+        }
+    },
 
     augment: function(modifiedObject, extraObject) {
         for (var i in extraObject) if (modifiedObject[i] === undefined) {

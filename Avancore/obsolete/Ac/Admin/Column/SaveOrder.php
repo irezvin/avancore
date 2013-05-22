@@ -7,7 +7,7 @@ class Ac_Admin_Column_SaveOrder extends Ac_Table_Column_SaveOrder {
      */
     var $manager = false;
     var $paramName = 'ordering';
-    var $saveOrderIcon = 'images/filesave.png';
+    var $saveOrderIcon = false;
     
     function getTaskName() {
         if (isset($this->settings['taskName'])) $res = $this->settings['taskName'];
@@ -21,17 +21,19 @@ class Ac_Admin_Column_SaveOrder extends Ac_Table_Column_SaveOrder {
             $this->getTaskName(), true
         ));
         
+        $saveOrderIcon = $this->saveOrderIcon === false? $this->manager->getConfigService()->getImagePrefix().'../admin/tick.png' : $this->saveOrderIcon;
+        
         ?>
         <th <?php echo Ac_Util::mkAttribs($this->getHeaderAttribs($rowCount, $rowNo)); ?> > 
             <?php echo $this->getTitle(); ?> 
         </th>
-        <th <?php echo Ac_Util::mkAttribs($this->getHeaderAttribs($rowCount, $rowNo)); ?> > <a href="#" onclick="<?php echo $saveOrderCall; ?>"><img src="<?php echo $this->saveOrderIcon; ?>" border="0" width="16" height="16" alt=ACLT_SAVE_ORDER /></a></th>
+        <th <?php echo Ac_Util::mkAttribs($this->getHeaderAttribs($rowCount, $rowNo)); ?> > <a href="#" onclick="<?php echo $saveOrderCall; ?>"><img src="<?php echo $saveOrderIcon; ?>" border="0" width="16" height="16" alt="<?php echo ACLT_SAVE_ORDER; ?>" /></a></th>
         <?php
     }
     
     function showCell($record, $rowNo) {
         $fieldName = $this->manager->getContext()->mapParam(array('processingParams', $this->paramName, $this->manager->getStrPk($record)));
-        $data = $this->getData($record, $rowNo, $this->fieldName);
+        $data = $this->getData($record, $rowNo, $this->getFieldName());
         if (is_null($data)) $data = 0;
         ?>
         <td <?php echo Ac_Util::mkAttribs($this->getCellAttribs()); ?> >

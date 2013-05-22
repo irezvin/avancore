@@ -13,7 +13,7 @@ class Ac_Admin_Processing_SaveOrder extends Ac_Admin_Processing {
 	
 	function getOrderingValue($record) {
 		$res = $this->getContext()->getData(array($this->paramName, $this->manager->getStrPk($record)), false);
-		if (is_numeric($res) && $res >= 1) $res = (int) $res;
+		if (is_numeric($res)) $res = (int) $res;
 			else $res = false;
 		return $res;
 	}

@@ -12,6 +12,10 @@ abstract class Ac_Facet_SetImpl extends Ac_Prototyped {
     function setFacetSet(Ac_Facet_Set $facetSet) {
         $this->facetSet = $facetSet;
     }
+    
+    function getRequiredItemImplClass() {
+        return $this->getDefaultItemImplClass();
+    }
 
     /**
      * @return Ac_Facet_Set
@@ -22,7 +26,7 @@ abstract class Ac_Facet_SetImpl extends Ac_Prototyped {
     
     function createItemImpl(Ac_Facet_Item $item, array $prototype) {
         $prototype = Ac_Util::m (array('class' => $this->getDefaultItemImplClass()), $prototype);
-        $res = Ac_Prototyped::factory($prototype, $this->getDefaultItemImplClass());
+        $res = Ac_Prototyped::factory($prototype, $this->getRequiredItemImplClass());
         $res->setItem($item);
         return $res;
     }

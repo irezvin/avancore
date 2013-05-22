@@ -75,7 +75,8 @@ class Ac_Table_Column_Reorder extends Ac_Table_Column {
     }
     
     function canOrderUp ($record, $rowNo) {
-        if (strlen($m = $this->canOrderUpMethod)) $res = $record->$m();
+        if ($this->canOrderUpMethod === true) $res = true;
+        elseif (strlen($m = $this->canOrderUpMethod)) $res = $record->$m();
         else {
             $res = $rowNo > 0 && $this->getOrderPropertyValue($record, $rowNo) === $this->getPrevOrderProp($rowNo);
         }
@@ -83,7 +84,8 @@ class Ac_Table_Column_Reorder extends Ac_Table_Column {
     }
     
     function canOrderDown ($record, $rowNo) {
-        if (strlen($m = $this->canOrderDownMethod)) $res = $record->$m();
+        if ($this->canOrderDownMethod === true) $res = true;
+        elseif (strlen($m = $this->canOrderDownMethod)) $res = $record->$m();
         else {
             $res = ($rowNo < count($this->_table->listRecords()) - 1) 
                 && $this->getOrderPropertyValue($record, $rowNo) === $this->getNextOrderProp($rowNo);
