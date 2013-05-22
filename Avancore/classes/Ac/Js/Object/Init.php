@@ -18,18 +18,32 @@ class Ac_Js_Object_Init {
         return $this->object;
     }
     
-    function toJs() {
+    function getArgs() {
         if ($this->object->args) {
             if (!isset($this->object->args[0])) $args = array($this->object->args);
             else $args = $this->object->args;
         } else {
             $args = array();
         }
+        return $args;
+    }
+    
+    function toJs() {
+        $args = $this->getArgs();
         if ($this->object->constructor) {
-            $res = $this->object->id.' = '.(new Ac_Js_Call($this->object->constructor, $args, true)).';';
+            $res = $this->object->id.' = '.$this->getRvalue().';';
         } else {
-            $a = $args? new Ac_Js_Val($this->args) : new Ac_Js_Var('{}');
-            $res = $this->object->id.' = '.$a.';';
+            $res = $this->object->id.' = '.$this->getRvalue();
+        }
+        return $res;
+    }
+    
+    function getRvalue() {
+        $args = $this->getArgs();
+        if (strlen($this->object->constructor)) {
+            $res = new Ac_Js_Call($this->object->constructor, $args, true);
+        } else {
+            $res = $args? new Ac_Js_Val($this->args) : new Ac_Js_Var('{}');
         }
         return $res;
     }

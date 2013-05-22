@@ -470,10 +470,6 @@ class Cg_Model {
     function listAeModelRelations() {
         $this->init();
         $res = array();
-        //foreach (array_keys($this->_relations) as $k) {
-        //  if ($this->_relations[$k]->isEnabled()) $res[] = $k;
-        //}
-        //var_dump($this->_relations);
         foreach ($this->listProperties() as $p) {
             $prop = $this->getProperty($p);
             if (is_a($prop, 'Cg_Property_Object') && $prop->isEnabled()) {
@@ -660,7 +656,7 @@ class Cg_Model {
         $cp = Cg_Util::findCommonPrefix($rels);
         $res = array();
         foreach ($rels as $propName => $relName) {
-            $res[$propName] = substr($relName, strlen($cp));
+            $res[$propName] = Cg_Inflector::camelize(substr($relName, strlen($cp)));
         }
         return $res;
     }

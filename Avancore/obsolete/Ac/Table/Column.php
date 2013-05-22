@@ -142,7 +142,7 @@ class Ac_Table_Column {
         return $res;
     }
     
-    function getRecordProperty($record, $fieldName) {
+    function getRecordProperty($record, $fieldName, $noDecorate = false) {
         static $getters = array();
         $rc = get_class($record);
         if (!isset($getters[$rc]) || !isset($getters[$rc][$fieldName])) $getters[$rc][$fieldName] = $this->determineGetter($record, $fieldName);
@@ -238,10 +238,13 @@ class Ac_Table_Column {
      * @return string cell title
      */
     function getTitle() {
+        $res = $this->_name;
         if (isset($this->settings['title'])) $res = $this->settings['title'];
-        elseif (($pi = $this->getStaticPropertyInfo()) && $pi->caption) {
-            $res = $pi->caption;
-        } else $res = $this->_name;
+        elseif ($pi = $this->getStaticPropertyInfo()) {
+             if (isset($pi->colCaption) && strlen($pi->colCaption))
+                 $res = $pi->colCaption;
+             elseif (strlen($pi->caption)) $res = $pi->caption;
+        }
         return $res;
     }    
     

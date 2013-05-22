@@ -137,14 +137,10 @@ class Cg_Frontend {
             $model = $dom->getModel($modelName);
             $this->showExpandable("<h3>".$modelName."</h3>", false);
             $this->show($model);
-            //ini_set('xdebug.var_display_max_data', 102)
-            var_dump($model->getConflictsInfo());
-            //var_dump($dom->analyzeTableName($model->table));
 ?>
 <?php       if ($ps = $model->listProperties()) { ?>
         		<ul>
 <?php           foreach ($ps as $p) { $prop = $model->getProperty($p); ?>
-<?php               // if (is_a($prop, 'Cg_Property_Object')) var_dump($prop->getOtherEntityName(), $prop->getOtherEntityName(false)); ?>
 <?php               $cmn = '$'.$prop->getClassMemberName(); if ($prop->pluralForList) $cmn .= '[]'; ?>
               		<li>
 <?php                     $this->showExpandable($cmn, false); ?>

@@ -117,16 +117,33 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
     }
     
     function getStatement() { /** @TODO: fix issue when otherJoins are put BEFORE primary alias! */
-        $this->pushState();
-        $this->applyParts();
+        $this->beginCalc();
         $parts[] = $this->getColumnsList(true, true);
         if (strlen($s = $this->getStatementTail(true))) $parts[] = $s;
         $res = implode("\n", $parts);
-        $this->popState();
+        $this->endCalc();
         return $res;
     }
     
+    protected $calc = 0;
+    
+    protected function beginCalc() {
+        if (!$this->calc) {
+            $this->calc++;
+            $this->pushState();
+            $this->applyParts();
+        }
+    }
+    
+    protected function endCalc() {
+        if ($this->calc) {
+            $this->calc--;
+            $this->popState();
+        }
+    }
+    
     function getStatementTail($withFromKeyword = false) {
+        $this->beginCalc();
         if (strlen($s = $this->getFromClause($withFromKeyword))) $parts[] = $s;
         if (strlen($s = $this->getWhereClause(true))) $parts[] = $s;
         if (strlen($s = $this->getGroupByClause(true))) $parts[] = $s;
@@ -134,10 +151,12 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         if (strlen($s = $this->getOrderByClause(true))) $parts[] = $s;
         if (strlen($s = $this->getLimitClause(true))) $parts[] = $s;
         $res = implode("\n", $parts);
+        $this->endCalc();
         return $res;
     }
     
     function getColumnsList($withSelectKeyword = false, $addAsteriskIfNoColumns = false, $asArray = false) {
+        $this->beginCalc();
     	if (!is_array($this->columns)) $cols = array($this->columns);
     		else $cols = $this->columns;
     	$columns = array();
@@ -155,10 +174,12 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
 	        if ($this->distinct) $res = 'DISTINCT '.$res;
 	        if ($withSelectKeyword && strlen($res)) $res = "SELECT ".$res;
     	}
+        $this->endCalc();
         return $res;
     }
     
     function getFromClause($withFromKeyword = false, $skipAliases = array(), $withFirstAlias = true) {
+        $this->beginCalc();
         $orderedAliases = $this->_getOrderedAliases($this->getUsedAliases());
         $res = '';
         if ($this->otherJoins) $res .= implode("\n", $this->otherJoins);
@@ -177,6 +198,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         $res = trim($this->_db->indent($res));
         if ($withFromKeyword && strlen($res)) $res = 'FROM '.$res;
         if ($this->otherJoinsAfter) $res .= ' '.implode("\n", $this->otherJoinsAfter);
+        $this->endCalc();
         return $res;
     }
     
@@ -185,6 +207,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
      * @param $asArray Can be FALSE, TRUE or 'plain'
      */
     function getWhereClause($withWhereKeyword = false, $asArray = false) {
+        $this->beginCalc();
         $res = '';
         if ($asArray === true) $res = is_array($this->where)? $this->where : array($this->where);
         else {
@@ -206,17 +229,21 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
                 }
             if ($withWhereKeyword && is_string($res) && strlen($res)) $res = 'WHERE '.$res;
         }
+        $this->endCalc();
         return $res;   
     }
     
     function getGroupByClause($withGroupByKeyword = false) {
+        $this->beginCalc();
         $res = '';
         if ($this->groupBy) $res = implode(', ', $this->groupBy);
         if ($withGroupByKeyword && strlen($res)) $res = 'GROUP BY '.$res;
+        $this->endCalc();
         return $res;
     }
     
     function getHavingClause($withHavingKeyword = false, $asArray = false) {
+        $this->beginCalc();
         $res = '';
         if ($asArray) $res = is_array($this->having)? $this->having : array($this->having);
         else {
@@ -224,20 +251,24 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
                 $res = count($this->having) > 1? '('.implode(') AND (', $this->having).')' : implode('', $this->having);
             if ($withHavingKeyword && strlen($res)) $res = 'HAVING '.$res;
         }
+        $this->endCalc();
         return $res;   
     }
     
     function getOrderByClause($withOrderByKeyword = false, $asArray = false) {
+        $this->beginCalc();
         $ob = Ac_Util::toArray($this->orderBy);
         if ($asArray) $res = $ob;
         else {
             $res = Ac_Util::implode_r(", ", $ob);
             if ($withOrderByKeyword && strlen($res)) $res = 'ORDER BY '.$res;
         }
+        $this->endCalc();
         return $res;
     }
     
     function getLimitClause($withLimitKeyword = false) {
+        $this->beginCalc();
         $res = '';
 //        if (strlen($this->limitCount)) {
 //            $res = $this->limitCount;
@@ -247,6 +278,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         if (strlen($this->limitCount)) {
             $res = $this->_db->getLimitClause($this->limitCount, $this->limitOffset, $withLimitKeyword);
         }
+        $this->endCalc();
         return $res;
     }
     
@@ -314,8 +346,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         if (!strlen($mapperClass) && !strlen($pkName)) trigger_error("Even mapper class or pk name must be provided", E_USER_ERROR);
         $res = new Ac_Model_Collection();
         
-        $this->pushState();
-        $this->applyParts();
+        $this->beginCalc();
         
         $orderedAliases = $this->_getOrderedAliases($this->getUsedAliases());
         if (!count($orderedAliases)) {
@@ -350,7 +381,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
             $res->setLimits($this->limitOffset, $this->limitCount);
         }
         
-        $this->popState();
+        $this->endCalc();
         
         return $res;
     }

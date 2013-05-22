@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl {
+class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_ItemImpl {
 
     protected $titleAlias = false;
 
@@ -14,7 +14,25 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl {
     
     protected $selectExtra = array();
     
+    protected $alwaysApply = false;
+    
     protected $withCounts = null;
+    
+    /**
+     * @var Ac_Sql_Select
+     */
+    protected $selectForValues = false;
+
+    function setSelectForValues(Ac_Sql_Select $selectForValues) {
+        $this->selectForValues = $selectForValues;
+    }
+
+    /**
+     * @return Ac_Sql_Select
+     */
+    function getSelectForValues() {
+        return $this->selectForValues;
+    }    
     
     /**
      * @return Ac_Facet_Sql_SetImpl
@@ -24,9 +42,19 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl {
         if (!$res instanceof Ac_Facet_Sql_SetImpl) throw new Exception("Incompatible \$setImpl, Ac_Facet_Sql_SetImpl expected, got: ".get_class($res));
         return $res;
     }
+
+    function setAlwaysApply($alwaysApply) {
+        $this->alwaysApply = (bool) $alwaysApply;
+    }
+
+    function getAlwaysApply() {
+        return $this->alwaysApply;
+    }
     
     function getPossibleValues() {
-        $select = $this->getSetImpl()->createSelectForItem($this);
+        if ($this->getItem()->getName() == 'substring') trigger_error("Foo", E_USER_ERROR);
+        if ($this->selectForValues) $select = $this->selectForValues;
+            else $select = $this->getSetImpl()->createSelectForItem($this);
         //$select->distinct = true;
         $tc = $this->getTitleCol();
         $vc = $this->getValueCol();
@@ -47,11 +75,16 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl {
             $select->groupBy = array($vc);
             if (!is_object($select->columns['count'])) $select->columns['count'] = 'COUNT(DISTINCT '.$select->columns['count'].')';
         }
+        if (is_array($this->selectExtra)) {
+            if (isset($this->selectExtra['columns']) && is_array($this->selectExtra['columns'])) {
+                Ac_Util::ms($select->columns, $this->selectExtra['columns']);
+            }
+        }
         $t0 = microtime(true);
         $res = $select->getDb()->fetchArray($select, 'value');
-        if ($this->debug) {
+        if ($this->item->getDebug()) {
             $t1 = microtime(true) - $t0;
-            Ac_Debug::fb($select."\n -- ".round($t1, 4));
+            $this->item->setDebugData('impl', array('time' => round($t1, 4), 'query' => ''.$select));
         }
         return $res;
     }
@@ -110,11 +143,15 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl {
         return $this->valueSetter;
     }
     
-    function applyToSelectPrototype(array & $prototype) {
+    function applyToSelectPrototype(array & $prototype, Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
+        if ($currValuesImpl === $this && !$this->alwaysApply) return;
         if ($this->selectExtra) Ac_Util::ms($prototype, $this->selectExtra);
     }
     
-    function applyToSelect(Ac_Sql_Select $select) {
+    function applyToSelect(Ac_Sql_Select $select, Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
+        if ($currValuesImpl === $this && !$this->alwaysApply) return;
+        $v = $this->getValue();
+        if ($v === false) return; // value not provided
         $this->getValueSetter(true)->setValue($this, $select);
     }
 
@@ -134,6 +171,5 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl {
         if (is_null($this->withCounts)) return $this->getSetImpl()->getWithCounts();
         return $this->withCounts;
     }    
-    
     
 }

@@ -1198,7 +1198,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $disp = Ac_Dispatcher::getInstance();
                 $db = $disp->database;
                 $sqlDb = new Ac_Sql_Db_Ae($db);
-	            $options = $this->getMapper()->getSqlSelectPrototype('t');
+	            $options = Ac_Util::m($this->getMapper()->getSqlSelectPrototype('t'), $options);
                 $this->_sqlSelect = new Ac_Sql_Select($sqlDb, $options);
                 if ($ff = $this->getFilterForm()) {
                     $fVal = $ff->getValue();
@@ -1286,6 +1286,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
     
     function _getOrder() {
+        $s = $this->_getSqlSelect();
         if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getOrderByClause(false)))) {
             $res = $w;
         } else {

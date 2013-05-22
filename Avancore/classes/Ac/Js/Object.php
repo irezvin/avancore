@@ -14,7 +14,7 @@ class Ac_Js_Object {
     
     function __construct($id, $constructor = null, $args = array()) {
         if (func_num_args() == 1 && is_array($id) && isset($id['_id'])) {
-            $this->id = $id['_id'];
+            if (isset($id['_id'])) $this->id = $id['_id'];
             if (isset($id['_constructor'])) $this->constructor = $id['_constructor'];
             unset($id['_id']);
             unset($id['_constructor']);

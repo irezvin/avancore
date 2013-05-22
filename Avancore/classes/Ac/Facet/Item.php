@@ -1,6 +1,10 @@
 <?php
 
 class Ac_Facet_Item extends Ac_Prototyped {
+
+    protected $debug = null;
+    
+    protected $debugData = array();
     
     /**
      * @var Ac_Facet_Set
@@ -186,6 +190,31 @@ class Ac_Facet_Item extends Ac_Prototyped {
     function getMultiple() {
         return $this->multiple;
     }    
-   
+
+    function setDebug($debug) {
+        $this->debug = is_null($debug)? $debug : (bool) $debug;
+    }
+
+    function getDebug() {
+        if (is_null($this->debug)) return $this->getFacetSet()->getDebug();
+        return $this->debug;
+    }    
+    
+    function getDebugData() {
+        return $this->debugData;
+    }
+    
+    function setDebugData($key, $data = null) {
+        if (func_num_args() == 1) {
+            $this->debugData = $key;
+            if (!$this->debugData) $this->debugData = array();
+        }
+        else {
+            if (!is_null($data))
+                $this->debugData[$key] = $data;
+            else 
+                unset ($this->debugData[$key]);
+        }
+    }
     
 }

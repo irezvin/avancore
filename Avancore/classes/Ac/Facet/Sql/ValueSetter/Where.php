@@ -28,7 +28,7 @@ class Ac_Facet_Sql_ValueSetter_Where extends Ac_Facet_Sql_ValueSetter {
         $alias = $this->alias;
         if ($alias === false) $alias = $impl->getValueAlias();
         if ($alias !== false) $select->useAlias($alias);
-        $value = $impl->getItem()->getValue();
+        $value = $impl->getValue();
         if ($this->isEmptyValue($impl, $value)) {
             $select->where['facets_'.$impl->getItem()->getName()] = new Ac_Sql_Expression(
                 "IFNULL ($colExpr) IN (0, '')"
