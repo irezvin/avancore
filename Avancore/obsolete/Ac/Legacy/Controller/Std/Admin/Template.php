@@ -30,7 +30,7 @@ class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Template_Html {
 	}
 	
 	function _showWrapper($content) {
-        $this->htmlResponse->addCssLib('{AC}/managers.css', true);
+        $this->htmlResponse->addCssLib('{AC}/managers.css', true, true);
 ?>
 
 		<div class='main'>
@@ -55,7 +55,7 @@ class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Template_Html {
             $this->htmlResponse->mergeWithResponse($this->managerResponse);
             ob_start(); 
 ?>
-    		<div class='avantravel'>
+    		<div class='avanadmin'>
     			<form <?php echo Ac_Util::mkAttribs($formAttribs); ?>>
     				<?php echo $bu->getHidden(); ?>
     				<?php echo $this->managerResponse->content; ?>    				

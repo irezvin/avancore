@@ -122,7 +122,7 @@ class Ac_Table_Column {
      */
     function getCellAttribs() {
         if (isset($this->settings['cellAttribs'])) $res = $this->settings['cellAttribs'];
-            else $res = array('align' => 'left');
+            else $res = array();
         return $res;
     }
     
@@ -135,7 +135,7 @@ class Ac_Table_Column {
      */
     function getHeaderAttribs($rowCount, $rowNo = 1) {
         if (isset($this->settings['headerAttribs'])) $res = $this->settings['headerAttribs'];
-            else $res = array('align' => 'left');
+            else $res = array();
             
         $res['rowspan'] = $this->getHeaderRowspan($rowCount, $rowNo);        
        

@@ -1143,6 +1143,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                     $filterSettings = array(
                         'class' => 'Ac_Sql_Filter_Multiple',
                         'filters' => $allFilters, 
+                        'applied' => true,
                     );
                 }
                 $this->_sqlFilter = Ac_Sql_Part::factory($filterSettings, 'Ac_Sql_Filter');
@@ -1194,13 +1195,14 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             }
             $f = $this->_getSqlFilter();
             $o = $this->_getSqlOrder();
-            if ($f || $o || $options) {
+            $ff = $this->getFilterForm();
+            if ($f || $o || $ff || $options) {
                 $disp = Ac_Dispatcher::getInstance();
                 $db = $disp->database;
                 $sqlDb = new Ac_Sql_Db_Ae($db);
 	            $options = Ac_Util::m($this->getMapper()->getSqlSelectPrototype('t'), $options);
                 $this->_sqlSelect = new Ac_Sql_Select($sqlDb, $options);
-                if ($ff = $this->getFilterForm()) {
+                if ($ff) {
                     $fVal = $ff->getValue();
                 } else {
                     $fVal = true;
@@ -1212,6 +1214,14 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 if ($o) {
                     $o->bind($fVal);
                     $o->applyToSelect($this->_sqlSelect);
+                }
+                // find missing filters and apply them to respective parts
+                $filtersInManager = $f? $f->listFilters() : array();
+                $filtersInForm = array_keys($fVal);
+                $filtersInMapper = $this->_sqlSelect->listParts();
+                $filtersToSet = array_diff(array_intersect($filtersInForm, $filtersInMapper), $filtersInManager);
+                foreach ($filtersToSet as $partName) {
+                    $this->_sqlSelect->getPart($partName)->bind($fVal[$partName]);
                 }
             } else {
                 $this->_sqlSelect = null;
