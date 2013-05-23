@@ -156,7 +156,7 @@ class Ac_Sql_Part extends Ac_Prototyped {
      * @access protected
      */
     function _doGetAppliedAliases() {
-        return $this->aliases;
+        return Ac_Util::toArray($this->aliases);
     }
 
     function _doBeforeExpandPaths(& $input) {
@@ -194,12 +194,10 @@ class Ac_Sql_Part extends Ac_Prototyped {
         $res = array();
         foreach (array_keys($array) as $k) {
             if (is_array($array[$k])) {
-                $foo = false;
-                $v = & $foo;
                 $v = $this->_expandPaths($array[$k]);
             } else $v = & $array[$k];
             if (strpos($k, '.') !== false) $this->_setArrayByPath($res, $k, $v);
-                else $res[$k] = & $v;
+                else $res[$k] = $v;
         }
         return $res;
     }

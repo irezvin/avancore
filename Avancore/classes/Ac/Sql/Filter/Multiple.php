@@ -141,7 +141,11 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
      */
     function _doGetAppliedWhere() {
         if (!$this->isHaving && count($this->_filters)) {
-            $res = array($this->_colCriteria());
+            $cc = $this->_colCriteria();
+            if ($cc !== false)
+                $res = array($cc);
+            else 
+                $res = array();
         } else {
             $res = array();
         }
@@ -153,7 +157,11 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
      */
     function _doGetAppliedHaving() {
         if ($this->isHaving && count($this->_filters)) {
-            $res = array($this->_colCriteria());
+            $cc = $this->_colCriteria();
+            if ($cc !== false)
+                $res = array($cc);
+            else 
+                $res = array();
         } else {
             $res = array();
         }

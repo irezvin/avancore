@@ -79,11 +79,14 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 	}
 	
 	function _doHasTable($alias) {
+        if (!strncmp($alias, 'mid__', 5)) $alias = substr($alias, 5);
 		return $this->_searchPath($alias) !== false;
 	}
 	
 	function _doGetTable($alias) {
-		$p = $this->_searchPath($alias);
+        $origAlias = $alias;
+        if (!strncmp($alias, 'mid__', 5)) $alias = substr($alias, 5);
+        $p = $this->_searchPath($alias);
 		if ($p) {
 			$m = Ac_Model_Mapper::getMapper($p['mapperClass']);
 			if (isset($p['prevAlias'])) {
@@ -99,7 +102,7 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 			$rel = $prevMapper->getRelation($p['relationId']);
 			$protos = array();
 			if ($rel->midTableName) {
-				$midAlias = 'mid-'.$alias;
+				$midAlias = 'mid__'.$alias;
 				$protos[$midAlias] = array(
 					'name' => $rel->midTableName,
 					'joinsAlias' => $joinsAlias,
@@ -117,7 +120,7 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 			foreach ($protos as $alias => $proto) {
 				$t = $this->addTable($proto, $alias);
 			}
-			$res = $this->_tables[$alias];
+			$res = $this->_tables[$origAlias];
 		} else {
 			$res = null;
 		}

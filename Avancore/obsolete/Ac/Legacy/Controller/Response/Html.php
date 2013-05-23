@@ -46,11 +46,13 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
         }
     }
     
-    function addCssLib($cssLib, $isLocal = false) {
+    function addCssLib($cssLib, $isLocal = false, $atBeginning = false) {
         if (is_array($cssLib)) {
-            foreach ($cssLib as $lib) $this->addCssLib($lib, $isLocal);
+            foreach ($atBeginning? array_reverse($cssLib) : $cssLib as $lib) 
+                $this->addCssLib($lib, $isLocal, $atBeginning);
         } else {
-            $this->cssLibs[] = array($cssLib, $isLocal);
+            if ($atBeginning) array_unshift ($this->cssLibs, array($cssLib, $isLocal));
+            else $this->cssLibs[] = array($cssLib, $isLocal);
             $this->cssLibs = Ac_Util::array_unique($this->cssLibs);
         }
     }
