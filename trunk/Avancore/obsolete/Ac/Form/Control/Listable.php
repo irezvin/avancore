@@ -49,7 +49,7 @@ class Ac_Form_Control_Listable extends Ac_Form_Control {
         if ($this->isList === '?') {
             if (($p = $this->getModelProperty()) && ($p->plural || $p->arrayValue)) $res = true;
             elseif (is_array($this->getDefault())) $res = true;
-            else $res = false;             
+            else $res = false;
         } else $res = $this->isList;
         return $res;
     }

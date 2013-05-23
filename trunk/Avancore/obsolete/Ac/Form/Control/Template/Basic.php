@@ -610,7 +610,36 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
      * @param Ac_Form_Control_List $control
      */
     function _showSelectListControls($control, $listItems) {
-        echo "<h1 style='color: red'>".className($this).'::'.__FUNCTION__.' is not implemented yet</h1>';
+        $elementAttribs = $control->getHtmlAttribs();
+        $name = $this->_mapNames($control, 'value');
+        if (!isset($elementAttribs['class']) ) $elementAttribs['class'] = '';
+        $elementAttribs['class'] .= ' checkList';
+        $this->htmlResponse->addAssetLibs(array(
+            '{FASI}/fasiFrontend.css',
+        ));
+        if ($control->getMultiSelect()) {
+            $type = "checkbox";
+            $name .= '[]';
+            $elementAttribs['class'] .= ' multiple';
+        } else {
+            if ($control->dummyCaption !== false) {
+                array_shift($listItems);
+            }
+            $type = "radio";
+        }
+        $i = 0;
+?>
+        
+        <div <?php $this->attribs($elementAttribs); ?>>
+<?php foreach ($listItems as $item) { $i++; ?>
+            <div>
+                <input name="<?php $this->d($name); ?>" type="<?php echo $type; ?>" id="<?php echo $id = $control->getContext()->mapIdentifier('_item_'.$i); ?>" value="<?php $this->d($item['value'], $control->isHtmlAllowed()); ?>"<?php if($item['selected']) { ?> checked="checked"<?php } ?> />
+<?php           if (is_array($item['caption'])) $item['caption'] = implode(', ', $item['caption']); ?>
+                <label for="<?php echo $id; ?>"><?php if (strlen($item['caption'])) $this->d($item['caption'], $control->isHtmlAllowed()); else echo "&nbsp;"; ?></label>
+            </div>
+<?php } ?>
+        </div>
+<?php
     }
     
     /**

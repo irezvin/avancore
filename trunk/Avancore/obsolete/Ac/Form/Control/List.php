@@ -169,6 +169,12 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
         return $res;
     }
     
+    function isList() {
+        if ($this->isList === '?' && $this->multiSelect && $this->multiSelect !== '?') $res = true;
+        else $res = parent::isList();
+        return $res;
+    }
+    
     function getId() {
         if ($this->id === false) {
             $this->id = '';
