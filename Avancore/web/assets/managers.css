@@ -145,3 +145,36 @@ body.admin td.enabled {
     border-right: 1px solid #eee;
     border-left: 1px solid #eee;
 }
+
+.manager .pagesList {
+    display: inline-block;
+}
+
+/* Styles beginning with "section" are for Joomla 3.0 only! */
+
+section .manager .pagesList {
+    margin-bottom: 1em;
+}
+
+section .manager .pagesList span, section .manager .pagesList a {
+    display: inline-block;
+    float: none;
+    padding:0.75em;
+    height: auto;
+    line-height: 1em;
+}
+
+section .manager .pagesList span {
+    border: none;
+}
+
+
+section .manager .pagesList a {
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+
+.tabContent table {
+    width: 100%;
+}

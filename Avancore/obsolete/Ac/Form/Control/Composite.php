@@ -23,6 +23,8 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     
     var $valueFirstInContext = false;
     
+    var $defaultChildClass = false;
+    
     protected $modelUpdated = false;
     
     function doInitProperties($options = array()) {
@@ -216,6 +218,8 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     function _createControl($name, $settings = array()) {
         if (isset($settings['class']) && strlen($settings['class'])) {
             $class = $settings['class'];
+        } elseif (strlen($this->defaultChildClass)) {
+            $class = $this->defaultChildClass;
         } else {
             $class = 'Ac_Form_Control'; 
         }
