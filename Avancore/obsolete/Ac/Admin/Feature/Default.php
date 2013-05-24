@@ -14,6 +14,11 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     var $columnSettings = array();
     
     var $formSettings = array();
+
+    /**
+     * @var callback to function (array & $fieldConfig, $propName, Ac_Model_Property $property, array & $formSettings)
+     */
+    var $formFieldGeneratorCallback = false;
     
     var $formFieldDefaults = array();
     
@@ -182,8 +187,9 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
                 $conf['readOnly'] = true;
                 $conf['emptyCaption'] = AC_ID_EMPTY_CAPTION;
             }
-                            
-            $formSettings['controls'][$prop->propName] = $conf;
+            if ($this->formFieldGeneratorCallback) call_user_func_array($this->formFieldGeneratorCallback, array(& $conf, $p, $prop, & $formSettings));
+            if (is_array($conf))
+                $formSettings['controls'][$prop->propName] = $conf;
         }
         if ($this->formSettings) Ac_Util::ms($formSettings, $this->formSettings);
     }

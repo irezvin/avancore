@@ -238,7 +238,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
     /**
      * @param Ac_Form_Control $control
      */
-    function showTrWrapper ($control, $html, $extraParams) {
+    function showTrWrapper ($control, $html, $extraParams = array()) {
         if (is_array($extraParams) && isset($extraParams['class'])) {
             $extraClasses = ' '.$extraParams['class'];
         } else {
@@ -252,6 +252,35 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         </td>
         <td><?php if ($control->isRequired($control)) $this->_showCoolRequiredAsterisk($control); else echo "&nbsp;"; ?></td>
         <td class='control'>
+<?php echo $html; ?>
+<?php if ($errors) { ?>
+
+            <div class='errors'>
+                <?php $this->_showErrors($errors); ?>
+            </div>
+<?php } ?>
+            
+        </td>
+    </tr>
+<?php        
+    }
+    
+    function showTrWrapperColspan ($control, $html, $extraParams = array()) {
+        if (is_array($extraParams) && isset($extraParams['class'])) {
+            $extraClasses = ' '.$extraParams['class'];
+        } else {
+            $extraClasses = '';
+        }
+?>
+
+    <tr class='control<?php if($errors = $control->getErrors()) echo ' withErrors'; ?><?php echo $extraClasses; ?>'>
+        <td class='control spanned' colspan = "3">
+<?php       if (strlen($control->getCaption())) { ?>
+                <div class="caption"><?php $this->_showCaption($control, true, "&nbsp;"); ?></div>
+<?php       } ?>
+<?php       if ($control->isRequired($control)) { ?>
+                <?php $this->_showCoolRequiredAsterisk($control); ?>
+<?php       } ?>
 <?php echo $html; ?>
 <?php if ($errors) { ?>
 
