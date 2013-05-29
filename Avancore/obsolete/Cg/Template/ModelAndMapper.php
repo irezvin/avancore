@@ -432,7 +432,9 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     <?php } ?>
     
     protected function doGetInfoParams() {
-        return <?php $this->exportArray($this->model->getMapperInfoParams(), 8); ?>;
+        return Ac_Util::m(parent::doGetInfoParams(), 
+            <?php $this->exportArray($this->model->getMapperInfoParams(), 12); ?>
+        );
     }
     
     <?php if ($this->uniqueIndexData) { ?>

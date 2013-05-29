@@ -50,7 +50,7 @@ class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Template_Html {
             $bu->query = Ac_Util::m($allState, $u->query, true);
             $this->htmlResponse->redirectUrl = $bu;
         } else {
-            $bu = $this->controller->getUrl(array('action' => 'manager', 'mapper' => $this->context->getData('mapper')));
+            $bu = $this->controller->getUrl(array($this->controller->_methodParamName => 'manager', 'mapper' => $this->context->getData('mapper')));
             $formAttribs = array('action' => $bu->toString(false), 'method' => 'post', 'name' => 'aForm', 'id' => 'aForm',  'enctype' => 'multipart/form-data');
             $this->htmlResponse->mergeWithResponse($this->managerResponse);
             ob_start(); 

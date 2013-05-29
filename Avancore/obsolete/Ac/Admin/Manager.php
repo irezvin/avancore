@@ -829,7 +829,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     function listSubManagers() {
         if ($this->_subManagers === false) {
             $this->_subManagers = array();
-            if ($this->allowSubManagers) {
+            if ($this->allowSubManagers && $this->getRecord()->isPersistent()) {
                 foreach ($this->listFeatures() as $f) {
                     $feat = $this->getFeature($f);
                     $smc = $feat->getSubManagersConfig();
@@ -1196,35 +1196,31 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $f = $this->_getSqlFilter();
             $o = $this->_getSqlOrder();
             $ff = $this->getFilterForm();
-            if ($f || $o || $ff || $options) {
-                $disp = Ac_Dispatcher::getInstance();
-                $db = $disp->database;
-                $sqlDb = new Ac_Sql_Db_Ae($db);
-	            $options = Ac_Util::m($this->getMapper()->getSqlSelectPrototype('t'), $options);
-                $this->_sqlSelect = new Ac_Sql_Select($sqlDb, $options);
-                if ($ff) {
-                    $fVal = $ff->getValue();
-                } else {
-                    $fVal = true;
-                }
-                if ($f) {
-                    $f->bind($fVal);
-                    $f->applyToSelect($this->_sqlSelect);
-                }
-                if ($o) {
-                    $o->bind($fVal);
-                    $o->applyToSelect($this->_sqlSelect);
-                }
-                // find missing filters and apply them to respective parts
-                $filtersInManager = $f? $f->listFilters() : array();
-                $filtersInForm = array_keys($fVal);
-                $filtersInMapper = $this->_sqlSelect->listParts();
-                $filtersToSet = array_diff(array_intersect($filtersInForm, $filtersInMapper), $filtersInManager);
-                foreach ($filtersToSet as $partName) {
-                    $this->_sqlSelect->getPart($partName)->bind($fVal[$partName]);
-                }
+            $disp = Ac_Dispatcher::getInstance();
+            $db = $disp->database;
+            $sqlDb = new Ac_Sql_Db_Ae($db);
+            $options = Ac_Util::m($this->getMapper()->getSqlSelectPrototype('t'), $options);
+            $this->_sqlSelect = new Ac_Sql_Select($sqlDb, $options);
+            if ($ff) {
+                $fVal = $ff->getValue();
             } else {
-                $this->_sqlSelect = null;
+                $fVal = array();
+            }
+            if ($f) {
+                $f->bind($fVal);
+                $f->applyToSelect($this->_sqlSelect);
+            }
+            if ($o) {
+                $o->bind($fVal);
+                $o->applyToSelect($this->_sqlSelect);
+            }
+            // find missing filters and apply them to respective parts
+            $filtersInManager = $f? $f->listFilters() : array();
+            $filtersInForm = array_keys($fVal);
+            $filtersInMapper = $this->_sqlSelect->listParts();
+            $filtersToSet = array_diff(array_intersect($filtersInForm, $filtersInMapper), $filtersInManager);
+            foreach ($filtersToSet as $partName) {
+                $this->_sqlSelect->getPart($partName)->bind($fVal[$partName]);
             }
         }
         return $this->_sqlSelect;
