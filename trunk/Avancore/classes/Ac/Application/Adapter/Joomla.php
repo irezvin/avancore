@@ -41,8 +41,8 @@ class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
     function getLiveSite() {
         if ($this->liveSite === false) {
             $uri = JUri::getInstance();
-            $uri = $uri->base(array('scheme', 'host', 'path'));
-            $uri = preg_replace('#(/administrator)?(/index\.php)?$#', '', $uri);
+            $uri = $uri->base();
+            $uri = preg_replace('#(/administrator/)?(/index\.php)?$#', '', $uri);
             $this->liveSite = $uri;
         }
         return $this->liveSite;

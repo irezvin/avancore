@@ -32,6 +32,10 @@ class Ac_Form_Converter {
                 $conf['class'] = 'Ac_Form_Control_DateTime';
                 break;
                 
+            case $property->dataType == 'timestamp':
+                $conf['class'] = 'Ac_Form_Control_DateTime';
+                break;
+                
             case $property->dataType == 'date':
                 $conf['class'] = 'Ac_Form_Control_Date';
                 break;

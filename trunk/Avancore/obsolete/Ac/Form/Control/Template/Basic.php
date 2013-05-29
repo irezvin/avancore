@@ -749,11 +749,11 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             <input <?php echo Ac_Util::mkAttribs($attribs); ?> />
 <?php
         if ($date->showCalendar && !$date->isReadOnly()) {
-            $this->addJsLib('{AC}/calendar/calendar_stripped.js');
-            $this->addJsLib('{AC}/calendar/calendar-setup_stripped.js');
-            $this->addJsLib('{AC}/calendar/lang/calendar-'.(defined('AC_LANG_ID')? AC_LANG_ID : 'en').'.js');
+            $this->addJsLib('{AC}/vendor/calendar/calendar_stripped.js');
+            $this->addJsLib('{AC}/vendor/calendar/calendar-setup_stripped.js');
+            $this->addJsLib('{AC}/vendor/calendar/lang/calendar-'.(defined('AC_LANG_ID')? AC_LANG_ID : 'en').'.js');
             if ($date->calendarSkin) {
-                $this->addCssLib('{ACCSS}js/calendar/calendar-'.$date->calendarSkin.'.css');
+                $this->addCssLib('{AC}/vendor/calendar/calendar-'.$date->calendarSkin.'.css');
             }
             $json = array(
                 'inputField' => $id,

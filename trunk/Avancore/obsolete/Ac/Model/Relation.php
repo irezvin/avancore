@@ -266,12 +266,12 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function setSrcMapper(Ac_Model_Mapper $srcMapper) {
         $this->_srcMapper = $srcMapper;
         $this->srcMapperClass = $srcMapper->getId();
-        if (!$this->database) $this->database = $this->_srcMapper->getDatabase();
+        if (!$this->database) $this->database = $this->_srcMapper->getApplication()->getLegacyDatabase();
     }
     
     function setDestMapper(Ac_Model_Mapper $destMapper) {
         $this->_destMapper = $destMapper;
-        if (!$this->database) $this->database = $this->_destMapper->getDatabase();
+        if (!$this->database) $this->database = $this->_destMapper->getApplication()->getLegacyDatabase();
     }
     
     function setApplication(Ac_Application $application) {
@@ -304,8 +304,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         }
         
         if ($this->database === false) {
-            if ($this->_srcMapper) $this->database = $this->_srcMapper->getDatabase();
-            elseif ($this->_destMapper) $this->database = $this->_destMapper->getDatabase();
+            if ($this->_srcMapper) $this->database = $this->_srcMapper->getApplication()->getLegacyDatabase();
+            elseif ($this->_destMapper) $this->database = $this->_destMapper->getApplication()->getLegacyDatabase();
         }
         
         if (!$this->fieldLinks) trigger_error('fieldLinks must be specified', E_USER_ERROR);
@@ -642,7 +642,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             } else {
                 $this->_getAllValues($data, $values, $keys);
             }
-            $counts = $this->_countWithValues($values, $this->midTableName? $fieldLinks2 : Ac_Util::array_values($fieldLinks), true, $separate, $matchMode > 0, $tableName, false, false, $this->midTableName);
+            $counts = $this->_countWithValues($values, $this->midTableName? $fieldLinks2 : Ac_Util::array_values($fieldLinks), true, $separate, $matchMode > 0, $tableName, false, false, $this->midTableName, $this->midTableName? $fieldLinks : false);
             if (!$separate) {
                 $res = $counts;
             } else {
@@ -964,14 +964,14 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     
     // TODO: optimize _countWithValues and _getWithValues to place instances into nested array faster when resultset is ordered
     
-    function _countWithValues($values, $keys, $multipleValues, $separateCounts, $byKeys, $tableName, $orderByKeys = false, $retSql = false, $midTableName = '') {
+    function _countWithValues($values, $keys, $multipleValues, $separateCounts, $byKeys, $tableName, $orderByKeys = false, $retSql = false, $midTableName = '', $otherKeys = false) {
         if (!$multipleValues) $values = array($values);
             elseif (!count($values)) return $separateCounts? array() : 0;
         if ($midTableName) {
-            $fromWhere = ' FROM '.$this->database->NameQuote($midTableName).' AS _mid_ '.$this->_getJoin('INNER', '_mid_', $tableName, '', $keys);
+            $fromWhere = ' FROM '.$this->database->NameQuote($midTableName).' AS _mid_ '/*.$this->_getJoin('INNER', '_mid_', $tableName, '', $keys)*/;
             //foreach($midKeysMap as $rightKey) $selKeys[] = $rightKey;
             $selKeys = array_keys($keys);
-            $keys = array_keys($keys); 
+            $keys = array_values($otherKeys); 
             $lta = '_mid_.';
             $crit = $this->_makeSqlCriteria($values, $keys, '_mid_');
         } else {

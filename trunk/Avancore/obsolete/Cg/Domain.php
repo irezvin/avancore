@@ -191,6 +191,11 @@ class Cg_Domain {
     var $ignoredColumnsInJunctionTables = array();
     
     /**
+     * @var array('regExp' => array('extraConfig'))
+     */
+    var $extraConfigByTables = array();
+    
+    /**
      * @param Cg_Generator $generator 
      */
     function Cg_Domain($generator, $name, $config = array()) {
@@ -314,6 +319,15 @@ class Cg_Domain {
         $coolName = $this->extractNameFromTableName($tableName);
         
         $conf['table'] = $tableName;
+        
+        if ($this->extraConfigByTables) {
+            foreach ($this->extraConfigByTables as $k => $extraConfig) {
+                if (is_array($extraConfig) && ($k === $tableName || ($k{0} == '/' && preg_match($k, $tableName)))) {
+                    Ac_Util::ms($conf, $extraConfig);
+                }
+            }
+        }
+        
         $name = Cg_Util::makeIdentifier($coolName);
         
         return array($name, $conf);

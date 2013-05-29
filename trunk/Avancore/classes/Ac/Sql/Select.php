@@ -236,7 +236,8 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
     function getGroupByClause($withGroupByKeyword = false) {
         $this->beginCalc();
         $res = '';
-        if ($this->groupBy) $res = implode(', ', $this->groupBy);
+        if ($this->groupBy) $res = is_array($this->groupBy)? 
+            implode(', ', $this->groupBy) : $this->groupBy;
         if ($withGroupByKeyword && strlen($res)) $res = 'GROUP BY '.$res;
         $this->endCalc();
         return $res;

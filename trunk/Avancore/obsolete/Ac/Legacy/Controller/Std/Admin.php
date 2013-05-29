@@ -21,7 +21,7 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
 	}
 	
 	function executeDefault() {
-	    $this->_response->redirectUrl = $this->getUrl(array('action' => 'start'), false);
+	    $this->_response->redirectUrl = $this->getUrl(array($this->_methodParamName => 'start'), false);
 	}
 	
 	function getStateVarName() {
@@ -42,7 +42,7 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
             Ac_Util::unsetArrayByPath($state, array('keys'));
             
             $data = $c->getData();
-            if (isset($data['action']) && $data['action'] == 'list') {
+            if (isset($data[$this->_methodParamName]) && $data[$this->_methodParamName] == 'list') {
 	            if (!is_array($state)) $state = array();
 	            if (!count($data)) $state = array();
                 if ($c->getData('filterForm')) $state['filterForm'] = array();
@@ -57,7 +57,7 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
 	    $mapperClasses = $this->doListMapperClasses();
 	    $mapperId = $this->_context->getData('mapper', $this->_defaultMapper);
 	    if (in_array($mapperId, $mapperClasses)) {
-	        $bu = $this->getUrl(array('action' => 'manager', 'mapper' => $mapperId));
+	        $bu = $this->getUrl(array($this->_methodParamName => 'manager', 'mapper' => $mapperId));
             $contextOptions = array(
                 'baseUrl' => $bu->toString(),
                 'isInForm' => 'aForm',
@@ -82,15 +82,15 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
                 if (strlen($manager->toolbarContent)) {
                     Ac_Legacy_Output_Joomla15::addHtmlToJoomlaToolbar($manager->toolbarContent);
                 }
-                if (strlen($manager->toolbarHeader)) {
-                    JToolBarHelper::title($manager->toolbarHeader);
-                }
+            }
+            if (strlen($manager->toolbarHeader)) {
+                JToolBarHelper::title($manager->toolbarHeader);
             }
             $this->_tplData['manager'] = $manager;
             $this->_tplData['managerResponse'] = $response;
             $this->_templatePart = 'manager';
 	    } else {
-	        $this->_response->redirectUrl = $this->getUrl(array('action' => 'start'));	        
+	        $this->_response->redirectUrl = $this->getUrl(array($this->_methodParamName => 'start'));	        
 	    }
 	}
 	
