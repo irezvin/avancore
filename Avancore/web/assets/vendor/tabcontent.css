@@ -9,12 +9,13 @@ list-style-type: none;
 text-align: left; /*set to left, center, or right to align the menu as desired*/
 }
 
-.shadetabs li{
+.shadetabs li {
 display: inline;
 margin: 0;
+line-height: 1em;
 }
 
-.shadetabs li a{
+.shadetabs li a {
 text-decoration: none;
 position: relative;
 z-index: 1;

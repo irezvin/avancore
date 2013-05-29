@@ -116,11 +116,11 @@ body.admin td.enabled {
     cursor: pointer;
 }
 
-.adminlist th {
+.adminlist th, .manager .details .adminlist th {
     text-align: center;
 }
 
-.adminlist th, .adminlist td {
+.adminlist th, .adminlist td, .manager .details .adminlist th, .manager .details .adminlist td {
     padding: 4px 2px;
 }
 
@@ -129,19 +129,19 @@ body.admin td.enabled {
     font-family: Tahoma, Liberation Sans;
 }
 
-.manager .adminlist th {
+.manager .adminlist th, .manager .details .adminlist th {
     border-right: 1px solid silver;
     border-left: 1px solid silver;
     border-top: 1px solid silver;
     padding: 2px;
 }
 
-.manager .adminlist td {
+.manager .adminlist td,  .manager .details .adminlist td {
     border-right: 1px solid #eee;
     border-left: 1px solid #eee;
 }
 
-.manager .adminlist .row0 td {
+.manager .adminlist .row0 td, .manager .details .adminlist .row0 td {
     border-right: 1px solid #eee;
     border-left: 1px solid #eee;
 }
@@ -177,4 +177,17 @@ section .manager .pagesList a {
 
 .tabContent table {
     width: 100%;
+}
+
+.calendar table {
+    border-collapse: separate;
+    border-spacing: inherit;
+}
+
+.manager .details .adminlist td {
+    vertical-align: middle;
+}
+
+.manager .details .details {
+    margin: 1em;
 }
