@@ -1481,7 +1481,7 @@ class Ac_Model_Data {
     }
     
     function getFormOptions($propName, $onlyStatic = true) {
-        $pi = $this->getPropertyInfo($propName);
+        $pi = $this->getPropertyInfo($propName, $onlyStatic);
         return $pi->toFormOptions();
     }
     
