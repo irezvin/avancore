@@ -91,6 +91,8 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     var $useGetterIfPossible = true;
     
+    var $getterParams = array();
+    
     /**
      * Whether the control should try to retrieve default value from the model if no own default value is supplied
      * @var bool
@@ -850,7 +852,13 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
             if (strlen($p = $this->getPropertyName())) {
                 $res = $m->getField($p);
             }
-            elseif ($this->useGetterIfPossible && $g = $this->getGetterName()) $res = $m->$g();
+            elseif ($this->useGetterIfPossible && $g = $this->getGetterName()) {
+                if (is_array($this->getterParams) && $this->getterParams) {
+                    $res = call_user_func_array(array($m, $g), $this->getterParams);
+                } else {
+                    $res = $m->$g();
+                }
+            }
             else $res = null;
         }
         else $res = null;
