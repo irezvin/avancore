@@ -134,6 +134,8 @@ class Cg_Model {
     var $orderingCol = false;
     
     var $fixMapperMethodNames = false;
+    
+    var $extraOwnPropertiesInfo = array();
 
     // ---------------------------------------------------------------------
     
@@ -332,7 +334,7 @@ class Cg_Model {
             'ownProperties' => $ownProperties, 
             'ownAssociations' => $ownAssociations, 
             'ownLists' => $ownLists, 
-            'ownPropertiesInfo' => $ownPropertiesInfo
+            'ownPropertiesInfo' => Ac_Util::m($ownPropertiesInfo, $this->extraOwnPropertiesInfo),
         );
     }
     
