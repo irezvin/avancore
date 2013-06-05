@@ -460,7 +460,7 @@ class Ac_Form_Helper {
         else $this->doShowSelectList($name, $value, $valueList, $multiple, $dummyCaption, $useInputs, $attribs, $options);
     }
     
-    function showCheckbox($name, $value = null, $checkedValue = false, $attibs = array(), $noWrap = false) {
+    function showCheckbox($name, $value = null, $checkedValue = false, $attribs = array(), $noWrap = false) {
         $options = $this->getOptions($name, true);
         $this->_processAttribs($attribs, 'checkbox', $options);
         if (!$noWrap && ($this->alwaysWrap || $this->showCaptions || $this->showErrors && isset($options['error']) && $options['error'] || $this->showRequiredFields && isset($options['required']) && $options['required'])) { 
