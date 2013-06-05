@@ -114,10 +114,10 @@ class Cg_Frontend {
     <p><i><?php echo $this->getTitle(); ?></i></p>
     
     <form method='post' style='float: left; padding: 1em; border: 1px solid silver; margin: 0.5em; background-color: lightyellow'>
-        <?php $hlp->showCheckbox('cod', $cleanOutputDir, false, array(), true); ?> Clear output dir <br />
-        <?php $hlp->showCheckbox('cef', $createEditableFiles, false, array(), true); ?> Create editable files <br /> 
-        <?php $hlp->showCheckbox('cnf', $createNonEditableFiles, false, array(), true); ?> Create non-editable files <br /> 
-        <?php $hlp->showCheckbox('cpg', $copyGen, false, array(), true); ?> Deploy non-editable files after generation <br />
+        <?php $hlp->showCheckbox('cod', $cleanOutputDir, false, array('id' => 'cod'), true); ?> <label for="cod">Clear output dir</label> <br />
+        <?php $hlp->showCheckbox('cef', $createEditableFiles, false, array('id' => 'cef'), true); ?> <label for="cef">Create editable files</label> <br /> 
+        <?php $hlp->showCheckbox('cnf', $createNonEditableFiles, false, array('id' => 'cnf'), true); ?> <label for="cnf">Create non-editable files</label> <br /> 
+        <?php $hlp->showCheckbox('cpg', $copyGen, false, array('id' => 'cpg'), true); ?> <label for="cpg">Deploy non-editable files after generation</label> <br />
         <p style='text-align: center'> 
         	<input type='submit' name='submit' style='height: 30px; width: 100px; font-weight: bold' value='Generate' />
        	</p>
