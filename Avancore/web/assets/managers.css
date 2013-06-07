@@ -191,3 +191,14 @@ section .manager .pagesList a {
 .manager .details .details {
     margin: 1em;
 }
+
+.beforeActions.withHeader {
+    width: 100%;
+    text-align: left;
+    padding: 0;
+}
+
+.main .main {
+    margin: 1em 0;
+    padding: 0;
+}

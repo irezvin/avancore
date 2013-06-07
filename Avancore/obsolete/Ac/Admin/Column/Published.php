@@ -7,6 +7,30 @@ class Ac_Admin_Column_Published extends Ac_Table_Column_Published {
      */
     var $manager = false;
     
+    function getPublishedImg() {
+        if (isset($this->settings['publishedImg'])) $res = $this->settings['publishedImg'];
+            else {
+                $res = 'templates/hathor/images/admin/publish_g.png';
+                $ad = $this->manager->getApplication()->getAdapter();
+                if ($ad instanceof Ac_Application_Adapter_Joomla) {
+                    $res = rtrim($ad->getLiveSite(), '/').'/administrator/'.$res;
+                }
+            }
+        return $res;
+    }
+    
+    function getUnpublishedImg() {
+        if (isset($this->settings['unpublishedImg'])) $res = $this->settings['unpublishedImg'];
+            else {
+                $res = 'templates/hathor/images/admin/publish_x.png';
+                $ad = $this->manager->getApplication()->getAdapter();
+                if ($ad instanceof Ac_Application_Adapter_Joomla) {
+                    $res = rtrim($ad->getLiveSite(), '/').'/administrator/'.$res;
+                }
+            }
+        return $res;
+    }
+    
     function getData($record, $rowNo, $fieldName) {
         $data = intval(Ac_Table_Column::getData($record, $rowNo, $this->fieldName));
         $img = $data? $this->getPublishedImg() : $this->getUnpublishedImg();

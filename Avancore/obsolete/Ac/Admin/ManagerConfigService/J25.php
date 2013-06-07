@@ -4,7 +4,6 @@
 
 class Ac_Admin_ManagerConfigService_J25 extends Ac_Admin_ManagerConfigService {
     
-    
     function getManagerJsAssets() {
         return array(
             '{AC}/util.js',
@@ -14,7 +13,8 @@ class Ac_Admin_ManagerConfigService_J25 extends Ac_Admin_ManagerConfigService {
     }
       
     function getDefaultImagePrefix() {
-        return 'templates/'.JApplication::getInstance('administrator').'hathor/images/toolbar';
+        $base = $this->application->getAdapter()->getLiveSite();
+        return $base.'/administrator/templates/'.JApplication::getInstance('administrator').'hathor/images/toolbar';
     }
     
     protected function getDefaultToolbarImagesMap() {

@@ -59,13 +59,20 @@ class Ac_Admin_Template extends Ac_Template_Html {
     
     function showToolbar() {
         $this->addJsLib('{AC}/vendor/overlib_mini.js');
+        $showOwnToolbarHeader = !$this->manager->getConfigService()->showToolbarHeader($this->manager->toolbarHeader);
         
         if (count($this->actions)) {
 ?>
 
     <table class='actions'>
         <tr>
-            <td class="beforeActions">&nbsp;</td>
+            <td class="beforeActions<?php if ($showOwnToolbarHeader) echo " withHeader"; ?>">
+<?php           if ($showOwnToolbarHeader) { ?>
+                <h1><?php echo $this->manager->toolbarHeader; ?></h1>
+<?php           } else { ?>
+                &nbsp;
+<?php           } ?>                
+            </td>
 <?php foreach(array_keys($this->actions) as $a) { $act = $this->actions[$a]; ?>
             <td id="<?php echo $this->htmlIdsPrefix ?>_action_td_<?php echo $a; ?>" >
                 <img id="<?php echo $this->htmlIdsPrefix ?>_action_img_<?php echo $a; ?>" />
