@@ -6,6 +6,11 @@ class Ac_Admin_ManagerConfigService {
 
     protected $toolbarImagesMap = false;
     
+    /**
+     * @var Ac_Application
+     */
+    protected $application = false;
+    
     protected function getDefaultToolbarImagesMap() {
         return array(
             'new' => array(
@@ -39,6 +44,10 @@ class Ac_Admin_ManagerConfigService {
         );
     }
     
+    function __construct(Ac_Application $application = null) {
+        if ($application) $this->setApplication($application);
+    }
+    
     function getToolbarImagesMap($forKind = false) {
     
         if ($this->toolbarImagesMap === false) {
@@ -54,6 +63,8 @@ class Ac_Admin_ManagerConfigService {
     function getDefaultImagePrefix() {
         return 'images';
     }
+    
+    
     
     function getImagePrefix() {
         $imagePrefix = $this->getDefaultImagePrefix();
@@ -71,6 +82,26 @@ class Ac_Admin_ManagerConfigService {
             '{AC}/avanManager.js',
             '{AC}/managerRenderer.js',
         );
+    }
+
+    function setApplication(Ac_Application $application) {
+        $this->application = $application;
+    }
+
+    /**
+     * @return Ac_Application
+     */
+    function getApplication() {
+        return $this->application;
+    }    
+    
+    function showToolbarHeader($toolbarHeader) {
+        $res = false;
+        if (class_exists('JToolBarHelper')) {
+            if (strlen($toolbarHeader)) JToolBarHelper::title($toolbarHeader);
+            $res = true;
+        }
+        return $res;
     }
     
 }

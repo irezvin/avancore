@@ -83,9 +83,6 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
                     Ac_Legacy_Output_Joomla15::addHtmlToJoomlaToolbar($manager->toolbarContent);
                 }
             }
-            if (strlen($manager->toolbarHeader) && class_exists('JToolBarHelper')) {
-                JToolBarHelper::title($manager->toolbarHeader);
-            }
             $this->_tplData['manager'] = $manager;
             $this->_tplData['managerResponse'] = $response;
             $this->_templatePart = 'manager';
