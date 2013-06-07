@@ -388,6 +388,7 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     function setService($id, $prorotypeOrInstance, $overwrite = false) {
         if (isset($this->services[$id]) && !$overwrite) throw new Exception("Service '\$id' is already registered");
         $this->services[$id] = $prorotypeOrInstance;
+        if (is_object($this->services[$id])) Ac_Accessor::setObjectProperty($this->services[$id], 'application', $this);
     }
     
     function deleteService($id, $dontThrow = false) {
@@ -398,10 +399,14 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     function getService($id, $dontThrow = false) {
         $res = false;
         if (isset($this->services[$id])) {
-            if (!is_object($this->services[$id])) $this->services[$id] = Ac_Prototyped::factory($this->services[$id]);
+            if (!is_object($this->services[$id])) {
+                $this->services[$id] = Ac_Prototyped::factory($this->services[$id]);
+                Ac_Accessor::setObjectProperty($this->services[$id], 'application', $this);
+            }
             $res = $this->services[$id];
         } elseif ($this->adapter && $s = $this->adapter->getService($id, true)) {
             $res = $s;
+            Ac_Accessor::setObjectProperty($res, 'application', $this);
         } elseif (!$dontThrow) throw new Exception("No such service: '{$id}");
         return $res;
     }
