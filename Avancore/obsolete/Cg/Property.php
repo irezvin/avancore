@@ -69,7 +69,7 @@ class Cg_Property {
     }
     
     function getLangStringName() {
-        $res = strtolower(Cg_Inflector::definize($this->_model->_domain->appName.'_'.$this->_model->single.'_'.$this->varName));
+        $res = strtolower(Cg_Inflector::definize($this->_model->getLangStringPrefix().'_'.$this->varName));
         return $res;
     }
     
@@ -90,8 +90,8 @@ class Cg_Property {
     }
     
     function getCaption() {
-        if ($this->_model->_domain->captionsToPmtLangStrings) {
-            $res = new Cg_Php_Expression("new Pmt_Lang_String('".$this->getLangStringName()."')");
+        if ($this->_model->getUseLangStrings()) {
+            $res = new Cg_Php_Expression("new Ac_Lang_String('".$this->getLangStringName()."')");
         } else {
             $res = $this->caption;
         }

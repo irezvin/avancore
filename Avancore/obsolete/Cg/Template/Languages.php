@@ -13,10 +13,11 @@ class Cg_Template_Languages extends Cg_Template {
         
         foreach ($this->domain->listModels() as $m) {
             $mod = $this->domain->getModel($m);
-            
-            foreach ($mod->listProperties() as $p) {
-                $prop = $mod->getProperty($p);
-                $this->langStrings[$prop->getLangStringName()] = $prop->caption;
+            if ($mod->getUseLangStrings()) {
+                foreach ($mod->listProperties() as $p) {
+                    $prop = $mod->getProperty($p);
+                    $this->langStrings[$prop->getLangStringName()] = $prop->caption;
+                }
             }
         }
         
@@ -38,6 +39,7 @@ class Cg_Template_Languages extends Cg_Template {
     }
     
     function showGenLangFile() {
+        ksort($this->langStrings);
         $this->phpOpen();
 ?>
 

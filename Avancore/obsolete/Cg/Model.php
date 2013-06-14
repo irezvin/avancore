@@ -136,6 +136,15 @@ class Cg_Model {
     var $fixMapperMethodNames = false;
     
     var $extraOwnPropertiesInfo = array();
+    
+    /**
+     * ?|true|false
+     * '?' => inheirted from Domain
+     * @var string
+     */
+    var $useLangStrings = '?';
+    
+    var $langStringPrefix = false;
 
     // ---------------------------------------------------------------------
     
@@ -663,6 +672,16 @@ class Cg_Model {
         return $res;
     }
     
+    function getUseLangStrings() {
+        if ($this->useLangStrings === '?') $res = $this->_domain->useLangStrings;
+        else $res = $this->useLangStrings;
+        return $res;
+    }
+    
+    function getLangStringPrefix() {
+        if ($this->langStringPrefix === false) $res = strtolower(Cg_Inflector::definize($this->_domain->getLangStringPrefix().'_'.$this->single));
+        else $res = $this->langStringPrefix;
+        return $res;
+    }
+    
 }
-
-?>
