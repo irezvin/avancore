@@ -182,7 +182,7 @@ class Cg_Domain {
      * Use 'new Pmt_Lang_String(...)' instead of captions
      * @var bool
      */
-    var $captionsToPmtLangStrings = false;
+    var $useLangStrings = false;
     
     /**
      * @var type List of columns with service information to be ignored for proper recognition of n-to-n relations
@@ -194,6 +194,10 @@ class Cg_Domain {
      * @var array('regExp' => array('extraConfig'))
      */
     var $extraConfigByTables = array();
+    
+    var $langStringPrefix = false;
+    
+    protected $langStrings = array();
     
     /**
      * @param Cg_Generator $generator 
@@ -429,6 +433,19 @@ class Cg_Domain {
         return $res;
     }
     
+    protected function needsLangStrings() {
+        if ($this->useLangStrings) $res = true;
+        else {
+            foreach ($this->listModels() as $m) {
+                if ($this->getModel($m)->getUseLangStrings()) {
+                    $res = true;
+                    break;
+                }
+            }
+        }
+        return $res;
+    }
+    
     /**
      * This function is called by Cg_Generator when Cg_Strategy object is initialized for this Cg_Domain
      * Function result is merged with prototype for strategy settings.
@@ -438,7 +455,7 @@ class Cg_Domain {
         if (is_array($this->strategySettings)) $res = $this->strategySettings;
             else $res = array();
             
-        if ($this->captionsToPmtLangStrings) $res['domainTemplates'] = array('Cg_Template_Domain', 'Cg_Template_Languages');
+        if ($this->needsLangStrings()) $res['domainTemplates'] = array('Cg_Template_Domain', 'Cg_Template_Languages');
             
         return $res;
     }
@@ -461,6 +478,22 @@ class Cg_Domain {
     
     function getAppClass() {
         return strlen($this->appClass)? $this->appClass : $this->appName;
+    }
+    
+    function getLangStrings($key = false) {
+        $res = $this->langStrings;
+        if ($key !== false)  $res = isset($res[$key])? $res[$key] : null;
+        return $res;
+    }
+    
+    function registerLangString($key, $value) {
+        $this->langStrings[$key] = $value;
+    }
+    
+    function getLangStringPrefix() {
+        if ($this->langStringPrefix === false) $res = strtolower(Cg_Inflector::definize($this->appName));
+            else $res = $this->langStringPrefix;
+        return $res;
     }
     
 }
