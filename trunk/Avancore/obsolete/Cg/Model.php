@@ -145,6 +145,8 @@ class Cg_Model {
     var $useLangStrings = '?';
     
     var $langStringPrefix = false;
+    
+    var $tableLangStringPrefix = false;
 
     // ---------------------------------------------------------------------
     
@@ -562,11 +564,18 @@ class Cg_Model {
     }
     
     function getMapperInfoParams() {
-        return array(
+        $res = array(
             'singleCaption' => $this->singleCaption,
             'pluralCaption' => $this->pluralCaption,
             'hasUi' => !$this->noUi,
         );
+        if ($this->getUseLangStrings()) {
+            $s = $this->getTableLangStringPrefix($this->name).'_single';
+            $p = $this->getTableLangStringPrefix($this->name).'_plural';
+            $res['singleCaption'] = new Cg_Php_Expression("new Ac_Lang_String(".Ac_Util_Php::export($s, true).")");
+            $res['pluralCaption'] = new Cg_Php_Expression("new Ac_Lang_String(".Ac_Util_Php::export($p, true).")");
+        }
+        return $res;
     }
     
     function getDefaultParentMapperClassName() {
@@ -683,5 +692,29 @@ class Cg_Model {
         else $res = $this->langStringPrefix;
         return $res;
     }
+    
+    function getTableLangStringPrefix($after = false) {
+        if ($this->tableLangStringPrefix === false) $res = $this->_domin->getTableLangStringPrefix();
+            else $res = $this->tableLangStringPrefix;
+        if ($after !== false) $res = strtolower(Cg_Inflector::definize($res.'_'.$after));
+        return $res;
+    }
+
+    function getTableLangStrings() {
+        $res = array();
+        $res[$this->getTableLangStringPrefix($this->name).'_single'] = $this->single;
+        $res[$this->getTableLangStringPrefix($this->name).'_plural'] = $this->plural;
+        return $res;
+    }
+    
+    function getAllLangStrings() {
+        $res = $this->getTableLangStrings();
+        foreach ($this->listProperties() as $p) {
+            $prop = $this->getProperty($p);
+            $res[$prop->getLangStringName()] = $prop->caption;
+        }
+        return $res;
+    }
+    
     
 }
