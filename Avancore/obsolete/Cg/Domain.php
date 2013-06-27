@@ -197,6 +197,8 @@ class Cg_Domain {
     
     var $langStringPrefix = false;
     
+    var $tableLangStringPrefix = false;
+    
     protected $langStrings = array();
     
     /**
@@ -495,6 +497,13 @@ class Cg_Domain {
             else $res = $this->langStringPrefix;
         return $res;
     }
+    
+    function getTableLangStringPrefix() {
+        if ($this->tableLangStringPrefix === false) $res = strtolower(Cg_Inflector::definize($this->appName));
+            else $res = $this->tableLangStringPrefix;
+        return $res;
+    }
+    
     
 }
 

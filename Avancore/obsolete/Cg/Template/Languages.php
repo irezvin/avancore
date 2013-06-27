@@ -14,10 +14,7 @@ class Cg_Template_Languages extends Cg_Template {
         foreach ($this->domain->listModels() as $m) {
             $mod = $this->domain->getModel($m);
             if ($mod->getUseLangStrings()) {
-                foreach ($mod->listProperties() as $p) {
-                    $prop = $mod->getProperty($p);
-                    $this->langStrings[$prop->getLangStringName()] = $prop->caption;
-                }
+                Ac_Util::ms($this->langStrings, $mod->getAllLangStrings());
             }
         }
         

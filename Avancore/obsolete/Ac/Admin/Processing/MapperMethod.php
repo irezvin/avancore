@@ -7,7 +7,7 @@ class Ac_Admin_Processing_MapperMethod extends Ac_Admin_Processing {
     var $provideRecordKeys = false;
     
     function executeProcess() {
-        if ($provideRecordKeys) {
+        if ($this->provideRecordKeys) {
             $args = array($this->_getRecordKeysFromRequest());
         } else {
             $args = array();

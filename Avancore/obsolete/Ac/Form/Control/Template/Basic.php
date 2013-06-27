@@ -522,7 +522,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
                 'value' => $control->getOutputText(),
             ), $this->_getAttribs($control));
 ?>
-            <input <?php echo Ac_Util::mkAttribs($attribs, '"', ENT_QUOTES, $this->charset, $control->doubleEncodeInInput); ?> />
+            <input <?php echo Ac_Util::mkAttribs($attribs, '"', ENT_QUOTES, "UTF-8", $control->doubleEncodeInInput); ?> />
 <?php
    }
     
