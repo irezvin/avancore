@@ -319,6 +319,35 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     }
     
     /**
+     * Loads records into already loaded rows that reference current table' objects by the key
+     * Does not work with objects and will overwrite values in $src[$i][$valueProperty]
+     * 
+     * @param array $src Array of arrays
+     * @param string $keyProperty Key in $src elements that contains record key
+     * @param string $valueProperty Key in $dest elements that will contain record
+     * @param mixed $def Value to use if related object isn't found
+     * @return array All objects loaded, indexed by their IDs (as in loadRecrodsArray())
+     */
+    function loadObjectsColumn(& $src, $keyProperty, $valueProperty, $def = null) {
+        $ids = array();
+        $objects = array();
+        foreach ($src as $v) if (isset($v[$keyProperty])) {
+            $ids[] = $v[$keyProperty];
+        }
+        if ($ids) {
+            $objects = $this->loadRecordsArray($ids, true);
+        }
+        foreach (array_keys($src) as $k) {
+            $val = $def;
+            if (isset($src[$k][$keyProperty]) && isset($objects[$src[$k][$keyProperty]])) {
+                $val = $objects[$src[$k][$keyProperty]];
+            }
+            $src[$k][$valueProperty] = $val;
+        }
+        return $objects;
+    }
+    
+    /**
      * Returns first record in the resultset (returns NULL if there are no records)
      * @return Ac_Model_Object
      */
