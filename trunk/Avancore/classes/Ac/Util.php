@@ -857,6 +857,31 @@ abstract class Ac_Util {
         } else $res = $something;
         return $res;
     }
+    
+    /**
+     * Recursively filters array $arr leaving only objects of $requiredClasses
+     * @param array $arr
+     * @param string|array $allowedClasses One or several class names
+     * @param bool $withEmptyArrays Whether to leave empty arrays (ones without objects) in result
+     */
+    static function getObjectsOfClass(array $arr, $requiredClasses, $withEmptyArrays = false) {
+        $res = array();
+        $c = Ac_Util::toArray($requiredClasses);
+        foreach ($arr as $k => $v) {
+            if (is_object($v)) {
+                foreach ($c as $class) 
+                    if ($v instanceof $class) {
+                        $res[$k] = $v;
+                        break;
+                    }
+            } elseif (is_array($v)) {
+                $v = self::getObjectsOfClass($v, $c, $withEmptyArrays);
+                if ($withEmptyArrays || count($v)) $res[$k] = $v;
+            }
+        }
+        return $res;
+    }
+
 
     /**
      * This obfuscated function obfuscates email

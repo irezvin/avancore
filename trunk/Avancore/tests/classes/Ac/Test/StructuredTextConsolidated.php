@@ -2,6 +2,33 @@
 
 class Ac_Test_StructuredTextConsolidated extends Ac_Test_Base {
 
+    function testStructuredTextWithStringObjects() {
+        $resp = new Ac_Response_Html();
+        $resp->setNoHtml(true);
+        $resp->setRegistry($st = new Ac_Content_StructuredText, 'content');
+        $widget = new Ac_Response();
+        $widget->setRegistry(array(
+            'content' => array($widgetContent = '<div><h2>A widget</h2>Blah blah blah</div>'),
+        ));
+        //$st->begin('content');
+        ob_start();
+        echo ($before = "<hr />");
+        echo new Ac_StringObject_Wrapper($widget);
+        echo ($after = "<hr /><p>Some more text</p>");
+        $st->append(ob_get_clean(), 'content');
+        //var_dump($st->getBuffer(true));
+        //$st->end();
+        $w = new Ac_Response_Writer_HtmlPage();
+        $w->setEnvironment($e = new Ac_Response_Environment_Dummy);
+        $w->writeResponse($resp);
+        if (!$this->assertEqual($e->responseText, $before."\n".$widgetContent."\n".$after)) {
+            var_dump($e->responseText);
+        }
+        
+//        var_dump($st->getConsolidated());
+//        var_dump($st->getBuffer(true));
+        
+    }
 
     function testStructuredText() { 
         $resp = new Ac_Response();
@@ -143,7 +170,7 @@ class Ac_Test_StructuredTextConsolidated extends Ac_Test_Base {
         
         if (!$this->assertEqual(str_replace("\n", "", $e->responseText), str_replace("\n", "", $fullSample))) var_dump($e->responseText, $fullSample);        
         
-        if (!$this->assertIdentical($before, $after, "getConsolidated() MUST NOT have side effects")) {
+        if (!$this->assertIdentical($before, $after, "Ac_Response_Consolidated::getConsolidated() MUST NOT have side effects")) {
             echo "<table><tr><td valign='top'>";
             var_dump($before);
             echo "</td><td valign='top'>";
@@ -151,7 +178,10 @@ class Ac_Test_StructuredTextConsolidated extends Ac_Test_Base {
             echo "</td></tr></table>";
         }
         
+        /*$before = $resp2->exportRegistry();
+        $resp2->getConsolidated();
+        $after = $resp2->exportRegistry();
+        $this->assertIdentical($before, $after, "Ac_Response::getConsolidated() MUST NOT have side effects");*/
     }
-    
     
 }

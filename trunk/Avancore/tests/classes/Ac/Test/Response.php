@@ -251,8 +251,8 @@ class Ac_Test_Response extends Ac_Test_Base {
     function getMyPerfectResponse() {
         return array(
             'headers' => array(
-                'X-Powered-By' => 'X-Powered-By: Avancore 0.3',
-                'Content-Type' => 'Content-Type: text/html; charset=utf-8',
+                'X-Powered-By' => 'Avancore 0.3',
+                'Content-Type' => 'text/html; charset=utf-8',
             ),
             'headContent' => array(
                 '<!-- loudly and proudly powered by Avancore 0.3 -->',
@@ -284,13 +284,14 @@ class Ac_Test_Response extends Ac_Test_Base {
         $resp->mergeRegistry($this->getMyPerfectResponse());
         if (!$this->assertEqual($con = $resp->getConsolidated(), array(
             'headers' => array(
-                'X-Powered-By: Avancore 0.3',
-                'Content-Type: text/html; charset=utf-8',
+                'X-Powered-By' => 'Avancore 0.3',
+                'Content-Type' => 'text/html; charset=utf-8',
             ),
             'metaKeywords' => 'foo bar, baz, quux',
             'metaDescription' => 'some interesting text; about something good',
             'title' => 'My perfect HTML document',
             'docType' => 'html',
+            'noHtml' => false,
             'rootTagAttribs' => array(),
             'bodyTagAttribs' => array(),
             'headContent' => array(
@@ -314,6 +315,15 @@ class Ac_Test_Response extends Ac_Test_Base {
             ),
 
         ))) var_dump($con);
+    }
+    
+    function testConsolidatedResponseHeaders() {
+        $reg = new Ac_Response_Http;
+        $reg->setHeaders('text/plain', 'Content-type');
+        $cons = new Ac_Response_Consolidated();
+        $cons->mergeRegistry($reg);
+        $arr = $cons->getConsolidated();
+        $this->assertIdentical($arr['headers'], array('Content-type' => 'text/plain'));
     }
     
     function testResponseWriter() {
@@ -360,6 +370,7 @@ Lets dump some debug data here
         $w2 = new Ac_Response_Writer_HtmlPage();
         $resp = new Ac_Response;
         $resp->addRegistry('test.css', 'assetLibs');
+        $w2->setEnvironment(new Ac_Response_Environment_Dummy);
         $w2->writeResponse($resp);
         
     }
@@ -390,7 +401,9 @@ Lets dump some debug data here
         $resp->setRegistry(array(
             'sub' => array('foo', 'bar', 'baz')
         ));
-        $this->assertIdentical($s = $resp->getRegistry(), $reg);
+        if (!$this->assertIdentical($s = $resp->getRegistry(), $reg)) {
+            var_dump($s, $reg);
+        }
         $this->assertIdentical($s = $resp->getRegistry('sub'), array('foo', 'bar', 'baz'));
         $this->assertIdentical($c = $resp->getConsolidated(), array('sub' => array('baz')));
     }

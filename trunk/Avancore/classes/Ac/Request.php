@@ -244,7 +244,7 @@ class Ac_Request {
      * @param string|Ac_Url $url
      * @param string $scriptName If provided, will be used to populate $_SERVER['SCRIPT_NAME'] since it is important for the future pathinfo calculation
      * @param array $postData If provider, REQUEST_METHOD will be POST and post data will be set; otherwise REQUEST_METHOD will be GET
-     * @param bool $returnAlterationOnly Only returns array with overrides, without changing the request
+     * @param bool $dontChange Only returns array with overrides, without changing the request
      * 
      * @return array ('get' => array(), 'post' => array(), 'env' => array(), 'server' => array() -- what have (should have) been changed
      */

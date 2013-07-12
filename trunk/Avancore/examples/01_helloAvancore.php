@@ -8,6 +8,7 @@ $resp->mergeRegistry(array(
     'assetLibs' => array(
         'examples.css',
     ),
+    'headers' => array('X-Powered-By' => 'Avancore 0.3'),
     'content' => array(
         '<h1>Hello, Avancore!</h1>',
         '<p>Small example using Ac_Response and Ac_Response_Writer_HtmlPage<p>',

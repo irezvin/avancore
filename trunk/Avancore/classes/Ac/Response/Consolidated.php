@@ -52,7 +52,7 @@ class Ac_Response_Consolidated extends Ac_Response {
         if (strlen($this->xmlns)) $rta->setRegistry($this->xmlns, 'xmlns');
         $this->setRegistry(array(
             'headers' => new Ac_Registry_Consolidated(array(
-                'flatten' => true,
+                'flatten' => Ac_Registry_Consolidated::flattenSecondLevel,
                 'default' => array(),
             )),
             'metaKeywords' => new Ac_Registry_Consolidated(array(
@@ -72,6 +72,11 @@ class Ac_Response_Consolidated extends Ac_Response {
             )),
             'docType' => new Ac_Registry_Consolidated(array(
                 'default' => $this->defaultDocType, 
+                'singleValue' => Ac_Registry_Consolidated::svLast, 
+                'toArray' => false
+            )),
+            'noHtml' => new Ac_Registry_Consolidated(array(
+                'default' => false, 
                 'singleValue' => Ac_Registry_Consolidated::svLast, 
                 'toArray' => false
             )),

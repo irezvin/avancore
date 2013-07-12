@@ -105,5 +105,15 @@ class Ac_Response_Writer implements Ac_I_Response_Writer {
     protected function processConsolidatedArray(array $arrData) {
         
     }
+    
+    static function makeHeaders(array $headers) {
+        $res = array();
+        foreach ($headers as $key => $content) {
+            if (is_array($content)) $content = array_pop($content); // Use last value from an array
+            if (strlen($key) && $key{0} != ' ') $content = $key.': '.$content;
+            $res[] = $content;
+        }
+        return $res;
+    }
 
 }

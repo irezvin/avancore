@@ -8,7 +8,7 @@
  * @license http://www.gnu.org/licenses/lgpl.html GNU/LGPL, see LICENSE.php
  */
  
-class Ac_Url {
+class Ac_Url implements Ac_I_RedirectTarget {
     
     /**
      * Scheme, i.e. "http://"
@@ -129,6 +129,10 @@ class Ac_Url {
     }
     
     function __toString() {
+        return $this->toString();
+    }
+    
+    function getTargetUrl() {
         return $this->toString();
     }
     

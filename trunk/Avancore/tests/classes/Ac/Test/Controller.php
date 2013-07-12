@@ -47,8 +47,8 @@ class Ac_Test_Controller extends Ac_Test_Base {
         
         $this->assertEqual(
             get_class($result), 
-            'Ac_Cr_Result', 
-            'Method returns Ac_Cr_Result by default'
+            'Ac_Cr_Result_Response', 
+            'Method returns Ac_Cr_Result_Response by default'
         );
         
         $this->assertSame(

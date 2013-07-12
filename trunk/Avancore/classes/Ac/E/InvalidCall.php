@@ -12,6 +12,12 @@ class Ac_E_InvalidCall extends Exception {
         return $res;
     }
     
+    static function gettype($value) {
+        if (is_object($value)) $res = 'object('.get_class($value).')';
+            else $res = gettype($value);
+        return $res;
+    }
+    
     /**
      * @return Ac_E_InvalidCall 
      */
@@ -30,8 +36,24 @@ class Ac_E_InvalidCall extends Exception {
     /**
      * @return Ac_E_InvalidCall 
      */
+    static function outOfConst($paramName, $value, array $allowedValues, $class = '') {
+        $value = self::toString($value);
+        if (strlen($class)) foreach ($allowedValues as & $value) $value = $class.'::'.$value;
+        return new Ac_E_InvalidCall("Invalid \${$paramName} value '{$value}'; allowed values are ".implode(', ', $allowedValues));
+    }
+    
+    /**
+     * @return Ac_E_InvalidCall 
+     */
     static function wrongType($paramName, $value, $allowedTypes) {
-        return new Ac_E_InvalidCall("Invalid \${$paramName} type: '".gettype($value)."'; allowed types are '".implode(', ', Ac_Util::toArray($allowedTypes))."'");
+        return new Ac_E_InvalidCall("Invalid \${$paramName} type: '".self::gettype($value)."'; allowed types are '".implode(', ', Ac_Util::toArray($allowedTypes))."'");
+    }
+    
+    /**
+     * @return Ac_E_InvalidCall 
+     */
+    static function wrongClass($paramName, $value, $allowedTypes) {
+        return new Ac_E_InvalidCall("Invalid class of \${$paramName}: '".self::gettype($value)."'; expected '".implode(', ', Ac_Util::toArray($allowedTypes))."'");
     }
     
     /**
@@ -51,6 +73,15 @@ class Ac_E_InvalidCall extends Exception {
         if ($allowedValues) $suff = "; allowed properties are '".implode(', ', $allowedValues)."'"; 
             else $suff = "";
         return new Ac_E_InvalidCall("No such property: '$issuer'->\${$propName}'{$suff}");
+    }
+    
+    /**
+     * @return Ac_E_InvalidCall 
+     */
+    static function alreadySuchItem($title, $key, $removeFn = false) {
+        $msg = "$title '{$key}' already exists";
+        if ($removeFn) $msg .= "; remove with {$removeFn}() first";
+        return new Ac_E_InvalidCall($msg);
     }
     
     /**

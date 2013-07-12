@@ -649,6 +649,12 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
         return $this->mergeRegistry($value, $preserveExistingValues);
     }
     
+    function getMergedWith($value, $preserveExistingValues = false) {
+        $clone = $this->createClone();
+        $clone->mergeWith($value, $preserveExistingValues);
+        return $clone;
+    }
+    
     function isRightMergeableWith($value) {
         return is_array($value);
     }
@@ -732,7 +738,7 @@ class Ac_Content_StructuredText extends Ac_Content_WithCharset implements
             $res = array();
             Ac_Util::setArrayByPath($r, $path, $buf);
             foreach($sl = Ac_Response::sliceWithConsolidatedObjects($r, $forCaching) as $chunk) {
-                $res = Ac_Registry::getMerged($res, $chunk, false);
+                $res = Ac_Registry::getMerged($res, $chunk, false, true);
             }
         }
         
