@@ -22,7 +22,7 @@ class Ac_Response_Html extends Ac_Response_Http {
         return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
-    function getHeaderContent($headerContent, $index = null) {
+    function getHeaderContent($index = null) {
         $args = func_get_args();
         array_splice($args, 0, 0, array('headContent'));
         return call_user_func_array(array($this, 'getRegistry'), $args);
@@ -34,7 +34,7 @@ class Ac_Response_Html extends Ac_Response_Http {
         return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
-    function getMetaKeywords($metaKeywords, $index = null) {
+    function getMetaKeywords($index = null) {
         $args = func_get_args();
         array_splice($args, 0, 0, array('metaKeywords'));
         return call_user_func_array(array($this, 'getRegistry'), $args);
@@ -46,7 +46,7 @@ class Ac_Response_Html extends Ac_Response_Http {
         return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
-    function getMetaDescription($metaDescription, $index = null) {
+    function getMetaDescription($index = null) {
         $args = func_get_args();
         array_splice($args, 0, 0, array('metaDescription'));
         return call_user_func_array(array($this, 'getRegistry'), $args);
@@ -58,7 +58,7 @@ class Ac_Response_Html extends Ac_Response_Http {
         return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
-    function getAssetLibs($assetLibs, $index = null) {
+    function getAssetLibs($index = null) {
         $args = func_get_args();
         array_splice($args, 0, 0, array('assetLibs'));
         return call_user_func_array(array($this, 'getRegistry'), $args);
@@ -70,7 +70,7 @@ class Ac_Response_Html extends Ac_Response_Http {
         return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
-    function getInitScripts($initScripts, $index = null) {
+    function getInitScripts($index = null) {
         $args = func_get_args();
         array_splice($args, 0, 0, array('initScripts'));
         return call_user_func_array(array($this, 'getRegistry'), $args);
@@ -82,7 +82,7 @@ class Ac_Response_Html extends Ac_Response_Http {
         return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
-    function getHeadScripts($headScripts, $index = null) {
+    function getHeadScripts($index = null) {
         $args = func_get_args();
         array_splice($args, 0, 0, array('headScripts'));
         return call_user_func_array(array($this, 'getRegistry'), $args);

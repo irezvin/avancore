@@ -152,6 +152,21 @@ class Ac_Test_Registry extends Ac_Test_Base {
         $this->assertSame($reg->exportRegistry(false, 'key2'), $reg2);
     }
     
+    function testInnerRegistrySetGet() {
+        $resp = new Ac_Response_Html();
+        $resp->setHeaders('text-plain; charset=utf-8', 'Content-type');
+        if (!$this->assertEqual($h = $resp->getHeaders(), array(
+            'Content-type' => 'text-plain; charset=utf-8'
+        ), 'Ac_Response_Html::getHeaders() must return array with key provided by Ac_Response_Html::setHeaders()')) var_dump($h);
+        $foo = new Ac_Registry;
+        $foo->setRegistry(new Ac_Registry(), 'key');
+        $foo->setRegistry('string', 'key', 'subKey');
+        $inner = $foo->exportRegistry(false, 'key');
+        if (!$this->assertEqual($val = $foo->getRegistry('key', 'subKey'), 'string', 'getRegistry() should be transparent to Ac_Registry objects')) {
+            var_dump($val);
+        }
+    }
+    
     function testExceptions() {
 
         $reg = new Ac_Registry;

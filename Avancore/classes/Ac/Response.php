@@ -104,9 +104,14 @@ class Ac_Response extends Ac_Registry
      * 
      * See test case for the example.
      * 
-     * 
      */
     static function sliceWithConsolidatedObjects(array & $src, $forCaching = false, array $extraArgs = array(), array $targetPath = array(), $consolidate = true) {
+        
+        //
+        // TODO: get rid of this function 
+        // (currently it is an ultimate time waster)
+        //
+        
         $chunks = array(array());
         $dest = & $chunks[0];
         if ($targetPath) {
@@ -244,7 +249,7 @@ class Ac_Response extends Ac_Registry
                         var_dump($last);
                         echo "</td>";
                     }
-                    $curr = Ac_Registry::getMerged($curr, $last, false);
+                    $curr = Ac_Registry::getMerged($curr, $last, false, true);
                     $last = $curr;
                 }
                 if (isset($this->deb)) {
@@ -264,7 +269,7 @@ class Ac_Response extends Ac_Registry
                         $a[0] = $last['__fullPath'];
                         $cons = call_user_func_array(array($xp, 'getConsolidated'), $a);
                         unset($last['__fullPath']);
-                        $last = self::getMerged($cons, $last, false);
+                        $last = self::getMerged($cons, $last, false, true);
                         if (isset($this->deb)) {
                             echo "<td>";
                             var_dump($last);
@@ -290,7 +295,7 @@ class Ac_Response extends Ac_Registry
     }
     
     function __construct(array $options = array()) {
-        parent::__construct();
+        //parent::__construct();
         Ac_Accessor::setObjectProperty($this, $options);
         Ac_StringObject::onConstruct($this);
     }

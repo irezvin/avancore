@@ -40,12 +40,21 @@ class Ac_Response_Writer_HtmlPage extends Ac_Response_Writer {
         $env = $this->getEnvironment();
         $env->begin();
         
-        if (isset($arrData[$k = 'headers']) && is_array($arrData[$k])) $env->acceptHeaders($arrData[$k]);
+        if (isset($arrData[$k = 'headers']) && is_array($arrData[$k])) $env->acceptHeaders($this->makeHeaders($arrData[$k]));
         if (isset($arrData[$k = 'cookie']) && is_array($arrData[$k])) $env->acceptCookies($arrData[$k]);
         if (isset($arrData[$k = 'session']) && is_null($arrData[$k])) $env->destroySession;
         if (isset($arrData[$k = 'session']) && is_array($arrData[$k])) $env->acceptSessionData($arrData[$k]);
         
-        $text = $this->composeResponseText($arrData);
+        if (isset($arrData['noHtml']) && $arrData['noHtml']) {
+            $text = isset($arrData[$k = 'content'])? implode("\n", $arrData[$k]) : '';
+            // TODO: depending on content type, properly escape debug info as comments
+            /*if ($arrData['debug'] && $this->showDebugInfo) { 
+                $text .= "\n<!-- Debug: \n".implode("\n", $arrData['debug'])."\n-->\n";
+            }*/
+        } else {
+            $text = $this->composeResponseText($arrData);
+        }
+        
         if (strlen($text)) $env->acceptResponseText ($text);
         
     }

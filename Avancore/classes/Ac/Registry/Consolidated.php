@@ -5,6 +5,8 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
     const svNone = 'svNone';
     const svFirst = 'svFirst';
     const svLast = 'svLast';
+    
+    const flattenSecondLevel = 'flattenSecondLevel';
 
     protected $flatten = false;
 
@@ -41,7 +43,8 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
     }    
     
     function setFlatten($flatten) {
-        $this->flatten = (bool) $flatten;
+        if ($flatten !== self::flattenSecondLevel) $flatten = (bool) $flatten;
+        $this->flatten = $flatten;
     }
 
     function getFlatten() {
@@ -108,17 +111,18 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
     
     function getConsolidated(array $path = array(), $forCaching = false, $_ = null) {
         
-        
         $reg = $this->exportRegistry(array(1 => 'Ac_I_Consolidated'));
+        
         while (is_object($reg) && !($reg instanceof Ac_I_Consolidated) && ($reg instanceof Ac_Registry)) {
             $reg = $reg->exportRegistry();
         }
+        $bar = $this->exportRegistry();
         
         if (is_array($reg)) {
             $cons = Ac_Response_Consolidated::sliceWithConsolidatedObjects($reg, $forCaching, array(), $path);
             $full = array();
             foreach ($cons as $con) {
-                $full = Ac_Registry::getMerged($full, $con, false);
+                $full = Ac_Registry::getMerged($full, $con, false, true);
             }
             $ptr = array('ptr' => & $full);
             $newPath = $path;
@@ -144,15 +148,19 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
             $res = $reg;
         }
         
-        //$res = $this->exportRegistry();
         
-        if ($this->flatten) $res = Ac_Util::flattenArray ($res);
+        //$res = $this->exportRegistry();
+
+        if ($this->flatten) {
+            if ($this->flatten === self::flattenSecondLevel) $res = self::flattenArraySecondLevel ($res);
+            else $res = Ac_Util::flattenArray ($res);
+        }
         if ($this->keysort) $res = ksort($res);
         if ($this->unique) {
             $res = array_unique($res);
         }
         if (is_array($res) && $this->reverse) $res = array_reverse($res);
-        if ($this->singleValue !== self::svNone) {
+        if ($this->singleValue !== self::svNone && is_array($res)) {
             if (!count($res)) $res = null;
             elseif ($this->singleValue == self::svFirst) $res = array_shift($res);
             elseif ($this->singleValue == self::svLast) $res = array_pop($res);
@@ -170,6 +178,7 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
         } else {
             if (is_null($res)) $res = $this->default;
         }
+        $bar = $this->exportRegistry();
         
         /*if (is_array($res) || !$this->toArray) {
             $tmp = array();
@@ -178,11 +187,21 @@ class Ac_Registry_Consolidated extends Ac_Registry implements Ac_I_Consolidated,
         }*/
         
         /*if ($path === array('assetLibs')) {
-            var_dump('***', $full, '***');
+            var_dump('***', $full, $this->exportRegistry(), '***');
             var_dump(Ac_Debug_Log::getInstance()->getTrace());
         }*/
         
         return $full;
     }
+    
+    static function flattenArraySecondLevel($array) {
+        $res = array();
+        foreach ($array as $k => $v) {
+            if (is_array($v) && ($level != 0)) $res[$k] = Ac_Util::flattenArray($v);
+            else $res[$k] = & $array[$k];
+        }
+        return $res;
+    }
+    
     
 }

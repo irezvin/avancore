@@ -47,6 +47,13 @@ class Ac_Test_StringObject extends Ac_Test_Base {
         // TODO
     }
     
+    function testWrappers() {
+        $o1 = new Ac_StringObject_Wrapper(new InnerObject('AAA'));
+        $o2 = new Ac_StringObject_Wrapper(new InnerObject('BBB'));
+        $s = "foo {$o1} bar {$o2}";
+        $this->assertEqual(Ac_StringObject::replaceObjects($s, 'getData'), "foo AAA bar BBB");
+    }
+    
 }
 
 class TestStringObject implements Ac_I_StringObject {
@@ -108,6 +115,20 @@ class TestStringContainer implements Ac_I_StringObjectContainer {
     
     function registerStringObjects(array $stringObjects) {
         $this->stringObjects = array_merge($this->stringObjects, Ac_StringObject::registerMany($stringObjects));
+    }
+    
+}
+
+class InnerObject {
+
+    var $data = null;
+    
+    function __construct($data) {
+        $this->data = $data;
+    }
+    
+    function getData() {
+        return $this->data;
     }
     
 }

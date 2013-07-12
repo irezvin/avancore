@@ -86,7 +86,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
      */
     protected function getUseParamsAccessor() {
         if (!isset($this->accessors['useParams'])) {
-            $this->accessors['useParams'] = new Ac_Accessor_Path($this->paramBlock? $this->paramBlock : $this->context->use, null);
+            $this->accessors['useParams'] = new Ac_Accessor_Path($this->paramBlock? $this->paramBlock : $this->getContext()->use, null);
         }
         return $this->accessors['useParams'];
     }
@@ -240,6 +240,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
             }
         } else {
             if (is_array($invokeEnv['result']) || is_object($invokeEnv['result'])) {
+                if (is_array($invokeEnv['result']) && !isset($invokeEnv['result']['class'])) $invokeEnv['result']['class'] = 'Ac_Cr_Result_Response';
                 $result = Ac_Prototyped::factory($invokeEnv['result'], 'Ac_Cr_Result');
                 if ($result !== $methodReturnValue) $result->setMethodReturnValue($methodReturnValue);
                 $result->setMethodOutput($methodOutput);
@@ -293,7 +294,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
         $res = false;
         if (is_array($action)) {
             throw new Exception("Action path not implemented yet");
-        } elseif (is_string($action)) {
+        } elseif (is_string($action) || $action === false) {
             if (strlen($action)) {
                 if (method_exists($this, $method = 'action'.$action)) {
                     $res = $method;
@@ -303,7 +304,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
             } elseif (method_exists($this, $method = 'defaultAction')) {
                 $res = $method;
             }
-        } else throw Ac_E_InvalidCall::wrongType ('action', $action, array('array', 'string'));
+        } elseif ($action !== false) throw Ac_E_InvalidCall::wrongType ('action', $action, array('array', 'string'));
         return $res;
     }
     

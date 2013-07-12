@@ -9,6 +9,7 @@ class Ac_Response_Http extends Ac_Response {
                 'headers' => new Ac_Registry(),
                 'session' => new Ac_Registry(),
                 'cookie' => new Ac_Registry(),
+                'noHtml' => new Ac_Registry_Consolidated(array('singleValue' => Ac_Registry_Consolidated::svLast)),
             )
         );
     }
@@ -19,7 +20,7 @@ class Ac_Response_Http extends Ac_Response {
         return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
-    function getHeaders($headers, $headerName = null) {
+    function getHeaders($headerName = null) {
         $args = func_get_args();
         array_splice($args, 0, 0, array('headers'));
         return call_user_func_array(array($this, 'getRegistry'), $args);
@@ -31,7 +32,7 @@ class Ac_Response_Http extends Ac_Response {
         return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
-    function getSession($session, $headerName = null) {
+    function getSession($headerName = null) {
         $args = func_get_args();
         array_splice($args, 0, 0, array('session'));
         return call_user_func_array(array($this, 'getRegistry'), $args);
@@ -43,10 +44,18 @@ class Ac_Response_Http extends Ac_Response {
         return call_user_func_array(array($this, 'setRegistry'), $args);
     }
 
-    function getCookie($cookie, $headerName = null) {
+    function getCookie($headerName = null) {
         $args = func_get_args();
         array_splice($args, 0, 0, array('cookie'));
         return call_user_func_array(array($this, 'getRegistry'), $args);
+    }
+    
+    function setNoHtml($noHtml) {
+        $this->setRegistry($noHtml, 'noHtml');
+    }
+    
+    function getNoHtml() {
+        return $this->getRegistry('noHtml');
     }
     
 }
