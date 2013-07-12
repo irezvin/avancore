@@ -92,6 +92,7 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
              * Had to call class_exists to autoload class
 			 */
             if (class_exists($className) && Ac_Util::implementsInterface($className, 'Ac_I_Prototyped')) { 
+                unset($prototype['class']);
                 $res = new $className ($prototype);
             } else {
                 

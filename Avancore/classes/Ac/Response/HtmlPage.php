@@ -6,10 +6,10 @@ class Ac_Response_HtmlPage extends Ac_Response_Html {
         parent::__construct();
         $this->mergeRegistry(
             array(
-                'title' => Ac_Registry(),
-                'docType' => Ac_Registry_Consolidated('singleValue'),
-                'rootTagAttribs' => Ac_Registry(),
-                'bodyTagAttribs' => Ac_Registry(),
+                'title' => new Ac_Registry(),
+                'docType' => new Ac_Registry_Consolidated(array('singleValue' => Ac_Registry_Consolidated::svLast)),
+                'rootTagAttribs' => new Ac_Registry(),
+                'bodyTagAttribs' => new Ac_Registry(),
             )
         );
     }

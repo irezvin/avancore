@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
+class Ac_Registry implements Ac_I_Registry/*, Ac_I_WithClone*/ /*, Ac_I_Prototyped*/ /*, Iterator, ArrayAccess*/ {
 
     protected $registry = array();
     
@@ -9,9 +9,6 @@ class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
     protected $keys = null;
     
     protected $strictTypes = false;
-
-    function __construct() {
-    }
     
     function isMergeableWith($value) {
         return true;
@@ -19,6 +16,12 @@ class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
     
     function mergeWith($value, $preserveExistingValues = false) {
         return $this->mergeRegistry($value, $preserveExistingValues);
+    }
+    
+    function getMergedWith($value, $preserveExistingValues = false) {
+        $tmp = clone $this;
+        $tmp->mergeWith($value, $preserveExistingValues);
+        return $tmp;
     }
     
     function isRightMergeableWith($value) {
@@ -80,7 +83,6 @@ class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
         
         $path = func_get_args();
         $path = self::flattenOnce($path);
-        
         $found = self::arrayDive($this->registry, $path, $ptr);
         if (is_object($ptr['ptr']) && $ptr['ptr'] instanceof Ac_I_Registry) 
             $res = $ptr['ptr']->getRegistry($path);
@@ -136,7 +138,7 @@ class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
                 $ptr['ptr'] = $value;
                 $res = true;
             } else {
-                $res = $ptr['ptr']->setRegistry($value);
+                $res = $ptr['ptr']->setRegistry($value, $path);
             }
         } /*elseif ($found) {
             $ptr['ptr'] = $value;
@@ -320,12 +322,15 @@ class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
         return $res;
     }
 
-    static function getMerged($value1, $value2, $preserveExistingValues) {
+    static function getMerged($value1, $value2, $preserveExistingValues, $clone = false) {
 
         if (is_object($value1) && $value1 instanceof Ac_I_Mergeable && $value1->isMergeableWith($value2)) {
             
-            $value1->mergeWith($value2, $preserveExistingValues);
-            $res = $value1;
+            if ($clone) $res = $value1->getMergedWith($value2, $preserveExistingValues);
+            else {
+                $value1->mergeWith($value2, $preserveExistingValues);
+                $res = $value1;
+            }
             
         } elseif (is_object($value2) && $value2 instanceof Ac_I_RightMergeable && $value2->isRightMergeableWith($value1)) {
 
@@ -344,7 +349,7 @@ class Ac_Registry implements Ac_I_Registry /*, Iterator, ArrayAccess*/ {
             foreach (array_keys($value2) as $i) {
                 if (is_int($i)) array_push($res, $value2[$i]);
                 elseif (array_key_exists($i, $res)) {
-                    $res[$i] = self::getMerged($res[$i], $value2[$i], $preserveExistingValues);
+                    $res[$i] = self::getMerged($res[$i], $value2[$i], $preserveExistingValues, $clone);
                 } else {
                     $res[$i] = $value2[$i];
                 }

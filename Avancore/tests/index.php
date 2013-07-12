@@ -30,6 +30,9 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
 } else {
 	$t = new TestSuite('Avancore Framework v0.3 Tests');
 	$t->add(new Ac_Test_Cr);
+	$t->add(new Ac_Test_Controller);
+	$t->add(new Ac_Test_Response);
+	$t->add(new Ac_Test_Registry);
     $t->add(new Ac_Test_Hacks);
 	$t->add(new Ac_Test_Dbi);
 	$t->add(new Ac_Test_SqlSelect);
@@ -41,6 +44,8 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
 	
 }
 
-//if (function_exists('xdebug_time_index')) var_dump(xdebug_time_index());
+if (function_exists('xdebug_time_index')) var_dump(xdebug_time_index());
+
+
 
 ?>

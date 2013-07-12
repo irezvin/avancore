@@ -1,8 +1,8 @@
 <?php
 
-class Ac_Cr_Result {
+abstract class Ac_Cr_Result {
 
-    protected $methodReturnValue = false;
+    protected $methodReturnValue = null;
 
     protected $methodOutput = false;
     
@@ -22,26 +22,6 @@ class Ac_Cr_Result {
         return $this->methodOutput;
     }    
     
-    /**
-     * Pushes data contained in the result into the response.
-     * Creates new empty response if no $response is provided.
-     * 
-     * Returns either provided $response or newly created one.
-     * 
-     * @return Ac_Response 
-     */
-    function populateResponse(Ac_Response $response = null) {
-       if (is_null($response)) $response = new Ac_Response; // TODO: use Factory?
-       // ...
-       return $response;
-    }
-    
-    /**
-     * Creates empty response and populates it
-     * @return Ac_Response 
-     */
-    function getResponse() {
-        return $this->populateResponse(null);
-    }
+    abstract function getResponse();
     
 }

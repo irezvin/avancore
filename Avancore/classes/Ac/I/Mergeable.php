@@ -6,5 +6,7 @@ interface Ac_I_Mergeable {
     
     function mergeWith($value, $preserveExistingValues = false);
     
+    function getMergedWith($value, $preserveExistingValues = false);
+    
 }
 
