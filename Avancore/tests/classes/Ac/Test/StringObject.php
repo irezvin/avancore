@@ -43,6 +43,94 @@ class Ac_Test_StringObject extends Ac_Test_Base {
         ));
     }
     
+    function testStringObjectContext() {
+        $o1 = new TestStringObject();
+        $o2 = new TestStringObject();
+        $o3 = new TestStringObject();
+        $s = '111'.$o1.'222'.$o2.'333'.$o3.'444';
+        
+        $beg1 = strlen('111');
+        $end1 = $beg1 + strlen($o1) - 1;
+        
+        $beg2  = strlen('111'.$o1.'222');
+        $end2 = $beg2 + strlen($o2) - 1;
+        
+        $beg3  = strlen('111'.$o1.'222'.$o2.'333');
+        $end3 = $beg3 + strlen($o3) - 1;
+        
+        $sliced = Ac_StringObject::sliceStringWithObjects($s);
+        
+        if (!$this->assertEqual( // before $o1
+            $sc = Ac_StringObject::getStringObjectContext($s, 0), 
+            array(
+                'prev' => FALSE, 
+                'current' => FALSE, 
+                'next' => array(''.$o1, $beg1)
+            )
+        )) var_dump($sc);
+        
+        foreach (array($beg1, $beg1 + 1, $end1) as $pos)
+            if (!$this->assertEqual( // at $o1
+                $sc = Ac_StringObject::getStringObjectContext($s, $pos), 
+                array(
+                    'prev' => FALSE, 
+                    'current' => array(''.$o1, $beg1), 
+                    'next' => array(''.$o2, $beg2)
+                )
+            )) var_dump($pos, $sc);
+            
+        if (!$this->assertEqual( // between $o1 and $o2
+            $sc = Ac_StringObject::getStringObjectContext($s, $end1 + 1), 
+            array(
+                'prev' => array(''.$o1, $beg1), 
+                'current' => FALSE, 
+                'next' => array(''.$o2, $beg2)
+            )
+        )) var_dump($sc);
+            
+        foreach (array($beg2, $beg2 + 1, $end2) as $pos)
+            if (!$this->assertEqual( // at $o2
+                $sc = Ac_StringObject::getStringObjectContext($s, $pos), 
+                array(
+                    'prev' => array(''.$o1, $beg1), 
+                    'current' => array(''.$o2, $beg2), 
+                    'next' => array(''.$o3, $beg3)
+                )
+            )) var_dump($pos, $sc);
+        
+        foreach (array($beg3, $beg3 + 1, $end3) as $pos)
+            if (!$this->assertEqual( // at $o3; also cache is used
+                $sc = Ac_StringObject::getStringObjectContext($s, $pos, true), 
+                array(
+                    'prev' => array(''.$o2, $beg2), 
+                    'current' => array(''.$o3, $beg3), 
+                    'next' => FALSE
+                )
+            )) var_dump($pos, $sc);
+
+        foreach (array($end3 + 1, strlen($s) - 1, strlen($s)) as $pos)
+            if (!$this->assertEqual( // after $o3; also cache is used
+                $sc = Ac_StringObject::getStringObjectContext($s, $pos, true), 
+                array(
+                    'prev' => array(''.$o3, $beg3), 
+                    'current' => FALSE, 
+                    'next' => FALSE
+                )
+            )) var_dump($pos, $sc);
+            
+        $theFoo = ''.$o1;
+        if (!$this->assertEqual( // before first: get next
+            $sc = Ac_StringObject::getStringObjectContext($theFoo, -1), 
+            array(
+                'prev' => FALSE, 
+                'current' => FALSE, 
+                'next' => array(''.$o1, 0),
+            )
+        )) var_dump($sc);
+        
+        
+    }
+    
     function testEvaluatedStringObject() {
         // TODO
     }
