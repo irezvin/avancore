@@ -24,9 +24,6 @@ class Ac_Result_Stage extends Ac_Prototyped {
     // ---- traversal-related
     
     
-    /**
-     * @var Ac_Result
-     */
     protected $current = null;
     
     /**
@@ -36,13 +33,11 @@ class Ac_Result_Stage extends Ac_Prototyped {
 
     protected $stack = array();
     
+    protected $defaultTraverseClasses = 'Ac_Result';
     
     
     
-    protected $currentProperty = false;
-
-    protected $currentPosition = false;
-
+    
     function setRoot(Ac_Result $root) {
         if ($root !== ($oldRoot = $this->root)) {
             $this->root = $root;
@@ -72,32 +67,9 @@ class Ac_Result_Stage extends Ac_Prototyped {
     }
 
 //    function setCurrent(Ac_Result $current) {
-//        $this->current = $current;
+//        $this->currentResult = $current;
 //    }
 
-    /**
-     * @return Ac_Result
-     */
-    function getCurrent() {
-        return $this->current;
-    }
-
-//    function setCurrentProperty($currentProperty) {
-//        $this->currentProperty = $currentProperty;
-//    }
-//
-//    function getCurrentProperty() {
-//        return $this->currentProperty;
-//    }
-//
-//    function setCurrentPosition($currentPosition) {
-//        $this->currentPosition = $currentPosition;
-//    }
-//
-//    function getCurrentPosition() {
-//        return $this->currentPosition;
-//    }    
-    
     // ---- result tree traversal ----
     
     protected function invokeHandlers(Ac_Result $result = null, $stageName, $args = null) {
@@ -119,40 +91,18 @@ class Ac_Result_Stage extends Ac_Prototyped {
         }
     }
     
-    protected function beginItem(Ac_Result $item) {
-        $this->invokeHandlers($this->parent, 'beforeChild', $item);
-        $this->invokeHandlers($item, 'beginStage');
-    }
-    
-    protected function endItem(Ac_Result $item) {
-        $this->invokeHandlers($item, 'endStage');
-        $this->invokeHandlers($this->parent, 'afterChild', $item);
-    }
-    
-    protected function getFirstChild(Ac_Result $item) {
-        // TODO: better implementation
-        
-        $sr = array_values(Ac_Util::flattenArray($item->getSubResults()));
-        if (count($sr)) $res = $sr[0];
-        else $res = null;
-        return $res;
-    }
-    
-    protected function getNextSibling(Ac_Result $item, Ac_Result $parent = null) {
-        // TODO: better implementation using PHP' "internal array pointers"
-
-        if ($parent) {
-            $fa = Ac_Util::flattenArray($parent->getSubResults());
-            $v = array_values($fa);
-            $res = null;
-            if (($key = array_search($item, $v, true)) !== false) {
-                array_splice($v, 0, $key + 1);
-                $res = array_shift($v);
-            }
-        } else {
-            $res = null;
+    protected function beginItem($item) {
+        if ($item instanceof Ac_Result) {
+            $this->invokeHandlers($this->parent, 'beforeChild', $item);
+            $this->invokeHandlers($item, 'beginStage');
         }
-        return $res;
+    }
+    
+    protected function endItem($item) {
+        if ($item instanceof Ac_Result) {
+            $this->invokeHandlers($item, 'endStage');
+            $this->invokeHandlers($this->parent, 'afterChild', $item);
+        }
     }
     
     protected $beganCurrent = false;
@@ -160,40 +110,62 @@ class Ac_Result_Stage extends Ac_Prototyped {
     protected $isAscend = false;
     
     protected $traversalClasses = 'Ac_Result';
+    
+    /**
+     * @var Ac_Result_Stage_Position
+     */
+    protected $position = false;
  
-    protected function traverse($classes = 'Ac_Result') {
+    protected function traverse($classes = null) {
+        if (is_null($classes)) $classes = $this->defaultTraverseClasses;
+        
         $this->resetTraversal($classes);
         while ($this->traverseNext()) {
         };
     }
 
-    protected function resetTraversal($classes) {
+    protected function resetTraversal($classes = null) {
+        if (is_null($classes)) $classes = $this->defaultTraverseClasses;
+        
         $this->parent = null;
         $this->current = $this->root;
         $this->stack = array();
         $this->isAscend = false;
         $this->traversalClasses = $classes;
+        $this->isActive = true;
+        $this->isComplete = false;
     }
     
     protected function traverseNext() {
         if ($this->current) {
+            $this->isActive = true;
             $doneCurrent = false;
             $switchedCurrent = false;
             if (!$this->isAscend) {
+                
                 $this->beginItem($this->current);
-                $fc = $this->getFirstChild($this->current);
-                if ($fc) {
-                    array_push($this->stack, array($this->current, $this->parent));
-                    $this->parent = $this->current;
-                    $this->current = $fc;
-                    $switchedCurrent = true;
-                } else {
+                
+                $fc = false;
+                if ($this->current instanceof Ac_Result) {
+                    $position = new Ac_Result_Stage_Position($this->current, $this->traversalClasses);
+                    $fc = $position->advance();
+                    if ($fc) {
+                        array_push($this->stack, array($this->current, $this->parent, $this->position));
+                        $this->parent = $this->current;
+                        $this->current = $fc;
+                        $this->position = $position;
+                        $switchedCurrent = true;
+                    }
+                }
+                
+                if (!$fc) {
                     $this->endItem($this->current);
                     $doneCurrent = true;
                 }
             }
             if (!$switchedCurrent) {
-                $ns = $this->getNextSibling($this->current, $this->parent);
+                if ($this->position) $ns = $this->position->advance();
+                else $ns = null;
                 if ($ns) {
                     $this->isAscend = false;
                     if (!$doneCurrent) {
@@ -203,7 +175,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
                     $this->current = $ns;
                 } else {
                     if (count($this->stack)) {
-                        list ($this->current, $this->parent) = array_pop($this->stack);
+                        list ($this->current, $this->parent, $this->position) = array_pop($this->stack);
                         $this->isAscend = true;
                     } else {
                         $this->parent = null;
@@ -212,11 +184,91 @@ class Ac_Result_Stage extends Ac_Prototyped {
                     }
                 }
             }
-            $res = (bool) $this->current;
+            $res = $this->current;
         } else {
             $res = false;
         }
+        if (!$res) {
+            $this->isActive = false;
+            $this->isComplete = true;
+        }
         return $res;
+    }
+
+    /**
+     * @return Ac_Result
+     */
+    function getCurrentResult() {
+        if ($this->current instanceof Ac_Result) $res = $this->current;
+        elseif ($this->position) $res = $this->position->getResult();
+        else $res = null;
+        return $res;
+    }
+    
+    /**
+     * @return object
+     */
+    function getCurrentObject() {
+        $res = null;
+        if ($this->position) $res = $this->position->getObject();
+        return $res;
+    }
+    
+    function isAtRoot() {
+        if (!$this->isActive) $res = null;
+        else $res = (bool) $this->current === $this->root;
+        return $res;
+    }
+    
+    function getCurrentProperty() {
+        $res = null;
+        if ($this->position) {
+            $pos = $this->position->getPosition();
+            $res = $pos[0];
+        }
+        return $res;
+    }
+    
+    function getCurrentPropertyIsString() {
+        $res = null;
+        if ($this->position) $res = $this->position->getIsString();
+        return $res;
+    }
+    
+    function getCurrentOffset() {
+        $res = null;
+        if ($this->position) {
+            $pos = $this->position->getPosition();
+            $res = $pos[1];
+        }
+        return $res;
+    }
+    
+    function getIsChangeable() {
+        return (bool) ($this->position && !$this->position->getIsDone());
+    }
+    
+    /**
+     * Puts content immediately after the current object (self::getCurrentObject())
+     * @param string|object $content
+     */
+    function put($content) {
+        if ($this->isChangeable()) {
+            $this->position->insertAfter($content, true);
+        } else {
+            throw new Ac_E_InvalidUsage("Cannot put() when not in position; check with getIsChangeable() first");
+        }
+    }
+
+    /**
+     * Replaces self::getCurrentObject() with $content (object or string)
+     */
+    function replaceCurrentObject($content) {
+        if ($this->isChangeable()) {
+            $this->position->replaceCurrentObject($content, true);
+        } else {
+            throw new Ac_E_InvalidUsage("Cannot put() when not in position; check with getIsChangeable() first");
+        }
     }
     
 }
