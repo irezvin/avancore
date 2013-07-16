@@ -68,7 +68,6 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     
     protected $debugData = false;
     
-    
     function listPlaceholders() {
         return array_keys($this->placeholders);
     }
@@ -306,12 +305,17 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
         $this->touchStringObjects();
     }
     
-    function insertAtPosition($content, $position) {
+    function insertAtPosition($position, $content) {
         $this->content = substr($this->content, 0, $position).$content.substr($this->content, $position);
         $this->touchStringObjects();
     }
     
-    function removeFromContent($content, Ac_I_StringObject $stringObject) {
+    function removeFromPosition($position, $length) {
+        $this->content = substr($this->content, 0, $position).substr($this->content, $position + $length);
+        $this->touchStringObjects();
+    }
+    
+    function removeFromContent(Ac_I_StringObject $stringObject) {
         if (strpos($this->content, ''.$stringObject) === false) {
             throw new Exception("String object {$stringObject} is not in the content");
         } else {
@@ -321,11 +325,21 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
         }
     }
     
+    function replaceObjectInContent(Ac_I_StringObject $stringObject, $content) {
+        if (($pos = strpos($this->content, ''.$stringObject)) === false) {
+            throw new Exception("String object {$stringObject} is not in the content");
+        } else {
+            $this->content = substr($this->content, 0, $position).$content.substr($this->content, $position + $length);
+            $this->touchStringObjects();
+        }
+    }
+    
+    
     function addToList($property, $object, $position) {
         throw new Exception("Method isn't supported by ".get_class($this));
     }
     
-    function removeFromList($property, $object, $position) {
+    function removeFromList($property, $object) {
         throw new Exception("Method isn't supported by ".get_class($this));
     }
     
@@ -391,13 +405,14 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     
     function getTraversableBunch($classes = false) {
         if (is_array($classes)) $hash = implode(',', $classes);
+            else $hash = ''.$classes;
         if (!isset($this->bunches[$hash])) {
             $this->bunches[$hash] = array_merge($this->getStringBuffers(), $this->doGetTraversableBunch($classes));
         }
-        return $this->getStringBuffers();
+        return $this->bunches[$hash];
     }
     
-    function doGetTraversableBunch($classes) {
+    protected function doGetTraversableBunch($classes = false) {
         return array();
     }
     
