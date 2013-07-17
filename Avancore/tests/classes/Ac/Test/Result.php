@@ -66,10 +66,16 @@ class Ac_Test_Result extends Ac_Test_Base {
         do {
             $r = $stage->traverseNext();
             //if ($r) var_dump($stage->getCurrentResult()->getDebugData ().' '. $stage->getCurrentProperty().' '.$stage->getCurrentOffset().' '.$stage->getCurrentPropertyIsString().' '.$stage->getIsChangeable());
-            if ($stage->getCurrentResult()) $was[] = $stage->getCurrentResult()->getDebugData().':'.$stage->getIsAscend();
+            if ($r && $r instanceof Ac_Result && $r->getDebugData() == 'a_1' && $stage->getIsAscend()) {
+                $stage->put("After");
+                $stage->put(" a_1");
+            }
+            if ($stage->getCurrentResult()) $was[] = $stage->getCurrentResult()->getDebugData();
         } while ($r && $i++ < 20);
         
-        $this->assertEqual(count($was), count(array_unique($was)), "Traversal items should not repeat");
+        if (!$this->assertEqual(count($was), count(array_unique($was)), "Items should not be visited twice")) {
+            var_dump($was);
+        }
         
         $this->assertEqual($repeat, 0);
         
@@ -94,6 +100,52 @@ class Ac_Test_Result extends Ac_Test_Base {
                 'a endStage', 
         )))         
         var_dump($stage->travLog);
+    }
+    
+    function testStageModify() {
+        
+        $a = new Ac_Result(); 
+        $a->setDebugData('a');
+        
+        $a_1 = new Ac_Result();  
+        $a_1->setDebugData('<a_1>');
+        
+        $a_2 = new Ac_Result();  
+        $a_2->setDebugData('<a_2>');
+        
+        $a_3 = new Ac_Result();  
+        $a_3->setDebugData('<a_3>');
+        
+        $a_2_replacement = new Ac_Result();
+        $a_2_replacement->setDebugData('<a_2_replacement>');
+        
+        $a->put("a_1: {$a_1} a_2: {$a_2}: a_3 {$a_3}");
+        
+        $stage = new StageIterator();
+        $stage->setRoot($a);
+        
+        $i = 0;
+        $stage->resetTraversal();
+        $current = $stage->getCurrentResult();
+        $repeat = 0;
+        $was = array();
+        $wasAtNewA = false;
+        do {
+            $r = $stage->traverseNext();
+            if ($r === $a_1) {
+                $stage->put(" (after");
+                $stage->put(" a_1)");
+            }
+            if ($r === $a_2) {
+                $stage->replaceCurrentObject($a_2_replacement);
+            }
+            if ($r === $a_2_replacement) $wasAtNewA = true;
+            if ($stage->getCurrentResult()) $was[] = $stage->getCurrentResult()->getDebugData();
+        } while ($r && $i++ < 20);
+        
+        $this->assertFalse($wasAtNewA);
+        
+        $this->assertEqual($a->getContent(), "a_1: {$a_1} (after a_1) a_2: {$a_2_replacement}: a_3 {$a_3}");
     }
 
     function mkBunchResult() {

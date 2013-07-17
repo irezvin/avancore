@@ -164,25 +164,28 @@ class Ac_Result_Stage extends Ac_Prototyped {
                 }
             }
             if (!$switchedCurrent) {
-                if ($this->position) $ns = $this->position->advance();
-                else $ns = null;
-                if ($ns) {
-                    $this->isAscend = false;
-                    if (!$doneCurrent) {
-                        $this->endItem($this->current);
-                        $doneCurrent = true;
-                    }
-                    $this->current = $ns;
-                } else {
-                    if (count($this->stack)) {
-                        list ($this->current, $this->parent, $this->position) = array_pop($this->stack);
-                        $this->isAscend = true;
+                do { // we have to iterate while we ascend to prevent double visiting
+                    if ($this->position) $ns = $this->position->advance();
+                    else $ns = null;
+                    if ($ns) {
+                        $this->isAscend = false;
+                        if (!$doneCurrent) {
+                            $this->endItem($this->current);
+                            $doneCurrent = true;
+                        }
+                        $this->current = $ns;
                     } else {
-                        $this->parent = null;
-                        if ($this->isAscend) $this->endItem ($this->current);
-                        $this->current = null;
+                            if (count($this->stack)) {
+                                list ($this->current, $this->parent, $this->position) = array_pop($this->stack);
+                                $this->isAscend = true;
+                            } else {
+                                $this->parent = null;
+                                if ($this->isAscend) $this->endItem ($this->current);
+                                $this->current = null;
+                            }
                     }
-                }
+                    $doneCurrent = false;
+                } while ($this->isAscend && $this->current);
             }
             $res = $this->current;
         } else {
@@ -253,7 +256,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
      * @param string|object $content
      */
     function put($content) {
-        if ($this->isChangeable()) {
+        if ($this->getIsChangeable()) {
             $this->position->insertAfter($content, true);
         } else {
             throw new Ac_E_InvalidUsage("Cannot put() when not in position; check with getIsChangeable() first");
@@ -264,7 +267,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
      * Replaces self::getCurrentObject() with $content (object or string)
      */
     function replaceCurrentObject($content) {
-        if ($this->isChangeable()) {
+        if ($this->getIsChangeable()) {
             $this->position->replaceCurrentObject($content, true);
         } else {
             throw new Ac_E_InvalidUsage("Cannot put() when not in position; check with getIsChangeable() first");
