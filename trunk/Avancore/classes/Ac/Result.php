@@ -329,7 +329,8 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
         if (($pos = strpos($this->content, ''.$stringObject)) === false) {
             throw new Exception("String object {$stringObject} is not in the content");
         } else {
-            $this->content = substr($this->content, 0, $position).$content.substr($this->content, $position + $length);
+            $length = strlen(''.$stringObject);
+            $this->content = substr($this->content, 0, $pos).$content.substr($this->content, $pos + $length);
             $this->touchStringObjects();
         }
     }
