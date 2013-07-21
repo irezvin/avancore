@@ -10,7 +10,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     protected $content = '';
     
     
-    protected $placeholders = array();
+    protected $placeholders = false;
  
     protected $handlers = array();
 
@@ -53,7 +53,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     /**
      * @var bool
      */
-    protected $mergred = false;
+    protected $merged = false;
 
     
     
@@ -69,6 +69,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     protected $debugData = false;
     
     function listPlaceholders() {
+        if (!is_array($this->placeholders)) $this->setPlaceholders(array());
         return array_keys($this->placeholders);
     }
     
@@ -76,6 +77,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
      * @return Ac_Result_Placeholder
      */
     function getPlaceholder($id, $dontThrow = false) {
+        if (!is_array($this->placeholders)) $this->setPlaceholders(array());
         if (isset($this->placeholders[$id])) {
             return $this->placeholders[$id];
         } else {
@@ -98,13 +100,14 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     }
     
     function setPlaceholders(array $placeholders) {
-        $this->placeholders = Ac_Prototyped::factoryCollection($placeholders, 'Ac_Result_Placeholder');
+        $this->placeholders = Ac_Prototyped::factoryCollection(Ac_Util::m($this->doGetDefaultPlaceholders(), $placeholders), 'Ac_Result_Placeholder', array(), 'id');
     }
     
     /**
      * @return array
      */
     function getPlaceholders() {
+        if (!is_array($this->placeholders)) $this->setPlaceholders(array());
         return $this->placeholders;
     }
     
@@ -190,6 +193,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
 
     function setWriter(Ac_Result_Writer $writer) {
         $this->writer = $writer;
+        $this->writer->setSource($this);
     }
 
     /**
@@ -197,8 +201,14 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
      */
     function getWriter() {
         if ($this->writer === false) {
+            $this->writer = $this->createDefaultWriter();
         }
         return $this->writer;
+    }
+    
+    function createDefaultWriter() {
+        $res = new Ac_Result_Writer_Auto(array('source' => $this));
+        return $res;
     }
 
     /**
@@ -242,21 +252,21 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     }
 
     /**
-     * @param bool $mergred
+     * @param bool $merged
      */
-    function setMergred($mergred) {
-        $mergred = (bool) $merged;
-        if ($mergred !== ($oldMergred = $this->mergred)) {
+    function setMerged($merged) {
+        $merged = (bool) $merged;
+        if ($merged !== ($oldMerged = $this->merged)) {
             if (!$merged) throw new Ac_E_InvalidUsage("Cannot remove merged flag once it have been set");
-            $this->mergred = $mergred;
+            $this->merged = $merged;
         }
     }
 
     /**
      * @return bool
      */
-    function getMergred() {
-        return $this->mergred;
+    function getMerged() {
+        return $this->merged;
     }
     
     function __sleep() {
@@ -417,4 +427,19 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
         return array();
     }
     
+    protected function doGetDefaultPlaceholders() {
+        return array();
+    }
+    
+    protected function initFromPrototype(array $prototype = array(), $strictParams = null) {
+        $def = array_intersect_key($prototype, $dp =  $this->doGetDefaultPlaceholders());
+        $prototype = array_diff_key($prototype, $dp);
+        $res = parent::initFromPrototype($prototype, $strictParams);
+        foreach ($def as $k => $v) if (!is_null($v) && $v !== false) {
+            if (is_array($v)) $this->getPlaceholder($k)->addItems($v);
+                else $this->getPlaceholder($k)->addItems(array($v));
+        }
+        return $res;
+    }
+
 }

@@ -92,6 +92,14 @@ class Ac_Test_Base extends UnitTestCase {
 		if ($exactItems !== true) $right = $this->stripRightArrayToLeft($left, $right, $exactItems); 
 		return $this->assertEqual($left, $right, $message);
 	}
+    
+    function normalizeHtml($html, $stripBreaks = true) {
+        $html = str_replace("'", '"', trim($html));
+        $html = preg_replace("/\s*\n\r?\s*/", "\n", $html);
+        $html = preg_replace("/ +/", " ", $html);
+        $html = preg_replace("/\n+/", $stripBreaks? "" : "\n", $html);
+        return $html;
+    }
 	
 	
 }
