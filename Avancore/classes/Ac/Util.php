@@ -915,6 +915,12 @@ abstract class Ac_Util {
         }
         return $res;
     }
+    
+    static function typeClass($item) {
+        $res = gettype($item);
+        if (is_object($item)) $res .=  ' '.get_class($item);
+        return $res;
+    }
 
 }
 
