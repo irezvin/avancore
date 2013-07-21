@@ -2,6 +2,11 @@
 
 class Ac_Result_Stage extends Ac_Prototyped {
 
+    const HANDLER_BEFORE_CHILD = 'beforeChild';
+    const HANDLER_AFTER_CHILD = 'afterChild';
+    const HANDLER_BEGIN_STAGE = 'beginStage';
+    const HANDLER_END_STAGE = 'endStage';
+    
     /**
      * @var bool
      */
@@ -93,15 +98,15 @@ class Ac_Result_Stage extends Ac_Prototyped {
     
     protected function beginItem($item) {
         if ($item instanceof Ac_Result) {
-            $this->invokeHandlers($this->parent, 'beforeChild', $item);
-            $this->invokeHandlers($item, 'beginStage');
+            $this->invokeHandlers($this->parent, self::HANDLER_BEFORE_CHILD, $item);
+            $this->invokeHandlers($item, self::HANDLER_BEGIN_STAGE);
         }
     }
     
     protected function endItem($item) {
         if ($item instanceof Ac_Result) {
-            $this->invokeHandlers($item, 'endStage');
-            $this->invokeHandlers($this->parent, 'afterChild', $item);
+            $this->invokeHandlers($item, self::HANDLER_END_STAGE);
+            $this->invokeHandlers($this->parent, self::HANDLER_AFTER_CHILD, $item);
         }
     }
     
@@ -175,12 +180,12 @@ class Ac_Result_Stage extends Ac_Prototyped {
                         }
                         $this->current = $ns;
                     } else {
+                            if ($this->isAscend) $this->endItem ($this->current);
                             if (count($this->stack)) {
                                 list ($this->current, $this->parent, $this->position) = array_pop($this->stack);
                                 $this->isAscend = true;
                             } else {
                                 $this->parent = null;
-                                if ($this->isAscend) $this->endItem ($this->current);
                                 $this->current = null;
                             }
                     }
@@ -206,6 +211,13 @@ class Ac_Result_Stage extends Ac_Prototyped {
         elseif ($this->position) $res = $this->position->getResult();
         else $res = null;
         return $res;
+    }
+    
+    /**
+     * @return Ac_Result
+     */
+    function getParentResult() {
+        return $this->parent;
     }
     
     /**
@@ -273,5 +285,24 @@ class Ac_Result_Stage extends Ac_Prototyped {
             throw new Ac_E_InvalidUsage("Cannot put() when not in position; check with getIsChangeable() first");
         }
     }
+    
+    /**
+     * @var Ac_Application
+     */
+    protected $application = false;
+
+    function setApplication(Ac_Application $application) {
+        $this->application = $application;
+    }
+
+    /**
+     * @return Ac_Application
+     */
+    function getApplication() {
+        if ($this->application === false) {
+            return Ac_Application::getDefaultInstance();
+        }
+        return $this->application;
+    }    
     
 }

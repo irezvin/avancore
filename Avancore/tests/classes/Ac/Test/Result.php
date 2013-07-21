@@ -54,6 +54,13 @@ class Ac_Test_Result extends Ac_Test_Base {
         
         $a_1->put($a_1_1);
         $a_1->put($a_1_2);
+
+        $a_3 = new Ac_Result();  $a_3->setDebugData('a_3');
+        $a_3_1 = new Ac_Result(); $a_3_1->setDebugData('a_3_1');
+        $a_3_2 = new Ac_Result(); $a_3_2->setDebugData('a_3_2');
+        $a_3->put($a_3_1);
+        $a_3->put($a_3_2);
+        $a->put($a_3);
         
         $stage = new StageIterator();
         $stage->setRoot($a);
@@ -71,7 +78,7 @@ class Ac_Test_Result extends Ac_Test_Base {
                 $stage->put(" a_1");
             }
             if ($stage->getCurrentResult()) $was[] = $stage->getCurrentResult()->getDebugData();
-        } while ($r && $i++ < 20);
+        } while ($r && $i++ < 30);
         
         if (!$this->assertEqual(count($was), count(array_unique($was)), "Items should not be visited twice")) {
             var_dump($was);
@@ -79,7 +86,7 @@ class Ac_Test_Result extends Ac_Test_Base {
         
         $this->assertEqual($repeat, 0);
         
-        if (!$this->assertEqual($stage->travLog, array(
+        if (!$this->assertEqual($stage->travLog, $rq = array(
                 'a beginStage', 
                 'a beforeChild a_1', 
                 'a_1 beginStage', 
@@ -97,9 +104,25 @@ class Ac_Test_Result extends Ac_Test_Base {
                 'a_2 beginStage', 
                 'a_2 endStage',
                 'a afterChild a_2', 
+                'a beforeChild a_3', 
+                'a_3 beginStage', 
+                'a_3 beforeChild a_3_1', 
+                'a_3_1 beginStage', 
+                'a_3_1 endStage', 
+                'a_3 afterChild a_3_1', 
+                'a_3 beforeChild a_3_2', 
+                'a_3_2 beginStage', 
+                'a_3_2 endStage', 
+                'a_3 afterChild a_3_2', 
+                'a_3 endStage', 
+                'a afterChild a_3', 
                 'a endStage', 
-        )))         
-        var_dump($stage->travLog);
+        ))) {
+            echo "<table border='1'><tr>
+                    <td valign='top'>".implode("<br />", $stage->travLog)."</td>
+                    <td valign='top'>".implode("<br />", $rq)."</td>
+                </tr></table>";
+        }
     }
     
     function testStageModify() {
@@ -377,6 +400,110 @@ class Ac_Test_Result extends Ac_Test_Base {
         ));
         $stage = new StageIterator(array('root' => $outer));
         
+    }
+    
+    function testPlainWriter() {
+        $outer = new Ac_Result(array('debugData' => 'outer'));
+        $sub1 = new Ac_Result(array('debugData' => 'sub1'));
+        $sub11 = new Ac_Result(array('debugData' => 'sub11', 'content' => '{sub11 /}'));
+        $sub1->put("{sub1}{$sub11}{/sub1}");
+        $sub2 = new Ac_Result(array('debugData' => 'sub2', 'content' => '{sub2 /}'));
+        $outer->put("{outer}{$sub1} {$sub2}{/outer}");
+        $s = new Ac_Result_Stage_Write(array('root' => $outer));
+        ob_start();
+        ini_set('html_errors', 0);
+        $s->write();
+        ini_set('html_errors', 1);
+        $buf = ob_get_clean();
+        if (!$this->assertEqual($buf, '{outer}{sub1}{sub11 /}{/sub1} {sub2 /}{/outer}')) {
+            var_dump($buf);
+        }
+    }
+    
+    function testHtmlResult() {
+        $outer = new Ac_Result_Html();
+        $outer->getPlaceholder('comments')->addItems(array('line1', 'line2', 'line3'));
+        $widget1 = new Ac_Result_Html(array(
+            'content' =>  $w1content = '<div><p>Widget 1</p><div>Widget 1 body</div></div>',
+            'assets' => array(
+                '{FOO}/first.js',
+                '{FOO}/first.css',
+            )
+        ));
+        $widget2 = new Ac_Result_Html(array(
+            'content' =>  $w2content = '<div><p>Widget 2</p><div>Widget 2 body</div></div>',
+            'assets' => array(
+                '{FOO}/first.js',
+                '{FOO}/first.css',
+                '{FOO}/second.js',
+            )
+        ));
+        $widget3 = new Ac_Result_Html(array(
+            'content' =>  $w3content = '<div><p>Widget 3</p><div>Widget 3 body</div></div>',
+            'assets' => array(
+                '{FOO}/second.js',
+                '{FOO}/second.css',
+            )
+        ));
+        $widget23 = new Ac_Result_Html(array(
+            'content' =>  "<div class='group'>{$widget2} {$widget3}</div>",
+        ));
+            
+        $outer->put("{$widget1} {$widget23}");
+        $s = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => false));
+        ini_set('html_errors', 0);
+        $s->write();
+        ini_set('html_errors', 1);
+        
+        if (!$this->assertEqual($outer->getContent(), 
+            "$w1content <div class='group'>{$w2content} {$w3content}</div>"
+        )) var_dump($outer->getContent());
+            
+        $assets = $outer->getPlaceholder('assets')->getItems();
+        $needAssets = array(
+            '{FOO}/first.js',
+            '{FOO}/first.css',
+            '{FOO}/second.js',
+            '{FOO}/second.css',
+        );
+        
+        sort($assets);
+        sort($needAssets);
+        if (!$this->assertEqual($assets, $needAssets)) var_dump($assets);
+        $outer->getPlaceholder('doctype')->addItems(array(Ac_Result_Html::DOCTYPE_STRICT));
+        $outer->getPlaceholder('doctype')->addItems(array(Ac_Result_Html::DOCTYPE_HTML5));
+        ob_start();
+        $outer->setWriter($w = new Ac_Result_Writer_RenderHtml(array(
+            'assetPlaceholders' => array('{FOO}' => '//cdn.foo.example.com')
+        )));
+        $w->write();
+        $buf = ob_get_clean();
+        if (!$this->assertEqual(
+            $this->normalizeHtml($buf),
+            $this->normalizeHtml('
+                <!DOCTYPE html>
+                <html>
+                    <head>
+                    <link rel="stylesheet" type="text/css" href="//cdn.foo.example.com/first.css" />
+                    <link rel="stylesheet" type="text/css" href="//cdn.foo.example.com/second.css" />
+                    <script type="text/javascript" src="//cdn.foo.example.com/first.js"> </script>
+                    <script type="text/javascript" src="//cdn.foo.example.com/second.js"> </script>
+                    </head>
+                    <body>
+                <div><p>Widget 1</p><div>Widget 1 body</div></div> <div class=\'group\'><div><p>Widget 2</p><div>Widget 2 body</div></div> <div><p>Widget 3</p><div>Widget 3 body</div></div></div>    </body>
+                </html>
+
+
+                <!--
+
+                    line1
+
+                    line2
+
+                    line3
+                -->
+            ')
+        )) var_dump($buf);
     }
     
 }
