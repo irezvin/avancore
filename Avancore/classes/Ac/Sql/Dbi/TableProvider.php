@@ -127,5 +127,3 @@ class Ac_Sql_Dbi_TableProvider extends Ac_Sql_Select_TableProvider {
     }
 	
 }    
-
-}

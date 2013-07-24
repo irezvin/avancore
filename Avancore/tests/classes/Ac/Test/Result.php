@@ -1,5 +1,7 @@
 <?php
 
+require(dirname(__FILE__).'/assets/ClassesToTestResult.php');
+
 class Ac_Test_Result extends Ac_Test_Base {
     
     function testBasicResult() {
@@ -420,11 +422,21 @@ class Ac_Test_Result extends Ac_Test_Base {
         }
     }
     
+    function testLazyPlaceholders() {
+        $h = new Ac_Result_Html();
+        $this->assertEqual($h->listPlaceholders(), $h->listPlaceholders(false, false));
+        $this->assertEqual($h->listPlaceholders(true), array());
+        $h->getPlaceholder('title');
+        $this->assertEqual($h->listPlaceholders(), $h->listPlaceholders(false, false));
+        if (!$this->assertEqual($p = $h->listPlaceholders(true), array('title'))) var_dump($p);
+    }
+    
     function testHtmlResult() {
         $outer = new Ac_Result_Html();
         $outer->getPlaceholder('comments')->addItems(array('line1', 'line2', 'line3'));
         $widget1 = new Ac_Result_Html(array(
             'content' =>  $w1content = '<div><p>Widget 1</p><div>Widget 1 body</div></div>',
+            'title' => 'Sub',
             'assets' => array(
                 '{FOO}/first.js',
                 '{FOO}/first.css',
@@ -450,6 +462,7 @@ class Ac_Test_Result extends Ac_Test_Base {
         ));
             
         $outer->put("{$widget1} {$widget23}");
+        $outer->getPlaceholder('title')->addItems(array('Parent'));
         $s = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => false));
         ini_set('html_errors', 0);
         $s->write();
@@ -472,6 +485,8 @@ class Ac_Test_Result extends Ac_Test_Base {
         if (!$this->assertEqual($assets, $needAssets)) var_dump($assets);
         $outer->getPlaceholder('doctype')->addItems(array(Ac_Result_Html::DOCTYPE_STRICT));
         $outer->getPlaceholder('doctype')->addItems(array(Ac_Result_Html::DOCTYPE_HTML5));
+        $outer->initScripts[] = "console.log('foo');";
+        $outer->initScripts[] = new Ac_Js_Script("console.log('bar');");
         ob_start();
         $outer->setWriter($w = new Ac_Result_Writer_RenderHtml(array(
             'assetPlaceholders' => array('{FOO}' => '//cdn.foo.example.com')
@@ -480,17 +495,24 @@ class Ac_Test_Result extends Ac_Test_Base {
         $buf = ob_get_clean();
         if (!$this->assertEqual(
             $this->normalizeHtml($buf),
-            $this->normalizeHtml('
+            $this->normalizeHtml(
+<<<EOD
                 <!DOCTYPE html>
                 <html>
                     <head>
-                    <link rel="stylesheet" type="text/css" href="//cdn.foo.example.com/first.css" />
-                    <link rel="stylesheet" type="text/css" href="//cdn.foo.example.com/second.css" />
-                    <script type="text/javascript" src="//cdn.foo.example.com/first.js"> </script>
-                    <script type="text/javascript" src="//cdn.foo.example.com/second.js"> </script>
+                        <title>Parent - Sub</title>
+                        <link rel="stylesheet" type="text/css" href="//cdn.foo.example.com/first.css" />
+                        <link rel="stylesheet" type="text/css" href="//cdn.foo.example.com/second.css" />
+                        <script type="text/javascript" src="//cdn.foo.example.com/first.js"> </script>
+                        <script type="text/javascript" src="//cdn.foo.example.com/second.js"> </script>
                     </head>
                     <body>
-                <div><p>Widget 1</p><div>Widget 1 body</div></div> <div class=\'group\'><div><p>Widget 2</p><div>Widget 2 body</div></div> <div><p>Widget 3</p><div>Widget 3 body</div></div></div>    </body>
+                <div><p>Widget 1</p><div>Widget 1 body</div></div> <div class='group'><div><p>Widget 2</p><div>Widget 2 body</div></div> <div><p>Widget 3</p><div>Widget 3 body</div></div></div>    
+                <script type='text/javascript'>
+                    console.log('foo');
+                    console.log('bar');
+                </script>
+                </body>
                 </html>
 
 
@@ -502,110 +524,80 @@ class Ac_Test_Result extends Ac_Test_Base {
 
                     line3
                 -->
-            ')
+EOD
+            )
         )) var_dump($buf);
+        
     }
     
-}
-
-class AllHandler implements Ac_I_Result_Handler_All {
-
-    static $log = array();
-    
-    var $myLog = null;
-    
-    var $name = false;
-    
-    static function so($name, & $log = null) {
-        return new Ac_StringObject_Wrapper(new self($name, $log));
+    function testResultMagic() {
+        
+        $r = new Ac_Result_Html();
+        $r->assets[] = '{FOO}/bar.js';
+        $r->assets[] = '{FOO}/bar.css';
+        $r->headTags = array('<link rel="canonical" href="http://www.example.com" />');
+        
+        if (!$this->assertEqual(
+            $i = $r->assets->getItems(),
+            $rAssets = array(
+                '{FOO}/bar.js',
+                '{FOO}/bar.css'
+            )
+        )) var_dump($i);
+        
+        if (!$this->assertEqual(
+            $i = $r->headTags->getItems(),
+            array('<link rel="canonical" href="http://www.example.com" />')
+        )) var_dump($i);
+        
+        $r2 = new Ac_Result_Html();
+        $r2->assets[] = '{FOO}/quux.js';
+        $r2->assets = $r->assets;
+        
+        if (!$this->assertEqual(
+            $i = $r2->assets->getItems(),
+            $rAssets
+        )) var_dump($i);
+        
+        $r3 = new Ac_Result_Html();
+        $r3->assets = '{FOO}/quux.js';
+        $r3->assets->addItems($r->assets);
+        if (!$this->assertEqual(
+            $i = $r3->assets->getItems(),
+            array_merge(array('{FOO}/quux.js'), $rAssets)
+        )) var_dump($i);
+        
+        $r3->assets = null;
+        
+        if (!$this->assertEqual(
+            $i = $r3->assets->getItems(),
+            array()
+        )) var_dump($i);
+        
+        $s = array(
+            'console.log("Foo");',
+            new Ac_Js_Script('console.log("Bar");')
+        );
+        $r3->initScripts[] = $s[0];
+        $r3->initScripts[] = $s[1];
+        
+        if (!$this->assertEqual(
+            $i = $r3->initScripts->getItems(),
+            $s
+        )) var_dump($i);
+        
+        $s = array(
+            'console.log("Foo");',
+            new Ac_Js_Script('console.log("Bar");')
+        );
+        $r3->initScripts->setItems($s);
+        
+        if (!$this->assertEqual(
+            $i = $r3->initScripts->getItems(),
+            $s
+        )) var_dump($i);
+        
+        
     }
     
-    function __construct($name, & $log = null) {
-        $this->name = $name;
-        if (!is_null($log)) $this->myLog = & $log;
-            else $this->myLog = & self::$log;
-    }
-    
-    function handleDefault($event, $stage, $result) {
-        $aa = func_get_args();
-        array_unshift($this->name, $a);
-        foreach ($aa as $k => $v) 
-            if (is_object($v) && $v instanceof Ac_Result) $aa[$k] = $v->getDebugData();
-        $this->log[] = implode('; ', $aa);
-    }
-    
-}
-
-class StageIterator extends Ac_Result_Stage {
-    
-    var $travLog = array();
-    
-    var $defaultTraverseClasses = array('Ac_Result', 'Ac_I_StringObject');
-    
-    function traverse($classes = null) {
-        return parent::traverse($classes);
-    }
-    
-    function resetTraversal($classes = null) {
-        $this->travLog = array();
-        return parent::resetTraversal($classes);
-    }
-    
-    function traverseNext() {
-        return parent::traverseNext();
-    }
-    
-    function invokeHandlers(Ac_Result $result = null, $stageName, $args = null) {
-        $args = func_get_args();
-        if ($result) {
-            $aa = $args;
-            foreach ($aa as $k => $v) 
-                if (is_object($v) && $v instanceof Ac_Result) $aa[$k] = $v->getDebugData();
-            $this->travLog[] = implode(' ',$aa);
-        }
-        return call_user_func_array(array('Ac_Result_Stage', 'invokeHandlers'), $args);
-    }
-    
-    function getIsAscend() {
-        return $this->isAscend;
-    }
-    
-}
-
-class BunchResult extends Ac_Result {
-    
-    var $bunch = array();
-
-    function touchStringObjects() {
-        parent::touchStringObjects();
-    }
-    
-    protected function doGetTraversableBunch($classes = false) {
-        if ($classes !== false) {
-            $res = Ac_Util::getObjectsOfClass($this->bunch, $classes);
-        } else {
-            $res = $this->bunch;
-        }
-        return $res;
-    }
-    
-    function addToList($property, $object, $position) {
-        array_splice($this->bunch[$property], $position, 0, array($object));
-        $this->touchStringObjects();
-    }
-    
-    function removeFromList($property, $object) {
-        $k = array_search($object, array_values($this->bunch[$property]), true);
-        if ($k !== false) {
-            array_splice($this->bunch[$property], $k, 1);
-        }
-        $this->touchStringObjects();
-    }
-    
-}
-
-class FooResult extends Ac_Result {
-}
-
-class BarResult extends Ac_Result {
 }

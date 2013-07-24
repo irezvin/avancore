@@ -31,13 +31,13 @@ class Ac_Result_Writer_RenderHtml extends Ac_Result_Writer_Plain {
 ?>
 <?php   $this->wp('doctype'); ?>
 <html<?php $this->wp('htmlAttribs'); ?>>
-    <head><?php ?>
+<head><?php ?>
 <?php $this->wp('title', 'headTags', 'assets', 'headScripts'); ?>
-    </head>
-    <body<?php $this->wp('bodyAttribs'); ?>>
+</head>
+<body<?php $this->wp('bodyAttribs'); ?>>
 <?php   echo parent::implWrite($r, $t, $s); ?>
-<?php   $this->wp('initScripts'); ?>
-    </body>
+<?php   $this->wp('initScripts'); ?> 
+</body>
 </html>
 <?php   $this->wp('comments'); ?>
 <?php

@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @property Ac_Result_Placeholder $headers HTTP headers
+ */
 abstract class Ac_Result_Http_Abstract extends Ac_Result {
     
     /**
