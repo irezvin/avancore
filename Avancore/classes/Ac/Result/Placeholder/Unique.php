@@ -34,7 +34,8 @@ class Ac_Result_Placeholder_Unique extends Ac_Result_Placeholder {
         return array_key_exists($this->getHash($item), $this->items);
     }
     
-    function addItems(array $items) {
+    function addItems($items) {
+        $items = self::toArray($items);        
         foreach ($items as $value) {
             $hash = $this->getHash($value);
             if (!array_key_exists($hash, $this->items)) {

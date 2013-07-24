@@ -12,7 +12,8 @@ class Ac_Result_Placeholder_Single extends Ac_Result_Placeholder {
             unset($this->items[$offset]);
     }
     
-    function addItems(array $items) {
+    function addItems($items) {
+        $items = self::toArray($items);
         if (count($items)) {
             $kk  = array_keys($items);
             $k = array_pop($kk);

@@ -68,9 +68,13 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     
     protected $debugData = false;
     
-    function listPlaceholders() {
+    function listPlaceholders($onlyUsed = false, $onlyDefault = false) {
         if (!is_array($this->placeholders)) $this->setPlaceholders(array());
-        return array_keys($this->placeholders);
+        $res = array_keys($this->placeholders);
+        if ($onlyUsed) $res = array_diff($res, array_keys($this->placeholders, false, true));
+        if ($onlyDefault) $res = array_intersect($res, array_keys($this->doGetDefaultPlaceholders()));
+        if ($onlyUsed || $onlyDefault) $res = array_values($res);
+        return $res;
     }
     
     /**
@@ -79,6 +83,11 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     function getPlaceholder($id, $dontThrow = false) {
         if (!is_array($this->placeholders)) $this->setPlaceholders(array());
         if (isset($this->placeholders[$id])) {
+            if ($this->placeholders[$id] === false) {
+                $dp = $this->doGetDefaultPlaceholders();
+                if (is_array($dp[$id]) && !isset($dp[$id]['id'])) $dp[$id]['id'] = $id;
+                $this->placeholders[$id] = Ac_Prototyped::factory($dp[$id], 'Ac_Result_Placeholder');
+            }
             return $this->placeholders[$id];
         } else {
             if (!$dontThrow) throw Ac_E_InvalidCall::noSuchItem('Placeholder', $id, 'listPlaceholders');
@@ -91,8 +100,14 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
         $this->placeholders[$id] = $placeholder;
     }
     
+    function isDefaultPlaceholder($id) {
+        return in_array($id, array_keys($this->doGetDefaultPlaceholders()));
+    }
+    
     function removePlaceholder($id, $dontThrow = false) {
         if (isset($this->placeholders[$id])) {
+            if ($this->placeholders[$id] === false || in_array($id, array_keys($this->doGetDefaultPlaceholders()))) 
+                throw new Ac_E_InvalidCall("Cannot removePlaceholder('{$id}') because isDefaultPlaceholder('{$id}')");
             unset($this->placeholders[$id]);
         } else {
             if (!$dontThrow) throw Ac_E_InvalidCall::noSuchItem('Placeholder', $id, 'listPlaceholders');
@@ -100,15 +115,29 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     }
     
     function setPlaceholders(array $placeholders) {
-        $this->placeholders = Ac_Prototyped::factoryCollection(Ac_Util::m($this->doGetDefaultPlaceholders(), $placeholders), 'Ac_Result_Placeholder', array(), 'id');
+        if (!is_array($this->placeholders)) {
+            $this->placeholders = array();
+            foreach (array_keys($this->doGetDefaultPlaceholders()) as $dp) $this->placeholders[$dp] = false;
+        } else {
+            foreach (array_diff(array_keys($this->placeholders), array_keys($this->doGetDefaultPlaceholders())) as $k) unset($this->placeholders[$k]);
+        }
+        Ac_Util::ms($this->placeholders, Ac_Prototyped::factoryCollection($placeholders, 'Ac_Result_Placeholder', array(), 'id'));
     }
     
     /**
      * @return array
      */
-    function getPlaceholders() {
+    function getPlaceholders($onlyUsed = false) {
         if (!is_array($this->placeholders)) $this->setPlaceholders(array());
-        return $this->placeholders;
+        $res = $this->placeholders;
+        if ($notInstantiated = array_keys($res, false, true)) {
+            if ($onlyUsed) {
+                $res = array_diff_key($res, array_flip($notInstantiated));
+            } else {
+                foreach ($notInstantiated as $id) $res[$id] = $this->getPlaceholder($id);
+            }
+        }
+        return $res;
     }
     
     function listHandlers() {
@@ -440,6 +469,32 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
                 else $this->getPlaceholder($k)->addItems(array($v));
         }
         return $res;
+    }
+    
+    function __get($varName) {
+        if (in_array($varName, $this->listPlaceholders())) {
+            $res = $this->getPlaceholder($varName);
+        } else {
+            $res = NULL;
+        }
+        return $res;
+    }
+    
+    function __set($varName, $value) {
+        if (in_array($varName, $this->listPlaceholders())) {
+            $this->getPlaceholder($varName)->setItems($value);
+        } else {
+            if (!in_array($varName, get_class_vars(__CLASS__))) $this->$varName = $value;
+        }
+    }
+    
+    function __isset($varName) {
+        if (in_array($varName, $this->listPlaceholders())) {
+            $res = true;
+        } else {
+            $res = false;
+        }
+        return $res;        
     }
 
 }
