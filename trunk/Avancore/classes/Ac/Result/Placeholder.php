@@ -49,7 +49,8 @@ class Ac_Result_Placeholder extends Ac_Prototyped implements ArrayAccess, Iterat
     }
     
     function offsetSet($offset, $value) {
-        $this->items[$offset] = $value;
+        if (is_null($offset)) $this->items[] = $value;
+            else $this->items[$offset] = $value;
     }
     
     function offsetUnset($offset) {
@@ -61,12 +62,48 @@ class Ac_Result_Placeholder extends Ac_Prototyped implements ArrayAccess, Iterat
         return $this->items;
     }
     
+    function clearItems() {
+        $this->items = array();
+    }
+
+    static function toArray($items, $forceScalarToArray = false) {
+        if (is_object($items)) {
+            if ($items instanceof Ac_Placeholder) {
+                $res = $items->getItems();
+            } else {
+                if ($items instanceof IteratorAggregate) $items = $items->getIterator();
+                if ($items instanceof Iterator) {
+                    $res = array();
+                    foreach ($items as $k => $v) $res[$k] = $v;
+                } else {
+                    $res = Ac_Util::toArray($items);
+                }
+            }
+        } else {
+            if (is_array($items)) $res = $items;
+            elseif ($forceScalarToArray) $res = array($items);
+            else $res = Ac_Util::toArray ($items);
+        }
+        return $res;
+    }
+    
+    function setItems($items) {
+        $this->clearItems();
+        $items = self::toArray($items);
+        if ($items) $this->addItems($items);
+    }
+
     function hasItem($item) {
         return in_array($item, $this->items, true);
     }
     
-    function addItems(array $items) {
+    function addItems($items) {
+        $items = self::toArray($items, true);
         $this->items = array_merge($this->items, $items);
+    }
+    
+    function addItem($item) {
+        $this->offsetSet(null, $item);
     }
     
     function removeItem($item) {

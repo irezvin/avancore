@@ -7,14 +7,18 @@ class Ac_Js_Script extends Ac_Js_Code {
     function __toString() {
         $a = array('type' => 'text/javascript');
         if (strlen($this->src)) $a['src'] = $this->src;
-        $res = Ac_Util::mkElement('script', parent::toJs(new Ac_Js()), $a);
+        $res = Ac_Util::mkElement('script', $this->toRawCode(), $a);
         return $res;
+    }
+    
+    function toRawCode() {
+        return parent::toJs(new Ac_Js());
     }
 
     function toJs(Ac_Js $js, $indent = 0, $indentStep = 4, $newLines = true) {
         $res =
             "function() {\n"
-            .parent::toJs($js, $indent, $indentStep, $newLines)
+            .$this->toRawCode()
             ."\n}";
         return $res;
     }
