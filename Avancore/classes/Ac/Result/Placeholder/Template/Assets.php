@@ -21,7 +21,7 @@ class Ac_Result_Placeholder_Template_Assets extends Ac_Result_Placeholder_Templa
     protected function getStrings(Ac_Result_Placeholder $placeholder, Ac_Result_Writer $writer) {
         if ($this->assetPlaceholders === false) {
             $assetPlaceholders = array();
-            if ($writer instanceof Ac_Result_Writer_RenderHtml)
+            if ($writer instanceof Ac_Result_Writer_AbstractHtmlRenderer)
                 $assetPlaceholders = $writer->getAssetPlaceholders();
             else {
                 $app = Ac_Application::getDefaultInstance();
@@ -31,7 +31,7 @@ class Ac_Result_Placeholder_Template_Assets extends Ac_Result_Placeholder_Templa
             $assetPlaceholders = $this->assetPlaceholders;
         }
         $ren = new Ac_Util_AssetRenderer($assetPlaceholders);
-        return $ren->renderAssets($placeholder->getItems(), true);
+        return $ren->renderAssets($placeholder->getItemsForWrite($writer), true);
     }
     
 }

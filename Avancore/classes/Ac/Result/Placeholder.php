@@ -7,6 +7,11 @@ class Ac_Result_Placeholder extends Ac_Prototyped implements ArrayAccess, Iterat
     protected $template = array('class' => 'Ac_Result_Placeholder_Template');
     
     protected $id = false;
+    
+    /**
+     * @var bool
+     */
+    protected $overwriteOnMerge = false;
 
     function setId($id) {
         if ($this->id !== false && $id !== $this->id) throw new Ac_E_InvalidCall("Can setId() only once");
@@ -62,6 +67,10 @@ class Ac_Result_Placeholder extends Ac_Prototyped implements ArrayAccess, Iterat
         return $this->items;
     }
     
+    function getItemsForWrite(Ac_Result_Writer $writer) {
+        return $this->items;
+    }
+    
     function clearItems() {
         $this->items = array();
     }
@@ -97,13 +106,22 @@ class Ac_Result_Placeholder extends Ac_Prototyped implements ArrayAccess, Iterat
         return in_array($item, $this->items, true);
     }
     
+    function addItem($item) {
+        $this->offsetSet(null, $item);
+    }
+    
     function addItems($items) {
         $items = self::toArray($items, true);
         $this->items = array_merge($this->items, $items);
     }
     
-    function addItem($item) {
-        $this->offsetSet(null, $item);
+    function mergeWith(Ac_Result_Placeholder $other) {
+        if ($other->overwriteOnMerge) $this->clearItems();
+        $this->doMergeWith($other);
+    }
+    
+    protected function doMergeWith(Ac_Result_Placeholder $other) {
+        Ac_Util::ms($this->items, $other->getItems());
     }
     
     function removeItem($item) {
@@ -112,12 +130,22 @@ class Ac_Result_Placeholder extends Ac_Prototyped implements ArrayAccess, Iterat
         }
     }
     
-    function mergeWith(Ac_Result_Placeholder $other) {
-        Ac_Util::ms($this->items, $other->getItems());
-    }
-    
     function write(Ac_Result_Writer $writer) {
         $this->getTemplateInstance()->writePlaceholder($this, $writer);
     }
+
+    /**
+     * @param bool $overwriteOnMerge
+     */
+    function setOverwriteOnMerge($overwriteOnMerge) {
+        $this->overwriteOnMerge = $overwriteOnMerge;
+    }
+
+    /**
+     * @return bool
+     */
+    function getOverwriteOnMerge() {
+        return $this->overwriteOnMerge;
+    }    
     
 }

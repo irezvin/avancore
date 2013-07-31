@@ -21,8 +21,8 @@ class Ac_Result_Placeholder_Single extends Ac_Result_Placeholder {
         }
     }
     
-    function mergeWith(Ac_Result_Placeholder $other) {
-        return $this->addItems($other->getItems());
+    protected function doMergeWith(Ac_Result_Placeholder $other) {
+        $this->addItems($other->getItems());
     }
     
 }

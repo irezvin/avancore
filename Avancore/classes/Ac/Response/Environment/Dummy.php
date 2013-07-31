@@ -19,6 +19,7 @@ class Ac_Response_Environment_Dummy implements Ac_I_Response_Environment {
     function begin() {
         foreach (get_class_vars(get_class($this)) as $k => $v) 
             $this->$k = $v;
+        ob_start();
     }
     
     function cancelBuffering() {
@@ -47,6 +48,9 @@ class Ac_Response_Environment_Dummy implements Ac_I_Response_Environment {
 
     function finishOutput() {
         $this->outputFinished = true;
+        if (strlen($buf = ob_get_clean())) {
+            $this->responseText .= $buf;
+        }
     }
     
 }

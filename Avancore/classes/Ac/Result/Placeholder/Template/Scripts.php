@@ -8,7 +8,7 @@ class Ac_Result_Placeholder_Template_Scripts extends Ac_Result_Placeholder_Templ
     
     protected function getStrings(Ac_Result_Placeholder $placeholder, Ac_Result_Writer $writer) {
         $res = array();
-        foreach ($placeholder->getItems() as $item) {
+        foreach ($placeholder->getItemsForWrite($writer) as $item) {
             if (is_object($item) && $item instanceof Ac_Js_Script) $item = $item->toRawCode();
             $res[] = $item;
         }

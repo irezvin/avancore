@@ -3,7 +3,7 @@
 require(dirname(__FILE__).'/assets/ClassesToTestResult.php');
 
 class Ac_Test_Result extends Ac_Test_Base {
-    
+
     function testBasicResult() {
         
         $outer = new Ac_Result();
@@ -197,7 +197,7 @@ class Ac_Test_Result extends Ac_Test_Base {
         return $r;
     }
     
-    function advanceAndLog(Ac_Result_Stage_Position $p, $max = false, array & $aLog = array(), array & $bLog = array()) {
+    function advanceAndLog(Ac_Result_Position $p, $max = false, array & $aLog = array(), array & $bLog = array()) {
         $i = 0;
         if ($max === false) 
             $max = count(Ac_Util::flattenArray($p->getResult()->getTraversableBunch())) + 10;
@@ -219,7 +219,7 @@ class Ac_Test_Result extends Ac_Test_Base {
             'content', 'first'
         ));
         
-        $p = new Ac_Result_Stage_Position($b1);
+        $p = new Ac_Result_Position($b1);
         list($aLog, $bLog) = $this->advanceAndLog($p);
         if (!$this->assertEqual($bLog, array(
             'content foo0.1',
@@ -234,7 +234,7 @@ class Ac_Test_Result extends Ac_Test_Base {
         $this->assertTrue($p->getIsDone());
         $this->assertNull($p->getObject());
         
-        $p2 = new Ac_Result_Stage_Position($b1, 'BarResult');
+        $p2 = new Ac_Result_Position($b1, 'BarResult');
         $foo = array();
         $bar = array();
         list($aLog, $bLog) = $this->advanceAndLog($p2);
@@ -243,7 +243,7 @@ class Ac_Test_Result extends Ac_Test_Base {
             'first bar1',
         ))) var_dump($bLog, $aLog);
         
-        $p3 = new Ac_Result_Stage_Position($b1, array('FooResult', 'BarResult'));
+        $p3 = new Ac_Result_Position($b1, array('FooResult', 'BarResult'));
         list($aLog, $bLog) = $this->advanceAndLog($p3);
         if (!$this->assertEqual($bLog, array(
             'content foo0.1',
@@ -264,7 +264,7 @@ class Ac_Test_Result extends Ac_Test_Base {
     function testStagePositionExtMorph() {
         $b1 = $this->mkBunchResult();
         
-        $p = new Ac_Result_Stage_Position($b1);
+        $p = new Ac_Result_Position($b1);
         
         $aLog = array();
         $bLog = array();
@@ -304,7 +304,7 @@ class Ac_Test_Result extends Ac_Test_Base {
     function testStagePositionExtDrop() {
         $b1 = $this->mkBunchResult();
         
-        $p = new Ac_Result_Stage_Position($b1);
+        $p = new Ac_Result_Position($b1);
         
         $aLog = array();
         $bLog = array();
@@ -328,7 +328,7 @@ class Ac_Test_Result extends Ac_Test_Base {
     function testStagePositionIntMorph() {
         $b1 = $this->mkBunchResult();
         
-        $p = new Ac_Result_Stage_Position($b1);
+        $p = new Ac_Result_Position($b1);
         
         $aLog = array();
         $bLog = array();
@@ -369,7 +369,7 @@ class Ac_Test_Result extends Ac_Test_Base {
     function testStagePositionIntDrop() {
         $b1 = $this->mkBunchResult();
         
-        $p = new Ac_Result_Stage_Position($b1);
+        $p = new Ac_Result_Position($b1);
         
         $aLog = array();
         $bLog = array();
@@ -411,10 +411,9 @@ class Ac_Test_Result extends Ac_Test_Base {
         $sub1->put("{sub1}{$sub11}{/sub1}");
         $sub2 = new Ac_Result(array('debugData' => 'sub2', 'content' => '{sub2 /}'));
         $outer->put("{outer}{$sub1} {$sub2}{/outer}");
-        $s = new Ac_Result_Stage_Write(array('root' => $outer));
         ob_start();
         ini_set('html_errors', 0);
-        $s->write();
+        $outer->write();
         ini_set('html_errors', 1);
         $buf = ob_get_clean();
         if (!$this->assertEqual($buf, '{outer}{sub1}{sub11 /}{/sub1} {sub2 /}{/outer}')) {
@@ -463,9 +462,8 @@ class Ac_Test_Result extends Ac_Test_Base {
             
         $outer->put("{$widget1} {$widget23}");
         $outer->getPlaceholder('title')->addItems(array('Parent'));
-        $s = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => false));
         ini_set('html_errors', 0);
-        $s->write();
+        $outer->write(array('writeRoot' => false));
         ini_set('html_errors', 1);
         
         if (!$this->assertEqual($outer->getContent(), 
@@ -597,7 +595,183 @@ EOD
             $s
         )) var_dump($i);
         
+        $r4 = new Ac_Result();
+        $r4->setContent('foo');
+        $this->assertEqual($r4->content, 'foo');
+        $r4->content = 'bar';
+        $this->assertEqual($r4->getContent(), 'bar');
         
+    }
+    
+    function testNonExistentPropertySet() {
+        
+        $r = new Ac_Result();
+        $this->expectException();
+        $r->nonExistentProperty = 'bar';
+        
+    }
+    
+    function testNonExistentPropertyGet() {
+        
+        $r = new Ac_Result();
+        $this->expectException();
+        echo $r->nonExistentProperty2;
+        
+    }
+    
+    function testResultWithCharset() {
+        
+        $inner = new Ac_Result_Html(array('content' => iconv('utf-8', 'windows-1251', 'Немного текста'), 'charset' => 'windows-1251'));
+        $outer = new Ac_Result_Html(array('content' => "Снаружи. {$inner} внутри", 'charset' => 'utf-8'));
+        $s = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => false));
+        $s->write();
+        if (!$this->assertEqual($c = $outer->getContent(), 'Снаружи. Немного текста внутри')) var_dump($c);
+        
+    }
+    
+    function testResultHtmlMergeContentType() {
+        $inner = new Ac_Result_Html(array('content' => 'Some text'));
+        $outer = new Ac_Result_Http(array('content' => $inner));
+        $stage = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => false));
+        $stage->write();
+        if (!$this->assertTrue(in_array('Content-Type: text/html', $headers = $outer->getHeaders()->getItems()))) var_dump($headers);
+    }
+    
+    function testResultHtmlHttpOut() {
+        $inner = new Ac_Result_Html(array('content' => 'Some text', 'charset' => 'utf-8', 'charsetUsage' => Ac_I_Result_WithCharset::CHARSET_PROPAGATE));
+        $outer = new Ac_Result_Html(array('content' => $inner));
+        $env = new Ac_Response_Environment_Dummy;
+        $outer->setWriter(new Ac_Result_Writer_RenderHtml(array('environment' => $env)));
+        $stage = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => true));
+        $stage->write();
+        $this->assertEqual($env->headers, array(
+            'Content-Type: text/html; charset=utf-8'
+        ));
+        $this->assertTrue(strpos($this->normalizeHtml($env->responseText), '<body>Some text</body>') !== false);
+        
+        $plain = new Ac_Result_Http(array('contentType' => 'text/plain', 'content' => 'Some Interesting Text'));
+        $plain->setWriter(new Ac_Result_Writer_HttpOut(array('environment' => $env)));
+        $stage = new Ac_Result_Stage_Write(array('root' => $plain, 'writeRoot' => true));
+        $stage->write();
+        if (!$this->assertEqual($h = $env->headers, array(
+            'Content-Type: text/plain'
+        ))) var_dump($h);
+        if (!$this->assertEqual($text = $env->responseText, $plain->getContent())) var_dump($text);
+    }
+    
+    function testAdvancedPlaceholders() {
+        $parent = new Ac_Result_Html(array(
+            'title' => 'Will be replaced',
+            'meta' => array(
+                'keywords' => array('foo', 'bar'),
+                'description' => array('aaa bbb ccc'),
+                'http' => array(
+                    'X-Foo-1' => 'foo1', 
+                    'X-Foo-2' => 'You won\'t see me'),
+            ),
+        ));
+        $child = new Ac_Result_Html(array(
+            'title' => 'New title',
+            'meta' => array(
+                'keywords' => array('There can be only one'),
+                'description' => array('ddd'),
+                'http' => array(
+                    'X-Foo-2' => 'foo2', 
+                ),
+            ),
+        ));
+        $child->title->setOverwriteOnMerge(true);
+        $child->meta->keywords->setOverwriteOnMerge(true);
+        $parent->meta->description[] = "some extra";
+        $child->meta['http']['X-Foo-3'] = 'foo3';
+        $child->meta[] = "not a good idea";
+        $child->meta['author'] = "Ilya Rezvin";
+        $parent->meta['generator'] = "Avancore 0.3";
+        $parent->put($child);
+        ob_start();
+        $parent->write();
+        $c = ob_get_clean();
+        if (!$this->assertEqual(
+            $this->normalizeHtml($c),
+            $this->normalizeHtml(<<<EOD
+                <html>
+                <head>
+                    <title>New title</title>
+
+                    <meta name="keywords" content="There can be only one" />
+                    <meta name="description" content="aaa bbb ccc some extra ddd" />
+                    <meta http-equiv="X-Foo-1" content="foo1" />
+                    <meta http-equiv="X-Foo-2" content="foo2" />
+                    <meta http-equiv="X-Foo-3" content="foo3" />
+                    <meta name="generator" content="Avancore 0.3" />
+                    <meta name="0" content="not a good idea" />
+                    <meta name="author" content="Ilya Rezvin" />
+                </head>
+                <body>
+                </body>
+                </html>
+EOD
+            )
+        )) var_dump($c);
+        
+    }
+    
+    /**
+     * @return Ac_Result
+     */
+    protected function sample7() {
+        $r = new Ac_Result;
+        $r1 = new Ac_Result;
+        $r2 = new Ac_Result;
+        $r1_1 = new Ac_Result(array('content' => 'r1_1'));
+        $r1_2 = new Ac_Result(array('content' => 'r1_2'));
+        $r2_1 = new Ac_Result(array('content' => 'r2_1'));
+        $r2_2 = new Ac_Result(array('content' => 'r2_2'));
+        $r->setContent("r1: {$r1} r2: {$r2}");
+        $r1->setContent("({$r1_1} {$r1_2})");
+        $r2->setContent("({$r2_1} {$r2_2})");
+        return compact('r', 'r1', 'r2', 'r1_1', 'r1_2', 'r2_1', 'r2_2');
+    }
+    
+    function testOverrides() {
+        $a = $this->sample7();
+        $this->assertEqual($a['r']->returnWritten(), 'r1: (r1_1 r1_2) r2: (r2_1 r2_2)');
+        
+        $a = $this->sample7();
+        $a['r']->setReplaceWith(new Ac_Result(array('content' => 'Something')));
+        $this->assertEqual($a['r']->returnWritten(), 'Something');
+        
+        $a = $this->sample7();
+        $a['r1_1']->setOverrideMode(Ac_Result::OVERRIDE_PARENT);
+        $this->assertEqual($a['r']->returnWritten(), 'r1: r1_1 r2: (r2_1 r2_2)');
+        
+        $a = $this->sample7();
+        $a['r1_1']->setOverrideMode(Ac_Result::OVERRIDE_ALL);
+        $this->assertEqual($a['r']->returnWritten(), 'r1_1');
+        
+        $a = $this->sample7();
+        $a['r1_1']->setReplaceWith(new Ac_Result(array('content' => 'Foo Bar')));
+        $this->assertEqual($a['r']->returnWritten(), 'r1: (Foo Bar r1_2) r2: (r2_1 r2_2)');
+        
+        $a = $this->sample7();
+        $a['r1_1']->setReplaceWith(new Ac_Result(array('content' => 'Foo Bar', 'replaceWith' => new Ac_Result(array('content' => 'Baz Quux')))));
+        $this->assertEqual($a['r']->returnWritten(), 'r1: (Baz Quux r1_2) r2: (r2_1 r2_2)');
+        
+        $a = $this->sample7();
+        $a['r1_1']->setReplaceWith(new Ac_Result(array('content' => 'Foo Bar', 'replaceWith' => new Ac_Result(array('content' => 'Baz Quux', 'overrideMode' => Ac_Result::OVERRIDE_PARENT)))));
+        $this->assertEqual($a['r']->returnWritten(), 'r1: Baz Quux r2: (r2_1 r2_2)');
+        
+        $a = $this->sample7();
+        $a['r1_1']->setReplaceWith(new Ac_Result(array('content' => 'Foo Bar', 'replaceWith' => new Ac_Result(array('content' => 'Baz Quux', 'overrideMode' => Ac_Result::OVERRIDE_ALL)))));
+        $this->assertEqual($a['r']->returnWritten(), 'Baz Quux');
+    }
+    
+    function testWriteAgain() {
+        $a = $this->sample7();
+        $this->assertEqual($a['r']->returnWritten(), 'r1: (r1_1 r1_2) r2: (r2_1 r2_2)');
+        $this->assertEqual($a['r']->returnWritten(), 'r1: (r1_1 r1_2) r2: (r2_1 r2_2)');
+        $a['r']->setReplaceWith(new Ac_Result(array('content' => 'Something New')));
+        $this->assertEqual($a['r']->returnWritten(), 'Something New');
     }
     
 }

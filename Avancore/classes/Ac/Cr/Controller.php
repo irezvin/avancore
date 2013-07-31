@@ -2,6 +2,12 @@
 
 class Ac_Cr_Controller extends Ac_Prototyped {
 
+    const OUTPUT_TARGET_CONTENT = 0;
+    
+    const OUTPUT_TARGET_DEBUG = 1;
+    
+    const OUTPUT_TARGET_PASS = 2;
+    
     protected $onlyListedParams = false;
     
     protected $paramBlock = false;
@@ -11,10 +17,6 @@ class Ac_Cr_Controller extends Ac_Prototyped {
     protected $extraParamNames = array();
     
     protected $paramBlockPrototype = false;
-    
-    protected $tempParamStack = array();
-
-    protected $invokeDataStack = array();
     
     /**
      * @var Ac_Cr_Context
@@ -36,9 +38,14 @@ class Ac_Cr_Controller extends Ac_Prototyped {
     
     protected $invokeEnvStack = array();
     
-    protected $result = array();
-    
+    protected $result = null;
+
+    /**
+     * @var Ac_Result
+     */
     protected $lastResult = false;
+    
+    protected $outputTarget = self::OUTPUT_TARGET_CONTENT;
 
     function __get($name) {
         if ($name === 'param') {
@@ -152,7 +159,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
         
     /**
      * TODO: think out how tempParams are applied: before or after param block
-     * @return Ac_Cr_Result
+     * @return Ac_Result
      */
     function getResult(/*$tempParams = false, $overrideAll = false*/) {
         
@@ -169,15 +176,15 @@ class Ac_Cr_Controller extends Ac_Prototyped {
         try {
             $action = $this->getAction();
             if (($impl = $this->getActionImplementation($action)) !== false) {
-                if (is_string($impl)) $res = $this->invokeActionMethod($impl);
+                if (is_string($impl)) $res = $this->invokeActionMethod($impl, array(), $action);
                 else {
                     $res = $impl->getResult();
                 }
             } else {
-                $res = $this->invokeActionMethod('notFoundAction', array($action));
+                $res = $this->invokeActionMethod('notFoundAction', $action, array($action));
             }
         } catch (Exception $e) {
-            $res = $this->invokeActionMethod('exceptionAction', array($e));
+            $res = $this->invokeActionMethod('exceptionAction', $action, array($e));
         }
         return $res;
     }
@@ -193,7 +200,8 @@ class Ac_Cr_Controller extends Ac_Prototyped {
     
     protected function getInvokeEnvDefaults() {
         return array(
-            'result' => array(), 
+            'result' => null, 
+            'outputTarget' => $this->outputTarget,
         );
     }
     
@@ -225,39 +233,66 @@ class Ac_Cr_Controller extends Ac_Prototyped {
      * @param array $invokeEnv
      * @param type $methodResult
      * @param type $methodOutput 
+     * @param string $action Action name
      * 
-     * @return Ac_Cr_Result
+     * @return Ac_Result
      * 
      * @TODO use Ac_E_Controller_InvalidMethodResult
      */
-    protected function processInvokeEnv(array $invokeEnv, $methodReturnValue, $methodOutput) {
+    protected function processInvokeEnv(array $invokeEnv, $methodReturnValue, $methodOutput, $action) {
         $result = false;
-        if (is_object($methodReturnValue) && $methodReturnValue instanceof Ac_Cr_Result) {
-            if ($invokeEnv['result']) {
-                throw new Exception("Action method should either return Ac_Cr_Result instance or populate Ac_Cr_Controller->\$result, but not both");
+        if (is_object($methodReturnValue)) {
+            if ($methodReturnValue instanceof Ac_Result) {
+                if ($invokeEnv['result']) {
+                    throw new Exception("Action method '' should either return Ac_Result instance or populate Ac_Cr_Controller->\$result, but not both");
+                } else {
+                    $result = $methodReturnValue;
+                }
             } else {
-                $result = $methodReturnValue;
+                throw new Exception("Action method for action '{$action}' should return either NULL or an instance of Ac_Result");
             }
         } else {
-            if (is_array($invokeEnv['result']) || is_object($invokeEnv['result'])) {
-                if (is_array($invokeEnv['result']) && !isset($invokeEnv['result']['class'])) $invokeEnv['result']['class'] = 'Ac_Cr_Result_Response';
-                $result = Ac_Prototyped::factory($invokeEnv['result'], 'Ac_Cr_Result');
-                if ($result !== $methodReturnValue) $result->setMethodReturnValue($methodReturnValue);
-                $result->setMethodOutput($methodOutput);
+            if (is_null($invokeEnv['result'])) $result = new Ac_Result();
+            elseif (is_array($invokeEnv['result']) || is_object($invokeEnv['result']) && $invokeEnv['result'] instanceof Ac_Result) {
+                if (is_array($invokeEnv['result']))
+                    $result = Ac_Prototyped::factory($invokeEnv['result'], 'Ac_Result');
             } else {
-                throw new Exception("Unknown type of Ac_Cr_Controller->\$result; array, object or Ac_Cr_Result instance must be provided");
+                throw new Exception("Unknown type of Ac_Cr_Controller->\$result; array, object or Ac_Result instance must be provided");
             }
         }
+        $this->processMethodOutput($methodOutput, $result);
         return $result;
     }
     
+    protected function processMethodOutput($methodOutput, Ac_Result $result) {
+        $res = false;
+        if (strlen($methodOutput)) {
+            if ($this->outputTarget == self::OUTPUT_TARGET_CONTENT) {
+                $result->put($methodOutput);
+                $res = true;
+            } elseif ($this->outputTarget == self::OUTPUT_TARGET_DEBUG) {
+                $this->echoToDebug($methodOutput);
+                $res = true;
+            } elseif ($this->outputTarget == self::OUTPUT_TARGET_PASS) {
+                echo $methodOutput;
+                $res = true;
+            }
+        }
+        return $res;
+    }
+    
+    protected function echoToDebug($output) {
+        echo $output; // TODO: pass to the application logger
+    }
+    
     /**
-     * @return Ac_Cr_Result
+     * @return Ac_Result
      * @param string $impl Name of the function 
      * @param array $args Arguments to the function
+     * @param string $action Action name (for reference only)
      * @throws Exception 
      */
-    protected function invokeActionMethod($impl, array $args = array()) {
+    protected function invokeActionMethod($impl, array $args = array(), $action) {
         $es = 0;
         try {
             array_push($this->invokeEnvStack, $this->getInvokeEnv());
@@ -268,7 +303,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
             $methodOutput = ob_get_clean();
             $resultEnv = $this->getInvokeEnv();
             $this->setInvokeEnv(array_pop($this->invokeEnvStack));
-            $res = $this->processInvokeEnv($resultEnv, $methodReturnValue, $methodOutput);
+            $res = $this->processInvokeEnv($resultEnv, $methodReturnValue, $methodOutput, $action);
             return $res;
         } catch (Exception $e) {
             // TODO: write captured output somewhere
