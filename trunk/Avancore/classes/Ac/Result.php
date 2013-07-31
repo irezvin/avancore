@@ -5,7 +5,6 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     const OVERRIDE_NONE = 0;
     const OVERRIDE_PARENT = 1;
     const OVERRIDE_ALL = 2;
-    
 
     protected $content = '';
     
@@ -33,6 +32,8 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
      */
     protected $writer = false;
 
+    protected $overrideMode = self::OVERRIDE_NONE;
+
     /**
      * @var bool
      */
@@ -42,8 +43,6 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
      * @var bool
      */
     protected $cacheable = true;
-
-    protected $overrideMode = self::OVERRIDE_NONE;
     
     /**
      * @var array idHash => stringObject
@@ -67,6 +66,8 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     
     
     protected $debugData = false;
+    
+        
     
     function listPlaceholders($onlyUsed = false, $onlyDefault = false) {
         if (!is_array($this->placeholders)) $this->setPlaceholders(array());
@@ -200,7 +201,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     function getTargetPlaceholderId() {
         return $this->targetPlaceholderId;
     }
-
+    
     function setPlaceholderParams($placeholderParams) {
         $this->placeholderParams = $placeholderParams;
     }
@@ -325,9 +326,13 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
         return $this->content;
     }   
     
+    function echoContent() {
+        echo $this->content;
+    }
+    
     function setContent($content) {
         $this->stringObjects = array();
-        $this->content = $content;
+        $this->content = ''.$content;
         $this->touchStringObjects();
     }
     
@@ -472,19 +477,21 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     }
     
     function __get($varName) {
-        if (in_array($varName, $this->listPlaceholders())) {
+        if ($varName === 'content') $res = $this->getContent();
+        elseif (in_array($varName, $this->listPlaceholders())) {
             $res = $this->getPlaceholder($varName);
         } else {
-            $res = NULL;
+            throw Ac_E_InvalidCall::noSuchProperty($this, $varName);
         }
         return $res;
     }
     
     function __set($varName, $value) {
-        if (in_array($varName, $this->listPlaceholders())) {
+        if ($varName === 'content') $this->setContent($value);
+        elseif (in_array($varName, $this->listPlaceholders())) {
             $this->getPlaceholder($varName)->setItems($value);
         } else {
-            if (!in_array($varName, get_class_vars(__CLASS__))) $this->$varName = $value;
+            throw Ac_E_InvalidCall::noSuchProperty($this, $varName);
         }
     }
     
@@ -496,5 +503,22 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
         }
         return $res;        
     }
-
+    
+    /**
+     * @param type $stage Ac_Result_Stage_Write or its prototype
+     * @return Ac_Result_Stage_Write
+     */
+    function write($stage = null) {
+        if (is_null($stage)) $stage = array();
+        $stage = Ac_Prototyped::factory($stage, 'Ac_Result_Stage_Write', array('root' => $this), true);
+        $stage->write();
+        return $stage;
+    }
+    
+    function returnWritten(& $stage = null) {
+        ob_start();
+        $stage = $this->write($stage);
+        return ob_get_clean();
+    }
+    
 }

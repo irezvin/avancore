@@ -350,6 +350,14 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         return $this->intGetConfigValue(substr(__FUNCTION__, 3));
     }
     
+    function getCharset() {
+        return $this->intGetConfigValue(substr(__FUNCTION__, 3));
+    }
+    
+    protected function doGetDefaultCharset() {
+        return 'utf-8';
+    }
+    
     /**
      * @return array
      */

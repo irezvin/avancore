@@ -64,7 +64,7 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
             $hash = md5(serialize($prototype));
             $bc = (string) $baseClass;
             if (!isset(self::$factoryOnceInstances[$bc]) || !isset(self::$factoryOnceInstances[$bc][$hash])) {
-                self::$factoryOnceInstances[$bc][$hash] = self::factory($prototype, $baseClass, $strictParams);
+                self::$factoryOnceInstances[$bc][$hash] = self::factory($prototype, $baseClass, array(), false, $strictParams);
             }
             $res = self::$factoryOnceInstances[$bc][$hash];
         } else {
@@ -73,15 +73,24 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
         return $res;
     }
     
-    static function factory($prototype, $baseClass = null, $strictParams = null) {
+    static function factory(
+        $prototype, 
+        $baseClass = null, 
+        array $defaults = array(), 
+        $setObjectPropertiesToDefaults = false,
+        $strictParams = null
+    ) {
         if (is_null($strictParams)) $strictParams = self::$strictParams;
         
         $className = $baseClass;
         
         if (is_object($prototype)) {
             $res = $prototype;
+            if ($defaults && $setObjectPropertiesToDefaults)
+                Ac_Accessor::setObjectProperty ($res, $defaults);
         } else {
             if (!is_array($prototype)) $prototype = array('class' => (string) $prototype);
+            if ($defaults) $prototype = Ac_Util::m($defaults, $prototype);
 
             $class = null;
             

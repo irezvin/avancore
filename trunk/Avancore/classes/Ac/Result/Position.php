@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Result_Stage_Position {
+class Ac_Result_Position {
 
     /**
      * @var Ac_Result
@@ -277,9 +277,9 @@ class Ac_Result_Stage_Position {
     
     function insertBefore($objectOrString) {
         if ($this->propertyName === false && $advanceIfNoPosition) $this->advance();
-        if ($this->isDone) throw new Ac_E_InvalidUsage("Cannot insertBefore() when not at object; check with !Ac_Result_Stage_Position::isDone() first");
+        if ($this->isDone) throw new Ac_E_InvalidUsage("Cannot insertBefore() when not at object; check with !Ac_Result_Position::isDone() first");
         if (!is_object($objectOrString) && !$this->isString) 
-            throw new Ac_E_InvalidUsage("Cannot insertBefore(".gettype($withObjectOrString).") into non-string property '".$this->propertyName."'; check with Ac_Result_Stage_Position::isString() first");
+            throw new Ac_E_InvalidUsage("Cannot insertBefore(".gettype($withObjectOrString).") into non-string property '".$this->propertyName."'; check with Ac_Result_Position::isString() first");
         // TODO: check if current offset isn't INSIDE a string object mark (probably better to do it at Ac_Result)
         
         if ($this->isString) {
@@ -295,7 +295,7 @@ class Ac_Result_Stage_Position {
         if ($this->propertyName === false && $advanceIfNoPosition) $this->advance();
         if ($this->isDone) throw new Ac_E_InvalidUsage("Cannot insertAfter() when not at object; check with isDone() first");
         if (!is_object($objectOrString) && !$this->isString) 
-            throw new Ac_E_InvalidUsage("Cannot insertAfter(".gettype($withObjectOrString).") into non-string property '".$this->propertyName."'; check with Ac_Result_Stage_Position::isString() first");
+            throw new Ac_E_InvalidUsage("Cannot insertAfter(".gettype($withObjectOrString).") into non-string property '".$this->propertyName."'; check with Ac_Result_Position::isString() first");
         // TODO: check if current offset isn't INSIDE a string object mark (probably better to do it at Ac_Result)
         
         if ($this->isString) {
@@ -314,7 +314,7 @@ class Ac_Result_Stage_Position {
     
     function removeCurrentObject() {
         if ($this->propertyName === false && $advanceIfNoPosition) $this->advance();
-        if ($this->isDone) throw new Ac_E_InvalidUsage("Cannot removeCurrentObject() when not at object; check with !Ac_Result_Stage_Position::isDone() first");
+        if ($this->isDone) throw new Ac_E_InvalidUsage("Cannot removeCurrentObject() when not at object; check with !Ac_Result_Position::isDone() first");
         
         if ($this->isString) {
             $this->result->removeFromContent($this->currentObject);
@@ -325,11 +325,11 @@ class Ac_Result_Stage_Position {
     
     function replaceCurrentObject($withObjectOrString) {
         if ($this->propertyName === false && $advanceIfNoPosition) $this->advance();
-        if ($this->isDone) throw new Ac_E_InvalidUsage("Cannot replaceCurrentObject() when not at object; check with !Ac_Result_Stage_Position::isDone() first");
+        if ($this->isDone) throw new Ac_E_InvalidUsage("Cannot replaceCurrentObject() when not at object; check with !Ac_Result_Position::isDone() first");
         if (!is_object($withObjectOrString) && !$this->isString) 
-            throw new Ac_E_InvalidUsage("Cannot replaceCurrentObject(".gettype($withObjectOrString).") into non-string property '".$this->propertyName."'; check with Ac_Result_Stage_Position::isString() first");
+            throw new Ac_E_InvalidUsage("Cannot replaceCurrentObject(".gettype($withObjectOrString).") into non-string property '".$this->propertyName."'; check with Ac_Result_Position::isString() first");
         if ($this->propertyName === false && $advanceIfNoPosition) $this->advance();
-        if ($this->isDone) throw new Ac_E_InvalidUsage("Cannot removeCurrentObject() when not at object; check with !Ac_Result_Stage_Position::isDone() first");
+        if ($this->isDone) throw new Ac_E_InvalidUsage("Cannot removeCurrentObject() when not at object; check with !Ac_Result_Position::isDone() first");
         
         if ($this->isString) {
             $this->result->replaceObjectInContent($this->currentObject, $withObjectOrString);

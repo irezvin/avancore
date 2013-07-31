@@ -49,7 +49,7 @@ class Ac_Result_Placeholder_Unique extends Ac_Result_Placeholder {
         unset($this->items[$hash]);
     }
     
-    function mergeWith(Ac_Result_Placeholder $other) {
+    protected function doMergeWith(Ac_Result_Placeholder $other) {
         if ($other instanceof Ac_Result_Placeholder_Unique)
             $this->items = array_merge($this->items, array_diff_key($other->items, $this->items));
         else 

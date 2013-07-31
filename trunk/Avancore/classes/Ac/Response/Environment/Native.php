@@ -12,7 +12,7 @@ class Ac_Response_Environment_Native implements Ac_I_Response_Environment, Ac_I_
         return true;
     }
     
-    function begin() {
+    function e() {
     }
     
     function cancelBuffering() {

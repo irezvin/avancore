@@ -8,6 +8,11 @@ class Ac_Result_Stage extends Ac_Prototyped {
     const HANDLER_END_STAGE = 'endStage';
     
     /**
+     * @var Ac_Application
+     */
+    protected $application = false;
+    
+    /**
      * @var bool
      */
     protected $isActive = false;
@@ -117,7 +122,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
     protected $traversalClasses = 'Ac_Result';
     
     /**
-     * @var Ac_Result_Stage_Position
+     * @var Ac_Result_Position
      */
     protected $position = false;
  
@@ -126,7 +131,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
         
         $this->resetTraversal($classes);
         while ($this->traverseNext()) {
-        };
+        }
     }
 
     protected function resetTraversal($classes = null) {
@@ -141,6 +146,41 @@ class Ac_Result_Stage extends Ac_Prototyped {
         $this->isComplete = false;
     }
     
+    /**
+     * Checks if current, parent or root item should be overriden by 
+     * ReplaceWith or OverrideMode properties
+     */
+    protected function checkOverride() {
+        $old = $this->current;
+        $was = array($this->current);
+        while (($repl = $this->current->getReplaceWith()) && ($repl !== $this->current)) {
+            $this->current = $repl;
+            if (in_array($repl, $was, true)) throw new Exception("Cyclic reference detected in Ac_Result::getReplaceWith()");
+            $was[] = $repl;
+        }
+        if ($this->current !== $old) {
+            if ($this->position) {
+                $this->position->replaceCurrentObject($this->current);
+            }
+        }
+        if ($this->current->getOverrideMode() == Ac_Result::OVERRIDE_PARENT) {
+            if ($this->parent) {
+                $new = $this->current;
+                list ($this->current, $this->parent, $this->position) = array_pop($this->stack);
+                $this->position->replaceCurrentObject($new);
+                $this->current = $new;
+            }
+        } elseif ($this->current->getOverrideMode() == Ac_Result::OVERRIDE_ALL) {
+                //Ac_Debug::ddd($this->root === $this->stack[0][0]);
+            $curr = $this->current;
+            // goto root node
+            list ($this->current, $this->parent, $this->position) = $this->stack[0];
+            $this->stack = array();
+            $this->current->setReplaceWith($curr);
+            $this->current = $curr;
+        }
+    }
+    
     protected function traverseNext() {
         if ($this->current) {
             $this->isActive = true;
@@ -148,11 +188,12 @@ class Ac_Result_Stage extends Ac_Prototyped {
             $switchedCurrent = false;
             if (!$this->isAscend) {
                 
+                if ($this->current instanceof Ac_Result) $this->checkOverride();
                 $this->beginItem($this->current);
                 
                 $fc = false;
                 if ($this->current instanceof Ac_Result) {
-                    $position = new Ac_Result_Stage_Position($this->current, $this->traversalClasses);
+                    $position = new Ac_Result_Position($this->current, $this->traversalClasses);
                     $fc = $position->advance();
                     if ($fc) {
                         array_push($this->stack, array($this->current, $this->parent, $this->position));
@@ -285,11 +326,6 @@ class Ac_Result_Stage extends Ac_Prototyped {
             throw new Ac_E_InvalidUsage("Cannot put() when not in position; check with getIsChangeable() first");
         }
     }
-    
-    /**
-     * @var Ac_Application
-     */
-    protected $application = false;
 
     function setApplication(Ac_Application $application) {
         $this->application = $application;
