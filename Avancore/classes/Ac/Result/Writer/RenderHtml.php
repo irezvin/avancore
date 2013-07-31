@@ -1,46 +1,49 @@
 <?php
 
-class Ac_Result_Writer_RenderHtml extends Ac_Result_Writer_Plain {
+class Ac_Result_Writer_RenderHtml extends Ac_Result_Writer_AbstractHtmlRenderer {
     
-    protected $assetPlaceholders = false;
+    /**
+     * @var Ac_I_Response_Environment
+     */
+    protected $environment = null;
 
-    function setAssetPlaceholders(array $assetPlaceholders) {
-        $this->assetPlaceholders = $assetPlaceholders;
+    function setEnvironment(Ac_I_Response_Environment $environment = null) {
+        $this->environment = $environment;
     }
 
     /**
-     * @return array
+     * @return Ac_I_Response_Environment
      */
-    function getAssetPlaceholders() {
-        if ($this->assetPlaceholders === false) {
-            $app = ($s = $this->getStage())? $s->getApplication() : Ac_Application::getDefaultInstance();
-            if (!$app) return array();
-            return $app->getAssetPlaceholders(true);
-        }
-        return $this->assetPlaceholders;
-    }    
+    function getEnvironment() {
+        return $this->environment;
+    }        
     
-    protected function wp($placeholderId, $_ = null) {
-        $args = func_get_args();
-        foreach ($args as $placeholderId) 
-            $this->source->getPlaceholder($placeholderId)->write($this);
-    }
-    
-    protected function implWrite(Ac_Result $r, Ac_Result $t = null, Ac_Result_Stage $s = null) {
+    protected function implWriteNoCharset(Ac_Result $r, Ac_Result $t = null, Ac_Result_Stage $s = null) {
         if (!$r instanceof Ac_Result_Html) throw Ac_E_InvalidCall::wrongClass('r', $r, 'Ac_Result_Html');
+        if ($r->getContentType() === false) $r->setContentType('text/html');
+        if ($t && ($env = $this->getEnvironment())) 
+            throw new Ac_E_InvalidUsage("Both Environment and Target properties were set - cannot decide precedence");
+        $useEnv = (!$t && ($env = $this->environment));
+        if ($useEnv) {
+            $env->begin();
+            $env->acceptHeaders($r->getHeaders()->getItems());
+        } elseif ($t && $t instanceof Ac_Result_Http_Abstract) {
+            $t->getHeaders()->mergeWith($r->getHeaders());
+        }
 ?>
-<?php   $this->wp('doctype'); ?>
-<html<?php $this->wp('htmlAttribs'); ?>>
+<?php   $this->writePlaceholder('doctype'); ?>
+<html<?php $this->writePlaceholder('htmlAttribs'); ?>>
 <head><?php ?>
-<?php $this->wp('title', 'headTags', 'assets', 'headScripts'); ?>
+<?php $this->writePlaceholder('title', 'meta', 'headTags', 'assets', 'headScripts'); ?>
 </head>
-<body<?php $this->wp('bodyAttribs'); ?>>
-<?php   echo parent::implWrite($r, $t, $s); ?>
-<?php   $this->wp('initScripts'); ?> 
+<body<?php $this->writePlaceholder('bodyAttribs'); ?>>
+<?php   $r->echoContent(); ?>
+<?php   $this->writePlaceholder('initScripts'); ?> 
 </body>
 </html>
-<?php   $this->wp('comments'); ?>
+<?php   $this->writePlaceholder('comments'); ?>
 <?php
+        if ($useEnv) $env->finishOutput();
     }
     
 }

@@ -23,6 +23,15 @@ class Ac_Test_PrototypeAccess extends Ac_Test_Base {
         ));
     }
     
+    function testNewFactory() {
+        $a1 = Ac_Prototyped::factory(new ApSample, 'ApSample', array('baz' => 'baz1'), true);
+        $a2 = Ac_Prototyped::factory(new ApSample, 'ApSample', array('baz' => 'baz2'), false);
+        $a3 = Ac_Prototyped::factory(array(), 'ApSample', array('baz' => 'baz3'), false);
+        $this->assertEqual($a1->getBaz(), 'baz1');
+        $this->assertEqual($a2->getBaz(), false);
+        $this->assertEqual($a3->getBaz(), 'baz3');
+    }
+    
     function testAccessor() {
         $obj = new ApSample();
         $acc = new Ac_Accessor($obj);

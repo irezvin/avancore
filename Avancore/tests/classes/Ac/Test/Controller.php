@@ -12,7 +12,7 @@ class Ac_Test_Controller extends Ac_Test_Base {
         $rq->populate($url, '/index.php');
         
         $ctx = new Ac_Cr_Context();
-        $ctx->setRequest($rq); 
+        $ctx->setRequest($rq);
         
         $c = new testController1();
         $c->setContext($ctx);
@@ -41,14 +41,14 @@ class Ac_Test_Controller extends Ac_Test_Base {
         
         $this->assertIsA(
             $result,
-            'Ac_Cr_Result',
-            'Ac_Cr_Controller::getResult should return Ac_Cr_Result instance'
+            'Ac_Result',
+            'Ac_Cr_Controller::getResult should return Ac_Result instance'
         );
         
         $this->assertEqual(
             get_class($result), 
-            'Ac_Cr_Result_Response', 
-            'Method returns Ac_Cr_Result_Response by default'
+            'Ac_Result', 
+            'Method returns Ac_Result by default'
         );
         
         $this->assertSame(
@@ -58,7 +58,7 @@ class Ac_Test_Controller extends Ac_Test_Base {
         );
         
         $this->assertEqual(
-            $result->getMethodOutput(), 
+            $result->getContent(), 
             'Id is: 1',
             'Result content should be the same as expected and contain passed parameter \'id\' value'
         );
@@ -73,8 +73,6 @@ class Ac_Test_Controller extends Ac_Test_Base {
         $this->assertTrue ($result !== $result2, 
             'After Ac_Cr_Controller::reset() controller should return other Result instance'
         );
-        
-        $this->assertIsA($result->getResponse(), 'Ac_Response');
         
         $this->assertEqual(
             $c->getUrl().'',
@@ -97,11 +95,11 @@ class testController1 extends Ac_Cr_Controller {
     
     function actionDetails() {
         echo "Id is: ".$this->getId();
-        return array(
+        /*return array(
             'id' => $this->getId(),
             'name' => 'Some name',
             'description' => 'Some description',
-        );
+        );*/
     }
     
     function executeMyUrl() {
