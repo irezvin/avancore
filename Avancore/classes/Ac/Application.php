@@ -67,6 +67,7 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     
     static function setDefaultInstance(Ac_Application $instance) {
         self::$defaultInstance = $instance;
+        self::$defaultInstanceIds[get_class($instance)] = $instance->getId();
     }
     
     protected static function getNextId(Ac_Application $instance) {
