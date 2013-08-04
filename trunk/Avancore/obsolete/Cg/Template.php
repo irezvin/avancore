@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Template extends Ac_Template {
+class Cg_Template extends Ac_Legacy_Template {
     
     var $_init = false;
     

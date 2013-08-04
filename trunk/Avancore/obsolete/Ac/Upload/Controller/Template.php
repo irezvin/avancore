@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Upload_Controller_Template extends Ac_Template_Html {
+class Ac_Upload_Controller_Template extends Ac_Legacy_Template_Html {
     
     var $langFileToUpload = 'File to upload';
     var $langFilename = 'Filename';

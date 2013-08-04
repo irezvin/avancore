@@ -1,12 +1,12 @@
 <?php
 
-class Ac_Template_Helper {
+class Ac_Legacy_Template_Helper {
     /**
-     * @var Ac_Template
+     * @var Ac_Legacy_Template
      */
     var $template = false;
     
-    function Ac_Template_Helper($template) {
+    function Ac_Legacy_Template_Helper($template) {
         $this->template = $template;
     }
 }

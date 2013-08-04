@@ -10,7 +10,7 @@ class Ac_Legacy_Output_Native extends Ac_Legacy_Output {
     
     var $allowCleanBufferAndDie = true;
 
-    var $templateClass = 'Ac_Template_HtmlPage';
+    var $templateClass = 'Ac_Legacy_Template_HtmlPage';
     
     function Ac_Output_Native($options = array()) {
         Ac_Util::bindAutoparams($this, $options);

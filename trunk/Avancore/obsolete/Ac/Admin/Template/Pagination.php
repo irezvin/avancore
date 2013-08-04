@@ -9,7 +9,7 @@ if (!defined('AC_ADMIN_PAGINATION_OF')) define ('AC_ADMIN_PAGINATION_OF', 'of');
 if (!defined('AC_ADMIN_PAGINATION_SHOW_QTY')) define ('AC_ADMIN_PAGINATION_SHOW_QTY', 'Show #');
 if (!defined('AC_ADMIN_PAGINATION_RECORDS')) define ('AC_ADMIN_PAGINATION_RECORDS', 'records');
 
-class Ac_Admin_Template_Pagination extends Ac_Template_Html {
+class Ac_Admin_Template_Pagination extends Ac_Legacy_Template_Html {
 
     var $showFormTag = false;
     
