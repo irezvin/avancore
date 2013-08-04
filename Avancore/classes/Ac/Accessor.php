@@ -150,7 +150,7 @@ class Ac_Accessor implements Ac_I_Accessor {
             $head = self::getObjectProperty($head, $segment, $defaultValue);
         }
         $res = count($path)? $defaultValue : $head;
-        return $res;;
+        return $res;
     }
     
     static function getObjectProperty($item, $propertyName, $defaultValue = null) {

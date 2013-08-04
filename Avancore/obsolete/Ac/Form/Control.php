@@ -604,7 +604,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
             }
         }
         if ((is_object($wcp[0]) || strlen($wcp[0])) && strlen($wcp[1])) {
-            if (is_a($wcp[0], 'Ac_Template')) $tpl = $wcp[0];
+            if (is_a($wcp[0], 'Ac_Legacy_Template')) $tpl = $wcp[0];
                 else $tpl = $this->getSpecificTemplate($wcp[0]);
             $res = $tpl->fetch($wcp[1], $this->_doGetWrapperTemplatePartParams($wrappedHtml));
         } else {

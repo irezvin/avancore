@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Template_Helper_Html extends Ac_Template_Helper {
+class Ac_Legacy_Template_Helper_Html extends Ac_Legacy_Template_Helper {
     function jsQuote($string, $singleQuote = true) {
         $quote = $singleQuote? "'" : '"';
         $res = $quote.addcslashes($string, $quote."\n\r\t\0").$quote;

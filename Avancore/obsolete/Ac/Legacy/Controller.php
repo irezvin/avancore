@@ -28,7 +28,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped {
     var $_templatePart = false;
     
     /**
-     * @var Ac_Template_Html
+     * @var Ac_Legacy_Template_Html
      */
     var $_template = false;
     
@@ -384,7 +384,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped {
     }
     
     /**
-     * @return Ac_Template_Html
+     * @return Ac_Legacy_Template_Html
      */
     function getTemplate() {
         if ($this->_template === false) {

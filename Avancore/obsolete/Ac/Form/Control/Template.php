@@ -3,7 +3,7 @@
 /**
  * Important note: form template show... methods should accept reference to the rendered control as the first parameter
  */
-class Ac_Form_Control_Template extends Ac_Template_Html {
+class Ac_Form_Control_Template extends Ac_Legacy_Template_Html {
     
     var $control = false;
 

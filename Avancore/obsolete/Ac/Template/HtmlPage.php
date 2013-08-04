@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Template_HtmlPage extends Ac_Template_Html {
+class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
 
     const doctypeTransitional = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">';
     const doctypeStrict = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';

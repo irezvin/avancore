@@ -93,7 +93,7 @@ class Ac_Legacy_Controller_Std_Submission_Sendout {
     /**
      * @param Ac_Legacy_Controller_Std_Submission $submission Controller that processes object submission from the Web
      * @param Ac_Model_Object $modelObject Object that was submitted and, maybe, stored to the database
-     * @param Ac_Template_Html $template Controller's template object (to render template parts)
+     * @param Ac_Legacy_Template_Html $template Controller's template object (to render template parts)
      * @param array $prototype Values to initialize $this object properties
      * @return Ac_Legacy_Controller_Std_Submission_Sendout 
      */

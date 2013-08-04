@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Template {
+class Ac_Legacy_Template {
 
     /**
      * @var Ac_Legacy_Controller
@@ -13,7 +13,7 @@ class Ac_Template {
     var $context = false;
     
     /**
-     * Ac_Template_Helper instances
+     * Ac_Legacy_Template_Helper instances
      *
      * @var unknown_type
      */
@@ -29,14 +29,14 @@ class Ac_Template {
     /**
      * @param array $vars Initial values for template variables 
      */
-    function Ac_Template($vars = array()) {
+    function Ac_Legacy_Template($vars = array()) {
         $this->setVars($vars);
     }
     
     /**
      * @param string $className Name of template class
      * @param array $vars Initial values for template variables
-     * @return Ac_Template
+     * @return Ac_Legacy_Template
      */
     function factory($className, $vars = array()) {
         $res = new $className($vars);
@@ -76,7 +76,7 @@ class Ac_Template {
      * @param array $extraParams Parameters to pass to template function
      */
     function showTemplate($className, $vars = array(), $partName = 'default', $extraParams = array()) {
-        $tpl = Ac_Template::factory($className, $vars);
+        $tpl = Ac_Legacy_Template::factory($className, $vars);
         return $tpl->show($partName, $extraParams);
     }
     
@@ -91,7 +91,7 @@ class Ac_Template {
      * @return string rendered template part 
      */
     function fetchTemplate($className, $vars = array(), $partName = 'default', $extraParams = array()) {
-        $tpl = Ac_Template::factory($className, $vars);
+        $tpl = Ac_Legacy_Template::factory($className, $vars);
         return $tpl->fetch($partName, $extraParams);
     }
         

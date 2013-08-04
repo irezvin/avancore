@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Template_JoomlaPage extends Ac_Template_Html {
+class Ac_Legacy_Template_JoomlaPage extends Ac_Legacy_Template_Html {
     
     var $addXmlTag = true;
     
