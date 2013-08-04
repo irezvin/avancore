@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Template_Html extends Ac_Template {
+class Ac_Legacy_Template_Html extends Ac_Legacy_Template {
 
     /**
      * @var Ac_Legacy_Controller_Context_Http
@@ -145,10 +145,10 @@ class Ac_Template_Html extends Ac_Template {
     }
     
     /**
-     * @return Ac_Template_Helper_Html
+     * @return Ac_Legacy_Template_Helper_Html
      */
     function getHtmlHelper () {
-        $res = $this->getHelper ('Ac_Template_Helper_Html');
+        $res = $this->getHelper ('Ac_Legacy_Template_Helper_Html');
         return $res; 
     }
     

@@ -1,6 +1,6 @@
 <?php
 
-require(dirname(__FILE__).'/assets/ClassesToTestResult.php');
+require_once(dirname(__FILE__).'/assets/Result_classes.php');
 
 class Ac_Test_Result extends Ac_Test_Base {
 
