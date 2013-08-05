@@ -4,6 +4,10 @@
 class TestTemplate1 extends Ac_Template {
 
     // Public -- for testing purposes
+    function getStack() {
+        return $this->stack;
+    }
+    
     function getSignature($methodName) {
         return parent::getSignature($methodName);
     }
@@ -57,24 +61,24 @@ class TestTemplate1 extends Ac_Template {
 <?php        
     }
     
-    protected function partWrapper1($innerText) { 
+    protected function partWrapper1($buffer) { 
 ?>
         Begin wrapper1
-<?php   echo $innerText; ?> 
+<?php   echo $buffer; ?> 
         End wrapper1
 <?php
     }
     
-    protected function partWrapper2($innerText) { 
+    protected function partWrapper2($buffer) { 
 ?>
         Begin wrapper2
-<?php   echo $innerText; ?> 
+<?php   echo $buffer; ?> 
         End wrapper2
 <?php
     }
     
     protected function partWithWrapper1() {
-        $this->wrapWith('wrapper1');
+        $this->wrap('wrapper1');
 ?>        
         Text of part with wrapper1
 <?php        
@@ -83,8 +87,22 @@ class TestTemplate1 extends Ac_Template {
     protected function partWithoutWrapper() {
         $this->dontWrap();
 ?>        
-        echo 'Text of part without wrapper';
+        Text of part without wrapper
 <?php        
+    }
+    
+    protected function partWithNesting() {
+        $this->wrap('wrapper2');
+?>
+        Part with nesting:
+        
+        <?php $this->showWithWrapper1(); ?>
+        
+        <?php $this->showWithoutWrapper(); ?>
+        
+        <?php $this->showObjects(); ?>
+        
+<?php
     }
     
 }
@@ -138,6 +156,7 @@ class TestObject1 {
     
 }
 
-class TestObject1_1 extends TestObject1 {}
+class TestObject1_1 extends TestObject1 {
+}
 
 class TestObject1_2 extends TestObject1 {}
