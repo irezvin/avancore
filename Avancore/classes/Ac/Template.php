@@ -17,8 +17,20 @@ class Ac_Template extends Ac_Prototyped {
     
     protected $defaultResultClass = 'Ac_Result_Html';
     
+    protected $compatibleResultClasses = array('Ac_Result_Html');
+    
     protected $component = false;
-
+    
+    protected $stack = array();
+    
+    protected $stackItems = array('wrap' => false);
+        
+    protected $wrap = false;
+    
+    protected $wrapTopLevel = true;
+    
+    protected $defaultWrapper = false;
+    
     function setComponent($component = null) {
         $this->component = $component;
     }
@@ -31,7 +43,12 @@ class Ac_Template extends Ac_Prototyped {
         return get_class($this);
     }
     
-    protected function setlue($name) {
+    protected function incompatibleResultClass($class) {
+        $descr = $this->getDescription();
+        return new Ac_E_Template("Incompatible result class {$class} passed to template {$descr}. Check with isResultCompatible() first.");
+    }
+    
+    protected function noSuchValue($name) {
         $descr = $this->getDescription();
         return new Ac_E_Template("No such value: '{$name}' in template {$descr}");
     }
@@ -39,6 +56,10 @@ class Ac_Template extends Ac_Prototyped {
     protected function noSuchPart($name) {
         $descr = $this->getDescription();
         return new Ac_E_Template("No such part: '{$name}' in template {$descr}");
+    }
+    
+    protected function callFromTemplatePartOnly($method) {
+        return new Ac_E_Template("Method {$method} can be called from a template part only");
     }
     
     protected static function describeArgs($signature) {
@@ -147,17 +168,72 @@ class Ac_Template extends Ac_Prototyped {
     
     protected function invokeMethod($methodName, array $args) {
         ob_start();
-        // TODO: push current wrapper and other in-method context
-        $args = $this->getArgs($methodName, $args, $missingArgs);
-        if (count($missingArgs)) 
-            throw $this->missingArguments ($methodName, $missingArgs);
-        // TODO: load replacement file here (if any)
-        call_user_func_array(array($this, $methodName), $args);
-        $buffer = ob_get_clean();
-        
-        // TODO: pop the context, apply wrapper
-        $res = $buffer;
+        $this->push();
+        $popped = false;
+        try {
+            if (count($this->stack) == 1 && $this->wrapTopLevel !== false) {
+                $this->wrap($this->wrapTopLevel);
+            }
+            $args = $this->getArgs($methodName, $args, $missingArgs);
+            if (count($missingArgs)) 
+                throw $this->missingArguments ($methodName, $missingArgs);
+            // TODO: load replacement file here (if any)
+            call_user_func_array(array($this, $methodName), $args);
+            $buffer = ob_get_clean();
+
+            if ($this->wrap !== false) $buffer = $this->applyWrapper($buffer);
+            
+            $res = $buffer;
+            $popped = true;
+            $this->pop();
+        } catch (Exception $e) {
+            if (!$popped) $this->pop();
+            throw $e;
+        }
         return $res;
+    }
+    
+    protected function applyWrapper($buffer) {
+        if ($this->wrap === true) $wrap = $this->getDefaultWrapper();
+        else $wrap = $this->wrap;
+        if ($wrap !== false) {
+            $buffer = $this->fetchWithArgs($wrap, array('buffer' => $buffer));
+        }
+        return $buffer;
+    }
+    
+    function setWrapTopLevel($wrapTopLevel) {
+        if (!is_bool($wrapTopLevel) && !$this->hasPart($wrapTopLevel)) {
+            throw $this->noSuchPart($wrapTopLevel);
+        }
+        $this->wrapTopLevel = $wrapTopLevel;
+    }
+
+    function getWrapTopLevel() {
+        return $this->wrapTopLevel;
+    }
+    
+    function setDefaultWrapper($defaultWrapper) {
+        if ($defaultWrapper !== false && !$this->hasPart($defaultWrapper)) {
+            throw $this->noSuchPart($defaultWrapper);
+        }
+        $this->defaultWrapper = $defaultWrapper;
+    }
+
+    function getDefaultWrapper() {
+        return $this->defaultWrapper;
+    }
+    
+    protected function wrap($wrapper = true) {
+        if (!count($this->stack)) throw $this->callFromTemplatePartOnly(__METHOD__);
+        if (!is_bool($wrapper) && !$this->hasPart($wrapper)) 
+            throw $this->noSuchPart ($wrapper);
+        $this->wrap = $wrapper;
+    }
+    
+    protected function dontWrap() {
+        if (!count($this->stack)) throw $this->callFromTemplatePartOnly(__METHOD__);
+        $this->wrap = false;
     }
     
     /**
@@ -215,6 +291,16 @@ class Ac_Template extends Ac_Prototyped {
         return $res;
     }
     
+    function hasPart($partName) {
+        $res = method_exists($this, 'part'.$partName);
+        return $res;
+    }
+    
+    function listParts() {
+        $res = preg_grep('/part/', get_class_methods(get_class($this)));
+        return $res;
+    }
+    
     protected function fetchWithArgs($partName, array $args) {
         $methodName = 'part'.$partName;
         if (method_exists($this, $methodName)) {
@@ -247,6 +333,63 @@ class Ac_Template extends Ac_Prototyped {
         array_shift($args); 
         $this->result->put($this->fetchWithArgs($partName, $args));
         return $this->result;
+    }
+    
+    function renderResultWithArgs($partName, array $args = array()) {
+        $this->result = new $this->defaultResultClass;
+        $this->result->put($this->fetchWithArgs($partName, $args));
+        return $this->result;
+    }
+    
+    protected function push() {
+        $s = array();
+        foreach ($this->stackItems as $varName => $default) {
+            $s[$varName] = $this->$varName;
+            $this->$varName = $default;
+        }
+        $this->stack[] = $s;
+    }
+    
+    protected function pop() {
+        if (!count($this->stack)) throw new Exception("Cannot pop(): is at top");
+        foreach (array_pop($this->stack) as $i => $v) {
+            $this->$i = $v;
+        }
+    }
+    
+    function getDefaultResultClass() {
+        return $this->defaultResultClass;
+    }
+    
+    function getCompatibleResultClasses() {
+        return $this->compatibleResultClasses;
+    }
+    
+    function isResultCompatible(Ac_Result $result) {
+        $res = true;
+        if (count($this->compatibleResultClasses)) {
+            $res = false;
+            foreach ($this->compatibleResultClasses as $rc) {
+                if ($result instanceof $rc) {
+                    $res = true;
+                    break;
+                }
+            }
+        }
+        return $res;
+    }
+ 
+    /**
+     * @return Ac_Result
+     */
+    function renderTo(Ac_Result $result, $partName, array $args = array()) {
+        if ($this->isResultCompatible($result)) {
+            $this->result = $result;
+            $this->result->put($a = $this->fetchWithArgs($partName, $args));
+            return $this->result;
+        } else {
+            throw $this->incompatibleResultClass(get_class($result));
+        }
     }
     
 }

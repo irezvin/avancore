@@ -78,6 +78,7 @@ class Ac_Test_Template extends Ac_Test_Base {
                 var2 = {$cVals['var2']}
             ")
         )) var_dump($c);
+        $this->assertEqual(count($t1->getStack()), 0);
         $r = $t1->renderResult('objects');
         
         $this->assertIsA($r, 'Ac_Result_Html');
@@ -89,6 +90,83 @@ class Ac_Test_Template extends Ac_Test_Base {
                 object2 = {$cVals['object2']}
             ")
         )) var_dump($c);
+        $this->assertEqual(count($t1->getStack()), 0);
+                
+        $r = $t1->renderResult('withWrapper1');
+        if (!$this->assertEqual(
+            $this->normalizeHtml($c = $r->getContent()), 
+            $this->normalizeHtml("
+                Begin wrapper1
+                Text of part with wrapper1
+                End wrapper1
+            ")
+        )) var_dump($c);
+        $this->assertEqual(count($t1->getStack()), 0);
+        
+        $t1->setWrapTopLevel('wrapper1');
+        
+        $r = $t1->renderResult('objects');
+        if (!$this->assertEqual(
+            $this->normalizeHtml($c = $r->getContent()), 
+            $this->normalizeHtml("
+                Begin wrapper1
+                Objects:
+                object1 = {$cVals['object1']}
+                object2 = {$cVals['object2']}
+                End wrapper1
+            ")
+        )) var_dump($c);
+        $this->assertEqual(count($t1->getStack()), 0);
+        
+        $r = $t1->renderResult('withoutWrapper');
+        if (!$this->assertEqual(
+            $this->normalizeHtml($c = $r->getContent()), 
+            $this->normalizeHtml("
+                Text of part without wrapper
+            ")
+        )) var_dump($c);
+        $this->assertEqual(count($t1->getStack()), 0);
+        
+        $r = $t1->renderResult('withNesting');
+        if (!$this->assertEqual(
+            $this->normalizeHtml($c = $r->getContent()), 
+            $this->normalizeHtml("
+                Begin wrapper2
+                
+                Part with nesting:
+                
+                Begin wrapper1
+                Text of part with wrapper1
+                End wrapper1
+                
+                Text of part without wrapper
+                
+                Objects:
+                object1 = {$cVals['object1']}
+                object2 = {$cVals['object2']}
+
+                End wrapper2
+            ")
+        )) var_dump($c);
+        $this->assertEqual(count($t1->getStack()), 0);
+        
+        $r = new Ac_Result_Html();
+        $r->put("Some text before\n");
+        $t1->setDefaultWrapper(false);
+        $t1->setWrapTopLevel(false);
+        $t1->renderTo($r, 'objects', array('object2' => ($o2 = new TestObject1_2('1_2'))));
+        if (!$this->assertEqual(
+            $this->normalizeHtml($c = $r->getContent()), 
+            $this->normalizeHtml("
+                Some text before
+                Objects:
+                object1 = {$cVals['object1']}
+                object2 = {$o2}
+            ")
+        )) var_dump($c);
+        
+        
+                
     }
     
 }
