@@ -103,6 +103,15 @@ class Ac_Template extends Ac_Prototyped {
         $this->values[$name] = $value;
     }
     
+    function setValues(array $values = array(), $override = false) {
+        if ($override) $this->values = array_merge($this->values, $values);
+            else $this->values = $values;
+    }
+    
+    function getValues() {
+        return $this->values;
+    }
+    
     function deleteValue($name) {
         unset($this->values[$name]);
     }

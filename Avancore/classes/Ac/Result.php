@@ -515,7 +515,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
         return $stage;
     }
     
-    function returnWritten(& $stage = null) {
+    function writeAndReturn(& $stage = null) {
         ob_start();
         $stage = $this->write($stage);
         return ob_get_clean();

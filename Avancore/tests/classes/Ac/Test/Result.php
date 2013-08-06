@@ -735,43 +735,43 @@ EOD
     
     function testOverrides() {
         $a = $this->sample7();
-        $this->assertEqual($a['r']->returnWritten(), 'r1: (r1_1 r1_2) r2: (r2_1 r2_2)');
+        $this->assertEqual($a['r']->writeAndReturn(), 'r1: (r1_1 r1_2) r2: (r2_1 r2_2)');
         
         $a = $this->sample7();
         $a['r']->setReplaceWith(new Ac_Result(array('content' => 'Something')));
-        $this->assertEqual($a['r']->returnWritten(), 'Something');
+        $this->assertEqual($a['r']->writeAndReturn(), 'Something');
         
         $a = $this->sample7();
         $a['r1_1']->setOverrideMode(Ac_Result::OVERRIDE_PARENT);
-        $this->assertEqual($a['r']->returnWritten(), 'r1: r1_1 r2: (r2_1 r2_2)');
+        $this->assertEqual($a['r']->writeAndReturn(), 'r1: r1_1 r2: (r2_1 r2_2)');
         
         $a = $this->sample7();
         $a['r1_1']->setOverrideMode(Ac_Result::OVERRIDE_ALL);
-        $this->assertEqual($a['r']->returnWritten(), 'r1_1');
+        $this->assertEqual($a['r']->writeAndReturn(), 'r1_1');
         
         $a = $this->sample7();
         $a['r1_1']->setReplaceWith(new Ac_Result(array('content' => 'Foo Bar')));
-        $this->assertEqual($a['r']->returnWritten(), 'r1: (Foo Bar r1_2) r2: (r2_1 r2_2)');
+        $this->assertEqual($a['r']->writeAndReturn(), 'r1: (Foo Bar r1_2) r2: (r2_1 r2_2)');
         
         $a = $this->sample7();
         $a['r1_1']->setReplaceWith(new Ac_Result(array('content' => 'Foo Bar', 'replaceWith' => new Ac_Result(array('content' => 'Baz Quux')))));
-        $this->assertEqual($a['r']->returnWritten(), 'r1: (Baz Quux r1_2) r2: (r2_1 r2_2)');
+        $this->assertEqual($a['r']->writeAndReturn(), 'r1: (Baz Quux r1_2) r2: (r2_1 r2_2)');
         
         $a = $this->sample7();
         $a['r1_1']->setReplaceWith(new Ac_Result(array('content' => 'Foo Bar', 'replaceWith' => new Ac_Result(array('content' => 'Baz Quux', 'overrideMode' => Ac_Result::OVERRIDE_PARENT)))));
-        $this->assertEqual($a['r']->returnWritten(), 'r1: Baz Quux r2: (r2_1 r2_2)');
+        $this->assertEqual($a['r']->writeAndReturn(), 'r1: Baz Quux r2: (r2_1 r2_2)');
         
         $a = $this->sample7();
         $a['r1_1']->setReplaceWith(new Ac_Result(array('content' => 'Foo Bar', 'replaceWith' => new Ac_Result(array('content' => 'Baz Quux', 'overrideMode' => Ac_Result::OVERRIDE_ALL)))));
-        $this->assertEqual($a['r']->returnWritten(), 'Baz Quux');
+        $this->assertEqual($a['r']->writeAndReturn(), 'Baz Quux');
     }
     
     function testWriteAgain() {
         $a = $this->sample7();
-        $this->assertEqual($a['r']->returnWritten(), 'r1: (r1_1 r1_2) r2: (r2_1 r2_2)');
-        $this->assertEqual($a['r']->returnWritten(), 'r1: (r1_1 r1_2) r2: (r2_1 r2_2)');
+        $this->assertEqual($a['r']->writeAndReturn(), 'r1: (r1_1 r1_2) r2: (r2_1 r2_2)');
+        $this->assertEqual($a['r']->writeAndReturn(), 'r1: (r1_1 r1_2) r2: (r2_1 r2_2)');
         $a['r']->setReplaceWith(new Ac_Result(array('content' => 'Something New')));
-        $this->assertEqual($a['r']->returnWritten(), 'Something New');
+        $this->assertEqual($a['r']->writeAndReturn(), 'Something New');
     }
     
 }
