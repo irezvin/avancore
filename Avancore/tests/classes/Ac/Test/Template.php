@@ -165,8 +165,47 @@ class Ac_Test_Template extends Ac_Test_Base {
             ")
         )) var_dump($c);
         
+    }
+    
+    function testTemplateResult() {
         
-                
+        $t = new TestTemplate1;
+        
+        $c = new TestComponent;
+        
+        $tplRes = new Ac_Result_Template(array(
+            'template' => $t,
+            'component' => $c,
+            'partName' => 'part1',
+            'renderedResultWriter' => 'Ac_Result_Writer_Plain'
+        ));
+        
+        $r = new Ac_Result(array("content" => " 
+            Outer result
+            {$tplRes}
+            /Outer result
+        "));
+            
+        $w = $r->writeAndReturn();
+        
+        if (!$this->assertEqual(
+            $this->normalizeHtml($w),
+            $this->normalizeHtml("
+               Outer result
+               Part1:
+               var1 = val1
+               var2 = val2
+               /Outer result
+        "))) var_dump($w);
+
+        $w = $tplRes->writeAndReturn();
+        if (!$this->assertEqual(
+            $this->normalizeHtml($w),
+            $this->normalizeHtml("
+               Part1:
+               var1 = val1
+               var2 = val2
+        "))) var_dump($w);
     }
     
 }
