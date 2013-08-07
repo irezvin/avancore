@@ -205,7 +205,9 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
             if (isset($u)) {
                 $u->query = array();
                 if (substr($u->path, -1) !== '/') $u->path = dirname($u->path).'/';
-                if (!isset($this->config['webAssetsUrl'])) $this->config['webAssetsUrl'] = $u->toString().'assets';
+                if (!isset($this->config['webAssetsUrl'])) {
+                    $this->config['webAssetsUrl'] = $u->toString().'assets';
+                }
                 if (!isset($this->config['adminImagesUrl']))$this->config['adminImagesUrl'] = $u->toString().'images';
             }
         }
@@ -378,12 +380,12 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         $res = $this->intGetConfigValue(substr(__FUNCTION__, 3));
         if (is_null($res)) $res = array();
         if (is_array($res)) {
-            $res = Ac_Util::m($this->getDefaultCachePrototype(), $res);
+            $res = Ac_Util::m($this->doGetDefaultCachePrototype(), $res);
         }
         return $res;
     }
     
-    protected function getDefaultCachePrototype() {
+    protected function doGetDefaultCachePrototype() {
         return array('cacheDir' => $this->getVarCachePath());
     }
     

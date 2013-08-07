@@ -40,6 +40,13 @@ class Ac_Admin_ManagerConfigService_J25 extends Ac_Admin_ManagerConfigService {
             'cancel' => array(
                 'image' => 'icon-32-cancel.png', 
             ), 
+            'publish' => array(
+                'image' => 'icon-32-publish.png', 
+            ), 
+            'unpublish' => array(
+                'image' => 'icon-32-unpublish.png', 
+            ), 
+            
         );
     }
 

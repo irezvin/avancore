@@ -64,6 +64,16 @@ class Ac_Debug {
         call_user_func_array('var_dump', $a);
     }
     
+    /**
+     * Stands for "dump trace"
+     */
+    static function ddt($_ = null) {
+        self::savageMode();
+        $a = func_get_args();
+        array_push($a, self::getTrace(false));
+        if (count($a)) call_user_func_array('var_dump', $a);
+    }
+    
     static function enableAllErrors() {
         ini_set('error_reporting', E_ALL);
         ini_set('display_errors', 1);
@@ -122,5 +132,37 @@ class Ac_Debug {
         }
         return $res;
     }
+    
+        
+    static function getTrace($asArray = false, $skip = true) {
+        if ($skip === true) $skip = array('Ac_Debug');
+        $bt = debug_backtrace();
+        if ($skip) {
+            $classes = Ac_Util::toArray($skip);
+            $i = 0;
+            while (isset($bt[$i]['class']) && in_array($bt[$i]['class'], $skip)) $i++;
+            $bt = array_slice($bt, $i);
+        }
+        $c = count($bt);
+        $s = array();
+        foreach ($bt as $i => $arr) {
+            $string = array();
+            $string[] = sprintf("%4d.", $c - $i);
+            if (isset($arr['function'])) {
+                $fn = $arr['function'];
+                if (isset($arr['class'])) {
+                    $type = isset($arr['type'])? $arr['type'] : '::';
+                    $fn = $arr['class'].$type.$fn;
+                }
+                $string[] = $fn;
+            }
+            if (isset($arr['file'])) $string[] = 'in '.$arr['file'];
+            if (isset($arr['line'])) $string[] = '# '.$arr['line'];
+            $s[] = $asArray? $string : implode(" ", $string);
+        }
+        $res = $asArray? $s : implode("\n", $s);
+        return $res;
+    }
+
     
 }

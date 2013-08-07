@@ -222,7 +222,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     var $matchKeys = false;
     
     /**
-     * @var Ac_Legacy_Database
+     * @var Ac_Sql_Db
      */
     var $database = false;
     
@@ -266,17 +266,17 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function setSrcMapper(Ac_Model_Mapper $srcMapper) {
         $this->_srcMapper = $srcMapper;
         $this->srcMapperClass = $srcMapper->getId();
-        if (!$this->database) $this->database = $this->_srcMapper->getApplication()->getLegacyDatabase();
+        if (!$this->database) $this->database = $this->_srcMapper->getApplication()->getDb();
     }
     
     function setDestMapper(Ac_Model_Mapper $destMapper) {
         $this->_destMapper = $destMapper;
-        if (!$this->database) $this->database = $this->_destMapper->getApplication()->getLegacyDatabase();
+        if (!$this->database) $this->database = $this->_destMapper->getApplication()->getDb();
     }
     
     function setApplication(Ac_Application $application) {
         $this->application = $application;
-        if (!$this->database) $this->database = $this->application->getLegacyDatabase();
+        if (!$this->database) $this->database = $this->application->getDb();
     }
     
     /**
@@ -304,8 +304,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         }
         
         if ($this->database === false) {
-            if ($this->_srcMapper) $this->database = $this->_srcMapper->getApplication()->getLegacyDatabase();
-            elseif ($this->_destMapper) $this->database = $this->_destMapper->getApplication()->getLegacyDatabase();
+            if ($this->_srcMapper) $this->database = $this->_srcMapper->getApplication()->getDb();
+            elseif ($this->_destMapper) $this->database = $this->_destMapper->getApplication()->getDb();
         }
         
         if (!$this->fieldLinks) trigger_error('fieldLinks must be specified', E_USER_ERROR);
@@ -428,7 +428,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if (!$this->midTableName) trigger_error("This function is only applicable to relations with midTableName set", E_USER_ERROR);
         if (!strlen($this->srcNNIdsVarName)) trigger_error("Property \$srcNNIdsVarName should be set to non-empty string to use this method", E_USER_ERROR); 
         $relConfig = array(
-            'database' => & $this->database,
+            'database' => $this->database,
             'srcTableName' => $this->srcTableName,
             'srcMapperClass' => $this->srcMapperClass,
             'srcVarName' => $this->srcNNIdsVarName,
@@ -448,7 +448,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if (!$this->midTableName) trigger_error("This function is only applicable to relations with midTableName set", E_USER_ERROR);
         if (!strlen($this->destNNIdsVarName)) trigger_error("Property \$destNNIdsVarName should be set to non-empty string to use this method", E_USER_ERROR);
         $relConfig = array(
-            'database' => & $this->database,
+            'database' => $this->database,
             'destTableName' => $this->destTableName,
             'destMapperClass' => $this->destMapperClass,
             'destVarName' => $this->destNNIdsVarName,
@@ -831,12 +831,12 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $keys = array_values($allKeys[0]);            
             //$selKeys = array_keys($keys);
             $lta = '_mid_.';
-            $fromWhere = ' FROM '.$this->database->NameQuote($midTableName).' AS _mid_ '.$this->_getJoin('INNER', '_mid_', $tableName, $ta, $allKeys[1]);
+            $fromWhere = ' FROM '.$this->database->n($midTableName).' AS _mid_ '.$this->_getJoin('INNER', '_mid_', $tableName, $ta, $allKeys[1]);
             $crit = $this->_makeSqlCriteria($values, $selKeys, '_mid_');
         } else {
-            $fromWhere = ' FROM '.$this->database->NameQuote($tableName).$asTa;
+            $fromWhere = ' FROM '.$this->database->n($tableName).$asTa;
             $selKeys = $keys;    
-            $lta = $this->database->NameQuote($tableName).'.';
+            $lta = $this->database->n($tableName).'.';
             $crit = $this->_makeSqlCriteria($values, $keys, $ta);
         }
         if ($extraJoins) $fromWhere .= ' '.$extraJoins;
@@ -844,11 +844,11 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if ($extraWhere) $fromWhere .= ' AND '.$extraWhere; 
         
         $qKeys = array();
-        foreach ($keys as $key) $qKeys[] = $lta.$this->database->NameQuote($key);
+        foreach ($keys as $key) $qKeys[] = $lta.$this->database->n($key);
         $sKeys = implode(', ', $qKeys);
         $sql = 'SELECT ';
         if ($midTableName) {
-            $sql .= 'DISTINCT '.$sKeys.', '.$this->database->NameQuote($ta? $ta: $tableName).'.*'.$fromWhere;
+            $sql .= 'DISTINCT '.$sKeys.', '.$this->database->n($ta? $ta: $tableName).'.*'.$fromWhere;
         } else $sql = 'SELECT '.$cols.' '.$fromWhere;
         if ($orderByKeys) {
             $ord = array();
@@ -865,8 +865,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             //return $res;
         }
         
-        $this->database->setQuery($sql);
-        $rr = $this->database->getResultResource();
+        $rr = $this->database->getResultResource($sql);
         
         if ($midTableName) {
             //$xti = xdebug_time_index();
@@ -968,16 +967,16 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if (!$multipleValues) $values = array($values);
             elseif (!count($values)) return $separateCounts? array() : 0;
         if ($midTableName) {
-            $fromWhere = ' FROM '.$this->database->NameQuote($midTableName).' AS _mid_ '/*.$this->_getJoin('INNER', '_mid_', $tableName, '', $keys)*/;
+            $fromWhere = ' FROM '.$this->database->n($midTableName).' AS _mid_ '/*.$this->_getJoin('INNER', '_mid_', $tableName, '', $keys)*/;
             //foreach($midKeysMap as $rightKey) $selKeys[] = $rightKey;
             $selKeys = array_keys($keys);
             $keys = array_values($otherKeys); 
             $lta = '_mid_.';
             $crit = $this->_makeSqlCriteria($values, $keys, '_mid_');
         } else {
-            $fromWhere = ' FROM '.$this->database->NameQuote($tableName);
+            $fromWhere = ' FROM '.$this->database->n($tableName);
             $selKeys = $keys;    
-            $lta = $this->database->NameQuote($tableName).'.';
+            $lta = $this->database->n($tableName).'.';
             $crit = $this->_makeSqlCriteria($values, $keys, '');
         }
         $fromWhere .= ' WHERE '.$crit;
@@ -985,20 +984,18 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if (!$separateCounts) {
             $sql = 'SELECT COUNT(*) '.$fromWhere;
             if ($retSql) return $sql;
-            $this->database->setQuery($sql);
-            return $this->database->loadResult();
+            return $this->database->fetchValue($sql);
         }
         $qKeys = array();
-        foreach ($keys as $key) $qKeys[] = $lta.$this->database->NameQuote($key);
+        foreach ($keys as $key) $qKeys[] = $lta.$this->database->n($key);
         $sKeys = implode(', ', $qKeys);
         $i = 0;
         while(in_array($cntColumn = '__count__'.$i, $keys)) $i++; 
-        $sql = 'SELECT '.$sKeys.', COUNT(*) AS '.$this->database->NameQuote($cntColumn).$fromWhere.' GROUP BY '.$sKeys;
+        $sql = 'SELECT '.$sKeys.', COUNT(*) AS '.$this->database->n($cntColumn).$fromWhere.' GROUP BY '.$sKeys;
         if ($orderByKeys) $sql .= ' ORDER BY '.$sKeys; 
         if ($retSql) return $sql;
         $res = array();
-        $this->database->setQuery($sql);
-        $rr = $this->database->getResultResource();
+        $rr = $this->database->getResultResource($sql);
         if ($byKeys && $multipleValues) {
             if (count($selKeys) === 1) {
                 $key = $selKeys[0];
@@ -1022,11 +1019,10 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         $crit = $this->_makeSqlCriteria($values, $keys);
         if (!$multipleValues) $values = array($values);
             elseif (!count($values)) return 0;
-        $sql =  'DELETE FROM '.$this->database->NameQuote($tableName).' WHERE ('.$crit.')';
+        $sql =  'DELETE FROM '.$this->database->n($tableName).' WHERE ('.$crit.')';
         if (strlen($where)) $sql .= ' AND '.$where;
         if ($retSql) return $sql;
-        $this->database->setQuery($sql);
-        return $this->database->query();
+        return $this->database->query($sql);
     }
 
     function _destInstance($row) {
@@ -1048,7 +1044,43 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @return string
      **/
     function _makeSqlCriteria($values, $keyFields, $alias = '', $default = '0') {
-        return $this->database->sqlKeysCriteria($values, $keyFields, $alias, $default);
+        if (!count($values)) return $default;
+        // TODO: Optimization 1: remove duplicates from values! (how??? sort keys??? make a tree???)
+        // TODO: Optimization 2: make nested criterias depending on values cardinality
+        $values = Ac_Util::array_unique($values); 
+        $db = $this->database;
+        $qAlias = strlen($alias)? $alias.'.' : $alias;
+        if (is_array($keyFields)) {
+            if (count($keyFields) === 1) {
+                $qValues = array();
+                $qKeyField = $db->n($keyFields[0]);
+                foreach ($values as $val) $qValues[] = $db->q($val[0]);
+                $qValues = array_unique($qValues);
+                if (count($qValues) === 1) $res = $qAlias.$qKeyField.' = '.$qValues[0];
+                    else $res = $qAlias.$qKeyField.' IN('.implode(",", $qValues).')';
+            } else {
+                $cKeyFields = count($keyFields);
+                $bKeyFields = $cKeyFields - 1;
+                $qKeyFields = array();
+                foreach ($keyFields as $keyField) $qKeyFields[] = $qAlias.$db->n($keyField);
+                $crit = array();
+                foreach ($values as $valArray) {
+                    $c = '';
+                    for ($i = 0; $i < $bKeyFields; $i++) {
+                         $c .= $qKeyFields[$i].'='.$db->q($valArray[$i]).' AND ';
+                    }
+                    $crit[] = $c.$qKeyFields[$bKeyFields].' = '.$db->q($valArray[$bKeyFields]);
+                }
+                $res = '('.implode(')OR(', $crit).')';
+            }
+        } else {
+            $qValues = array();
+            $qKeyField = $db->NameQuote($keyFields);
+            foreach ($values as $val) $qValues[] = $db->Quote($val);
+            if (count($qValues) === 1) $res = $qAlias.$qKeyField.' = '.$qValues[0];
+                else $res = $qAlias.$qKeyField.' IN('.implode(",", $qValues).')';
+        }
+        return $res;
     }
     
     /**
