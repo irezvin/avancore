@@ -48,7 +48,7 @@ class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
         return $this->liveSite;
     }
 
-    protected function getDefaultCachePrototype() {
+    protected function doGetDefaultCachePrototype() {
         $res = array('cacheDir' => $this->getVarCachePath());
         if (!$this->getConfigValue('ignoreJoomlaCacheSettings')) {
             // TODO: create specialized cache that works through Joomla

@@ -283,6 +283,14 @@ class Ac_Table_Column {
         if (!$this->hidden) echo $this->getHint();
     }
     
+    function unfoldAssetString($string) {
+        // Ugly...
+        $di = Ac_Application::getDefaultInstance();
+        if ($di) $ph = $di->getAssetPlaceholders(true);
+            else $ph = array();
+        return Ac_Legacy_Controller_Response_Html::unfoldAssetString($string, $ph);
+    }
+    
 }
 
 ?>

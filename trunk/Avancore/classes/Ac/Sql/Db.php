@@ -234,6 +234,16 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     abstract function getIfnullFunction();
     
+    abstract function getResultResource($query);
+    
+    abstract function getFieldsInfo($resultResource);
+    
+    abstract function fetchAssocByTables($resultResource, array $fieldsInfo = array());
+    
+    abstract function fetchAssoc($resultResource);
+    
+    abstract function freeResultResource($resultResource);
+    
     function fetchObject($query, $default = null) {
         $res = $this->fetchObjects($query);
         if (count($res)) $res = $res[0];
@@ -276,10 +286,6 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
         trigger_error("Call to abstract function", E_USER_ERROR);
     }
     
-    function replaceDbPrefix($string) {
-        return str_replace('#__', $this->getDbPrefix(), $string);
-    }
-    
     /**
      * @return Ac_Sql_Dbi_Inspector
      */
@@ -288,6 +294,18 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
             $this->inspector = $this->getDialect()->createInspector($this);
         }
         return $this->inspector;
+    }
+    
+    function startTransaction() {
+        // TODO
+    }
+    
+    function rollback() {
+        // TODO
+    }
+    
+    function commit() {
+        // TODO
     }
     
 }

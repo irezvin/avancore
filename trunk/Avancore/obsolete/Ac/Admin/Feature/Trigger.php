@@ -47,22 +47,25 @@ class Ac_Admin_Feature_Trigger extends Ac_Admin_Feature {
     
     function getActions() {
         $res = array();
+        
+        $map = $this->manager->getConfigService()->getToolbarImagesMap();
+        
         $res = array(
             ($pc = $this->colName.'Publish') => array(
                 'id' => $pc,
                 'scope' => 'some',
-                'image' => 'icon-32-publish.png', 
                 'caption' => 'Включить',
                 'managerProcessing' => $pc,
                 'listOnly' => true,
+                'kind' => 'publish',
             ), 
             ($upc = $this->colName.'Unpublish') => array(
                 'id' => $upc,
                 'scope' => $this->colName.'some',
-                'image' => 'icon-32-unpublish.png', 
                 'caption' => 'Выключить',
                 'managerProcessing' => $upc,
                 'listOnly' => true,
+                'kind' => 'unpublish',
             ),
         );
         if (is_array($this->publishAction)) Ac_Util::ms($res[$pc], $this->publishAction);
