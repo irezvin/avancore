@@ -54,6 +54,11 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
      */
     protected $defaultAssetsPlaceholder = null;
     
+    /**
+     * @var array
+     */
+    protected $extraAssetPlaceholders = false;
+    
     abstract function getAppClassFile();
     
     protected static function registerInstance(Ac_Application $instance) {
@@ -355,6 +360,9 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     
     function getAssetPlaceholders($fromAllApplications = false) {
         $res = array_merge($this->getDefaultAssetPlaceholders(), $this->adapter->getAssetPlaceholders());
+        if ($this->extraAssetPlaceholders) {
+            $res = array_merge($res, $this->extraAssetPlaceholders);
+        }
         if ($fromAllApplications) {
             $r = $res;
             foreach (Ac_Application::listInstances() as $cn => $list) {
@@ -367,7 +375,17 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
         }
         return $res;
     }
-    
+
+    function setExtraAssetPlaceholders(array $extraAssetPlaceholders) {
+        $this->extraAssetPlaceholders = $extraAssetPlaceholders;
+    }
+
+    /**
+     * @return array
+     */
+    function getExtraAssetPlaceholders() {
+        return $this->extraAssetPlaceholders;
+    }    
     function createDefaultContext(Ac_Cr_Controller $forController) {
         return new Ac_Cr_Context();
     }

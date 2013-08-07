@@ -11,6 +11,8 @@ class Ac_Admin_ManagerConfigService {
      */
     protected $application = false;
     
+    protected $toolbarImagePlaceholder = '{TOOLBAR}';
+    
     protected function getDefaultToolbarImagesMap() {
         return array(
             'new' => array(
@@ -40,6 +42,14 @@ class Ac_Admin_ManagerConfigService {
             'cancel' => array(
                 'image' => 'cancel_f2.png', 
                 'disabledImage' => 'cancel.png',
+            ), 
+            'publish' => array(
+                'image' => 'publish_f2.png', 
+                'disabledImage' => 'publish.png',
+            ), 
+            'unpublish' => array(
+                'image' => 'unpublish_f2.png', 
+                'disabledImage' => 'unpublish.png',
             ), 
         );
     }
@@ -85,7 +95,10 @@ class Ac_Admin_ManagerConfigService {
     }
 
     function setApplication(Ac_Application $application) {
-        $this->application = $application;
+        if ($application !== ($oldApplication = $this->application)) {
+            $this->application = $application;
+            $this->setToolbarImagePlaceholder($this->toolbarImagePlaceholder, true);
+        }
     }
 
     /**
@@ -104,4 +117,31 @@ class Ac_Admin_ManagerConfigService {
         return $res;
     }
     
+    function setToolbarImagePlaceholder($toolbarImagePlaceholder, $force = false) {
+        
+        if ($toolbarImagePlaceholder !== ($oldToolbarImagePlaceholder = $this->toolbarImagePlaceholder) || $force) {
+            $this->toolbarImagePlaceholder = $toolbarImagePlaceholder;
+            if ($a = $this->application) {
+                $p = $a->getExtraAssetPlaceholders();
+                if (isset($p[$oldToolbarImagePlaceholder])) unset($p[$oldToolbarImagePlaceholder]);
+                if ($toolbarImagePlaceholder !== false) {
+                    $p[$h = $this->getToolbarImagePlaceholder(true)] = $this->getImagePrefix();
+                    $a->setExtraAssetPlaceholders($p);
+                }
+            }
+        }
+    }
+
+    function getToolbarImagePlaceholder($expandAppId = false) {
+        $res = $this->toolbarImagePlaceholder;
+        if ($expandAppId) {
+            $a = $this->application;
+            if ($a) {
+                $res = sprintf($res, strtoupper(get_class($a)));
+            }
+        }
+        return $res;
+    }    
+    
+   
 }

@@ -63,8 +63,13 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     /**
      * @return Ae_Sql_Db
+     * @deprecated 
      */
     function getSqlDb() {
+        return $this->getDb();
+    }
+    
+    function getDb() {
         return $this->getMapper()->getDb();
     }
     

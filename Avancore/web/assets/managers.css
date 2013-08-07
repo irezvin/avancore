@@ -202,3 +202,28 @@ section .manager .pagesList a {
     margin: 1em 0;
     padding: 0;
 }
+
+
+.avanadmin .details td.withHeader {
+    padding-left: 1em;
+    vertical-align: middle;
+}
+
+td.withHeader h1 {
+    color: darkred;
+    font-size: 1.5em;
+}
+
+.avanadmin .details .manager  {
+    margin: 0.5em;
+}
+
+table.actions td.withHeader, .avanadmin .details table.actions td.withHeader {
+    padding-left: 0;
+}
+
+table.actions td, .avanadmin .details table.actions td {
+    padding: 0 0.5em
+}
+
+

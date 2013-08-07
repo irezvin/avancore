@@ -46,33 +46,7 @@ class Ac_Debug_Log {
     }
     
     function getTrace($asArray = false, $skip = true) {
-        if ($skip === true) $skip = array('Ac_Debug_Log');
-        $bt = debug_backtrace();
-        if ($skip) {
-            $classes = Ac_Util::toArray($skip);
-            $i = 0;
-            while (isset($bt[$i]['class']) && in_array($bt[$i]['class'], $skip)) $i++;
-            $bt = array_slice($bt, $i);
-        }
-        $c = count($bt);
-        $s = array();
-        foreach ($bt as $i => $arr) {
-            $string = array();
-            $string[] = sprintf("%4d.", $c - $i);
-            if (isset($arr['function'])) {
-                $fn = $arr['function'];
-                if (isset($arr['class'])) {
-                    $type = isset($arr['type'])? $arr['type'] : '::';
-                    $fn = $arr['class'].$type.$fn;
-                }
-                $string[] = $fn;
-            }
-            if (isset($arr['file'])) $string[] = 'in '.$arr['file'];
-            if (isset($arr['line'])) $string[] = '# '.$arr['line'];
-            $s[] = $asArray? $string : implode(" ", $string);
-        }
-        $res = $asArray? $s : implode("\n", $s);
-        return $res;
+        return Ac_Debug::getTrace($asArray, $skip === true? array('Ac_Debug', 'Ac_Debug_Log') : $skip);
     }
     
     function trace() {

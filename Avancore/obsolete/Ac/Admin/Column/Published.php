@@ -10,11 +10,7 @@ class Ac_Admin_Column_Published extends Ac_Table_Column_Published {
     function getPublishedImg() {
         if (isset($this->settings['publishedImg'])) $res = $this->settings['publishedImg'];
             else {
-                $res = 'templates/hathor/images/admin/publish_g.png';
-                $ad = $this->manager->getApplication()->getAdapter();
-                if ($ad instanceof Ac_Application_Adapter_Joomla) {
-                    $res = rtrim($ad->getLiveSite(), '/').'/administrator/'.$res;
-                }
+                $res = '{TOOLBAR}publish_g.png';
             }
         return $res;
     }
@@ -22,11 +18,7 @@ class Ac_Admin_Column_Published extends Ac_Table_Column_Published {
     function getUnpublishedImg() {
         if (isset($this->settings['unpublishedImg'])) $res = $this->settings['unpublishedImg'];
             else {
-                $res = 'templates/hathor/images/admin/publish_x.png';
-                $ad = $this->manager->getApplication()->getAdapter();
-                if ($ad instanceof Ac_Application_Adapter_Joomla) {
-                    $res = rtrim($ad->getLiveSite(), '/').'/administrator/'.$res;
-                }
+                $res = '{TOOLBAR}publish_x.png';
             }
         return $res;
     }
@@ -48,7 +40,7 @@ class Ac_Admin_Column_Published extends Ac_Table_Column_Published {
         $inner = 
                     "<img ".
                         Ac_Util::mkAttribs(array(
-                            'src' => "$img", 
+                            'src' => $this->unfoldAssetString("$img"), 
                             'width' => 12,
                             'height' => 12,
                             'border' => 0,

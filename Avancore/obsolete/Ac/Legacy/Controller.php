@@ -300,7 +300,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped {
     /**
      * @return Ac_Url
      */
-    function getUrl($extraParams = array()) {
+    function getUrl($extraParams = array(), $preserveCurrentParams = true) {
         $res = false;
         if (is_a($this->_context, 'Ac_Legacy_Controller_Context_Http')) {
             $ctx = $this->_context->cloneObject();

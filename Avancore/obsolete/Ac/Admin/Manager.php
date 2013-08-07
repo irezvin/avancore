@@ -1197,8 +1197,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $o = $this->_getSqlOrder();
             $ff = $this->getFilterForm();
             $disp = Ac_Dispatcher::getInstance();
-            $db = $disp->database;
-            $sqlDb = new Ac_Sql_Db_Ae($db);
+            $sqlDb = $this->application->getDb();
             $options = Ac_Util::m($this->getMapper()->getSqlSelectPrototype('t'), $options);
             $this->_sqlSelect = new Ac_Sql_Select($sqlDb, $options);
             if ($ff) {

@@ -376,7 +376,7 @@ class Ac_Model_Collection {
                 }
             } 
             if ($withLimits && $this->_limitCount) /*$res .= $this->_db->getLimitsClause($this->_limitCount, $this->_limitOffset);*/
-                $res = $this->_db->applyLimits($res, $this->_limitCount, $this->_limitOffset);
+                $res = $this->_db->applyLimits($res, $this->_limitCount, $this->_limitOffset, true);
             
             $this->_sqlTail[$hash] = $res;
             

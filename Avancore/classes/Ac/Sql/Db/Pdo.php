@@ -16,6 +16,8 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     
     protected $returnsLastInsertId = false;
     
+    protected $throwExceptions = true;
+    
     function __construct($pdo, Ac_Sql_Dialect $dialect = null) {
         
         if (is_array($pdo) && array_key_exists('pdo', $pdo) && func_num_args() == 1) { // Ac_Prototyped style init
@@ -116,8 +118,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     function fetchArray($query, $keyColumn = false, $withNumericKeys = false) {
         $res = array();
         $key = -1;
-        $query = $this->replaceDbPrefix($query);
-        $q = $this->pdo->query($query);
+        $q = $this->queryPdo($query);
         foreach ($q->fetchAll($withNumericKeys? PDO::FETCH_BOTH : PDO::FETCH_ASSOC) as $row) {
             $r = $row;
             if ($withNumericKeys) $r = array_merge($r, array_values($row));
@@ -141,10 +142,9 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     function fetchRow($query, $key = false, $keyColumn = false, $withNumericKeys = false, $default = false) {
         $res = $default; 
         $k = -1;
-        $query = $this->replaceDbPrefix($query);
-        foreach (($stmt = $this->pdo->query($query)) as $row) {
+        $stmt = $this->queryPdo($query);
+        while ($row = $stmt->fetch($withNumericKeys? PDO::FETCH_BOTH : PDO::FETCH_ASSOC)) {
             $r = $row;
-            if ($withNumericKeys) $r = array_merge($r, array_values($row));
             if ($keyColumn !== false) $k = $r[$keyColumn];
                 else $k++;
             if ($key === false || $k == $key) {
@@ -160,7 +160,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
         $res = array();
         $key = -1;
         $withNumericKeys = (is_numeric($colNo) && ($keyColumn === false || is_numeric($keyColumn)));
-        foreach ($this->pdo->query($query) as $row) {
+        foreach ($this->queryPdo($query) as $row) {
             $r = $row;
             if ($withNumericKeys) $r = array_merge($r, array_values($row));
             if ($keyColumn !== false) $key = $r[$keyColumn];
@@ -173,8 +173,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     function fetchValue($query, $colNo = 0, $default = null) {
         $res = $default;
         if (is_numeric($colNo)) {
-            $query = $this->replaceDbPrefix($query);
-            $stmt = $this->pdo->query($query);
+            $stmt = $this->queryPdo($query);
             $res = $stmt->fetchColumn($colNo);
             $stmt->closeCursor();
         } else {
@@ -184,8 +183,26 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     }
     
     function query($query) {
-        $query = $this->replaceDbPrefix($query);
-        return $this->pdo->exec($query);
+        return $this->queryPdo($query, true);
+    }
+    
+    /**
+     * @return PDOStatement
+     * @throws Ac_E_Database
+     */
+    protected function queryPdo($query, $exec = false) {
+        $x = $exec? "exec" : "query";
+        $query = $this->replacePrefix($query);
+        if ($this->throwExceptions) {
+            try {
+                $res = $this->pdo->$x($query);
+            } catch (PDOException $e) {
+                throw new Ac_E_Database('PDO Exception: '.$e->getMessage().', SQL is '.$query, $e->getCode(), $e);
+            }
+        } else {
+            $res = $this->pdo->$x($query);
+        }
+        return $res;
     }
     
     function getErrorCode() {
@@ -216,6 +233,55 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
      */
     function getDialect() {
         return $this->dialect;
+    }
+    
+    /**
+     * @return PDOStatement
+     */
+    function getResultResource($query) {
+        return $this->queryPdo($query);
+    }
+
+    /**
+     * @param PDOStatement $resultResource
+     */
+    function getFieldsInfo($resultResource) {
+        $res = array();
+        $c = $resultResource->columnCount();
+        for ($i = 0; $i < $c; $i++) {
+            $col = $resultResource->getColumnMeta($i);
+            $res[] = array($col['table'], $col['name']);
+        }
+        return $res;
+    }
+    
+    /**
+     * @param PDOStatement $resultResource
+     */
+    function fetchAssocByTables($resultResource, array $fieldsInfo = array()) {
+        $row = $resultResource->fetch(PDO::FETCH_NUM);
+        if ($row === false) $res = $row;
+        else {
+            if (!$fieldsInfo) $fieldsInfo = $this->getFieldsInfo($resultResource);
+            foreach ($fieldsInfo as $i => $fi) {
+                $res[$fi[0]][$fi[1]] = $row[$i];
+            }
+        }
+        return $res;
+    }
+    
+    /**
+     * @param PDOStatement $resultResource
+     */
+    function fetchAssoc($resultResource) {
+        $res = $resultResource->fetch(PDO::FETCH_ASSOC);
+        return $res;
+    }
+    
+    /**
+     * @param PDOStatement $resultResource
+     */
+    function freeResultResource($resultResource) {
     }
     
     
