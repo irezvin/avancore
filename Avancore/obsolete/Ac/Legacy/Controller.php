@@ -437,7 +437,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped {
     }
 
     function setApplication(Ac_Application $application) {
-        if ($this->application) throw new Exception("Can setApplication() only once");
+        if ($this->application && $this->application !== $application) throw new Exception("Can setApplication() only once");
         $this->application = $application;
     }
 
