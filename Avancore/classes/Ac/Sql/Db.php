@@ -236,13 +236,13 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     abstract function getResultResource($query);
     
-    abstract function getFieldsInfo($resultResource);
+    abstract function resultGetFieldsInfo($resultResource);
     
-    abstract function fetchAssocByTables($resultResource, array $fieldsInfo = array());
+    abstract function resultFetchAssocByTables($resultResource, array $fieldsInfo = array());
     
-    abstract function fetchAssoc($resultResource);
+    abstract function resultFetchAssoc($resultResource);
     
-    abstract function freeResultResource($resultResource);
+    abstract function resultFreeResource($resultResource);
     
     function fetchObject($query, $default = null) {
         $res = $this->fetchObjects($query);
