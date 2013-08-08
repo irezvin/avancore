@@ -47,6 +47,11 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
      */
     var $_datalink = false;
     
+    /**
+     * @var Ac_Admin_Manager
+     */
+    protected $manager = false;
+    
     function doInitProperties($options = array()) {
         if (!strcasecmp(get_class($this), 'ae_admin_processing'))
             trigger_error ("Attempt to instantiate abstract class", E_USER_ERROR);
@@ -60,6 +65,13 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
         elseif (isset($options['records'])) $this->setRecords($options['records']);
         elseif (isset($options['recordsCollection'])) $this->setRecordsCollection($options['recordsCollection']);
         elseif (isset($options['noRecords']) && $options['noRecords']) $this->setNoRecords($options['noRecords']);        
+        
+        if (isset($options['manager']) && is_object($options['manager']) && $options['manager'] instanceof Ac_Admin_Manager) $this->setManager($options['manager']);
+    }
+    
+    function setManager(Ac_Admin_Manager $manager) {
+        $this->manager = $manager;
+        if ($manager->getApplication()) $this->application = $manager->getApplication();
     }
     
     function setMapperClass($mapperClass) {
