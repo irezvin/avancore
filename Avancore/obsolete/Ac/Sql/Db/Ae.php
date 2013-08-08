@@ -175,5 +175,29 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
         return $this->inspector;
     }
     
+    function getResultResource($query) {
+        $this->_aeDb->setQuery($this->_convert($query));
+        return $this->_aeDb->getResultResource();
+    }
+    
+    function resultGetFieldsInfo($resultResource) {
+        return $this->_aeDb->getFieldsInfo($resultResource);
+    }
+    
+    function resultFetchAssocByTables($resultResource, array $fieldsInfo = array()) {
+        if (!$fieldsInfo) $fieldsInfo = $this->resultGetFieldsInfo ($resultResource);
+        return $this->_aeDb->fetchAssocByTables($resultResource, $fieldsInfo);
+    }
+    
+    function resultFetchAssoc($resultResource) {
+        return $this->_aeDb->fetchAssoc($resultResource);
+    }
+    
+    function resultFreeResource($resultResource) {
+        return $this->_aeDb->freeResultResource($resultResource);
+    }
+    
+    
+    
     
 }

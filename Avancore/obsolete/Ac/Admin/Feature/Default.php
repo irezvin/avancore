@@ -34,9 +34,9 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     
     var $processingSettings = array();
     
-    var $displayOrderStart = false;
+    var $displayOrderStart = 0;
     
-    var $displayOrderStep = 0;
+    var $displayOrderStep = 10;
     
     function doCanBeApplied() {
         return true;
