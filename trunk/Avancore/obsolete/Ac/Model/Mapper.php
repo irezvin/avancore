@@ -88,7 +88,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     
     protected $allRecords = false;
     
-    function Ac_Model_Mapper(array $options = array()) {
+    function __construct(array $options = array()) {
         if ($options) Ac_Accessor::setObjectProperty ($this, $options);
 /*     
         if (!$this->database) {

@@ -202,7 +202,7 @@ class Cg_Property_Object extends Cg_Property {
                     
             }
         }
-        if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
+        if (strlen($this->otherModelIdInMethodsPrefix) && strlen($res)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
         return $res;
     }
     

@@ -869,16 +869,16 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         
         if ($midTableName) {
             //$xti = xdebug_time_index();
-            $fi = $this->database->getFieldsInfo($rr);
+            $fi = $this->database->resultGetFieldsInfo($rr);
             $rightKeyFields = array_values($allKeys[1]);
             if ($byKeys) {
-                $prefix = $this->database->getPrefix();
+                $prefix = $this->database->getDbPrefix();
                 $tn = str_replace('#__', $prefix, $tableName);
                 if ($ta) $tn = $ta;
                 if (count($keys) === 1) {
                     $key = $keys[0];
                     if ($unique) {
-                        while($row = $this->database->fetchAssocByTables($rr, $fi)) 
+                        while($row = $this->database->resultFetchAssocByTables($rr, $fi)) 
                             $res[$row['_mid_'][$key]] = $this->$ifun ($row[$tn]);
                     } else {
                         //$res = array();
@@ -886,7 +886,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                         $instances = array();
                         if (count($rightKeyFields) == 1) {
                             $kf = $rightKeyFields[0];
-                            while($row = $this->database->fetchAssocByTables($rr, $fi)) {
+                            while($row = $this->database->resultFetchAssocByTables($rr, $fi)) {
                                 $rowKey = $row[$tn][$kf];
                                 if (isset($instances[$rowKey])) $instance = $instances[$rowKey];
                                 else {
@@ -896,7 +896,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                                 $res[$row['_mid_'][$key]][] = $instance;
                             }
                         } else {
-                            while($row = $this->database->fetchAssocByTables($rr, $fi)) {
+                            while($row = $this->database->resultFetchAssocByTables($rr, $fi)) {
                                 $rowKey = $this->_getValues($row[$tn], $rightKeyFields);
                                 $instance = Ac_Util::simpleGetArrayByPath($instances, $rowKey, false);
                                 if (!$instance) {
@@ -907,13 +907,13 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                         }
                     }
                 } else {
-                    while($row = $this->database->fetchAssocByTables($rr, $fi)) {
+                    while($row = $this->database->resultFetchAssocByTables($rr, $fi)) {
                         $instance = $this->$ifun ($row[$tableName]);
                         Ac_Util::simpleSetArrayByPath($res, $row['_mid_'], $instance, $unique);
                     }
                 }
             } else {
-                while($row = $this->database->fetchAssoc($rr)) { 
+                while($row = $this->database->resultFetchAssoc($rr)) { 
                     $res[] = $this->$ifun ($row);     
                 }
             }
@@ -923,16 +923,16 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 if (count($keys) === 1) {
                     $key = $keys[0];
                     if ($unique) {
-                        while($row = $this->database->fetchAssoc($rr)) {
+                        while($row = $this->database->resultFetchAssoc($rr)) {
                             $res[$row[$key]] = $this->$ifun ($row);
                         }
                     } else {
-                        while($row = $this->database->fetchAssoc($rr)) { 
+                        while($row = $this->database->resultFetchAssoc($rr)) { 
                             $res[$row[$key]][] = $this->$ifun ($row);
                         }
                     }
                 } else {
-                    while($row = $this->database->fetchAssoc($rr)) {
+                    while($row = $this->database->resultFetchAssoc($rr)) {
                         $instance = $this->$ifun ($row);
                         $this->_putRowToArray($row, $instance, $res, $keys, $unique);        
                     }
@@ -940,14 +940,14 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 
             } else {
                 
-                while($row = $this->database->fetchAssoc($rr)) {
+                while($row = $this->database->resultFetchAssoc($rr)) {
                     // that's it - The Circular Reference Creator -- 26.03.2009
                     $res[] = $this->$ifun ($row);     
                 }
             }
         
         }
-        $this->database->freeResultResource($rr);
+        $this->database->resultFreeResource($rr);
         if (!$multipleValues && $unique && count($res)) {
             // $res = $res[0] // crashes PHP 4.3.9, works in PHP 4.4.x
             $tmp = $res[0];
@@ -999,18 +999,18 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if ($byKeys && $multipleValues) {
             if (count($selKeys) === 1) {
                 $key = $selKeys[0];
-                while($row = $this->database->fetchAssoc($rr)) 
+                while($row = $this->database->resultFetchAssoc($rr)) 
                     $res[$row[$key]] = $row[$cntColumn];        
             } else {
-                while($row = $this->database->fetchAssoc($rr)) {
+                while($row = $this->database->resultFetchAssoc($rr)) {
                     $this->_putRowToArray($row, $row[$cntColumn], $res, $selKeys, true);        
                 }
             }
         } else {
-            while($row = $this->database->fetchAssoc($rr)) 
+            while($row = $this->database->resultFetchAssoc($rr)) 
                 $res[] = $row[$cntColumn];     
         }
-        $this->database->freeResultResource($rr);
+        $this->database->resultFreeResource($rr);
         if (!$multipleValues) $res = $res[0];
         return $res;
     }

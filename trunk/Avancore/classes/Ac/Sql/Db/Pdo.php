@@ -245,7 +245,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     /**
      * @param PDOStatement $resultResource
      */
-    function getFieldsInfo($resultResource) {
+    function resultGetFieldsInfo($resultResource) {
         $res = array();
         $c = $resultResource->columnCount();
         for ($i = 0; $i < $c; $i++) {
@@ -258,7 +258,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     /**
      * @param PDOStatement $resultResource
      */
-    function fetchAssocByTables($resultResource, array $fieldsInfo = array()) {
+    function resultFetchAssocByTables($resultResource, array $fieldsInfo = array()) {
         $row = $resultResource->fetch(PDO::FETCH_NUM);
         if ($row === false) $res = $row;
         else {
@@ -273,7 +273,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     /**
      * @param PDOStatement $resultResource
      */
-    function fetchAssoc($resultResource) {
+    function resultFetchAssoc($resultResource) {
         $res = $resultResource->fetch(PDO::FETCH_ASSOC);
         return $res;
     }
@@ -281,7 +281,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     /**
      * @param PDOStatement $resultResource
      */
-    function freeResultResource($resultResource) {
+    function resultFreeResource($resultResource) {
     }
     
     
