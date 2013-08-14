@@ -141,45 +141,18 @@ class Ac_Url implements Ac_I_RedirectTarget {
      */
     function toString($withQuery = true) {
         
-        if ($withQuery && function_exists('sefRelToAbs')) {
-            $lUri  = strlen($this->scheme) ? $this->scheme.':'.((strtolower($this->scheme) == 'mailto') ? '':'//') : '';
-            $lUri .= strlen($this->user) ? $this->user.(strlen($this->pass)? ':'.$this->pass:'').'@':'';
-            $lUri .= strlen($this->host) ? $this->host : '';
-            $lUri .= strlen($this->port) ? ':'.$this->port : '';
-            $lUri .= strlen($this->path) ? $this->path : '';
-            $lUri .= strlen($this->pathInfo) ? $this->pathInfo : '';
-            
-            $rUri = '';
-            if (!strlen($this->path) && !strlen($this->pathInfo) && (($withQuery && $this->query) || strlen($this->fragment)) && substr($uri, -1) !== '/') $uri .= '/';
-            if ($withQuery && $this->query) {
-                $rUri .= '?'.http_build_query($this->query);
-//                if (function_exists('http_build_query')) $rUri .= '?'.http_build_query($this->query);
-//                    else $rUri .= $withQuery && $this->query ? '?'.(Ac_Url::array2queryString($this->query)) : '';
-            }
-            $rUri .= $this->fragment ? '#'.$this->fragment : '';
-            if (strlen($lUri)) {
-                if ($lUri === $GLOBALS['mosConfig_live_site']."/index.php") {
-                    $rUri = "index.php".$rUri;
-                    $uri = sefRelToAbs($rUri);
-                } else {
-                    $uri = $lUri.$rUri;
-                }
-            }
-            
-        } else {
-            $uri  = strlen($this->scheme) ? $this->scheme.':'.((strtolower($this->scheme) == 'mailto') ? '':'//') : '';
-            $uri .= strlen($this->user) ? $this->user.(strlen($this->pass)? ':'.$this->pass:'').'@':'';
-            $uri .= strlen($this->host) ? $this->host : '';
-            $uri .= strlen($this->port) ? ':'.$this->port : '';
-            $uri .= strlen($this->path) ? $this->path : '';
-            $uri .= strlen($this->pathInfo) ? $this->pathInfo : '';
-            if (!strlen($this->path) && !strlen($this->pathInfo) && (($withQuery && $this->query) || strlen($this->fragment)) && substr($uri, -1) !== '/') $uri .= '/';
-            //$uri .= $withQuery && strlen($this->query) ? '?'.(Ac_Url::array2queryString($this->query)) : '';
-            if ($withQuery && $this->query) {
-                $uri .= '?'.http_build_query($this->query);
-            }
-            $uri .= $this->fragment ? '#'.$this->fragment : '';
+        $uri  = strlen($this->scheme) ? $this->scheme.':'.((strtolower($this->scheme) == 'mailto') ? '':'//') : '';
+        $uri .= strlen($this->user) ? $this->user.(strlen($this->pass)? ':'.$this->pass:'').'@':'';
+        $uri .= strlen($this->host) ? $this->host : '';
+        $uri .= strlen($this->port) ? ':'.$this->port : '';
+        $uri .= strlen($this->path) ? $this->path : '';
+        $uri .= strlen($this->pathInfo) ? $this->pathInfo : '';
+        if (!strlen($this->path) && !strlen($this->pathInfo) && (($withQuery && $this->query) || strlen($this->fragment)) && substr($uri, -1) !== '/') $uri .= '/';
+        //$uri .= $withQuery && strlen($this->query) ? '?'.(Ac_Url::array2queryString($this->query)) : '';
+        if ($withQuery && $this->query) {
+            $uri .= '?'.http_build_query($this->query);
         }
+        $uri .= $this->fragment ? '#'.$this->fragment : '';
         
         return $uri;
     }

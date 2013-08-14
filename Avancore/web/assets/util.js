@@ -212,10 +212,11 @@ Ajs_Util = {
     },
     
     makeQuery: function(data, paramName, stripLeadingAmpersand) {
-        var res = '';
+        var res = '', i;
+        if (data === undefined) return '';
         if (data instanceof Array) {
         	if (data.length) {
-	            for (var i = 0; i < data.length; i++) {
+	            for (i = 0; i < data.length; i++) {
 	                res = res + Ajs_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i);
 	            }
         	} else {
@@ -223,7 +224,7 @@ Ajs_Util = {
         	}
         } else {
             if ((typeof data) == 'object') {
-                for (var i in data) if (Ajs_Util.hasOwnProperty(data, i)) {
+                for (i in data) if (Ajs_Util.hasOwnProperty(data, i)) {
                     res = res + Ajs_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i);
                 }
             } else {
@@ -669,6 +670,104 @@ Ajs_Util.override.Value.prototype = {
 Ajs_Util.override.Remove = function() {
 }
 
+Ajs_Util.Uri = function(uri) {
+    this.query = {};
+    if (typeof uri == 'object' && uri['Ajs_Util.Uri']) this.assign(uri);
+        else this.parse(uri);
+}
+
+Ajs_Util.Uri.prototype = {
+    
+    'Ajs_Util.Uri': true,
+    
+    scheme: '',
+    user: '',
+    password: '',
+    host: '',
+    port: '',
+    path: '',
+    query: null,
+    
+    parse: function(str) {
+        
+        // Credit for regular expression and keys length: JSURI project - http://code.google.com/p/jsuri/
+        var regex = /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/;
+        var keys = [
+            ".source",
+            "scheme",
+            ".authority",
+            ".userInfo",
+            "user",
+            "password",
+            "host",
+            "port",
+            ".relative",
+            "path",
+            ".directory",
+            ".file",
+            "query",
+            "fragment"
+        ];
+        var r = regex.exec(str);
+        for (var i = keys.length - 1; i >= 0; i--) {
+            var k = keys[i];
+            if (k.charAt(0) != '.') this[k] = r[i] || '';
+        }
+        if (this.query.length) {
+            this.query = Ajs_Util.parseQuery(this.query);
+        } else {
+            this.query = {};
+        }
+    },
+    
+    assign: function(uri) {
+        var a = ['scheme', 'user', 'password', 'host', 'port', 'path'];
+        for (var i = a.length - 1; i >=0; i--) this[a[i]] = uri[a[i]];
+        this.query = {};
+        Ajs_Util.override(this.query, uri.query);
+    },
+    
+    build: function(withQuery) {
+        if (withQuery === undefined) withQuery = true;
+        var uri, q, s;
+        s = this.scheme? ('' + this.scheme) : '';
+        
+        uri  = s ? (s + ':' + (s.toLowerCase() == 'mailto' ? '' : '//')) : '';
+        uri += this.user ? this.user + (this.pass?   ':' + this.pass  :  '') + '@' : '';
+        uri += this.host ? this.host : '';
+        uri += this.port ? ':' + this.port : '';
+        uri += this.path ? this.path : '';
+        
+        if (withQuery) {
+            q = Ajs_Util.makeQuery(this.query, '', true);
+        } else {
+            q = '';
+        }
+        
+        //if (!this.path && (withQuery && q.length || this.fragment && uri.slice(-1) !== '/')) uri += '/';
+        if (withQuery && q.length) {
+            uri += '?' + q;
+        }
+        uri += this.fragment ? '#' + this.fragment : '';
+        return uri;
+    },
+    
+    clone: function() {
+        return new Ajs_Util.Uri(this);
+    },
+    
+    toString: function() {
+        return this.build();
+    },
+    
+    overrideQuery: function(extra) {
+        if (typeof extra !== 'object') {
+            extra = Ajs_Util.parseQuery(extra);
+        }
+        Ajs_Util.override(this.query, extra);
+    }
+    
+}
 
 Ajs_Util.DelayedCall = function(func, id, contextObject, args, delay, immediate) {
     if (id === undefined) id = Ajs_Util.DelatedCall.lastId++;

@@ -52,7 +52,7 @@ class Ac_Legacy_Database_MsSql extends Ac_Legacy_Database {
     }
 
     function Quote($value) {
-        if (is_a($value, 'Ac_Sql_Expression')) $res=$value->getQuoted($this);
+        if (is_object($value) && $value instanceof Ac_I_Sql_Expression) $res=$value->getQuoted($this);
         elseif (is_a($value, 'Ac_Pg_Value')) $res = $value->getQuoted();
 	    elseif (is_a($value, 'DateTime')) $res = "'".Ac_Util::date($value, "m.d.Y H:i:s")."'";
         elseif (is_null($value)) $res = 'null';
@@ -63,7 +63,7 @@ class Ac_Legacy_Database_MsSql extends Ac_Legacy_Database {
     }
     
     function NameQuote($string) {
-        if (is_a($string, 'Ac_Sql_Expression')) return $string->nameQuote($this);
+        if (is_object($string) && $string instanceof Ac_I_Sql_Expression) return $string->nameQuote($this);
         return '['.str_replace('[', '[[', str_replace(']', ']]', $string)).']';
     }    
     

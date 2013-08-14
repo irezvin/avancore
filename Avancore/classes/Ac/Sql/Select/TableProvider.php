@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Sql_Select_TableProvider {
+class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
 	
 	var $_id = false;
 	
@@ -61,7 +61,7 @@ class Ac_Sql_Select_TableProvider {
      * @param Ac_Sql_Db $db
      * @return Ac_Sql_Select
      */
-    function Ac_Sql_Select_TableProvider($options = array()) {
+    function __construct(array $options = array()) {
         if (!is_array($options)) trigger_error("\$options must be an array", E_USER_ERROR);
     	Ac_Util::bindAutoparams($this, $options, true);
     }
@@ -103,7 +103,6 @@ class Ac_Sql_Select_TableProvider {
     function addTable($options, $alias = false) {
     	if (is_a($options, 'Ac_Sql_Select_Table')) {
             $t = $options;
-            $t->setTableProvider($this);
         }
         else {
             if (!is_array($options)) trigger_error("\$options must be an array or an Ac_Sql_Select_Table instance", E_USER_ERROR);
@@ -113,6 +112,7 @@ class Ac_Sql_Select_TableProvider {
                 else $class = 'Ac_Sql_Select_Table';
             $t = new $class ($this, $options);
         }
+        $t->setTableProvider($this);
         $alias = $t->alias? $t->alias : $t->name;
         if (!strlen($alias)) trigger_error("name of table must be provided", E_USER_ERROR);
         if (isset($this->_tables[$alias])) {
@@ -247,5 +247,9 @@ class Ac_Sql_Select_TableProvider {
         $this->_tableProviders = array();
         $this->_foundTables = array();
     }
+    
+    function hasPublicVars() {
+        return true;
+    }    
     
 }

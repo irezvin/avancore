@@ -34,7 +34,7 @@ class Ac_Legacy_Database_Joomla extends Ac_Legacy_Database {
     }
     
     function NameQuote($string) {
-        if (is_a($string, 'Ac_Sql_Expression')) return $string->nameQuote($this);
+        if (is_object($string) && $string instanceof Ac_I_Sql_Expression) return $string->nameQuote($this);
             else return $this->_db->quoteName($string);
     }
     

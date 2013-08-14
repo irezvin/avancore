@@ -612,7 +612,7 @@ class Ac_Sql_NestedSets {
             
             
             if ($extraJoins !== false) {
-                if (is_a($extraJoins, 'Ac_Sql_Expression')) $extraJoinsParam = $extraJoins;
+                if (is_object($extraJoins) && $extraJoins instanceof Ac_I_Sql_Expression) $extraJoinsParam = $extraJoins;
                     else $extraJoinsParam = new Ac_Sql_Expression($extraJoins);
             } else {
                 $extraJoinsParam = new Ac_Sql_Expression('');
@@ -621,7 +621,7 @@ class Ac_Sql_NestedSets {
             
             
             if ($orderBy !== false) {
-                if (is_a($orderBy, 'Ac_Sql_Expression')) $orderByParam = array('ORDER BY ', $orderBy);
+                if (is_object($orderBy) && $orderBY instanceof Ac_I_Sql_Expression) $orderByParam = array('ORDER BY ', $orderBy);
                     else $orderByParam = new Ac_Sql_Expression('ORDER BY '.$orderBy);
             } else {
                 $orderByParam = new Ac_Sql_Expression('');
@@ -630,7 +630,7 @@ class Ac_Sql_NestedSets {
             
             
             if ($extraWhere !== false) {
-                if (is_a($extraWhere, 'Ac_Sql_Expression')) $extraWhereParam = array('AND ', $extraWhere);
+                if (is_object($extraWhere) && ($extraWhere instanceof Ac_I_Sql_Expression)) $extraWhereParam = array('AND ', $extraWhere);
                     else $extraWhereParam = new Ac_Sql_Expression('AND '.$extraWhere);
             } else {
                 $extraWhereParam = new Ac_Sql_Expression('');
@@ -639,7 +639,7 @@ class Ac_Sql_NestedSets {
             
             
             if ($groupBy !== false) {
-                if (is_a($groupBy, 'Ac_Sql_Expression')) $groupByParam = array('GROUP BY ', $groupBy);
+                if (is_object($groupBy) && $groupBy instanceof Ac_I_Sql_Expression) $groupByParam = array('GROUP BY ', $groupBy);
                     else $groupByParam = new Ac_Sql_Expression('GROUP BY '.$groupBy);
             } else {
                 $groupByParam = new Ac_Sql_Expression('');

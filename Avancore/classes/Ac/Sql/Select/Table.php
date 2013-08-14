@@ -120,13 +120,11 @@ class Ac_Sql_Select_Table {
     /**
      * @param Ac_Sql_Select $sqlSelect
      */
-    function setSqlSelect($sqlSelect) {
-        if (!is_a($sqlSelect, 'Ac_Sql_Select'))  trigger_error("\$sqlSelect must be an instance of Ac_Sql_Select", E_USER_ERROR);
+    function setSqlSelect(Ac_Sql_Select $sqlSelect) {
         $this->_tableProvider = $sqlSelect;
     }
     
-    function setTableProvider($tableProvider) {
-    	if (!is_a($tableProvider, 'Ac_Sql_Select_TableProvider')) triggerError("\$tableProvider must be an instance of Ac_Sql_Select_TableProvider", E_USER_ERROR);
+    function setTableProvider(Ac_Sql_Select_TableProvider $tableProvider) {
     	$this->_tableProvider = $tableProvider;
     }
     
@@ -168,13 +166,15 @@ class Ac_Sql_Select_Table {
     		($this->useUsing == AC_USE_USING_ALWAYS || ($this->useUsing == AC_USE_USING_GLOBAL && $sqs->useUsing));
     	if ($res) 
     		foreach ($this->joinsOn as $v)
-    			if (is_a($v, 'Ac_Sql_Expression')) {
+    			if (is_object($v) && $v instanceof Ac_I_Sql_Expression) {
     				$res = false; break;
     			}
     	return $res;
     }
     
-    function getJoinsOn() {
+    function getJoinsOn($alias = false) {
+        if ($alias === false) $alias = $this->alias;
+        
         // get kind of join
         if (is_array($this->joinsOn)) {
         	$sqs = $this->getSqlSelect(true);
@@ -184,16 +184,16 @@ class Ac_Sql_Select_Table {
         	else {
         		$c = array();
         		foreach ($this->joinsOn as $myColumn => $otherColumn) {
-        			if (is_a($otherColumn, 'Ac_Sql_Expression')) {
+        			if (is_object($otherColumn) && $otherColumn instanceof Ac_I_Sql_Expression) {
         				if (!is_numeric($myColumn)) {
-        					$expr = $db->nameQuote(array($this->alias, $myColumn)).' = '.$db->quote($otherColumn); 
+        					$expr = $db->nameQuote(array($alias, $myColumn)).' = '.$db->quote($otherColumn); 
         				} else {
         					$expr = $db->quote($otherColumn);
         				}
         				$c[] = $expr;
         			} else {
         				if (is_numeric($myColumn)) $myColumn = $otherColumn;
-                		$c[] = $db->nameQuote(array($this->joinsAlias, $otherColumn)).' = '.$db->nameQuote(array($this->alias, $myColumn));
+                		$c[] = $db->nameQuote(array($this->joinsAlias, $otherColumn)).' = '.$db->nameQuote(array($alias, $myColumn));
         			}
             	}
             	$joinsOn = implode(' AND ', $c);
@@ -222,12 +222,21 @@ class Ac_Sql_Select_Table {
     	return is_array($something)? !count($something) : !strlen($something);
     }
     
-    function getJoinClausePart() {
+    protected function getSqlSrc() {
+        if ($this->name === false) trigger_error ("\$name must be provided for table '{$this->alias}'", E_USER_ERROR);
+        $sqlSelect = $this->getSqlSelect();
+        $res = $sqlSelect->n($this->name);
+        return $res;
+    }
+    
+    function getJoinClausePart($alias = false) {
         if ($this->omitInFromClause) $res = '';
         else {
+            
+            if ($alias === false) $alias = $this->alias;
+            
             $sqlSelect = $this->getSqlSelect(true);
             //if (!$this->_sqlSelect) trigger_error("\'sqlSelect' property not set - call setSqlSelect() first", E_USER_ERROR);
-            if ($this->name === false) trigger_error ("\$name must be provided for table '{$this->alias}'", E_USER_ERROR);
             //if (!strlen($this->alias)) trigger_error ("\$alias must be provided", E_USER_ERROR);
 
             if (strlen($this->joinsAlias)) {
@@ -248,19 +257,19 @@ class Ac_Sql_Select_Table {
                 if (!strlen($joinType) || (trim($joinType) == ',')) {
                     $joinType = ',';
                 }
-                $res = $joinType.' '.$sqlSelect->nameQuote($this->name);
-                if (strlen($this->alias)) $res .= ' AS '.$sqlSelect->nameQuote($this->alias);
+                $res = $joinType.' '.$this->getSqlSrc();
+                if (strlen($alias)) $res .= ' AS '.$sqlSelect->n($alias);
 
                 if ($this->useIndex !== false) {
                     $res .= ' USE INDEX('.(is_array($this->useIndex)? implode(", ", $this->useIndex) : $this->useIndex).')'; 
                 }
 
-                $res .= $this->getJoinsOn();
+                $res .= $this->getJoinsOn($alias);
 
             } else {
 
-                $res = $sqlSelect->nameQuote($this->name);
-                if (strlen($this->alias)) $res .= ' AS '.$sqlSelect->nameQuote($this->alias);
+                $res = $sqlSelect->n($this->name);
+                if (strlen($alias)) $res .= ' AS '.$sqlSelect->n($alias);
                 if ($this->useIndex !== false) {
                     $res .= ' USE INDEX('.(is_array($this->useIndex)? implode(", ", $this->useIndex) : $this->useIndex).')'; 
                 }
