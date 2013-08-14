@@ -74,15 +74,18 @@ abstract class Ac_Result_Writer extends Ac_Prototyped {
      * @throws Ac_E_InvalidUsage
      */
     function write($return = false) {
-        if (!($r = $this->getSource())) 
+        if (!($r = $this->getSource())) {
             throw new Ac_E_InvalidUsage("setSource() first");
-        if ($r->setMerged(true));
+        }
+        $r->setMerged(true);
         $t = $this->getTarget();
-        if ($this->requiresTarget() && !$t)
+        if ($this->requiresTarget() && !$t) {
             throw new Ac_E_InvalidUsage("setTarget() first");
+        }
         $s = $this->getStage();
-        if ($this->requiresStage() && !$this->getStage())
+        if ($this->requiresStage() && !$this->getStage()) {
             throw new Ac_E_InvalidUsage("setStage() first");
+        }
         if ($return) ob_start();
         $this->implWrite($r, $t, $s);
         if ($return) {

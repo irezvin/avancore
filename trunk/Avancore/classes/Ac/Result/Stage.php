@@ -125,6 +125,8 @@ class Ac_Result_Stage extends Ac_Prototyped {
      * @var Ac_Result_Position
      */
     protected $position = false;
+    
+    protected $noAdvance = false;
  
     protected function traverse($classes = null) {
         if (is_null($classes)) $classes = $this->defaultTraverseClasses;
@@ -180,12 +182,14 @@ class Ac_Result_Stage extends Ac_Prototyped {
             $this->current = $curr;
         }
     }
+ 
+    protected $switchedCurrent = false;
     
     protected function traverseNext() {
         if ($this->current) {
             $this->isActive = true;
             $doneCurrent = false;
-            $switchedCurrent = false;
+            $this->switchedCurrent = false;
             if (!$this->isAscend) {
                 
                 if ($this->current instanceof Ac_Result) $this->checkOverride();
@@ -200,7 +204,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
                         $this->parent = $this->current;
                         $this->current = $fc;
                         $this->position = $position;
-                        $switchedCurrent = true;
+                        $this->switchedCurrent = true;
                     }
                 }
                 
@@ -209,7 +213,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
                     $doneCurrent = true;
                 }
             }
-            if (!$switchedCurrent) {
+            if (!$this->switchedCurrent) {
                 do { // we have to iterate while we ascend to prevent double visiting
                     if ($this->position) $ns = $this->position->advance();
                     else $ns = null;
@@ -323,10 +327,20 @@ class Ac_Result_Stage extends Ac_Prototyped {
         if ($this->getIsChangeable()) {
             $this->position->replaceCurrentObject($content, true);
         } else {
-            throw new Ac_E_InvalidUsage("Cannot put() when not in position; check with getIsChangeable() first");
+            throw new Ac_E_InvalidUsage("Cannot replaceCurrentObject() when not in position; check with getIsChangeable() first");
         }
     }
-
+    
+    function replaceParentObject(Ac_Result $replaceWith, $replaceRoot = false) {
+        if (!count($this->stack))
+            throw new Ac_E_InvalidUsage("Cannot replaceParentObject() when not at child node");
+        list ($this->current, $this->parent, $this->position) = array_pop($this->stack);
+        $this->current->setReplaceWith($replaceWith);
+        if ($replaceRoot) $this->current->setOverrideMode(Ac_Result::OVERRIDE_ALL);
+        $this->switchedCurrent = true;
+        $this->checkOverride();
+    }
+    
     function setApplication(Ac_Application $application) {
         $this->application = $application;
     }
