@@ -234,7 +234,7 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
         foreach (array_diff(array_keys($this->params), array_keys($this->_qp)) as $k) {
             $n++;
             $v = $this->params[$k];
-            if (is_a($v, 'Ac_Sql_Expression') && method_exists($v, 'applyGlobalParams')) {
+            if (is_object($v) && $v instanceof Ac_I_Sql_Expression && method_exists($v, 'applyGlobalParams')) {
                 $gParams = $this->params;
                 $qParams = $this->_qParams;
                 unset($gParams[$k]);
@@ -255,7 +255,7 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
             $qParts = array();
             foreach (array_keys($part) as $p) $qParts[] = $this->_quotePart($part[$p], $qParams);
             $res = implode(' ', $qParts);
-        } elseif (is_a($part, 'Ac_Sql_Expression')) {
+        } elseif (is_object($part) && $part instanceof Ac_I_Sql_Expression) {
             if (method_exists($part, 'applyGlobalParams')) $part->applyGlobalParams($this->params, $this->_getQParams());
             $res = $part->getExpression($this->_db);
         } else {

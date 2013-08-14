@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
+class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expression {
     
     /**
      * @var Ac_Sql_Db
@@ -45,21 +45,41 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
      * @param Ac_Sql_Db $db
      * @return Ac_Sql_Select
      */
-    function Ac_Sql_Select($db, $options) {
-    	$options['db'] = $db;
-    	parent::Ac_Sql_Select_TableProvider($options);
+    function __construct($db, array $options = array()) {
+        if (is_array($db) && func_num_args() == 1) {
+            $options = $db;
+        } else {
+            $options['db'] = $db;
+        }
+    	parent::__construct($options);
     }
 
-    function setDb($db) {
-    	if (!is_a($db, 'Ac_Sql_Db')) trigger_error("\$db must be an instance of Ac_Sql_Db", E_USER_ERROR);;
+    function setDb(Ac_Sql_Db $db) {
     	$this->_db = $db;
+    }
+    
+    function hasDb() {
+        return $this->_db !== false;
+    }
+    
+    function nameQuote($db) {
+        return $this->getExpression($db);
+    }
+    
+    function __toString() {
+    	return $this->getStatement();
+    }
+    
+    function getExpression($db) {
+        if (!$this->_db && is_object($db) && $db instanceof Ac_Sql_Db) $this->setDb($db);
+    	return $this->__toString();
     }
     
     /**
      * @return Ac_Sql_Db
      */
     function getDb() {
-        if ($this->_db === false) $this->_db = new Ac_Sql_Db_Ae();
+        if ($this->_db === false) return new Ac_Sql_Db_Ae();
         return $this->_db;
     }
     
@@ -108,12 +128,12 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         return array_keys($this->_tables);
     }
     
-    function quote($str) {
-        return $this->_db->quote($str);
+    function q($str) {
+        return $this->_db->q($str);
     }
     
-    function nameQuote($str) {
-        return $this->_db->nameQuote($str);
+    function n($str) {
+        return $this->_db->n($str);
     }
     
     function getStatement() { /** @TODO: fix issue when otherJoins are put BEFORE primary alias! */
@@ -161,7 +181,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
     		else $cols = $this->columns;
     	$columns = array();
     	foreach ($cols as $k => $c) {
-    		if (is_a($c, 'Ac_Sql_Expression')) $cl = $c->getExpression($this->_db);
+    		if (is_object($c) && $c instanceof Ac_I_Sql_Expression) $cl = $c->getExpression($this->_db);
     			else $cl = $c;
     		if (!is_numeric($k)) $cl = $cl.' AS '.$this->_db->nameQuote($k);
     		$columns[] = $cl;
@@ -399,14 +419,6 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider {
         preg_match_all("/\\b{$aa}\\b/", $expression, $matches);
         if ($matches && isset($matches['alias'])) $res = array_unique($matches['alias']);
         return $res;  
-    }
-    
-    function __toString() {
-    	return $this->getStatement();
-    }
-    
-    function getExpression() {
-    	return $this->__toString();
     }
     
     function cleanupReferences() {

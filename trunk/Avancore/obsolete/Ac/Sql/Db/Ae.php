@@ -39,7 +39,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
     
     protected function implIsNameQuoted($name) {
-        return !is_a($name, 'Ac_Sql_Expression') && $this->_aeDb->isNameQuoted($name);
+        return !is_object($name) && $name instanceof Ac_I_Sql_Expression && $this->_aeDb->isNameQuoted($name);
     }
     
     protected function implConcatNames($quotedNames) {
@@ -63,7 +63,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
 
     function _convert($query) {
-        if(is_a($query, 'Ac_Sql_Expression')) {
+        if(is_object($query) && $query instanceof Ac_I_Sql_Expression) {
         	if (function_exists('xdebug_time_index')) {
             	if (!isset($GLOBALS['_exprTime'])) $GLOBALS['_exprTime'] = 0;
             	$t = xdebug_time_index(); 

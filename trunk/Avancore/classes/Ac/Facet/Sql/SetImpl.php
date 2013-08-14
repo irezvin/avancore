@@ -10,7 +10,7 @@ class Ac_Facet_Sql_SetImpl extends Ac_Facet_SetImpl {
     protected $withCounts = null;
 
     protected $countColName = false;
-
+    
     function getDefaultItemImplClass() {
         return 'Ac_Facet_Sql_ItemImpl';
     }
