@@ -24,8 +24,11 @@ class Ac_Result_Writer_Auto extends Ac_Result_Writer {
             }
         }
         elseif ($r instanceof Ac_Result_Http) {
-            $proto['class'] = 'Ac_Result_Writer_Replace';
             if (!$t) $proto['class'] = 'Ac_Result_Writer_HttpOut';
+            else { 
+                $proto['class'] = 'Ac_Result_Writer_Replace';
+                $proto['replaceAll'] = true;
+            }
         }
         
         return $this->applyWriter($proto, $r, $t, $s);

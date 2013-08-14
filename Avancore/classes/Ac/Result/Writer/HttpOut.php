@@ -15,7 +15,7 @@ class Ac_Result_Writer_HttpOut extends Ac_Result_Writer_WithCharset {
      * @return Ac_I_Response_Environment
      */
     function getEnvironment() {
-        if ($this->environment === false) $this->environment = new Ac_Response_Environment_Native();
+        if ($this->environment === false) return Ac_Response_Environment::getDefault();
         return $this->environment;
     }        
     
@@ -23,12 +23,12 @@ class Ac_Result_Writer_HttpOut extends Ac_Result_Writer_WithCharset {
         if ($t) throw new Ac_E_InvalidCall(__CLASS__." can work only without target response");
         if (!($e = $this->getEnvironment())) throw new Ac_E_InvalidCall("setEnvironment() first");
         
-        $e->begin();
-        if ($r instanceof Ac_Result_Http_Abstract) {
+        if ($e) $e->begin();
+        if ($r instanceof Ac_Result_Http_Abstract && $e) {
             $e->acceptHeaders($r->getHeaders()->getItems());
         }
         $r->echoContent();
-        $e->finishOutput();
+        if ($e) $e->finishOutput();
     }
     
 }

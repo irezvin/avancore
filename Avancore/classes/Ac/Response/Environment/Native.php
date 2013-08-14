@@ -20,12 +20,14 @@ class Ac_Response_Environment_Native implements Ac_I_Response_Environment, Ac_I_
     }
     
     function acceptHeaders(array $headers) {
-        foreach ($headers as $header) {
-            if (is_object($header) && $header instanceof Ac_I_Http_Header) {
-                $header->processNatively();
-            } else {
-                // TODO: better headers handling
-                header($header);
+        if (!headers_sent()) {
+            foreach ($headers as $header) {
+                if (is_object($header) && $header instanceof Ac_I_Http_Header) {
+                    $header->processNatively();
+                } else {
+                    // TODO: better headers handling
+                    header($header);
+                }
             }
         }
     }
@@ -59,5 +61,9 @@ class Ac_Response_Environment_Native implements Ac_I_Response_Environment, Ac_I_
     function finishOutput() {
         // should probably die() here
     }
+    
+    function begin() {
+    }
+    
     
 }

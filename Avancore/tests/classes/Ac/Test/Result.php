@@ -774,4 +774,52 @@ EOD
         $this->assertEqual($a['r']->writeAndReturn(), 'Something New');
     }
     
+    function testWriterReplace() {
+        $o = new Ac_Result(array('debugData' => 'o'));
+        $i = new Ac_Result(array(
+            'content' => 'inner',
+            'writer' => 'Ac_Result_Writer_Replace',
+            'debugData' => 'i',
+        ));
+        $o->put("*** {$i} ***");
+        if (!$this->assertEqual($str = $o->writeAndReturn(), $i->getContent()))
+            var_dump($str);
+    }
+    
+    function testJson() {
+        
+        $data = array('foo' => 'bar', 'baz' => array('quux', 1, 2, 3));
+        $js = new Ac_Result_Json(array('data' => $data));
+        
+        $i = new Ac_Result(array('content' => "<{$js}>"));
+        $o = new Ac_Result(array('content' => "*{$i}*"));
+        
+        $d = new Ac_Response_Environment_Dummy();
+        Ac_Response_Environment::setDefault($d);
+        
+        $o->write();
+        if (!$this->assertEqual($str = $d->responseText, $js->getContent()))
+            var_dump($str);
+        if (!$this->assertEqual($h = $d->headers, array('Content-Type: text/json')))
+            var_dump($h);
+        
+        
+        
+        
+        $js = new Ac_Result_Js(array('data' => $data));
+        
+        $i = new Ac_Result(array('content' => "<{$js}>"));
+        $o = new Ac_Result(array('content' => "*{$i}*"));
+        
+        $d = new Ac_Response_Environment_Dummy();
+        Ac_Response_Environment::setDefault($d);
+        
+        $o->write();
+        if (!$this->assertEqual($str = $d->responseText, $js->getContent()))
+            var_dump($str);
+        if (!$this->assertEqual($h = $d->headers, array('Content-Type: text/javascript')))
+            var_dump($h);
+        
+    }
+    
 }

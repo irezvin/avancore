@@ -221,9 +221,13 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
         return $this->replaceWith;
     }
 
-    function setWriter(Ac_Result_Writer $writer) {
+    /**
+     * @param Ac_Result_Writer $writer or its' prototype
+     */
+    function setWriter($writer) {
+        if (is_object($writer) && $writer instanceof Ac_Result_Writer)
+            $writer->setSource ($this);
         $this->writer = $writer;
-        $this->writer->setSource($this);
     }
 
     /**
@@ -232,6 +236,14 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     function getWriter() {
         if ($this->writer === false) {
             $this->writer = $this->createDefaultWriter();
+        } else {
+            if (!is_object($this->writer) || !$this->writer instanceof Ac_Result_Writer)
+                $this->writer = Ac_Prototyped::factory(
+                    $this->writer, 
+                    'Ac_Result_Writer',
+                    array('source' => $this),
+                    true
+                );
         }
         return $this->writer;
     }
@@ -327,7 +339,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     }   
     
     function echoContent() {
-        echo $this->content;
+        echo $this->getContent();
     }
     
     function setContent($content) {
