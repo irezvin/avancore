@@ -377,6 +377,8 @@ class Ac_Legacy_Database {
     }
     
     function isNameQuoted($name) {
+        if (is_object($name) && $name instanceof Ac_I_Sql_Expression) return true;
+        $name = ''.$name;
         return strlen($name) > 2 && $name{0} == '`';
     }
     

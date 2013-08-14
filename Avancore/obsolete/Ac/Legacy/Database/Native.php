@@ -47,13 +47,13 @@ class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
         elseif (is_int($value) || is_float($value)) $res = ''.$value;
         elseif (is_null($value)) $res = 'null';
         elseif (is_bool($value)) $res = $value? 'true' : 'false';
-        elseif (is_a($value, 'Ac_Sql_Expression')) $res = $value->getExpression($this);
+        elseif (is_object($value) && $value instanceof Ac_I_Sql_Expression) $res = $value->getExpression($this);
         else $res = '\''.mysql_real_escape_string($value, $this->_connection).'\'';
         return $res;
     }
     
     function NameQuote($string) {
-        if (is_a($string, 'Ac_Sql_Expression')) return $string->nameQuote($this);
+        if (is_object($string) && $string instanceof Ac_I_Sql_Expression) return $string->nameQuote($this);
             else return "`".str_replace("`", "``", $string)."`";
     }
     
@@ -237,7 +237,7 @@ class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
     }
 
     function canCopyToDest($db) {
-    	if (is_a($db, 'Ac_Legacy_Database_Native') && ($db->_db != $this->_db)) {
+    	if (is_object($db) && $db instanceof Ac_Legacy_Database_Native && ($db->_db != $this->_db)) {
     		return true;
     	} else return false;
     }

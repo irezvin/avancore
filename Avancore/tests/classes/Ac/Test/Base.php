@@ -11,7 +11,19 @@ class Ac_Test_Base extends UnitTestCase {
 	protected $aeDb = false;
     
     protected $legacyDb = false;
+    
+    /**
+     * @var Sample
+     */
+    protected $sampleApp = false;
+    
+    protected $bootSampleApp = false;
 	
+    function __construct($label = false) {
+        parent::__construct($label);
+        if ($this->bootSampleApp) $this->getSampleApp();
+    }
+    
 	/**
 	 * @return Ac_Sql_Db_Ae
 	 */
@@ -19,6 +31,20 @@ class Ac_Test_Base extends UnitTestCase {
 		if ($this->aeDb === false) $this->aeDb = new Ac_Sql_Db_Ae($this->getLegacyDb());
 		return $this->aeDb;
 	}
+    
+    /**
+     * @return Sample
+     */
+    function getSampleApp() {
+        if ($this->sampleApp === false) {
+            $appClassFile = dirname(dirname(dirname(dirname(__FILE__)))).'/sampleApp/gen/classes/Sample/DomainBase.php';
+            require_once($appClassFile);
+            $appClassFile = dirname(dirname(dirname(dirname(__FILE__)))).'/sampleApp/classes/Sample.php';
+            require_once($appClassFile);
+            $this->sampleApp = Sample::getInstance();
+        }
+        return $this->sampleApp;
+    }
     
     /**
      * @return Ac_Legacy_Database 

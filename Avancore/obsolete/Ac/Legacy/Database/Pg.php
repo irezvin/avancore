@@ -45,7 +45,7 @@ class Ac_Legacy_Database_Pg extends Ac_Legacy_Database {
         elseif (is_null($value)) $res = 'null';
         elseif (is_int($value) || is_float($value)) $res = $value;
         elseif (is_bool($value)) $res = $value? 'true' : 'false';
-        elseif (is_object($value) && $value instanceof Ac_Sql_Expression) {
+        elseif (is_object($value) && $value instanceof Ac_I_Sql_Expression) {
             $res = $value->quote($this);
         }
         else $res = "'".pg_escape_string($value)."'";
@@ -53,7 +53,7 @@ class Ac_Legacy_Database_Pg extends Ac_Legacy_Database {
     }
     
     function NameQuote($string) {
-        if (is_object($string) && $string instanceof Ac_Sql_Expression) {
+        if (is_object($string) && $string instanceof Ac_I_Sql_Expression) {
             return $string->nameQuote($this);
         } else return '"'.$string.'"';
     }    

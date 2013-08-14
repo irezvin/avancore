@@ -2,7 +2,7 @@
 
 abstract class Ac_Sql_Db extends Ac_Prototyped {
 
-    var $defaultIndent = 4;
+    static $defaultIndent = 4;
     
     var $triggerErrorsOnSqlErrors = true;
     
@@ -28,7 +28,7 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     }
     
     function q($value, $asArray = false) {
-        if (is_object($value) && (is_a($value, 'Ac_Sql_Expression') || method_exists($value, 'getExpression'))) {
+        if (is_object($value) && (is_a($value, 'Ac_I_Sql_Expression') || method_exists($value, 'getExpression'))) {
             $res = $value->getExpression($this);
         } elseif (is_array($value)) {
             $r = array();
@@ -108,11 +108,11 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
      * @param int|bool $size 
      * @return array|string
      */
-    function indent($string, $size = false) {
-        if ($size === false) $size = $this->defaultIndent;
+    static function indent($string, $size = false) {
+        if ($size === false) $size = self::$defaultIndent;
         if (is_array($string)) {
             $res = array();
-            foreach ($string as $k => $v) $res[$k] = $this->indent($v, $size);
+            foreach ($string as $k => $v) $res[$k] = self::indent($v, $size);
         } else {
             $idt = str_repeat(" ", $size);
             $res = $idt.str_replace("\n", "\n".$idt, $string);

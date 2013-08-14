@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Sql_Expression {
+class Ac_Sql_Expression implements Ac_I_Sql_Expression {
 
     var $expression = '';
     

@@ -1059,6 +1059,17 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         return $res;
     }
     
+    /**
+     * Any call will fetch ALL records into the memory.
+     * 
+     * - FALSE to fetch ALL records, 
+     * - array with PKs to get SOME records 
+     * - PK to get Single record 
+     * 
+     * 
+     * @param false|scalar|array $key
+     * @return array|Ac_Model_Object
+     */
     function getAllRecords($key = false) {
         if ($this->allRecords === false) {
             if (strlen($t = $this->getTitleFieldName())) $ord = $t.' ASC';

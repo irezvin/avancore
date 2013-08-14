@@ -53,6 +53,7 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 		if (!isset($this->_aliasPaths[$alias])) {
 			$path = Ac_Util::pathToArray($alias);
 			$last = $path[count($path) - 1];
+            list($last, $suffix) = array_merge(explode(':', $last, 2), array(''));
 			if (count($path) > 1) {
 				$baseAlias = Ac_Util::arrayToPath(array_slice($path, 0, count($path) - 1));
 				$baseInfo = $this->_searchPath($baseAlias);
@@ -83,7 +84,7 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 		return $this->_searchPath($alias) !== false;
 	}
 	
-	function _doGetTable($alias) {
+	function _doGetTable($alias, $prototypeOnly = false) {
         $origAlias = $alias;
         if (!strncmp($alias, 'mid__', 5)) $alias = substr($alias, 5);
         $p = $this->_searchPath($alias);
@@ -103,13 +104,15 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 			$protos = array();
 			if ($rel->midTableName) {
 				$midAlias = 'mid__'.$alias;
-				$protos[$midAlias] = array(
-					'name' => $rel->midTableName,
-					'joinsAlias' => $joinsAlias,
-					'joinType' => 'LEFT JOIN',
-					'joinsOn' => array_flip($rel->fieldLinks),
-				);
-				$joinsAlias = $midAlias;
+                if (!isset($this->_tables[$midAlias])) {
+                    $protos[$midAlias] = array(
+                        'name' => $rel->midTableName,
+                        'joinsAlias' => $joinsAlias,
+                        'joinType' => 'LEFT JOIN',
+                        'joinsOn' => array_flip($rel->fieldLinks),
+                    );
+                    $joinsAlias = $midAlias;
+                }
 			}
 			$protos[$alias] = array(
 				'name' => $m->tableName,

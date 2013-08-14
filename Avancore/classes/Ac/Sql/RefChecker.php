@@ -210,7 +210,7 @@ class Ac_Sql_RefChecker {
 
 	function _getNonRefCriterion($t, $tableName, $primaryAlias) {
 		foreach($t->joinsOn as $otherColName => $myColName) {
-			if (is_a($myColName, 'Ac_Sql_Expression')) continue;
+			if (is_object($myColName) && $myColName instanceof Ac_I_Sql_Expression) continue;
 			if (is_numeric($otherColName)) $otherColName = $myColName;
 			$refSrc = array();
 			$validNonRef = $this->getValidNonRefValues($tableName, $myColName);
