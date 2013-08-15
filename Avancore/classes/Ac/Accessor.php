@@ -108,8 +108,8 @@ class Ac_Accessor implements Ac_I_Accessor {
                         }
                     }
                 }
-                if ($match) {
-                    if (is_array($name)) $name = Ac_Util::arrayToPath ($name);
+                if ($match) { 
+                   if (is_array($name)) $name = Ac_Util::arrayToPath ($name);
                     $this->errors[$name][] = $e;
                     $res = false;
                 } else {
@@ -143,6 +143,14 @@ class Ac_Accessor implements Ac_I_Accessor {
     function __isset($name) {
         return $this->hasProperty($name);
     }
+    
+    static function getObjectCollection($object, $listMethod, $getMethod) {
+        $res = array();
+        foreach($object->$listMethod() as $key) {
+            $res[$key] = $object->$getMethod($key);
+        }
+        return $res;
+    }
 
     static function getObjectPropertyByPath($item, array $path, $defaultValue = null) {
         $head = $item;
@@ -153,8 +161,8 @@ class Ac_Accessor implements Ac_I_Accessor {
         return $res;
     }
     
-    static function getObjectProperty($item, $propertyName, $defaultValue = null) {
-        if (is_array($item)) {
+    static function getObjectProperty($item, $propertyName, $defaultValue = null, $treatArraysAsObjects = false) {
+        if (is_array($item) && !$treatArraysAsObjects) {
             $res = array();
             foreach ($item as $k => $v) {
                 $res[$k] = self::getObjectProperty($v, $propertyName, $defaultValue);
@@ -168,7 +176,10 @@ class Ac_Accessor implements Ac_I_Accessor {
             return $res;
         } elseif ($propertyName instanceof Ac_I_Getter) {
             $res = $propertyName->get($item, $defaultValue);
-        } else {
+        } elseif (is_array($item)) {
+            if (array_key_exists($propertyName, $item)) $res = $propertyName[$item];
+                else $res = $defaultValue;
+        } elseif (is_object($item)) {
             $args = explode(':', $propertyName);
             $propertyName = $args[0];
             $args = array_slice($args, 1);
@@ -181,11 +192,17 @@ class Ac_Accessor implements Ac_I_Accessor {
             } elseif ($item instanceof Ac_I_Accessor) {
                 if ($item->hasProperty($propertyName)) $res = $item->getProperty($propertyName);
                 else $res = $defaultValue;
-            } elseif (($item instanceof Ac_I_Prototyped? $item->hasPublicVars() : true) && (array_key_exists($propertyName, Ac_Util::getClassVars(get_class($item))))) {
+            } elseif (
+                ($item instanceof Ac_I_Prototyped? $item->hasPublicVars() : true) 
+                && (array_key_exists($propertyName, Ac_Util::getPublicVars($item)))
+            ) {
                 $res = $item->$propertyName;
             } else {
                 $res = $defaultValue;
             }
+        } else {
+            throw Ac_E_InvalidCall("Unsupported \$item type: ".get_type($item)."; probably you "
+                ."didn't pass \$treatArraysAsObjects = true when trying to retrieve values from array");
         }
         return $res;
     }

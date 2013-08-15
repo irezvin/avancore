@@ -21,7 +21,7 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
     
     /**
      * Info where non-own tables were found. Is populated by methods that search in _tableProviders.
-     * @var array table alias => id of table provider 
+     * @var array table alias => id of table provider A
      */
     var $_foundTables = array();
     
@@ -145,6 +145,18 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
     	if (isset($this->_tableProviders[$id])) trigger_error("table provider with id '{$id}' is already in table providers collection", E_USER_ERROR);
     	$this->_tableProviders[$id] = $t;
     	return $t;
+    }
+    
+    /**
+     * @return Ac_Sql_Select_TableProvider
+     */
+    function getTableProvider($id) {
+        if (!isset($this->_tableProviders[$id])) throw Ac_E_InvalidCall::noSuchItem("tableProvider", $id, "listTableProviders");
+        return $this->_tableProviders[$id];
+    }
+    
+    function listTableProviders() {
+        return array_keys($this->_tableProviders);
     }
 
 	function hasTable($alias) {

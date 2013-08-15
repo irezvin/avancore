@@ -6,7 +6,7 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     var $triggerErrorsOnSqlErrors = true;
     
-    var $checkIfNameQuoted = true;
+    var $checkIfNameQuoted = false;
     
     protected $inspector = false;
     
@@ -152,9 +152,9 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
         if (!$multipleInserts) $rows = array($fieldValues);
             else $rows = $fieldValues;
         if (is_array($multipleInserts)) $keys = $multipleInserts;
+        $tableName = $this->n($tableName);
         foreach ($rows as $fieldValues) {
             if (count($fieldValues)) {
-                $tableName = $this->n($tableName);
                 $firstVal = current($fieldValues);
                 $isMultiple = is_array($firstVal);
                 if (!$isMultiple) $fieldValues = array($fieldValues);
