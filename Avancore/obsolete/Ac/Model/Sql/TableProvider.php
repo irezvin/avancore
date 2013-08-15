@@ -20,7 +20,27 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 	 */
 	var $_aliasPaths = array();
 	
-	function _setMapperClass($mapperClass) {
+    protected $defaultJoinType = 'LEFT JOIN';
+    
+    protected $ignoreMidWhere = false;
+
+    function setDefaultJoinType($defaultJoinType) {
+        $this->defaultJoinType = $defaultJoinType;
+    }
+
+    function getDefaultJoinType() {
+        return $this->defaultJoinType;
+    }
+
+    function setIgnoreMidWhere($ignoreMidWhere) {
+        $this->ignoreMidWhere = $ignoreMidWhere;
+    }
+
+    function getIgnoreMidWhere() {
+        return $this->ignoreMidWhere;
+    }    
+    
+    function _setMapperClass($mapperClass) {
 		$this->_mapperClass = $mapperClass;
 	}
 	
@@ -108,16 +128,19 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
                     $protos[$midAlias] = array(
                         'name' => $rel->midTableName,
                         'joinsAlias' => $joinsAlias,
-                        'joinType' => 'LEFT JOIN',
+                        'joinType' => $this->defaultJoinType,
                         'joinsOn' => array_flip($rel->fieldLinks),
                     );
+                    if ($rel->midWhere !== false && !$this->ignoreMidWhere) {
+                        $protos[$midAlias]['joinsOn'][] = new Ac_Sql_Expression($rel->getStrMidWhere($midAlias));
+                    }
                     $joinsAlias = $midAlias;
                 }
 			}
 			$protos[$alias] = array(
 				'name' => $m->tableName,
 				'joinsAlias' => $joinsAlias,
-				'joinType' => 'LEFT JOIN',
+				'joinType' => $this->defaultJoinType,
 				'joinsOn' => $rel->midTableName? array_flip($rel->fieldLinks2) : array_flip($rel->fieldLinks)
 			);
 			foreach ($protos as $alias => $proto) {

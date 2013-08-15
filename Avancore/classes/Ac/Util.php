@@ -438,13 +438,12 @@ abstract class Ac_Util {
         if (!is_array($arrPath)) $arrPath = array($arrPath);
         $src = & $arr;
         if ($arrPath) {
-            $arrPath = array_reverse($arrPath);
-            $key = array_pop($arrPath);
+            $key = array_shift($arrPath);
             while ($arrPath) {
                 if (!isset($src[$key])) $src[$key] = array();
                 elseif (!is_array($src[$key])) {
-                    if ($overwrite === true) $src[$key] = array();
-                    elseif ($overwrite === false) return false;
+                    if ($overwrite === false) return false;
+                    elseif ($overwrite === true) $src[$key] = array();
                     elseif (is_callable($overwrite)) {
                         $oRes = call_user_func_array($overwrite, array_merge(array(array_reverse(array_merge($arrPath, array($key))), & $src[$key], $value), $extraParams));
                         if ($oRes === false) return false;
@@ -452,7 +451,7 @@ abstract class Ac_Util {
                     }
                 }
                 $src = & $src[$key];
-                $key = array_pop($arrPath);
+                $key = array_shift($arrPath);
             }
             $src[$key] = $value;
         } else {
@@ -473,9 +472,8 @@ abstract class Ac_Util {
     static function unsetArrayByPath(& $arr, $arrPath) {
         if (!is_array($arrPath)) $arrPath = array($arrPath);
         $src = & $arr;
-        $arrPath = array_reverse($arrPath);
         while ($arrPath) {
-            $key = array_pop($arrPath);
+            $key = array_shift($arrPath);
             if (is_array($src) && isset($src[$key])) {
                 if ($arrPath) $src = & $src[$key];
                 else {
@@ -919,6 +917,38 @@ abstract class Ac_Util {
     static function typeClass($item) {
         $res = gettype($item);
         if (is_object($item)) $res .=  ' '.get_class($item);
+        return $res;
+    }
+    
+    /**
+     * Converts array(array('foo' => 'a'), array('foo' => 'b')) into array('a' => array('foo' => 'a'), 'b' => array('foo' => 'b'))
+     * 
+     * @param array $flatArray
+     * @param scalar|array $keyList
+     */
+    static function indexArray(array $flatArray, $keyList, $unique = false) {
+        $res = array();
+        if (is_array($keyList) && count($keyList) == 1) $keyList = array_shift($keyList);
+        if (!is_array($keyList)) {
+            // simple version
+            foreach ($flatArray as $v) {
+                if (is_object($v)) $k = Ac_Accessor::getObjectProperty($v, $keyList);
+                else $k = isset($v[$keyList])? $v[$keyList] : null;
+                
+                if ($unique) $res[$k] = $v;
+                else $res[$k][] = $v;
+            }
+        } else {
+            foreach ($flatArray as $v) {
+                if (is_object($v)) $path = array_values(Ac_Accessor::getObjectProperty($v, $keyList));
+                else {
+                    $path = array();
+                    foreach ($keyList as $i) if (isset($v[$i])) $path[] = $v[$i];
+                        else $path[] = null;
+                }
+                Ac_Util::simpleSetArrayByPathNoRef ($res, $path, $v, $unique);
+            }
+        }
         return $res;
     }
 
