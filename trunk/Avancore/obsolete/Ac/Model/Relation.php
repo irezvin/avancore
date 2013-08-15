@@ -238,6 +238,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     
     var $destWhere = false;
     
+    var $midWhere = false;
+    
     /**
      * Flipped links (from destination to midtable to source table) 
      */
@@ -331,7 +333,20 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function getDest ($srcData, $matchMode = AMR_PLAIN_RESULT, $defaultValue = null) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         $hasDef = func_num_args() >= 3;
-        $res = $this->_getSrcOrDest ($srcData, $matchMode, $defaultValue, $hasDef, $this->fieldLinks, $this->fieldLinks2, $this->destIsUnique, $this->destTableName, '_destInstance', $this->destOrdering, $this->destExtraJoins, $this->destWhere);
+        $res = $this->_getSrcOrDest (
+            $srcData, 
+            $matchMode, 
+            $defaultValue, 
+            $hasDef, 
+            $this->fieldLinks, 
+            $this->fieldLinks2, 
+            $this->destIsUnique, 
+            $this->destTableName, 
+            '_destInstance', 
+            $this->destOrdering, 
+            $this->destExtraJoins, 
+            $this->destWhere
+        );
         return $res;
     }
     
@@ -363,7 +378,19 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function getSrc ($destData, $matchMode = AMR_PLAIN_RESULT, $defaultValue = null) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         $hasDef = func_num_args() >= 3;
-        $res = $this->_getSrcOrDest ($destData, $matchMode, $defaultValue, $hasDef, $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcIsUnique, $this->srcTableName, '_srcInstance', $this->srcOrdering, $this->srcExtraJoins, $this->srcWhere);
+        $res = $this->_getSrcOrDest ($destData, 
+            $matchMode, 
+            $defaultValue, 
+            $hasDef, 
+            $this->_fieldLinksRev, 
+            $this->_fieldLinksRev2, 
+            $this->srcIsUnique, 
+            $this->srcTableName, 
+            '_srcInstance', 
+            $this->srcOrdering, 
+            $this->srcExtraJoins, 
+            $this->srcWhere
+        );
         return $res;
     }
     
@@ -424,6 +451,12 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcIsUnique, $this->destIsUnique, $this->srcTableName, '_srcInstance', $this->srcOrdering, $this->srcExtraJoins, $this->srcWhere);
     }
     
+    function getStrMidWhere($alias = false) {
+        if (is_array($this->midWhere)) $res = $this->database->valueCriterion($this->midWhere, $alias);
+        else $res = $this->midWhere;
+        return $res;
+    }
+    
     function loadDestNNIds($srcData, $ignoreLoaded = true) {
         if (!$this->midTableName) trigger_error("This function is only applicable to relations with midTableName set", E_USER_ERROR);
         if (!strlen($this->srcNNIdsVarName)) trigger_error("Property \$srcNNIdsVarName should be set to non-empty string to use this method", E_USER_ERROR); 
@@ -434,6 +467,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             'srcVarName' => $this->srcNNIdsVarName,
             
             'destTableName' => $this->midTableName,
+            'destWhere' => $this->getStrMidWhere(),
             'fieldLinks' => $this->fieldLinks,
         
             'srcIsUnique' => $this->srcIsUnique,
@@ -454,6 +488,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             'destVarName' => $this->destNNIdsVarName,
             
             'srcTableName' => $this->midTableName,
+            'srcWhere' => $this->midWhere,
             'fieldLinks' => $this->fieldLinks2,
         
             'srcIsUnique' => false,
@@ -507,7 +542,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $res = $this->_getJoin($type, $srcAlias, $this->destTableName, $destAlias, $this->fieldLinks);
         } else {
             if ($midAlias === false) $midAlias = $this->midTableAlias;
-            $res = $this->_getJoin($type, $srcAlias, $this->midTableName, $midAlias, $this->fieldLinks);
+            $res = $this->_getJoin($type, $srcAlias, $this->midTableName, $midAlias, $this->fieldLinks, $this->getStrMidWhere($midAlias));
             $res .= ' '.$this->_getJoin($joinType, $midAlias, $this->destTableName, $destAlias, $this->fieldLinks2);
         }
         return $res;
@@ -518,7 +553,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $res = $this->_getJoin($type, $destAlias, $this->srcTableName, $srcAlias, $this->_fieldLinksRev);
         } else {
             if ($midAlias === false) $midAlias = $this->midTableAlias;
-            $res = $this->_getJoin($type, $destAlias, $this->midTableName, $midAlias, $this->_fieldLinksRev2);
+            $res = $this->_getJoin($type, $destAlias, $this->midTableName, $midAlias, $this->_fieldLinksRev2, $this->getStrMidWhere($midAlias));
             $res .= ' '.$this->_getJoin($joinType, $midAlias, $this->srcTableName, $srcAlias, $this->_fieldLinksRev);
         }
         return $res;
@@ -973,6 +1008,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $keys = array_values($otherKeys); 
             $lta = '_mid_.';
             $crit = $this->_makeSqlCriteria($values, $keys, '_mid_');
+            if ($this->midWhere !== false) $crit = "( $crit ) AND (".$this->getStrMidWhere('_mid_').")";
         } else {
             $fromWhere = ' FROM '.$this->database->n($tableName);
             $selKeys = $keys;    
@@ -1087,7 +1123,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * Creates JOIN clause ("$joinType JOIN $rightTable AS $rightAlias ON $leftAlias.$key0 = $rightAlias.$field0 AND $leftAlias.$key1 = $rightAlias.$field1"), 
      * $keyN and $fieldN are taken from $fieldNames 
      */
-    function _getJoin ($joinType, $leftAlias, $rightTable, $rightAlias, $fieldNames) {
+    function _getJoin ($joinType, $leftAlias, $rightTable, $rightAlias, $fieldNames, $extraCrit = false) {
         $db = $this->database;
         $la = $db->NameQuote($leftAlias);
         $ra = $db->NameQuote($rightAlias);
@@ -1101,6 +1137,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         foreach ($fieldNames as $leftField => $rightField) {
             $on[] = $la.'.'.$db->NameQuote($leftField).' = '.$ra.'.'.$db->NameQuote($rightField);
         }
+        if ($extraCrit) $res[] = "($extraCrit)";
         $res .= implode(' AND ', $on);
         return $res;
     }    

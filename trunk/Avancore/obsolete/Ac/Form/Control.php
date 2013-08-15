@@ -777,7 +777,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
     
     function getResultPath() {
-        if (strlen($this->resultPath)) $res = $this->resultPath;
+        if ($this->resultPath !== false) $res = $this->resultPath;
         elseif (strlen($pn = $this->getPropertyName())) $res = $pn;
         else $res = $this->name;
         return $res;
