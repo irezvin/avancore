@@ -198,14 +198,14 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
 
     }
 
-    function showStoreUpstandingPart() {
+    function showStoreReferencedPart() {
         $this->init();
-        return $this->_doShowStoreUpstandingPart(); 
+        return $this->_doShowStoreReferencedPart(); 
     }
 
-    function showStoreDownstandingPart() {
+    function showStoreReferencingPart() {
         $this->init();
-        return $this->_doShowStoreDownstandingPart(); 
+        return $this->_doShowStoreReferencingPart(); 
     }
 
     function showStoreNNPart() {
@@ -213,11 +213,11 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
         return $this->_doShowStoreNNPart(); 
     }
     
-    function _doShowStoreUpstandingPart() {
+    function _doShowStoreReferencedPart() {
         return false;
     }
     
-    function _doShowStoreDownstandingPart() {
+    function _doShowStoreReferencingPart() {
         return false;
     }
     
