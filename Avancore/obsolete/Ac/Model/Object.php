@@ -312,9 +312,9 @@ class Ac_Model_Object extends Ac_Model_Data {
                 if ($this->_isReference && !$this->isPersistent()) $this->_loadReference();
                 $res = true;
                 
-                $res = $res && ($this->_storeUpstandingRecords() !== false);
+                $res = $res && ($this->_storeReferencedRecords() !== false);
                 $res = $res && $this->_legacyStore();
-                $res = $res && ($this->_storeDownstandingRecords() !== false);
+                $res = $res && ($this->_storeReferencingRecords() !== false);
                 $res = $res && ($this->_storeNNRecords() !== false);
                 if ($res) {
                     $this->_isBeingStored = false;
@@ -644,22 +644,22 @@ class Ac_Model_Object extends Ac_Model_Data {
     /**
      * Saves records that are referenced by current record and are linked to it in-memory 
      */
-    function _storeUpstandingRecords() {
+    function _storeReferencedRecords() {
     }
     
     /**
      * Saves records that are referencing current record and are linked to it in-memory
      */
-    function _storeDownstandingRecords() {
+    function _storeReferencingRecords() {
     }
     
     function _storeNNRecords() {
     }
     
     /**
-     * Stores upstanding records and populates this record foreign keys.
+     * Stores referenced records and populates this record foreign keys.
      */
-    function _autoStoreUpstanding($recordOrRecords, $fieldLinks, $errorKey) {
+    function _autoStoreReferenced($recordOrRecords, $fieldLinks, $errorKey) {
         $res = true;
         if ($recordOrRecords !== false && !is_null($recordOrRecords)) {
             if (is_array($recordOrRecords)) $r = $recordOrRecords;
@@ -679,9 +679,9 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     /**
-     * Populates downstanding records' foreign keys from this record keys and stores them
+     * Populates referencing records' foreign keys from this record keys and stores them
      */
-    function _autoStoreDownstanding($recordOrRecords, $fieldLinks, $errorKey) {
+    function _autoStoreReferencing($recordOrRecords, $fieldLinks, $errorKey) {
         $res = true;
         if ($recordOrRecords !== false && !is_null($recordOrRecords)) {
             if (is_array($recordOrRecords)) $r = $recordOrRecords;
@@ -700,7 +700,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
-    function _autoStoreNNRecords(& $recordOrRecords, $ids, $fieldLinks, $fieldLinks2, $midTableName, $errorKey) {
+    function _autoStoreNNRecords(& $recordOrRecords, $ids, $fieldLinks, $fieldLinks2, $midTableName, $errorKey, $midWhere = false) {
         $res = true;
         if ($recordOrRecords !== false && !is_null($recordOrRecords)) {
             $ids = array();
@@ -731,6 +731,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             $ids = array_unique($ids); //TODO: check why sometimes we receive duplicate IDs...
             $rows = array();
             $rowProto = array();
+            if (is_array($midWhere)) $rowProto = $midWhere;
             foreach ($fieldLinks as $s => $d) $rowProto[$d] = $this->$s;
             $f = array_keys($fieldLinks2);
             if (count($f) == 1) {
