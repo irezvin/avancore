@@ -112,7 +112,9 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     	$cols = is_array($this->columns)? $this->columns : array($this->columns);
     	$res = array();
     	foreach ($cols as $c) {
-    		if (is_a($c, 'Ac_Sql_Select_Expression')) $res = array_merge($res, $c->aliases);
+    		if (is_object($c) && $c instanceof Ac_Sql_Select_Expression) {
+                $res = array_merge($res, $c->aliases);
+            }
     	} 
     	$res = array_unique($res);
     	return $res;

@@ -52,7 +52,6 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
     }
     
     function getPossibleValues() {
-        if ($this->getItem()->getName() == 'substring') trigger_error("Foo", E_USER_ERROR);
         if ($this->selectForValues) $select = $this->selectForValues;
             else $select = $this->getSetImpl()->createSelectForItem($this);
         //$select->distinct = true;
@@ -62,11 +61,11 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
         $va = $this->getValueAlias();
         if ($ta !== false) {
             $select->useAlias($ta);
-            if (!is_array($ta)) $tc = $select->getDb()->n(array($ta, $tc));
+            if (!is_array($ta) && !(is_object($tc) && $tc instanceof Ac_I_Sql_Expression)) $tc = $select->getDb()->n(array($ta, $tc));
         }
         if ($va !== false) {
             $select->useAlias($va);
-            if (!is_array($va)) $vc = $select->getDb()->n(array($va, $vc));
+            if (!is_array($va) && !(is_object($vc) && $vc instanceof Ac_I_Sql_Expression)) $vc = $select->getDb()->n(array($va, $vc));
         }
         $select->columns = array('title' => $tc, 'value' => $vc);
         $select->orderBy = 'title ASC';
@@ -151,7 +150,7 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
     function applyToSelect(Ac_Sql_Select $select, Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
         if ($currValuesImpl === $this && !$this->alwaysApply) return;
         $v = $this->getValue();
-        if ($v === false) return; // value not provided
+        if ($v === false || is_array($v) && !count($v)) return; // value not provided
         $this->getValueSetter(true)->setValue($this, $select);
     }
 
