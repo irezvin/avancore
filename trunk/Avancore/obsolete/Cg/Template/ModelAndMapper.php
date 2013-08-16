@@ -182,15 +182,15 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         foreach (array_keys($this->assocProperties) as $relId) { 
             $prop = $this->assocProperties[$relId];
             $strat = $this->getAssocStrategy($relId, $prop);
-            ob_start(); $r = $strat->showStoreUpstandingPart(); $part = ob_get_clean(); if ($r !== false) $up .= $part;
-            ob_start(); $r = $strat->showStoreDownstandingPart(); $part = ob_get_clean(); if ($r !== false) $down .= $part;
+            ob_start(); $r = $strat->showStoreReferencedPart(); $part = ob_get_clean(); if ($r !== false) $up .= $part;
+            ob_start(); $r = $strat->showStoreReferencingPart(); $part = ob_get_clean(); if ($r !== false) $down .= $part;
             ob_start(); $r = $strat->showStoreNNPart(); $part = ob_get_clean(); if ($r !== false) $nn .= $part;  
         }
         if (strlen($up)) {
 ?>
 
-    function _storeUpstandingRecords() {
-        $res = parent::_storeUpstandingRecords() !== false;
+    function _storeReferencedRecords() {
+        $res = parent::_storeReferencedRecords() !== false;
         $mapper = $this->getMapper();
 <?php   echo $up; ?> 
         return $res;
@@ -200,8 +200,8 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         if (strlen($down)) {
 ?>
 
-    function _storeDownstandingRecords() {
-        $res = parent::_storeDownstandingRecords() !== false;
+    function _storeReferencingRecords() {
+        $res = parent::_storeReferencingRecords() !== false;
         $mapper = $this->getMapper();
 <?php   echo $down; ?>
         return $res; 

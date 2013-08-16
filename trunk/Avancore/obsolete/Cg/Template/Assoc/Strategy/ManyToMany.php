@@ -43,7 +43,7 @@ class Cg_Template_Assoc_Strategy_ManyToMany extends Cg_Template_Assoc_Strategy_M
 <?php  
     }
     
-    function _doShowStoreDownstandingPart() {
+    function _doShowStoreReferencingPart() {
         return false;
     }
     
@@ -55,7 +55,7 @@ class Cg_Template_Assoc_Strategy_ManyToMany extends Cg_Template_Assoc_Strategy_M
         
         if (is_array($this-><?php $this->d($this->var); ?>) || is_array($this-><?php $this->d($imn); ?>)) {
             $rel = $mapper->getRelation(<?php $this->str($this->relationId); ?>);
-            if (!$this->_autoStoreNNRecords($this-><?php $this->d($this->var); ?>, $this-><?php $this->d($imn); ?>, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, <?php $this->str($this->plural); ?>)) 
+            if (!$this->_autoStoreNNRecords($this-><?php $this->d($this->var); ?>, $this-><?php $this->d($imn); ?>, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, <?php $this->str($this->plural); ?>, $rel->midWhere)) 
                 $res = false;
         }
 <?php       } else { ?>
