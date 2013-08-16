@@ -33,6 +33,14 @@ class Ac_Facet_Item extends Ac_Prototyped {
     protected $possibleValues = false;
     
     protected $multiple = false;
+    
+    /**
+     * Allows to specify custom filtes' for different values
+     * 
+     * @var array (value => title)
+     */
+    protected $titlesForValues = false;
+    
 
     function setEmptyCaption($emptyCaption) {
         $this->emptyCaption = $emptyCaption;
@@ -109,6 +117,9 @@ class Ac_Facet_Item extends Ac_Prototyped {
                     if (!strlen($v['title']) || is_null($v['title'])) {
                         $k = $this->getEmptyValue();
                         $v['title'] = $this->getEmptyCaption();
+                    }
+                    if (isset($this->titlesForValues[$k])) {
+                        $v['title'] = $this->titlesForValues[$k];
                     }
                     $r[$k] = $v;
                 }
@@ -216,5 +227,17 @@ class Ac_Facet_Item extends Ac_Prototyped {
                 unset ($this->debugData[$key]);
         }
     }
+
+    function setTitlesForValues(array $titlesForValues) {
+        $this->titlesForValues = $titlesForValues;
+    }
+
+    /**
+     * @return array
+     */
+    function getTitlesForValues() {
+        return $this->titlesForValues;
+    }    
+    
     
 }
