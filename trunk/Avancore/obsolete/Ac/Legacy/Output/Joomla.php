@@ -118,6 +118,7 @@ class Ac_Legacy_Output_Joomla extends Ac_Legacy_Output {
         if ($response->noHtml) {
             while(ob_get_level()) ob_end_clean();
             if (strlen($response->contentType)) header('content-type: '.$response->contentType);
+            foreach ($response->extraHeaders as $h) header($h);
         }
         
         echo $response->replacePlaceholders(false, true);
