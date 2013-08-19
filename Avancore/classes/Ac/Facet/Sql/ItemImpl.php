@@ -19,6 +19,11 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
     protected $withCounts = null;
     
     /**
+     * @var array
+     */
+    protected $selectPrototypesForValues = array();
+    
+    /**
      * @var Ac_Sql_Select
      */
     protected $selectForValues = false;
@@ -145,6 +150,17 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
     function applyToSelectPrototype(array & $prototype, Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
         if ($currValuesImpl === $this && !$this->alwaysApply) return;
         if ($this->selectExtra) Ac_Util::ms($prototype, $this->selectExtra);
+        if ($this->selectPrototypesForValues) {
+            $v = $this->getValue();
+            if ($v !== false || is_array($v) && count($v)) {
+                $v = Ac_Util::toArray($v);
+                foreach ($v as $val) {
+                    if (isset($this->selectPrototypesForValues[$val])) {
+                        Ac_Util::ms($prototype, $this->selectPrototypesForValues[$val]);
+                    }
+                }
+            }
+        }
     }
     
     function applyToSelect(Ac_Sql_Select $select, Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
@@ -169,6 +185,17 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
     function getWithCounts() {
         if (is_null($this->withCounts)) return $this->getSetImpl()->getWithCounts();
         return $this->withCounts;
+    }    
+
+    function setSelectPrototypesForValues(array $selectPrototypesForValues) {
+        $this->selectPrototypesForValues = $selectPrototypesForValues;
+    }
+
+    /**
+     * @return array
+     */
+    function getSelectPrototypesForValues() {
+        return $this->selectPrototypesForValues;
     }    
     
 }

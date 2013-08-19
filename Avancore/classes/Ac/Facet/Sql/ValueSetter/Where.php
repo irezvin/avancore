@@ -34,10 +34,9 @@ class Ac_Facet_Sql_ValueSetter_Where extends Ac_Facet_Sql_ValueSetter {
                 "IFNULL ($colExpr) IN (0, '')"
             );
         } else {
-            $val = new Ac_Sql_Value($value);
             $db = new Ac_Sql_Db_Ae();
             $select->where['facets_'.$impl->getItem()->getName()] =
-	      new Ac_Sql_Expression($colExpr.' = '.$db->q($val));
+	      new Ac_Sql_Expression($colExpr.' '.$db->eqCriterion($value));
         }
     }
     
