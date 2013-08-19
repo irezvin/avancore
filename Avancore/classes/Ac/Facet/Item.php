@@ -41,6 +41,13 @@ class Ac_Facet_Item extends Ac_Prototyped {
      */
     protected $titlesForValues = false;
     
+    /**
+     * Whether possibleValues where supplied by external application using setPossibleValues()
+     * or not
+     * 
+     * @var bool
+     */
+    protected $possibleValuesSupplied = false;
 
     function setEmptyCaption($emptyCaption) {
         $this->emptyCaption = $emptyCaption;
@@ -101,7 +108,8 @@ class Ac_Facet_Item extends Ac_Prototyped {
     }
     
     function notifySetValueChanged() {
-        $this->possibleValues = false;
+        if (!$this->possibleValuesSupplied) 
+            $this->possibleValues = false;
     }
     
     function getValue() {
@@ -128,6 +136,12 @@ class Ac_Facet_Item extends Ac_Prototyped {
             $this->possibleValues = $res;
         }
         return $this->possibleValues;
+    }
+    
+    function setPossibleValues($possibleValues) {
+        if (!(is_array($possibleValues) || $possibleValues === false)) throw new Ac_E_InvalidCall("\$possibleValues must be either array or FLASE");
+        $this->possibleValues = $possibleValues;
+        $this->possibleValuesSupplied = $possibleValues !== false;
     }
     
     function getValueCaption() {

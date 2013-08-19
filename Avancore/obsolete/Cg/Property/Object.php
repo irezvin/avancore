@@ -40,7 +40,6 @@ class Cg_Property_Object extends Cg_Property {
     var $otherModelIdInMethodsPrefix = false;
     
     var $mapperClass = false;
-    var $relationId = false;
     
     /**
      * @var Ac_Sql_Dbi_Relation
@@ -62,7 +61,6 @@ class Cg_Property_Object extends Cg_Property {
         return array_merge(array(
             'className', 
             'mapperClass', 
-            'relationId', 
             'otherModelIdInMethodsSingle', 
             'otherModelIdInMethodsPlural', 
             'otherModelIdInMethodsPrefix'
@@ -105,8 +103,6 @@ class Cg_Property_Object extends Cg_Property {
         
         if (!$this->varName) $this->varName = $this->getDefaultVarName();
         
-        if (!$this->relationId) $this->relationId = '_'.$this->varName;
-        
         if (!$this->pluralForList) $this->pluralForList = $this->getDefaultPluralForList();
         
         if (!$this->caption) $this->caption = $this->getDefaultCaption();
@@ -131,7 +127,6 @@ class Cg_Property_Object extends Cg_Property {
     function resolveConflicts() {
         if ($this->varNameHasConflicts()) {
             $this->varName = substr($this->name, 5); // strip out "_rel_" prefix from the name
-            $this->relationId = '_'.$this->varName;
         }
     }
     
@@ -364,6 +359,7 @@ class Cg_Property_Object extends Cg_Property {
     
     function getAeModelPropertyInfo() {
         if ($this->getIdsMemberName() !== false) {
+            $many = true;
             $res = array(
                 $this->varName => parent::getAeModelPropertyInfo(),
                 $this->getIdsPropertyName() => array(
@@ -379,7 +375,18 @@ class Cg_Property_Object extends Cg_Property {
                 ),
             );
         } else {
+            $many = false;
             $res = parent::getAeModelPropertyInfo();
+        }
+        $relId = $this->_model->searchRelationIdByProperty($this);
+        if ($relId !== false) {
+            $prot = $this->_model->getAeModelRelationPrototype($relId);
+            if (isset($prot['srcVarName'])) {
+                if ($many) 
+                    $res[$this->varName]['relationId'] = $prot['srcVarName'];
+                else 
+                    $res['relationId'] = $prot['srcVarName'];
+            }
         }
         return $res;
     }
