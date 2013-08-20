@@ -15,6 +15,7 @@ class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
         $this->setDefault('checkDirs', true);
         $this->detectDir('varCachePath', JPATH_CACHE);
         $this->detectDir('varTmpPath', $jc->tmp_path);
+        $this->detectDir('varFlagsPath', $jc->tmp_path);
         $this->detectDir('varLogsPath', $jc->log_path);
         return parent::calcMissingConfig();
     }
