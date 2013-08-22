@@ -18,6 +18,8 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     
     protected $throwExceptions = true;
     
+    protected $affectedRows = false;
+    
     function __construct($pdo, Ac_Sql_Dialect $dialect = null) {
         
         if (is_array($pdo) && array_key_exists('pdo', $pdo) && func_num_args() == 1) { // Ac_Prototyped style init
@@ -192,6 +194,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
      */
     protected function queryPdo($query, $exec = false) {
         $x = $exec? "exec" : "query";
+        $this->affectedRows = false;
         $query = $this->replacePrefix($query);
         if ($this->throwExceptions) {
             try {
@@ -202,6 +205,8 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
         } else {
             $res = $this->pdo->$x($query);
         }
+        if (!$exec && $res instanceof PDOStatement) $this->affectedRows = $res->rowCount();
+        elseif ($exec) $this->affectedRows = $res;
         return $res;
     }
     
@@ -282,6 +287,10 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
      * @param PDOStatement $resultResource
      */
     function resultFreeResource($resultResource) {
+    }
+    
+    function getAffectedRows() {
+        return $this->affectedRows;
     }
     
     

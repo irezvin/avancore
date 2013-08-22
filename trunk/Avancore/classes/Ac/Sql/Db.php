@@ -282,9 +282,7 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
         return $d;
     }
     
-    function getAffectedRows() {
-        trigger_error("Call to abstract function", E_USER_ERROR);
-    }
+    abstract function getAffectedRows();
     
     /**
      * @return Ac_Sql_Dbi_Inspector
