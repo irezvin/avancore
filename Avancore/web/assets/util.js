@@ -687,6 +687,7 @@ Ajs_Util.Uri.prototype = {
     port: '',
     path: '',
     query: null,
+    fragment: '',
     
     parse: function(str) {
         

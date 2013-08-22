@@ -58,6 +58,7 @@ class Ac_Facet_Sql_SetImpl extends Ac_Facet_SetImpl {
      */
     function createSelectForItem(Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
         $proto = $this->getSelectPrototype();
+        $proto['distinct'] = true;
         $set = $this->getFacetSet();
         $usedFacets = $set->getValueOrder();
         //if ($itemImpl) $usedFacets = array_diff($usedFacets, array($itemImpl->getItem()->getName()));

@@ -50,6 +50,7 @@ class Ac_Sql_Part extends Ac_Prototyped {
         foreach (array_intersect(array_keys(get_object_vars($this)), array_keys($options)) as $k)
             if ($k{0} != '_') $this->$k = $options[$k];
         $this->_doOnInitialize($options);
+        if (isset($options['bind'])) $this->bind($options['bind']);
     }
     
     function hasPublicVars() {
