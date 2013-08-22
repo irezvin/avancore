@@ -32,6 +32,7 @@ class Ac_Model_Property {
     var $defaultValue = null;    
     
     var $caption = null;
+    var $colCaption = null;
     var $controlType = null;
     var $controlClass = null;
     
