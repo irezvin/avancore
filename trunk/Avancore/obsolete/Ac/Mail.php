@@ -2,6 +2,8 @@
 
 class Ac_Mail {
 
+    var $mailDebugPath = false;
+    
     var $useNewMailer = true;
     
     /**
@@ -100,7 +102,7 @@ class Ac_Mail {
     var $dontSaveErrors = false;
     
     var $_emailFileContent = false;
-
+    
     /**
      * @return Ac_Mail
      */
@@ -110,21 +112,22 @@ class Ac_Mail {
         return $res;
     }
     
-    function Ac_Mail ($templateName, $to = false, $defaultSubject = false, $from = false, $data = array(), $textTemplate = false) {
+    function __construct ($templateName, $to = false, $defaultSubject = false, $from = false, $data = array(), $textTemplate = false) {
         $this->_htmlTemplate = $templateName;
         $this->_textTemplate = $textTemplate;
         $this->_to = $to;
         $this->_from = $from;
         $this->_data = $data;
         $disp = Ac_Dispatcher::getInstance();
-        if ($this->_from === false) {
+        if ($this->_from === false && is_object($disp->config)) {
             $this->_from = array($disp->config->mailFrom, $disp->config->fromName);
         }
         if ($defaultSubject !== false) $this->defaultSubject = $defaultSubject;
         if ($this->_noSend === '?') {
             if (class_exists('Ac_Dispatcher')) {
                 $disp = Ac_Dispatcher::getInstance();
-                $this->_noSend = !$disp->config->sendEmails;
+                if ($disp->config)
+                    $this->_noSend = !$disp->config->sendEmails;
             }
         }
     }
@@ -135,13 +138,15 @@ class Ac_Mail {
     function configureMailer($mailer) {
         if ($this->method === true) {
             $disp = Ac_Dispatcher::getInstance();
-            $method = $disp->config->mailer;
-            $smtpHost = $disp->config->smtpHost;
-            $smtpSecure = $disp->config->smtpSecure;
-            $smtpPort = $mailer->Port;
-            $smtpPassword = $disp->config->smtpPass;
-            $smtpUser = $disp->config->smtpUser;
-            $smtpAuth = $disp->config->smtpAuth;
+            if ($disp->config) {
+                $method = $disp->config->mailer;
+                $smtpHost = $disp->config->smtpHost;
+                $smtpSecure = $disp->config->smtpSecure;
+                $smtpPort = $mailer->Port;
+                $smtpPassword = $disp->config->smtpPass;
+                $smtpUser = $disp->config->smtpUser;
+                $smtpAuth = $disp->config->smtpAuth;
+            }
         } else {
             $method = $this->method;
             $smtpHost = $this->smtpHost;
@@ -316,6 +321,7 @@ class Ac_Mail {
                     $m->CharSet = $charset;
                     $m->Subject = $this->_subject;
                     $triedToSend = true;
+                    
                     if (! ($this->_noSend || ($m->Send()) )) {
                         $this->_error = "Mailer error: ".$m->ErrorInfo;
                         $res = false;
@@ -364,8 +370,8 @@ class Ac_Mail {
     }
         
     protected function getMailerDir() {
-        $disp = Ac_Dispatcher::getInstance();
-        return $this->useNewMailer? $disp->getVendorDir().'/PHPMailerNew' : $disp->getVendorDir().'/PHPMailer';
+        $ad = Ac_Avancore::getInstance()->getAdapter();
+        return $this->useNewMailer? $ad->getVendorPath().'/PHPMailerNew' : $ad->getVendorPath().'/PHPMailer';
     } 
     
     /**
@@ -436,10 +442,16 @@ class Ac_Mail {
         
         if (!strlen($this->debugFilename)) {
         
-            if (isset($disp->config->emailsSavePath) && strlen($disp->config->emailsSavePath)) $dir = $disp->config->emailsSavePath;
-                else $dir = $disp->getDir().'/emails';
+            if (!strlen($this->mailDebugPath)) {
+            
+                if (isset($disp->config->emailsSavePath) && strlen($disp->config->emailsSavePath)) $dir = $disp->config->emailsSavePath;
+                    else $dir = $disp->getDir().'/emails';
 
-            if (!is_dir($dir)) mkdir($dir, 0777);
+                if (!is_dir($dir)) mkdir($dir, 0777);
+            } else {
+                $dir = $this->mailDebugPath;
+            }
+            
             
             $fname = date("Y-m-d-h-i-s");
             $suffix = -1;

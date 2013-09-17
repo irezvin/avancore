@@ -98,3 +98,6 @@ s#\bclasses/Ac/Mail#obsolete/Ac/Mail#g
 s#\bclasses/Ac/Table#obsolete/Ac/Table#g
 s#\bclasses/Ac/Template#obsolete/Ac/Template#g
 s#\bclasses/Cg/#obsolete/Cg/#g
+
+s#\bparent::_doGetInfoParams\b#parent::doGetInfoParams#g
+s#\bfunction _doGetInfoParams\b#protected function doGetInfoParams#g
