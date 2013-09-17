@@ -703,7 +703,7 @@ class PHPMailer {
   protected function SmtpSend($header, $body) {
     require_once $this->PluginDir . 'class.smtp.php';
     $bad_rcpt = array();
-
+    
     if(!$this->SmtpConnect()) {
       throw new phpmailerException($this->Lang('smtp_connect_failed'), self::STOP_CRITICAL);
     }
