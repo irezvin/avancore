@@ -1109,6 +1109,16 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         return $res;
     }
     
+    /**
+     * @param array $prototypeExtra
+     * @param string $primaryAlias
+     * @return Ac_Sql_Select
+     */
+    function createSqlSelect(array $prototypeExtra = array(), $primaryAlias = 't') {
+        $res = new Ac_Sql_Select($this->getDb(), Ac_Util::m($this->getSqlSelectPrototype($primaryAlias), $prototypeExtra));
+        return $res;
+    }
+    
     function getManagerConfig() {
         return array();
     }

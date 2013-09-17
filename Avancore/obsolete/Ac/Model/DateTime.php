@@ -259,7 +259,7 @@ class Ac_Model_DateTime {
     }
     
     
-    function arrayFromString($string, $userMask = false) {
+    static function arrayFromString($string, $userMask = false) {
     	if (is_a($string, 'DateTime')) $res = getdate(@$string->format('U')); else {
 	        $parser = Ac_Model_DateTime::getInstance();
 	        if (!($res = $parser->match($string))) return false;
@@ -268,18 +268,18 @@ class Ac_Model_DateTime {
         return $res;
     }
     
-    function fromString($string, $userMask = false, $useGmt = true, & $wasZeroDate = false) {
+    static function fromString($string, $userMask = false, $useGmt = true, & $wasZeroDate = false) {
         $parser = Ac_Model_DateTime::getInstance();
         if (!($res = $parser->match($string))) return false;
         $res = $parser->process($res, $userMask);
         return $parser->tsFromArray($res, true, $useGmt, $wasZeroDate);
     }
     
-    function toString($format, $timestamp, $useGmt = true) {
+    static function toString($format, $timestamp, $useGmt = true) {
         return $useGmt? gmdate($format, $timestamp) : date($format, $timestamp);
     }
     
-    function isZeroDate($array) {
+    static function isZeroDate($array) {
             $isZeroDate = false;
             if (isset($array['year'])) {
                 $isZeroDate = true;

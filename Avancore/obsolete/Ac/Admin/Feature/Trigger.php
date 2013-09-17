@@ -61,7 +61,7 @@ class Ac_Admin_Feature_Trigger extends Ac_Admin_Feature {
             ), 
             ($upc = $this->colName.'Unpublish') => array(
                 'id' => $upc,
-                'scope' => $this->colName.'some',
+                'scope' => 'some',
                 'caption' => 'Выключить',
                 'managerProcessing' => $upc,
                 'listOnly' => true,
