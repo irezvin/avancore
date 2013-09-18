@@ -951,10 +951,10 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         if (!isset($this->dateFormats[$dataTypes])) {
             $this->dateFormats = array();
             $p = $this->getPrototype();
+            $this->dateFormats[$dataTypes] = array();
             foreach ($p->listOwnFields(true) as $f) {
-                $this->dateFormats[$dataTypes] = array();
                 $pi = $p->getPropertyInfo($f, true);
-                if ($dataTypes) {
+                if (!$dataTypes) {
                     static $a = array('date', 'time', 'dateTime');
                     if (in_array($pi->dataType, $a)) $this->dateFormats[$dataTypes][$f] = $pi->dataType;
                 } else {
