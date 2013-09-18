@@ -263,7 +263,6 @@ class Ac_Model_Object extends Ac_Model_Data {
     function _legacyStore() {
         $k = $this->_pk;
         $mapper = $this->getMapper();
-        $kv = array();
         $tpk = $this->tracksPk();
         $hyData = $this->getHyData();
         
