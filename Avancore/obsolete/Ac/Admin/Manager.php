@@ -519,11 +519,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $res['keys'][] = $this->getStrPk($rec); 
         }
         if ($this->_isForm && isset($this->_rqData['form']) && !$this->_recordStored) {
-            
-            // This causes "Request URI too large" on long forms; editing state should
-            // be stored somehow else
-            
-            //$res['form'] = $this->_rqData['form'];
+            $res['form'] = $this->_rqData['form'];
         }
         
         //if (isset($this->_rqData['pagination'])) $res['pagination'] = $this->_rqData['pagination'];

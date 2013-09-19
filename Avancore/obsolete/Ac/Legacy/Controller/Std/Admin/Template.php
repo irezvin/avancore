@@ -48,6 +48,7 @@ class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Legacy_Template_Html {
             $bu = $ctx->getUrl();
             $u = new Ac_Url($redir);
             $bu->query = Ac_Util::m($allState, $u->query, true);
+            //Ac_Debug::ddd(strlen(''.$bu), ''.$bu);
             $this->htmlResponse->redirectUrl = $bu;
         } else {
             $bu = $this->controller->getUrl(array($this->controller->_methodParamName => 'manager', 'mapper' => $this->context->getData('mapper')));
