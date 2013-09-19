@@ -164,6 +164,8 @@ class PHPMailer {
    * @var string
    */
   public $MessageID         = '';
+  
+  public $TextEncoding      = 'utf-8';
 
   /////////////////////////////////////////////////
   // PROPERTIES FOR SMTP
@@ -1200,10 +1202,10 @@ class PHPMailer {
 
     switch($this->message_type) {
       case 'alt':
-        $body .= $this->GetBoundary($this->boundary[1], '', 'text/plain', '');
+        $body .= $this->GetBoundary($this->boundary[1], $this->TextEncoding, 'text/plain', '');
         $body .= $this->EncodeString($this->AltBody, $this->Encoding);
         $body .= $this->LE.$this->LE;
-        $body .= $this->GetBoundary($this->boundary[1], '', 'text/html', '');
+        $body .= $this->GetBoundary($this->boundary[1], $this->TextEncoding, 'text/html', '');
         $body .= $this->EncodeString($this->Body, $this->Encoding);
         $body .= $this->LE.$this->LE;
         $body .= $this->EndBoundary($this->boundary[1]);
@@ -1220,10 +1222,10 @@ class PHPMailer {
       case 'alt_attachments':
         $body .= sprintf("--%s%s", $this->boundary[1], $this->LE);
         $body .= sprintf("Content-Type: %s;%s" . "\tboundary=\"%s\"%s", 'multipart/alternative', $this->LE, $this->boundary[2], $this->LE.$this->LE);
-        $body .= $this->GetBoundary($this->boundary[2], '', 'text/plain', '') . $this->LE; // Create text body
+        $body .= $this->GetBoundary($this->boundary[2], $this->TextEncoding, 'text/plain', '') . $this->LE; // Create text body
         $body .= $this->EncodeString($this->AltBody, $this->Encoding);
         $body .= $this->LE.$this->LE;
-        $body .= $this->GetBoundary($this->boundary[2], '', 'text/html', '') . $this->LE; // Create the HTML body
+        $body .= $this->GetBoundary($this->boundary[2], $this->TextEncoding, 'text/html', '') . $this->LE; // Create the HTML body
         $body .= $this->EncodeString($this->Body, $this->Encoding);
         $body .= $this->LE.$this->LE;
         $body .= $this->EndBoundary($this->boundary[2]);
