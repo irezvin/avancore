@@ -32,6 +32,12 @@ class Ac_Legacy_Output_Native extends Ac_Legacy_Output {
         if (!$r->contentType) $r->contentType = $this->defaultContentType;
         $redir = false;
         if ($r->redirectUrl) {
+            if (strlen(''.$r->redirectUrl) > 2000) {
+                while(ob_get_level()) ob_end_clean ();
+                $au = new Ac_Url($r->redirectUrl);
+                echo $au->getJsPostRedirect();
+                die();
+            }
             $redir = $r->redirectUrl;
             if (is_a($redir, 'Ac_Url')) $redir = $redir->toString();
         }
