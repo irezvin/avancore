@@ -15,6 +15,12 @@ class Ac_Legacy_Output_Joomla15 extends Ac_Legacy_Output_Joomla {
     
     function outputResponse(Ac_Legacy_Controller_Response_Html $response, $asModule = false) {
         if ($response->redirectUrl) {
+            if (strlen(''.$response->redirectUrl) > 2000) {
+                while(ob_get_level()) ob_end_clean ();
+                $au = new Ac_Url($response->redirectUrl);
+                echo $au->getJsPostRedirect();
+                die();
+            }
             $permanent = ($response->redirectType == Ac_Legacy_Controller_Response_Http::redirPermanent);
             $this->mainframe->redirect(''.$response->redirectUrl, '', 'message', $permanent);
         }
