@@ -37,7 +37,11 @@ $config = array(
         ),
         'defaultTitleColumn' => 'title',
         'dictionary' => array(
-            'data' => array(
+            'singularForms' => array(
+                'people' => 'person'
+            ),
+            'pluralForms' => array(
+                'person' => 'people'
             ),
         ),
 
@@ -50,34 +54,32 @@ $config = array(
         	'tracksChanges' => true,
         	'hasUniformPropertiesInfo' => true,
         ),
-        
         'models' => array(
-            /*
         	'relations' => array(
         		'properties' => array(
-        			'_rel_FK_ac_relations_1' => array(
+        			'_rel_FK_ac_relations_outgoing' => array(
         				'otherModelIdInMethodsSingle' => 'person',
         				'otherModelIdInMethodsPlural' => 'people',
         			),
-        			'_rel_FK_ac_relations_2' => array(
+        			'_rel_FK_ac_relations_incoming' => array(
         				'otherModelIdInMethodsSingle' => 'otherPerson',
         				'otherModelIdInMethodsPlural' => 'otherPeople',
         			),
         		),
         	),
         	'people' => array(
+                'single' => 'person',
         		'properties' => array(
-        			'_rel_FK_ac_relations_1' => array(
+        			'_rel_FK_ac_relations_outgoing' => array(
         				'otherModelIdInMethodsSingle' => 'outgoingRelation',
         				'otherModelIdInMethodsPlural' => 'outgoingRelations',
         			),
-        			'_rel_FK_ac_relations_2' => array(
+        			'_rel_FK_ac_relations_incoming' => array(
         				'otherModelIdInMethodsSingle' => 'incomingRelation',
         				'otherModelIdInMethodsPlural' => 'incomingRelations',
         			),
         		),
         	),
-        	*/
         ),
     ),
 );

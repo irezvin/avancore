@@ -437,6 +437,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         //if (!$this->srcVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $srcVarName is not set');
         $defaultValue = $this->destIsUnique? null : array();
         $biDirectional = $biDirectional && strlen($this->destVarName);
+        
         $res = $this->_loadSrcOrDest ($srcData, $defaultValue, $this->srcVarName, $this->destVarName, $ignoreLoaded, $biDirectional,
             $this->fieldLinks, $this->fieldLinks2, $this->destIsUnique, $this->srcIsUnique, $this->destTableName, '_destInstance', $this->destOrdering, $this->destExtraJoins, $this->destWhere);
         return $res;
@@ -447,8 +448,17 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if (!$this->destVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $destVarName is not set');
         $defaultValue = $this->srcIsUnique? null : array();
         $biDirectional = $biDirectional && strlen($this->srcVarName);
+        
+        if (strlen($this->midTableName)) {
+            $fl1 = $this->_fieldLinksRev2;
+            $fl2 = $this->_fieldLinksRev;
+        } else {
+            $fl1 = $this->_fieldLinksRev;
+            $fl1 = $this->_fieldLinksRev2;
+        }
+        
         return $this->_loadSrcOrDest ($destData, $defaultValue, $this->destVarName, $this->srcVarName, $ignoreLoaded, $biDirectional, 
-            $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcIsUnique, $this->destIsUnique, $this->srcTableName, '_srcInstance', $this->srcOrdering, $this->srcExtraJoins, $this->srcWhere);
+            $fl1, $fl2, $this->srcIsUnique, $this->destIsUnique, $this->srcTableName, '_srcInstance', $this->srcOrdering, $this->srcExtraJoins, $this->srcWhere);
     }
     
     function getStrMidWhere($alias = false) {
@@ -474,7 +484,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             'destIsUnique' => false,
         );
         $rel = new Ac_Model_Relation($relConfig);
-        $rel->loadDest($srcData, $ignoreLoaded);
+        $res = $rel->loadDest($srcData, $ignoreLoaded);
         $this->_fixNNIds($srcData, array_keys($this->fieldLinks2), $this->srcNNIdsVarName);
     }
     
@@ -1163,28 +1173,28 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if (is_object($data)) {
             $isSingle = true;
             $d = array(& $data);
-            foreach (array_keys($d) as $k) {
-                $row = $d[$k];
-                $val = $this->_getValue($row, $varName);
-                if (is_array($val)) {
-                    $newVal = array();
-                    if (count($fields) == 1) {
-                        $f = $fields[0];
-                        foreach ($val as $rec) {
-                            $newVal[] = $rec[$f];
-                        }
-                    } else {
-                        foreach ($val as $rec) {
-                            $nv = array();
-                            foreach ($fields as $f) $nv[$f] = $rec[$f];
-                            $newVal[] = $nv;
-                        }
-                    }
-                    $this->_setVal($row, $varName, $newVal);
-                }
-            }
         } else {
             $d = $data;
+        }
+        foreach (array_keys($d) as $k) {
+            $row = $d[$k];
+            $val = $this->_getValue($row, $varName);
+            if (is_array($val)) {
+                $newVal = array();
+                if (count($fields) == 1) {
+                    $f = $fields[0];
+                    foreach ($val as $rec) {
+                        $newVal[] = $rec[$f];
+                    }
+                } else {
+                    foreach ($val as $rec) {
+                        $nv = array();
+                        foreach ($fields as $f) $nv[$f] = $rec[$f];
+                        $newVal[] = $nv;
+                    }
+                }
+                $this->_setVal($row, $varName, $newVal);
+            }
         }
     }
     

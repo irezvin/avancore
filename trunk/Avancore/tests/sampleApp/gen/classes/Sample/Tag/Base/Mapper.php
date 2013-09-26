@@ -66,41 +66,42 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         return 'title';   
     }
                 
-    function _getRelationPrototypes() {
-        return Ac_Util::m(parent::_getRelationPrototypes(), array (
+    protected function getRelationPrototypes() {
+        return Ac_Util::m(parent::getRelationPrototypes(), array (
               '_people' => array (
                   'srcMapperClass' => 'Sample_Tag_Mapper',
-                  'destMapperClass' => 'Sample_People_Mapper',
+                  'destMapperClass' => 'Sample_Person_Mapper',
                   'srcVarName' => '_people',
-                  'srcNNIdsVarName' => '_peopleIds',
+                  'srcNNIdsVarName' => '_personIds',
                   'srcCountVarName' => '_peopleCount',
                   'destVarName' => '_tags',
                   'destCountVarName' => '_tagsCount',
                   'destNNIdsVarName' => '_tagIds',
                   'fieldLinks' => array (
-                      'tagId' => 'tagId',
+                      'tagId' => 'idOfTag',
                   ),
                   'srcIsUnique' => false,
                   'destIsUnique' => false,
                   'midTableName' => '#__people_tags',
                   'fieldLinks2' => array (
-                      'personId' => 'personId',
+                      'idOfPerson' => 'personId',
                   ),
               ),
         ));
         
     }
         
-    function _doGetInfoParams() {
-        return array (
-              'singleCaption' => 'Tag',
-              'pluralCaption' => 'Tags',
-              'hasUi' => false,
-        );
+    protected function doGetInfoParams() {
+        return Ac_Util::m(parent::doGetInfoParams(), 
+            array (
+                  'singleCaption' => 'Tag',
+                  'pluralCaption' => 'Tags',
+                  'hasUi' => false,
+            )        );
     }
     
         
-    function _doGetUniqueIndexData() {
+    protected function doGetUniqueIndexData() {
         return array (
               'PRIMARY' => array (
                   'tagId',
@@ -115,7 +116,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
      * @return Sample_Tag 
      */
     function loadByTagId ($tagId) {
-        $recs = $this->loadRecordsByCriteria(''.$this->database->NameQuote('tagId').' = '.$this->database->Quote($tagId).'');
+        $recs = $this->loadRecordsByCriteria(''.$this->getDb()->n('tagId').' = '.$this->getDb()->q($tagId).'');
         if (count($recs)) $res = $recs[0];
             else $res = null;
         return $res;
@@ -125,7 +126,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
      * @return Sample_Tag 
      */
     function loadByTitle ($title) {
-        $recs = $this->loadRecordsByCriteria(''.$this->database->NameQuote('title').' = '.$this->database->Quote($title).'');
+        $recs = $this->loadRecordsByCriteria(''.$this->getDb()->n('title').' = '.$this->getDb()->q($title).'');
         if (count($recs)) $res = $recs[0];
             else $res = null;
         return $res;
@@ -144,7 +145,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more tags of given one or more people 
-     * @param Sample_People|array $people of Sample_Tag objects
+     * @param Sample_Person|array $people of Sample_Tag objects
      
      */
     function loadForPeople($people) {
@@ -159,6 +160,15 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     function loadPeopleFor($tags) {
         $rel = $this->getRelation('_people');
         return $rel->loadDest($tags); 
+    }
+
+
+    /**
+     * @param Sample_Tag|array $tags 
+     */
+     function loadPersonIdsFor($tags) {
+        $rel = $this->getRelation('_people');
+        return $rel->loadDestNNIds($tags); 
     }
 
     

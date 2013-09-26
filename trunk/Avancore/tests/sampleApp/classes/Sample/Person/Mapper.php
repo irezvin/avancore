@@ -1,12 +1,12 @@
 <?php
 
-class Sample_People_Mapper extends Sample_People_Base_Mapper {
+class Sample_Person_Mapper extends Sample_Person_Base_Mapper {
     
     /*
     
-	function _doGetInfoParams() {
+	protected function doGetInfoParams() {
         
-		$res = Ac_Util::m(parent::_doGetInfoParams(), array(
+		$res = Ac_Util::m(parent::doGetInfoParams(), array(
         	'singleCaption' => '',
         	'pluralCaption' => '',
 		
@@ -65,7 +65,7 @@ class Sample_People_Mapper extends Sample_People_Base_Mapper {
 			        'filterFormSettings' => array(
 			        	'controls' => array(
 				        	'substring' => array(
-			        			'class' => 'Ae_Form_Control_Text',
+			        			'class' => 'Ac_Form_Control_Text',
 			        			'caption' => 'Filter',
 			        			'htmlAttribs' => array(	
 			        				'onchange' => 'document.aForm.submit();',
@@ -87,10 +87,10 @@ class Sample_People_Mapper extends Sample_People_Base_Mapper {
 		return $res;
 	}    
     
-    function _getRelationPrototypes() {
-        return Ac_Util::m(parent::_getRelationPrototypes(), array(
+    protected function getRelationPrototypes() {
+        return Ac_Util::m(parent::getRelationPrototypes(), array(
             '' => array(
-                'srcMapperClass' => 'Sample_People_Mapper',
+                'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => '',
                 'fieldLinks' => array(),
                 'srcIsUnique' => false,

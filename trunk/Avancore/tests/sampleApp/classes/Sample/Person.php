@@ -1,6 +1,6 @@
 <?php
 
-class Sample_People extends Sample_People_Base_Object {
+class Sample_Person extends Sample_Person_Base_Object {
     
     /*
     function getOwnPropertiesInfo() {

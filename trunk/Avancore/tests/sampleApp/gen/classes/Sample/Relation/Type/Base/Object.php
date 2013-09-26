@@ -9,12 +9,24 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     var $isSymmetrical = 0;
     
     var $_mapperClass = 'Sample_Relation_Type_Mapper';
+    
+    /**
+     * @var Sample_Relation_Type_Mapper 
+     */
+    protected $mapper = false;
 
     /**
      * @return Sample 
      */
     function getApplication() {
         return parent::getApplication();
+    }
+    
+    /**
+     * @return Sample_Relation_Type_Mapper 
+     */
+    function getMapper($mapperClass = false) {
+        return parent::getMapper($mapperClass);
     }
     
     function listOwnProperties() {
@@ -40,8 +52,8 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
               'relations' => array (
                   'className' => 'Sample_Relation',
                   'mapperClass' => 'Sample_Relation_Mapper',
-                  'relationId' => '_relations',
                   'caption' => 'Relations',
+                  'relationId' => '_relations',
               ),
               'relationTypeId' => array (
                   'dataType' => 'int',
@@ -109,7 +121,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     /**
      * @param Sample_Relation $relation 
      */
-    function addRelation(& $relation) {
+    function addRelation($relation) {
         if (!is_a($relation, 'Sample_Relation')) trigger_error('$relation must be an instance of Sample_Relation', E_USER_ERROR);
         $this->listRelations();
         $this->_relations[] = $relation;
@@ -132,13 +144,13 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     
   
 
-    function _storeDownstandingRecords() {
-        $res = parent::_storeDownstandingRecords() !== false;
+    function _storeReferencingRecords() {
+        $res = parent::_storeReferencingRecords() !== false;
         $mapper = $this->getMapper();
 
         if (is_array($this->_relations)) {
             $rel = $mapper->getRelation('_relations');
-            if (!$this->_autoStoreDownstanding($this->_relations, $rel->fieldLinks, 'relations')) $res = false;
+            if (!$this->_autoStoreReferencing($this->_relations, $rel->fieldLinks, 'relations')) $res = false;
         }
         return $res; 
     }

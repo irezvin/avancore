@@ -65,8 +65,8 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     }
 
                 
-    function _getRelationPrototypes() {
-        return Ac_Util::m(parent::_getRelationPrototypes(), array (
+    protected function getRelationPrototypes() {
+        return Ac_Util::m(parent::getRelationPrototypes(), array (
               '_relationType' => array (
                   'srcMapperClass' => 'Sample_Relation_Mapper',
                   'destMapperClass' => 'Sample_Relation_Type_Mapper',
@@ -80,11 +80,10 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
                   'destIsUnique' => true,
                   'srcOutgoing' => true,
               ),
-              '_incomingPeople' => array (
+              '_otherPerson' => array (
                   'srcMapperClass' => 'Sample_Relation_Mapper',
-                  'destMapperClass' => 'Sample_People_Mapper',
-                  'srcVarName' => '_incomingPeople',
-                  'srcCountVarName' => '_incomingCount',
+                  'destMapperClass' => 'Sample_Person_Mapper',
+                  'srcVarName' => '_otherPerson',
                   'destVarName' => '_incomingRelations',
                   'destCountVarName' => '_incomingRelationsCount',
                   'fieldLinks' => array (
@@ -94,11 +93,10 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
                   'destIsUnique' => true,
                   'srcOutgoing' => true,
               ),
-              '_outgoingPeople' => array (
+              '_person' => array (
                   'srcMapperClass' => 'Sample_Relation_Mapper',
-                  'destMapperClass' => 'Sample_People_Mapper',
-                  'srcVarName' => '_outgoingPeople',
-                  'srcCountVarName' => '_outgoingCount',
+                  'destMapperClass' => 'Sample_Person_Mapper',
+                  'srcVarName' => '_person',
                   'destVarName' => '_outgoingRelations',
                   'destCountVarName' => '_outgoingRelationsCount',
                   'fieldLinks' => array (
@@ -112,16 +110,17 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         
     }
         
-    function _doGetInfoParams() {
-        return array (
-              'singleCaption' => 'Relation',
-              'pluralCaption' => 'Relations',
-              'hasUi' => false,
-        );
+    protected function doGetInfoParams() {
+        return Ac_Util::m(parent::doGetInfoParams(), 
+            array (
+                  'singleCaption' => 'Relation',
+                  'pluralCaption' => 'Relations',
+                  'hasUi' => false,
+            )        );
     }
     
         
-    function _doGetUniqueIndexData() {
+    protected function doGetUniqueIndexData() {
         return array (
               'PRIMARY' => array (
                   'relationId',
@@ -133,7 +132,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
      * @return Sample_Relation 
      */
     function loadByRelationId ($relationId) {
-        $recs = $this->loadRecordsByCriteria(''.$this->database->NameQuote('relationId').' = '.$this->database->Quote($relationId).'');
+        $recs = $this->loadRecordsByCriteria(''.$this->getDb()->n('relationId').' = '.$this->getDb()->q($relationId).'');
         if (count($recs)) $res = $recs[0];
             else $res = null;
         return $res;
@@ -172,62 +171,62 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
 
     /**
      * Returns (but not loads!) several relations of given one or more people 
-     * @param Sample_Relation|array $incomingPeople     
+     * @param Sample_Relation|array $otherPeople     
      * @return Sample_Relation|array of Sample_Relation objects  
      */
-    function getOfIncomingPeople($incomingPeople) {
-        $rel = $this->getRelation('_incomingPeople');
-        $res = $rel->getSrc($incomingPeople); 
+    function getOfOtherPeople($otherPeople) {
+        $rel = $this->getRelation('_otherPerson');
+        $res = $rel->getSrc($otherPeople); 
         return $res;
     }
     
     /**
      * Loads several relations of given one or more people 
-     * @param Sample_People|array $incomingPeople of Sample_Relation objects
+     * @param Sample_Person|array $otherPeople of Sample_Relation objects
      
      */
-    function loadForIncomingPeople($incomingPeople) {
-        $rel = $this->getRelation('_incomingPeople');
-        return $rel->loadSrc($incomingPeople); 
+    function loadForOtherPeople($otherPeople) {
+        $rel = $this->getRelation('_otherPerson');
+        return $rel->loadSrc($otherPeople); 
     }
 
     /**
      * Loads several people of given one or more relations 
      * @param Sample_Relation|array $relations     
      */
-    function loadIncomingPeopleFor($relations) {
-        $rel = $this->getRelation('_incomingPeople');
+    function loadOtherPeopleFor($relations) {
+        $rel = $this->getRelation('_otherPerson');
         return $rel->loadDest($relations); 
     }
 
 
     /**
      * Returns (but not loads!) several relations of given one or more people 
-     * @param Sample_Relation|array $outgoingPeople     
+     * @param Sample_Relation|array $people     
      * @return Sample_Relation|array of Sample_Relation objects  
      */
-    function getOfOutgoingPeople($outgoingPeople) {
-        $rel = $this->getRelation('_outgoingPeople');
-        $res = $rel->getSrc($outgoingPeople); 
+    function getOfPeople($people) {
+        $rel = $this->getRelation('_person');
+        $res = $rel->getSrc($people); 
         return $res;
     }
     
     /**
      * Loads several relations of given one or more people 
-     * @param Sample_People|array $outgoingPeople of Sample_Relation objects
+     * @param Sample_Person|array $people of Sample_Relation objects
      
      */
-    function loadForOutgoingPeople($outgoingPeople) {
-        $rel = $this->getRelation('_outgoingPeople');
-        return $rel->loadSrc($outgoingPeople); 
+    function loadForPeople($people) {
+        $rel = $this->getRelation('_person');
+        return $rel->loadSrc($people); 
     }
 
     /**
      * Loads several people of given one or more relations 
      * @param Sample_Relation|array $relations     
      */
-    function loadOutgoingPeopleFor($relations) {
-        $rel = $this->getRelation('_outgoingPeople');
+    function loadPeopleFor($relations) {
+        $rel = $this->getRelation('_person');
         return $rel->loadDest($relations); 
     }
 

@@ -7,8 +7,8 @@ abstract class Sample_DomainBase extends Ac_Application {
               'Sample_Orientation_Mapper' => array (
                   'class' => 'Sample_Orientation_Mapper',
               ),
-              'Sample_People_Mapper' => array (
-                  'class' => 'Sample_People_Mapper',
+              'Sample_Person_Mapper' => array (
+                  'class' => 'Sample_Person_Mapper',
               ),
               'Sample_Relation_Type_Mapper' => array (
                   'class' => 'Sample_Relation_Type_Mapper',
@@ -30,10 +30,10 @@ abstract class Sample_DomainBase extends Ac_Application {
     }
     
     /**
-     * @return Sample_People_Mapper 
+     * @return Sample_Person_Mapper 
      */
-    function getSamplePeopleMapper() {
-        return $this->getMapper('Sample_People_Mapper');
+    function getSamplePersonMapper() {
+        return $this->getMapper('Sample_Person_Mapper');
     }
     
     /**
@@ -74,17 +74,17 @@ abstract class Sample_DomainBase extends Ac_Application {
     
  
     /**
-     * @return Sample_People 
+     * @return Sample_Person 
      */
-    static function Sample_People ($object = null) {
+    static function Sample_Person ($object = null) {
         return $object;
     }
     
     /**
-     * @return Sample_People 
+     * @return Sample_Person 
      */
-    function createSamplePeople () {
-        return $this->getMapper('Sample_People_Mapper')->factory();
+    function createSamplePerson () {
+        return $this->getMapper('Sample_Person_Mapper')->factory();
     }
     
  

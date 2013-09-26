@@ -64,11 +64,11 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
         return 'title';   
     }
                 
-    function _getRelationPrototypes() {
-        return Ac_Util::m(parent::_getRelationPrototypes(), array (
+    protected function getRelationPrototypes() {
+        return Ac_Util::m(parent::getRelationPrototypes(), array (
               '_people' => array (
                   'srcMapperClass' => 'Sample_Orientation_Mapper',
-                  'destMapperClass' => 'Sample_People_Mapper',
+                  'destMapperClass' => 'Sample_Person_Mapper',
                   'srcVarName' => '_people',
                   'srcCountVarName' => '_peopleCount',
                   'destVarName' => '_orientation',
@@ -82,16 +82,17 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
         
     }
         
-    function _doGetInfoParams() {
-        return array (
-              'singleCaption' => 'Orientation',
-              'pluralCaption' => 'Orientation',
-              'hasUi' => false,
-        );
+    protected function doGetInfoParams() {
+        return Ac_Util::m(parent::doGetInfoParams(), 
+            array (
+                  'singleCaption' => 'Orientation',
+                  'pluralCaption' => 'Orientation',
+                  'hasUi' => false,
+            )        );
     }
     
         
-    function _doGetUniqueIndexData() {
+    protected function doGetUniqueIndexData() {
         return array (
               'PRIMARY' => array (
                   'sexualOrientationId',
@@ -103,7 +104,7 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
      * @return Sample_Orientation 
      */
     function loadBySexualOrientationId ($sexualOrientationId) {
-        $recs = $this->loadRecordsByCriteria(''.$this->database->NameQuote('sexualOrientationId').' = '.$this->database->Quote($sexualOrientationId).'');
+        $recs = $this->loadRecordsByCriteria(''.$this->getDb()->n('sexualOrientationId').' = '.$this->getDb()->q($sexualOrientationId).'');
         if (count($recs)) $res = $recs[0];
             else $res = null;
         return $res;
@@ -122,7 +123,7 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more orientation of given one or more people 
-     * @param Sample_People|array $people of Sample_Orientation objects
+     * @param Sample_Person|array $people of Sample_Orientation objects
      
      */
     function loadForPeople($people) {

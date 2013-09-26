@@ -73,6 +73,23 @@ class Cg_Template_Assoc_Strategy_ManyToMany extends Cg_Template_Assoc_Strategy_M
         
     }
     
+    function _doShowGenMapperMethods() {
+        parent::_doShowGenMapperMethods();
+        extract(get_object_vars($this));
+?>
+
+    /**
+     * @param <?php $this->d($thisClass); ?>|array <?php $this->d($idThisPlural); ?> 
+     */
+     function load<?php $this->d(ucfirst($this->prop->getIdsPropertyName())); ?>For(<?php $this->d($idThisPlural); ?>) {
+        $rel = $this->getRelation(<?php $this->str($relationId); ?>);
+        return $rel->loadDestNNIds(<?php $this->d($idThisPlural); ?>); 
+    }
+
+<?php
+
+    }
+    
     
 }
 
