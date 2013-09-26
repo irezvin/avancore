@@ -6,14 +6,15 @@ require_once('simpletest/unit_tester.php');
 ini_set('xdebug.var_display_max_data', 102400);
 ini_set('xdebug.var_display_max_depth', 7);
 
-// TODO: make the test work (requires Application as mapper provider!)
 class Ac_Test_ModelSql extends Ac_Test_Base {
 
+    protected $bootSampleApp = true;
+    
 	/**
 	 * @return Ac_Sql_Select
 	 */
 	function createSelect() {
-		$m = Ac_Test_Model::getAeTestModelPeopleMapper();
+		$m = Sample::getInstance()->getSamplePersonMapper();
 		$sel = new Ac_Sql_Select($this->getAeDb(), array(
 			'tables' => array(
 				't' => array(
@@ -43,23 +44,21 @@ class Ac_Test_ModelSql extends Ac_Test_Base {
     			LEFT JOIN `ac_people` AS `outgoingRelations[otherPerson]` ON  `outgoingRelations`.`otherPersonId` = `outgoingRelations[otherPerson]`.`personId`
     			LEFT JOIN `ac_relation_types` AS `outgoingRelations[relationType]` ON  `outgoingRelations`.`relationTypeId` = `outgoingRelations[relationType]`.`relationTypeId`
     	";
-		if (!$this->assertEqual($this->normalizeStatement($sel->getStatement()), $this->normalizeStatement($rightStatement))) {
-			var_dump($sel->getStatement());
+		if (!$this->assertEqual($foo = $this->normalizeStatement($sel->getStatement()), $bar = $this->normalizeStatement($rightStatement))) {
+			var_dump($sel->getStatement(), $rightStatement, $foo, $bar);
 		}
 		$this->assertTrue(count($sqlDb->fetchArray($sel)));
 		Ac_Dispatcher::loadClass('Ac_Sql_Select_Expression');
 		
-		$sel2 = Ac_Model_Sql_TableProvider::createSelect('Ac_Test_Model_People_Mapper', $db);
+		$sel2 = Ac_Model_Sql_TableProvider::createSelect('Sample_Person_Mapper', $sqlDb);
 		$sel2->columns = array(
 			't.name', 
 			'otherName' => new Ac_Sql_Select_Expression('outgoingRelations[otherPerson].name', true),
 			new Ac_Sql_Select_Expression('outgoingRelations[relationType].title', true),
 		);
 		if (!$this->assertEqual($this->normalizeStatement($sel2->getStatement()), $this->normalizeStatement($rightStatement))) {
-			var_dump($sel2->getStatement());
+			var_dump($sel2->getStatement(), $rightStatement);
 		}
-						
-		
 	}
 		
 }

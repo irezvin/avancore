@@ -195,7 +195,7 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
         if (!$this->legacyDatabase) {
             $db = $this->adapter->getLegacyDatabasePrototype();
             if (is_array($db) && $db) {
-                $db = Ac_Util::m(array('__construct' => array('config' => array('tmpDir' => $this->adapter->getVarTmpPath()))), $db);
+                $db = Ac_Util::m(array('__construct' => array('options' => array('tmpDir' => $this->adapter->getVarTmpPath()))), $db);
             }
             if ($db) $this->legacyDatabase = Ac_Prototyped::factory ($db, 'Ac_Legacy_Database');
         }

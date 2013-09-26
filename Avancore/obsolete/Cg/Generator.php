@@ -2,7 +2,7 @@
 
 class Cg_Generator {
     
-    var $dbClass = 'Ac_Legacy_Database_Native';
+    var $dbPrototype = false;
     
     /**
      * Hostname to access database
@@ -38,7 +38,7 @@ class Cg_Generator {
     var $targetDir = '../';
     
     /**
-     * @var Ac_Legacy_Database 
+     * @var Ac_Sql_Db 
      */
     var $_db = false;
     
@@ -180,17 +180,25 @@ class Cg_Generator {
     }
     
     /**
-     * @return Ac_Legacy_Database 
+     * @return Ac_Sql_Db
      */
     function getDb() {
         if ($this->_db === false) {
-            $dbOptions = array_merge(array(
-                'host' => $this->host,
-                'user' => $this->user,
-                'password' => $this->password,
-            ), $this->otherDbOptions);
-            $dbClass = $this->dbClass;
-            $this->_db = new $dbClass($dbOptions);
+            if ($this->dbPrototype === false) {
+                $dbPrototype = array(
+                    'class' => 'Ac_Sql_Db_Pdo',
+                    'pdo' => array(
+                        'dsn' => 'mysql:host='.$this->host,
+                        'username' => $this->user,
+                        'password' => $this->password,
+                        'driver_options' => array(
+                            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                            PDO::ATTR_PERSISTENT => true,
+                        ),
+                    ),
+                );
+            } else $dbPrototype = $this->dbPrototype;
+            $this->_db = Ac_Prototyped::factory($dbPrototype, 'Ac_Sql_Db');
         }
         return $this->_db;
     }

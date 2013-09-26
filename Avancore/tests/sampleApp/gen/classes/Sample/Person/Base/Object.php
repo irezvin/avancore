@@ -1,6 +1,6 @@
 <?php
 
-class Sample_People_Base_Object extends Ac_Model_Object {
+class Sample_Person_Base_Object extends Ac_Model_Object {
     
     var $_orientation = false;
     var $_tags = false;
@@ -19,13 +19,25 @@ class Sample_People_Base_Object extends Ac_Model_Object {
     var $createdTs = false;
     var $sexualOrientationId = NULL;
     
-    var $_mapperClass = 'Sample_People_Mapper';
+    var $_mapperClass = 'Sample_Person_Mapper';
+    
+    /**
+     * @var Sample_Person_Mapper 
+     */
+    protected $mapper = false;
 
     /**
      * @return Sample 
      */
     function getApplication() {
         return parent::getApplication();
+    }
+    
+    /**
+     * @return Sample_Person_Mapper 
+     */
+    function getMapper($mapperClass = false) {
+        return parent::getMapper($mapperClass);
     }
     
     function listOwnProperties() {
@@ -51,36 +63,40 @@ class Sample_People_Base_Object extends Ac_Model_Object {
               'orientation' => array (
                   'className' => 'Sample_Orientation',
                   'mapperClass' => 'Sample_Orientation_Mapper',
-                  'relationId' => '_orientation',
                   'caption' => 'Orientation',
+                  'relationId' => '_orientation',
               ),
               'tags' => array (
                   'className' => 'Sample_Tag',
                   'mapperClass' => 'Sample_Tag_Mapper',
-                  'relationId' => '_tags',
                   'caption' => 'Tags',
+                  'relationId' => '_tags',
               ),
               'tagIds' => array (
                   'dataType' => 'int',
                   'arrayValue' => true,
+                  'controlType' => 'selectList',
                   'values' => array (
                       'class' => 'Ac_Model_Values_Records',
                       'mapperClass' => 'Sample_Tag_Mapper',
                   ),
+                  'showInTable' => false,
               ),
               'incomingRelations' => array (
                   'className' => 'Sample_Relation',
                   'mapperClass' => 'Sample_Relation_Mapper',
-                  'relationId' => '_relations',
-                  'otherModelIdInMethodsPrefix' => 'incoming',
+                  'otherModelIdInMethodsSingle' => 'incomingRelation',
+                  'otherModelIdInMethodsPlural' => 'incomingRelations',
                   'caption' => 'Relations',
+                  'relationId' => '_incomingRelations',
               ),
               'outgoingRelations' => array (
                   'className' => 'Sample_Relation',
                   'mapperClass' => 'Sample_Relation_Mapper',
-                  'relationId' => '_relations',
-                  'otherModelIdInMethodsPrefix' => 'outgoing',
+                  'otherModelIdInMethodsSingle' => 'outgoingRelation',
+                  'otherModelIdInMethodsPlural' => 'outgoingRelations',
                   'caption' => 'Relations',
+                  'relationId' => '_outgoingRelations',
               ),
               'personId' => array (
                   'dataType' => 'int',
@@ -171,7 +187,7 @@ class Sample_People_Base_Object extends Ac_Model_Object {
     /**
      * @param Sample_Orientation $orientation 
      */
-    function setOrientation(& $orientation) {
+    function setOrientation($orientation) {
         if ($orientation === false) $this->_orientation = false;
         elseif ($orientation === null) $this->_orientation = null;
         else {
@@ -233,7 +249,7 @@ class Sample_People_Base_Object extends Ac_Model_Object {
     /**
      * @param Sample_Tag $tag 
      */
-    function addTag(& $tag) {
+    function addTag($tag) {
         if (!is_a($tag, 'Sample_Tag')) trigger_error('$tag must be an instance of Sample_Tag', E_USER_ERROR);
         $this->listTags();
         $this->_tags[] = $tag;
@@ -310,12 +326,12 @@ class Sample_People_Base_Object extends Ac_Model_Object {
     /**
      * @param Sample_Relation $incomingRelation 
      */
-    function addIncomingRelation(& $incomingRelation) {
+    function addIncomingRelation($incomingRelation) {
         if (!is_a($incomingRelation, 'Sample_Relation')) trigger_error('$incomingRelation must be an instance of Sample_Relation', E_USER_ERROR);
         $this->listIncomingRelations();
         $this->_incomingRelations[] = $incomingRelation;
         
-        $incomingRelation->_incomingPeople = $this;
+        $incomingRelation->_otherPerson = $this;
         
     }
     
@@ -366,12 +382,12 @@ class Sample_People_Base_Object extends Ac_Model_Object {
     /**
      * @param Sample_Relation $outgoingRelation 
      */
-    function addOutgoingRelation(& $outgoingRelation) {
+    function addOutgoingRelation($outgoingRelation) {
         if (!is_a($outgoingRelation, 'Sample_Relation')) trigger_error('$outgoingRelation must be an instance of Sample_Relation', E_USER_ERROR);
         $this->listOutgoingRelations();
         $this->_outgoingRelations[] = $outgoingRelation;
         
-        $outgoingRelation->_outgoingPeople = $this;
+        $outgoingRelation->_person = $this;
         
     }
     
@@ -389,30 +405,30 @@ class Sample_People_Base_Object extends Ac_Model_Object {
     
   
 
-    function _storeUpstandingRecords() {
-        $res = parent::_storeUpstandingRecords() !== false;
+    function _storeReferencedRecords() {
+        $res = parent::_storeReferencedRecords() !== false;
         $mapper = $this->getMapper();
 
         if (is_object($this->_orientation)) {
             $rel = $mapper->getRelation('_orientation');
-            if (!$this->_autoStoreUpstanding($this->_orientation, $rel->fieldLinks, 'orientation')) $res = false;
+            if (!$this->_autoStoreReferenced($this->_orientation, $rel->fieldLinks, 'orientation')) $res = false;
         }
  
         return $res;
     }
 
-    function _storeDownstandingRecords() {
-        $res = parent::_storeDownstandingRecords() !== false;
+    function _storeReferencingRecords() {
+        $res = parent::_storeReferencingRecords() !== false;
         $mapper = $this->getMapper();
 
         if (is_array($this->_incomingRelations)) {
             $rel = $mapper->getRelation('_incomingRelations');
-            if (!$this->_autoStoreDownstanding($this->_incomingRelations, $rel->fieldLinks, 'incomingRelations')) $res = false;
+            if (!$this->_autoStoreReferencing($this->_incomingRelations, $rel->fieldLinks, 'incomingRelations')) $res = false;
         }
 
         if (is_array($this->_outgoingRelations)) {
             $rel = $mapper->getRelation('_outgoingRelations');
-            if (!$this->_autoStoreDownstanding($this->_outgoingRelations, $rel->fieldLinks, 'outgoingRelations')) $res = false;
+            if (!$this->_autoStoreReferencing($this->_outgoingRelations, $rel->fieldLinks, 'outgoingRelations')) $res = false;
         }
         return $res; 
     }
@@ -423,7 +439,7 @@ class Sample_People_Base_Object extends Ac_Model_Object {
         
         if (is_array($this->_tags) || is_array($this->_tagIds)) {
             $rel = $mapper->getRelation('_tags');
-            if (!$this->_autoStoreNNRecords($this->_tags, $this->_tagIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'tags')) 
+            if (!$this->_autoStoreNNRecords($this->_tags, $this->_tagIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'tags', $rel->midWhere)) 
                 $res = false;
         }
             

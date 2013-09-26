@@ -4,13 +4,18 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     
     var $_people = false;
     var $_peopleCount = false;
-    var $_peopleIds = false;
+    var $_personIds = false;
     var $tagId = NULL;
     var $title = '';
     var $titleM = NULL;
     var $titleF = NULL;
     
     var $_mapperClass = 'Sample_Tag_Mapper';
+    
+    /**
+     * @var Sample_Tag_Mapper 
+     */
+    protected $mapper = false;
 
     /**
      * @return Sample 
@@ -19,9 +24,16 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         return parent::getApplication();
     }
     
+    /**
+     * @return Sample_Tag_Mapper 
+     */
+    function getMapper($mapperClass = false) {
+        return parent::getMapper($mapperClass);
+    }
+    
     function listOwnProperties() {
         
-        return array ( 'people', 'peopleIds', 'tagId', 'title', 'titleM', 'titleF', );
+        return array ( 'people', 'personIds', 'tagId', 'title', 'titleM', 'titleF', );
         
     }
 
@@ -33,25 +45,27 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
 
     function listOwnAssociations() {
         
-        return array ( 'people' => 'Sample_People', );
+        return array ( 'people' => 'Sample_Person', );
         
     }
 
     function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
               'people' => array (
-                  'className' => 'Sample_People',
-                  'mapperClass' => 'Sample_People_Mapper',
-                  'relationId' => '_people',
+                  'className' => 'Sample_Person',
+                  'mapperClass' => 'Sample_Person_Mapper',
                   'caption' => 'People',
+                  'relationId' => '_people',
               ),
-              'peopleIds' => array (
+              'personIds' => array (
                   'dataType' => 'int',
                   'arrayValue' => true,
+                  'controlType' => 'selectList',
                   'values' => array (
                       'class' => 'Ac_Model_Values_Records',
-                      'mapperClass' => 'Sample_People_Mapper',
+                      'mapperClass' => 'Sample_Person_Mapper',
                   ),
+                  'showInTable' => false,
               ),
               'tagId' => array (
                   'dataType' => 'int',
@@ -103,9 +117,9 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     }
     
     /**
-     * @return Sample_People 
+     * @return Sample_Person 
      */
-    function getPeople($id) {
+    function getPerson($id) {
         if ($this->_people === false) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_people');
@@ -117,49 +131,49 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     }
     
     /**
-     * @param Sample_People $people 
+     * @param Sample_Person $person 
      */
-    function addPeople(& $people) {
-        if (!is_a($people, 'Sample_People')) trigger_error('$people must be an instance of Sample_People', E_USER_ERROR);
+    function addPerson($person) {
+        if (!is_a($person, 'Sample_Person')) trigger_error('$person must be an instance of Sample_Person', E_USER_ERROR);
         $this->listPeople();
-        $this->_people[] = $people;
+        $this->_people[] = $person;
         
-        if (is_array($people->_tags) && !Ac_Util::sameInArray($this, $people->_tags)) {
-                $people->_tags[] = $this;
+        if (is_array($person->_tags) && !Ac_Util::sameInArray($this, $person->_tags)) {
+                $person->_tags[] = $this;
         }
         
     }
     
     /**
-     * @return Sample_People  
+     * @return Sample_Person  
      */
-    function createPeople($values = array(), $isReference = false) {
-        $m = $this->getMapper('Sample_People_Mapper');
+    function createPerson($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->factory();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
-        $this->addPeople($res);
+        $this->addPerson($res);
         return $res;
     }
     
 
-    function getPeopleIds() {
-        if ($this->_peopleIds === false) {
+    function getPersonIds() {
+        if ($this->_personIds === false) {
             $mapper = $this->getMapper();
             $mapper->loadAssocNNIdsFor($this, '_people');
         }
-        return $this->_peopleIds;
+        return $this->_personIds;
     }
     
-    function setPeopleIds($peopleIds) {
-        if (!is_array($peopleIds)) trigger_error('$peopleIds must be an array', E_USER_ERROR);
-        $this->_peopleIds = $peopleIds;
+    function setPersonIds($personIds) {
+        if (!is_array($personIds)) trigger_error('$personIds must be an array', E_USER_ERROR);
+        $this->_personIds = $personIds;
         $this->_people = false; 
     }
     
     function clearPeople() {
         $this->_people = array();
-        $this->_peopleIds = false;
+        $this->_personIds = false;
     }               
   
 
@@ -167,9 +181,9 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         $res = parent::_storeNNRecords() !== false;
         $mapper = $this->getMapper();
         
-        if (is_array($this->_people) || is_array($this->_peopleIds)) {
+        if (is_array($this->_people) || is_array($this->_personIds)) {
             $rel = $mapper->getRelation('_people');
-            if (!$this->_autoStoreNNRecords($this->_people, $this->_peopleIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'people')) 
+            if (!$this->_autoStoreNNRecords($this->_people, $this->_personIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'people', $rel->midWhere)) 
                 $res = false;
         }
             

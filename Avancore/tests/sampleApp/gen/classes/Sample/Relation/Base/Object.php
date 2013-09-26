@@ -3,10 +3,8 @@
 class Sample_Relation_Base_Object extends Ac_Model_Object {
     
     var $_relationType = false;
-    var $_incomingPeople = false;
-    var $_incomingCount = false;
-    var $_outgoingPeople = false;
-    var $_outgoingCount = false;
+    var $_otherPerson = false;
+    var $_person = false;
     var $relationId = NULL;
     var $personId = 0;
     var $otherPersonId = 0;
@@ -16,6 +14,11 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     var $notes = '';
     
     var $_mapperClass = 'Sample_Relation_Mapper';
+    
+    /**
+     * @var Sample_Relation_Mapper 
+     */
+    protected $mapper = false;
 
     /**
      * @return Sample 
@@ -24,21 +27,28 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
         return parent::getApplication();
     }
     
+    /**
+     * @return Sample_Relation_Mapper 
+     */
+    function getMapper($mapperClass = false) {
+        return parent::getMapper($mapperClass);
+    }
+    
     function listOwnProperties() {
         
-        return array ( 'relationType', 'incomingPeople', 'outgoingPeople', 'relationId', 'personId', 'otherPersonId', 'relationTypeId', 'relationBegin', 'relationEnd', 'notes', );
+        return array ( 'relationType', 'otherPerson', 'person', 'relationId', 'personId', 'otherPersonId', 'relationTypeId', 'relationBegin', 'relationEnd', 'notes', );
         
     }
 
     function listOwnLists() {
         
-        return array ( 'incomingPeople' => 'incoming', 'outgoingPeople' => 'outgoing', );
+        return array ( );
         
     }
 
     function listOwnAssociations() {
         
-        return array ( 'relationType' => 'Sample_Relation_Type', 'incomingPeople' => 'Sample_People', 'outgoingPeople' => 'Sample_People', );
+        return array ( 'relationType' => 'Sample_Relation_Type', 'otherPerson' => 'Sample_Person', 'person' => 'Sample_Person', );
         
     }
 
@@ -47,22 +57,24 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
               'relationType' => array (
                   'className' => 'Sample_Relation_Type',
                   'mapperClass' => 'Sample_Relation_Type_Mapper',
-                  'relationId' => '_relationType',
                   'caption' => 'Relation type',
+                  'relationId' => '_relationType',
               ),
-              'incomingPeople' => array (
-                  'className' => 'Sample_People',
-                  'mapperClass' => 'Sample_People_Mapper',
-                  'relationId' => '_people',
-                  'otherModelIdInMethodsPrefix' => 'incoming',
+              'otherPerson' => array (
+                  'className' => 'Sample_Person',
+                  'mapperClass' => 'Sample_Person_Mapper',
+                  'otherModelIdInMethodsSingle' => 'otherPerson',
+                  'otherModelIdInMethodsPlural' => 'otherPeople',
                   'caption' => 'People',
+                  'relationId' => '_otherPerson',
               ),
-              'outgoingPeople' => array (
-                  'className' => 'Sample_People',
-                  'mapperClass' => 'Sample_People_Mapper',
-                  'relationId' => '_people',
-                  'otherModelIdInMethodsPrefix' => 'outgoing',
+              'person' => array (
+                  'className' => 'Sample_Person',
+                  'mapperClass' => 'Sample_Person_Mapper',
+                  'otherModelIdInMethodsSingle' => 'person',
+                  'otherModelIdInMethodsPlural' => 'people',
                   'caption' => 'People',
+                  'relationId' => '_person',
               ),
               'relationId' => array (
                   'dataType' => 'int',
@@ -78,9 +90,9 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                   'maxLength' => '10',
                   'values' => array (
                       'class' => 'Ac_Model_Values_Records',
-                      'mapperClass' => 'Sample_People_Mapper',
+                      'mapperClass' => 'Sample_Person_Mapper',
                   ),
-                  'objectPropertyName' => 'outgoingPeople',
+                  'objectPropertyName' => 'person',
                   'caption' => 'Person Id',
               ),
               'otherPersonId' => array (
@@ -89,9 +101,9 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                   'maxLength' => '10',
                   'values' => array (
                       'class' => 'Ac_Model_Values_Records',
-                      'mapperClass' => 'Sample_People_Mapper',
+                      'mapperClass' => 'Sample_Person_Mapper',
                   ),
-                  'objectPropertyName' => 'incomingPeople',
+                  'objectPropertyName' => 'otherPerson',
                   'caption' => 'Other Person Id',
               ),
               'relationTypeId' => array (
@@ -150,7 +162,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     /**
      * @param Sample_Relation_Type $relationType 
      */
-    function setRelationType(& $relationType) {
+    function setRelationType($relationType) {
         if ($relationType === false) $this->_relationType = false;
         elseif ($relationType === null) $this->_relationType = null;
         else {
@@ -180,108 +192,108 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
         
     
     /**
-     * @return Sample_People 
+     * @return Sample_Person 
      */
-    function getIncomingPeople() {
-        if ($this->_incomingPeople === false) {
+    function getOtherPerson() {
+        if ($this->_otherPerson === false) {
             $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_incomingPeople');
+            $mapper->loadAssocFor($this, '_otherPerson');
         }
-        return $this->_incomingPeople;
+        return $this->_otherPerson;
     }
     
     /**
-     * @param Sample_People $incomingPeople 
+     * @param Sample_Person $otherPerson 
      */
-    function setIncomingPeople(& $incomingPeople) {
-        if ($incomingPeople === false) $this->_incomingPeople = false;
-        elseif ($incomingPeople === null) $this->_incomingPeople = null;
+    function setOtherPerson($otherPerson) {
+        if ($otherPerson === false) $this->_otherPerson = false;
+        elseif ($otherPerson === null) $this->_otherPerson = null;
         else {
-            if (!is_a($incomingPeople, 'Sample_People')) trigger_error('$incomingPeople must be an instance of Sample_People', E_USER_ERROR);
-            if (!is_object($this->_incomingPeople) && !Ac_Util::sameObject($this->_incomingPeople, $incomingPeople)) { 
-                $this->_incomingPeople = $incomingPeople;
+            if (!is_a($otherPerson, 'Sample_Person')) trigger_error('$otherPerson must be an instance of Sample_Person', E_USER_ERROR);
+            if (!is_object($this->_otherPerson) && !Ac_Util::sameObject($this->_otherPerson, $otherPerson)) { 
+                $this->_otherPerson = $otherPerson;
             }
         }
     }
     
-    function clearIncomingPeople() {
-        $this->incomingPeople = null;
+    function clearOtherPerson() {
+        $this->otherPerson = null;
     }
     
     /**
-     * @return Sample_People  
+     * @return Sample_Person  
      */
-    function createIncomingPeople($values = array(), $isReference = false) {
-        $m = $this->getMapper('Sample_People_Mapper');
+    function createOtherPerson($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->factory();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
-        $this->setIncomingPeople($res);
+        $this->setOtherPerson($res);
         return $res;
     }
     
         
     
     /**
-     * @return Sample_People 
+     * @return Sample_Person 
      */
-    function getOutgoingPeople() {
-        if ($this->_outgoingPeople === false) {
+    function getPerson() {
+        if ($this->_person === false) {
             $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_outgoingPeople');
+            $mapper->loadAssocFor($this, '_person');
         }
-        return $this->_outgoingPeople;
+        return $this->_person;
     }
     
     /**
-     * @param Sample_People $outgoingPeople 
+     * @param Sample_Person $person 
      */
-    function setOutgoingPeople(& $outgoingPeople) {
-        if ($outgoingPeople === false) $this->_outgoingPeople = false;
-        elseif ($outgoingPeople === null) $this->_outgoingPeople = null;
+    function setPerson($person) {
+        if ($person === false) $this->_person = false;
+        elseif ($person === null) $this->_person = null;
         else {
-            if (!is_a($outgoingPeople, 'Sample_People')) trigger_error('$outgoingPeople must be an instance of Sample_People', E_USER_ERROR);
-            if (!is_object($this->_outgoingPeople) && !Ac_Util::sameObject($this->_outgoingPeople, $outgoingPeople)) { 
-                $this->_outgoingPeople = $outgoingPeople;
+            if (!is_a($person, 'Sample_Person')) trigger_error('$person must be an instance of Sample_Person', E_USER_ERROR);
+            if (!is_object($this->_person) && !Ac_Util::sameObject($this->_person, $person)) { 
+                $this->_person = $person;
             }
         }
     }
     
-    function clearOutgoingPeople() {
-        $this->outgoingPeople = null;
+    function clearPerson() {
+        $this->person = null;
     }
     
     /**
-     * @return Sample_People  
+     * @return Sample_Person  
      */
-    function createOutgoingPeople($values = array(), $isReference = false) {
-        $m = $this->getMapper('Sample_People_Mapper');
+    function createPerson($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->factory();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
-        $this->setOutgoingPeople($res);
+        $this->setPerson($res);
         return $res;
     }
     
   
 
-    function _storeUpstandingRecords() {
-        $res = parent::_storeUpstandingRecords() !== false;
+    function _storeReferencedRecords() {
+        $res = parent::_storeReferencedRecords() !== false;
         $mapper = $this->getMapper();
 
         if (is_object($this->_relationType)) {
             $rel = $mapper->getRelation('_relationType');
-            if (!$this->_autoStoreUpstanding($this->_relationType, $rel->fieldLinks, 'relationType')) $res = false;
+            if (!$this->_autoStoreReferenced($this->_relationType, $rel->fieldLinks, 'relationType')) $res = false;
         }
 
-        if (is_object($this->_incomingPeople)) {
-            $rel = $mapper->getRelation('_incomingPeople');
-            if (!$this->_autoStoreUpstanding($this->_incomingPeople, $rel->fieldLinks, 'incomingPeople')) $res = false;
+        if (is_object($this->_otherPerson)) {
+            $rel = $mapper->getRelation('_otherPerson');
+            if (!$this->_autoStoreReferenced($this->_otherPerson, $rel->fieldLinks, 'otherPerson')) $res = false;
         }
 
-        if (is_object($this->_outgoingPeople)) {
-            $rel = $mapper->getRelation('_outgoingPeople');
-            if (!$this->_autoStoreUpstanding($this->_outgoingPeople, $rel->fieldLinks, 'outgoingPeople')) $res = false;
+        if (is_object($this->_person)) {
+            $rel = $mapper->getRelation('_person');
+            if (!$this->_autoStoreReferenced($this->_person, $rel->fieldLinks, 'person')) $res = false;
         }
  
         return $res;
