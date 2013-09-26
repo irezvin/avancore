@@ -8,12 +8,24 @@ class Sample_Orientation_Base_Object extends Ac_Model_Object {
     var $title = '';
     
     var $_mapperClass = 'Sample_Orientation_Mapper';
+    
+    /**
+     * @var Sample_Orientation_Mapper 
+     */
+    protected $mapper = false;
 
     /**
      * @return Sample 
      */
     function getApplication() {
         return parent::getApplication();
+    }
+    
+    /**
+     * @return Sample_Orientation_Mapper 
+     */
+    function getMapper($mapperClass = false) {
+        return parent::getMapper($mapperClass);
     }
     
     function listOwnProperties() {
@@ -30,17 +42,17 @@ class Sample_Orientation_Base_Object extends Ac_Model_Object {
 
     function listOwnAssociations() {
         
-        return array ( 'people' => 'Sample_People', );
+        return array ( 'people' => 'Sample_Person', );
         
     }
 
     function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
               'people' => array (
-                  'className' => 'Sample_People',
-                  'mapperClass' => 'Sample_People_Mapper',
-                  'relationId' => '_people',
+                  'className' => 'Sample_Person',
+                  'mapperClass' => 'Sample_Person_Mapper',
                   'caption' => 'People',
+                  'relationId' => '_people',
               ),
               'sexualOrientationId' => array (
                   'dataType' => 'int',
@@ -82,9 +94,9 @@ class Sample_Orientation_Base_Object extends Ac_Model_Object {
     }
     
     /**
-     * @return Sample_People 
+     * @return Sample_Person 
      */
-    function getPeople($id) {
+    function getPerson($id) {
         if ($this->_people === false) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_people');
@@ -96,38 +108,38 @@ class Sample_Orientation_Base_Object extends Ac_Model_Object {
     }
     
     /**
-     * @param Sample_People $people 
+     * @param Sample_Person $person 
      */
-    function addPeople(& $people) {
-        if (!is_a($people, 'Sample_People')) trigger_error('$people must be an instance of Sample_People', E_USER_ERROR);
+    function addPerson($person) {
+        if (!is_a($person, 'Sample_Person')) trigger_error('$person must be an instance of Sample_Person', E_USER_ERROR);
         $this->listPeople();
-        $this->_people[] = $people;
+        $this->_people[] = $person;
         
-        $people->_orientation = $this;
+        $person->_orientation = $this;
         
     }
     
     /**
-     * @return Sample_People  
+     * @return Sample_Person  
      */
-    function createPeople($values = array(), $isReference = false) {
-        $m = $this->getMapper('Sample_People_Mapper');
+    function createPerson($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->factory();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
-        $this->addPeople($res);
+        $this->addPerson($res);
         return $res;
     }
     
   
 
-    function _storeDownstandingRecords() {
-        $res = parent::_storeDownstandingRecords() !== false;
+    function _storeReferencingRecords() {
+        $res = parent::_storeReferencingRecords() !== false;
         $mapper = $this->getMapper();
 
         if (is_array($this->_people)) {
             $rel = $mapper->getRelation('_people');
-            if (!$this->_autoStoreDownstanding($this->_people, $rel->fieldLinks, 'people')) $res = false;
+            if (!$this->_autoStoreReferencing($this->_people, $rel->fieldLinks, 'people')) $res = false;
         }
         return $res; 
     }

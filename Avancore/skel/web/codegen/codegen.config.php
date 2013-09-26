@@ -43,8 +43,6 @@ $config = array(
         'defaultTitleColumn' => 'title',
         
         'dictionary' => array(
-            'data' => array(
-            ),
         ),
 
         'schemaExtras' => array(

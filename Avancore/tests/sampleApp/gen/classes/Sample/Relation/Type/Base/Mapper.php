@@ -65,8 +65,8 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         return 'title';   
     }
                 
-    function _getRelationPrototypes() {
-        return Ac_Util::m(parent::_getRelationPrototypes(), array (
+    protected function getRelationPrototypes() {
+        return Ac_Util::m(parent::getRelationPrototypes(), array (
               '_relations' => array (
                   'srcMapperClass' => 'Sample_Relation_Type_Mapper',
                   'destMapperClass' => 'Sample_Relation_Mapper',
@@ -83,16 +83,17 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         
     }
         
-    function _doGetInfoParams() {
-        return array (
-              'singleCaption' => 'Relation type',
-              'pluralCaption' => 'Relation types',
-              'hasUi' => false,
-        );
+    protected function doGetInfoParams() {
+        return Ac_Util::m(parent::doGetInfoParams(), 
+            array (
+                  'singleCaption' => 'Relation type',
+                  'pluralCaption' => 'Relation types',
+                  'hasUi' => false,
+            )        );
     }
     
         
-    function _doGetUniqueIndexData() {
+    protected function doGetUniqueIndexData() {
         return array (
               'PRIMARY' => array (
                   'relationTypeId',
@@ -104,7 +105,7 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
      * @return Sample_Relation_Type 
      */
     function loadByRelationTypeId ($relationTypeId) {
-        $recs = $this->loadRecordsByCriteria(''.$this->database->NameQuote('relationTypeId').' = '.$this->database->Quote($relationTypeId).'');
+        $recs = $this->loadRecordsByCriteria(''.$this->getDb()->n('relationTypeId').' = '.$this->getDb()->q($relationTypeId).'');
         if (count($recs)) $res = $recs[0];
             else $res = null;
         return $res;

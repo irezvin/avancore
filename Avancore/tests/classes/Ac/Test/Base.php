@@ -28,7 +28,7 @@ class Ac_Test_Base extends UnitTestCase {
 	 * @return Ac_Sql_Db_Ae
 	 */
 	function getAeDb() {
-		if ($this->aeDb === false) $this->aeDb = new Ac_Sql_Db_Ae($this->getLegacyDb());
+		if ($this->aeDb === false) $this->aeDb = Ac_Prototyped::factory (self::$config['dbPrototype'], 'Ac_Sql_Db');
 		return $this->aeDb;
 	}
     
@@ -54,10 +54,10 @@ class Ac_Test_Base extends UnitTestCase {
         return $this->legacyDb;
     }
 	
-	function normalizeStatement($sql, $replacePrefix = false) {
+	function normalizeStatement($sql, $replacePrefix = true) {
 		$res = preg_replace('/\s+/', ' ', trim($sql));
 		if ($replacePrefix) {
-			$res = $this->getLegacyDb()->replacePrefix($res);			
+			$res = $this->getAeDb()->replacePrefix($res);			
 		}
 		return $res;
 	}
