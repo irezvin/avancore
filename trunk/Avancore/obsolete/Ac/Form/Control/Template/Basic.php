@@ -783,6 +783,10 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         
     }
     
-}
-
+    function showErrorList(Ac_Form_Control $control) {
 ?>
+<?php   
+    }
+
+    
+}
