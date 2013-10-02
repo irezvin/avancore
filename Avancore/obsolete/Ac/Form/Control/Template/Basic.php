@@ -783,9 +783,14 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         
     }
     
-    function showErrorList(Ac_Form_Control $control) {
+    function showErrorList(Ac_Form_Control_ErrorList $control) {
+        if ($control->showErrorsInMainArea && ($e = $control->getValue())) {
 ?>
+        <li class="errors">
+            <?php echo Ac_Util::implode_r("</li><li>", Ac_Util::flattenArray($e)); ?>
+        </li>
 <?php   
+        }
     }
 
     
