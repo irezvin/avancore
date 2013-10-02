@@ -32,6 +32,7 @@ class Ac_Test_Form extends Ac_Test_Base {
         if ($invalid) var_dump($pres);
         
         $person->_errors = array();
+        
         $pres = $f->fetchPresentation(true);
         
         $invalid = false;

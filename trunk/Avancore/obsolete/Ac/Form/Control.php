@@ -254,8 +254,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     var $_displayChildren = array();
     
-    var $_orderedDisplayChildren = false;
-    
     /**
      * Templates that were instantiated for this control
      * @access protected
@@ -400,7 +398,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      */
     function addDisplayChild($control) {
         if (($index = $this->searchDisplayChild($control)) === false) {
-            $this->_orderedDisplayChildren = false;
             $index = count($this->_displayChildren);
             $this->_displayChildren[$index] = $control;
             $control->_displayParent = $this;
@@ -428,7 +425,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         $idx = $this->searchDisplayChild($control);
         if ($idx !== false) {
             unset($this->_displayChildren[$control]);
-            $this->_orderedDisplayChildren = false;
             $res = true;
         }
         else $res = false; 
@@ -443,16 +439,14 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
     
     function getOrderedDisplayChildren() {
-        if ($this->_orderedDisplayChildren === false) {
-            $this->_doInitDisplayChildren();
-            $this->_orderedDisplayChildren = array();
-            foreach (array_keys($this->_displayChildren) as $i) {
-                $child = $this->_displayChildren[$i];
-                if ($child->isVisible()) $this->_orderedDisplayChildren[$i] = $child;
-            }
-            uasort($this->_orderedDisplayChildren, array(& $this, '_displayOrderCallback'));
+        $this->_doInitDisplayChildren();
+        $res = array();
+        foreach (array_keys($this->_displayChildren) as $i) {
+            $child = $this->_displayChildren[$i];
+            if ($child->isVisible()) $res[$i] = $child;
         }
-        return $this->_orderedDisplayChildren;
+        uasort($res, array(& $this, '_displayOrderCallback'));
+        return $res;
     }
     
     /**
@@ -716,15 +710,18 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     function getErrors() {
         if ($this->errors === false) {
+            $res = false;
             if (($this->getErrorsFromModel) && ($m = $this->getModel()) && ($p = $this->getPropertyName())) {
                 if ($m->isChecked() || $this->forceModelCheck) {
-                    $this->errors = $m->getErrors($p, false);
+                    $res = $m->getErrors($p, false);
                 }
             }
-            if ($this->errors === false && $this->getErrorsFromParent && $this->_parent) 
-                $this->errors = $this->_parent->getErrorsForTheChild($this, true);
+            if ($res === false && $this->getErrorsFromParent && $this->_parent) 
+                $res = $this->_parent->getErrorsForTheChild($this, true);
+            return $res;
+        } else {
+            return $this->errors;
         }
-        return $this->errors;
     }
     
     function getHtmlAttribs() {
