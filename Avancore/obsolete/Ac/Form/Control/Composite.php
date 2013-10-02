@@ -278,6 +278,20 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
         return $res;
     }
     
+    /**
+     * Recursively traverses ALL sub-controls and returns a numerical array with all children
+     * @return array
+     */
+    function findControlsRecursive() {
+        $res = array();
+        foreach($this->listControls() as $i) {
+            $c = $this->getControl($i);
+            if ($c instanceof Ac_Form_Control_Composite) $res = array_merge($res, $c->findAllControls());
+            $res[] = $c;
+        }
+        return $res;
+    }
+    
 }
 
 ?>
