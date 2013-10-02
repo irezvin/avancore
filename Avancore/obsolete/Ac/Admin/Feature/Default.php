@@ -33,6 +33,10 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     var $sqlSelectSettings = array();
     
     var $processingSettings = array();
+
+    var $addErrorList = true;
+    
+    var $errorListPrototype = array();
     
     var $displayOrderStart = 0;
     
@@ -175,6 +179,11 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
             else $aif = false;
         $conv = new Ac_Form_Converter();
         $do = $this->displayOrderStart;
+        if ($this->addErrorList) {
+            $formSettings['controls']['errorList'] = array('class' => 'Ac_Form_Control_ErrorList', 'caption' => '');
+            if ($this->errorListPrototype && is_array($this->errorListPrototype)) 
+                Ac_Util::ms($formSettings['controls']['errorList'], $this->errorListPrototype);
+        }
         foreach ($rec->listOwnFields() as $p) {
             $prop = $rec->getPropertyInfo($p, true);
             if (isset($prop->showInForm) && !$prop->showInForm) continue;
