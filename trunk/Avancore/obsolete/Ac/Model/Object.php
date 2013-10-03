@@ -265,6 +265,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         $mapper = $this->getMapper();
         $tpk = $this->tracksPk();
         $hyData = $this->getHyData();
+        $error = false;
         
         if ($this->isPersistent()) {
             
@@ -272,7 +273,6 @@ class Ac_Model_Object extends Ac_Model_Data {
             $hyData = $this->mapper->peConvertForSave($hyData);
             $res = (bool) $this->mapper->peSave($hyData, true, $error);
             if ($res) $this->mapper->markUpdated();
-        
         } else {
             
             $skipKey = ($aif = $mapper->getAutoincFieldName()) == $k;
@@ -291,7 +291,10 @@ class Ac_Model_Object extends Ac_Model_Data {
         }
 
         if (!$res) {
-            $this->_error = strtolower(get_class($this))."::store failed <br />".$error;
+            if ($error !== false) {
+                $this->_errors['_store']['db'] = $error;
+                $this->_checked = true; // otherwise next getErrors() will trigger check() which will clean this error message
+            }
         } else {
             $mapper->forget($this);
             if (($t = $this->tracksChanges()) && ($t !== AC_CHANGES_AFTER_SAVE)) $this->_memorizeFields();

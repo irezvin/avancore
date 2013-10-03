@@ -993,7 +993,12 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         if ($exists) {
             $query = $this->db->updateStatement($this->tableName, $hyData, $this->pk, false);
             if ($this->db->query($query)) $res = $hyData;
-                else $res = false;
+            else {
+                $descr = $this->db->getErrorDescr();
+                if (is_array($descr)) $descr = implode("; ", $descr);
+                $error = $this->db->getErrorCode().': '.$descr;
+                $res = false;
+            }
         } else {
             $query = $this->db->insertStatement($this->tableName, $hyData);
             if ($this->db->query($query)) {
@@ -1002,6 +1007,9 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
                 }
                 $res = $hyData;
             } else {
+                $descr = $this->db->getErrorDescr();
+                if (is_array($descr)) $descr = implode("; ", $descr);
+                $error = $this->db->getErrorCode().':'.$descr;
                 $res = false;
             }
         }
