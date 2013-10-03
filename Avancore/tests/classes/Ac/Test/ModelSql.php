@@ -60,5 +60,19 @@ class Ac_Test_ModelSql extends Ac_Test_Base {
 			var_dump($sel2->getStatement(), $rightStatement);
 		}
 	}
+    
+    function testSaveError() {
+        $person = Sample::getInstance()->getSamplePersonMapper()->factory();
+        $person->setTagIds(array(-1, -2, -3));
+        $db = Sample::getInstance()->getDb();
+        $pdo = $db->getPdo();
+        $tmp = $pdo->getAttribute(PDO::ATTR_ERRMODE);
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_SILENT);
+        $this->assertTrue(!$person->store());
+        $pdo->setAttribute(PDO::ATTR_ERRMODE, $tmp);
+        if (!$this->assertTrue(is_array(Ac_Util::getArrayByPath($person->getErrors(), array('_store'))))) {
+            var_dump($person->getErrors());
+        }
+    }
 		
 }
