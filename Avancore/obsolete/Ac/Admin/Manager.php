@@ -1348,4 +1348,3 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
 }
 
-?>

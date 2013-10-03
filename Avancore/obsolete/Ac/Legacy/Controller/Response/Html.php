@@ -181,4 +181,3 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
     
 }
 
-?>

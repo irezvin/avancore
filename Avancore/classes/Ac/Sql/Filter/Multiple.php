@@ -183,4 +183,3 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
     }
     
 }
-?>

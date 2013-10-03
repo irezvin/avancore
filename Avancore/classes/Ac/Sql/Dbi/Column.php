@@ -71,4 +71,3 @@ class Ac_Sql_Dbi_Column extends Ac_Sql_Dbi_Object {
     
 }
 
-?>

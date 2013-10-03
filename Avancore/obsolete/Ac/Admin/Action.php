@@ -90,4 +90,3 @@ class Ac_Admin_Action {
     
 }
 
-?>

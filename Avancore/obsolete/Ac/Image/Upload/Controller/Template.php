@@ -45,4 +45,3 @@ class Ac_Image_Upload_Controller_Template extends Ac_Upload_Controller_Template 
         
 }
 
-?>

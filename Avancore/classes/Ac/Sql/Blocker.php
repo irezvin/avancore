@@ -31,4 +31,3 @@ class Ac_Sql_Blocker {
     
 }
 
-?>

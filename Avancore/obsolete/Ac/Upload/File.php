@@ -194,4 +194,3 @@ class Ac_Upload_File {
     
 }
 
-?>

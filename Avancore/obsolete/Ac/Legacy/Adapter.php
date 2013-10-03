@@ -214,4 +214,3 @@ class Ac_Legacy_Adapter {
 }
 
 
-?>

@@ -220,4 +220,3 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
     
 }
 
-?>

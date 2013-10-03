@@ -272,4 +272,3 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
     
 
 
-?>

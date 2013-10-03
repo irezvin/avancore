@@ -775,4 +775,3 @@ class Ac_Sql_NestedSets {
     
 }
 
-?>

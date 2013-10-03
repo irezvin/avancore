@@ -569,4 +569,3 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
     
 }
 
-?>

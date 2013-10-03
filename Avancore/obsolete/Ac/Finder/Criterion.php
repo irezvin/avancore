@@ -182,4 +182,3 @@ class Ac_Finder_Criterion extends Ac_Prototyped {
 
 }
 
-?>

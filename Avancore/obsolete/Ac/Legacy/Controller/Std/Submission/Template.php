@@ -105,4 +105,3 @@ class Ac_Legacy_Controller_Std_Submission_Template extends Ac_Legacy_Template_Ht
     
 }
 
-?>

@@ -38,4 +38,3 @@ class Ac_Form_Control_Template_Table extends Ac_Form_Control_Template {
     
 }
 
-?>

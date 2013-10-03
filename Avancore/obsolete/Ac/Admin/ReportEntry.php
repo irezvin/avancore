@@ -74,4 +74,3 @@ class Ac_Admin_ReportEntry {
     
 }
 
-?>

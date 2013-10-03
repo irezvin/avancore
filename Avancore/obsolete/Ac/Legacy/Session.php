@@ -24,4 +24,3 @@ class Ac_Legacy_Session {
     
 }
 
-?>

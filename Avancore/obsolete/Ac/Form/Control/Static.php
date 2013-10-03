@@ -35,4 +35,3 @@ class Ac_Form_Control_Static extends Ac_Form_Control {
     
 }
 
-?>

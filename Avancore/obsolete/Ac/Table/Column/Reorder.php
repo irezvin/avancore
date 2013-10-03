@@ -102,4 +102,3 @@ class Ac_Table_Column_Reorder extends Ac_Table_Column {
         echo "<td ".Ac_Util::mkAttribs($this->getCellAttribs()).">".$this->_table->_pageNav->orderDownIcon($rowNo, count($this->_table->listRecords()), $this->canOrderDown($record, $rowNo), $this->getOrderDownTask())."</td>";
     }
 }
-?>

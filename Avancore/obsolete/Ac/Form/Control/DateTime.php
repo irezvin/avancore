@@ -18,4 +18,3 @@ class Ac_Form_Control_DateTime extends Ac_Form_Control_Date {
     
 }
 
-?>

@@ -56,4 +56,3 @@ class Ac_Legacy_Config_Joomla extends Ac_Legacy_Config {
     
 }
 
-?>

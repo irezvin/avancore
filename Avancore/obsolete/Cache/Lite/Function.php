@@ -111,4 +111,3 @@ class Cache_Lite_Function extends Cache_Lite
 
 }
 
-?>

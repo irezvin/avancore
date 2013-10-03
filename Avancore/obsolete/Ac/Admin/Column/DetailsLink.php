@@ -44,4 +44,3 @@ class Ac_Admin_Column_DetailsLink extends Ac_Admin_Column {
      }
 }
 
-?>

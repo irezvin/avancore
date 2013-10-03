@@ -22,4 +22,3 @@ class Ac_Form_Control_Tabs_Sheet extends Ac_Form_Control_Group {
 
 }
 
-?>

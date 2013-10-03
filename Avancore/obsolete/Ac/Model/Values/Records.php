@@ -98,4 +98,3 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
     
 }
 
-?>

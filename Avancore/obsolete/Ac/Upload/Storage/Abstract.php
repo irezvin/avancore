@@ -30,4 +30,3 @@ class Ac_Upload_Storage_Abstract {
     
 }
 
-?>

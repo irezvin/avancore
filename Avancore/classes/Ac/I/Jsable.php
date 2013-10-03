@@ -6,4 +6,3 @@ interface Ac_I_Jsable {
     
 }
 
-?>

@@ -301,4 +301,3 @@ class Ac_Upload_Controller extends Ac_Legacy_Controller {
     
 }
 
-?>

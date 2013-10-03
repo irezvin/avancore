@@ -100,4 +100,3 @@ class Cg_Property {
     
 }
 
-?>

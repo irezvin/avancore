@@ -67,4 +67,3 @@ class Ac_Sql_Order_Columns extends Ac_Sql_Order {
     
 }
 
-?>

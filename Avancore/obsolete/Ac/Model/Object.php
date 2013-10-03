@@ -981,4 +981,3 @@ class Ac_Model_Object extends Ac_Model_Data {
     
 }
 
-?>

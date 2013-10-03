@@ -46,4 +46,3 @@ class Ac_Admin_Column_Checked extends Ac_Admin_Column {
      }
 }
 
-?>

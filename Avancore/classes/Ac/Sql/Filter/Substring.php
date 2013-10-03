@@ -132,4 +132,3 @@ class Ac_Sql_Filter_Substring extends Ac_Sql_Filter {
     }
     
 }
-?>

@@ -217,4 +217,3 @@ class Ac_Image_Upload extends Ac_Upload_File {
     
 }
 
-?>

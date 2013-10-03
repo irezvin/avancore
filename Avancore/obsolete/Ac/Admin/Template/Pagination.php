@@ -197,4 +197,3 @@ class Ac_Admin_Template_Pagination extends Ac_Legacy_Template_Html {
     
 }
 
-?>

@@ -57,4 +57,3 @@ class Ac_Legacy_Template_Helper_Html extends Ac_Legacy_Template_Helper {
     
 }
 
-?>

@@ -34,4 +34,3 @@ class Ac_Sql_Order extends Ac_Sql_Part {
     }
     
 }
-?>

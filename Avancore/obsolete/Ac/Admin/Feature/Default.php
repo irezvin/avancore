@@ -273,4 +273,3 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     }
     
 }
-?>

@@ -117,4 +117,3 @@ class Ac_Model_Property {
     
 }
 
-?>

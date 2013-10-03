@@ -87,4 +87,3 @@ class Ac_Legacy_Output_Native extends Ac_Legacy_Output {
     
 }
 
-?>

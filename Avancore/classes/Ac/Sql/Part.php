@@ -222,4 +222,3 @@ class Ac_Sql_Part extends Ac_Prototyped {
 
 }
 
-?>

@@ -394,4 +394,3 @@ class Cg_Property_Object extends Cg_Property {
     
 }
 
-?>

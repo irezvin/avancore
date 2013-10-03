@@ -136,4 +136,3 @@ class Ac_Legacy_Database_Joomla extends Ac_Legacy_Database {
     
 }
 
-?>

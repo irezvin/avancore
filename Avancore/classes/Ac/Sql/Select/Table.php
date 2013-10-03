@@ -316,4 +316,3 @@ class Ac_Sql_Select_Table {
     
 }
 
-?>

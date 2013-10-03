@@ -84,4 +84,3 @@ class <?php $this->d($this->finderClass); ?> extends <?php $this->d($this->genFi
     
 }
 
-?>

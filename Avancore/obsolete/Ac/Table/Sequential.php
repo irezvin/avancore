@@ -108,4 +108,3 @@ class Ac_Table_Sequential extends Ac_Table {
     
 }
 
-?>

@@ -163,4 +163,3 @@ class Cg_Template extends Ac_Legacy_Template {
     
 }
 
-?>

@@ -308,4 +308,3 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
 }
 
-?>

@@ -114,4 +114,3 @@ class Ac_Legacy_Config {
     
 }
 
-?>
