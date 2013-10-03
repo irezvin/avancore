@@ -228,4 +228,3 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
     
 }
 
-?>

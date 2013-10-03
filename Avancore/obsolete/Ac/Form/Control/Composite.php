@@ -294,4 +294,3 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     
 }
 
-?>

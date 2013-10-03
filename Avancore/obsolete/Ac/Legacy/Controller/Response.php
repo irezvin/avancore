@@ -205,4 +205,3 @@ class Ac_Legacy_Controller_Response {
     
 }
 
-?>

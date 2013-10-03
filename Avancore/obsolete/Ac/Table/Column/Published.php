@@ -92,5 +92,3 @@ class Ac_Table_Column_Published extends Ac_Table_Column {
     
 }
 
-?>
-    

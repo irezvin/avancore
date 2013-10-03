@@ -301,4 +301,3 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     
 }
 
-?>

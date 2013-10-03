@@ -344,4 +344,3 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
     }
 }
 
-?>

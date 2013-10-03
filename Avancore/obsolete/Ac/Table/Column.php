@@ -293,4 +293,3 @@ class Ac_Table_Column {
     
 }
 
-?>

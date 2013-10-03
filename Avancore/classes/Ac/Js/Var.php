@@ -16,4 +16,3 @@ class Ac_Js_Var {
     
 }
 
-?>

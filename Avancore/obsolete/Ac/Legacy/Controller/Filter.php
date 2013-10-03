@@ -98,4 +98,3 @@ class Ac_Legacy_Controller_Filter {
     
 }
 
-?>

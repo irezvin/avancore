@@ -51,4 +51,3 @@ class Ac_Sql_Order_Switcher extends Ac_Sql_Order {
   
 }
 
-?>

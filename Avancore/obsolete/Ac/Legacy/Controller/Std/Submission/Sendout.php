@@ -136,4 +136,3 @@ class Ac_Legacy_Controller_Std_Submission_Sendout {
     
 }
 
-?>

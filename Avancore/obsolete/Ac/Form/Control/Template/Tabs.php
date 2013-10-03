@@ -56,4 +56,3 @@ class Ac_Form_Control_Template_Tabs extends Ac_Form_Control_Template {
     
 }
 
-?>

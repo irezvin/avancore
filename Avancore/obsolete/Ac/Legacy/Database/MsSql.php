@@ -424,4 +424,3 @@ class Ac_Legacy_Database_MsSql extends Ac_Legacy_Database {
 	
 }
 
-?>

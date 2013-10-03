@@ -98,4 +98,3 @@ class Ac_Form_Control_Text extends Ac_Form_Control_Listable {
     
 }
 
-?>

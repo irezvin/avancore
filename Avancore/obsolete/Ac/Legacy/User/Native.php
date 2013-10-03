@@ -16,4 +16,3 @@ class Ac_Legacy_User_Native extends Ac_Legacy_User {
     
 }
 
-?>

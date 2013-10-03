@@ -224,4 +224,3 @@ class Cg_Dictionary {
     
 }
 
-?>

@@ -197,4 +197,3 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
     
 }
     
-?>

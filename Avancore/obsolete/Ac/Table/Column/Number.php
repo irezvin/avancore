@@ -29,4 +29,3 @@ class Ac_Table_Column_Number extends Ac_Table_Column {
     }
 }
 
-?>

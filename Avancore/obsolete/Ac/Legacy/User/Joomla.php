@@ -27,4 +27,3 @@ class Ac_Legacy_User_Joomla extends Ac_Legacy_User {
   
 }
 
-?>

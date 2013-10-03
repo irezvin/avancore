@@ -210,4 +210,3 @@ class Ac_Finder extends Ac_Prototyped {
     
 }
 
-?>

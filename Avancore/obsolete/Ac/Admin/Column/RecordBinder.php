@@ -52,4 +52,3 @@ if ($this->canEdit) { ?>.observe([AvanControllers.ListController.EditRecord], {e
      }
 }
     
-?>

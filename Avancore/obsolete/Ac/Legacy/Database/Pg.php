@@ -262,4 +262,3 @@ class Ac_Legacy_Database_Pg extends Ac_Legacy_Database {
     
 }
 
-?>

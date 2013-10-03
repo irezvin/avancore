@@ -26,4 +26,3 @@ class Ac_Legacy_Session_Joomla extends Ac_Legacy_Session {
     
 }
 
-?>

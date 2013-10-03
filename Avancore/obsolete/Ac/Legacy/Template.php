@@ -198,4 +198,3 @@ class Ac_Legacy_Template {
 
 }
 
-?>

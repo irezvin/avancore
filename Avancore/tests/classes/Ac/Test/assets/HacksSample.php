@@ -30,4 +30,3 @@ class HacksSample extends Ac_Hacks {
 	
 }
 
-?>

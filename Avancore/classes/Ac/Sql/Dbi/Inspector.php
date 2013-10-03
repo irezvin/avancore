@@ -136,4 +136,3 @@ class Ac_Sql_Dbi_Inspector {
     
 }
 
-?>

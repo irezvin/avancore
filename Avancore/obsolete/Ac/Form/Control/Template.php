@@ -84,4 +84,3 @@ class Ac_Form_Control_Template extends Ac_Legacy_Template_Html {
     
 }
 
-?>

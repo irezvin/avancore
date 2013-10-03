@@ -30,4 +30,3 @@ class Ac_Sql_Dbi_Index extends Ac_Sql_Dbi_Object {
     
 }
 
-?>

@@ -595,4 +595,3 @@ class Ac_Model_Collection {
         
 }
 
-?>

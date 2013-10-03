@@ -135,4 +135,3 @@ class Ac_Admin_Datalink {
     
 }
 
-?>

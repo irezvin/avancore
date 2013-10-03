@@ -71,4 +71,3 @@ class Ac_Upload_Storage {
     
 }
 
-?>

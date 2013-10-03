@@ -88,4 +88,3 @@ class Ac_Sql_Filter_Equals extends Ac_Sql_Filter {
     }
     
 }
-?>

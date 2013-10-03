@@ -29,4 +29,3 @@ class Ac_Sql_Order_Simple extends Ac_Sql_Order {
     
 }
 
-?>

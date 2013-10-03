@@ -93,4 +93,3 @@ class Ac_Sql_Filter_Custom extends Ac_Sql_Filter {
     
 }
 
-?>

@@ -101,4 +101,3 @@ class Ac_Form_Control_Template_Autocomplete extends Ac_Form_Control_Template {
     
 }
 
-?>

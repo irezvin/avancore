@@ -49,4 +49,3 @@ class Ac_Sql_Dbi_Inspector_MySql5 extends Ac_Sql_Dbi_Inspector {
 
 }
 
-?>

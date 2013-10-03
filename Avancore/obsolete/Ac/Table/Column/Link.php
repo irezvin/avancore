@@ -91,4 +91,3 @@ class Ac_Table_Column_Link extends Ac_Table_Column {
     }
     
 }
-?>

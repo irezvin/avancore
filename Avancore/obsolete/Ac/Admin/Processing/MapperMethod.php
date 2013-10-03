@@ -19,4 +19,3 @@ class Ac_Admin_Processing_MapperMethod extends Ac_Admin_Processing {
     
 }
 
-?>

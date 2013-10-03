@@ -49,4 +49,3 @@ class Ac_Legacy_Adapter_Native extends Ac_Legacy_Adapter {
     
 }
 
-?>

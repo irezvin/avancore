@@ -24,4 +24,3 @@ class Ac_Admin_Processing_Method extends Ac_Admin_Processing {
     }
 }
 
-?>

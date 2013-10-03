@@ -211,4 +211,3 @@ class Ac_Upload_Manager {
     
 }
 
-?>

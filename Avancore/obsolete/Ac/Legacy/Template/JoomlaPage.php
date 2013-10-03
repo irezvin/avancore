@@ -102,4 +102,3 @@ class Ac_Legacy_Template_JoomlaPage extends Ac_Legacy_Template_Html {
     
 }
 
-?>

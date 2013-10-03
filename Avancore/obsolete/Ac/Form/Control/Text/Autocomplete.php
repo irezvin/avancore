@@ -120,4 +120,3 @@ class Ac_Form_Control_Text_Autocomplete extends Ac_Form_Control_Text {
     
 }
 
-?>

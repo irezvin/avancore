@@ -27,4 +27,3 @@ class Ac_Legacy_Session_Native extends Ac_Legacy_Session {
     
 }
 
-?>

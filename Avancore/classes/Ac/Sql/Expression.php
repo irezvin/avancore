@@ -29,4 +29,3 @@ class Ac_Sql_Expression implements Ac_I_Sql_Expression {
     
 }
 
-?>

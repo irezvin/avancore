@@ -84,4 +84,3 @@ class Ac_Legacy_Adapter_Joomla extends Ac_Legacy_Adapter {
     
 }
 
-?>

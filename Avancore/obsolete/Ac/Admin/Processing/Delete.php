@@ -17,4 +17,3 @@ class Ac_Admin_Processing_Delete extends Ac_Admin_Processing {
     }
 }
 
-?>

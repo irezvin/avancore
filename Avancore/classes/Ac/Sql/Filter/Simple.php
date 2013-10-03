@@ -32,4 +32,3 @@ class Ac_Sql_Filter_Simple extends Ac_Sql_Filter {
     
 }
 
-?>
