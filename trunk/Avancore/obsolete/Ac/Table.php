@@ -228,4 +228,3 @@ class Ac_Table {
     }
 }
 
-?>

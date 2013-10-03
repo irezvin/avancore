@@ -255,4 +255,3 @@ class Ac_Legacy_Database_Native extends Ac_Legacy_Database {
 }
 
 
-?>

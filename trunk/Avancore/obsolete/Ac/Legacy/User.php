@@ -8,4 +8,3 @@ class Ac_Legacy_User {
     
 }
 
-?>

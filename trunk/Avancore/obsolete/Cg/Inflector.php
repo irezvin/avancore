@@ -148,4 +148,3 @@ class Cg_Inflector {
     
 }
 
-?>

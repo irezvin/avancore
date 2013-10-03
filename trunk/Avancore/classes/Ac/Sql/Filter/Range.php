@@ -135,4 +135,3 @@ class Ac_Sql_Filter_Range extends Ac_Sql_Filter {
     
 }
 
-?>

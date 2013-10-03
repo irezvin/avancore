@@ -72,4 +72,3 @@ class Ac_Form_Control_Toggle extends Ac_Form_Control {
     
 }
 
-?>

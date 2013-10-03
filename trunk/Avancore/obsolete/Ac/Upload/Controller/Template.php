@@ -201,4 +201,3 @@ class Ac_Upload_Controller_Template extends Ac_Legacy_Template_Html {
         
 }
 
-?>

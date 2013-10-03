@@ -101,4 +101,3 @@ class Ac_Form_Control_Date extends Ac_Form_Control {
     
 }
 
-?>

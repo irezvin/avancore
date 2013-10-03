@@ -475,4 +475,3 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     
 }
 
-?>

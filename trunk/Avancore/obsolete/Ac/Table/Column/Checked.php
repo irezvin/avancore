@@ -76,4 +76,3 @@ class Ac_Table_Column_Checked extends Ac_Table_Column {
     }
 }
 
-?>

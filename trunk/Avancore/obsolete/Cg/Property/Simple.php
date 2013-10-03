@@ -247,4 +247,3 @@ class Cg_Property_Simple extends Cg_Property {
     
 }
 
-?>

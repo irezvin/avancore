@@ -508,4 +508,3 @@ class Ac_Legacy_Database {
 	
 }
 
-?>

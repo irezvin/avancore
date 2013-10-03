@@ -46,4 +46,3 @@ class Ac_Model_Values_Files extends Ac_Model_Values {
         
 }
 
-?>

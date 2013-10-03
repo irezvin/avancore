@@ -507,4 +507,3 @@ class Cg_Domain {
     
 }
 
-?>

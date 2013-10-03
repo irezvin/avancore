@@ -161,4 +161,3 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
     
 }
 
-?>

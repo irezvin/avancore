@@ -60,4 +60,3 @@ class Ac_Sql_Filter_String extends Ac_Sql_Filter_Equals {
     }
     
 }
-?>

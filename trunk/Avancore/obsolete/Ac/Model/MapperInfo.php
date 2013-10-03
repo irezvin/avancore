@@ -46,4 +46,3 @@ class Ac_Model_MapperInfo {
     
 }
 
-?>

@@ -331,4 +331,3 @@ class Ac_Model_DateTime {
     
 }
 
-?>

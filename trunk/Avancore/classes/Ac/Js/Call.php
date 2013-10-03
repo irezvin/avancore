@@ -32,4 +32,3 @@ class Ac_Js_Call implements Ac_I_Jsable {
     
 }
 
-?>

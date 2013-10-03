@@ -93,4 +93,3 @@ class Cg_Template_Assoc_Strategy_Many extends Cg_Template_Assoc_Strategy {
     
 }
 
-?>

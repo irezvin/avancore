@@ -24,4 +24,3 @@ class Ac_Form_Control_Table extends Ac_Form_Control {
     
 }
 
-?>

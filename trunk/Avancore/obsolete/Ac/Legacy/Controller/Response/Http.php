@@ -45,4 +45,3 @@ class Ac_Legacy_Controller_Response_Http extends Ac_Legacy_Controller_Response {
     
 }
 
-?>

@@ -72,4 +72,3 @@ class Cg_Template_Assoc_Strategy_One extends Cg_Template_Assoc_Strategy {
     
 }
 
-?>

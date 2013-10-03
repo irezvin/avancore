@@ -141,4 +141,3 @@ abstract class Cg_Util {
     
 }
 
-?>

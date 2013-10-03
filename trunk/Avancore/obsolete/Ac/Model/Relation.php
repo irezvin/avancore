@@ -1201,4 +1201,3 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     
 }
 
-?>

@@ -90,4 +90,3 @@ class Ac_Image_Processor extends Ac_Prototyped {
     
 }
 
-?>

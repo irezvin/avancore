@@ -26,4 +26,3 @@ class Ac_Form_Control_Group extends Ac_Form_Control_Composite {
         
 }
 
-?>

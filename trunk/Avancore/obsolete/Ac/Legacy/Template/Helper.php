@@ -10,4 +10,3 @@ class Ac_Legacy_Template_Helper {
         $this->template = $template;
     }
 }
-?>

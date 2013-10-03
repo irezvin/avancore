@@ -38,4 +38,3 @@ class Ac_Admin_Column extends Ac_Table_Column {
     
 }
 
-?>

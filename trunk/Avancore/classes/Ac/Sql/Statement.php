@@ -267,4 +267,3 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
     
 }
 
-?>

@@ -62,4 +62,3 @@ class Ac_Image_Processor_Gd extends Ac_Image_Processor {
     
 }
 
-?>

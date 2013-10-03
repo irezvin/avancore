@@ -623,4 +623,3 @@ class Ac_Form_Helper {
     
 }
 
-?>

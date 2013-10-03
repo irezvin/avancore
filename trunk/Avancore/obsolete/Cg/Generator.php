@@ -374,4 +374,3 @@ class Cg_Generator {
     
 }
 
-?>

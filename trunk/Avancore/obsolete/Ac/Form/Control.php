@@ -1076,4 +1076,3 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
 }
 
-?>

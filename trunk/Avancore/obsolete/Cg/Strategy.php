@@ -171,4 +171,3 @@ class Cg_Strategy {
     
 }
 
-?>

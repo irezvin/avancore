@@ -72,4 +72,3 @@ class Ac_Table_Column_SaveOrder extends Ac_Table_Column {
         return $res;
     }
 }
-?>

@@ -311,4 +311,3 @@ class Ac_Admin_Pagination extends Ac_Legacy_Controller {
     
 }
 
-?>

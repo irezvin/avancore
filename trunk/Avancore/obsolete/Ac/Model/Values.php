@@ -409,4 +409,3 @@ class Ac_Model_Values {
     
 }
 
-?>
