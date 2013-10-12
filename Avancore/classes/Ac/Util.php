@@ -920,6 +920,16 @@ abstract class Ac_Util {
         return $res;
     }
     
+    static function getClassConstants($class, $prefix = false) {
+        $r = new ReflectionClass($class);
+        $res = $r->getConstants();
+        if ($prefix !== false) {
+            $l = strlen($prefix);
+            foreach ($res as $k => $v) if (strncmp($k, $prefix, $l)) unset($res[$k]);
+        }
+        return $res;
+    }
+    
     /**
      * Converts array(array('foo' => 'a'), array('foo' => 'b')) into array('a' => array('foo' => 'a'), 'b' => array('foo' => 'b'))
      * 

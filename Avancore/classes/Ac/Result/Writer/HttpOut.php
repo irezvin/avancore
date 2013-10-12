@@ -27,6 +27,11 @@ class Ac_Result_Writer_HttpOut extends Ac_Result_Writer_WithCharset {
         if ($r instanceof Ac_Result_Http_Abstract && $e) {
             $e->acceptHeaders($r->getHeaders()->getItems());
         }
+        if ($r instanceof Ac_Result_Http && $e) {
+            if (($c = $r->getStatusCode() !== false)) {
+                $e->acceptHttpStatusCode($r->getStatusCode(), $r->getReasonPhrase());
+            }
+        }
         $r->echoContent();
         if ($e) $e->finishOutput();
     }

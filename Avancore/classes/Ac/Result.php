@@ -339,6 +339,9 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
     }   
     
     function echoContent() {
+        if (func_num_args() > 0) // simple check to help developer
+            trigger_error (__METHOD__.": this method isn\'t supposed to receive any args and echo's result content into output stream. "
+                . "Weren't you intended to ".__CLASS__."::put(\$contnent)?", E_USER_NOTICE);
         echo $this->getContent();
     }
     

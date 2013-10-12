@@ -16,6 +16,8 @@ interface Ac_I_Response_Environment {
     
     function acceptResponseText($text);
     
+    function acceptHttpStatusCode($statusCode, $reasonPhrase = false);
+    
     function finishOutput();
     
 }

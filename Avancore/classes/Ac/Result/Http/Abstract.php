@@ -12,7 +12,7 @@ abstract class Ac_Result_Http_Abstract extends Ac_Result implements Ac_I_Result_
     protected $charsetUsage = Ac_I_Result_WithCharset::CHARSET_CONVERT;
     
     /**
-     * @return Ac_Result_Placeholder
+     * @return Ac_Result_Placeholder_Headers
      */
     function getHeaders() {
         return $this->getPlaceholder('headers');
@@ -39,7 +39,7 @@ abstract class Ac_Result_Http_Abstract extends Ac_Result implements Ac_I_Result_
     
     protected function doGetDefaultPlaceholders() {
         return array(
-            'headers' => array('class' => 'Ac_Result_Placeholder')
+            'headers' => array('class' => 'Ac_Result_Placeholder_Headers')
         );
     }
 
@@ -75,7 +75,7 @@ abstract class Ac_Result_Http_Abstract extends Ac_Result implements Ac_I_Result_
             if (strlen($this->charset)) $cts .= '; charset='.$this->charset;
             $this->headers[] = 'Content-Type: '.$cts;
         }
-    }
+    }    
     
     
 }
