@@ -822,4 +822,77 @@ EOD
         
     }
     
+    function testHeaders() {
+        $p = new Ac_Result_Placeholder_Headers();
+        $p[] = "Content-type: text/plain";
+        $p[] = "Foo: bar";
+        $p[] = "Another: value";
+        $p[] = "aNother: value2";
+        $p[] = "badheader";
+        if (!$this->assertEqual($h = $p->getHeaders(), array(
+            'content-type' => array(0 => 'text/plain'),
+            'foo' => array(1 => 'bar'),
+            'another' => array(2 => 'value', 3 => 'value2'),
+            '' => array(4 => 'badheader'),
+        ))) var_dump($h);
+        if (!$this->assertEqual($h = $p->getHeaders('content-type'), array(
+            0 => 'text/plain',
+        ))) var_dump($h);
+        if (!$this->assertEqual($h = $p->getHeaders('n0ne}{i5t3nt'), array(
+        ))) var_dump($h);
+        $this->assertEqual(
+            $p->replaceHeader('content-type: text/html'),
+            array(0 => 'text/plain')
+        );
+        $this->assertEqual(array_values($p->getHeaders('content-type')), array('text/html'));
+        $ex = null;
+        try {
+            $p->replaceHeader(array('foobar'));
+        } catch (Ac_E_InvalidCall $ex) {
+        }
+        $this->assertNotNull($ex);
+        $p->replaceHeader(array('v3', 'v4'), 'anoTHeR');
+        $this->assertEqual(array_values($p->getHeaders('another')), array(
+           'v3', 'v4'
+        ));
+        $p->setHeaders(array('foo' => 'baz', 'content-type: image/jpeg', 'a' => array('b', 'c')));
+        $this->assertEqual($p->getHeaders(), array(
+            'foo' => array(0 => 'baz'),
+            'content-type' => array(1 => 'image/jpeg'),
+            'a' => array(2 => 'b', 3 => 'c')
+        ));
+    }
+    
+    function testHttpStatus() {
+        $h = new Ac_Result_Http();
+        $h->setStatusCode(404, "not found");
+        $this->assertEqual($h->getReasonPhrase(), "not found");
+        $d = new Ac_Response_Environment_Dummy();
+        Ac_Response_Environment::setDefault($d);
+        $h->write();
+        $this->assertEqual($d->httpStatus, "404 not found");
+    }
+    
+    function testRedirect() {
+        $h = new Ac_Result_Redirect();
+        $h->setUrl('http://example.com', Ac_Result_Redirect::REDIR_PERMANENT);
+        $d = new Ac_Response_Environment_Dummy();
+        Ac_Response_Environment::setDefault($d);
+        $h->write();
+        $this->assertEqual($d->headers, array('location: http://example.com'));
+        $this->assertEqual($d->httpStatus, '301 Moved Permanently');
+        
+        $h = new Ac_Result_Redirect();
+        $d = new Ac_Response_Environment_Dummy();
+        Ac_Response_Environment::setDefault($d);
+        $h->setUrl('http://example.com/another/page', Ac_Result_Redirect::REDIR_PERMANENT);
+        $h2 = new Ac_Result_Html();
+        $h2->put('Something');
+        $h2->put($h);
+        $h2->write();
+        $this->assertEqual($d->headers, array('location: http://example.com/another/page'));
+        $this->assertEqual($d->httpStatus, '301 Moved Permanently');
+    }
+        
+    
 }

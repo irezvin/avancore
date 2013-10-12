@@ -16,6 +16,8 @@ class Ac_Response_Environment_Dummy implements Ac_I_Response_Environment {
     
     var $outputFinished = false;
     
+    var $httpStatus = false;
+    
     function begin() {
         foreach (get_class_vars(get_class($this)) as $k => $v) 
             $this->$k = $v;
@@ -51,6 +53,11 @@ class Ac_Response_Environment_Dummy implements Ac_I_Response_Environment {
         if (strlen($buf = ob_get_clean())) {
             $this->responseText .= $buf;
         }
+    }
+    
+    function acceptHttpStatusCode($statusCode, $reasonPhrase = false) {
+        $this->httpStatus = $statusCode;
+        if (strlen($reasonPhrase)) $this->httpStatus .= " ".$reasonPhrase;
     }
     
 }

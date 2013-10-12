@@ -54,6 +54,19 @@ class Ac_Response_Environment_Native implements Ac_I_Response_Environment, Ac_I_
         session_destroy();
     }
     
+    
+    function acceptHttpStatusCode($statusCode, $reasonPhrase = false) {
+        $s = $statusCode;
+        if (strlen($reasonPhrase)) $s .= " ".$reasonPhrase;
+        $sapi_type = php_sapi_name();
+        if (substr($sapi_type, 0, 3) == 'cgi') {
+            header("Status: ".$s, true, $statusCode);
+        } else {
+            header($_SERVER['SERVER_PROTOCOL']." ".$s, true, $statusCode);
+        }
+    }
+    
+    
     function acceptResponseText($text) {
         echo $text;
     }

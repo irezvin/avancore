@@ -63,4 +63,66 @@ class Ac_Test_Form extends Ac_Test_Base {
         $person->_checked = true;
     }
     
+    function testCreateForm() {
+        $p = Sample::getInstance()->getSamplePersonMapper()->factory();
+        $tf = $this->createTestForm1(array('model' => $p));
+        $ctx = $tf->getContext();
+        $ctx->updateData(array('name' => 'Name that user has entered'));
+        var_dump($tf->getControl('name')->getValue());
+        $p->name = 'New name';
+        var_dump($tf->getControl('name')->getValue());
+        $tf->updateFromModel();
+        var_dump($tf->getControl('name')->getValue());
+    }
+    
+    /**
+     * @return Ac_Form
+     */
+    function createTestForm1(array $prototypeExtra = array()) {
+        $f1 = new Ac_Form(
+            null,
+            Ac_Util::m(array(
+                'controls' => array(
+                    'tabs' => array(
+                        'class' => 'Ac_Form_Control_Tabs',
+                        'caption' => '',
+                        'model' => null,
+                        'controls' => array(
+                            'general' => array(
+                            ),
+                            'intimate' => array(
+                            ),
+                        ),
+                    ),
+                    'name' => array(
+                        'class' => 'Ac_Form_Control_Text',
+                        'displayParent' => '/tabs/general',
+                    ),
+                    'gender' => array(
+                        'class' => 'Ac_Form_Control_List',
+                        'displayParent' => '../tabs/intimate',
+                    ),
+                    'birthDate' => array(
+                        'class' => 'Ac_Form_Control_Date',
+                        'displayParent' => '/tabs/general',
+                    ),
+                    'sexualOrientationId' => array(
+                        'class' => 'Ac_Form_Control_List',
+                        'displayParent' => '../tabs/intimate',
+                        'displayOrder' => 2,
+                    ),
+                    'isSingle' => array(
+                        'class' => 'Ac_Form_Control_Toggle',
+                        'displayParent' => '../tabs/intimate',
+                        'displayOrder' => 1,
+                    ),
+                    'submit' => array(
+                        'class' => 'Ac_Form_Control_Button',
+                    ),
+                )
+            ), $prototypeExtra)
+        );
+        return $f1;
+    }
+    
 }
