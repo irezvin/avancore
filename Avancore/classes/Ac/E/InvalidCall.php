@@ -36,9 +36,15 @@ class Ac_E_InvalidCall extends Exception {
     /**
      * @return Ac_E_InvalidCall 
      */
-    static function outOfConst($paramName, $value, array $allowedValues, $class = '') {
+    static function outOfConst($paramName, $value, $allowedValues, $class = '') {
         $value = self::toString($value);
-        if (strlen($class)) foreach ($allowedValues as & $value) $value = $class.'::'.$value;
+        if (!is_array($allowedValues)) {
+            if (strlen($class) && class_exists($class, false))
+                $allowedValues = Ac_Util::getClassConstants ($class, $allowedValues);
+            else 
+                $allowedValues = array();
+        }
+        if (strlen($class)) foreach ($allowedValues as $aValue) $value = $class.'::'.$aValue;
         return new Ac_E_InvalidCall("Invalid \${$paramName} value '{$value}'; allowed values are ".implode(', ', $allowedValues));
     }
     
