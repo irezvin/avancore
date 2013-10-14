@@ -185,10 +185,12 @@ class Cg_Generator {
     function getDb() {
         if ($this->_db === false) {
             if ($this->dbPrototype === false) {
+                $dsnExtra = "";
+                if (isset($this->otherDbOptions['charset']) && strlen($this->otherDbOptions['charset'])) $dsnExtra .= ";charset=".$this->otherDbOptions['charset'];
                 $dbPrototype = array(
                     'class' => 'Ac_Sql_Db_Pdo',
                     'pdo' => array(
-                        'dsn' => 'mysql:host='.$this->host,
+                        'dsn' => 'mysql:host='.$this->host.$dsnExtra,
                         'username' => $this->user,
                         'password' => $this->password,
                         'driver_options' => array(
