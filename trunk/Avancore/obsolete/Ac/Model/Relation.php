@@ -454,7 +454,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $fl2 = $this->_fieldLinksRev;
         } else {
             $fl1 = $this->_fieldLinksRev;
-            $fl1 = $this->_fieldLinksRev2;
+            $fl2 = $this->_fieldLinksRev2;
         }
         
         return $this->_loadSrcOrDest ($destData, $defaultValue, $this->destVarName, $this->srcVarName, $ignoreLoaded, $biDirectional, 
