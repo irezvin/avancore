@@ -70,14 +70,14 @@ abstract class Ac_StringObject {
     }
     
     /**
-     * Returns $objects array where each Ac_I_StringOBjectWrapper() is replaced with its getHeloObject()
+     * Returns $objects array where each Ac_I_StringObject_Wrapper() is replaced with its getHeloObject()
      * 
      * @param array $objects
      */
     static function unwrap(array $objects) {
         $res = array();
         foreach ($objects as $k => $v) {
-            if (is_object($v) && $v instanceof Ac_I_StringObjectWrapper) $v = $v->getHeldObject();
+            if (is_object($v) && $v instanceof Ac_I_StringObject_Wrapper) $v = $v->getHeldObject();
             $res[$k] = $v;
         }
         return $res;
@@ -146,11 +146,11 @@ abstract class Ac_StringObject {
         return $res;
     }
     
-    static function onContainerSleep(Ac_I_StringObjectContainer $container) {
+    static function onContainerSleep(Ac_I_StringObject_Container $container) {
         self::registerContainerStrings($container);
     }
     
-    static function registerContainerStrings(Ac_I_StringObjectContainer $container) {
+    static function registerContainerStrings(Ac_I_StringObject_Container $container) {
         foreach ($container->getStringBuffers() as $string)
             $container->registerStringObjects (self::getObjects ($string, true));
     }

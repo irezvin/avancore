@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_I_StringObject {
+class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac_I_StringObject {
 
     const OVERRIDE_NONE = 0;
     const OVERRIDE_PARENT = 1;
@@ -384,12 +384,12 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
         }
     }
     
-    function replaceObjectInContent(Ac_I_StringObject $stringObject, $content) {
+    function replaceObjectInContent(Ac_I_StringObject $stringObject, $newContent) {
         if (($pos = strpos($this->content, ''.$stringObject)) === false) {
             throw new Exception("String object {$stringObject} is not in the content");
         } else {
             $length = strlen(''.$stringObject);
-            $this->content = substr($this->content, 0, $pos).$content.substr($this->content, $pos + $length);
+            $this->content = substr($this->content, 0, $pos).$newContent.substr($this->content, $pos + $length);
             $this->touchStringObjects();
         }
     }
@@ -425,7 +425,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObjectContainer, Ac_
         return $this->debugData;
     }
     
-    // ---- Ac_I_StringObjectContainer ----
+    // ---- Ac_I_StringObject_Container ----
     
     function getStringBuffers() {
         return array('content' => $this->content);
