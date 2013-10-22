@@ -893,6 +893,71 @@ EOD
         $this->assertEqual($d->headers, array('location: http://example.com/another/page'));
         $this->assertEqual($d->httpStatus, '301 Moved Permanently');
     }
+    
+    function testDeferredsAndStringObjects() {
+        require_once(dirname(__FILE__).'/assets/deferredsAndStringObjects.php');
+        
+        $r = new Ac_Result;
+        $r->put(new ExampleDeferred('1 ', '2'));
+        $r->put("\n");
+        $r->put(new ExampleDeferred('2 ', '2'));
+        $r->put("\n");
+        $r->put(new ExampleDeferred('3 ', '2'), true);
+        
+        $tmp = new RStage();
+        $tmp->setRoot($r);
+        $tmp->renderDeferreds();
+        
+        if (!$this->assertEqual($rendered = $r->writeAndReturn(), "1 2 3\n2 2 3\n3 2 3")) var_dump($rendered);
+
+        // tricky part - nested deferreds
+        
+        $sub1 = new ExampleDeferred('2.1', ' 3');
+        $sub2 = new ExampleDeferred('3.1', ',');
+        $sub3 = new ExampleDeferred('3.2', ')');
+        
+        $r = new Ac_Result;
+        $r->put(new ExampleDeferred('1 ', '2'));
+        $r->put("\n");
+        $r->put(new ExampleDeferred('2 ('.$sub1, ')'));
+        $r->put("\n");
+        $r->put(new ExampleDeferred('3 ('.$sub2.' '.$sub3, ' 2'));
+        
+        $tmp = new RStage();
+        $tmp->setRoot($r);
+        $tmp->renderDeferreds();
+        
+        if (!$this->assertEqual($rendered = $r->writeAndReturn(), "1 2 3\n2 (2.1 3 3) 3\n3 (3.1, 3 3.2) 3 2 3")) var_dump($rendered);
+
+        // trickiest part - nested result with deferreds
+
+        $r1 = new Ac_Result;
+        $r1->put(new ExampleDeferred('1 ', '2'));
+        $r1->put("\n");
+        $r1->put(new ExampleDeferred('2 ', '2'));
+        $r1->put("\n");
+        $r1->put(new ExampleDeferred('3 ', '2'), true);
+        
+        $r1result = "1 2 3\n2 2 3\n3 2 3";
+
+        $r = new Ac_Result;
+        $r->put(new ExampleDeferred('1 ', '2'));
+        $r->put("\n");
+        $r->put(new ExampleDeferred($r1, ' 2'));
+        $r->put("\n");
+        $r->put(new ExampleDeferred('3 ', '2'), true);
+        
+        $tmp = new RStage();
+        $tmp->setRoot($r);
+        $tmp->renderDeferreds();
+        
+        if (!$this->assertEqual($rendered = $r->writeAndReturn(), "1 2 3\n{$r1result} 2 3\n3 2 3")) var_dump($rendered);
+        
+        // TODO: test rendered string objects
+        // TODO: test rendering for write 
+        // TODO: test for render-before-write
+        
+    }
         
     
 }
