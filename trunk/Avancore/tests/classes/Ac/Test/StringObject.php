@@ -189,7 +189,7 @@ class TestStringObject2 extends TestStringObject {
     
 }
 
-class TestStringContainer implements Ac_I_StringObjectContainer {
+class TestStringContainer implements Ac_I_StringObject_Container {
     
     var $buf1 = '';
     

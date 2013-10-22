@@ -1,6 +1,6 @@
 <?php
 
-class Ac_StringObject_Wrapper implements Ac_I_StringObjectWrapper {
+class Ac_StringObject_Wrapper implements Ac_I_StringObject_Wrapper {
     
     protected $heldObject = null;
     
