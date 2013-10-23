@@ -21,6 +21,20 @@ class ExampleDeferred extends Ac_Deferred {
     
 }
 
+class ExampleRendered {
+    
+    var $string;
+    
+    function __construct($string = 'someString') {
+        $this->string = $string;
+    }
+    
+    function __toString() {
+        return $this->string;
+    }
+    
+}
+
 class ExampleEvaluator extends Ac_Prototyped implements Ac_I_Deferred_Evaluator {
     
     var $secondPart = ' 2';
@@ -39,14 +53,6 @@ class ExampleEvaluator extends Ac_Prototyped implements Ac_I_Deferred_Evaluator 
             $res[$k] = $firstPart . $this->secondPart . self::$thirdPart;
         }
         return $res;
-    }
-    
-}
-
-class RStage extends Ac_Result_Stage_Render {
-    
-    function expose() {
-        return get_object_vars($this);
     }
     
 }

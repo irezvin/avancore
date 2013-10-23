@@ -32,7 +32,7 @@ class Ac_Deferred implements Ac_I_Deferred_ResultAware, Ac_I_Deferred_Substitute
     }
     
     function shouldEvaluate(Ac_Result_Stage_Morph $stage) {
-        if ($this->evaluateBeforeStore) return $stage->getIsBeforeStore();
+        return $stage->getIsBeforeStore()? $this->evaluateBeforeStore : true;
     }
     
     /**

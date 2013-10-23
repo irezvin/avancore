@@ -13,7 +13,7 @@ class Ac_Result_Stage_Render extends Ac_Result_Stage_Morph {
     /**
      * @var bool
      */
-    protected $renderStrings = false;
+    protected $renderStrings = true;
 
     /**
      * @param bool $renderStrings
@@ -43,13 +43,13 @@ class Ac_Result_Stage_Render extends Ac_Result_Stage_Morph {
     
     protected function processItem($item, Ac_Result $result, $property, $offset) {
         $shouldCollect = false;
-        if ($item instanceof Ac_I_Deferred_ResultAware && $item->shouldEvaluate($this)) {
-            $shouldCollect = true;
+        if ($item instanceof Ac_I_Deferred_ResultAware) {
+            $shouldCollect = $item->shouldEvaluate($this);
         } elseif ($item instanceof Ac_I_Deferred) {
             $shouldCollect = true;
         } elseif ($item instanceof Ac_I_StringObject_WithRender) {
             if ($this->renderStrings) {
-                $result->replaceObjectInContent($stringObject, $item->getRenderedString());
+                $result->replaceObjectInContent($item, $item->getRenderedString());
             }
         }
         if ($shouldCollect) {

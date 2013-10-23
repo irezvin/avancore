@@ -126,12 +126,16 @@ class Ac_Result_Stage extends Ac_Prototyped {
      */
     protected $position = false;
     
+    protected $positionIsSet = false;
+    
     protected $noAdvance = false;
  
     protected function traverse($classes = null) {
         if (is_null($classes)) $classes = $this->defaultTraverseClasses;
         
-        $this->resetTraversal($classes);
+        if (!$this->positionIsSet) $this->resetTraversal($classes);
+            else $this->positionIsSet = false;
+            
         while ($this->traverseNext()) {
         }
     }
@@ -354,5 +358,12 @@ class Ac_Result_Stage extends Ac_Prototyped {
         }
         return $this->application;
     }    
+    
+    protected function startAt(Ac_Result_Stage $other) {
+        foreach (array('root', 'current', 'parent', 'stack', 'isActive', 'isAscend') as $p)
+            $this->$p = $other->$p;
+        $this->position = clone $other->position;
+        $this->positionIsSet = true;
+    }
     
 }
