@@ -898,13 +898,14 @@ EOD
         require_once(dirname(__FILE__).'/assets/deferredsAndStringObjects.php');
         
         $r = new Ac_Result;
+        
         $r->put(new ExampleDeferred('1 ', '2'));
         $r->put("\n");
         $r->put(new ExampleDeferred('2 ', '2'));
         $r->put("\n");
         $r->put(new ExampleDeferred('3 ', '2'), true);
-        
-        $tmp = new RStage();
+
+        $tmp = new Ac_Result_Stage_Render();
         $tmp->setRoot($r);
         $tmp->renderDeferreds();
         
@@ -917,13 +918,14 @@ EOD
         $sub3 = new ExampleDeferred('3.2', ')');
         
         $r = new Ac_Result;
+        
         $r->put(new ExampleDeferred('1 ', '2'));
         $r->put("\n");
         $r->put(new ExampleDeferred('2 ('.$sub1, ')'));
         $r->put("\n");
         $r->put(new ExampleDeferred('3 ('.$sub2.' '.$sub3, ' 2'));
         
-        $tmp = new RStage();
+        $tmp = new Ac_Result_Stage_Render();
         $tmp->setRoot($r);
         $tmp->renderDeferreds();
         
@@ -946,16 +948,45 @@ EOD
         $r->put(new ExampleDeferred($r1, ' 2'));
         $r->put("\n");
         $r->put(new ExampleDeferred('3 ', '2'), true);
+
+        $r2 = new Ac_Result;
+        $r2->put('before ');
+        $r2->put($r);
         
-        $tmp = new RStage();
+        $r3 = new Ac_Result;
+        $r3->put(' after');
+        $r2->put($r3);
+        
+        if (!$this->assertEqual($rendered = $r2->writeAndReturn(), "before 1 2 3\n{$r1result} 2 3\n3 2 3 after")) var_dump($rendered);
+        
+        // test rendering of string objects
+        
+        $r = new Ac_Result;
+        $r->put(new Ac_StringObject_Render(new ExampleRendered('aText')));
+        $r->put(' ');
+        $r->put(new ExampleDeferred(new Ac_StringObject_Render(new ExampleRendered('aText2')), ' 2'));
+        
+        if (!$this->assertEqual($rendered = $r->writeAndReturn(), "aText aText2 2 3")) var_dump($rendered);
+        
+        // test rendering before store
+
+        $r = new Ac_Result;
+        $r->put($a = new ExampleDeferred('1 ', '2'));
+        $r->put("\n");
+        $r->put(new ExampleDeferred('2 ', '2', true));
+        $r->put("\n");
+        $r->put($b = new ExampleDeferred('3 ', '2'));
+        
+        $tmp = new Ac_Result_Stage_Render();
+        $tmp->setIsBeforeStore(true);
         $tmp->setRoot($r);
         $tmp->renderDeferreds();
         
-        if (!$this->assertEqual($rendered = $r->writeAndReturn(), "1 2 3\n{$r1result} 2 3\n3 2 3")) var_dump($rendered);
+        $s = new Ac_Result_Stage_Write(array('doRender' => false));
         
-        // TODO: test rendered string objects
-        // TODO: test rendering for write 
-        // TODO: test for render-before-write
+        if (!$this->assertEqual($rendered = $r->writeAndReturn($s), "$a\n2 2 3\n$b")) var_dump($rendered);
+        
+        if (!$this->assertEqual($rendered = $r->writeAndReturn(), "1 2 3\n2 2 3\n3 2 3")) var_dump($rendered);
         
     }
         
