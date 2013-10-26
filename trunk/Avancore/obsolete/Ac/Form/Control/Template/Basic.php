@@ -582,6 +582,11 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         */
         $items = array();
         
+        if ($control->type == 'chosen') {
+            $control->autoId = true;
+            $controlId = $control->getId();
+        }
+        
         if (/*!$control->getMultiSelect() &&*/ !$control->isReadOnly() && (($cap = $control->getDummyCaption()) !== false)) {
             $items[] = array('value' => (string) $control->getDummyValue(), 'caption' => $cap, 'selected' => $control->isItemSelected(''));
         }
@@ -591,9 +596,26 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         }
         
         if ($control->isReadOnly()) $this->_showReadOnlyList($control, $items);
-        elseif ($control->type == 'selectList') $this->_showSelectListElement($control, $items);
+        elseif ($control->type == 'selectList' || $control->type == 'chosen') $this->_showSelectListElement($control, $items);
             else $this->_showSelectListControls($control, $items);
             
+        if ($control->type == 'chosen') {
+            $r = Ac_Legacy_Controller_Response_Global::r();
+            $r->addAssetLibs(array(
+                '{JQUERY}',
+                '{AC}/vendor/chosen/chosen.min.css',
+                '{AC}/vendor/chosen/chosen.jquery.min.js',
+            ));
+            $options = new Ac_Js_Val(Ac_Util::m(array(
+                'disable_search_threshold' => 10,
+                'allow_single_select' => true
+            ), $control->chosenOptions));
+            echo new Ac_Js_Script("
+                jQuery(document).ready(function() {
+                    jQuery(".new Ac_Js_Val('#'.$controlId).").chosen({$options});
+                });
+            ");
+        }
     }
     
     /**

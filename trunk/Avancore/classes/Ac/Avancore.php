@@ -31,4 +31,13 @@ class Ac_Avancore extends Ac_Application {
         parent::doOnInitialize();
     }
     
+    function getDefaultAssetPlaceholders() {
+        $res = parent::getDefaultAssetPlaceholders();
+        Ac_Util::ms($res, array(
+            '{JQUERY}' => '{AC}/assets/vendor/jquery.min.js'
+        ));
+        return $res;
+    }
+    
+    
 }

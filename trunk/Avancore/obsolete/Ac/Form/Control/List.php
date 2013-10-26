@@ -24,6 +24,8 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
     
     var $templatePart = 'selectList';
     
+    var $chosenOptions = array();
+    
     var $_valuesProvider = false;
     
     var $_valuesProviderPrototype = false;
