@@ -69,6 +69,20 @@ class Ac_Util_Csv extends Ac_Prototyped {
         return $this->useHeader;
     }    
     
+    /**
+     * @param array|FALSE $header
+     * @throws type
+     */
+    function setHeader($header) {
+        if (!is_array($header) || $header === false) 
+            throw Ac_E_InvalidCall::wrongType ('header', $header, array('boolean (FALSE)', 'array'));
+        $this->header = $header;
+    }
+    
+    function getHeader() {
+        return $this->header;
+    }
+    
     function pushLine($line) {
         $data = $this->decodeLine($line, $this->prevLine);
         if ($data === false && $this->multiline) return;

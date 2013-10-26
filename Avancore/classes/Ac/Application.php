@@ -57,7 +57,7 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     /**
      * @var array
      */
-    protected $extraAssetPlaceholders = false;
+    protected $extraAssetPlaceholders = array();
     
     abstract function getAppClassFile();
     
