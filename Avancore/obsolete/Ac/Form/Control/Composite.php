@@ -286,7 +286,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
         $res = array();
         foreach($this->listControls() as $i) {
             $c = $this->getControl($i);
-            if ($c instanceof Ac_Form_Control_Composite) $res = array_merge($res, $c->findAllControls());
+            if ($c instanceof Ac_Form_Control_Composite) $res = array_merge($res, $c->findControlsRecursive());
             $res[] = $c;
         }
         return $res;

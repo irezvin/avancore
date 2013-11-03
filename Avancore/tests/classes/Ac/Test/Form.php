@@ -12,8 +12,20 @@ class Ac_Test_Form extends Ac_Test_Base {
                     'class' => 'Ac_Form_Control_ErrorList',
                     'hideErrorsShownByOtherControls' => false,
                 ),
-                'name' => array('class' => 'Ac_Form_Control_Text'),
-                'gender' => array('class' => 'Ac_Form_Control_List'),
+                'tabs' => array(
+                    'class' => 'Ac_Form_Control_Tabs',
+                    'controls' => array(
+                        'sheet1' => array(),
+                    ),
+                ),
+                'name' => array(
+                    'class' => 'Ac_Form_Control_Text', 
+                    'displayParent' => '../tabs/sheet1'
+                ),
+                'gender' => array(
+                    'class' => 'Ac_Form_Control_List', 
+                    'displayParent' => '../tabs/sheet1'
+                ),
             ),
             'model' => $person
         ));
@@ -54,9 +66,10 @@ class Ac_Test_Form extends Ac_Test_Base {
         $pres = $f->fetchPresentation(true);
         
         $invalid = false;
-        if (!$this->assertTrue(strpos($pres, $e['name']['foo']) === false)) $invalid = true;
-        if (!$this->assertTrue(strpos($pres, $e['gender']['bar']) === false)) $invalid = true;
-        if (!$this->assertTrue(strpos($pres, $e['invisible']['baz']) === false)) $invalid = true;
+        $issue = 'fetchPresentation(true) should return updated controls';
+        if (!$this->assertTrue(strpos($pres, $e['name']['foo']) === false, $issue)) $invalid = true;
+        if (!$this->assertTrue(strpos($pres, $e['gender']['bar']) === false, $issue)) $invalid = true;
+        if (!$this->assertTrue(strpos($pres, $e['invisible']['baz']) === false, $issue)) $invalid = true;
         if (!$this->assertTrue(strpos($pres, 'ErrorList') === false)) $invalid = true;
         if ($invalid) var_dump($pres);
         
