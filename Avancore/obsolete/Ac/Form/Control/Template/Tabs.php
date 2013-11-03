@@ -37,7 +37,7 @@ class Ac_Form_Control_Template_Tabs extends Ac_Form_Control_Template {
 ?>
     
         <div id="<?php $this->d($smId); ?>" <?php $this->attribs($controls[$i]->getSheetAttribs()); ?>>
-            <?php echo $controls[$i]->fetchPresentation(); ?>
+            <?php echo $controls[$i]->fetchPresentation(true); ?>
         </div>
 <?php } ?>
 

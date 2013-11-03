@@ -78,7 +78,7 @@ class Ac_Form_Control_Template_Placeholders extends Ac_Form_Control_Template_Bas
     
     function renderChildContainer(Ac_Form_Control $child, & $controlsById, $part = 'divWrapper') {
         $cid = $child->name;
-        $control = $child->fetchPresentation();
+        $control = $child->fetchPresentation(true);
         if ($child->showWrapper) $control = $this->fetch($part, array($child, $control));
         if (isset($controlsById[$cid])) unset($controlsById[$cid]);
         $res = strtr($this->controlWrapper, array(

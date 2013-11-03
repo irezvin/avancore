@@ -102,7 +102,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
     function utlShowSimpleControlsList ($controls, $wrap = null) {
         foreach (array_keys($controls) as $k) { $cl = $controls[$k];
 ?>
-            <?php echo $cl->fetchPresentation(false, $wrap); ?>
+            <?php echo $cl->fetchPresentation(true, $wrap); ?>
 <?php
         }
     }
@@ -110,7 +110,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
     function utlShowDivsList ($controls, $wrap = null) {
         foreach (array_keys($controls) as $k) { $cl = $controls[$k];
 ?>
-            <?php echo "<div>". $cl->fetchPresentation(false, $wrap)."</div>"; ?>
+            <?php echo "<div>". $cl->fetchPresentation(true, $wrap)."</div>"; ?>
 <?php
         }
     }
@@ -137,13 +137,13 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
                     echo $cl->fetchWithWrapper();
                 } else {
                     if (!is_array($trWrapperMethod)) {
-                        $this->$trWrapperMethod($cl, $cl->fetchPresentation(false, false), $cl->wrapperTemplateParam);
+                        $this->$trWrapperMethod($cl, $cl->fetchPresentation(true, false), $cl->wrapperTemplateParam);
                     } else {
-                        call_user_func($trWrapperMethod, $cl, $cl->fetchPresentation(false, false), $cl->wrapperTemplateParam);
+                        call_user_func($trWrapperMethod, $cl, $cl->fetchPresentation(true, false), $cl->wrapperTemplateParam);
                     }
                 }
             } else {
-                echo $cl->fetchPresentation(false, false);
+                echo $cl->fetchPresentation(true, false);
             }
         }
 ?>        
@@ -165,7 +165,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         }
         foreach (array_keys($controls) as $k) { $cl = $controls[$k];
 ?>
-            <?php echo $this->showTdWrapper($cl, $cl->fetchPresentation(false, false)); ?>
+            <?php echo $this->showTdWrapper($cl, $cl->fetchPresentation(true, false)); ?>
 <?php } ?>
 <?php if ($withTableTag) { ?>
 	</tr>
