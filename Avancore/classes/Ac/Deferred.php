@@ -80,5 +80,9 @@ class Ac_Deferred implements Ac_I_Deferred_ResultAware, Ac_I_Deferred_Substitute
         if (strlen($this->stringObjectMark)) Ac_StringObject::onClone($this);
     }
     
+    function __wakeup() {
+        Ac_StringObject::onWakeup($this);
+    }
+    
     
 }

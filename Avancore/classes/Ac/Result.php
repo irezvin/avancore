@@ -5,16 +5,17 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
     const OVERRIDE_NONE = 0;
     const OVERRIDE_PARENT = 1;
     const OVERRIDE_ALL = 2;
+    
+    const SERIALIZATION_NONE = 0;
+    const SERIALIZATION_INNER = 1;
+    const SERIALIZATION_OUTER = 2;
 
     protected $content = '';
-    
     
     protected $placeholders = false;
  
     protected $handlers = array();
 
-    
-        
     /**
      * @var string
      */
@@ -54,20 +55,15 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
      */
     protected $merged = false;
 
-    
-    
     protected $stringObjectsUpdated = false;
     
     protected $foundSubResults = false;
     
-    
     protected $stringObjectMark = false;
-    
-    
     
     protected $debugData = false;
     
-        
+    protected $serializationState = self::SERIALIZATION_NONE;
     
     function listPlaceholders($onlyUsed = false, $onlyDefault = false) {
         if (!is_array($this->placeholders)) $this->setPlaceholders(array());
@@ -184,10 +180,6 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
         return $this->handlers;
     }
 
-    
-    
-    
-    
     /**
      * @param string $targetPlaceholderId
      */
@@ -312,15 +304,33 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
     }
     
     function __sleep() {
+        
         // this will register string objects if needed
         $this->getStringObjects(); 
         
-        // serialize all properties by default
-        return array_keys(get_class_vars(get_class($this)));
+        if ($this->serializationState === self::SERIALIZATION_INNER) { // we already have been visited - just release the lock
+            
+            $this->serializationState = self::SERIALIZATION_NONE;
+            
+        } else { // this call comes from outermost result -- let's call Store stage
+            
+            $storeStage = new Ac_Result_Stage_Store(array('root' => $this));
+            $storeStage->prepareResultForStore();
+            $this->serializationState = self::SERIALIZATION_OUTER; // will be picked up on __wakeup
+            
+        }
+        
+        // SERIALIZATION all properties by default
+        return array_keys(get_object_vars($this));
     }
     
     function __wakeup() {
         Ac_StringObject::onWakeup($this);
+        if ($this->serializationState === self::SERIALIZATION_OUTER) {
+            $this->serializationState = self::SERIALIZATION_NONE;
+            $loadStage = new Ac_Result_Stage_Load(array('root' => $this));
+            $loadStage->processResultDuringWakeup();
+        }
     }
     
     /**
@@ -534,6 +544,10 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
         ob_start();
         $stage = $this->write($stage);
         return ob_get_clean();
+    }
+    
+    function notifyIsStored() {
+        $this->serializationState = self::SERIALIZATION_INNER;
     }
     
 }
