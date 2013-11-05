@@ -96,7 +96,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
                 if (is_callable($call = array($handler, $methodName)))
                     call_user_func_array($call, $args);
                 elseif (is_callable($call = array($handler, $methodName2)))
-                    call_user_func_array($call, $args);
+                    call_user_func_array($call, $args2);
             }
         }
     }

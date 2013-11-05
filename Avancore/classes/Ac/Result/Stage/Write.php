@@ -1,7 +1,7 @@
 <?php
 
 class Ac_Result_Stage_Write extends Ac_Result_Stage_Morph {
-    
+
     /**
      * @var bool
      */
@@ -11,25 +11,6 @@ class Ac_Result_Stage_Write extends Ac_Result_Stage_Morph {
      * @var Ac_Result
      */
     protected $rootTarget = null;
-    
-    /**
-     * @var Ac_Result_Stage_Render
-     */
-    protected $render = null;
-    
-    protected $defaultTraverseClasses = array ('Ac_Result', 'Ac_I_Deferred', 'Ac_I_StringObject_WithRender');
-    
-    protected $hasRendered = false;
-    
-    /**
-     * @var array
-     */
-    protected $renderStagePrototype = array();
-    
-    /**
-     * @var bool
-     */
-    protected $doRender = true;
     
     /**
      * @param bool $writeRoot
@@ -84,43 +65,12 @@ class Ac_Result_Stage_Write extends Ac_Result_Stage_Morph {
         parent::endItem($item);
         if ($item instanceof Ac_Result && (!$this->getCurrentProperty() || $this->getCurrentPropertyIsString())) {
             $this->writeOut($item);
-        } elseif (!$this->hasRendered && $this->doRender && ($item instanceof Ac_I_Deferred || $item instanceof Ac_I_StringObject_WithRender)) {
-            // let's initialize renderer only when we will encounter 
-            $this->render = Ac_Prototyped::factory($this->renderStagePrototype, 'Ac_Result_Stage_Render');
-            $this->hasRendered = true;
-            $this->render->startAt($this);
-            $this->render->renderDeferreds();
-        }
+        } else $this->renderIfNecessary ($item);
     }
 
     function write() {
         if ($this->isComplete) throw new Ac_E_InvalidUsage("write() already called; check with getIsComplete() first");
         $this->traverse();
     }
-    
-    /**
-     * @param bool $doRender
-     */
-    function setDoRender($doRender) {
-        $this->doRender = $doRender;
-    }
-
-    /**
-     * @return bool
-     */
-    function getDoRender() {
-        return $this->doRender;
-    }
-
-    function setRenderStagePrototype(array $renderStagePrototype) {
-        $this->renderStagePrototype = $renderStagePrototype;
-    }
-
-    /**
-     * @return array
-     */
-    function getRenderStagePrototype() {
-        return $this->renderStagePrototype;
-    }    
     
 }

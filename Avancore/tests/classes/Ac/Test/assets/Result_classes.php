@@ -1,5 +1,21 @@
 <?php
 
+class StringObjectCache extends Ac_StringObject {
+    
+    static function getStrings() {
+        return Ac_StringObject::$strings;
+    }
+    
+    static function setStrings(array $strings) {
+        Ac_StringObject::$strings = $strings;
+    }
+    
+    static function clearStrings() {
+        Ac_StringObject::$strings = array();
+    }
+    
+}
+
 class AllHandler implements Ac_I_Result_Handler_All {
 
     static $log = array();
@@ -20,10 +36,14 @@ class AllHandler implements Ac_I_Result_Handler_All {
     
     function handleDefault($event, $stage, $result) {
         $aa = func_get_args();
-        array_unshift($this->name, $a);
+        array_unshift($aa, $this->name);
         foreach ($aa as $k => $v) 
-            if (is_object($v) && $v instanceof Ac_Result) $aa[$k] = $v->getDebugData();
-        $this->log[] = implode('; ', $aa);
+            if (is_object($v)) {
+                if ($v instanceof Ac_Result) $aa[$k] = $v->getDebugData();
+                elseif (method_exists($v, '__toString')) $aa[$k] = ''.$v;
+                else $aa[$k] = get_class($v);
+            }
+        self::$log[] = implode('; ', $aa);
     }
     
 }
