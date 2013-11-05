@@ -989,6 +989,121 @@ EOD
         if (!$this->assertEqual($rendered = $r->writeAndReturn(), "1 2 3\n2 2 3\n3 2 3")) var_dump($rendered);
         
     }
+
+    /**
+     * @return Ac_Result
+     */
+    protected function getTestResultForLoadAndSave($hId = 'AllHandler', Ac_I_Result_Handler_All & $allHandler = null, $debugPrefix = 'a', $writeOnStore = false) {
         
+        require_once(dirname(__FILE__).'/assets/deferredsAndStringObjects.php');
+        
+        $r = new Ac_Result;
+        if (is_null($allHandler)) $allHandler = new AllHandler($hId);
+        $r->addHandler($allHandler, 'all');
+        $r->put(new ExampleDeferred('1 ', '2'));
+        $r->put("\n");
+        $r->setDebugData($debugPrefix.' o');
+        
+        $sr = new Ac_Result;
+        $sr->put(new ExampleDeferred('2 ', '2', !$writeOnStore));
+        $sr->setDebugData($debugPrefix.' i');
+        $sr->setWriteOnStore($writeOnStore);
+        
+        $r->put($sr);
+        
+        $r->put("\n");
+        $r->put(new ExampleDeferred('3 ', '2'));
+        return $r;
+    }
+    
+    
+    
+    function testLoadAndSave() {
+        
+        AllHandler::$log = array();
+        
+        $r = $this->getTestResultForLoadAndSave('allHandler', $allHandler, 'r1.1');
+        $r2 = $this->getTestResultForLoadAndSave('allHandler2', $allHandler2, 'r1.2');
+        
+        $pres2 = $r2->writeAndReturn();
+        
+        $ser = serialize($r);
+        StringObjectCache::clearStrings();
+        $r1 = unserialize($ser);
+        $pres1 = $r1->writeAndReturn();
+        if (!$this->assertEqual($pres1, $pres2)) {
+            var_dump($pres1, $pres2);
+        }
+        
+        //var_dump(AllHandler::$log);
+        
+        // now let's check if render-before-write works
+        
+        $r = $this->getTestResultForLoadAndSave('allHandler', $allHandler, 'r2.1');
+        $r2 = $this->getTestResultForLoadAndSave('allHandler2', $allHandler2, 'r2.2');
+
+        
+        ExampleEvaluator::$thirdPart = ' 4before';
+
+        $ser = serialize($r);
+        StringObjectCache::clearStrings();
+        $r1 = unserialize($ser);
+        
+        ExampleEvaluator::$thirdPart = ' 4after';
+        
+        $pres1 = $r1->writeAndReturn();
+        if (!$this->assertEqual($pres1, 
+              "1 2 4after\n"
+            . "2 2 4before\n" // this was evaluated during serialize()
+            . "3 2 4after", 
+            "\$renderBeforeWrite")) {
+            var_dump($pres1);
+        }
+        
+        // now let's check if Ac_Result::$writeOnStore == TRUE works
+        
+        $r = $this->getTestResultForLoadAndSave('allHandler', $allHandler, 'r3.1', true);
+        
+        ExampleEvaluator::$thirdPart = ' 5before';
+
+        $ser = serialize($r);
+        StringObjectCache::clearStrings();
+        $r1 = unserialize($ser);
+        
+        ExampleEvaluator::$thirdPart = ' 5after';
+        
+        $pres1 = $r1->writeAndReturn();
+        if (!$this->assertEqual($pres1, 
+              "1 2 5after\n"
+            . "2 2 5before\n" // this was evaluated during serialize()
+            . "3 2 5after", 
+            "\$renderBeforeWrite")) {
+            var_dump($pres1);
+        }
+        
+        $r = $this->getTestResultForLoadAndSave('allHandler', $allHandler, 'r3.1');
+        
+        // Question: how Store stage should behave when root has writeOnStore()?
+        $r->setWriteOnStore(true);
+        
+        ExampleEvaluator::$thirdPart = ' 6before';
+
+        $ser = serialize($r);
+        StringObjectCache::clearStrings();
+        $r1 = unserialize($ser);
+        
+        ExampleEvaluator::$thirdPart = ' 6after';
+        
+        $pres1 = $r1->writeAndReturn();
+        if (!$this->assertEqual($pres1, 
+              "1 2 6before\n"
+            . "2 2 6before\n" // this was evaluated during serialize()
+            . "3 2 6before", 
+            "\$renderBeforeWrite")) {
+            var_dump($pres1);
+        }
+        
+        
+    }
     
 }

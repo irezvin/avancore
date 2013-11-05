@@ -1,8 +1,9 @@
 <?php
 
 class Ac_Result_Stage_Render extends Ac_Result_Stage_Morph {
-    
-    protected $defaultTraverseClasses = array('Ac_Result', 'Ac_I_Deferred', 'Ac_I_StringObject_WithRender');
+
+    // It is ALWAYS false
+    protected $doRender = false;
     
     protected $deferreds = array();
     
@@ -141,5 +142,14 @@ class Ac_Result_Stage_Render extends Ac_Result_Stage_Morph {
         } while ($this->deferreds);
         
     }
+    
+    function setDoRender($doRender) {
+        if ($doRender) trigger_error("\$setDoRender(TRUE) does not have effect in Ac_Result_Stage_Render", E_USER_NOTICE);
+    }
+    
+    protected function renderIfNecessary($item) {
+        return false;
+    }
+    
     
 }
