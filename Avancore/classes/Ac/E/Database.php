@@ -11,7 +11,8 @@ class Ac_E_Database extends Exception {
             $message = $message[0];
             $message = $message . '\n\nQuery was: "'.$query.'"';
         }
-        
+
+        $code = (int) $code; // otherwise we will receive 'A non well formed numeric value encountered' warning
         if (func_num_args() == 3) {
             parent::__construct($message, $code, $previous);
         } else {

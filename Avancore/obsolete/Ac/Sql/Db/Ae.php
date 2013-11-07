@@ -62,23 +62,9 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
         return $res;
     }
 
-    function _convert($query) {
-        if(is_object($query) && $query instanceof Ac_I_Sql_Expression) {
-        	if (function_exists('xdebug_time_index')) {
-            	if (!isset($GLOBALS['_exprTime'])) $GLOBALS['_exprTime'] = 0;
-            	$t = xdebug_time_index(); 
-            	$res = $query->getExpression($this);
-            	$GLOBALS['_exprTime'] += (xdebug_time_index() - $t);
-        	} else {
-        		$res = $query->getExpression($this);
-        	} 
-        } else $res = $query;
-        return $res;
-    }
-    
     function fetchArray($query, $keyColumn = false, $withNumericKeys = false) {
         $res = array();
-        $this->_aeDb->setQuery($this->_convert($query));
+        $this->_aeDb->setQuery($this->preProcessQuery($query));
         if (!$withNumericKeys) $res = $this->_aeDb->loadAssocList($keyColumn);
         else {
             $res = array();
@@ -94,13 +80,13 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     
     function fetchObjects($query, $keyColumn = false) {
         $res = array();
-        $this->_aeDb->setQuery($this->_convert($query));
+        $this->_aeDb->setQuery($this->preProcessQuery($query));
         $res = $this->_aeDb->loadObjectList();
         return $res;
     }
     
     function fetchColumn($query, $colNo = 0, $keyColumn = false) {
-        $this->_aeDb->setQuery($this->_convert($query));
+        $this->_aeDb->setQuery($this->preProcessQuery($query));
         $res = array();
         foreach ($this->_aeDb->loadAssocList() as $ass) {
             $ass = array_merge($ass, array_values($ass));
@@ -111,7 +97,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
     
     function fetchValue($query, $colNo = 0, $default = null) {
-        $this->_aeDb->setQuery($this->_convert($query));
+        $this->_aeDb->setQuery($this->preProcessQuery($query));
         $res = $default;
         foreach ($this->_aeDb->loadAssocList() as $ass) {
             $ass = array_merge($ass, array_values($ass));
@@ -122,7 +108,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
     
     function query($query) {
-        $this->_aeDb->setQuery($this->_convert($query));
+        $this->_aeDb->setQuery($this->preProcessQuery($query));
         $res = $this->_aeDb->query();
         return $res;
     }
@@ -176,7 +162,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
     
     function getResultResource($query) {
-        $this->_aeDb->setQuery($this->_convert($query));
+        $this->_aeDb->setQuery($this->preProcessQuery($query));
         return $this->_aeDb->getResultResource();
     }
     

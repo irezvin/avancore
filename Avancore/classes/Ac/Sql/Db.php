@@ -20,7 +20,7 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     abstract function getDialect();
     
     function replacePrefix($string) {
-        return str_replace('#__', $this->getDbPrefix(), $string);
+        return $this->getDialect()->replacePrefix($this->getDbPrefix(), $string);
     }
     
     function quote($value, $asArray = false) {
@@ -304,6 +304,41 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     function commit() {
         // TODO
+    }
+    
+    /** 
+     * @param array|string|object $query
+     * 
+     * Function to prepare queries before execution
+     * Strings queries have their prefixes replaced.
+     * Arrays are treated in a such way: 
+     * [0 => $strQueryTemplate, 1 => $posParam1, 2 => $posParam2, 'foo' => $namedParamFoo]
+     * 
+     * All queries passed to methods of Ac_Sql_Db must be processed with this method.
+     */
+    function preProcessQuery($query) {
+        
+        if (is_string($query)) $res = $this->replacePrefix($query);
+        elseif (is_array($query)) {
+            if (!isset($query[0])) 
+                throw new Ac_E_InvalidCall("array \$query must have element #0 (query-template string)");
+            if (!is_string($query[0])) 
+                throw new Ac_E_InvalidCall("\$query[0] must be a string");
+            $template = $query[0];
+            unset($query[0]);
+            $quotedPosArgs = array();
+            $quotedNamedArgs = array();
+            foreach ($query as $key => $arg) {
+                if (is_numeric($key)) $quotedPosArgs[] = $this->quote($arg);
+                else $quotedNamedArgs[$key] = $this->quote($arg);
+            }
+            $res = $this->getDialect()->prepareSql($template, $this->getDbPrefix(), $quotedPosArgs, $quotedNamedArgs);
+        } elseif (is_object($query) && $query instanceof Ac_I_Sql_Expression) {
+            $res = $query->getExpression($this);
+        } else {
+            throw new Ac_E_InvalidCall("\$query must be either string, an Ac_I_Sql_Expression instance, or an array");
+        }
+        return $res;
     }
     
 }

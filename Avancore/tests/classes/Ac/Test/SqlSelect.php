@@ -33,7 +33,7 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 				'peopleTagsLink' => array(
 					'name' => '#__people_tags',
 					'joinsAlias' => 'people',
-					'joinsOn' => array('personId'),
+					'joinsOn' => array('idOfPerson' => 'personId'),
 					'joinType' => 'LEFT JOIN',
 				),
 			),
@@ -43,19 +43,19 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 						'peopleTags' => array(
 							'name' => '#__tags',
 							'joinsAlias' => 'peopleTagsLink',
-							'joinsOn' => array('tagId'),
+							'joinsOn' => array('tagId' => 'idOfTag'),
 							'joinType' => 'LEFT JOIN',
 						),
 						'otherPeopleTagsLink' => array(
 							'name' => '#__people_tags',
 							'joinsAlias' => 'otherPeople',
-							'joinsOn' => array('personId'),
+							'joinsOn' => array('idOfPerson' => 'personId'),
 							'joinType' => 'LEFT JOIN',
 						),
 						'otherPeopleTags' => array(
 							'name' => '#__tags',
 							'joinsAlias' => 'otherPeopleTagsLink',
-							'joinsOn' => array('tagId'),
+							'joinsOn' => array('tagId' => 'idOfTag'),
 							'joinType' => 'LEFT JOIN',
 						),
 					),
@@ -67,6 +67,8 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 	}
 
 	function testBasics() {
+
+        restore_error_handler();
 		
 		$db = $this->getAeDb();
 		
@@ -83,16 +85,17 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 		$select->setUsedAliases(array('peopleTags', 'otherPeopleTags', 'relationTypes'));
 		$rightStatement2 = "
 				`#__people` AS `people`
-    			LEFT JOIN `#__people_tags` AS `peopleTagsLink` ON  `people`.`personId` = `peopleTagsLink`.`personId`
-    			LEFT JOIN `#__tags` AS `peopleTags` ON  `peopleTagsLink`.`tagId` = `peopleTags`.`tagId`
+    			LEFT JOIN `#__people_tags` AS `peopleTagsLink` ON  `people`.`personId` = `peopleTagsLink`.`idOfPerson`
+    			LEFT JOIN `#__tags` AS `peopleTags` ON  `peopleTagsLink`.`idOfTag` = `peopleTags`.`tagId`
     			INNER JOIN `#__relations` AS `relations` ON  `people`.`personId` = `relations`.`personId`
     			INNER JOIN `#__people` AS `otherPeople` ON  `relations`.`otherPersonId` = `otherPeople`.`personId`
-    			LEFT JOIN `#__people_tags` AS `otherPeopleTagsLink` ON  `otherPeople`.`personId` = `otherPeopleTagsLink`.`personId`
-    			LEFT JOIN `#__tags` AS `otherPeopleTags` ON  `otherPeopleTagsLink`.`tagId` = `otherPeopleTags`.`tagId`
+    			LEFT JOIN `#__people_tags` AS `otherPeopleTagsLink` ON  `otherPeople`.`personId` = `otherPeopleTagsLink`.`idOfPerson`
+    			LEFT JOIN `#__tags` AS `otherPeopleTags` ON  `otherPeopleTagsLink`.`idOfTag` = `otherPeopleTags`.`tagId`
     			INNER JOIN `#__relation_types` AS `relationTypes` USING(`relationTypeId`)
     	";
 		$this->assertEqual($this->normalizeStatement($from = $select->getFromClause()), $this->normalizeStatement($rightStatement2, true));
-		$this->assertTrue(is_array($db->fetchArray("SELECT * FROM ".$from)), "valid query");
+		//var_dump($from);
+        $this->assertTrue(is_array($db->fetchArray("SELECT * FROM ".$from)), "valid query");
 		
 		$t = $select->getTable('otherPeople');
 		$t->joinsOn = "ON `relations`.`otherPersonId` = `otherPeople`.`personId`";
