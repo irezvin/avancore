@@ -4,6 +4,8 @@ abstract class Ac_Sql_Dialect {
     
     protected $nameQuoteChar = '"';
     
+    protected $escapeChar = "\\";
+    
     protected $ifNullFunction = 'COALESCE';
     
     protected $dateStoreFormats = array('date' => 'Y-m-d', 'time' => 'H:i:s', 'dateTime' => 'Y-m-d H:i:s');
@@ -117,5 +119,82 @@ abstract class Ac_Sql_Dialect {
         $dbi = new $c ($db, $db->getDbName());
         return $dbi;
     }
+    
+    function replacePrefix($withString, $inString) {
+        return $this->prepareSql($inString, $withString);
+    }
+    
+    
+    /**
+     * @param string $sql
+     * @param string $replacePrefixWith What to replace '#__' to
+     * @param array $quotedPosArgs Positional arguments, already escaped & quoted (? in statement)
+     * @param array $quotedNamedArgs Named arguments, already escaped & quoted (? in statement)
+     * @return string
+     * @throws Ac_E_InvalidUsage If positional or named arg not found
+     */
+    
+    function prepareSql($sql, $replacePrefixWith, array $quotedPosArgs = array(), array $quotedNamedArgs = array()) {
+        
+        // Do we have need to parse positional or numerical arguments
+        $hasArgs = func_num_args() > 2;
+        
+        // Tokens we are interested in
+        $rx = $hasArgs? '/([\'\\\\?"`])|(#__)|(:\w+)/' : '/([\'\\\\"`])|(#__)/'; 
+        
+        $tokens = preg_split($rx, $sql, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+        $escapeChar = $this->escapeChar;
+        $nameQuoteChar = $this->nameQuoteChar;
+        
+        
+        $qChar = false; // Current outermost quote char
+        $escape = false; // Is next character escaped
+        $posIdx = 0; // Idx of current positional param
+
+        $res = ''; // Result string
+
+        foreach($tokens as $token) {
+
+            $wasEscape = false;    
+            if ($token == $escapeChar) {
+                    $escape = !$escape;
+                    $wasEscape = $escape;
+            } elseif ($token == "'" || $token == '"' || $token == $nameQuoteChar) {
+                if (!$escape) {
+                    if ($qChar == $token) $qChar = false;
+                    else $qChar = $token;
+                }
+            } elseif ($token == '#__') {
+                if ($qChar === false || $qChar == $nameQuoteChar) { // should replace?
+                    if ($escape) // it's escaped - ignore escape character, don't replace prefix
+                        $res = substr($res, 0, -1); // remove previous escape character from the output stream
+                    else
+                        $token = $replacePrefixWith; 
+                }    
+            } elseif ($hasArgs && $token == '?') {
+                if ($qChar === false) {
+                    if ($escape) // it's escaped - ignore escape character, don't replace prefix
+                        $res = substr($res, 0, -1); // remove previous escape character from the output stream
+                    else {
+                        if (array_key_exists($posIdx, $quotedPosArgs)) {
+                            $token = $quotedPosArgs[$posIdx];
+                            $posIdx++;
+                        } else {
+                            throw new Ac_E_InvalidUsage("No positional argument #{$posIdx}");
+                        }
+                    }
+                }
+            } elseif ($hasArgs && $token{0} == ':' && $qChar === false && strlen($token) > 1 && preg_match('/^:\w+$/', $token)) {
+                if (array_key_exists($argName = substr($token, 1), $quotedNamedArgs)) {
+                    $token = $quotedNamedArgs[$argName];
+                } else throw new Ac_E_InvalidUsage("No such named argument: {$argName}");
+            }
+
+            $escape = $wasEscape? $escape : false;
+
+            $res .= $token;
+        }
+        return $res;
+    }   
     
 }

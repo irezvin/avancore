@@ -193,6 +193,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
      * @throws Ac_E_Database
      */
     protected function queryPdo($query, $exec = false) {
+        $query = $this->preProcessQuery($query);
         $x = $exec? "exec" : "query";
         $this->affectedRows = false;
         $query = $this->replacePrefix($query);
