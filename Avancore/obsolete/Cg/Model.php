@@ -694,7 +694,7 @@ class Cg_Model {
     }
     
     function getTableLangStringPrefix($after = false) {
-        if ($this->tableLangStringPrefix === false) $res = $this->_domin->getTableLangStringPrefix();
+        if ($this->tableLangStringPrefix === false) $res = $this->_domain->getTableLangStringPrefix();
             else $res = $this->tableLangStringPrefix;
         if ($after !== false) $res = strtolower(Cg_Inflector::definize($res.'_'.$after));
         return $res;
