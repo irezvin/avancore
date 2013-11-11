@@ -291,17 +291,16 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     }
     
     function getLimitClause($withLimitKeyword = false) {
-        $this->beginCalc();
-        $res = '';
-//        if (strlen($this->limitCount)) {
-//            $res = $this->limitCount;
-//            if (strlen($this->limitOffset)) $res = $this->limitOffset.', '.$res;
-//        }
-//        if ($withLimitKeyword && strlen($res)) $res = 'LIMIT '.$res;
-        if (strlen($this->limitCount)) {
-            $res = $this->_db->getLimitClause($this->limitCount, $this->limitOffset, $withLimitKeyword);
+        if ($this->getDb()->getSupportsLimitClause()) {
+            $this->beginCalc();
+            $res = '';
+            if (strlen($this->limitCount)) {
+                $res = $this->_db->getLimitClause($this->limitCount, $this->limitOffset, $withLimitKeyword);
+            }
+            $this->endCalc();
+        } else {
+            $res = '';
         }
-        $this->endCalc();
         return $res;
     }
     
@@ -425,9 +424,6 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     
     function cleanupReferences() {
         $this->_db = null;
-        foreach ($this->_tables as $t) {
-            $t->_sqlSelect = null;
-        }
         parent::cleanupReferences();
     }
     
@@ -471,6 +467,20 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     
     protected function popState() {
         foreach ( array_pop($this->state) as $k => $v) $this->$k = $v;
+    }
+    
+    function __clone() {
+        parent::__clone();
+        foreach ($this->parts as $i => $p) {
+            $this->parts[$i] = clone $p;
+        }
+        if (is_array($this->columns)) {
+            foreach ($this->columns as $i => $c) {
+                if ($c instanceof Ac_I_Sql_Expression) 
+                    $this->columns[$i] = clone $c;
+            }
+        }
+        $this->_allDeps = false;
     }
     
 }

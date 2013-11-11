@@ -197,4 +197,20 @@ abstract class Ac_Sql_Dialect {
         return $res;
     }   
     
+    function getSupportsLimitClause() {
+        return true;
+    }
+    
+    function getLimitClause($count, $offset = false, $withLimitKeyword = true) {
+        if (!$this->getSupportsLimitClause())
+            throw new Ac_E_InvalidCall("getLimitClause() isn't supported by ".get_class($this)."; use applyLimits() instead");
+        
+        if (strlen($count)) {
+            $res = $count;
+            if (strlen($offset)) $res = $offset.', '.$res;
+        }
+        if ($withLimitKeyword && strlen($res)) $res = 'LIMIT '.$res;
+        return $res;
+    }
+    
 }

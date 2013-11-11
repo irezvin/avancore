@@ -71,6 +71,7 @@ class Ac_Sql_Part extends Ac_Prototyped {
     function setParentPart($parentPart) {
         assert($parentPart === false || is_a($parentPart, 'Ac_Sql_Part'));
         $this->_parentPart = $parentPart;
+        $this->_idWithPrefix = false;
     }
     
     function getIdWithPrefix() {
@@ -218,6 +219,9 @@ class Ac_Sql_Part extends Ac_Prototyped {
         }
         if ($unique) $src[$key] = & $value;
             else $src[$key][] = & $value;
+    }
+    
+    function __clone() {
     }
 
 }

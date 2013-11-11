@@ -51,4 +51,11 @@ class Ac_Sql_Dialect_Mysql extends Ac_Sql_Dialect {
 	    return $row;
 	}
     
+    function getLimitsClause($count, $offset = false, $withLimitKeyword = true) {
+        if ($withLimitKeyword === false) $l = ''; else $l = ' LIMIT';
+        if ($offset === false) $res = " {$l} ".intval($count);
+            else $res = " {$l} ".intval($offset).", ".intval($count);
+        return $res;
+    }
+    
 }
