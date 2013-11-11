@@ -78,8 +78,6 @@ class Ac_Sql_Select_Table {
     
     var $_allRequiredAliases = false;
     
-    var $_deps = false;
-    
     /**
      * @var Ac_Sql_Select_TableProvider
      */
@@ -126,6 +124,7 @@ class Ac_Sql_Select_Table {
     
     function setTableProvider(Ac_Sql_Select_TableProvider $tableProvider) {
     	$this->_tableProvider = $tableProvider;
+        $this->_allRequiredAliases = false;
     }
     
     /**
@@ -236,8 +235,6 @@ class Ac_Sql_Select_Table {
             if ($alias === false) $alias = $this->alias;
             
             $sqlSelect = $this->getSqlSelect(true);
-            //if (!$this->_sqlSelect) trigger_error("\'sqlSelect' property not set - call setSqlSelect() first", E_USER_ERROR);
-            //if (!strlen($this->alias)) trigger_error ("\$alias must be provided", E_USER_ERROR);
 
             if (strlen($this->joinsAlias)) {
 
@@ -312,6 +309,10 @@ class Ac_Sql_Select_Table {
             //var_dump($this->name.' AS '.$this->alias.': '.implode(', ', $this->_allRequiredAliases));
         }
         return $this->_allRequiredAliases;
+    }
+    
+    function __clone() {
+        
     }
     
 }

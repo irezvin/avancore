@@ -250,11 +250,13 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
 	}
     
     function cleanupReferences() {
-        foreach ($this->_tables as $t) $t->_tableProvider = null;
+        foreach ($this->_tables as $t) {
+            $t->setTableProvider(null);
+        }
         $this->_tables = array();
         foreach ($this->_tableProviders as $t) {
             $t->cleanupReferences();
-            $t->_parent = null;
+            $t->setParent(null);
         }
         $this->_tableProviders = array();
         $this->_foundTables = array();
@@ -263,5 +265,24 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
     function hasPublicVars() {
         return true;
     }    
+    
+    /**
+     * return Ac_Sql_Select_TableProvider
+     */
+    function cloneObject() {
+        return clone $this;
+    }
+ 
+    function __clone() {
+        foreach ($this->_tableProviders as $i => $tp) {
+            $this->_tableProviders[$i] = clone $tp;
+            $this->_tableProviders[$i]->setParent($this);
+        }
+        $this->_foundTables = array();
+        foreach ($this->_tables as $i => $t) {
+            $this->_tables[$i] = clone $t;
+            $this->_tables[$i]->setTableProvider($this);
+        }
+    }
     
 }

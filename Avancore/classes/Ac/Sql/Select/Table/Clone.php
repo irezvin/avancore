@@ -98,9 +98,6 @@ class Ac_Sql_Select_Table_Clone extends Ac_Sql_Select_Table {
         }
         return $res;
     }    
-
-    
-    
     
     function getEffectiveJoinType() {
         $m = __FUNCTION__;
