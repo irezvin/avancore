@@ -15,7 +15,7 @@ class Ac_Sql_Select_Table_Subquery extends Ac_Sql_Select_Table {
     function setSubquery(Ac_Sql_Select $subquery) {
         $this->subquery = $subquery;
         if ($this->subqueryPrototype) {
-            trigger_error("\$subqueryPrototype property will not be used because setSubquery() is applied directly");
+            trigger_error("\$subqueryPrototype property will not be used because setSubquery() is applied directly", E_USER_WARNING);
         }
         $this->subqueryPrototype = false;
     }
@@ -53,6 +53,11 @@ class Ac_Sql_Select_Table_Subquery extends Ac_Sql_Select_Table {
         }
         $res = '('.$subquery.')';
         return $res;
+    }
+    
+    function __clone() {
+        parent::__clone();
+        if ($this->subquery) $this->subquery = clone $this->subquery;
     }
     
 }

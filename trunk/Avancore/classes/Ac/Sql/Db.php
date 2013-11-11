@@ -192,16 +192,11 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     }
     
     function getLimitClause($count, $offset = false, $withLimitKeyword = true) {
-        if (strlen($count)) {
-            $res = $count;
-            if (strlen($offset)) $res = $offset.', '.$res;
-        }
-        if ($withLimitKeyword && strlen($res)) $res = 'LIMIT '.$res;
-        return $res;
+        return $this->getDialect()->getLimitClause($count, $offset, $withLimitKeyword);
     }
     
     function applyLimits($statement, $count, $offset = false, $orderBy = false) {
-        return $statement.' '.$this->getLimitClause($count, $offset, $orderBy);
+        return $this->getDialect()->applyLimits($statement, $count, $offset, $orderBy);
     }
     
     abstract protected function implValueQuote($value);
@@ -339,6 +334,10 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
             throw new Ac_E_InvalidCall("\$query must be either string, an Ac_I_Sql_Expression instance, or an array");
         }
         return $res;
+    }
+    
+    function getSupportsLimitClause() {
+        return $this->getDialect()->getSupportsLimitClause();
     }
     
 }

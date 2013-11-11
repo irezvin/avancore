@@ -140,4 +140,14 @@ class Ac_Sql_Order_Multiple extends Ac_Sql_Order {
         return $res;
     }
     
+    function __clone() {
+        parent::__clone();
+        foreach ($this->_orders as $k => $f) {
+            if (is_object($f)) {
+                $this->_orders[$k] = clone $f;
+                $this->_orders[$k]->setParentPart($this);
+            }
+        }
+    }
+    
 }

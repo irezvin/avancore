@@ -68,8 +68,6 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 
 	function testBasics() {
 
-        restore_error_handler();
-		
 		$db = $this->getAeDb();
 		
 		$select = $this->createMySelect();
@@ -179,5 +177,33 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 		$this->expectError(new PatternExpectation('/\$joinsOn property not provided for/i'));
 		$sqlSelect->getFromClause();
 	}
+    
+    function testCloning() {
+        $s1 = $this->createMySelect();
+        $s1->addParts(array(
+            'mul' => array(
+                'class' => 'Ac_Sql_Filter_Multiple',
+                'filters' => array(
+                    'op' => array(
+                        'class'  => 'Ac_Sql_Filter_Equals',
+                        'colName' => 'otherPeople.id',
+                        'aliases' => array('otherPeople')
+                    )
+                )
+            )
+        ));
+        $s1->getPart('mul')->bind(array('op' => 1));
+        $s2 = clone $s1;
+        $this->assertEqual($oldS1 = ''.$s1, $oldS2 = ''.$s2);
+        $s1->getPart('mul')->bind(array('op' => 2));
+        $this->assertNotEqual($oldS1, $otherS1 = ''.$s1);
+        $this->assertEqual($oldS2, ''.$s2);
+        $s1->useAlias('peopleTags');
+        $this->assertNotEqual(''.$s1, ''.$s2);
+        $this->assertNotEqual($otherS1, $lastS1 = ''.$s1);
+        $s2->getPart('mul')->bind(array('op' => 2));
+        $this->assertNotEqual(''.$s2, $oldS2);
+        $this->assertEqual(''.$s1, $lastS1);
+    }
 	
 }

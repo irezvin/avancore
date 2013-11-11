@@ -84,5 +84,9 @@ class Ac_Sql_Dialect_Mssql extends Ac_Sql_Dialect {
 	function ifClose() {
 		return " END";
 	}
-   
+    
+    function getSupportsLimitClause() {
+        return false;
+    }
+    
 }

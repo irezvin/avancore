@@ -182,4 +182,14 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
         return $res;
     }
     
+    function __clone() {
+        parent::__clone();
+        foreach ($this->_filters as $k => $f) {
+            if (is_object($f)) {
+                $this->_filters[$k] = clone $f;
+                $this->_filters[$k]->setParentPart($this);
+            }
+        }
+    }
+    
 }
