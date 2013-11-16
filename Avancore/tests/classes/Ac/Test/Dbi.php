@@ -39,6 +39,7 @@ class Ac_Test_Dbi extends Ac_Test_Base {
 			if ($indexes) $res['tables'][$tableName]['indexes'] = $indexes;
 		}
 		//var_dump ($this->exportArray($res, 0, false, false, true));	
+        //var_dump($res);
 		return $res;
 	}
 	

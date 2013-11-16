@@ -10,7 +10,7 @@ class Ac_Test_Evaluated extends Ac_Test_Base {
             'k3' => new ExampleEvaluated('2011-04-27')
         );
         $o->dateFormat = 'd.m.Y';
-        $e = new ExampleEvaluator;
+        $e = new AcExampleEvaluator;
         $res = $e->evaluateContext($o);
         if (!$this->assertEqual(
             $res, 
@@ -43,7 +43,7 @@ class Ac_Test_Evaluated extends Ac_Test_Base {
             'k3' => new ExampleEvaluated2('2011-04-27')
         );
         $o->dateFormat = 'd.m.Y';
-        $e = new ExampleEvaluator;
+        $e = new AcExampleEvaluator;
         $res = $e->evaluateContext($o);
         if (!$this->assertEqual(
             $res, 
@@ -71,7 +71,7 @@ class Ac_Test_Evaluated extends Ac_Test_Base {
         $o->addValue($v1);
         $o->addValue($v2);
         
-        $ev = new ExampleEvaluator();
+        $ev = new AcExampleEvaluator();
         $res = $ev->evaluateContext($o);
         
         if (!$this->assertEqual(
@@ -94,7 +94,7 @@ class Ac_Test_Evaluated extends Ac_Test_Base {
             'k2' => new ExampleEvaluated('1981-12-23'),
         );
         $o->dateFormat = 'd.m.Y';
-        $e = new ExampleEvaluator;
+        $e = new AcExampleEvaluator;
         $res = $e->evaluateContext($o);
         
         if (!$this->assertEqual(
@@ -171,7 +171,7 @@ class ExampleEvaluated implements Ac_I_EvaluatedObject {
 class ExampleEvaluated2 extends ExampleEvaluated implements Ac_I_EvaluatedObject_WithSuggestion {
     
     function suggestEvaluatorPrototype(Ac_Evaluator $basicEvaluator) {
-        if ($basicEvaluator instanceof ExampleEvaluator) {
+        if ($basicEvaluator instanceof AcExampleEvaluator) {
             return array('class' => 'ExampleEvaluator2');
         }
     }
@@ -183,7 +183,7 @@ class ExampleEvaluated3 extends ExampleEvaluated2 {
     var $add = null;
     
     function suggestEvaluatorPrototype(Ac_Evaluator $basicEvaluator) {
-        if ($basicEvaluator instanceof ExampleEvaluator) {
+        if ($basicEvaluator instanceof AcExampleEvaluator) {
             return array('class' => 'ExampleEvaluator3');
         }
     }
@@ -209,7 +209,7 @@ class ExampleContext implements Ac_I_EvaluationContext {
     }
 }
 
-class ExampleEvaluator extends Ac_Evaluator {
+class AcExampleEvaluator extends Ac_Evaluator {
     
     protected $supportedClasses = array('ExampleEvaluated');
     
@@ -225,7 +225,7 @@ class ExampleEvaluator extends Ac_Evaluator {
     
 }
 
-class ExampleEvaluator2 extends ExampleEvaluator {
+class ExampleEvaluator2 extends AcExampleEvaluator {
     
     function doGetEvaluationResults(array $objects, Ac_I_EvaluationContext $context = null) {
         $foo = $context->getFoo();
@@ -290,7 +290,7 @@ class ExampleContextCache extends ExampleContext implements Ac_I_EvaluationConte
 }
 
 
-class ExampleEvaluator3 extends ExampleEvaluator {
+class ExampleEvaluator3 extends AcExampleEvaluator {
     
     protected $supportedClasses = array('ExampleEvaluated');
     
