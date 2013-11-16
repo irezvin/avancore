@@ -28,7 +28,10 @@ class Ac_Test_Adapter extends Ac_Test_Base {
         foreach ($adapter->getConfigFiles() as $f) {
             if (is_file($f)) $adapterFiles[] = realpath($f);
         }
-        $this->assertEqual($configFilesToLoad, $adapterFiles);
+        
+        if (!$this->assertEqual($configFilesToLoad, $adapterFiles)) {
+            var_dump($configFilesToLoad, $adapterFiles);
+        }
         
 
         // Test config overwrite priority

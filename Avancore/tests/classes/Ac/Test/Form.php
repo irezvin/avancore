@@ -81,11 +81,11 @@ class Ac_Test_Form extends Ac_Test_Base {
         $tf = $this->createTestForm1(array('model' => $p));
         $ctx = $tf->getContext();
         $ctx->updateData(array('name' => 'Name that user has entered'));
-        var_dump($tf->getControl('name')->getValue());
+        //var_dump($tf->getControl('name')->getValue());
         $p->name = 'New name';
-        var_dump($tf->getControl('name')->getValue());
+        //var_dump($tf->getControl('name')->getValue());
         $tf->updateFromModel();
-        var_dump($tf->getControl('name')->getValue());
+        //var_dump($tf->getControl('name')->getValue());
     }
     
     /**

@@ -27,8 +27,8 @@ class Ac_Test_Mapper extends Ac_Test_Base {
     function testPersistence() {
         // TODO: people => person
         $sam = Sample::getInstance();
-        $m = $sam->getSamplePeopleMapper();
-        $guy = $sam->createSamplePeople();
+        $m = $sam->getSamplePersonMapper();
+        $guy = $sam->createSamplePerson();
         $guy->name = 'Guy';
         $guy->birthDate = '0000-00-00';
         $guy->store();

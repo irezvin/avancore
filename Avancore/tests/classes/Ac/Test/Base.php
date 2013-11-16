@@ -18,7 +18,12 @@ class Ac_Test_Base extends UnitTestCase {
     protected $sampleApp = false;
     
     protected $bootSampleApp = false;
-	
+
+//    function setUp() {
+//        parent::setUp();
+//        restore_error_handler();
+//    }
+    
     function __construct($label = false) {
         parent::__construct($label);
         if ($this->bootSampleApp) $this->getSampleApp();

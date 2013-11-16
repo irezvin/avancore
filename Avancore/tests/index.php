@@ -29,16 +29,12 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
     
 } else {
 	$t = new TestSuite('Avancore Framework v0.3 Tests');
-	$t->add(new Ac_Test_Cr);
-	$t->add(new Ac_Test_Controller);
-	$t->add(new Ac_Test_Response);
-	$t->add(new Ac_Test_Registry);
-    $t->add(new Ac_Test_Hacks);
-	$t->add(new Ac_Test_Dbi);
-	$t->add(new Ac_Test_SqlSelect);
-	$t->add(new Ac_Test_RefChecker);
-	$t->add(new Ac_Test_ModelSql);
-    $t->add(new Ac_Test_Adapter);	
+    $classes = array();
+    foreach ($files = glob(dirname(__FILE__).'/classes/Ac/Test/*.php') as $file) {
+        $class = 'Ac_Test_'.basename($file, '.php');
+        if ($class !== 'Ac_Test_Base') $classes[] = $class;
+    }
+    foreach ($classes as $class) $t->add($class);
 		
 	$t->run(new HtmlReporter('UTF-8'));
 	
@@ -46,6 +42,3 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
 
 if (function_exists('xdebug_time_index')) var_dump(xdebug_time_index());
 
-
-
-?>

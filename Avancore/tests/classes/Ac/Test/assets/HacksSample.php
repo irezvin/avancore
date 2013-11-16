@@ -7,7 +7,7 @@ class HacksSample extends Ac_Hacks {
 	/**
 	 * @return HacksSample
 	 */
-	function & _hck_getInstance() {
+	static function & _hck_getInstance($className = null) {
 		$res = Ac_Hacks::_hck_getInstance('hacksSample');
 		return $res;
 	}
