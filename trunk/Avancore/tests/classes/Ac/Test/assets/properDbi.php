@@ -133,35 +133,35 @@ $properDbi = array (
           ),
           '#__people_tags' => array (    
               'columns' => array (      
-                  'personId' => array (        
+                  'idOfPerson' => array (        
                       'type' => 'int',
                       'unsigned' => true,
                       'width' => '10',
                       'nullable' => false,
                       'default' => NULL,
-                      'name' => 'personId',
+                      'name' => 'idOfPerson',
                   ),
-                  'tagId' => array (        
+                  'idOfTag' => array (        
                       'type' => 'int',
                       'unsigned' => true,
                       'width' => '10',
                       'nullable' => false,
                       'default' => NULL,
-                      'name' => 'tagId',
+                      'name' => 'idOfTag',
                   ),
               ),
               'relations' => array (      
                   'FK_ac_people_tags_1' => array (        
                       'table' => '#__people',
                       'columns' => array (          
-                          'personId' => 'personId',
+                          'idOfPerson' => 'personId',
                       ),
                       'name' => 'FK_ac_people_tags_1',
                   ),
                   'FK_ac_people_tags_2' => array (        
                       'table' => '#__tags',
                       'columns' => array (          
-                          'tagId' => 'tagId',
+                          'idOfTag' => 'tagId',
                       ),
                       'name' => 'FK_ac_people_tags_2',
                   ),
@@ -171,8 +171,8 @@ $properDbi = array (
                       'primary' => true,
                       'unique' => true,
                       'columns' => array (          
-                          1 => 'personId',
-                          2 => 'tagId',
+                          1 => 'idOfPerson',
+                          2 => 'idOfTag',
                       ),
                       'name' => 'PRIMARY',
                   ),
@@ -180,7 +180,7 @@ $properDbi = array (
                       'primary' => false,
                       'unique' => false,
                       'columns' => array (          
-                          1 => 'tagId',
+                          1 => 'idOfTag',
                       ),
                       'name' => 'FK_ac_people_tags_2',
                   ),
@@ -279,26 +279,26 @@ $properDbi = array (
                   ),
               ),
               'relations' => array (      
-                  'FK_ac_relations_1' => array (        
-                      'table' => '#__people',
-                      'columns' => array (          
-                          'personId' => 'personId',
-                      ),
-                      'name' => 'FK_ac_relations_1',
-                  ),
-                  'FK_ac_relations_2' => array (        
-                      'table' => '#__people',
-                      'columns' => array (          
-                          'otherPersonId' => 'personId',
-                      ),
-                      'name' => 'FK_ac_relations_2',
-                  ),
                   'FK_ac_relations_3' => array (        
                       'table' => '#__relation_types',
                       'columns' => array (          
                           'relationTypeId' => 'relationTypeId',
                       ),
                       'name' => 'FK_ac_relations_3',
+                  ),
+                  'FK_ac_relations_outgoing' => array (        
+                      'table' => '#__people',
+                      'columns' => array (          
+                          'personId' => 'personId',
+                      ),
+                      'name' => 'FK_ac_relations_outgoing',
+                  ),
+                  'FK_ac_relations_incoming' => array (        
+                      'table' => '#__people',
+                      'columns' => array (          
+                          'otherPersonId' => 'personId',
+                      ),
+                      'name' => 'FK_ac_relations_incoming',
                   ),
               ),
               'indexes' => array (      
@@ -310,22 +310,6 @@ $properDbi = array (
                       ),
                       'name' => 'PRIMARY',
                   ),
-                  'FK_ac_relations_1' => array (        
-                      'primary' => false,
-                      'unique' => false,
-                      'columns' => array (          
-                          1 => 'personId',
-                      ),
-                      'name' => 'FK_ac_relations_1',
-                  ),
-                  'FK_ac_relations_2' => array (        
-                      'primary' => false,
-                      'unique' => false,
-                      'columns' => array (          
-                          1 => 'otherPersonId',
-                      ),
-                      'name' => 'FK_ac_relations_2',
-                  ),
                   'FK_ac_relations_3' => array (        
                       'primary' => false,
                       'unique' => false,
@@ -333,6 +317,22 @@ $properDbi = array (
                           1 => 'relationTypeId',
                       ),
                       'name' => 'FK_ac_relations_3',
+                  ),
+                  'FK_ac_relations_outgoing' => array (        
+                      'primary' => false,
+                      'unique' => false,
+                      'columns' => array (          
+                          1 => 'personId',
+                      ),
+                      'name' => 'FK_ac_relations_outgoing',
+                  ),
+                  'FK_ac_relations_incoming' => array (        
+                      'primary' => false,
+                      'unique' => false,
+                      'columns' => array (          
+                          1 => 'otherPersonId',
+                      ),
+                      'name' => 'FK_ac_relations_incoming',
                   ),
               ),
           ),

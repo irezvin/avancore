@@ -68,19 +68,23 @@ class Ac_Test_RefChecker extends Ac_Test_Base {
 		
 		$rightStatement = "
 			`#__relations` AS `#__relations`
-    			INNER JOIN `#__people` AS `rel_#__people_1` ON `#__relations`.`personId` = `rel_#__people_1`.`personId`
-    			INNER JOIN `#__people` AS `rel_#__people_2` ON `#__relations`.`otherPersonId` = `rel_#__people_2`.`personId`
     			INNER JOIN `#__relation_types` AS `rel_#__relation_types` ON  `#__relations`.`relationTypeId` = `rel_#__relation_types`.`relationTypeId`
+    			INNER JOIN `#__people` AS `rel_#__people_1` ON `#__relations`.`otherPersonId` = `rel_#__people_1`.`personId`
+    			INNER JOIN `#__people` AS `rel_#__people_2` ON `#__relations`.`personId` = `rel_#__people_2`.`personId`
      	";
-		$this->assertEqual($this->normalizeStatement($select->getFromClause()), $this->normalizeStatement($rightStatement, true));
+		if (!$this->assertEqual($a = $this->normalizeStatement($select->getFromClause()), $b = $this->normalizeStatement($rightStatement, true))) {
+            var_dump($a, $b);
+        }
 		
 		$select2 = $rc->createSelect('#__relations', 't', '#__people', false, 'LEFT JOIN');
 		$rightStatement2 = "
 			`#__relations` AS `t`
-    			LEFT JOIN `#__people` AS `rel_#__people_1` ON `t`.`personId` = `rel_#__people_1`.`personId`
-    			LEFT JOIN `#__people` AS `rel_#__people_2` ON `t`.`otherPersonId` = `rel_#__people_2`.`personId`
+    			LEFT JOIN `#__people` AS `rel_#__people_1` ON `t`.`otherPersonId` = `rel_#__people_1`.`personId`
+    			LEFT JOIN `#__people` AS `rel_#__people_2` ON `t`.`personId` = `rel_#__people_2`.`personId`
 		";
-		$this->assertEqual($this->normalizeStatement($select2->getFromClause()), $this->normalizeStatement($rightStatement2, true));
+		if (!$this->assertEqual($a = $this->normalizeStatement($select2->getFromClause()), $b = $this->normalizeStatement($rightStatement2, true))) {
+            var_dump($a, $b);
+        }
 		
 		$select3 = $rc->createSelect('#__relations', 't', false, false, 'LEFT JOIN');
 		$sdb = $this->getSqlDb();

@@ -121,7 +121,7 @@ class Ac_Hacks {
 	 * 		}
 	 * </code>
 	 */
-	static function & _hck_getInstance($className) {
+	static function & _hck_getInstance($className = null) {
 		$varName = '_aeHacks_'.$className;
 		if (!isset($GLOBALS[$varName]) || !is_a($GLOBALS[$varName], $className)) $GLOBALS[$varName] = new $className();
 		$res = & $GLOBALS[$varName];
@@ -323,7 +323,7 @@ class Ac_Hacks {
 				$res = & $this->_hck_context->$v('call', $method, $args);
 				$called = true;
 			} elseif (is_callable($cl = array(& $this->_hck_context, $method))) {
-				$res = & call_user_func_array($cl, $args);
+				$res = call_user_func_array($cl, $args);
 				$called = true;
 			}
 		} elseif (strlen($this->_hck_class) && is_callable($cl = array($this->_hck_class, $method))) {
