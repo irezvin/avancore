@@ -71,9 +71,4 @@ class Ac_Result_Stage_Write extends Ac_Result_Stage_Morph {
         } else $this->renderIfNecessary ($item);
     }
 
-    function write() {
-        if ($this->isComplete) throw new Ac_E_InvalidUsage("write() already called; check with getIsComplete() first");
-        $this->traverse();
-    }
-    
 }
