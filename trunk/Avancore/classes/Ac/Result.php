@@ -64,6 +64,17 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
     protected $debugData = false;
     
     protected $serializationState = self::SERIALIZATION_NONE;
+
+    protected $serializeTime = false;
+
+    protected $unserializeTime = false;
+    
+    protected $maxLifetime = false;    
+    
+    /**
+     * @var boolean
+     */
+    protected $isObsolete = null;
     
     function listPlaceholders($onlyUsed = false, $onlyDefault = false) {
         if (!is_array($this->placeholders)) $this->setPlaceholders(array());
@@ -304,6 +315,8 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
     }
     
     function __sleep() {
+     
+        $this->serializeTime = microtime(true);
         
         // this will register string objects if needed
         $this->getStringObjects(); 
@@ -325,6 +338,9 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
     }
     
     function __wakeup() {
+        
+        $this->unserializeTime = microtime(true);
+        
         Ac_StringObject::onWakeup($this);
         if ($this->serializationState === self::SERIALIZATION_OUTER) {
             $this->serializationState = self::SERIALIZATION_NONE;
@@ -548,6 +564,40 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
     
     function notifyIsStored() {
         $this->serializationState = self::SERIALIZATION_INNER;
+    }
+    
+    function getSerializeTime() {
+        return $this->serializeTime;
+    }
+
+    function getUnserializeTime() {
+        return $this->unserializeTime;
+    }    
+    
+    function setMaxLifetime($maxLifetime) {
+        if (!($maxLifetime === false || is_numeric($maxLifetime) && $maxLifetime >= 0))
+            throw new Ac_E_InvalidCall("\$maxLifetime must be either FALSE or 0 or natural number");
+        $this->maxLifetime = $maxLifetime;
+    }
+
+    function getMaxLifetime() {
+        return $this->maxLifetime;
+    }    
+
+    /**
+     * @return boolean
+     */
+    function getIsObsolete() {
+        if ($this->isObsolete === null) {
+            $l = $this->getMaxLifetime();
+            $s = $this->getSerializeTime();
+            return $l && $s && $s < (microtime() - $l);
+        }
+        return $this->isObsolete;
+    }    
+    
+    function markObsolete() {
+        $this->isObsolete = true;
     }
     
 }
