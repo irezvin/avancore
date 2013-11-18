@@ -3,7 +3,7 @@
 class Ac_Result_Stage_Morph extends Ac_Result_Stage {
     
     /**
-     * @var Ac_Result_Stage_Render
+     * @var Ac_Result_Stage_Deferreds
      */
     protected $render = null;
     
@@ -19,7 +19,7 @@ class Ac_Result_Stage_Morph extends Ac_Result_Stage {
     /**
      * @var bool
      */
-    protected $doRender = true;
+    protected $renderDeferreds = true;
     
     /**
      * @var bool
@@ -34,17 +34,17 @@ class Ac_Result_Stage_Morph extends Ac_Result_Stage {
     }    
     
     /**
-     * @param bool $doRender
+     * @param bool $renderDeferreds
      */
-    function setDoRender($doRender) {
-        $this->doRender = $doRender;
+    function setRenderDeferreds($renderDeferreds) {
+        $this->renderDeferreds = $renderDeferreds;
     }
 
     /**
      * @return bool
      */
-    function getDoRender() {
-        return $this->doRender;
+    function getRenderDeferreds() {
+        return $this->renderDeferreds;
     }
 
     function setRenderStagePrototype(array $renderStagePrototype) {
@@ -62,7 +62,7 @@ class Ac_Result_Stage_Morph extends Ac_Result_Stage {
      * @important MUST BE CALLED BY CONCRETE CLASSES in endItem()
      */
     protected function renderIfNecessary($item) {
-        if (!$this->hasRendered && $this->doRender && ($item instanceof Ac_I_Deferred || $item instanceof Ac_I_StringObject_WithRender)) {
+        if (!$this->hasRendered && $this->renderDeferreds && ($item instanceof Ac_I_Deferred || $item instanceof Ac_I_StringObject_WithRender)) {
             // let's initialize renderer only when we will encounter 
             $this->hasRendered = true;
             $this->render = $this->createRender();
@@ -75,10 +75,10 @@ class Ac_Result_Stage_Morph extends Ac_Result_Stage {
     }
     
     /**
-     * @return Ac_Result_Stage_Render
+     * @return Ac_Result_Stage_Deferreds
      */
     protected function createRender() {
-        $res = Ac_Prototyped::factory($this->renderStagePrototype, 'Ac_Result_Stage_Render');
+        $res = Ac_Prototyped::factory($this->renderStagePrototype, 'Ac_Result_Stage_Deferreds');
         $res->setIsBeforeStore($this->getIsBeforeStore());
         $res->startAt($this);
         return $res;
