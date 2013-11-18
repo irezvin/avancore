@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Result_Stage_Store extends Ac_Result_Stage_Morph {
+class Ac_Result_Stage_Serialize extends Ac_Result_Stage_Morph {
 
     protected $defaultTraverseClasses = array ('Ac_Result', 'Ac_I_Deferred', 'Ac_I_StringObject_WithRender');
     

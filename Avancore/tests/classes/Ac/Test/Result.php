@@ -905,7 +905,7 @@ EOD
         $r->put("\n");
         $r->put(new ExampleDeferred('3 ', '2'), true);
 
-        $tmp = new Ac_Result_Stage_Render();
+        $tmp = new Ac_Result_Stage_Deferreds();
         $tmp->setRoot($r);
         $tmp->renderDeferreds();
         
@@ -925,7 +925,7 @@ EOD
         $r->put("\n");
         $r->put(new ExampleDeferred('3 ('.$sub2.' '.$sub3, ' 2'));
         
-        $tmp = new Ac_Result_Stage_Render();
+        $tmp = new Ac_Result_Stage_Deferreds();
         $tmp->setRoot($r);
         $tmp->renderDeferreds();
         
@@ -977,12 +977,12 @@ EOD
         $r->put("\n");
         $r->put($b = new ExampleDeferred('3 ', '2'));
         
-        $tmp = new Ac_Result_Stage_Render();
+        $tmp = new Ac_Result_Stage_Deferreds();
         $tmp->setIsBeforeStore(true);
         $tmp->setRoot($r);
         $tmp->renderDeferreds();
         
-        $s = new Ac_Result_Stage_Write(array('doRender' => false));
+        $s = new Ac_Result_Stage_Write(array('renderDeferreds' => false));
         
         if (!$this->assertEqual($rendered = $r->writeAndReturn($s), "$a\n2 2 3\n$b")) var_dump($rendered);
         

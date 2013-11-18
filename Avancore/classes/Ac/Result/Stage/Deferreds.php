@@ -1,9 +1,9 @@
 <?php
 
-class Ac_Result_Stage_Render extends Ac_Result_Stage_Morph {
+class Ac_Result_Stage_Deferreds extends Ac_Result_Stage_Morph {
 
     // It is ALWAYS false
-    protected $doRender = false;
+    protected $renderDeferreds = false;
     
     protected $deferreds = array();
     
@@ -143,8 +143,8 @@ class Ac_Result_Stage_Render extends Ac_Result_Stage_Morph {
         
     }
     
-    function setDoRender($doRender) {
-        if ($doRender) trigger_error("\$setDoRender(TRUE) does not have effect in Ac_Result_Stage_Render", E_USER_NOTICE);
+    function setRenderDeferreds($renderDeferreds) {
+        if ($renderDeferreds) trigger_error("\$setRenderDeferreds(TRUE) does not have effect in Ac_Result_Stage_Deferreds", E_USER_NOTICE);
     }
     
     protected function renderIfNecessary($item) {
