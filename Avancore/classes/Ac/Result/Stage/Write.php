@@ -50,6 +50,9 @@ class Ac_Result_Stage_Write extends Ac_Result_Stage_Morph {
                 $target = $this->rootTarget;
             }
             $writer->setTarget($target);
+            if ($item instanceof Ac_Result && $item->getIsObsolete()) {
+                trigger_error("Trying to echo an obsolete Result", E_USER_WARNING);
+            }
             $res = $writer->write((bool) $target);
             if ($target) {
                 if ($target === $this->parent) {

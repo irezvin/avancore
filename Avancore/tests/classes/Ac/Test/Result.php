@@ -1103,7 +1103,19 @@ EOD
             var_dump($pres1);
         }
         
-        
+    }
+    
+    function testObsoleteOnLoad() {
+        $r = new Ac_Result;
+        $r1 = new Ac_Result;
+        $r->put($r1);
+        $r2 = new Ac_Result;
+        $r1->put($r2);
+        $r2->markObsolete();
+        $s = serialize($r);
+        $uns = unserialize($s);
+        $this->assertTrue($uns->getIsObsolete());
+       
     }
     
 }
