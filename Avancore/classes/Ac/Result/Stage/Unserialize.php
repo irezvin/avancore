@@ -2,10 +2,6 @@
 
 class Ac_Result_Stage_Unserialize extends Ac_Result_Stage {
     
-    function processResultDuringWakeup() {
-        $this->traverse();
-    }
-    
     function setCurrentResultObsolete() {
         if (($r = $this->getCurrentResult())) $r->markObsolete();
         

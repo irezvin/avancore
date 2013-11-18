@@ -366,4 +366,9 @@ class Ac_Result_Stage extends Ac_Prototyped {
         $this->positionIsSet = true;
     }
     
+    function invoke() {
+        if ($this->isComplete) throw new Ac_E_InvalidUsage("invoke() already called; check with getIsComplete() first");
+        $this->traverse();
+    }
+    
 }

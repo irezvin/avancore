@@ -624,7 +624,7 @@ EOD
         $inner = new Ac_Result_Html(array('content' => iconv('utf-8', 'windows-1251', 'Немного текста'), 'charset' => 'windows-1251'));
         $outer = new Ac_Result_Html(array('content' => "Снаружи. {$inner} внутри", 'charset' => 'utf-8'));
         $s = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => false));
-        $s->write();
+        $s->invoke();
         if (!$this->assertEqual($c = $outer->getContent(), 'Снаружи. Немного текста внутри')) var_dump($c);
         
     }
@@ -633,7 +633,7 @@ EOD
         $inner = new Ac_Result_Html(array('content' => 'Some text'));
         $outer = new Ac_Result_Http(array('content' => $inner));
         $stage = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => false));
-        $stage->write();
+        $stage->invoke();
         if (!$this->assertTrue(in_array('Content-Type: text/html', $headers = $outer->getHeaders()->getItems()))) var_dump($headers);
     }
     
@@ -643,7 +643,7 @@ EOD
         $env = new Ac_Response_Environment_Dummy;
         $outer->setWriter(new Ac_Result_Writer_RenderHtml(array('environment' => $env)));
         $stage = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => true));
-        $stage->write();
+        $stage->invoke();
         $this->assertEqual($env->headers, array(
             'Content-Type: text/html; charset=utf-8'
         ));
@@ -652,7 +652,7 @@ EOD
         $plain = new Ac_Result_Http(array('contentType' => 'text/plain', 'content' => 'Some Interesting Text'));
         $plain->setWriter(new Ac_Result_Writer_HttpOut(array('environment' => $env)));
         $stage = new Ac_Result_Stage_Write(array('root' => $plain, 'writeRoot' => true));
-        $stage->write();
+        $stage->invoke();
         if (!$this->assertEqual($h = $env->headers, array(
             'Content-Type: text/plain'
         ))) var_dump($h);
@@ -907,7 +907,7 @@ EOD
 
         $tmp = new Ac_Result_Stage_Deferreds();
         $tmp->setRoot($r);
-        $tmp->renderDeferreds();
+        $tmp->invoke();
         
         if (!$this->assertEqual($rendered = $r->writeAndReturn(), "1 2 3\n2 2 3\n3 2 3")) var_dump($rendered);
 
@@ -927,7 +927,7 @@ EOD
         
         $tmp = new Ac_Result_Stage_Deferreds();
         $tmp->setRoot($r);
-        $tmp->renderDeferreds();
+        $tmp->invoke();
         
         if (!$this->assertEqual($rendered = $r->writeAndReturn(), "1 2 3\n2 (2.1 3 3) 3\n3 (3.1, 3 3.2) 3 2 3")) var_dump($rendered);
 
@@ -980,7 +980,7 @@ EOD
         $tmp = new Ac_Result_Stage_Deferreds();
         $tmp->setIsBeforeStore(true);
         $tmp->setRoot($r);
-        $tmp->renderDeferreds();
+        $tmp->invoke();
         
         $s = new Ac_Result_Stage_Write(array('renderDeferreds' => false));
         

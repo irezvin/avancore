@@ -31,10 +31,6 @@ class Ac_Result_Stage_Serialize extends Ac_Result_Stage_Morph {
         } else $this->renderIfNecessary ($item);
     }
     
-    function prepareResultForStore() {
-        $this->traverse();
-    }
-    
     protected function traverse($classes = null) {    
         if ($this->root && $this->root->getWriteOnStore()) {
             $tmp = true;

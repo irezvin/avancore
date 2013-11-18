@@ -66,7 +66,7 @@ class Ac_Result_Stage_Morph extends Ac_Result_Stage {
             // let's initialize renderer only when we will encounter 
             $this->hasRendered = true;
             $this->render = $this->createRender();
-            $this->render->renderDeferreds();        
+            $this->render->invoke();        
             $res = true;
         } else {
             $res = false;
