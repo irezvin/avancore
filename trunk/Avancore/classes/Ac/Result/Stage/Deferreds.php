@@ -74,7 +74,7 @@ class Ac_Result_Stage_Deferreds extends Ac_Result_Stage_Morph {
         $this->evaluators[$evHash]['deferreds'][$defId] = $evArg;
     }
     
-    function renderDeferreds() {
+    function invoke() {
         if ($this->isComplete) throw new Ac_E_InvalidUsage("renderDeferreds() already called; check with getIsComplete() first");
         $this->resetTraversal();
         $this->traverse();

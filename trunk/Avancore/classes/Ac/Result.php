@@ -328,7 +328,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
         } else { // this call comes from outermost result -- let's call Store stage
             
             $storeStage = new Ac_Result_Stage_Serialize(array('root' => $this));
-            $storeStage->prepareResultForStore();
+            $storeStage->invoke();
             $this->serializationState = self::SERIALIZATION_OUTER; // will be picked up on __wakeup
             
         }
@@ -345,7 +345,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
         if ($this->serializationState === self::SERIALIZATION_OUTER) {
             $this->serializationState = self::SERIALIZATION_NONE;
             $loadStage = new Ac_Result_Stage_Unserialize(array('root' => $this));
-            $loadStage->processResultDuringWakeup();
+            $loadStage->invoke();
         }
     }
     
@@ -552,7 +552,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
     function write($stage = null) {
         if (is_null($stage)) $stage = array();
         $stage = Ac_Prototyped::factory($stage, 'Ac_Result_Stage_Write', array('root' => $this), true);
-        $stage->write();
+        $stage->invoke();
         return $stage;
     }
     
