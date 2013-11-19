@@ -1118,4 +1118,16 @@ EOD
        
     }
     
+    function testCloneResult() {
+        $r = new Ac_Result();
+        $r2 = new Ac_Result(array('content' => 'old'));
+        $r->put($r2);
+        $cloneR = clone $r;
+        $r2->setContent('new');
+        if (!$this->assertEqual($strR = $r->writeAndReturn(), 'new')) 
+            var_dump($strR);
+        if (!$this->assertEqual($strCloneR = $cloneR->writeAndReturn(), 'old')) 
+            var_dump($strCloneR);
+    }
+    
 }
