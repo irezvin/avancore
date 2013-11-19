@@ -125,4 +125,10 @@ class Ac_Result_Placeholder_Composite extends Ac_Result_Placeholder implements A
         return $gp;
     }
     
+    function __clone() {
+        foreach ($this->placeholders as $i => $p) {
+            if (is_object($p)) $this->placeholders[$i] = clone $p;
+        }
+    }
+    
 }
