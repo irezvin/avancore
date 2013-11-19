@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac_I_StringObject {
+class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac_I_StringObject_ClonedWithBuffer {
 
     const OVERRIDE_NONE = 0;
     const OVERRIDE_PARENT = 1;
@@ -485,6 +485,15 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
     
     function __clone() {
         if (strlen($this->stringObjectMark)) Ac_StringObject::onClone($this);
+        if (is_array($this->placeholders)) {
+            foreach ($this->placeholders as $i => $p) {
+                if (is_object($p)) $this->placeholders[$i] = clone $p;
+            }
+        }
+        if (!(class_exists('Ac_Result_Stage_Clone') && Ac_Result_Stage_Clone::getIsRunning())) {
+            $s = new Ac_Result_Stage_Clone(array('root' => $this));
+            $s->invoke();
+        }
     }
 
     protected $bunches = array();
