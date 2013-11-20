@@ -255,9 +255,9 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         return $this->config;
     }
     
-    protected function intGetConfigValue($option) {
+    protected function intGetConfigValue($option, $fromFun = true) {
         $res = null;
-        $option{0} = strtolower($option{0});
+        if ($fromFun) $option{0} = strtolower($option{0});
         if (method_exists($this, $m = 'doGet'.$option)) $res = $this->$m();
         if (is_null($res)) {
             $conf = $this->intGetArrConfig();
@@ -268,7 +268,7 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     }
     
     function getConfigValue($option, $default = null) {
-        $res = $this->intGetConfigValue($option);
+        $res = $this->intGetConfigValue($option, false);
         if (is_null($res)) $res = $default;
         return $res;
     }
