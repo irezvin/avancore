@@ -121,3 +121,15 @@ class FooResult extends Ac_Result {
 
 class BarResult extends Ac_Result {
 }
+
+
+class TestStreamValue extends Ac_Value_Stream {
+    
+    var $outputCalled = 0;
+    
+    function output($callback = null) {
+        $this->outputCalled++;
+        return parent::output($callback);
+    }
+    
+}

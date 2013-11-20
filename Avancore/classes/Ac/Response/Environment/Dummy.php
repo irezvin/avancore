@@ -45,7 +45,7 @@ class Ac_Response_Environment_Dummy implements Ac_I_Response_Environment {
     }
     
     function acceptResponseText($text) {
-        $this->responseText = $text;
+        $this->responseText .= $text;
     }
 
     function finishOutput() {
