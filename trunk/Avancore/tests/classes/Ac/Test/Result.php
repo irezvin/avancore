@@ -903,7 +903,7 @@ EOD
         $r->put("\n");
         $r->put(new ExampleDeferred('2 ', '2'));
         $r->put("\n");
-        $r->put(new ExampleDeferred('3 ', '2'), true);
+        $r->put(new ExampleDeferred('3 ', '2', true));
 
         $tmp = new Ac_Result_Stage_Deferreds();
         $tmp->setRoot($r);
@@ -938,7 +938,7 @@ EOD
         $r1->put("\n");
         $r1->put(new ExampleDeferred('2 ', '2'));
         $r1->put("\n");
-        $r1->put(new ExampleDeferred('3 ', '2'), true);
+        $r1->put(new ExampleDeferred('3 ', '2', true));
         
         $r1result = "1 2 3\n2 2 3\n3 2 3";
 
@@ -947,7 +947,7 @@ EOD
         $r->put("\n");
         $r->put(new ExampleDeferred($r1, ' 2'));
         $r->put("\n");
-        $r->put(new ExampleDeferred('3 ', '2'), true);
+        $r->put(new ExampleDeferred('3 ', '2', true));
 
         $r2 = new Ac_Result;
         $r2->put('before ');
@@ -1128,6 +1128,16 @@ EOD
             var_dump($strR);
         if (!$this->assertEqual($strCloneR = $cloneR->writeAndReturn(), 'old')) 
             var_dump($strCloneR);
+    }
+    
+    function testStreamInResult() {
+        $r = new Ac_Result();
+        $r->put('foo ', $sVal = new TestStreamValue($fl = (dirname(__FILE__).'/assets/Result_classes.php')), ' bar');
+        $fc = file_get_contents($fl);
+        $cnt = $r->writeAndReturn();
+        if (!$this->assertEqual($cnt, 'foo '.$fc.' bar')) var_dump($cnt);
+        $this->assertEqual($sVal->outputCalled, 1);
+        $r1 = new Ac_Result();
     }
     
 }

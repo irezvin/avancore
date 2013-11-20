@@ -39,7 +39,7 @@ class Ac_Value_Stream implements Ac_I_Streamable, Ac_I_WithOutput {
             while (!feof($s)) 
                 call_user_func($callback, fread($s, $this->blockSize));
         } else {
-            while (!feof($s)) echo fread($s, $this->blockSize);
+            fpassthru($s);
         }
     }
     
