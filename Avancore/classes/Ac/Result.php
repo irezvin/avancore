@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac_I_StringObject_ClonedWithBuffer {
+class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac_I_StringObject_ClonedWithBuffer, Ac_I_WithOutput {
 
     const OVERRIDE_NONE = 0;
     const OVERRIDE_PARENT = 1;
@@ -368,7 +368,23 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
         if (func_num_args() > 0) // simple check to help developer
             trigger_error (__METHOD__.": this method isn\'t supposed to receive any args and echo's result content into output stream. "
                 . "Weren't you intended to ".__CLASS__."::put(\$contnent)?", E_USER_NOTICE);
-        echo $this->getContent();
+        $this->output();
+    }
+    
+    function output($callback = null) {
+        foreach (Ac_StringObject::sliceStringWithObjects($this->getContent()) as $cnt) {
+            $string = false;
+            if (is_object($cnt) && $cnt instanceof Ac_I_WithOutput) $cnt->output($callback);
+            elseif (is_object($cnt) && $cnt instanceof Ac_I_StringObject_WithRender) {
+                $string = $cnt->getRenderedString();
+            } else {
+                $string = $cnt;
+            }
+            if ($string !== false) {
+                if ($callback) call_user_func($callback, $string);
+                else echo $string;
+            }
+        }
     }
     
     function setContent($content) {
@@ -385,8 +401,12 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
         $this->put(ob_get_clean());
     }
     
-    function put($content) {
-        $this->content .= $content;
+    function put($content, $_ = null) {
+        foreach (func_get_args() as $cnt) {
+            if (is_object($cnt) && ! $cnt instanceof Ac_I_StringObject && $cnt instanceof Ac_I_WithOutput)
+                $cnt = new Ac_StringObject_Wrapper($cnt);
+            $this->content .= $cnt;
+        }
         $this->touchStringObjects();
     }
     
