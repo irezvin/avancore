@@ -1140,4 +1140,55 @@ EOD
         $r1 = new Ac_Result();
     }
     
+    function testSlots() {
+        // the final frontier
+
+        $r = new Ac_Result();
+        
+        $second = new Ac_Result(array('content' => 'second', 'slotId' => 'slot'));
+        
+        $inner = new Ac_Result();
+        $inner->put(
+            'a ', 
+            
+            new Ac_Result(array(
+                    'content' => 'first'.($second), 
+                    'slotId' => 'slot'
+            )), 
+            'b '
+        );
+        $r->put($inner);
+        $r->put(new Ac_Result_SlotRenderer(array('slotId' => 'slot', 'before' => '(', 'separator' => ', ', 'after' => ')')));
+        $inner2 = new Ac_Result();
+        $inner2->put(
+            ' c ', 
+            new Ac_Result(array('content' => 'third', 'slotId' => 'slot')), 
+            'd'
+        );
+        $r->put($inner2);
+        
+        require_once(dirname(__FILE__).'/assets/deferredsAndStringObjects.php');
+        
+        $def = new ExampleDeferred(new Ac_Result(array('slotId' => 'slot', 'content' => 'fourth')), '...');
+        
+        $r->put($def);
+        
+        ExampleEvaluator::$thirdPart = '';
+            
+        $ren = new ExampleRendered(new Ac_Result(array('slotId' => 'slot', 'content' => 'fifth')));
+        
+        $r->put($ren);
+        
+        $outer = new Ac_Result;
+        $outer->put(
+            new Ac_Result(array('slotId' => 'slot', 'content' => 'P.S.#1')), 
+            '{', $r, '}', 
+            new Ac_Result_SlotRenderer(array('slotId' => 'slot', 'before' => ' (', 'separator' => ', ', 'after' => ')')),
+            new Ac_Result(array('slotId' => 'slot', 'content' => 'P.S.#2'))
+        );
+        
+        if (!$this->assertEqual($str = $outer->writeAndReturn(), "{a b (first, second, third, fourth, fifth) c d...} (P.S.#1, P.S.#2)"))
+            var_dump($str);
+    }
+    
 }

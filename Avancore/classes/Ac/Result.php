@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac_I_StringObject_ClonedWithBuffer, Ac_I_WithOutput {
+class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac_I_StringObject_ClonedWithBuffer, Ac_I_WithOutput, Ac_I_Result_ForSlot {
 
     const OVERRIDE_NONE = 0;
     const OVERRIDE_PARENT = 1;
@@ -19,9 +19,11 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
     /**
      * @var string
      */
-    protected $targetPlaceholderId = false;
+    protected $slotId = false;
+    
+    protected $slotContent = array();
 
-    protected $placeholderParams = false;
+    protected $slotParams = false;
 
     /**
      * @var Ac_Result
@@ -51,7 +53,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
     protected $stringObjects = array();
     
     /**
-     * @var bool
+     * @var boolclone
      */
     protected $merged = false;
 
@@ -192,25 +194,78 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
     }
 
     /**
-     * @param string $targetPlaceholderId
+     * @param string $slotId
      */
-    function setTargetPlaceholderId($targetPlaceholderId) {
-        $this->targetPlaceholderId = $targetPlaceholderId;
+    function setSlotId($slotId) {
+        $this->slotId = $slotId;
     }
 
     /**
      * @return string
      */
-    function getTargetPlaceholderId() {
-        return $this->targetPlaceholderId;
+    function getSlotId() {
+        return $this->slotId;
     }
     
-    function setPlaceholderParams($placeholderParams) {
-        $this->placeholderParams = $placeholderParams;
+    function setSlotParams($slotParams) {
+        $this->slotParams = $slotParams;
     }
 
-    function getPlaceholderParams() {
-        return $this->placeholderParams;
+    function getSlotParams() {
+        return $this->slotParams;
+    }
+    
+    /**
+     * @param string|bool $slotId FALSE to get content of all slots; otherwise slot id
+     * @return array
+     */
+    function getSlotContent($slotId = false) {
+        if ($slotId === false) $res = $this->slotContent;
+        else $res = isset($this->slotContent[$slotId])? $this->slotContent[$slotId] : array();
+        return $res;
+    }
+    
+    /**
+     * Sets content of the slot
+     * 
+     * @param array $slotContent Contnent of the slot
+     * @param bool $slotId FALSE to set content of all slots at once (requires array of arrays)
+     */
+    function setSlotContent(array $slotContent, $slotId = false) {
+        if ($slotId === false) {
+            $this->slotContent = array();
+            foreach ($slotContent as $k => $v) {
+                $this->setSlotContent($v, $k);
+            }
+        } else {
+            foreach ($slotContent as $item) {
+                if (!$item instanceof Ac_I_Result_ForSlot) 
+                    throw new Ac_E_InvalidCall("Only Ac_I_Result_ForSlot is allowed to put into the slot");
+                $this->slotContent[$slotId] = $item;
+            }
+        }
+    }
+    
+    function hasSlotContent(Ac_I_Result_ForSlot $content, $slotId = false) {
+        if ($slotId === false) $slotId = $content->getSlotId();
+        $s = $this->getSlotContent($slotId);
+        $res = false;
+        foreach ($s as $v) 
+            if ($v === $content) {
+                $res = true;
+                break;
+            }
+        return $res;
+    }
+    
+    function addSlotContent(Ac_I_Result_ForSlot $content, $slotId = false, $noDuplicate = false) {
+        if ($slotId === false) $slotId = $content->getSlotId();
+        if (!isset($this->slotContent[$slotId])) {
+            $this->slotContent[$slotId] = array($content);
+        } else {
+            if (!$noDuplicate || !$this->hasSlotContent($content, $slotId)) 
+                $this->slotContent[$slotId][] = $content;
+        }
     }
 
     function setReplaceWith(Ac_Result $replaceWith = null) {
