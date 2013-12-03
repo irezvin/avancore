@@ -21,17 +21,49 @@ class ExampleDeferred extends Ac_Deferred {
     
 }
 
-class ExampleRendered {
+class ExampleRendered implements Ac_I_StringObject_WithRender {
     
     var $string;
     
+    protected $stringObjectMark = '';
+        
     function __construct($string = 'someString') {
         $this->string = $string;
     }
     
-    function __toString() {
+    function getRenderedString() {
         return $this->string;
     }
+    
+    // ---- Ac_I_StringObject ----
+
+    /**
+     * @param string $stringObjectMark
+     */
+    function setStringObjectMark($stringObjectMark) {
+        $this->stringObjectMark = $stringObjectMark;
+    }
+
+    /**
+     * @return string
+     */
+    function getStringObjectMark() {
+        return $this->stringObjectMark;
+    }    
+    
+    function __toString() {
+        if (!strlen($this->stringObjectMark)) Ac_StringObject::register($this);
+        return $this->getStringObjectMark();
+    }
+    
+    function __clone() {
+        if (strlen($this->stringObjectMark)) Ac_StringObject::onClone($this);
+    }
+    
+    function __wakeup() {
+        Ac_StringObject::onWakeup($this);
+    }
+    
     
 }
 
