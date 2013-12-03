@@ -22,9 +22,6 @@ class Ac_Result_Stage extends Ac_Prototyped {
      */
     protected $isComplete = false;
     
-    
-    
-    
     /**
      * @var Ac_Result
      */
@@ -42,6 +39,8 @@ class Ac_Result_Stage extends Ac_Prototyped {
     protected $parent = null;
 
     protected $stack = array();
+    
+    protected $stackProps = array('current', 'parent', 'position', 'isAscend');
     
     protected $defaultTraverseClasses = 'Ac_Result';
     
@@ -151,6 +150,20 @@ class Ac_Result_Stage extends Ac_Prototyped {
         $this->isActive = true;
         $this->isComplete = false;
     }
+
+    protected function pushStack($retOnly = false) {
+        $res = array();
+        foreach ($this->stackProps as $p) {
+            $res[$p] = $this->$p;
+        }
+        if (!$retOnly) $this->stack[] = $res;
+        return $res;
+    }
+    
+    protected function popStack($fromWhat = false) {
+        if ($fromWhat === false) $fromWhat = array_pop($this->stack);
+        foreach ($fromWhat as $k => $v) $this->$k = $v;
+    }
     
     /**
      * Checks if current, parent or root item should be overriden by 
@@ -172,7 +185,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
         if ($this->current->getOverrideMode() == Ac_Result::OVERRIDE_PARENT) {
             if ($this->parent) {
                 $new = $this->current;
-                list ($this->current, $this->parent, $this->position) = array_pop($this->stack);
+                $this->popStack();
                 $this->position->replaceCurrentObject($new);
                 $this->current = $new;
             }
@@ -180,8 +193,8 @@ class Ac_Result_Stage extends Ac_Prototyped {
                 //Ac_Debug::ddd($this->root === $this->stack[0][0]);
             $curr = $this->current;
             // goto root node
-            list ($this->current, $this->parent, $this->position) = $this->stack[0];
-            $this->stack = array();
+            array_splice($this->stack, 1);
+            $this->popStack();
             $this->current->setReplaceWith($curr);
             $this->current = $curr;
         }
@@ -204,7 +217,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
                     $position = new Ac_Result_Position($this->current, $this->traversalClasses);
                     $fc = $position->advance();
                     if ($fc) {
-                        array_push($this->stack, array($this->current, $this->parent, $this->position));
+                        $this->pushStack();
                         $this->parent = $this->current;
                         $this->current = $fc;
                         $this->position = $position;
@@ -231,7 +244,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
                     } else {
                             if ($this->isAscend) $this->endItem ($this->current);
                             if (count($this->stack)) {
-                                list ($this->current, $this->parent, $this->position) = array_pop($this->stack);
+                                $this->popStack();
                                 $this->isAscend = true;
                             } else {
                                 $this->parent = null;
@@ -338,7 +351,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
     function replaceParentObject(Ac_Result $replaceWith, $replaceRoot = false) {
         if (!count($this->stack))
             throw new Ac_E_InvalidUsage("Cannot replaceParentObject() when not at child node");
-        list ($this->current, $this->parent, $this->position) = array_pop($this->stack);
+        $this->popStack();
         $this->current->setReplaceWith($replaceWith);
         if ($replaceRoot) $this->current->setOverrideMode(Ac_Result::OVERRIDE_ALL);
         $this->switchedCurrent = true;

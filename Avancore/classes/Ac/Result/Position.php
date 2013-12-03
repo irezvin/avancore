@@ -332,12 +332,18 @@ class Ac_Result_Position {
         if ($this->isDone) throw new Ac_E_InvalidUsage("Cannot removeCurrentObject() when not at object; check with !Ac_Result_Position::isDone() first");
         
         if ($this->isString) {
+            if (! $this->currentObject instanceof Ac_I_StringObject) {
+                Ac_Debug::dd(''.new Exception);
+            }
             $this->result->replaceObjectInContent($this->currentObject, $withObjectOrString);
         } else {
             $this->result->removeFromList($this->propertyName, $this->currentObject);
             $this->result->addToList($this->propertyName, $withObjectOrString, $this->offset);
         }
-        $this->currentObject = $withObjectOrString;
+        if (is_object($withObjectOrString) && $withObjectOrString instanceof Ac_I_StringObject)
+            $this->currentObject = $withObjectOrString;
+        else 
+            $this->currentObject = false;
     }
     
 }
