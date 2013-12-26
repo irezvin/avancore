@@ -1080,7 +1080,8 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      */
     function getAllRecords($key = false) {
         if ($this->allRecords === false) {
-            if (strlen($t = $this->getTitleFieldName())) $ord = $t.' ASC';
+            if (strlen($t = $this->getTitleFieldName()) && !$this->isTitleAProperty()) $ord = $t.' ASC';
+            elseif (($o = $this->getDefaultOrdering()) !== false) $ord = $o;
                 else $ord = '';
                 
             $this->allRecords = $this->loadRecordsByCriteria('', true, $ord);

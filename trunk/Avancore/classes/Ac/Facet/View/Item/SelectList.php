@@ -28,7 +28,7 @@ class Ac_Facet_View_Item_SelectList extends Ac_Facet_ItemView {
         $v = $this->item->getPossibleValues();
         $size = $this->getSize();
         $a = array(
-            'size' => is_null($size)? 1 : $size,
+            'size' => $size? $size : 1,
             'name' => $this->getHtmlName(),
             'onchange' => 'if (this.form) this.form.submit();',
         );
@@ -36,8 +36,8 @@ class Ac_Facet_View_Item_SelectList extends Ac_Facet_ItemView {
             $a['multiple'] = true;
             $a['name'] .= '[]';
             if (is_null($size)) {
-                $a['size'] = count($v);
-                if ($this->maxSize >= 0 && $a['size'] >= $this->maxSize) $a['size'] = $this->maxSize;
+                $a['size'] = max(count($v), 1);
+                if ($this->maxSize !== false && $this->maxSize >= 0 && $a['size'] >= $this->maxSize) $a['size'] = $this->maxSize;
             }
         }
         if (count($v) == 1) $a['disabled'] = true;

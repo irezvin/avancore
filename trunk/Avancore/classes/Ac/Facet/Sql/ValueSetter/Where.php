@@ -24,7 +24,7 @@ class Ac_Facet_Sql_ValueSetter_Where extends Ac_Facet_Sql_ValueSetter {
     
     function setValue (Ac_Facet_Sql_ItemImpl $impl, Ac_Sql_Select $select) {
         $colExpr = $this->colExpr;
-        if ($colExpr === false) $colExpr = $impl->getValueCol();
+        if ($colExpr === false) $colExpr = $impl->getValueCol($select->getDb());
         $alias = $this->alias;
         if ($alias === false) $alias = $impl->getValueAlias();
         if ($alias !== false) $select->useAlias($alias);

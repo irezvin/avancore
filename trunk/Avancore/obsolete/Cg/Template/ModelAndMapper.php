@@ -285,7 +285,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
 <?php   if ($this->parentClass === 'Ac_Model_Object') { ?>    
         return $pi;
 <?php   } else { ?>
-        return Ac_Util::m(parent::getOwnPropertiesInfo(), $pi);
+        return Ac_Util::m($pi, parent::getOwnPropertiesInfo());
 <?php   } ?>                
     }
 <?php if ($this->model->hasUniformPropertiesInfo) { ?>
@@ -369,6 +369,10 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     protected $autoincFieldName = <?php $this->str($this->autoincFieldName) ?>;
     
 <?php } ?>
+    function listSqlColumns() {
+        return $this->columnNames;
+    }
+    
     /**
      * @return <?php $this->d($this->modelClass); ?> 
      */ 
@@ -432,9 +436,16 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     <?php } ?>
     
     protected function doGetInfoParams() {
+<?php   if (!in_array($this->genMapperClass, array('Ac_Model_Mapper', 'Ac_Model_CpkMapper'))) { ?>
+        return Ac_Util::m( 
+            <?php $this->exportArray($this->model->getMapperInfoParams(), 12); ?>,
+            parent::doGetInfoParams()
+        );
+<?php   } else { ?>
         return Ac_Util::m(parent::doGetInfoParams(), 
             <?php $this->exportArray($this->model->getMapperInfoParams(), 12); ?>
         );
+<?php   } ?>        
     }
     
     <?php if ($this->uniqueIndexData) { ?>
