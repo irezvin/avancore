@@ -326,6 +326,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $data = $form->getValue();
         $record = $this->getRecord();
         $record->bind($data);
+        $this->callFeatures('onBind', $record);
         if ($record->check() && $record->store()) {
             $this->_recordStored = true;
             $this->_record = null;
@@ -390,6 +391,15 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return !$this->onlyRecord && ($this->getPrimaryKey() === false) && !$this->_recordStored && (isset($this->_rqData['new']) && $this->_rqData['new'] || $this->_isNewRecord);
     }
     
+    protected function callFeatures($method, $_ = null) {
+        $args = func_get_args();
+        array_shift($args);
+        foreach ($this->listFeatures() as $id) {
+            $feat = $this->getFeature($id);
+            if (method_exists($feat, $method)) call_user_func_array(array($feat, $method), $args);
+        }
+    }
+    
     /**
      * Returns record that should be edited with the form
      * @return Ac_Model_Object
@@ -400,12 +410,14 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             if ($this->isNewRecord()) {
                 $m = $this->getMapper();
                 $this->_record = $m->factory();
+                $this->callFeatures('onCreate', $this->_record);
                 if ($this->_datalink) $this->_datalink->setRecordDefaults($this->_record);
             } elseif (($pk = $this->getPrimaryKey()) !== false) {
                 if ($this->onlyRecord) $this->_record = $this->onlyRecord;
                 else {
                     $m = $this->getMapper();
                     $this->_record = $m->loadRecord($pk);
+                    $this->callFeatures('onLoad', $this->_record);
                     if (!$this->_record) $this->_record = null; else {
                         if ($this->_datalink && !$this->_datalink->canProcessRecord($this->_record))
                             $this->_record = null;
@@ -713,6 +725,10 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $this->_table;
     }
     
+    protected function cmpFeatures(Ac_Admin_Feature $feat1, Ac_Admin_Feature $feat2) {
+        return $feat1->order - $feat2->order;
+    }
+    
     function listFeatures() {
         if ($this->_featureObjects === false) {
             $this->_featureObjects = array();
@@ -733,6 +749,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $feature = new $class ($this, $featureSettings);
                 if ($feature->canBeApplied()) $this->_featureObjects[$fc] = $feature;
             }
+            uasort($this->_featureObjects, array($this, 'cmpFeatures'));
         }
         return array_keys($this->_featureObjects);
     }
@@ -769,6 +786,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                         } else {
                             Ac_Util::ms($actionPrototypes[$ak], $a[$ak]);
                         }
+                    } elseif ($a[$ak] === false || is_null($a[$ak])) {
+                        unset($actionPrototypes[$ak]);
                     }
                 }
             }
