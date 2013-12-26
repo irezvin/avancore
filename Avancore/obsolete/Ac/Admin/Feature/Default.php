@@ -5,7 +5,7 @@
  */
 class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     
-    var $priority = 0;
+    var $order = 0;
     
     var $preloadRelations = false;
     

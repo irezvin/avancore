@@ -6,7 +6,7 @@ class Ac_Admin_Feature {
      * Priority that is used to sort features in the manager 
      * @var int
      */
-    var $priority = 50;
+    var $order = 50;
     
     /**
      * @var Ac_Admin_Manager 
@@ -132,6 +132,15 @@ class Ac_Admin_Feature {
     
     function onCollectionCreated(Ac_Model_Collection $collection) {
     }
+    
+    function onLoad($record) {
+    }
+    
+    function onCreate($record) {
+    }
      
+    function onBind($record) {
+    }
+    
 }
 

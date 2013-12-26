@@ -52,7 +52,10 @@ class Ac_Decorator_Multi extends Ac_Decorator {
     }
     
     function setDecorators(array $decorators) {
-        $this->decorators = Ac_Prototyped::factoryCollection($decorators, 'Ac_I_Decorator', array_merge(array('model' => $this->model), $this->globalProps));
+        $this->decorators = Ac_Prototyped::factoryCollection($decorators, 'Ac_I_Decorator', $this->globalProps);
+        if ($this->model) {
+            foreach ($this->decorators as $d) if ($d instanceof Ac_I_Decorator_Model) $d->setModel($this->model);
+        }
         return $this->decorators;
     }
     

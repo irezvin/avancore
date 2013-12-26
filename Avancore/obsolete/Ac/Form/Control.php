@@ -347,8 +347,9 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
             } else {
                 $res = $this->_doGetDefault();
             }
-            if ($this->decorator)
+            if ($this->decorator) {
                 $res = Ac_Decorator::decorate ($this->decorator, $res, $this->decorator);            
+            }
         }
         return $res;
     }

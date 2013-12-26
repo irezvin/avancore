@@ -70,7 +70,9 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
         }
         if ($va !== false) {
             $select->useAlias($va);
-            if (!is_array($va) && !(is_object($vc) && $vc instanceof Ac_I_Sql_Expression)) $vc = $select->getDb()->n(array($va, $vc));
+            if (!is_array($vc) && !(is_object($vc) && $vc instanceof Ac_I_Sql_Expression)) {
+                $vc = $select->getDb()->n(array($va, $vc));
+            }
         }
         $select->columns = array('title' => $tc, 'value' => $vc);
         $select->orderBy = 'title ASC';
@@ -122,9 +124,18 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
         $this->valueCol = $valueCol;
     }
 
-    function getValueCol() {
-        if ($this->valueCol === false) return $this->getItem()->getName();
-        return $this->valueCol;
+    function getValueCol(Ac_Sql_Db $quoteBy = null) {
+        if ($this->valueCol === false) $res = $this->getItem()->getName();
+        else $res = $this->valueCol;
+        if ($quoteBy) {
+            $va = $this->getValueAlias();
+            if ($va !== false) {
+                if (!is_array($res) && !(is_object($res) && $res instanceof Ac_I_Sql_Expression)) {
+                    $res = $quoteBy->n(array($va, $res));
+                }
+            }
+        }
+        return $res;
     }
 
     function setValueSetter($valueSetter) {
@@ -149,7 +160,9 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
     
     function applyToSelectPrototype(array & $prototype, Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
         if ($currValuesImpl === $this && !$this->alwaysApply) return;
-        if ($this->selectExtra) Ac_Util::ms($prototype, $this->selectExtra);
+        if ($this->selectExtra) {
+            Ac_Util::ms($prototype, $this->selectExtra);
+        }
         if ($this->selectPrototypesForValues) {
             $v = $this->getValue();
             if ($v !== false || is_array($v) && count($v)) {

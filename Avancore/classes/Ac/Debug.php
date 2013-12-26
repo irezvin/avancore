@@ -64,6 +64,11 @@ class Ac_Debug {
         call_user_func_array('var_dump', $a);
     }
     
+    static function log($_ = null) {
+        $a = func_get_args();
+        return call_user_func_array(array('Ac_Debug_Log', 'l'), $a);
+    }
+    
     /**
      * Stands for "dump trace"
      */
