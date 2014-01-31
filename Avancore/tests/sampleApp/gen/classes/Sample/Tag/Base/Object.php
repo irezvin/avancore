@@ -1,14 +1,14 @@
 <?php
 
 class Sample_Tag_Base_Object extends Ac_Model_Object {
-    
-    var $_people = false;
-    var $_peopleCount = false;
-    var $_personIds = false;
-    var $tagId = NULL;
-    var $title = '';
-    var $titleM = NULL;
-    var $titleF = NULL;
+
+    public $_people = false;
+    public $_peopleCount = false;
+    public $_personIds = false;
+    public $tagId = NULL;
+    public $title = '';
+    public $titleM = NULL;
+    public $titleF = NULL;
     
     var $_mapperClass = 'Sample_Tag_Mapper';
     

@@ -992,7 +992,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         if (is_null($exists)) $exists = array_key_exists($this->pk, $hyData);
         if ($exists) {
             $query = $this->db->updateStatement($this->tableName, $hyData, $this->pk, false);
-            if ($this->db->query($query)) $res = $hyData;
+            if ($this->db->query($query) !== false) $res = $hyData;
             else {
                 $descr = $this->db->getErrorDescr();
                 if (is_array($descr)) $descr = implode("; ", $descr);

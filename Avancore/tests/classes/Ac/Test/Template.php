@@ -23,15 +23,15 @@ class Ac_Test_Template extends Ac_Test_Base {
         );
         $this->assertEqual($missing, array());
         
-        $t1->setValue('object1', $object1 = new TestObject1_1);
+        $t1->setField('object1', $object1 = new TestObject1_1);
         $object2 = new TestObject1_2;
-        $this->assertEqual(
-            $t1->getArgs('partObjects', $args = array('object2' => $object2), $missing), 
+        if (!$this->assertEqual(
+            $a = $t1->getArgs('partObjects', $args = array('object2' => $object2), $missing), 
             array($object1, $object2)
-        );
+        )) var_dump($a);
         $this->assertEqual($missing, array());
         
-        $t1->deleteValue('object1');
+        $t1->deleteField('object1');
         $this->assertEqual(
             $t1->getArgs('partSomeObjects', $args = array(), $missing), 
             array(1 => null)

@@ -188,12 +188,20 @@ class Cg_Frontend {
     function show($object, $buf = false, $showDefaults = false) {
         $r = array();
         if (!$showDefaults) $cv = get_class_vars(get_class($object));
-        foreach (get_object_vars($object) as $k => $v) {
+        $vars = get_object_vars($object);
+        if (method_exists($object, 'onShow')) {
+            $extra = $object->onShow();
+        } else {
+            $extra = array();
+        }
+        Ac_Util::ms($vars, $extra);
+        foreach ($vars as $k => $v) {
             if ($k == 'password') $v = str_repeat('*', strlen($v));
-            if ($k{0} != '_' && !is_object($v) && !is_array($v)) {
+            if (array_key_exists($k, $extra) || ($k{0} != '_' && !is_object($v) && !is_array($v))) {
                 if (!$showDefaults && isset($cv[$k]) && $cv[$k] === $v) continue; 
                 if ($v === false) $v = '<i>false</i>';
                 elseif ($v === true) $v = '<i>true</i>';
+                elseif (is_array($v)) $v = $v? '<pre>'.htmlspecialchars(print_r($v, 1)).'</pre>' : "Array()";
                 else $v = "'".htmlspecialchars($v)."'";
                 $r[] = "<li> <strong>$k</strong>: $v</li>";
             }

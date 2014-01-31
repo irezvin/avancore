@@ -16,7 +16,7 @@ class StringObjectCache extends Ac_StringObject {
     
 }
 
-class AllHandler implements Ac_I_Result_Handler_All {
+class AllHandler implements Ac_I_Result_Handler {
 
     static $log = array();
     
