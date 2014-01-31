@@ -34,25 +34,27 @@ abstract class Ac_Util {
     }
     
     static function m($paArray1, $paArray2, $preserveNumeric = false) {
-        return Ac_Util::array_merge_recursive2 ($paArray1, $paArray2, $preserveNumeric);
+        if (!is_array($paArray1) || !is_array($paArray2)) { return $paArray2; }
+        if (!$paArray1) return $paArray2;
+        if (!$paArray2) return $paArray1;
+        foreach ($paArray2 AS $sKey2 => $sValue2) {
+            if (is_int($sKey2) && !$preserveNumeric) {
+                $paArray1[] = $sValue2;
+            }
+            else {
+                if (!isset($paArray1[$sKey2])) $paArray1[$sKey2] = null;
+                $paArray1[$sKey2] = Ac_Util::array_merge_recursive2($paArray1[$sKey2], $sValue2, $preserveNumeric);
+            }
+        }
+        return $paArray1;
     }
 
     static function ms(& $paArray1, $paArray2, $preserveNumeric = false) {
-        return $paArray1 = Ac_Util::array_merge_recursive2 ($paArray1, $paArray2, $preserveNumeric);
+        return $paArray1 = Ac_Util::m($paArray1, $paArray2, $preserveNumeric);
     }
 
     static function array_merge_recursive2($paArray1, $paArray2, $preserveNumeric  = false) {
-        if (!is_array($paArray1) or !is_array($paArray2)) { return $paArray2; }
-            foreach ($paArray2 AS $sKey2 => $sValue2) {
-                if (is_int($sKey2) && !$preserveNumeric) {
-                    $paArray1[] = $sValue2;
-                }
-                else {
-                    if (!isset($paArray1[$sKey2])) $paArray1[$sKey2] = null;
-                    $paArray1[$sKey2] = Ac_Util::array_merge_recursive2($paArray1[$sKey2], $sValue2, $preserveNumeric);
-                }
-            }
-        return $paArray1;
+        return Ac_Util::m($paArray1, $paArray2, $preserveNumeric);
     }
     
     static function mkAttribs ($attribs = array(), $quote='"', $quoteStyle = ENT_QUOTES, $charset = false, $doubleEncode = true, $addSpace = true) {
@@ -568,11 +570,8 @@ abstract class Ac_Util {
         return $res;
     }
     
-    static function stripTrailingSlash($s, $slash = '/') {
-        if (!strlen($s)) return $s;
-        $l = strlen($s);
-        if (strpos($slash, substr($s, $l - 1, 1)) !== false) $s = substr($s, 0, $l - 1);
-        return $s;
+    static function stripTrailingSlash($string, $slash = '/\\') {
+        return Ac_Util::removeTrailingSlash($string, $slash);
     }
     
     static function flattenArray($array, $level = -1) {

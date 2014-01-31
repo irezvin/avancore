@@ -2,6 +2,9 @@
 
 class Ac_Result_Stage_Unserialize extends Ac_Result_Stage {
     
+    // is used to call special methods of the handlers
+    protected $stageName = 'Unserialize';    
+    
     function setCurrentResultObsolete() {
         if (($r = $this->getCurrentResult())) $r->markObsolete();
         

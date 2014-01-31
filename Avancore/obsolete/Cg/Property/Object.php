@@ -391,6 +391,18 @@ class Cg_Property_Object extends Cg_Property {
         return $res;
     }
     
+    function getForeignKeyFieldName() {
+        $res = false;
+        if (!$this->isList()) {
+            $proto = $this->getAeModelRelationPrototype();
+            $fl = $proto['fieldLinks'];
+            if (count($fl) == 1) {
+                $tmp = array_keys($fl);
+                $res = $tmp[0];
+            }
+        }
+        return $res;
+    }
     
 }
 

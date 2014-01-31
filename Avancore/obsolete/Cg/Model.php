@@ -147,6 +147,8 @@ class Cg_Model {
     var $langStringPrefix = false;
     
     var $tableLangStringPrefix = false;
+    
+    var $createAccessors = false;
 
     // ---------------------------------------------------------------------
     
@@ -714,6 +716,23 @@ class Cg_Model {
             $res[$prop->getLangStringName()] = $prop->caption;
         }
         return $res;
+    }
+    
+    function getReferenceFieldsData() {
+        $res = array();
+        foreach ($this->listProperties() as $i) {
+            $prop = $this->getProperty($i);
+            if ($prop instanceof Cg_Property_Object) {
+                if (strlen($f = $prop->getForeignKeyFieldName())) {
+                    $res[$f] = $prop->getClassMemberName();
+                }
+            }
+        }
+        return $res;
+    }
+    
+    function onShow() {
+        return array('getReferenceFieldsData()' => $this->getReferenceFieldsData());
     }
     
     

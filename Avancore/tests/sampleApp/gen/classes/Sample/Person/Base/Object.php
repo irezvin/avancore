@@ -1,23 +1,23 @@
 <?php
 
 class Sample_Person_Base_Object extends Ac_Model_Object {
-    
-    var $_orientation = false;
-    var $_tags = false;
-    var $_tagsCount = false;
-    var $_tagIds = false;
-    var $_incomingRelations = false;
-    var $_incomingRelationsCount = false;
-    var $_outgoingRelations = false;
-    var $_outgoingRelationsCount = false;
-    var $personId = NULL;
-    var $name = '';
-    var $gender = 'F';
-    var $isSingle = 1;
-    var $birthDate = NULL;
-    var $lastUpdatedDatetime = NULL;
-    var $createdTs = false;
-    var $sexualOrientationId = NULL;
+
+    public $_orientation = false;
+    public $_tags = false;
+    public $_tagsCount = false;
+    public $_tagIds = false;
+    public $_incomingRelations = false;
+    public $_incomingRelationsCount = false;
+    public $_outgoingRelations = false;
+    public $_outgoingRelationsCount = false;
+    public $personId = NULL;
+    public $name = '';
+    public $gender = 'F';
+    public $isSingle = 1;
+    public $birthDate = NULL;
+    public $lastUpdatedDatetime = NULL;
+    public $createdTs = false;
+    public $sexualOrientationId = NULL;
     
     var $_mapperClass = 'Sample_Person_Mapper';
     
@@ -444,6 +444,13 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         }
             
         return $res; 
+    }
+ 
+    protected function intListReferenceFields() {
+        $res = array (
+              'sexualOrientationId' => '_orientation',
+        );
+        return $res;
     }
     
 }

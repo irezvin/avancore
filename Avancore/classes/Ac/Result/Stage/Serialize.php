@@ -1,6 +1,9 @@
 <?php
 
 class Ac_Result_Stage_Serialize extends Ac_Result_Stage_Morph {
+    
+    // is used to call special methods of the handlers
+    protected $stageName = 'Serialize';    
 
     protected $defaultTraverseClasses = array ('Ac_Result', 'Ac_I_Deferred', 'Ac_I_StringObject_WithRender');
     

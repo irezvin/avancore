@@ -74,5 +74,13 @@ class Ac_Test_ModelSql extends Ac_Test_Base {
             var_dump($person->getErrors());
         }
     }
+    
+    function testSaveRecordNotChanged() {
+        $people = Sample::getInstance()->getSamplePersonMapper()->getAllRecords();
+        $person = array_pop($people);
+        $storeResult = $person->store();
+        $this->assertTrue($storeResult);
+        $this->assertTrue(!$person->getErrors());
+    }
 		
 }
