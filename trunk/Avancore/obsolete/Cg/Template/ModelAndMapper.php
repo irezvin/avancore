@@ -23,6 +23,8 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     var $assocProperties = array();
     var $relationPrototypes = false;
     var $uniqueIndexData = false;
+    var $createAccessors = false;
+    var $accessors = array();
     
     function _generateFilesList() {
         return array(
@@ -57,10 +59,14 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         $this->mapperClass = $this->model->getMapperClass();
         $this->genMapperClass = $this->model->getGenMapperClass();
         $this->parentMapperClass = $this->model->parentMapperClassName;
+        $this->createAccessors = $this->model->createAccessors;
         
         foreach ($this->model->listProperties() as $name) {
             $prop = $this->model->getProperty($name);
             if (!$prop->isEnabled()) continue;
+            if ($this->createAccessors && $prop instanceof Cg_Property_Simple) {
+                $this->accessors[$prop->getClassMemberName()] = $prop->getClassMemberName();
+            }
             //foreach ($gacm = $prop->getAllClassMembers() as $cm) if (!$cm) var_dump($prop->name, $gacm);
             $this->vars = array_merge($this->vars, $prop->getAllClassMembers());
         }
@@ -128,6 +134,26 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         //$class = 'Cg_Template_Assoc_Strategy';
         $res = new $class (array('relationId' => $relationId, 'prop' => & $prop, 'model' => & $this->model, 'template' => & $this));
         return $res;
+    }
+    
+    function _showModelAccessors() {
+        foreach ($this->accessors as $propName => $varName) {
+            $ucProp = ucfirst($propName);
+?>
+
+    function set<?php echo $ucProp; ?>($<?php echo $propName; ?>) {
+        if ($<?php echo $propName; ?> !== ($old<?php echo $ucProp; ?> = $this-><?php echo $varName; ?>)) {
+            $this-><?php echo $varName; ?> = $<?php echo $propName; ?>;
+            $this->notifyFieldChanged(<?php $this->export($propName); ?>);
+        }
+    }
+
+    function get<?php echo $ucProp; ?>() {
+        return $this-><?php echo $varName; ?>;
+    }
+        
+<?php
+        }
     }
 
     /**
@@ -219,10 +245,19 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     }
 <?php           
         }
+        
+        if (($rf = $this->model->getReferenceFieldsData())) { ?> 
+    protected function intListReferenceFields() {
+        $res = <?php echo $this->exportArray($rf, 8); ?>;
+        return $res;
+    }
+<?php   }
     }
     
     function showModelGenObject() {  
 
+        $fieldVisibility = $this->createAccessors? 'protected' : 'public';
+        
     // ------------------------------------------- modelGenObject -------------------------------------------    
         
 ?>
@@ -230,9 +265,9 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
 
 
 <?php if ($this->model->parentClassIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genModelClass); ?> extends <?php $this->d($this->parentClass); ?> {
-    
+
 <?php foreach($this->vars as $var => $default) { ?>
-    var $<?php $this->d($var); ?> = <?php $this->export($default); ?>;
+    <?php echo $fieldVisibility; ?> $<?php $this->d($var); ?> = <?php $this->export($default); ?>;
 <?php } ?>
     
     var $_mapperClass = <?php $this->str($this->mapperClass); ?>;
@@ -296,6 +331,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
 
     function tracksChanges() { return true; }
 <?php } ?>
+<?php if ($this->createAccessors) $this->_showModelAccessors(); ?>
 <?php foreach (array_keys($this->assocProperties) as $relId) { $this->_showModelMethodsForAssociation($relId, $this->assocProperties[$relId]); } ?>  
 <?php $this->_showModelStorageMethods(); ?>
     

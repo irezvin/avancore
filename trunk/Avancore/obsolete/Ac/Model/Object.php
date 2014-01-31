@@ -310,6 +310,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     function store() {
         if (!$this->_isBeingStored) { // we have to prevent recursion while saving complex in-memory record graphs
             $this->_isBeingStored = true;
+            $this->intResetReferences();
             if (($this->doBeforeSave() !== false)) {
                 if ($this->_isReference && !$this->isPersistent()) $this->_loadReference();
                 $res = true;
@@ -491,7 +492,9 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function _listSavedMembers() {
-        $res = array_intersect($this->_listOwnPublicVars(), $this->getMapper()->getColumnNames());
+        if (get_class($this) == 'Ac_Model_Object') $res = array_intersect($this->_listOwnPublicVars(), $this->getMapper()->getColumnNames());
+        else $res = array_intersect($this->listOwnFields(), $this->getMapper()->getColumnNames());        
+        
         return $res;
     }
     
@@ -545,7 +548,10 @@ class Ac_Model_Object extends Ac_Model_Data {
      * @return array ($fieldName => $fieldValue)
      */
     function getDataFields($fieldNames = false, $returnFalseFields = true) {
-        if ($fieldNames === false) $fieldNames = $this->_listOwnPublicVars();
+        if ($fieldNames === false) {
+            if (get_class($this) == 'Ac_Model_Object') $fieldNames = $this->_listOwnPublicVars();
+            else $fieldNames = array_intersect($this->listOwnFields(), $this->getMapper()->getColumnNames());
+        }
         elseif (!is_array($fieldNames)) $fieldNames = array($fieldNames);
         $res = array();
         if ($returnFalseFields)
@@ -971,6 +977,55 @@ class Ac_Model_Object extends Ac_Model_Data {
                 $v = $cv[$k];
             }
             $this->$k = $v;
+        }
+    }
+    
+    function __isset($name) {
+        $res = in_array($name, $this->listOwnFields());
+        return $res;
+    }
+    
+    function __get($name) {
+        if (in_array($name, $this->listOwnFields())) $res = $this->getField($name);
+        elseif (!in_array($name, array_diff(array_keys(Ac_Util::getPublicVars($this)), array_keys(get_object_vars($this))))) {
+            return $this->$name;
+        } else {
+            $rc = new ReflectionClass(get_class($this));
+            $p = $rc->getProperty($name);
+            if ($p->isPrivate()) $m = 'private';
+            elseif ($p->isProtected()) $m = 'protected';
+            else throw new Exception("Assertion: something is wrong in ".__METHOD__);
+            throw new Ac_E_InvalidCall("Cannot access {$m} property '$name' in class ".get_class($this));
+        }
+    }
+    
+    function __set($name, $value) {
+        if (in_array($name, $this->listOwnFields())) $res = $this->setField($name, $value);
+        elseif (!in_array($name, array_diff(array_keys(Ac_Util::getPublicVars($this)), array_keys(get_object_vars($this))))) {
+            $this->$name = $value;
+        } else {
+            $rc = new ReflectionClass(get_class($this));
+            $p = $rc->getProperty($name);
+            if ($p->isPrivate()) $m = 'private';
+            elseif ($p->isProtected()) $m = 'protected';
+            else throw new Exception("Assertion: something is wrong in ".__METHOD__);
+            throw new Ac_E_InvalidCall("Cannot access {$m} property '$name' in class ".get_class($this));
+        }
+    }
+    
+    protected function notifyFieldChanged($field) {
+    }
+    
+    /**
+     * @return array($foreignKeyPropertyName => $objectPropertyName)
+     */
+    protected function intListReferenceFields() {
+        return array();
+    }
+    
+    protected function intResetReferences() {
+        foreach ($this->intListReferenceFields() as $fieldName => $objectFieldName) {
+            if ($this->isChanged($fieldName)) $this->$objectFieldName = false;
         }
     }
     

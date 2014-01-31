@@ -436,6 +436,7 @@ class Cg_Domain {
     }
     
     protected function needsLangStrings() {
+        $res = false;
         if ($this->useLangStrings) $res = true;
         else {
             foreach ($this->listModels() as $m) {

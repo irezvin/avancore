@@ -1,11 +1,11 @@
 <?php
 
 class Sample_Orientation_Base_Object extends Ac_Model_Object {
-    
-    var $_people = false;
-    var $_peopleCount = false;
-    var $sexualOrientationId = NULL;
-    var $title = '';
+
+    public $_people = false;
+    public $_peopleCount = false;
+    public $sexualOrientationId = NULL;
+    public $title = '';
     
     var $_mapperClass = 'Sample_Orientation_Mapper';
     

@@ -29,4 +29,8 @@ class Ac_Test_Sql extends Ac_Test_Base {
             . "'ThirdNamed' + 'SecondPos' AS `thirdNamedPlusSecondPos`")) var_dump($prep);
     }
     
+    function testZeroRowsChanged() {
+        
+    }
+    
 }

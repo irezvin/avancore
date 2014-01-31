@@ -1,12 +1,12 @@
 <?php
 
 class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
-    
-    var $_relations = false;
-    var $_relationsCount = false;
-    var $relationTypeId = NULL;
-    var $title = '';
-    var $isSymmetrical = 0;
+
+    public $_relations = false;
+    public $_relationsCount = false;
+    public $relationTypeId = NULL;
+    public $title = '';
+    public $isSymmetrical = 0;
     
     var $_mapperClass = 'Sample_Relation_Type_Mapper';
     

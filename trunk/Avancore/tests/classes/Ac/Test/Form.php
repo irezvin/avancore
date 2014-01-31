@@ -138,4 +138,16 @@ class Ac_Test_Form extends Ac_Test_Base {
         return $f1;
     }
     
+    function testFormTr() {
+        $tf1 = $this->createTestForm1();
+        $trs = new Tr_Scanner(new Tr_Forms_Scanner);
+        $root = $trs->scan($tf1);
+        $iter = new RecursiveTreeIterator($root);
+        echo "\n<br />".$root;
+        foreach ($iter as $foo) echo "\n<br />".$foo;
+        //$iter = new RecursiveTreeIterator();
+        //foreach ($iter as $foo) var_dump($foo);
+        
+    }
+    
 }

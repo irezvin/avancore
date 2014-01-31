@@ -6,7 +6,7 @@ class Ac_Template extends Ac_Prototyped {
     
     const ARG_DEFAULT = 'ARG_DEFAULT:36d82df14db770153cb56a4ccd5518e5';
     
-    protected $values = array();
+    protected $fields = array();
     
     protected $methodSignatures = array();
     
@@ -48,9 +48,9 @@ class Ac_Template extends Ac_Prototyped {
         return new Ac_E_Template("Incompatible result class {$class} passed to template {$descr}. Check with isResultCompatible() first.");
     }
     
-    protected function noSuchValue($name) {
+    protected function noSuchField($name) {
         $descr = $this->getDescription();
-        return new Ac_E_Template("No such value: '{$name}' in template {$descr}");
+        return new Ac_E_Template("No such field: '{$name}' in template {$descr}");
     }
     
     protected function noSuchPart($name) {
@@ -90,63 +90,68 @@ class Ac_Template extends Ac_Prototyped {
         return new Ac_E_Template("Missing argument(s) '{$missing}' in method {$cl}::{$methodName}({$signs}) of template '{$descr}'");
     }
     
-    function getValue($name, $own = false) {
-        if (array_key_exists($name, $this->values)) $res = $this->values[$name];
+    function getField($name, $own = false) {
+        if (array_key_exists($name, $this->fields)) $res = $this->fields[$name];
         elseif (!$own && $this->component && Ac_Accessor::objectPropertyExists($this->component, $name)) {
             $res = Ac_Accessor::getObjectProperty($this->component, $name);
         }
-        else throw $this->noSuchValue($name);
+        else throw $this->noSuchField($name);
         return $res;
     }
     
-    function setValue($name, $value) {
-        $this->values[$name] = $value;
+    function setField($name, $value) {
+        $this->fields[$name] = $value;
     }
     
-    function setValues(array $values = array(), $override = false) {
-        if ($override) $this->values = array_merge($this->values, $values);
-            else $this->values = $values;
+    function setFields(array $fields = array(), $override = false) {
+        if ($override) $this->fields = array_merge($this->fields, $fields);
+            else $this->fields = $fields;
     }
     
-    function getValues() {
-        return $this->values;
+    /**
+     * @return array
+     */
+    function getFields() {
+        return $this->fields;
     }
     
-    function deleteValue($name) {
-        unset($this->values[$name]);
+    function deleteField($name) {
+        unset($this->fields[$name]);
     }
     
-    function hasValue($name, $own = false) {
+    function hasField($name, $own = false) {
         $res = false;
-        if (array_key_exists($name, $this->values)) $res = true;
+        if (array_key_exists($name, $this->fields)) $res = true;
         elseif (!$own && $this->component && Ac_Accessor::objectPropertyExists($this->component, $name)) $res = true;
         return $res;
     }
     
     function __set($name, $value) {
-        return $this->setValue($name, $value);
+        return $this->setField($name, $value);
     }
     
     function __get($name) {
-        return $this->getValue($name);
+        return $this->getField($name);
     }
     
     function __isset($name) {
-        return $this->hasValue($name);
+        return $this->hasField($name);
     }
     
     function __unset($name) {
-        $this->deleteValue($name);
+        $this->deleteField($name);
     }
     
     function __call($name, $args) {
         $px = substr($name, 0, 4);
-        $show = $px == 'show';
-        $fetch = $px == 'fetch';
+        $show = !strncmp($px, 'show', 4);
+        $fetch = !$show && !strncmp($px, 'fetch', 5);
         if ($show || $fetch) {
-            $partName = substr($name, 4);
+            $partName = substr($name, $show? 4 : 5);
             if ($show) $this->showWithArgs($partName, $args);
                 else $this->fetchWithArgs($partName, $args);
+        } else {
+            throw Ac_E_InvalidCall::noSuchMethod($this, $name);
         }
     }
     
@@ -277,8 +282,8 @@ class Ac_Template extends Ac_Prototyped {
                 $hasVal = $sig[$argName]['optional'];
                 $val = $sig[$argName]['defaultValue'];
                 if (!isset($def[$argName])) {
-                    if ($this->hasValue($argName)) {
-                        $val = $this->getValue($argName);
+                    if ($this->hasField($argName)) {
+                        $val = $this->getField($argName);
                         if ($sig[$argName]['isArray'] && is_array($val)) $hasVal = true;
                         elseif ($sig[$argName]['class'] !== false 
                             && (
@@ -335,7 +340,11 @@ class Ac_Template extends Ac_Prototyped {
         array_shift($args); 
         return $this->showWithArgs($partName, $args);
     }
-    
+
+    /**
+     * @param string $partName
+     * @return Ac_Result
+     */
     function renderResult($partName, $_ = null) {
         $this->result = new $this->defaultResultClass;
         $args = func_get_args();
@@ -344,6 +353,11 @@ class Ac_Template extends Ac_Prototyped {
         return $this->result;
     }
     
+    /**
+     * @param type $partName
+     * @param array $args
+     * @return Ac_Result
+     */
     function renderResultWithArgs($partName, array $args = array()) {
         $this->result = new $this->defaultResultClass;
         $this->result->put($this->fetchWithArgs($partName, $args));

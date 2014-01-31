@@ -1,6 +1,9 @@
 <?php
 
 class Ac_Result_Stage_Clone extends Ac_Result_Stage_Morph {
+    
+    // is used to call special methods of the handlers
+    protected $stageName = 'Clone';    
 
     /**
      * @var array oldStringObjectMark => newStringObjectInstance

@@ -993,7 +993,7 @@ EOD
     /**
      * @return Ac_Result
      */
-    protected function getTestResultForLoadAndSave($hId = 'AllHandler', Ac_I_Result_Handler_All & $allHandler = null, $debugPrefix = 'a', $writeOnStore = false) {
+    protected function getTestResultForLoadAndSave($hId = 'AllHandler', Ac_I_Result_Handler & $allHandler = null, $debugPrefix = 'a', $writeOnStore = false) {
         
         require_once(dirname(__FILE__).'/assets/deferredsAndStringObjects.php');
         

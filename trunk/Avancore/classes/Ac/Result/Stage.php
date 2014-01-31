@@ -1,6 +1,9 @@
 <?php
 
 class Ac_Result_Stage extends Ac_Prototyped {
+    
+    // is used to call special methods of the handlers
+    protected $stageName = '';    
 
     const HANDLER_BEFORE_CHILD = 'beforeChild';
     const HANDLER_AFTER_CHILD = 'afterChild';
@@ -44,9 +47,6 @@ class Ac_Result_Stage extends Ac_Prototyped {
     
     protected $defaultTraverseClasses = 'Ac_Result';
     
-    
-    
-    
     function setRoot(Ac_Result $root) {
         if ($root !== ($oldRoot = $this->root)) {
             $this->root = $root;
@@ -88,10 +88,18 @@ class Ac_Result_Stage extends Ac_Prototyped {
             $args = func_get_args();
             array_splice($args, 0, 2, array($this, $result));
             
+            if (strlen($this->stageName)) {
+                $methodNameStage = 'handle'.$this->stageName.$stageName;
+            } else {
+                $methodNameStage = '';
+            }
+            
             $methodName2 = 'handleDefault';
             $args2 = $args; array_splice($args2, 0, 0, array($stageName));
             
             foreach ($handlers as $handler) {
+                if (strlen($methodNameStage) && is_callable($call = array($handler, $methodNameStage)))
+                    call_user_func_array($call, $args);
                 if (is_callable($call = array($handler, $methodName)))
                     call_user_func_array($call, $args);
                 elseif (is_callable($call = array($handler, $methodName2)))

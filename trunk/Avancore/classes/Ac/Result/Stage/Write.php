@@ -1,6 +1,9 @@
 <?php
 
 class Ac_Result_Stage_Write extends Ac_Result_Stage_Morph {
+    
+    // is used to call special methods of the handlers
+    protected $stageName = 'Write';    
 
     /**
      * @var bool
