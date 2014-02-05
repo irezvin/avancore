@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Template_ModelAndMapper extends Cg_Template {
+class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     
     var $modelClass = false;
     var $genModelClass = false;
@@ -29,22 +29,22 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     function _generateFilesList() {
         return array(
             'modelObject' => array(
-                'relPath' => Cg_Util::className2fileName($this->modelClass), 
+                'relPath' => Ac_Cg_Util::className2fileName($this->modelClass), 
                 'isEditable' => true, 
                 'templatePart' => 'modelObject',
             ),
             'genModelObject' => array(
-                'relPath' => 'gen/'.Cg_Util::className2fileName($this->genModelClass), 
+                'relPath' => 'gen/'.Ac_Cg_Util::className2fileName($this->genModelClass), 
                 'isEditable' => false, 
                 'templatePart' => 'modelGenObject',
             ),
             'mapper' => array(
-                'relPath' => Cg_Util::className2fileName($this->mapperClass), 
+                'relPath' => Ac_Cg_Util::className2fileName($this->mapperClass), 
                 'isEditable' => true, 
                 'templatePart' => 'mapper',
             ),
             'genMapper' => array(
-                'relPath' => 'gen/'.Cg_Util::className2fileName($this->genMapperClass), 
+                'relPath' => 'gen/'.Ac_Cg_Util::className2fileName($this->genMapperClass), 
                 'isEditable' => false, 
                 'templatePart' => 'genMapper',
             ), 
@@ -64,7 +64,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
         foreach ($this->model->listProperties() as $name) {
             $prop = $this->model->getProperty($name);
             if (!$prop->isEnabled()) continue;
-            if ($this->createAccessors && $prop instanceof Cg_Property_Simple) {
+            if ($this->createAccessors && $prop instanceof Ac_Cg_Property_Simple) {
                 $this->accessors[$prop->getClassMemberName()] = $prop->getClassMemberName();
             }
             //foreach ($gacm = $prop->getAllClassMembers() as $cm) if (!$cm) var_dump($prop->name, $gacm);
@@ -94,16 +94,16 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
             $this->pkStr = $this->exportArray($pk, 0, false, true, true);
         }
         
-        $this->mapperVars['pk'] = new Cg_Php_Expression($this->pkStr);
+        $this->mapperVars['pk'] = new Ac_Cg_Php_Expression($this->pkStr);
         $this->mapperVars['recordClass'] = $this->modelClass;
         $this->mapperVars['tableName'] = $this->tableName;
         $this->mapperVars['id'] = $this->mapperClass;
-        $this->mapperVars['columnNames'] = new Cg_Php_Expression($this->exportArray($this->model->tableObject->listColumns(), 0, false, true, true));
+        $this->mapperVars['columnNames'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->tableObject->listColumns(), 0, false, true, true));
         foreach ($this->model->tableObject->listColumns() as $nm) {
             $col = $this->model->tableObject->getColumn($nm);
             $this->mapperVars['defaults'][$nm] = $col->default;
         }
-        $this->mapperVars['defaults'] = new Cg_Php_Expression($this->exportArray($this->mapperVars['defaults'], 8, true, false, true));
+        $this->mapperVars['defaults'] = new Ac_Cg_Php_Expression($this->exportArray($this->mapperVars['defaults'], 8, true, false, true));
         
         $this->relationPrototypes = array();
         
@@ -123,15 +123,15 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     }
 
     /**
-     * @param Cg_Property_Object $prop
-     * @return Cg_Template_Assoc_Strategy
+     * @param Ac_Cg_Property_Object $prop
+     * @return Ac_Cg_Template_Assoc_Strategy
      */
     function getAssocStrategy($relationId, $prop) {
-        if ($prop->isList() && $prop->isManyToMany()) $class = 'Cg_Template_Assoc_Strategy_ManyToMany';
-        elseif ($prop->isList()) $class = 'Cg_Template_Assoc_Strategy_Many';
-        else $class = 'Cg_Template_Assoc_Strategy_One';
+        if ($prop->isList() && $prop->isManyToMany()) $class = 'Ac_Cg_Template_Assoc_Strategy_ManyToMany';
+        elseif ($prop->isList()) $class = 'Ac_Cg_Template_Assoc_Strategy_Many';
+        else $class = 'Ac_Cg_Template_Assoc_Strategy_One';
 
-        //$class = 'Cg_Template_Assoc_Strategy';
+        //$class = 'Ac_Cg_Template_Assoc_Strategy';
         $res = new $class (array('relationId' => $relationId, 'prop' => & $prop, 'model' => & $this->model, 'template' => & $this));
         return $res;
     }
@@ -157,7 +157,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     }
 
     /**
-     * @param Cg_Property_Object $prop
+     * @param Ac_Cg_Property_Object $prop
      */
     function _showModelMethodsForAssociation($relationId, $prop) {
         $strategy = $this->getAssocStrategy($relationId, $prop);
@@ -194,7 +194,7 @@ class Cg_Template_ModelAndMapper extends Cg_Template {
     }
     
     /**
-     * @param Cg_Property_Object $prop
+     * @param Ac_Cg_Property_Object $prop
      */
     function _showMapperMethodsForAssociation($relationId, $prop) {
         $strategy = $this->getAssocStrategy($relationId, $prop);

@@ -9,11 +9,11 @@
  *    require_once('../deploy.settings.php');
  *    ini_set('include_path', _DEPLOY_AVANCORE_PATH.PATH_SEPARATOR.'.');
  *    require_once('Cg/Frontend.php');
- *    $f = new Cg_Frontend();
+ *    $f = new Ac_Cg_Frontend();
  *    $f->processWebRequest();
  * </code>
  */
-class Cg_Frontend {
+class Ac_Cg_Frontend {
 
     var $configPath = 'codegen.config.php';
 
@@ -96,7 +96,7 @@ class Cg_Frontend {
         $this->check();
         $this->init();
             
-        $gen = new Cg_Generator($this->configPath);
+        $gen = new Ac_Cg_Generator($this->configPath);
     
         $hlp = new Ac_Form_Helper($dummy = null, false);
         $hlp->alwaysWrap = false;
@@ -169,7 +169,7 @@ class Cg_Frontend {
 
 <?php   if ($copyGen && $createNonEditableFiles) { ?>
 <?php       $ds = DIRECTORY_SEPARATOR; ?>
-<?php 	    list($cmd, $output, $res) = Cg_Util::copyDirRecursive("output{$ds}gen", $this->getGenDeployPath(), true, true); ?>
+<?php 	    list($cmd, $output, $res) = Ac_Cg_Util::copyDirRecursive("output{$ds}gen", $this->getGenDeployPath(), true, true); ?>
 <?php 	    echo '<pre>'.htmlspecialchars($cmd)."</pre><p>{$res}</p><pre>".$output.'</pre>'; ?>
 <?php   } ?>
 

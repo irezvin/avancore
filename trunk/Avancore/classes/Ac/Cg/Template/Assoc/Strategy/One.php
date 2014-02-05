@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Template_Assoc_Strategy_One extends Cg_Template_Assoc_Strategy {
+class Ac_Cg_Template_Assoc_Strategy_One extends Ac_Cg_Template_Assoc_Strategy {
     
     
     

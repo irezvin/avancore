@@ -4,7 +4,7 @@
  * Domain metamodel for Code Generator. Models between different domains are not linked
  **/
 
-class Cg_Domain {
+class Ac_Cg_Domain {
 
     /**
      * @var string Name of the domain
@@ -125,7 +125,7 @@ class Cg_Domain {
     var $dontPrefixClassesWithAppName = false;
     
     /**
-     * @var Cg_Generator
+     * @var Ac_Cg_Generator
      */
     var $_gen = false;
     
@@ -135,7 +135,7 @@ class Cg_Domain {
     var $_database = false;
     
     /**
-     * @var array Cg_Model instances
+     * @var array Ac_Cg_Model instances
      */
     var $_models = false;
     
@@ -143,19 +143,19 @@ class Cg_Domain {
     
     /**
      * Default name for model special properties auto-detection
-     * @see Cg_Model::detectSpecialProperties  
+     * @see Ac_Cg_Model::detectSpecialProperties  
      */
     var $defaultTitlePropName = false;
     
     /**
      * Default name for model special properties auto-detection
-     * @see Cg_Model::detectSpecialProperties  
+     * @see Ac_Cg_Model::detectSpecialProperties  
      */
     var $defaultPublishedPropName = false;
     
     /**
      * Default name for model special properties auto-detection
-     * @see Cg_Model::detectSpecialProperties  
+     * @see Ac_Cg_Model::detectSpecialProperties  
      */
     var $defaultOrderingPropName = false;
     
@@ -174,7 +174,7 @@ class Cg_Domain {
     /**
      * Dictionary to hold singular, plural forms and translations 
      *
-     * @var Cg_Dictionary
+     * @var Ac_Cg_Dictionary
      */
     var $dictionary = false;
     
@@ -202,9 +202,9 @@ class Cg_Domain {
     protected $langStrings = array();
     
     /**
-     * @param Cg_Generator $generator 
+     * @param Ac_Cg_Generator $generator 
      */
-    function Cg_Domain($generator, $name, $config = array()) {
+    function Ac_Cg_Domain($generator, $name, $config = array()) {
          $this->_gen = $generator;
          $this->$name = $name;
          Ac_Util::simpleBind($config, $this);
@@ -219,7 +219,7 @@ class Cg_Domain {
              $dicConf = array();
          }
          if (!isset($dicConf['constantPrefix'])) $dicConf['constantPrefix'] = $this->appName; 
-         $this->dictionary = new Cg_Dictionary($dicConf);
+         $this->dictionary = new Ac_Cg_Dictionary($dicConf);
     }
     
     function listModels() {
@@ -277,7 +277,7 @@ class Cg_Domain {
     
     /**
      * @param string $name Name of model 
-     * @return Cg_Model
+     * @return Ac_Cg_Model
      */
     function getModel($name) {
         if (!in_array($name, $this->listModels())) trigger_error ('No such model: \''.$name.'\'', E_USER_ERROR);
@@ -286,7 +286,7 @@ class Cg_Domain {
             if (is_array($this->modelDefaults)) $conf = Ac_Util::m($this->modelDefaults, $conf);
             
             if (isset($conf['metaModelClass']) && $conf['metaModelClass']) $cls = $conf['metaModelClass'];
-            else $cls = 'Cg_Model';  
+            else $cls = 'Ac_Cg_Model';  
             $this->_models[$name] = new $cls($this, $name, $conf);
             $this->_models[$name]->init();
         }
@@ -334,7 +334,7 @@ class Cg_Domain {
             }
         }
         
-        $name = Cg_Util::makeIdentifier($coolName);
+        $name = Ac_Cg_Util::makeIdentifier($coolName);
         
         return array($name, $conf);
     }
@@ -352,7 +352,7 @@ class Cg_Domain {
 	            $l = strlen($this->extraStripFromIds);
 	            if (!strncmp($coolName, $this->extraStripFromIds, $l)) $coolName = substr($coolName, $l);
 	        }
-	        $coolName = Cg_Util::addSpacesBeforeCamelCase($coolName);
+	        $coolName = Ac_Cg_Util::addSpacesBeforeCamelCase($coolName);
 	        $coolName = str_replace('_', ' ', $coolName);
 	        $coolName = strtolower($coolName);
 	        $coolName = preg_replace('/ +/', ' ', $coolName);
@@ -361,7 +361,7 @@ class Cg_Domain {
     }
     
     /**
-     * @return Cg_Model
+     * @return Ac_Cg_Model
      */
     function searchModelByTable($tableName) {
         $res = null;
@@ -381,8 +381,8 @@ class Cg_Domain {
      * Following keys and values are present in returned array:
      * - 'tableNameWithPrefix' => string - name of table where prefix is replaced with $this->replaceTablePrefixWith, 
      * - 'subsystemPrefixes' => array - zero or more subsystem prefixes in order in which they appear in the $tableName, 
-     * - 'singleEntity' => array|false - Cg_Inflector::explode'd parts of the entity identifier if $this->tableNamesArePlural is FALSE or $autoChangeForm is true, FALSE otherwise    
-     * - 'pluralEntity' => array|false - Cg_Inflector::explode'd parts of the entity identifier if $this->tableNamesArePlural is TRUE or $autoChangeForm is true, FALSE otherwise
+     * - 'singleEntity' => array|false - Ac_Cg_Inflector::explode'd parts of the entity identifier if $this->tableNamesArePlural is FALSE or $autoChangeForm is true, FALSE otherwise    
+     * - 'pluralEntity' => array|false - Ac_Cg_Inflector::explode'd parts of the entity identifier if $this->tableNamesArePlural is TRUE or $autoChangeForm is true, FALSE otherwise
      * Subsystem prefixes are not included in neither single not plural form of the entity identifier. 
      * Note that if table name consists only of subsystem prefixes, last prefix is considered an entity identifier.   
      * 
@@ -408,7 +408,7 @@ class Cg_Domain {
         foreach ($this->tableNameFixes as $regex => $replacement) {
             $aName = preg_replace($regex, $replacement, $aName);
         }
-        $nameParts = Cg_Inflector::explode($aName);
+        $nameParts = Ac_Cg_Inflector::explode($aName);
         $ssPrefixes = array();
         foreach ($this->subsystemPrefixes as $p) $ssPrefixes[strtolower($p)] = 1;
         $res['subsystemPrefixes'] = array();
@@ -425,10 +425,10 @@ class Cg_Domain {
         }
         if ($this->tableNamesArePlural) {
             $res['pluralEntity'] = $nameParts;
-            if ($autoChangeForm) $res['singleEntity'] = Cg_Inflector::explode($this->dictionary->getSingular(implode('_', $nameParts)));
+            if ($autoChangeForm) $res['singleEntity'] = Ac_Cg_Inflector::explode($this->dictionary->getSingular(implode('_', $nameParts)));
         } else {
             $res['singleEntity'] = $nameParts;
-            if ($autoChangeForm) $res['pluralEntity'] = Cg_Inflector::explode($this->dictionary->getPlural(implode('_', $nameParts)));
+            if ($autoChangeForm) $res['pluralEntity'] = Ac_Cg_Inflector::explode($this->dictionary->getPlural(implode('_', $nameParts)));
         }
         
         
@@ -450,7 +450,7 @@ class Cg_Domain {
     }
     
     /**
-     * This function is called by Cg_Generator when Cg_Strategy object is initialized for this Cg_Domain
+     * This function is called by Ac_Cg_Generator when Ac_Cg_Strategy object is initialized for this Ac_Cg_Domain
      * Function result is merged with prototype for strategy settings.
      * @return array
      */
@@ -458,7 +458,7 @@ class Cg_Domain {
         if (is_array($this->strategySettings)) $res = $this->strategySettings;
             else $res = array();
             
-        if ($this->needsLangStrings()) $res['domainTemplates'] = array('Cg_Template_Domain', 'Cg_Template_Languages');
+        if ($this->needsLangStrings()) $res['domainTemplates'] = array('Ac_Cg_Template_Domain', 'Ac_Cg_Template_Languages');
             
         return $res;
     }
@@ -494,13 +494,13 @@ class Cg_Domain {
     }
     
     function getLangStringPrefix() {
-        if ($this->langStringPrefix === false) $res = strtolower(Cg_Inflector::definize($this->appName));
+        if ($this->langStringPrefix === false) $res = strtolower(Ac_Cg_Inflector::definize($this->appName));
             else $res = $this->langStringPrefix;
         return $res;
     }
     
     function getTableLangStringPrefix() {
-        if ($this->tableLangStringPrefix === false) $res = strtolower(Cg_Inflector::definize($this->appName));
+        if ($this->tableLangStringPrefix === false) $res = strtolower(Ac_Cg_Inflector::definize($this->appName));
             else $res = $this->tableLangStringPrefix;
         return $res;
     }
