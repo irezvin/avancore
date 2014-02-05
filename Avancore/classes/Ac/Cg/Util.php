@@ -1,6 +1,6 @@
 <?php
 
-abstract class Cg_Util {
+abstract class Ac_Cg_Util {
     
     static function createDirPath($dirPath, $rights = 0777) {
         $dirs = explode('/', $dirPath); 
@@ -15,7 +15,7 @@ abstract class Cg_Util {
     
     static function createFilePath($filePath, $dirRights = 0777, $fileRights = 0666) {
         $dir = dirname($filePath);
-        Cg_Util::createDirPath($dir, $dirRights);
+        Ac_Cg_Util::createDirPath($dir, $dirRights);
         touch($filePath);
         chmod($filePath, $fileRights);
         $handle = fopen($filePath, "w");
@@ -28,7 +28,7 @@ abstract class Cg_Util {
             if($file != "." && $file != ".." && $file != ".svn") {
                 if($recursive && is_dir("$dirPath/$file") && (!$dirRegex || preg_match($dirRegex, "$dirPath/$file"))) { 
                     if ($includeDirNames) array_push($files, "$dirPath/$file");    
-                    $files=Cg_Util::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex, $includeDirNames);
+                    $files=Ac_Cg_Util::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex, $includeDirNames);
                 }
                 else {
                     if (!$fileRegex || preg_match($fileRegex, "$dirPath/$file")) {
@@ -44,7 +44,7 @@ abstract class Cg_Util {
     }
 
     static function cleanDir($dirName) {
-        $dc = Cg_Util::listDirContents($dirName, true, array(), false, false, true);
+        $dc = Ac_Cg_Util::listDirContents($dirName, true, array(), false, false, true);
         sort($dc);
         $dc = array_reverse($dc);
         foreach ($dc as $item) {
@@ -74,7 +74,7 @@ abstract class Cg_Util {
     
     static function makeCaption ($string) {
         $c = str_replace("_", " ", $string);
-        $c = Cg_Util::addSpacesBeforeCamelCase($c);
+        $c = Ac_Cg_Util::addSpacesBeforeCamelCase($c);
         $c = preg_replace ("/ +/", " ", $c);
         $c = ucwords($c);
         return $c;

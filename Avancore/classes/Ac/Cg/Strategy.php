@@ -1,13 +1,13 @@
 <?php
 
-class Cg_Strategy {
+class Ac_Cg_Strategy {
     /**
-     * @var Cg_Domain
+     * @var Ac_Cg_Domain
      */ 
     var $_dom = false;
     
     /**
-     * @var Cg_Generator
+     * @var Ac_Cg_Generator
      */
     var $_gen = false;
     
@@ -39,27 +39,27 @@ class Cg_Strategy {
     /**
      * @var array Names of templates that apply to each model 
      */
-    var $modelTemplates = array('Cg_Template_ModelAndMapper');
+    var $modelTemplates = array('Ac_Cg_Template_ModelAndMapper');
     
     /**
      * @var array Names of templates that apply only to models with user interface 
      */
-    var $uiTemplates = array('Cg_Template_Ui');
+    var $uiTemplates = array('Ac_Cg_Template_Ui');
     
     /**
      * @var array Names of templates that are common for whole domain
      */
-    var $domainTemplates = array('Cg_Template_Domain');
+    var $domainTemplates = array('Ac_Cg_Template_Domain');
     
     var $language = 'labels';
     
     var $languageData = false;
     
     /**
-     * @param Cg_Generator $generator
+     * @param Ac_Cg_Generator $generator
      * @param string $domainName
      */
-    function Cg_Strategy($generator, $domainName, $outputDir, $genEditable, $overwriteEditable, $extraOptions = array()) {
+    function Ac_Cg_Strategy($generator, $domainName, $outputDir, $genEditable, $overwriteEditable, $extraOptions = array()) {
         Ac_Util::simpleBind($extraOptions, $this);
         $this->_gen = $generator;
         $this->_dom = $generator->getDomain($domainName);
@@ -91,14 +91,14 @@ class Cg_Strategy {
         
         //if ($this->_gen->generatePmtFinders)
         if ($mod->hasPmtFinder()) 
-            $res = array_merge($res, array('Cg_Template_PmtFinder'));
+            $res = array_merge($res, array('Ac_Cg_Template_PmtFinder'));
             
         $res = array_unique($res);
         return $res;
     }
     
     /**
-     * @param Cg_Model $model
+     * @param Ac_Cg_Model $model
      * @return string Name and path of pagemap file 
      */
     function getPagemapFileName($model) {
@@ -108,7 +108,7 @@ class Cg_Strategy {
     
     /**
      * Instantiates a template (if $modelName is given, this must be model-wise template, and domain-wise in other case)
-     * @return Cg_Template
+     * @return Ac_Cg_Template
      */
     function _createTemplate($templateName, $modelName = false) {
         $tpl = new $templateName;

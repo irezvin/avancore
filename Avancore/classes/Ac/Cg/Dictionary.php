@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Dictionary {
+class Ac_Cg_Dictionary {
     
     var $translations = array();
     
@@ -20,7 +20,7 @@ class Cg_Dictionary {
     
     var $useInflector = true;
     
-    function Cg_Dictionary ($config = array()) {
+    function Ac_Cg_Dictionary ($config = array()) {
         foreach (array('alwaysUseConstants', 'fallbackToConstants', 'constantPrefix', 'defaultLanguage', 'useInflector') as $p) 
             if (isset($config[$p])) 
                 $this->$p = $config[$p];
@@ -32,17 +32,17 @@ class Cg_Dictionary {
         else {
             foreach ($data as $word => $details) if(is_array($details)) {
                 if (isset($details['plural'])) {
-                    $this->pluralForms[$si = Cg_Inflector::humanize($word)] = $plu = Cg_Inflector::humanize($details['plural']);
+                    $this->pluralForms[$si = Ac_Cg_Inflector::humanize($word)] = $plu = Ac_Cg_Inflector::humanize($details['plural']);
                     $this->singularForms[$plu] = $si;
                     unset($details['plural']);
                 }
                 if (isset($details['singular'])) {
-                    $this->singularForms[$plu = Cg_Inflector::humanize($word)] = $si = Cg_Inflector::humanize($details['singular']);
+                    $this->singularForms[$plu = Ac_Cg_Inflector::humanize($word)] = $si = Ac_Cg_Inflector::humanize($details['singular']);
                     $this->pluralForms[$si] = $plu;
                     unset($details['singular']);
                 }
                 foreach ($details as $lang => $translation) {
-                    $this->translations[strtolower($lang)] = Cg_Inflector::humanize($translation);
+                    $this->translations[strtolower($lang)] = Ac_Cg_Inflector::humanize($translation);
                 }
             }
             $res = true;
@@ -67,7 +67,7 @@ class Cg_Dictionary {
      * @return false|string 
      */
     function translate($string, $langName, $returnFalseIfNotFound = false) {
-        $string = Cg_Inflector::humanize($string);
+        $string = Ac_Cg_Inflector::humanize($string);
         $langName = strtolower($langName);
         if (isset($translations[$string]) && is_array($translations[$string]) && isset($translations[$string][$langName])) {
             $translation = $translations[$string][$langName];
@@ -90,7 +90,7 @@ class Cg_Dictionary {
     }
     
     function _makeConstant($string, $langName, $value) {
-        $constantName = Cg_Inflector::definize($string);
+        $constantName = Ac_Cg_Inflector::definize($string);
         if (strlen($this->constantPrefix)) $constantName = strtoupper($this->constantPrefix).'_'.$constantName;
         $this->constants[$constantName][$langName] = $value;
         return $constantName; 
@@ -114,7 +114,7 @@ class Cg_Dictionary {
                 if ($returnMissingConstants) {
                     if (($l = strlen($this->constantPrefix)) && !strncmp($c, strtoupper($this->constantPrefix.'_'), $l + 1)) $id = substr($c, $l + 1);
                         else $id = $c;
-                    $res[$c] = Cg_Inflector::humanize($id);
+                    $res[$c] = Ac_Cg_Inflector::humanize($id);
                 }
             }
         }
@@ -133,7 +133,7 @@ class Cg_Dictionary {
         $allIdentifiers = array_unique(array_merge(array_keys($this->translations), array_values($this->singularForms), array_values($this->pluralForms)));
         $langs = $this->getAllLanguages();
         foreach ($allIdentifiers as $id) {
-            $const = Cg_Inflector::definize($id);
+            $const = Ac_Cg_Inflector::definize($id);
             foreach ($langs as $lang) {
                 if ($lang == $this->defaultLanguage) $tr = $id; 
                 else {
@@ -173,9 +173,9 @@ class Cg_Dictionary {
             foreach ($string as $k => $v) $res[$k] = $this->getPlural($v, $langName);
             return $res;
         }
-        $s = Cg_Inflector::humanize($string);
+        $s = Ac_Cg_Inflector::humanize($string);
         if (isset($this->pluralForms[$s])) $plural = $this->pluralForms[$s];
-        elseif ($this->useInflector) $plural = Cg_Inflector::singularToPlural($s);
+        elseif ($this->useInflector) $plural = Ac_Cg_Inflector::singularToPlural($s);
         else $plural = $string;
         if ($langName !== false) $res = $this->translate($plural, $langName);
             else $res = $plural;
@@ -194,9 +194,9 @@ class Cg_Dictionary {
             foreach ($string as $k => $v) $res[$k] = $this->getSingular($v, $langName);
             return $res;
         }
-        $s = Cg_Inflector::humanize($string);
+        $s = Ac_Cg_Inflector::humanize($string);
         if (isset($this->singularForms[$s])) $singular = $this->singularForms[$s];
-        elseif ($this->useInflector) $singular = Cg_Inflector::pluralToSingular($s);
+        elseif ($this->useInflector) $singular = Ac_Cg_Inflector::pluralToSingular($s);
         else $singular = $string;
         if ($langName !== false) $res = $this->translate($singular, $langName);
             else $res = $singular;
@@ -215,7 +215,7 @@ class Cg_Dictionary {
     function isConstant($string, $onlyKnownConstants = false, $addIfDontKnow = true) {
         if ($onlyKnownConstants) $res = isset($this->constants[$string]); 
         else { 
-            if (strlen($string) > 0 && $string == Cg_Inflector::definize($string)) $res = true;
+            if (strlen($string) > 0 && $string == Ac_Cg_Inflector::definize($string)) $res = true;
             if ($l = strlen($this->constantPrefix)) $res = $res && !strncmp($string, strtoupper($this->constantPrefix).'_', $l+1);
             if ($res && $addIfDontKnow) $this->constants[$res] = array();
         }

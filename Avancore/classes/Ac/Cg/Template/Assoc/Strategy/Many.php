@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Template_Assoc_Strategy_Many extends Cg_Template_Assoc_Strategy {
+class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
     
     function _doShowGenModelMethods() {
         extract(get_object_vars($this));

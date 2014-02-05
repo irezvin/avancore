@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Inflector {
+class Ac_Cg_Inflector {
     
     /**
      * Explodes an identifier to its parts using spaces, camelCase and underscores.
@@ -31,7 +31,7 @@ class Cg_Inflector {
      * @return string|array
      */
     static function pluralToSingular($stringOrArray, $convertAll = false) {
-        return Cg_Inflector::_convert($stringOrArray, $convertAll, true);
+        return Ac_Cg_Inflector::_convert($stringOrArray, $convertAll, true);
     }
     
     /**
@@ -42,26 +42,26 @@ class Cg_Inflector {
      * @return string|array
      */
     static function singularToPlural($stringOrArray, $convertAll = false) {
-        return Cg_Inflector::_convert($stringOrArray, $convertAll, false);
+        return Ac_Cg_Inflector::_convert($stringOrArray, $convertAll, false);
     }
     
     static function _convert($stringOrArray, $convertAll, $toSingular) {
         if ($convertAll) {
             $res = array();
-            foreach (Cg_Inflector::explode(" ", $string) as $part) $res[] = Cg_Inflector::_convert($part, false, $toSingular);
+            foreach (Ac_Cg_Inflector::explode(" ", $string) as $part) $res[] = Ac_Cg_Inflector::_convert($part, false, $toSingular);
         } else {
             if (is_array($stringOrArray)) {
                 $res = $stringOrArray;
                 if (count($stringOrArray)) {
                     $keys = array_keys($stringOrArray);
                     $lastKey = $keys[count($keys) - 1];
-                    $res[$lastKey] = Cg_Inflector::_convert($res[$lastKey], false, $toSingular);
+                    $res[$lastKey] = Ac_Cg_Inflector::_convert($res[$lastKey], false, $toSingular);
                 }
             } else {
                 if ($toSingular) {
-                    $res = Cg_Inflector::_toSingular($stringOrArray);
+                    $res = Ac_Cg_Inflector::_toSingular($stringOrArray);
                 } else {
-                    $res = Cg_Inflector::_toPlural($stringOrArray);
+                    $res = Ac_Cg_Inflector::_toPlural($stringOrArray);
                 }
             }
         }
@@ -102,7 +102,7 @@ class Cg_Inflector {
      */
     static function pearize($identifier) {
         $parts = array();  
-        foreach (Cg_Inflector::explode($identifier) as $part) $parts[] = ucfirst($part);
+        foreach (Ac_Cg_Inflector::explode($identifier) as $part) $parts[] = ucfirst($part);
         return implode("_", $parts);
     }
     
@@ -115,7 +115,7 @@ class Cg_Inflector {
      */
     static function camelize($identifier, $ucFirst = false) {
         $parts = array();  
-        foreach (Cg_Inflector::explode($identifier) as $part) $parts[] = ucfirst($part);
+        foreach (Ac_Cg_Inflector::explode($identifier) as $part) $parts[] = ucfirst($part);
         $res = implode("", $parts);
         if (!$ucFirst && strlen($res)) $res{0} = strtolower($res{0});
         return $res;
@@ -129,7 +129,7 @@ class Cg_Inflector {
      * @param unknown_type $ucOther Whether convert other parts to upper case
      */
     static function humanize($identifier, $ucFirst = true, $ucOther = false) {
-        $parts = Cg_Inflector::explode($identifier);
+        $parts = Ac_Cg_Inflector::explode($identifier);
         if ($ucFirst) $start = 0; else $start = 1;
         $c = $ucOther? count($parts) : min(count($parts), 1);
         for ($i = $start; $i < $c; $i++) $parts[$i] = ucfirst($parts[$i]);
@@ -143,7 +143,7 @@ class Cg_Inflector {
      * @param string|array $identifier
      */
     static function definize($identifier) {
-        return strtoupper(implode("_", Cg_Inflector::explode($identifier)));
+        return strtoupper(implode("_", Ac_Cg_Inflector::explode($identifier)));
     }
     
 }

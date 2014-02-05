@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Template_Languages extends Cg_Template {
+class Ac_Cg_Template_Languages extends Ac_Cg_Template {
     
     var $genLangFile = false;
     var $langFile = false;

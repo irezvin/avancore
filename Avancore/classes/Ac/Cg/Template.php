@@ -1,28 +1,28 @@
 <?php
 
-class Cg_Template extends Ac_Legacy_Template {
+class Ac_Cg_Template extends Ac_Legacy_Template {
     
     var $_init = false;
     
     var $_filesList = false;
     
     /**
-     * @var Cg_Generator
+     * @var Ac_Cg_Generator
      */
     var $generator = false;
     
     /**
-     * @var Cg_Model
+     * @var Ac_Cg_Model
      */
     var $model = false;
     
     /**
-     * @var Cg_Domain
+     * @var Ac_Cg_Domain
      */
     var $domain = false;
     
     /**
-     * @var Cg_Strategy
+     * @var Ac_Cg_Strategy
      */
     var $strategy = false;
     
@@ -68,7 +68,7 @@ class Cg_Template extends Ac_Legacy_Template {
         if (!in_array($id, $this->listFiles())) trigger_error ("No such file: '$id' in template ".get_class($this), E_USER_ERROR);
         $partName = $this->_filesList[$id]['templatePart'];
         $path = $this->getFilePath($id, $basePath);
-        Cg_Util::createDirPath(dirname($path));
+        Ac_Cg_Util::createDirPath(dirname($path));
         if (method_exists($this, $mtdName = 'show'.$partName)) {
              $f = fopen($path, "w");
              if ($f === false) trigger_error ("Cannot open file '$path' for write", E_USER_ERROR);

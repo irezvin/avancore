@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Template_Domain extends Cg_Template {
+class Ac_Cg_Template_Domain extends Ac_Cg_Template {
     
     var $domainClass = false;
     var $domainGenClass = false;
@@ -38,12 +38,12 @@ class Cg_Template_Domain extends Cg_Template {
     function _generateFilesList() {
         $res = array();
         $res['domainFile'] = array(
-            'relPath' => Cg_Util::className2fileName($this->domainClass),
+            'relPath' => Ac_Cg_Util::className2fileName($this->domainClass),
             'isEditable' => true,
             'templatePart' => 'domainFile',
         );
         $res['domainGenFile'] = array(
-            'relPath' => 'gen/'.Cg_Util::className2fileName($this->domainGenClass),
+            'relPath' => 'gen/'.Ac_Cg_Util::className2fileName($this->domainGenClass),
             'isEditable' => false,
             'templatePart' => 'domainGenFile',
         );

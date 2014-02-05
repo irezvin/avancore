@@ -4,7 +4,7 @@
  * Model metamodel for Code Generator
  */
         
-class Cg_Model {
+class Ac_Cg_Model {
 
     /**
      * Model name
@@ -153,7 +153,7 @@ class Cg_Model {
     // ---------------------------------------------------------------------
     
     /**
-     * @var Cg_Domain
+     * @var Ac_Cg_Domain
      */
     var $_domain = false;
     
@@ -227,7 +227,7 @@ class Cg_Model {
      */
     var $hasUniformPropertiesInfo = false;
     
-    function Cg_Model($domain, $name, $config = array()) {
+    function Ac_Cg_Model($domain, $name, $config = array()) {
         $this->_domain = $domain;
         $this->name = $name;
         Ac_Util::simpleBindAll($config, $this);
@@ -255,7 +255,7 @@ class Cg_Model {
         foreach ($pNames as $name) {
             $conf = $this->_properties[$name];
             if (isset($conf['metaPropertyClass']) && $conf['metaPropertyClass']) $cls = $conf['metaPropertyClass'];
-            else $cls = 'Cg_Property_Simple';
+            else $cls = 'Ac_Cg_Property_Simple';
             $this->_properties[$name] = new $cls ($this, $name, $this->_properties[$name]);
         }
         
@@ -268,7 +268,7 @@ class Cg_Model {
     }
     
     /**
-     * @return Cg_Property
+     * @return Ac_Cg_Property
      */
     function getProperty($name) {
         if (!in_array($name, $this->listProperties())) trigger_error ('No such property: \''.$name.'\'', E_USER_ERROR);
@@ -303,7 +303,7 @@ class Cg_Model {
         $res = $this->single;
         if ($this->subsystemPrefixes) $res = implode(' ', $this->subsystemPrefixes).' '.$res;
         if ($this->_domain->appName && !$this->_domain->dontPrefixClassesWithAppName) $res = $this->_domain->appName.' '.$res;
-        $res = Cg_Inflector::pearize($res);
+        $res = Ac_Cg_Inflector::pearize($res);
         return $res;
     }
     
@@ -329,7 +329,7 @@ class Cg_Model {
         foreach ($this->listProperties() as $name) {
             $prop = $this->getProperty($name);
             if (!$prop->isEnabled()) continue;
-            if (is_a($prop, 'Cg_Property_Object')) {
+            if (is_a($prop, 'Ac_Cg_Property_Object')) {
                 $ownAssociations[$prop->varName] = $prop->className;
             }
             if ($prop->pluralForList) $ownLists[$prop->varName] = $prop->pluralForList;
@@ -366,18 +366,18 @@ class Cg_Model {
         $info = $this->_domain->analyzeTableName($this->name);
         
         if (!strlen($this->plural)) {
-            $this->plural = Cg_Inflector::camelize($info['pluralEntity']);
+            $this->plural = Ac_Cg_Inflector::camelize($info['pluralEntity']);
         }
         if (!strlen($this->single)) {
-            $this->single = Cg_Inflector::camelize($info['singleEntity']);
+            $this->single = Ac_Cg_Inflector::camelize($info['singleEntity']);
         }
         $db = $this->_domain->getDatabase();
         $this->tableObject = $db->getTable($this->table);
         
         if ($this->subsystemPrefixes === false) $this->subsystemPrefixes = $info['subsystemPrefixes'];
         
-        if (!$this->singleCaption) $this->singleCaption = Cg_Inflector::humanize($info['singleEntity']);
-        if (!$this->pluralCaption) $this->pluralCaption = Cg_Inflector::humanize($info['pluralEntity']);
+        if (!$this->singleCaption) $this->singleCaption = Ac_Cg_Inflector::humanize($info['singleEntity']);
+        if (!$this->pluralCaption) $this->pluralCaption = Ac_Cg_Inflector::humanize($info['pluralEntity']);
         if (!$this->className) $this->className = $this->getDefaultClassName();
         if (!$this->parentClassName) $this->parentClassName = $this->getDefaultParentClassName();
         if (!$this->parentMapperClassName) $this->parentMapperClassName = $this->getDefaultParentMapperClassName();
@@ -444,7 +444,7 @@ class Cg_Model {
      * Adds automatic property config base on column $colName to $this->_properties array (if needed)
      */
     function _addSimplePropertyConfig($colName) {
-        $this->_properties[$colName] = array('column' => $colName, 'metaPropertyClass' => 'Cg_Property_Simple');
+        $this->_properties[$colName] = array('column' => $colName, 'metaPropertyClass' => 'Ac_Cg_Property_Simple');
     }
     
     /**
@@ -471,7 +471,7 @@ class Cg_Model {
                 $nm = '_rel_'.$nmv.($n? $n : '');
                 $n++;   
             } while (isset($this->_properties[$nm]));
-            $xp = array('relation' => $relName, 'metaPropertyClass' => 'Cg_Property_Object', 'isIncoming' => $isIncoming, 
+            $xp = array('relation' => $relName, 'metaPropertyClass' => 'Ac_Cg_Property_Object', 'isIncoming' => $isIncoming, 
                 'otherRelation' => $otherRelationName, 'isOtherIncoming' => $otherRelationIsIncoming);
             //if (isset($this->properties[$nm]) && is_array($this->properties[$nm])) Ac_Util::ms($xp, $this->properties[$nm]);
             $this->_properties[$nm] = $xp;
@@ -487,7 +487,7 @@ class Cg_Model {
         $res = array();
         foreach ($this->listProperties() as $p) {
             $prop = $this->getProperty($p);
-            if (is_a($prop, 'Cg_Property_Object') && $prop->isEnabled()) {
+            if (is_a($prop, 'Ac_Cg_Property_Object') && $prop->isEnabled()) {
                 $res[] = $this->searchRelationIdByProperty($prop);
             }
         }
@@ -515,7 +515,7 @@ class Cg_Model {
     }
     
     /**
-     * @return Cg_Property
+     * @return Ac_Cg_Property
      */
     function searchPropertyByRelation($relName) {
         $this->init();
@@ -527,13 +527,13 @@ class Cg_Model {
     }
     
     /**
-     * @return Cg_Property
+     * @return Ac_Cg_Property
      */
     function _searchPropertyByRelation($relName) {
         $res = null;
         foreach ($this->listProperties() as $name) {
             $prop = $this->getProperty($name);
-            if (is_a($prop, 'Cg_Property_Object') && ($prop->relation == $relName)) {
+            if (is_a($prop, 'Ac_Cg_Property_Object') && ($prop->relation == $relName)) {
                 $res = $prop;
                 break; 
             }
@@ -574,8 +574,8 @@ class Cg_Model {
         if ($this->getUseLangStrings()) {
             $s = $this->getTableLangStringPrefix($this->name).'_single';
             $p = $this->getTableLangStringPrefix($this->name).'_plural';
-            $res['singleCaption'] = new Cg_Php_Expression("new Ac_Lang_String(".Ac_Util_Php::export($s, true).")");
-            $res['pluralCaption'] = new Cg_Php_Expression("new Ac_Lang_String(".Ac_Util_Php::export($p, true).")");
+            $res['singleCaption'] = new Ac_Cg_Php_Expression("new Ac_Lang_String(".Ac_Util_Php::export($s, true).")");
+            $res['pluralCaption'] = new Ac_Cg_Php_Expression("new Ac_Lang_String(".Ac_Util_Php::export($p, true).")");
         }
         return $res;
     }
@@ -610,14 +610,14 @@ class Cg_Model {
             $res['destIsUnique'] = $rel->isOtherRecordUnique(); 
         }
         // TODO: $rel['srcVarName'] = ???? - where should I get this var???
-        // TODO: create Cg_Property_Table   
+        // TODO: create Ac_Cg_Property_Table   
         return $res;
     }
     
     /**
      * Returns array with subsystem prefixes that are common for both this and other models
      *
-     * @param Cg_Model $otherModel
+     * @param Ac_Cg_Model $otherModel
      * @return array
      */
     function getCommonSubsystemPrefixes($otherModel) {
@@ -640,7 +640,7 @@ class Cg_Model {
         $props = array();
         foreach ($this->listProperties() as $i) {
             $prop = $this->getProperty($i);
-            if ($prop instanceof Cg_Property_Object) {
+            if ($prop instanceof Ac_Cg_Property_Object) {
                 if (!isset($props[$prop->className])) {
                     $props[$prop->className] = array('props' => array(), 'byVarName' => array(), 'unresolved' => 0);
                 }
@@ -672,13 +672,13 @@ class Cg_Model {
         $rels = array();
         foreach ($propsList as $prop) {
             if (!is_object($prop)) $prop = $this->getProperty($prop);
-            if (!($prop instanceof Cg_Property_Object)) throw new Exception("items of \$propsList shuld be either Cg_Property_Object instances or their IDs");
+            if (!($prop instanceof Ac_Cg_Property_Object)) throw new Exception("items of \$propsList shuld be either Ac_Cg_Property_Object instances or their IDs");
             $rels[$prop->name] = $prop->getRelation()->name;
         }
-        $cp = Cg_Util::findCommonPrefix($rels);
+        $cp = Ac_Cg_Util::findCommonPrefix($rels);
         $res = array();
         foreach ($rels as $propName => $relName) {
-            $res[$propName] = Cg_Inflector::camelize(substr($relName, strlen($cp)));
+            $res[$propName] = Ac_Cg_Inflector::camelize(substr($relName, strlen($cp)));
         }
         return $res;
     }
@@ -690,7 +690,7 @@ class Cg_Model {
     }
     
     function getLangStringPrefix() {
-        if ($this->langStringPrefix === false) $res = strtolower(Cg_Inflector::definize($this->_domain->getLangStringPrefix().'_'.$this->single));
+        if ($this->langStringPrefix === false) $res = strtolower(Ac_Cg_Inflector::definize($this->_domain->getLangStringPrefix().'_'.$this->single));
         else $res = $this->langStringPrefix;
         return $res;
     }
@@ -698,7 +698,7 @@ class Cg_Model {
     function getTableLangStringPrefix($after = false) {
         if ($this->tableLangStringPrefix === false) $res = $this->_domain->getTableLangStringPrefix();
             else $res = $this->tableLangStringPrefix;
-        if ($after !== false) $res = strtolower(Cg_Inflector::definize($res.'_'.$after));
+        if ($after !== false) $res = strtolower(Ac_Cg_Inflector::definize($res.'_'.$after));
         return $res;
     }
 
@@ -722,7 +722,7 @@ class Cg_Model {
         $res = array();
         foreach ($this->listProperties() as $i) {
             $prop = $this->getProperty($i);
-            if ($prop instanceof Cg_Property_Object) {
+            if ($prop instanceof Ac_Cg_Property_Object) {
                 if (strlen($f = $prop->getForeignKeyFieldName())) {
                     $res[$f] = $prop->getClassMemberName();
                 }

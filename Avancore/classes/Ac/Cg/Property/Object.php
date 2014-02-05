@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Property_Object extends Cg_Property {
+class Ac_Cg_Property_Object extends Ac_Cg_Property {
 
     var $isPrivateVar = true;
     
@@ -53,7 +53,7 @@ class Cg_Property_Object extends Cg_Property {
     
     /**
      * Other model that is associated with one of current relation 
-     * @var Cg_Model
+     * @var Ac_Cg_Model
      */
     var $_other = false;
     
@@ -117,7 +117,7 @@ class Cg_Property_Object extends Cg_Property {
         if ($this->varName === $pdn) {
             foreach ($this->_model->listProperties() as $i) {
                 $p = $this->_model->getProperty($i);
-                if (!Ac_Util::sameObject($p, $this) && is_a($p, 'Cg_Property_Object') && $p->getPreferredDefaultVarName() == $pdn) $res = true;
+                if (!Ac_Util::sameObject($p, $this) && is_a($p, 'Ac_Cg_Property_Object') && $p->getPreferredDefaultVarName() == $pdn) $res = true;
             }
         }
         return $res;
@@ -164,7 +164,7 @@ class Cg_Property_Object extends Cg_Property {
             
             $res .= ' '.($this->idrSuffix = !$single? $this->idrSuffixPlural : $this->idrSuffixSingle);
         }
-        $res = Cg_Inflector::camelize($res);
+        $res = Ac_Cg_Inflector::camelize($res);
         return $res;
     }
     
@@ -215,13 +215,13 @@ class Cg_Property_Object extends Cg_Property {
     
     /**
      * Gets corresponding property from other model that is built on the same relation 
-     * @return Cg_Property_Object
+     * @return Ac_Cg_Property_Object
      */
     function getMirrorProperty() {
         $res = null;
         foreach ($this->_other->listProperties() as $name) {
             $prop = $this->_other->getProperty($name);
-            if (is_a($prop, 'Cg_Property_Object')) {
+            if (is_a($prop, 'Ac_Cg_Property_Object')) {
                 if ($this->_otherRel) {
                     if ($prop->_otherRel && ($prop->isIncoming == !$this->isOtherIncoming) && ($prop->isOtherIncoming == !$this->isIncoming) 
                         && Ac_Util::sameObject($this->_rel, $prop->_otherRel) && Ac_Util::sameObject($this->_otherRel, $prop->_rel)) 
@@ -321,7 +321,7 @@ class Cg_Property_Object extends Cg_Property {
     }
     
     /**
-     * @return Cg_Model
+     * @return Ac_Cg_Model
      */
     function getOtherModel() {
         return $this->_other;

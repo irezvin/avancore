@@ -22,7 +22,7 @@ $config = array(
         'generatePmtFinders' => true,
     ),
     'domains.{APP_ID}' => array(
-        'strategyClass' => 'Cg_Strategy',
+        'strategyClass' => 'Ac_Cg_Strategy',
         'appName' => '{APP_CLASS_PREFIX}',
         'dbName' => _DEPLOY_DB_NAME,
         'caption' => '{APP_CAPTION}',
