@@ -76,3 +76,14 @@ X Moved all to-be-abandoned or to-be-rewritten classes to /obsolete directory
 2012-03-03
 
 + Ae_I_Autopoarams can be used to tag classes whose constructors accept prototype arrays
+
+2012-2014
+
+....A lot of time has passed....
+and many small improvements have been done
+
+2014-02-05
+
++ Renamed Cg to Ac_Cg
++ Moved Form, Table, Model, Admin class trees from obsolete/ back to classes/ (they seem immortal)
+

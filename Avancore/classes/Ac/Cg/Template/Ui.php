@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Template_Ui extends Cg_Template {
+class Ac_Cg_Template_Ui extends Ac_Cg_Template {
     
     var $modelName = false;
     var $modelClass = false;
@@ -42,22 +42,22 @@ class Cg_Template_Ui extends Cg_Template {
     function _generateFilesList() {
         $res = array(
             'form' => array(
-                'relPath' => Cg_Util::className2fileName($this->formClass), 
+                'relPath' => Ac_Cg_Util::className2fileName($this->formClass), 
                 'isEditable' => true, 
                 'templatePart' => 'form',
             ),
             'genForm' => array(
-                'relPath' => 'gen/'.Cg_Util::className2fileName($this->genFormClass), 
+                'relPath' => 'gen/'.Ac_Cg_Util::className2fileName($this->genFormClass), 
                 'isEditable' => false, 
                 'templatePart' => 'genForm',
             ),
             'list' => array(
-                'relPath' => Cg_Util::className2fileName($this->listClass), 
+                'relPath' => Ac_Cg_Util::className2fileName($this->listClass), 
                 'isEditable' => true, 
                 'templatePart' => 'list',
             ),
             'genList' => array(
-                'relPath' => 'gen/'.Cg_Util::className2fileName($this->genListClass), 
+                'relPath' => 'gen/'.Ac_Cg_Util::className2fileName($this->genListClass), 
                 'isEditable' => false, 
                 'templatePart' => 'genList',
             ), 

@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Generator {
+class Ac_Cg_Generator {
     
     var $dbPrototype = false;
     
@@ -60,7 +60,7 @@ class Cg_Generator {
     var $_configFileName = false;
     
     /**
-     * Array of Cg_Domain objects
+     * Array of Ac_Cg_Domain objects
      */
     var $_domains = false;
     
@@ -133,7 +133,7 @@ class Cg_Generator {
     /**
      * @param string $configFileName name of file with static configuration of project
      */
-    function Cg_Generator($configFileName, $runtimeOptions = array()) {
+    function Ac_Cg_Generator($configFileName, $runtimeOptions = array()) {
         $this->_configFileName = $configFileName;
         $this->_loadStaticConfig();
         if (isset($this->staticConfig['generator']) && is_array($this->staticConfig['generator'])) {
@@ -175,7 +175,7 @@ class Cg_Generator {
         $this->staticConfig = array();
         if ($this->_configFileName) {
             require($this->_configFileName);
-            if (isset($config) && is_array($config)) $this->staticConfig = Cg_Generator::_expandPaths($config);
+            if (isset($config) && is_array($config)) $this->staticConfig = Ac_Cg_Generator::_expandPaths($config);
         }
     }
     
@@ -228,7 +228,7 @@ class Cg_Generator {
             if (isset($this->staticConfig['domains']) && is_array($this->staticConfig['domains'])) { 
                 foreach ($this->staticConfig['domains'] as $name => $config) {
                     if (is_array($this->domainDefaults)) $config = Ac_Util::m($this->domainDefaults, $config);
-                    $obj = new Cg_Domain($this, $name, $config);
+                    $obj = new Ac_Cg_Domain($this, $name, $config);
                     $this->{$l}[$name] = $obj; 
                 }
             }
@@ -237,7 +237,7 @@ class Cg_Generator {
     }
     
     /**
-     * @return Cg_Domain
+     * @return Ac_Cg_Domain
      */
     function getDomain($name) {
         if (!in_array($name, $this->listDomains())) trigger_error ('No such domain: \''.$name.'\'', E_USER_ERROR);
@@ -246,7 +246,7 @@ class Cg_Generator {
     
     /**
      * Returns array where each key is processed as dot-separated path
-     *      Cg_Generator::expandPaths(array('x' => 10, 'y.z' => 20, 'foo.bar' => array ('baz' => 40)), '.q.w.e' => 'goo')
+     *      Ac_Cg_Generator::expandPaths(array('x' => 10, 'y.z' => 20, 'foo.bar' => array ('baz' => 40)), '.q.w.e' => 'goo')
      * will return
      *      array(
      *          x => 10
@@ -269,7 +269,7 @@ class Cg_Generator {
         $keys = array_keys($array);
         foreach ($keys as $i=>$k) 
         {
-            if (is_array($array[$k])) {$ak = Cg_Generator::_expandPaths($array[$k]); $array[$k] = $ak;}
+            if (is_array($array[$k])) {$ak = Ac_Cg_Generator::_expandPaths($array[$k]); $array[$k] = $ak;}
             if ((($sp = strpos($k, '.')) !== false) && ($sp != 0)) {
                 list($head, $tail) = explode('.', $k, 2);
                 $value = $array[$k];
@@ -283,10 +283,10 @@ class Cg_Generator {
     }
     
     /**
-     * @return Cg_Strategy
+     * @return Ac_Cg_Strategy
      */
     function createStrategyForDomain($domainName) {
-        $class = Ac_Util::getArrayByPath($this->staticConfig, array('domains', $domainName, 'strategyClass'), 'Cg_Strategy');
+        $class = Ac_Util::getArrayByPath($this->staticConfig, array('domains', $domainName, 'strategyClass'), 'Ac_Cg_Strategy');
         if (is_array($this->strategySettings)) $ss = $this->strategySettings; else $ss = array();
         $ss['genNonEditable'] = $this->genNonEditable;
         $dom = $this->getDomain($domainName);
@@ -336,7 +336,7 @@ class Cg_Generator {
         $this->_outputBytes = 0;
         $this->_outputFiles = 0;
         
-        if ($this->clearOutputDir && $this->outputDir) Cg_Util::cleanDir($this->outputDir);
+        if ($this->clearOutputDir && $this->outputDir) Ac_Cg_Util::cleanDir($this->outputDir);
         $todo = $this->parseGenEntities();
         foreach ($todo as $domain => $models) {
             $strat = $this->createStrategyForDomain($domain);

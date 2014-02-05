@@ -1,10 +1,10 @@
 <?php
 
-class Cg_Php_Expression {
+class Ac_Cg_Php_Expression {
     
     var $expression = false;
     
-    function Cg_Php_Expression($expression) {
+    function Ac_Cg_Php_Expression($expression) {
         $this->expression = $expression;
     }
     

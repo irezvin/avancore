@@ -23,7 +23,7 @@ $config = array(
         ),
     ),
     'domains.Sample' => array(
-        'strategyClass' => 'Cg_Strategy',
+        'strategyClass' => 'Ac_Cg_Strategy',
         'appName' => 'Sample',
         'dbName' => $dbConf['db'],
         'caption' => 'Avancore_Sample',

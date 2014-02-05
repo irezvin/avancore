@@ -1,11 +1,11 @@
 <?php
 
-class Cg_Property {
+class Ac_Cg_Property {
     
     var $enabled = '?';
     
     /**
-     * @var Cg_Model
+     * @var Ac_Cg_Model
      */
     var $_model = false;
 
@@ -24,7 +24,7 @@ class Cg_Property {
     
     var $extraPropertyInfo = array();
     
-    function Cg_Property ($model, $name, $config = array()) {
+    function Ac_Cg_Property ($model, $name, $config = array()) {
         $this->_model = $model;
         $this->name = $name;
         Ac_Util::simpleBindAll($config, $this);
@@ -69,7 +69,7 @@ class Cg_Property {
     }
     
     function getLangStringName() {
-        $res = strtolower(Cg_Inflector::definize($this->_model->getLangStringPrefix().'_'.$this->varName));
+        $res = strtolower(Ac_Cg_Inflector::definize($this->_model->getLangStringPrefix().'_'.$this->varName));
         return $res;
     }
     
@@ -91,7 +91,7 @@ class Cg_Property {
     
     function getCaption() {
         if ($this->_model->getUseLangStrings()) {
-            $res = new Cg_Php_Expression("new Ac_Lang_String('".$this->getLangStringName()."')");
+            $res = new Ac_Cg_Php_Expression("new Ac_Lang_String('".$this->getLangStringName()."')");
         } else {
             $res = $this->caption;
         }

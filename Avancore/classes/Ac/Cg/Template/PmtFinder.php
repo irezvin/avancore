@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Template_PmtFinder extends Cg_Template {
+class Ac_Cg_Template_PmtFinder extends Ac_Cg_Template {
     
     var $modelClass = false;
     var $mapperClass = false;
@@ -11,13 +11,13 @@ class Cg_Template_PmtFinder extends Cg_Template {
     function _generateFilesList() {
         return array(
             'pmtFinder' => array(
-                'relPath' => Cg_Util::className2fileName($this->finderClass), 
+                'relPath' => Ac_Cg_Util::className2fileName($this->finderClass), 
                 'isEditable' => true, 
                 'templatePart' => 'pmtFinder',
             ),
             
             'pmtGenFinder' => array(
-                'relPath' => 'gen/'.Cg_Util::className2fileName($this->genFinderClass), 
+                'relPath' => 'gen/'.Ac_Cg_Util::className2fileName($this->genFinderClass), 
                 'isEditable' => false, 
                 'templatePart' => 'pmtGenFinder',
             ),

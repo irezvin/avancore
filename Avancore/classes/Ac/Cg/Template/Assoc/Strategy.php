@@ -1,29 +1,29 @@
 <?php
 
-class Cg_Template_Assoc_Strategy extends Cg_Template {
+class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
     
     /**
-     * @var Cg_Template_ModelAndMapper
+     * @var Ac_Cg_Template_ModelAndMapper
      */
     var $template = false;
     
     /**
-     * @var Cg_Model
+     * @var Ac_Cg_Model
      */
     var $model = false;
 
     /**
-     * @var Cg_Model
+     * @var Ac_Cg_Model
      */
     var $otherModel = false;
     
     /**
-     * @var Cg_Property_Object
+     * @var Ac_Cg_Property_Object
      */
     var $prop = false;
     
     /**
-     * @var Cg_Property_Object
+     * @var Ac_Cg_Property_Object
      */
     var $mirrorProp = false;
     
@@ -58,7 +58,7 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
     var $mirrorRemoveMethod = false;
     var $mirrorVar = false;
     
-    function Cg_Template_Assoc_Strategy ($options) {
+    function Ac_Cg_Template_Assoc_Strategy ($options) {
         Ac_Util::simpleBindAll($options, $this);
     }
     
@@ -69,7 +69,7 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
         $this->otherModel = $this->prop->getOtherModel();
         
 //        $om = $prop->getOtherModel();
-//        $single = Cg_Util::makeIdentifier($om->single);
+//        $single = Ac_Cg_Util::makeIdentifier($om->single);
 //        $ucSingle = ucfirst($single).$prop->idrSuffixSingle; 
 //        $singleId = '$this->'.$single; 
 
@@ -94,11 +94,11 @@ class Cg_Template_Assoc_Strategy extends Cg_Template {
             $this->countId = '$this->'.$this->count;
         }
 
-        $this->thisPlural = Cg_Util::makeIdentifier($this->model->plural);
-        $this->otherPlural = Cg_Util::makeIdentifier($this->otherModel->plural);
+        $this->thisPlural = Ac_Cg_Util::makeIdentifier($this->model->plural);
+        $this->otherPlural = Ac_Cg_Util::makeIdentifier($this->otherModel->plural);
         
         if ($this->model->fixMapperMethodNames) {
-            $this->otherPlural = Cg_Util::makeIdentifier($this->plural);
+            $this->otherPlural = Ac_Cg_Util::makeIdentifier($this->plural);
         }
         
         if ($this->prop->otherModelIdInMethodsSingle) $this->otherSingle = $this->prop->otherModelIdInMethodsSingle;

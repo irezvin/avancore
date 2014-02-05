@@ -1,6 +1,6 @@
 <?php
 
-class Cg_Property_Simple extends Cg_Property {
+class Ac_Cg_Property_Simple extends Ac_Cg_Property {
     
     var $colName = false;
     
@@ -211,7 +211,7 @@ class Cg_Property_Simple extends Cg_Property {
     
     function getDefaultCaption() {
         if ($this->_col->comment) $c = $this->_col->comment; 
-            else $c = Cg_Util::makeCaption($this->colName);
+            else $c = Ac_Cg_Util::makeCaption($this->colName);
         return $c;        
     }
     
@@ -227,7 +227,7 @@ class Cg_Property_Simple extends Cg_Property {
                     if ($mod = $this->_model->_domain->searchModelByTable($foreignTbl->name)) {
                         foreach ($this->_model->listProperties() as $i) {
                             $p = $this->_model->getProperty($i);
-                            if (is_a($p, 'Cg_Property_Object') && $om = $p->getOtherModel()) {
+                            if (is_a($p, 'Ac_Cg_Property_Object') && $om = $p->getOtherModel()) {
                                 if (Ac_Util::sameObject($om, $mod)) {
                                     $rel = $p->_rel;
                                     if (in_array($this->colName, array_keys($rel->columns))) {
