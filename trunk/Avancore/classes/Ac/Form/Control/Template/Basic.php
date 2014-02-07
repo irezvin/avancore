@@ -593,16 +593,20 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         
         foreach ($control->getValueList() as $val => $cap) {
             $items[] = array('value' => $val, 'caption' => $cap, 'selected' => $control->isItemSelected($val));
-        }
-        
+        } 
+       
         if ($control->isReadOnly()) $this->_showReadOnlyList($control, $items);
         elseif ($control->type == 'selectList' || $control->type == 'chosen') $this->_showSelectListElement($control, $items);
             else $this->_showSelectListControls($control, $items);
             
         if ($control->type == 'chosen') {
             $r = Ac_Legacy_Controller_Response_Global::r();
+            if (!isset($control->tplExtras['noJquery']) || !$control->tplExtras['noJquery']) {
+                $r->addAssetLibs(array(
+                    '{JQUERY}',
+                ));
+            }
             $r->addAssetLibs(array(
-                '{JQUERY}',
                 '{AC}/vendor/chosen/chosen.min.css',
                 '{AC}/vendor/chosen/chosen.jquery.min.js',
             ));

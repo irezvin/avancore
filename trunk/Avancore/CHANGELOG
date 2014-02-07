@@ -87,3 +87,24 @@ and many small improvements have been done
 + Renamed Cg to Ac_Cg
 + Moved Form, Table, Model, Admin class trees from obsolete/ back to classes/ (they seem immortal)
 
+2014-02-07
+
+Large number of admin- and facet- related changes and small bugifxes
+
+* Ac_Form_Control_List: improved 'chosen' type support
++ Ac_Admin_Feature_DebugSql: feature that displays current SQL select statement for admin list
++ Ac_Admin_Manager::$dontCount support, also rudimentary no-count support in Ac_Admin_Paginator 
+  (will work event if records count is not provided)
+* Ac_Admin_Manager::$featureSettings now OVERRIDE values provided 
+  by Ac_Model_Mapper_Info::$adminFeatures
+* Fix images path in Ac_Admin_ManagerConfigService_J25
+* Ac_Facet_Sql_SetImpl::getSelectPrototypeWithFacets(), applyFacetsToSearchInstance() for more
+  fine-grained integration with Select managed by outside application
++ Ac_Form_Converter now overrides created proto with Ac_Model_Property->$controlPrototype 
+  if it's provided
++ Ac_Sql_Part now use Ac_Util::m instead of array_merge to merge where, order and groupBy clauses,
+  that allows to specify keys to combine criteria into AND/OR groups
++ Ac_Url::getJsPostRedirect() now allows to specify which parts of query will pass ino query args
+  and which will get into hidden POST fields
++ Ac_Util::flattenArray has $keyGlue arg to join keys instead of ignoring them
+

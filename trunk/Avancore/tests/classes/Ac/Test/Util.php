@@ -57,4 +57,22 @@ class Ac_Test_Util extends Ac_Test_Base {
         
     }
     
+    function testFlattenArray() {
+        $arr = array(
+            'foo',
+            'bar' => array(
+                'baz',
+                'quux' => 'moo'
+            )
+        );
+        $f = Ac_Util::flattenArray($arr, -1, '.');
+        if (!$this->assertEqual($f = Ac_Util::flattenArray($arr, -1, '.'), array(
+            'foo',
+            'bar.0' => 'baz',
+            'bar.quux' => 'moo',
+        ))) {
+            var_dump($f);
+        }
+    }
+    
 }

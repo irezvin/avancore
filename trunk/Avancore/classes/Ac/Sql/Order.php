@@ -30,7 +30,7 @@ class Ac_Sql_Order extends Ac_Sql_Part {
      */
     function _doApplyToSelect($select) {
         parent::_doApplyToSelect($select);
-        $select->orderBy = array_merge($select->orderBy, $this->getAppliedOrderBy());
+        $select->orderBy = Ac_Util::m($select->orderBy, $this->getAppliedOrderBy());
     }
     
 }

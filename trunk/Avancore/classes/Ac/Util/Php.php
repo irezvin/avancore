@@ -38,7 +38,7 @@ abstract class Ac_Util_Php {
         $stringdelim = '\'';
 
         // Check the export isn't a simple string / int
-        if (is_object($array) && is_a($array, 'Cg_Php_Expression')) {
+        if (is_object($array) && is_a($array, 'Ac_Cg_Php_Expression')) {
             $out = $array->getExpression();
         } elseif (is_string($array)) {
             if (strpos($array, "\n")) {

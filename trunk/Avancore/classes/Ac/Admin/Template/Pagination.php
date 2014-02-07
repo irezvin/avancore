@@ -82,7 +82,7 @@ class Ac_Admin_Template_Pagination extends Ac_Legacy_Template_Html {
         $this->pagesPerSuperPage = $pagination->pagesPerSuperPage? $pagination->pagesPerSuperPage : $this->numPages;
         $this->superPageNo = $pagination->getSuperPageNo();
         $this->superPagesCount = $pagination->getSuperPagesCount();
-        $this->showTotals = $pagination->showTotals;
+        $this->showTotals = $pagination->totalRecords !== false && $pagination->showTotals;
         $this->showFormTag = $pagination->showFormTag;
         if ($pagination->putUrlsToLinks) {
             $context = $pagination->getContext();
@@ -171,7 +171,12 @@ class Ac_Admin_Template_Pagination extends Ac_Legacy_Template_Html {
             <?php } ?>
 <?php       if ($this->showLimits || $this->showTotals) { ?> 
             <div class='position'>
-                <?php echo AC_ADMIN_PAGINATION_SHOWING; ?> <?php $this->d($this->currPage*$limit + 1) ?> &ndash; <?php $this->d(min(($this->currPage + 1)*$limit + 1, $this->totalRecords)); ?> <?php echo AC_ADMIN_PAGINATION_OF; ?> <?php $this->d($this->totalRecords); ?>
+                <?php echo AC_ADMIN_PAGINATION_SHOWING; ?> <?php $this->d($this->currPage*$limit + 1) ?> 
+                &ndash; <?php $this->d(min($nRecs = ($this->currPage + 1)*$limit + 1, $this->totalRecords === false? $nRecs : $this->totalRecords)); ?>
+<?php          if ($this->totalRecords !== false) { ?>
+                <?php echo AC_ADMIN_PAGINATION_OF; ?> <?php $this->d($this->totalRecords); ?> 
+<?php          } else { ?>
+<?php          } ?>                
 <?php       if ($this->showLimits) { ?>                
                 <?php echo AC_ADMIN_PAGINATION_SHOW_QTY; ?> 
                 <select name='<?php $this->d($this->limitParamName); ?>' onchange="document['<?php $this->d($fid) ?>'].submit();">

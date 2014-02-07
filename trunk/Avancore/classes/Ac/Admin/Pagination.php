@@ -139,11 +139,13 @@ class Ac_Admin_Pagination extends Ac_Legacy_Controller {
         if ($this->_currentPageNo === false) {
             $src = $this->storeParamsInState? $this->_rqWithState : $this->_rqData;
             $v = false;
-            if (isset($src['pageNo']) && is_numeric($src['pageNo']) && intval($src['pageNo']) >= 0 && intval($src['pageNo']) <= $this->_getNumPages())
+            if (isset($src['pageNo']) && is_numeric($src['pageNo']) && intval($src['pageNo']) >= 0 && ($this->totalRecords === false || intval($src['pageNo']) <= $this->_getNumPages()))
                 $v = $src['pageNo'];  
             if ($v === false) $v = 0; 
             $this->_currentPageNo = $v;
-            if ($this->_currentPageNo > $this->_getNumPages()) $this->_currentPageNo = $this->_getNumPages();
+            if ($this->totalRecords !== false) {
+                if ($this->_currentPageNo > $this->_getNumPages()) $this->_currentPageNo = $this->_getNumPages();
+            }
             if ($this->storeParamsInState) $this->_context->setStateVariable('pageNo', $v);
         }
         return $this->_currentPageNo;
@@ -203,9 +205,12 @@ class Ac_Admin_Pagination extends Ac_Legacy_Controller {
     }
     
     function _getNumPages() {
-        if ($this->limitStep <= 0) $this->limitStep = 50;
-        if ($this->maxRecords <= 0) $this->maxRecords = 1000;
-        $res = (int) ceil($this->totalRecords / $this->getNumberOfRecordsPerPage());
+        if ($this->totalRecords === false) $res  = $this->getPageNo() + $this->pagesPerSuperPage;
+        else {
+            if ($this->limitStep <= 0) $this->limitStep = 50;
+            if ($this->maxRecords <= 0) $this->maxRecords = 1000;
+            $res = (int) ceil($this->totalRecords / $this->getNumberOfRecordsPerPage());
+        }
         return $res;
     }
     

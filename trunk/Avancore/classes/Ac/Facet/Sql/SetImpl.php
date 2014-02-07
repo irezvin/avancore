@@ -57,6 +57,35 @@ class Ac_Facet_Sql_SetImpl extends Ac_Facet_SetImpl {
      * @return Ac_Sql_Select
      */
     function createSelectForItem(Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
+        $proto = $this->getSelectPrototypeWithFacets($currValuesImpl);
+        $select = new Ac_Sql_Select(new Ac_Sql_Db_Ae(), $proto);
+        $this->applyFacetsToSelectInstance($select, $currValuesImpl);
+        return $select;
+    }
+    
+    function applyFacetsToSelectInstance(Ac_Sql_Select $select, Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
+        $set = $this->getFacetSet();
+        $usedFacets = $set->getValueOrder();
+        $alwaysApply = array();
+        foreach ($this->facetSet->getItems() as $name => $item) {
+            $impl = $item->getImpl();
+            if ($impl instanceof Ac_Facet_Sql_I_ItemImpl && !array_key_exists($name, $usedFacets) && $impl->getAlwaysApply()) {
+                $alwaysApply[$name] = $impl;
+            }
+        }
+        foreach ($usedFacets as $name) {
+            $impl = $set->getItem($name)->getImpl();
+            if ($impl instanceof Ac_Facet_Sql_I_ItemImpl) {
+                $impl->applyToSelect($select, $currValuesImpl);
+            }
+        }
+        foreach ($alwaysApply as $impl) $impl->applyToSelect($select, $currValuesImpl);
+    }
+    
+    /**
+     * @return Ac_Sql_Select
+     */
+    function getSelectPrototypeWithFacets(Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
         $proto = $this->getSelectPrototype();
         $proto['distinct'] = true;
         $set = $this->getFacetSet();
@@ -76,15 +105,7 @@ class Ac_Facet_Sql_SetImpl extends Ac_Facet_SetImpl {
             }
         }
         foreach ($alwaysApply as $impl) $impl->applyToSelectPrototype($proto, $currValuesImpl);
-        $select = new Ac_Sql_Select(new Ac_Sql_Db_Ae(), $proto);
-        foreach ($usedFacets as $name) {
-            $impl = $set->getItem($name)->getImpl();
-            if ($impl instanceof Ac_Facet_Sql_I_ItemImpl) {
-                $impl->applyToSelect($select, $currValuesImpl);
-            }
-        }
-        foreach ($alwaysApply as $impl) $impl->applyToSelect($select, $currValuesImpl);
-        return $select;
+        return $proto;
     }
 
     

@@ -14,7 +14,7 @@ class Ac_Admin_ManagerConfigService_J25 extends Ac_Admin_ManagerConfigService {
       
     function getDefaultImagePrefix() {
         $base = $this->application->getAdapter()->getLiveSite();
-        return $base.'/administrator/templates/'.JApplication::getInstance('administrator').'hathor/images/toolbar';
+        return $base.'/administrator/templates/hathor/images/toolbar';
     }
     
     protected function getDefaultToolbarImagesMap() {
