@@ -43,8 +43,8 @@ class Ac_Sql_Filter extends Ac_Sql_Part {
      */
     function _doApplyToSelect($select) {
         parent::_doApplyToSelect($select);
-        $select->where = array_merge($select->where, $this->getAppliedWhere());
-        $select->having = array_merge($select->having, $this->getAppliedHaving());
+        $select->where = Ac_Util::m($select->where, $this->getAppliedWhere());
+        $select->having = Ac_Util::m($select->having, $this->getAppliedHaving());
     }
     
 }

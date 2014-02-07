@@ -36,7 +36,7 @@ class Ac_Admin_Feature {
      */
     function canBeApplied() {
         if ($this->disabled) $res = false;
-            else $res = $this->doCanBeApplied();
+            else $res = $this->doCanBeApplied() !== false;
         return $res;
     }
     
@@ -140,6 +140,9 @@ class Ac_Admin_Feature {
     }
      
     function onBind($record) {
+    }
+    
+    function onCreateSqlSelect(Ac_Sql_Select $select) {
     }
     
 }
