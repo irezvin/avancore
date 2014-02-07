@@ -136,7 +136,7 @@ class Ac_Sql_Part extends Ac_Prototyped {
      * @param Ac_Sql_Select $select
      */
     function _doApplyToSelect($select) {
-        $select->groupBy = array_merge($select->groupBy, $this->getAppliedGroupBy());
+        $select->groupBy = Ac_Util::m($select->groupBy, $this->getAppliedGroupBy());
         $select->useAlias($this->getAppliedAliases());
     }
 

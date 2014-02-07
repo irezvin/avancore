@@ -241,10 +241,34 @@ class Ac_Url implements Ac_I_RedirectTarget {
         return $res;
     }
 
-    function getJsPostRedirect($formName = false) {
+    /**
+     * @param string $formName
+     * @param array $list
+     * @param array $listIsForPost
+     * @return string
+     */
+    function getJsPostRedirect($formName = false, $list = array(), $listIsForPost = false) {
         static $ctr = 0; 
         if (!$formName) $formName = "avcUrlGetJsPostRedirect".$ctr++;
-        $res = '<form name="'.htmlspecialchars($formName).'" action="'.$this->toString(false).'" method="post">'.$this->getHidden(null, "", "").'</form>';
+        if ($list) {
+            $a = array_intersect_key($this->query, $f = array_flip($list));
+            $b = array_diff_key($this->query, $f);
+            if ($listIsForPost) {
+                list ($post, $get) = array($a, $b);
+            } else {
+                list ($get, $post) = array($a, $b);
+            }
+            $tmp = $this->query;
+            $this->query = $get;
+            $action = $this->toString();
+            $this->query = $post;
+            $hidden = $this->getHidden(null, "", "");
+            $this->query = $tmp;
+        } else {
+            $action = $this->toString(false);
+            $hidden = $this->getHidden(null, "", "");
+        }
+        $res = '<form name="'.htmlspecialchars($formName).'" action="'.$action.'" method="post">'.$hidden.'</form>';
         $res .= '<script type="text/javascript">document.forms["'.addslashes($formName).'"].submit();</script>';
         return $res;
     }

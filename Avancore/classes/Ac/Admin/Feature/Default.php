@@ -42,6 +42,8 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     
     var $displayOrderStep = 10;
     
+    var $subManagersExtra = array();
+    
     function doCanBeApplied() {
         return true;
     }
@@ -241,6 +243,11 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
                 }
             }
         }
+        Ac_Util::ms($res, $this->subManagersExtra);
+        
+        foreach ($res as $k => $v) if (!is_array($v) && !$v) 
+            unset($res[$v]);
+        
         return $res;
     }
     

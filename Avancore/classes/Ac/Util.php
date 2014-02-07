@@ -574,11 +574,20 @@ abstract class Ac_Util {
         return Ac_Util::removeTrailingSlash($string, $slash);
     }
     
-    static function flattenArray($array, $level = -1) {
+    static function flattenArray($array, $level = -1, $keyGlue = false, $key = '') {
         $res = array();
         foreach ($array as $k => $v) {
-            if (is_array($v) && ($level != 0)) $res = array_merge($res, Ac_Util::flattenArray($v, $level-1));
-            else $res[] = & $array[$k];
+            if (strlen($keyGlue)) {
+                $tk = strlen($key)? $key.$keyGlue.$k : $k;
+            } else {
+                $tk = false;
+            }
+            if (is_array($v) && ($level != 0)) $res = array_merge($res, Ac_Util::flattenArray($v, $level-1, $keyGlue, $tk));
+            elseif (strlen($tk)) {
+                $res[$tk] = & $array[$k];
+            } else {
+                $res[] = & $array[$k];
+            }
         }
         return $res;
     }

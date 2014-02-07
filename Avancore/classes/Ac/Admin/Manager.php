@@ -72,6 +72,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      */
     var $featureSettings = array();
     
+    var $debugSql = false;
+    
     /**
      * @var string
      */
@@ -166,12 +168,16 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     var $_filterFormResponse = false;
     
+    var $dontCount = false;
+    
     /**
      * @var Ac_Admin_ManagerConfigService
      */
     protected $configService = false;
     
-    
+    function doInitProperties($options = array()) {
+        Ac_Util::bindAutoparams($this, $options);
+    }
     
     // ------------------------------------------- cache support methods ----------------------------------------------
     
@@ -204,10 +210,15 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if ($this->_formResponse === false) {
             $template = $this->getTemplate();
             $form = $this->getForm();
-            $hr = new Ac_Legacy_Controller_Response_Html();
-            $form->htmlResponse = $hr;
-            $hr->content = $form->fetchPresentation();
-            $this->_formResponse = $hr;
+            if ($form) {
+                $hr = new Ac_Legacy_Controller_Response_Html();
+                $form->htmlResponse = $hr;
+                $hr->content = $form->fetchPresentation();
+                $this->_formResponse = $hr;
+            } else {
+                $hr = new Ac_Legacy_Controller_Response_Html();
+                $this->_formResponse = $hr;
+            }
         }
         return $this->_formResponse;
     }
@@ -736,7 +747,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $mapper = $this->getMapper();
                 $info = $mapper->getInfo();
                 if (is_array($info->adminFeatures)) {
-                    Ac_Util::ms($this->featureSettings, $info->adminFeatures);
+                    $this->featureSettings = Ac_Util::m($info->adminFeatures, $this->featureSettings);
                 }
             }
             foreach ($this->listAllFeatureClasses() as $fc) {
@@ -821,7 +832,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $pgContext = $context->spawn('pagination');
             $this->_pagination = new Ac_Admin_Pagination($pgContext, array(), $this->_instanceId.'_pagination');
             if ($coll = $this->_getRecordsCollection()) {
-                $this->_pagination->totalRecords = $coll->countRecords();
+                if (!$this->dontCount)
+                    $this->_pagination->totalRecords = $coll->countRecords();
             } else {
                 $this->_pagination->totalRecords = 1;
             }
@@ -849,7 +861,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     function listSubManagers() {
         if ($this->_subManagers === false) {
             $this->_subManagers = array();
-            if ($this->allowSubManagers && $this->getRecord()->isPersistent()) {
+            if ($this->allowSubManagers && $this->getRecord() && $this->getRecord()->isPersistent()) {
                 foreach ($this->listFeatures() as $f) {
                     $feat = $this->getFeature($f);
                     $smc = $feat->getSubManagersConfig();
@@ -876,7 +888,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $allSubManagers = $this->_subManagers;
             $this->_subManagers = array();
             foreach (array_keys($allSubManagers) as $i => $sm) {
-                $this->_subManagers[$i] = $allSubManagers[$sm];
+                if (is_array($allSubManagers[$sm]) || is_object($allSubManagers[$sm]))
+                    $this->_subManagers[$i] = $allSubManagers[$sm];
             }
         }
         return array_keys($this->_subManagers);
@@ -892,6 +905,10 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if (is_array($this->_subManagers[$id])) {
             $conf = $this->_subManagers[$id];
             $ctx = $this->_createSubManagerContext($id);
+            if (isset($conf['mapperClass']) && strlen($conf['mapperClass'])) {
+                $mapper = $this->application->getMapper($conf['mapperClass']);
+                $conf = Ac_Util::m($mapper->getManagerConfig(), $conf);
+            }
             if (isset($conf['class']) && strlen($conf['class'])) {
                 $class = $conf['class'];
             } else $class = 'Ac_Admin_Manager';
@@ -1216,7 +1233,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $f = $this->_getSqlFilter();
             $o = $this->_getSqlOrder();
             $ff = $this->getFilterForm();
-            $disp = Ac_Dispatcher::getInstance();
             $sqlDb = $this->application->getDb();
             $options = Ac_Util::m($this->getMapper()->getSqlSelectPrototype('t'), $options);
             $this->_sqlSelect = new Ac_Sql_Select($sqlDb, $options);
@@ -1241,6 +1257,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             foreach ($filtersToSet as $partName) {
                 $this->_sqlSelect->getPart($partName)->bind($fVal[$partName]);
             }
+            $this->callFeatures('onCreateSqlSelect', $this->_sqlSelect);
         }
         return $this->_sqlSelect;
     }

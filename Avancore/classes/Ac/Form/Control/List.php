@@ -16,7 +16,7 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
     var $multiSelect = '?';
     
     /**
-     * @var string selectList | buttonsOrChecks
+     * @var string selectList | buttonsOrChecks | chosen
      */
     var $type = 'selectList'; 
     
