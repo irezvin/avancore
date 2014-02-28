@@ -62,8 +62,8 @@ class Ac_Form_Converter {
         
         if (isset($property->displayOrder)) $conf['displayOrder'] = $property->displayOrder;
         
-        if (isset($property->controlPrototype) && is_array($property->controlPrototoype)) {
-            Ac_Util::ms($conf, $property->controlPrototoype);
+        if (isset($property->controlPrototype) && is_array($property->controlPrototype)) {
+            Ac_Util::ms($conf, $property->controlPrototype);
         }
         
         return $conf;
