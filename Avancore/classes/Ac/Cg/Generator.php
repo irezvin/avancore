@@ -130,6 +130,10 @@ class Ac_Cg_Generator {
      */
     var $_outputFiles = false;
     
+    var $lintify = true;
+    
+    var $lintCommand = "php -l %s 2>&1";
+    
     /**
      * @param string $configFileName name of file with static configuration of project
      */
@@ -371,6 +375,16 @@ class Ac_Cg_Generator {
     
     function closeLog() {
         if ($this->_logFile) fclose($this->_logFile);
+    }
+    
+    function runLint($path) {
+        if (strlen($this->lintCommand)) {
+            $ePath = escapeshellarg($path);
+            exec(sprintf($this->lintCommand, $ePath), $out, $return);
+            if (!!$return) {
+                $this->log(implode("\n", $out)."\n", true);
+            }
+        }
     }
     
     

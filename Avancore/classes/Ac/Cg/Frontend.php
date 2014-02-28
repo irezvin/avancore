@@ -78,6 +78,7 @@ class Ac_Cg_Frontend {
     <html>
     <head>
         <title><?php echo $this->getTitle(); ?></title>
+        <meta http-equiv="content-type" content="text/html; charset=utf8" />
         <style type='text/css'>
             div {margin-left: 1em; padding-left: 1em; border-left: 1px dotted silver}
         </style>

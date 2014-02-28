@@ -172,14 +172,14 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         return $this->getOtherEntityName(!$this->isList());
     }
     
-    function getDefaultVarName() {
-        if ($this->isList()) {
+    function getDefaultVarName($forceSingle = false) {
+        if ($this->isList() || $forceSingle) {
             $res = $this->otherModelIdInMethodsPlural;
         } else {
             $res = $this->otherModelIdInMethodsSingle;
         }
         if (!strlen($res))
-            $res = $this->getOtherEntityName(!$this->isList());
+            $res = $this->getOtherEntityName(!$this->isList() || $forceSingle);
         if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
         return $res;
     }

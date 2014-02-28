@@ -156,7 +156,7 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
                 if (is_array($this->config[$configKey])) {
                     foreach ($this->config[$configKey] as $i => $dir) {
                         if (!is_dir($dir))
-                            throw new Exception("Directory not found: '{$this->config[$configKey]}' (specified in the configuration key '{$configKey}.{$i}')");
+                            throw new Exception("Directory not found: '{$dir}' (specified in the configuration key '{$configKey}.{$i}')");
                     }
                 } else {
                     if (!is_dir($this->config[$configKey])) throw new Exception("Directory not found: '{$this->config[$configKey]}' (specified in the configuration key '{$configKey}')");

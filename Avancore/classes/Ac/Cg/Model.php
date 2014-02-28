@@ -648,7 +648,7 @@ class Ac_Cg_Model {
                     $props[$prop->className] = array('props' => array(), 'byVarName' => array(), 'unresolved' => 0);
                 }
                 $props[$prop->className]['props'][] = $i;
-                if (!isset($props[$prop->className]['byVarName'][$v = $prop->getDefaultVarName()])) {
+                if (!isset($props[$prop->className]['byVarName'][$v = $prop->getDefaultVarName(true)])) {
                     $props[$prop->className]['byVarName'][$v][] = 1;
                 } else {
                     $props[$prop->className]['byVarName'][$v]++;

@@ -95,7 +95,7 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
         }
 
         $this->thisPlural = Ac_Cg_Util::makeIdentifier($this->model->plural);
-        $this->otherPlural = Ac_Cg_Util::makeIdentifier($this->otherModel->plural);
+        $this->otherPlural = Ac_Cg_Util::makeIdentifier($this->prop->getOtherEntityName(false));
         
         if ($this->model->fixMapperMethodNames) {
             $this->otherPlural = Ac_Cg_Util::makeIdentifier($this->plural);

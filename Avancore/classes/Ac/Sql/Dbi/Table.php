@@ -1,6 +1,26 @@
 <?php
 
 class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
+
+    /**
+     * Return indexes that have at least one matching column - intersection
+     */
+    const INDEX_ACCEPT_ALL = 0;
+    
+    /**
+     * Return indexes that have same columns (at any order) - equality
+     */
+    const INDEX_ACCEPT_SAME = 1;
+    
+    /**
+     * Return indexes that have all specified columns, but may have more columns - superset
+     */
+    const INDEX_ACCEPT_LARGER = 2;
+    
+    /**
+     * Return indexes that with every column of the index listed in the speicifed columns, but may have less number of columns - subset
+     */
+    const INDEX_ACCEPT_SMALLER = 3;
     
     /**
      * @var Ac_Sql_Dbi_Database
@@ -145,18 +165,28 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
      * Finds indices of current table that has specified columns in them.
      *
      * @param array $colNames Names of columns that have to be in index (in any order)
-     * @param bool $areAllColumns Don't return names of indices that have other columns besides specified ones
+     * @param bool $mode How indices are found (see self::INDEX_ACCEPT* constants)
      * @param bool $mustBeUnique Only return names of unique indices
      * 
      * @return array names of indices found
      */
-    function findIndicesByColumns($colNames, $areAllColumns = true, $mustBeUnique = false) {
+    function findIndicesByColumns($colNames, $mode = self::INDEX_ACCEPT_SAME, $mustBeUnique = false) {
+        if (!in_array((int) $mode, array(0, 1, 2, 3))) 
+            throw Ac_E_InvalidCall::outOfConst('mode', $mode, 'INDEX_ACCEPT', __CLASS__);
+        $mode = (int) $mode;
+        
         $res = array();
         foreach ($this->listIndices() as $name) {
             $idx = $this->getIndex($name);
             if ($mustBeUnique && !$idx->unique) continue;
-            $ok = !count(array_diff($colNames, $idx->listColumns()));
-            if ($areAllColumns) $ok = $ok && !count(array_diff($idx->listColumns(), $colNames));
+            $colMinusIdx = !array_diff($colNames, $idx->listColumns());
+            $idxMinusCol = !array_diff($idx->listColumns(), $colNames);
+            
+            if ($mode == self::INDEX_ACCEPT_ALL) $ok = $colMinusIdx || $idxMinusCol;
+            elseif ($mode == self::INDEX_ACCEPT_SAME) $ok = $colMinusIdx && $idxMinusCol;
+            elseif ($mode == self::INDEX_ACCEPT_LARGER) $ok = $colMinusIdx;
+            elseif ($mode == self::INDEX_ACCEPT_SMALLER) $ok = $idxMinusCol;
+            
             if ($ok) $res[] = $name;
         }
         return $res;
