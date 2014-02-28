@@ -20,6 +20,9 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     
     protected $stage = self::stConstructing;
     
+    /**
+     * @var Ac_Application_Adapter
+     */
     protected $adapter = null;
     
     protected $id = false;
@@ -217,6 +220,10 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
                 elseif (($leg = $this->getLegacyDatabase())) $this->db = new Ac_Sql_Db_Ae($leg);
         }
         return $this->db;
+    }
+    
+    function getAppRootDir() {
+        return $this->adapter->getAppRootDir();
     }
 
     function setCache(Ac_Cache $cache = null) {

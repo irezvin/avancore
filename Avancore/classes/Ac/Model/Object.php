@@ -429,9 +429,9 @@ class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
-    function isChanged($field) {
+    function isChanged($field, $strict = true) {
         if (!$this->tracksChanges()) return true;
-        return array_key_exists($field, $this->_oldValues) && ($this->_oldValues[$field] !== $this->{$field});
+        return array_key_exists($field, $this->_oldValues) && ($nonStrict? ($this->_oldValues[$field] != $this->{$field}) : ($this->_oldValues[$field] !== $this->{$field}));
     }
     
 /*    function getErrors($key = false) {
@@ -1025,7 +1025,9 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     protected function intResetReferences() {
         foreach ($this->intListReferenceFields() as $fieldName => $objectFieldName) {
-            if ($this->isChanged($fieldName)) $this->$objectFieldName = false;
+            if ($this->isChanged($fieldName, false)) {
+                $this->$objectFieldName = false;
+            }
         }
     }
     

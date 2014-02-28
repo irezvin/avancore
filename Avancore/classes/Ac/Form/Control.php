@@ -1075,5 +1075,12 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         return $res;
     }
     
+    function getApplication() {
+        if ($this->application) $res = $this->application;
+        elseif ($this->_parent) $res = $this->_parent->getApplication();
+        else $res = Ac_Application::getDefaultInstance();
+        return $res;
+    }
+    
 }
 
