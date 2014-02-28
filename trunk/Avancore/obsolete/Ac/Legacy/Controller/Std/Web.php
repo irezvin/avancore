@@ -8,6 +8,8 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
 
     // --------- cache support ---------
 
+    var $cacheDebug = false;
+    
     var $cacheSkip = false;
     
     var $cacheGroup = false;
@@ -82,7 +84,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
         $res = false;
         $m = $this->getMethodName();
         if (($this->cacheableMethods === true) || is_array($this->cacheableMethods) && in_array($m, $this->cacheableMethods)) {
-            if (!headers_sent()) Ac_Debug_FirePHP::getInstance()->log($m, 'method cache enabled');
+            if ($this->cacheDebug) Ac_Debug::fb($m, 'method cache enabled');
             $cacheParamsList = array();
             foreach ($this->cacheParamsMap as $k => $v) {
                 if (is_numeric($k)) $cacheParamsList[] = $v;
@@ -98,7 +100,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
             $res['_method'] = get_class($this).'::'.$m;
             if (!$asArray) $res = md5(serialize($res));
         } else {
-            if (!headers_sent()) Ac_Debug_FirePHP::getInstance()->log($m, ' non-cacheable method');
+            if ($this->cacheDebug) Ac_Debug::fb($m, ' non-cacheable method');
         }
         return $res;
     }
@@ -162,7 +164,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
             }
         }
         if ($id !== false) {
-            if (!headers_sent()) Ac_Debug_FirePHP::getInstance()->log(array('id' => $id, 'src ' => $this->getCacheId(array(), true)), "Page cache ".($res? 'hit' : 'miss'));
+            if ($this->cacheDebug) Ac_Debug::fb(array('id' => $id, 'src ' => $this->getCacheId(array(), true)), "Page cache ".($res? 'hit' : 'miss'));
         }
         $this->loadedFromCache = $res;
         return $res;
@@ -178,7 +180,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
                 foreach ($pv as $k => $v) {
                     $res[$cdm[$k]] = $v;
                 }
-                if (!headers_sent()) Ac_Debug_FirePHP::getInstance()->log($res, "Save to cache");
+                if ($this->cacheDebug) Ac_Debug::fb($res, "Save to cache");
                 $val = serialize($res);
                 $this->doSaveToCache($id, $this->getCacheGroup($this->getMethodName()), $val);
             }
@@ -211,10 +213,10 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
         $this->doOnResponseStart();
         if (!$this->cacheSkip && $this->getCacheEnabled()) {
             $this->loadFromCache();
-            if (!headers_sent()) Ac_Debug_FirePHP::getInstance()->log ($this->loadedFromCache .'/'.(is_object($this->_response)? get_class($this->_response) : gettype($this->_response)), $this->getMethodName().'::loadedFromCache');
+            if ($this->cacheDebug) Ac_Debug::fb($this->loadedFromCache .'/'.(is_object($this->_response)? get_class($this->_response) : gettype($this->_response)), $this->getMethodName().'::loadedFromCache');
         }
         else {
-            if (!headers_sent()) Ac_Debug_FirePHP::getInstance()->log ($methodName, 'cacheSkip');
+            if ($this->cacheDebug) Ac_Debug::fb($methodName, 'cacheSkip');
         }
         try {
              

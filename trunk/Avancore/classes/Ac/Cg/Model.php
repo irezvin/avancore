@@ -227,6 +227,8 @@ class Ac_Cg_Model {
      */
     var $hasUniformPropertiesInfo = false;
     
+    var $altDomainPrefix = false;
+    
     function Ac_Cg_Model($domain, $name, $config = array()) {
         $this->_domain = $domain;
         $this->name = $name;
@@ -302,7 +304,8 @@ class Ac_Cg_Model {
     function getModelBaseName() {
         $res = $this->single;
         if ($this->subsystemPrefixes) $res = implode(' ', $this->subsystemPrefixes).' '.$res;
-        if ($this->_domain->appName && !$this->_domain->dontPrefixClassesWithAppName) $res = $this->_domain->appName.' '.$res;
+        if ($this->altDomainPrefix) $res = $this->altDomainPrefix.' '.$res;
+            elseif ($this->_domain->appName && !$this->_domain->dontPrefixClassesWithAppName) $res = $this->_domain->appName.' '.$res;
         $res = Ac_Cg_Inflector::pearize($res);
         return $res;
     }

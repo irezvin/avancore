@@ -746,15 +746,6 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         }
         if (strlen($group->postHtml)) echo $group->postHtml;
     }
-
-    /**
-     * @param Ac_Form_Control_Parameters $params
-     */    
-    function showParameters($params) {
-        $mp = $params->getMosParameters();
-        $ctx = $params->getContext();
-        echo $mp->render($ctx->mapParam('value')); 
-    }
     
     /**
      * @param Ac_Form_Control_Date $date

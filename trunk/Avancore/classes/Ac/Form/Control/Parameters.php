@@ -4,19 +4,52 @@
  * Implements editing parameter values with mosParameters object and .xml file 
  */
 class Ac_Form_Control_Parameters extends Ac_Form_Control {
-
-    var $xmlFilePath = false;
-    
-    var $returnsArray = '?';
     
     /**
      * @var mosParameters
      */
-    var $_mosParameters = false;
+    protected $jForm = false;
+
+    var $xmlFilePath = false;
     
-    var $templateClass = 'Ac_Form_Control_Template_Basic';
+    /**
+     * Exact XML string ($xmlFilePath won't be used)
+     * @var string
+     */
+    var $xml = false;
+    
+    var $returnsArray = '?';
+    
+    var $templateClass = 'Ac_Form_Control_Template_Parameters';
     
     var $templatePart = 'parameters';
+    
+    var $appRootDir = false;
+    
+    /**
+     * XPath to find form definition in the form XML
+     * @var string
+     */
+    var $xpath = '//fields';
+    
+    var $formName = 'form';
+    
+    var $fieldsGroup = 'params';
+    
+    /**
+     * @var string|array Format of fieldsets' labels language strings
+     */
+    var $fieldsetLabelFormat = 'COM_PLUGINS_%s_FIELDSET_LABEL';
+        
+    /**
+     * @var string|array Language packages to load
+     */
+    var $langPackages = array('com_plugins');
+    
+    /**
+     * @var string|false keys where errors from the JForm will be passed in the value
+     */
+    var $passErrors = 'errors';
     
     function getXmlFilePath() {
         if ($this->xmlFilePath === false) {
@@ -26,7 +59,6 @@ class Ac_Form_Control_Parameters extends Ac_Form_Control {
             } else {
                 $res = false;
             }
-             
         } else {
             $res = $this->xmlFilePath;
         }
@@ -44,54 +76,47 @@ class Ac_Form_Control_Parameters extends Ac_Form_Control {
     }
     
     /**
-     * @return mosParameters
+     * @return JForm
      */
-    function getMosParameters() {
-        if ($this->_mosParameters === false) {
-            $this->_loadMosParametersClass();
-            $disp = Ac_Dispatcher::getInstance();
-            $xfp = $this->getXmlFilePath();
-            if (strlen($xfp)) $xfp = $disp->getDir().'/'.$xfp;
-            $this->_mosParameters = new mosParameters($this->getStringParams(), $xfp, 'module');
+    function getJForm() {
+        if ($this->jForm === false) {
+            jimport('joomla.form.form');
+            $this->jForm = new JForm($this->formName, array('control' => $this->getContext()->mapParam('value')));
+            if (!strlen($this->xml)) {
+                $dir = $this->getAppRootDir();
+                $xfp = $this->getXmlFilePath();
+                if (strlen($xfp) && !in_array($xfp{0}, array('/', '\\'))) $xfp = $dir.'/'.$xfp;
+                $this->jForm->loadFile($xfp, true, $this->xpath);
+            } else {
+                $this->jForm->load($this->xml, true, $this->xpath);
+            }
+            if ($v = $this->getValue()) {
+                if (!is_array($v)) $v = $this->stringToArray($v);
+                if (strlen($this->fieldsGroup)) {
+                    $v = array($this->fieldsGroup => $v);
+                }
+                $this->jForm->bind($v);
+            }
         }
-        return $this->_mosParameters;
-    }    
+        return $this->jForm;
+    }
     
     function getStringParams() {
         $v = $this->getValue();
         if (is_array($v)) {
-            $res = $this->_arrayToString($v);
+            $res = $this->arrayToString($v);
         } else $res = $v;
         return $res;
     }
 
-    function _loadMosParametersClass() {
-        if (!class_exists('mosParameters')) {
-            if (defined('_VALID_MOS')) {
-                require_once($GLOBALS['mosConfig_absolute_path'].'/includes/joomla.xml.php');
-            }
-            else {
-                $disp = Ac_Dispatcher::getInstance();
-                $GLOBALS['mosConfig_absolute_path'] = $disp->getDir();
-                require ($disp->getDir().'/vendor/joomla.xml.php');    
-            }
-        }
+    protected  function arrayToString(array $v) {
+        $res = json_encode($v);
+        return $res;
     }
     
-    function _arrayToString($v) {
-        $lines = array();
-        if (!is_array($v)) $res = (string) $v; else {
-            foreach ($v as $paramName => $paramValue) {
-                $lines[] = $paramName.'='.$paramValue;
-            }
-            $res = implode("\n", $lines);
-        }
-        return $res;        
-    }
-    
-    function _stringToArray($string) {
-        $this->_loadMosParametersClass();
-        $res = mosParameters::parse($string);
+    protected function stringToArray($string) {
+        $res = json_decode($string, true);
+        return $res;
     }
     
     /**
@@ -100,18 +125,46 @@ class Ac_Form_Control_Parameters extends Ac_Form_Control {
     function _doGetValue() {
         if (!($this->readOnly === true)) {
             if ($this->isSubmitted() && !isset($this->_rqData['value'])) $res = array();
-            elseif (isset($this->_rqData['value'])) {
-                if (is_string($this->_rqData['value'])) $res = $this->_stringToArray($this->_rqData['value']);
-                elseif (is_array($this->_rqData['value'])) $res = Ac_Util::stripSlashes($this->_rqData['value']);
-                else $res = array();
-                if (!$this->getReturnsArray()) {
-                    $res = $this->_arrayToString($res);
+            elseif (isset($this->_rqData['value']) && is_array($this->_rqData['value'])) {
+                $jf = $this->getJForm();
+                $jf->bind($this->_rqData['value']);
+                $res = $jf->filter($this->_rqData['value']);
+                if (is_string($this->fieldsGroup) && is_array($res)) {
+                    if (array_keys($res) == array($this->fieldsGroup)) {
+                        $res = $res[$this->fieldsGroup];
+                    }
+                }
+                if (!$jf->validate($this->_rqData['value'])) {
+                    if (strlen($this->passErrors)) {
+                        $err = Ac_Util::flattenArray($jf->getErrors());
+                        foreach ($err as $k => $v) {
+                            if ($v instanceof Exception) $err[$k] = $v->getMessage();
+                        }
+                        Ac_Util::setArrayByPath($res, Ac_Util::pathToArray($this->passErrors), $err);
+                    }
+                    else {
+                        $this->_errors['validate'] = $jf->getErrors();
+                        $res = $this->getDefault();
+                    }
+                }
+                if (is_array($res) && !$this->getReturnsArray()) {
+                    $res = $this->arrayToString($res);
                 }
             } else {
                 $res = $this->getDefault();
             }
         } else {
             $res = $this->getDefault();
+        }
+        return $res;
+    }
+    
+    function getAppRootDir() {
+        if ($this->appRootDir === false) {
+            $app = $this->getApplication();
+            if ($app) $res = $app->getAppRootDir();
+        } else {
+            $res = $this->appRootDir;
         }
         return $res;
     }

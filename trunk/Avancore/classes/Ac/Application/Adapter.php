@@ -25,6 +25,8 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     
     protected $services = array();
     
+    protected $classesDir = false;
+    
     function getEnvName() {
         if ($this->envName === false) {
             if (defined('AVANCORE_ENV')) $this->envName = AVANCORE_ENV;
@@ -40,6 +42,7 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     
     function setAppClassFile($value) {
         $this->appClassFile = $value;
+        $this->classesDir = false;
     }
     
     protected function setConfigFiles($value) {
@@ -115,14 +118,29 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     }
     
     protected function detectClassesDir() {
-        $res = false;
-        if (strlen($this->appClassFile)) {
-            $s = $this->appClassFile;
-            while (basename($s) !== 'classes') {
-                $s = dirname($s);
+        $this->classesDir = false;
+        if ($this->classesDir === false) {
+            $res = false;
+            if (strlen($this->appClassFile)) {
+                $s = $this->appClassFile;
+                while (basename($s) !== 'classes') {
+                    $s = dirname($s);
+                }
+                if (strlen($s) > 1) $res = $s;
             }
-            if (strlen($s) > 1) $res = $s;
+            $this->classesDir = $res;
         }
+        return $this->classesDir;
+    }
+    
+    function getAppRootDir() {
+        return $this->intGetConfigValue(substr(__FUNCTION__, 3));
+    }
+    
+    protected function doGetDefaultAppRootDir() {
+        $dir = $this->detectClassesDir();
+        if ($dir) $res = dirname($dir);
+            else $res = '';
         return $res;
     }
     

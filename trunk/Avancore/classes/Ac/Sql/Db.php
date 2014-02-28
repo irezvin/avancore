@@ -10,6 +10,8 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     protected $inspector = false;
     
+    protected $nextQueryArgs = array();
+    
     abstract function getDbPrefix();
     
     abstract function getDbName();
@@ -300,6 +302,22 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     function commit() {
         // TODO
     }
+
+    protected function intPreProcessQuery($query) {
+        if (is_array($query) && $this->nextQueryArgs) {
+            throw new Ac_E_InvalidUsage("Cannot mix Ac_Sql_Db::args() with array-style "
+                . "\$query parameter passing");
+        }
+        if ($this->nextQueryArgs) {
+            $q = $this->nextQueryArgs;
+            array_unshift($q, $query);
+            $res = $this->preProcessQuery($q);
+            $this->nextQueryArgs = array();
+        } else {
+            $res = $this->preProcessQuery($query);
+        }
+        return $res;
+    }
     
     /** 
      * @param array|string|object $query
@@ -338,6 +356,18 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     function getSupportsLimitClause() {
         return $this->getDialect()->getSupportsLimitClause();
+    }
+    
+    /**
+     * @param mixed $args
+     * @return Ac_Sql_Db
+     */
+    function args($args = array()) {
+        if (!is_array($args) || func_num_args() > 1) {
+            $args = func_get_args();
+        }
+        $this->nextQueryArgs = $args;
+        return $this;
     }
     
 }

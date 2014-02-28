@@ -248,18 +248,6 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped {
     }
     
     /**
-     * @return Ac_Legacy_Controller_Context_Info
-     */
-    function getContextInfo() {
-        if ($this->_contextInfo === false) {
-            $this->bindFromRequest();
-            $this->_contextInfo = new Ac_Context_Info($this);
-            $this->doInitializeRequestInfo();
-        }
-        return $this->_contextInfo;
-    }
-    
-    /**
      * Returns context of the controller 
      * @return Ac_Legacy_Controller_Context
      */

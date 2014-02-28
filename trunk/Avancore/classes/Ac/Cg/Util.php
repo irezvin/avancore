@@ -2,14 +2,10 @@
 
 abstract class Ac_Cg_Util {
     
-    static function createDirPath($dirPath, $rights = 0777) {
-        $dirs = explode('/', $dirPath); 
-        $dir='';
-        foreach ($dirs as $part) {
-            $dir.=$part.'/';
-            if (!is_dir($dir) && strlen($dir)>0)
-                mkdir($dir);
-                chmod($dir, $rights);
+    static function createDirPath($dir, $mode = 0777) {
+        if (!is_dir($dir)) {
+            mkdir($dir, $mode, true);
+            chmod($dir, $mode);
         }
     }
     

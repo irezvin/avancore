@@ -108,3 +108,22 @@ Large number of admin- and facet- related changes and small bugifxes
   and which will get into hidden POST fields
 + Ac_Util::flattenArray has $keyGlue arg to join keys instead of ignoring them
 
+2014-02-10
+
+Introduced Ac_Sql_Db->args(); Ac_Form_Control_Params update; small Cg improvements; bugfixes.
+
+- Removed Ac_Legacy_Controller::getContextInfo() since it's surely not used (creates non-existent
+  class)
++ Ac_Form_Control_Parameters is now JForms compatible (but requires Joomla2.5+)
++ Ac_Application_Adapter->$appRootDir, Ac_Application_Adapter->getAppRootDir()
++ Ac_Cg_Model->$altDomainPrefix (to prefix model classes with something different instead 
+  of Ac_Cg_Domain->$appName
+* Fix chmod-related warnings during Ac_Cg_ run
+* Ac_Model_Object->isChanged() now accepts second parameter, $strict = true
++ Added Ac_Sql_Db->args() to prefix query call with query arguments
++ Added Ac_Legacy_Controller_Std_Web->$cacheDebug = false to disable firebug-related debug messages,
+  changed calls to Ac_Debug::fb
+* Fixed some warnings in to-be-obsoleted Ac_Mail
+
+
+
