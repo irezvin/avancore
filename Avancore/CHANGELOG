@@ -125,5 +125,12 @@ Introduced Ac_Sql_Db->args(); Ac_Form_Control_Params update; small Cg improvemen
   changed calls to Ac_Debug::fb
 * Fixed some warnings in to-be-obsoleted Ac_Mail
 
+2014-02-28
 
+Codegen improvements.
 
+* Fixed error message when directory isn't found by Ac_Application_Adapter
+* Better logic of Ac_Sql_Dbi_Relation::isThisRecordUnique(), isOtherRecordUnique() - if unique index 
+  is sub-part of relation, TRUE is returned
+* Cg_Template_Assoc_Strategy now prefixes other model names with non-common subsystem IDs
+  (subsystem-free model suffix was used before which led to conflicts)

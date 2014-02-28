@@ -145,6 +145,7 @@ class Ac_Cg_Strategy {
             if (!$skip) {
                 $this->_gen->log($p.": writing file ");
                 $tpl->outputFile($n, $this->outputDir);
+                if ($this->_gen->lintify) $this->_gen->runLint($p);
             }
         }
     }

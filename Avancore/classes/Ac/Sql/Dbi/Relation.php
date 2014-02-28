@@ -50,7 +50,7 @@ class Ac_Sql_Dbi_Relation extends Ac_Sql_Dbi_Object {
     function isThisRecordUnique() {
         if ($this->_thisRecordUnique === '?') {
             $colNames = array_keys($this->columns);
-            $uniqueIndices = $this->ownTable->findIndicesByColumns($colNames, true, true);
+            $uniqueIndices = $this->ownTable->findIndicesByColumns($colNames, Ac_Sql_Dbi_Table::INDEX_ACCEPT_SMALLER, true);
             $this->_thisRecordUnique = count($uniqueIndices) > 0;
         }
         return $this->_thisRecordUnique;
@@ -60,7 +60,7 @@ class Ac_Sql_Dbi_Relation extends Ac_Sql_Dbi_Object {
         if ($this->_otherRecordUnique === '?') {
             $colNames = Ac_Util::array_values($this->columns);
             $ft = $this->getForeignTable();
-            $uniqueIndices = $ft->findIndicesByColumns($colNames, true, true);
+            $uniqueIndices = $ft->findIndicesByColumns($colNames, Ac_Sql_Dbi_Table::INDEX_ACCEPT_SMALLER, true);
             $this->_otherRecordUnique = count($uniqueIndices) > 0;
         }
         return $this->_otherRecordUnique;
