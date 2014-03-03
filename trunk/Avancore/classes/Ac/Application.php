@@ -12,6 +12,8 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     
     private static $defaultInstance = null;
     
+    private static $lastInstance = null;
+    
     private static $ids = array();
 
     const stConstructing = 'constructing';
@@ -56,11 +58,31 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
      * @var string
      */
     protected $defaultAssetsPlaceholder = null;
-    
+
     /**
      * @var array
      */
     protected $extraAssetPlaceholders = array();
+    
+    /**
+     * @var Ac_Url
+     */
+    protected $frontControllerUrl = false;
+    
+    /**
+     * @var Ac_Url
+     */
+    protected $siteUrl = false;
+    
+    /**
+     * @var Ac_I_User
+     */
+    protected $user = false;
+    
+    /**
+     * @var Ac_I_Mail_Sender
+     */
+    protected $mailSender = false;
     
     abstract function getAppClassFile();
     
@@ -71,6 +93,7 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
         self::$ids[$class] = array_unique(self::$ids[$class]);
         if (!isset(self::$defaultInstanceIds[$class]))
                 self::$defaultInstanceIds[$class] = $id;
+        self::$lastInstance = $instance;
     }
     
     static function setDefaultInstance(Ac_Application $instance) {
@@ -103,10 +126,15 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     }
     
     /**
+     * If setDefaultInstance() was called, returns previously set 'defaultInstance'.
+     * Otherwise returns last registered instance.
+     * 
      * @return Ac_Application
      */
     static function getDefaultInstance() {
-        return self::$defaultInstance;
+        if (!self::$defaultInstance) $res = self::$lastInstance;
+            else $res = self::$defaultInstance;
+        return $res;
     }
     
     static function getApplicationInstance($className, $id = null) {
@@ -173,8 +201,8 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
         if ($this->stage === self::stInitializing) {
             $adapter = $this->getAdapter();
             if ($this->addIncludePaths) {
-                Ac_Dispatcher::addIncludePath($adapter->getClassPaths());
-                if (strlen($gp = $adapter->getGenPath()))Ac_Dispatcher::addIncludePath($adapter->getGenPath());
+                Ac_Util::addIncludePath($adapter->getClassPaths());
+                if (strlen($gp = $adapter->getGenPath()))Ac_Util::addIncludePath($adapter->getGenPath());
             }
             $this->doOnInitialize();
             $this->stage = self::stInitialized;
@@ -231,12 +259,16 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     }
 
     /**
+     * Returns Ac_Cache object. If no cache is injected by setCache or Adapter does not provides any
+     * cache prototype, creates disabled (dummy) cache instance.
+     * 
      * @return Ac_Cache
      */
     function getCache() {
         if ($this->cache === null) {
             $cache = $this->adapter->getCachePrototype();
             if (is_array($cache) || strlen($cache)) $this->cache = Ac_Prototyped::factory ($cache, 'Ac_Cache');
+            else $this->cache = Ac_Prototyped::factory(array('class' => 'Ac_Cache', 'enabled' => false));
         }
         return $this->cache;
     }
@@ -443,5 +475,78 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     function getFlags() {
         return $this->getService('flags');
     }
+
+    /**
+     * Sets front controller URL
+     * @param Ac_Url $url
+     */
+    function setFrontControllerUrl(Ac_Url $url = null) {
+        $this->frontControllerUrl = $url? $url : false;
+    }
+
+    /**
+     * Returns front controller URL (defaults to Ac_Appliction_Adapter::getWebUrl())
+     * @return Ac_Url
+     */
+    function getFrontControllerUrl() {
+        if ($this->frontControllerUrl === false) {
+            $wu = $this->getAdapter()->getWebUrl();
+            if ($wu) $res = new Ac_Url($wu);
+            else $res = Ac_Url::guess ();
+        } else {
+            $res = clone $this->frontControllerUrl;
+        }
+        return $res;
+    }
+    
+    /**
+     * Returns website url (defaults to Ac_Application_Adapter::getWebUrl())
+     * @return Ac_Url
+     */
+    function getSiteUrl() {
+        if ($this->siteUrl === false) {
+            $res = new Ac_Url($this->getAdapter()->getSiteUrl());
+        } else {
+            $res = clone $this->siteUrl;
+        }
+        return $res;
+    }
+    
+    /**
+     * Sets website url (defaults to Ac_Application_Adapter::getSiteUrl())
+     * @param type $siteUrl
+     */
+    function setSiteUrl(Ac_Url $siteUrl = null) {
+        $this->siteUrl = $siteUrl? $siteUrl : false;
+    }
+
+    function setUser(Ac_I_User $user) {
+        $this->user = $user;
+    }
+
+    /**
+     * @return Ac_I_User
+     */
+    function getUser() {
+        return $this->user;
+    }    
+    
+    function setMailSender(Ac_I_MailSender $mailSender) {
+        $this->mailSender = $mailSender;
+    }
+
+    /**
+     * @return Ac_I_MailSender
+     */
+    function getMailSender() {
+        if ($this->mailSender === false) {
+            $this->mailSender = Ac_Prototyped::factory($this->adapter->getMailSenderPrototype(), 'Ac_I_MailSender');
+            if ($this->mailSender instanceof Ac_I_Mail_Sender_WithDump) {
+                $dd = $this->mailSender->getDumpDir();
+                if ($dd === false || is_null($dd)) $this->mailSender->setDumpDir($this->adapter->getVarDumpsPath());
+            }
+        }
+        return $this->mailSender;
+    }    
     
 }

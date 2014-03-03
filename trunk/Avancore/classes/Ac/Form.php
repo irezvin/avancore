@@ -53,6 +53,11 @@ class Ac_Form extends Ac_Form_Control_Composite {
      */
     var $baseUrlToAction = false;
     
+    var $formTagAttribs = array();
+    
+    // Will be moved from htmlAttribs to getFormAttribs() for compatibility
+    protected $forceFormTagAttribsOnly = array('action', 'method', 'onsubmit');
+    
     function fetchPresentation($refresh = false, $withWrapper = null) {
         if ($this->visible) {
             if (is_null($withWrapper)) $withWrapper = $this->showWrapper;
@@ -122,6 +127,40 @@ class Ac_Form extends Ac_Form_Control_Composite {
         if (is_string($this->performOwnSubmissionCheck)) $res = $this->performOwnSubmissionCheck;
             else $res = 'submitted';
         return $res; 
+    }
+    
+    function getHtmlAttribs() {
+        $res = array_diff_key(parent::getHtmlAttribs(), array_flip($this->forceFormTagAttribsOnly));
+        return $res;
+    }
+    
+    function getFormTagAttribs($withAction = true) {
+        $attribs = array();
+        $ctx = $this->getContext();
+        $attribs = $this->formTagAttribs;
+        foreach ($this->forceFormTagAttribsOnly as $attr) {
+            if (isset($this->htmlAttribs[$attr]) && !isset($attribs[$attr])) {
+                $attribs[$attr] = $this->htmlAttribs[$attr];
+            }
+        }
+        if ($withAction) $attribs['action'] = ''.$this->getActionUrl();
+        $attribs['method'] = $ctx->requestMethod;
+        if (strlen($this->name)) $attribs['name'] = $ctx->mapParam($this->name);
+        return $attribs;
+    }
+    
+    /**
+     * @return Ac_Url
+     */
+    function getActionUrl() {
+        // FIXME $url = $ctx->getUrl();
+        $formTagAttribs = $this->getFormTagAttribs(false);
+        if (!isset($formTagAttribs['action'])) {
+            $res = clone $this->getContext()->getBaseUrl();
+        } else {
+            $res = new Ac_Url($formTagAttribs['action']);
+        }
+        return $res;
     }
     
     

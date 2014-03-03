@@ -48,7 +48,6 @@ class Ac_Test_ModelSql extends Ac_Test_Base {
 			var_dump($sel->getStatement(), $rightStatement, $foo, $bar);
 		}
 		$this->assertTrue(count($sqlDb->fetchArray($sel)));
-		Ac_Dispatcher::loadClass('Ac_Sql_Select_Expression');
 		
 		$sel2 = Ac_Model_Sql_TableProvider::createSelect('Sample_Person_Mapper', $sqlDb);
 		$sel2->columns = array(

@@ -3,6 +3,43 @@
 if (!class_exists('Ac_Util', false)) require_once(dirname(__FILE__).'/../Util.php');
 if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/../Autoparams.php');
 
+/**
+ * @todo Document all config' properties and where are they used
+ * 
+ * @property $checkDirs
+ * @property $classPaths
+ * @property $genPath
+ * @property $varPath
+ * @property $varCachePath
+ * @property $varTmpPath
+ * @property $varFlagsPath
+ * @property $varLogsPath
+ * @property $varDumpsPath
+ * @property $scriptsPath
+ * @property $scriptsSqlUpgradePath
+ * @property $vendorPath
+ * @property $initPath
+ * @property $lanugagesPaths
+ * @property $lanugagesPaths_gen
+ * @property $webUrl
+ * @property $webAssetsUrl
+ * @property $outputPrototype
+ * @property $overrides
+ * @property $charset
+ * @property $assetPlaceholders
+ * @property $cachePrototype
+ * @property $dbPrototype
+ * @property $legacyDatabasePrototype
+ * @property $appInitOptions
+ * @property $logEnabled
+ * @property $services
+ * @property $mailSenderPrototype
+ *
+ * @property $managerImagesUrl
+ * @property $joomlaComponentName
+ * @property $cacheLifetime
+ * @property $rteDefaultInstance
+ */
 class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvider {
 
     protected $appClass = false;
@@ -52,6 +89,10 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     
     function setOverrideValue($option, $value) {
         $this->overrides[$option] = $value;
+    }
+    
+    function unsetOverrideValue($option) {
+        unset($this->overrides[$option]);
     }
     
     function getConfigFiles() {
@@ -180,6 +221,7 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
             $vp = $this->config['varPath'];
             $this->detectDir('varCachePath', $vp.'/cache') || $this->detectDir('varCachePath', $vp);
             $this->detectDir('varTmpPath', $vp.'/tmp') || $this->detectDir('varTmpPath', $vp);
+            $this->detectDir('varDumpsPath', $vp.'/dumps') || $this->detectDir('varDumpsPath', $vp);
             $this->detectDir('varFlagsPath', $vp.'/flags') || $this->detectDir('varFlagsPath', $vp);
             $this->detectDir('varLogsPath', $vp.'/logs') || $this->detectDir('varLogsPath', $vp);
         }
@@ -323,6 +365,10 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         return $this->intGetConfigValue(substr(__FUNCTION__, 3));
     }
     
+    function getVarDumpsPath() {
+        return $this->intGetConfigValue(substr(__FUNCTION__, 3));
+    }
+    
     function getVarFlagsPath() {
         return $this->intGetConfigValue(substr(__FUNCTION__, 3));
     }
@@ -362,6 +408,10 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         return $this->intGetConfigValue(substr(__FUNCTION__, 3));
     }
     
+    function getSiteUrl() {
+        return $this->getWebUrl();
+    }
+    
     function getWebAssetsUrl() {
         return $this->intGetConfigValue(substr(__FUNCTION__, 3));
     }
@@ -394,6 +444,17 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         return $this->intGetConfigValue(substr(__FUNCTION__, 3));
     }
     
+    function getMailSenderPrototype() {
+        return $this->intGetConfigValue(substr(__FUNCTION__, 3));
+    }
+    
+    protected function doGetDefaultMailSenderPrototype() {
+        $res = array(
+            'class' => 'Ac_Mail_PHPMailer_Mail'
+        );
+        return $res;
+    }
+    
     function getCachePrototype() {
         $res = $this->intGetConfigValue(substr(__FUNCTION__, 3));
         if (is_null($res)) $res = array();
@@ -404,7 +465,11 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     }
     
     protected function doGetDefaultCachePrototype() {
-        return array('cacheDir' => $this->getVarCachePath());
+        $res = array('cacheDir' => $this->getVarCachePath());
+        if (($cl = $this->getConfigValue('cacheLifetime')) !== false) {
+            $res['cacheLifetime'] = $cl;
+        }
+        return $res;
     }
     
     function getOutputPrototype() {
@@ -457,6 +522,22 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         }
         elseif (!$dontThrow) throw new Exception("No such service: '\$id'");
         return $res;
+    }
+    
+    function __get($varName) {
+        return $this->getConfigValue($varName);
+    }
+    
+    function __set($varName, $value) {
+        $this->setOverrideValue($varName, $value);
+    }
+    
+    function __isset($varName) {
+        return $this->getConfigValue($varName, null) !== null;
+    }
+    
+    function __unset($varName) {
+        $this->unsetOverrideValue($varName);
     }
     
 }

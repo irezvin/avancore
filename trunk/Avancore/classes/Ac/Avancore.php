@@ -1,9 +1,9 @@
 <?php
 
-if (!class_exists('Ac_Dispatcher', false)) {
-    require_once(dirname(__FILE__).'/Dispatcher.php');
-    Ac_Dispatcher::addIncludePath();
-    Ac_Dispatcher::registerAutoload();
+if (!class_exists('Ac_Util', false)) {
+    require_once(dirname(__FILE__).'/Util.php');
+    Ac_Util::addIncludePath();
+    Ac_Util::registerAutoload();
 }
 
 class Ac_Avancore extends Ac_Application {

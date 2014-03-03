@@ -22,7 +22,7 @@ class Ac_Legacy_Controller_Std_Submission_Sendout {
     var $_template = false;
     
     /**
-     * @var Ac_Mail
+     * @var Ac_Mail_Message
      */
     var $_mail = false;
     
@@ -85,7 +85,7 @@ class Ac_Legacy_Controller_Std_Submission_Sendout {
     var $mailExtraSettings = array();
     
     /**
-     * Whether Ac_Mail object should be created if no recipients found (for example, if application should fill recipients later)
+     * Whether Ac_Mail_Message object should be created if no recipients found (for example, if application should fill recipients later)
      * @var bool
      */
     var $createMailIfNoRecipients = false;
@@ -118,13 +118,13 @@ class Ac_Legacy_Controller_Std_Submission_Sendout {
     
     /**
      * Composes and returns mail object
-     * @return Ac_Mail
+     * @return Ac_Mail_Message
      */
     function getMail() {
         if ($this->_mail === false) {
              $rcpt = $this->getRecipients();
              if ($rcpt) {
-                 $this->_mail = new Ac_Mail(false, $rcpt, $this->subject, $this->from);
+                 $this->_mail = new Ac_Mail_Message(false, $rcpt, $this->subject, $this->from);
                  Ac_Util::simpleBind($this->mailExtraSettings, $this->_mail);
                  if ($this->replyTo) $this->_mail->replyTo = $this->replyTo;
                  $this->_template->currentSendout = $this;

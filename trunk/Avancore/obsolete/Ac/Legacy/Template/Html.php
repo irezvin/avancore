@@ -90,8 +90,8 @@ class Ac_Legacy_Template_Html extends Ac_Legacy_Template {
      * Shows site URL
      */
     function site($noEscape = false) {
-        $disp = Ac_Dispatcher::getInstance();
-        $this->d($disp->config->liveSite, $noEscape);
+        $app = $this->getApplication();
+        $this->d($app->getSiteUrl(), $noEscape);
     }
     
     function attribs($attribs = array(), $return = false) {

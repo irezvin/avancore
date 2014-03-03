@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @deprecated
+ */
 class Ac_Mail {
 
     var $useNewMailer = true;

@@ -25,7 +25,7 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
         $test = new $cn;
         $ts->add($test);
     }
-    $ts->run(new HtmlReporter('UTF-8'));
+    $ts->run(new Ac_Test_Reporter('UTF-8'));
     
 } else {
 	$t = new TestSuite('Avancore Framework v0.3 Tests');
@@ -36,7 +36,7 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
     }
     foreach ($classes as $class) $t->add($class);
 		
-	$t->run(new HtmlReporter('UTF-8'));
+	$t->run(new Ac_Test_Reporter('UTF-8'));
 	
 }
 

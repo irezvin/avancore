@@ -1,19 +1,27 @@
 <?php
 
-class Ac_Form_RteAdapter extends Ac_Prototyped {
+abstract class Ac_Form_RteAdapter extends Ac_Prototyped {
     
     protected static $defaultInstance = null;
     
+    /**
+     * @return Ac_Form_RteAdapter
+     */
     static function getDefaultInstance() {
         if (!self::$defaultInstance) {
-            $config = Ac_Dispatcher::getInstance()->config->getValue('rteDefaultInstance', false);
-            if (!is_array($config) || !$config) self::$defaultInstance = new Ac_Form_RteAdapter_TinyMce();
-            else self::$defaultInstance = Ac_Prototyped::factory($config, 'Ac_Form_RteAdapter');
+            $app = Ac_Application::getDefaultInstance();
+            $prototype = array();
+            if ($app) {
+                $prototype = $app->getAdapter()->getConfigValue('rteDefaultInstance', array());
+            }
+            if (!is_array($prototype) || !$prototype) 
+                self::$defaultInstance = new Ac_Form_RteAdapter_TinyMce();
+            else self::$defaultInstance = Ac_Prototyped::factory($prototype, 'Ac_Form_RteAdapter');
         }
         return self::$defaultInstance;
     }
     
-    static function setDefaultInstance($defaultInstance = null) {
+    static function setDefaultInstance(Ac_Form_RteAdapter $defaultInstance = null) {
         self::$defaultInstance = $defaultInstance;
     }
     

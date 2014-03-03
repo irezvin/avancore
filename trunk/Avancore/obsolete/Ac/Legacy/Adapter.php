@@ -189,28 +189,6 @@ class Ac_Legacy_Adapter {
         return $this->toolbarImagesMap;
     }
   
-    function getDefaultImagePrefix() {
-        return 'images';
-    }
-    
-    function getImagePrefix() {
-        $imagePrefix = $this->getDefaultImagePrefix();
-        $conf = Ac_Dispatcher::getInstance()->config;
-        if (isset($conf->managerImagesUrl) && strlen($u = $conf->managerImagesUrl)) {
-            $imagePrefix = $conf->managerImagesUrl;
-        }
-        $imagePrefix = rtrim($imagePrefix, '/').'/';
-        return $imagePrefix;
-    }
-    
-    function getManagerJsAssets() {
-        return array(
-            '{AE}util.js',
-            '{AE}avanManager.js',
-            '{AE}managerRenderer.js',
-        );
-    }
-    
 }
 
 

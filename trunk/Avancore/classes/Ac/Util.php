@@ -14,6 +14,90 @@ if (!defined('AC_PHP_VERSION_MAJOR') && !defined('AC_PHP_VERSION_MINOR')) {
 if (!defined('AC_UTIL_DEFAULT_CHARSET')) define('AC_UTIL_DEFAULT_CHARSET', 'utf-8');
 
 abstract class Ac_Util {
+
+    protected static $autoLoadRegistered = null;
+    
+    /**
+     * Adds one or more include paths
+     * @param false|string|array $path Path(s) to add (FALSE means directory with 'classes' where current file resides)
+     * @param bool $prepend Add this path to beginning of include_path list (not the end)
+     */
+    static function addIncludePath($path = false, $prepend = false) {
+        if ($path === false) $path = dirname(dirname(__FILE__));
+        $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
+        if (!is_array($path)) $path = array($path);
+        if ($prepend) $paths = array_merge($path, array_diff($paths, $path));
+            else $paths = array_merge(array_diff($paths, $path), $path);
+        ini_set('include_path', implode(PATH_SEPARATOR, $paths)); 
+    }
+
+    static function getSafeIncludePath() {        
+        $bd = explode(PATH_SEPARATOR, ini_get('open_basedir'));
+        $p = explode(PATH_SEPARATOR, ini_get('include_path'));
+        if ($bd) {
+            foreach ($p as $i => $dir) {
+                $found = false;
+                foreach ($bd as $dir2) {
+                    if (!strncmp($dir, $dir2, strlen($dir2))) {
+                        $found = true;
+                        break;
+                    } 
+                }
+                if (!$found) unset($p[$i]);
+            }
+        }
+        return $p;
+    } 
+    
+    static function loadClass($className) {        
+        if (!class_exists($className, false)) { // New behavior - use relative path to classDir
+            $fileName = str_replace('_', '/', $className).'.php';
+            $classDir = dirname(__FILE__).'/../';
+            $f = $classDir.$fileName;
+            $fileLoaded = false;
+            if (is_file($f)) {
+                require($f);
+                $fileLoaded = true;
+            } else {
+                $p = self::getSafeIncludePath();
+                foreach ($p as $dir) if (is_file($f = $dir.'/'.$fileName)) {
+                    require($f);
+                    $fileLoaded = true;
+                    break;
+                }
+            }
+            //if ($fileLoaded && !class_exists($className) || interface_exists($className))
+            //    trigger_error (__FILE__."::".__FUNCTION__." - class '$className' not found in the $fileName", E_USER_ERROR);
+        }
+    }
+    
+    static function registerAutoload() {
+        $res = false;
+        if (self::$autoLoadRegistered === null) {
+            if (function_exists('spl_autoload_register')) {
+                $f = spl_autoload_functions();
+                $cb = array('Ac_Util', 'loadClass');
+                if (!is_array($f) || !in_array($cb, $f)) { 
+                    spl_autoload_register($cb);
+                    $res = true;                
+                    if (function_exists('__autoload')) {
+                        spl_autoload_register('__autoload');
+                    }
+                }
+            } elseif (!function_exists('__autoload')) {
+
+                function __autoload($className) {
+                    return Ac_Util::loadClass($className);
+                }
+                $res = true;
+
+            }
+            self::$autoLoadRegistered = $res;
+        } else {
+            $res = self::$autoLoadRegistered;
+        }
+        return $res;
+    }
     
     static function implementsInterface($classOrObject, $interfaceName) {
         static $cache = array();
@@ -86,20 +170,7 @@ abstract class Ac_Util {
     }
     
     static function getEmailRx() {
-        $qtext = '[^\\x0d\\x22\\x5c\\x80-\\xff]';
-        $dtext = '[^\\x0d\\x5b-\\x5d\\x80-\\xff]';
-        $atom = '[^\\x00-\\x20\\x22\\x28\\x29\\x2c\\x2e\\x3a-\\x3c'.
-        '\\x3e\\x40\\x5b-\\x5d\\x7f-\\xff]+';
-        $quoted_pair = '\\x5c\\x00-\\x7f';
-        $domain_literal = "\\x5b($dtext|$quoted_pair)*\\x5d";
-        $quoted_string = "\\x22($qtext|$quoted_pair)*\\x22";
-        $domain_ref = $atom;
-        $sub_domain = "($domain_ref|$domain_literal)";
-        $word = "($atom|$quoted_string)";
-        $domain = "$sub_domain(\\x2e$sub_domain)*";
-        $local_part = "$word(\\x2e$word)*";
-        $addr_spec = "$local_part\\x40$domain";
-        return "!^$addr_spec$!";
+        return Ac_Mail_Util::getEmailRegex();
     }
 
     /**
@@ -986,6 +1057,6 @@ class _Ae_Util_ObjectVarGetter {
  * Used to register as unserialize handler (some version of PHP didn't allow to provide a static call)
  * @param type $className 
  */
-function acDispatcherLoadClass($className) {
-    Ac_Dispatcher::loadClass(Ac_Util::fixClassName($className));
+function acUtilLoadClass($className) {
+    Ac_Util::loadClass(Ac_Util::fixClassName($className));
 }

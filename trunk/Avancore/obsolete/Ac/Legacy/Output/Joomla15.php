@@ -59,7 +59,7 @@ class Ac_Legacy_Output_Joomla15 extends Ac_Legacy_Output_Joomla {
     }
     
     static function addHtmlToJoomlaToolbar($html) {
-        Ac_Dispatcher::loadClass('Ac_Joomla_15_AnyHtmlButton');
+        Ac_Util::loadClass('Ac_Joomla_15_AnyHtmlButton');
         $bar = JToolBar::getInstance('toolbar');
         $bar->appendButton('AnyHtml', $html);
     }

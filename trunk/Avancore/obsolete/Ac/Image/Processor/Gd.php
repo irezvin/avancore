@@ -17,9 +17,8 @@ class Ac_Image_Processor_Gd extends Ac_Image_Processor {
      * @return Resizeimage
      */
     function _getResizer() {
-        if (!class_exists('Resizeimage', false)) {
-            $disp = Ac_Dispatcher::getInstance();
-            require($disp->getVendorDir().'/resizeimage.inc.php');
+        if (!class_exists('Resizeimage')) {
+            require(Ac_Avancore::getInstance()->getAdapter()->getVendorDir().'/resizeimage.inc.php');
         }
         if ($this->_resizer === false) $this->_resizer = new Resizeimage();
         return $this->_resizer;
