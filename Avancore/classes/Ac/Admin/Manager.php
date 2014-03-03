@@ -195,15 +195,15 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
     
     function _loadFromCache($d = false, $rqd = false) {
+        $cache = $this->getApplication()->getCache();
         $cid = $this->_getCacheId($d, $rqd);
-        $disp = Ac_Dispatcher::getInstance();
-        return $disp->cacheGet($cid, $this->_getCacheGroup());
+        return $cache->get($cid, $this->_getCacheGroup());
     }
     
     function _saveToCache($data, $d = false, $rqd = false) {
         $cid = $this->_getCacheId($d, $rqd);
-        $disp = Ac_Dispatcher::getInstance();
-        return $disp->cacheSet($cid, $data, $this->_getCacheGroup());
+        $cache = $this->getApplication()->getCache();
+        return $cache->put($cid, $data, $this->_getCacheGroup());
     }
     
     function _getFormResponse() {

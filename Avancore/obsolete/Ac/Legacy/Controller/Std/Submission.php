@@ -161,9 +161,9 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
     
     function isAdmin() {
         $res = false;
-        $disp = Ac_Dispatcher::getInstance();
-        if (isset($GLOBALS['my']) && is_a($GLOBALS['my'], 'mosUser') && $GLOBALS['my']->usertype == 'Super Administrator') $res = true;
-        elseif ($disp->config->debug) $res = true;
+        $app = $this->getApplication();
+        $user = $app->getUser();
+        if ($user && $user->isSuperAdmin()) $res = true;
         return $res;
     }
 
@@ -226,7 +226,7 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
      * If this function returns false, mail won't be sent.
      * 
      * @access protected
-     * @param Ac_Mail $mail
+     * @param Ac_Mail_Message $mail
      * @param Ac_Legacy_Controller_Std_Submission_Sendout $sendout
      * @return bool
      */
@@ -238,7 +238,7 @@ class Ac_Legacy_Controller_Std_Submission extends Ac_Legacy_Controller {
      * Should return false to stop whole sendout process.
      * 
      * @access protected
-     * @param Ac_Mail $mail
+     * @param Ac_Mail_Message $mail
      * @param Ac_Legacy_Controller_Std_Submission_Sendout $sendout
      * @param string $sendoutKey Key of sendout object in the settings array
      * @return bool

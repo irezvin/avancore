@@ -42,6 +42,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
     function showTable($control, $extraParams = false) {
         $this->utlShowControlsTable($control->getOrderedDisplayChildren(), true, $control->getHtmlAttribs(), $extraParams);
     }
+    
     function showHTable($control) {
         $this->utlShowControlsTableHorizontal($control->getOrderedDisplayChildren(), true, $control->getHtmlAttribs());
     }
@@ -70,20 +71,17 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         
         $ctx = $form->getContext();
         if (!$ctx->isInForm) { 
-            $attribs = array();
-            $ownAttribs = $form->getHtmlAttribs();
-            // FIXME $url = $ctx->getUrl();
-            if (!isset($ownAttribs['action'])) {
-                $url = $ctx->_baseUrl;
-                $attribs['action'] = $url->toString($form->baseUrlToAction);
+            $attribs = $form->getFormTagAttribs(false);
+            $hasOwnAction = isset($attribs['action']);
+            if (!$hasOwnAction) {
+                $actionUrl = $form->getActionUrl();
+                $attribs['action'] = ''.$actionUrl;
             }
-            $attribs['method'] = $ctx->requestMethod;
-            if (strlen($form->name)) $attribs['name'] = $ctx->mapParam($form->name);
-            Ac_Util::ms($attribs, $ownAttribs);
+                else $actionUrl = null;
         ?>
         
         <form <?php echo Ac_Util::mkAttribs($attribs); ?> >
-<?php       if (!$form->baseUrlToAction && !isset($ownAttribs['action'])) echo $url->getHidden(); ?>
+<?php       if (!$form->baseUrlToAction && !$actionUrl) echo $actionUrl->getHidden(); ?>
 <?php   } 
 ?>
 

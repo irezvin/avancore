@@ -2,6 +2,11 @@
 
 class Ac_Upload_Manager {
     
+    /**
+     * @var Ac_Application
+     */
+    protected $application = false;
+    
     var $_uploadsLifetime = 3600;
     
     var $_uploadsCacheDir = false;
@@ -208,6 +213,20 @@ class Ac_Upload_Manager {
         $res = Ac_Util::factoryWithOptions($options, $this->_uploadClass);
         return $res;
     }
+
+    function setApplication(Ac_Application $application) {
+        $this->application = $application;
+    }
+
+    /**
+     * @return Ac_Application
+     */
+    function getApplication() {
+        if ($this->application === false) {
+            $this->application = Ac_Application::getDefaultInstance();
+        }
+        return $this->application;
+    }    
     
 }
 

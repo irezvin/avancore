@@ -45,22 +45,41 @@ class Ac_Cache {
      */
     protected $util = null;
 
+    static function getDefaultCacheDir() {
+        if (Ac_Application::getDefaultInstance()) {
+            $ac = Ac_Application::getDefaultInstance();
+            $res = $ac->getAdapter()->getVarCachePath();
+        } else {
+            if (defined('_DEPLOY_CACHE_PATH') && strlen(_DEPLOY_CACHE_PATH)) $res = _DEPLOY_CACHE_PATH;
+            $res = false;
+        }
+        return $res;
+    }
+
+    static function getDefaultCacheLifetime() {
+        if (Ac_Application::getDefaultInstance()) {
+            $ac = Ac_Application::getDefaultInstance();
+            $res = $ac->getAdapter()->getConfigValue('cacheLifetime', false);
+        } else {
+            $res = false;
+        }
+        return $res;
+    }
+    
     static function getDefaultPrototype() {
         $res = array();
-        if (class_exists('Ac_Dispatcher') && Ac_Dispatcher::hasInstance()) {
-            $d = Ac_Dispatcher::getInstance();
+        if (($cd = self::getDefaultCacheDir()) !== false) {
             $res = array(
                 'class' => 'Ac_Cache',
-            	'cacheDir' => $d->config->cachePath . '/aeCache',
+            	'cacheDir' => $cd,
             );
-            if (($l = (int) $d->config->getValue('cacheLifeTime'))) $res['lifetime'] = $l;
+            if (($l = (int) self::getDefaultCacheLifeTime())) $res['lifetime'] = $l;
         }
         return $res;
     }
     
     function __construct() {
-        if (class_exists('Ac_Dispatcher', false) && Ac_Dispatcher::hasInstance()) $this->cacheDir = Ac_Dispatcher::getInstance()->getCacheDir();
-        elseif (defined('_DEPLOY_CACHE_PATH') && strlen(_DEPLOY_CACHE_PATH)) $this->cacheDir = _DEPLOY_CACHE_PATH;
+        $this->cacheDir = self::getDefaultCacheDir();
     }
     
     function setCacheDir($cacheDir) {

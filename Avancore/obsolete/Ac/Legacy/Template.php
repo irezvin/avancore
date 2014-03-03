@@ -27,6 +27,11 @@ class Ac_Legacy_Template {
     var $_privateVars = array();
     
     /**
+     * @var Ac_Application
+     */
+    protected $application = false;
+    
+    /**
      * @param array $vars Initial values for template variables 
      */
     function Ac_Legacy_Template($vars = array()) {
@@ -195,6 +200,21 @@ class Ac_Legacy_Template {
     function langString($langString, $defaultOrArgs = false, $return = false) {
         return $this->l($langString, $defaultOrArgs, $return);
     }
+
+    function setApplication(Ac_Application $application) {
+        $this->application = $application;
+    }
+
+    /**
+     * @return Ac_Application
+     */
+    function getApplication() {
+        if ($this->application === false) {
+            if ($this->controller) return $this->controller->getApplication ();
+            else return Ac_Application::getDefaultInstance ();
+        }
+        return $this->application;
+    }    
 
 }
 

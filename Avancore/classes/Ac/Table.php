@@ -50,6 +50,11 @@ class Ac_Table {
     var $_recordPrototype = false;
     
     var $_colNames = false;
+
+    /**
+     * @var Ac_Application
+     */
+    protected $application = false;
     
     /**
      * @param array columnSettings Array 'column name' => array('class' => 'column class', ...other settings...)
@@ -226,5 +231,21 @@ class Ac_Table {
         if ($this->trAttribsCallback) call_user_func_array($this->trAttribsCallback, array(& $record, & $attribs));
         return $attribs;
     }
+    
+
+    function setApplication(Ac_Application $application) {
+        $this->application = $application;
+    }
+
+    /**
+     * @return Ac_Application
+     */
+    function getApplication() {
+        if ($this->application === false) {
+            $this->application = Ac_Application::getDefaultInstance();
+        }
+        return $this->application;
+    }    
+    
 }
 

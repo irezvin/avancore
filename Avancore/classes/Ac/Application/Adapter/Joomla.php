@@ -1,8 +1,43 @@
 <?php
 
+/**
+ * @property $joomlaComponentName
+ */
 class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
     
     protected $liveSite = false;
+    
+    protected $joomlaComponentName = false;
+    
+    function isAdmin() {
+        return JFactory::getApplication()->isAdmin();
+    }
+    
+    function setJoomlaComponentName($joomlaComponentName) {
+        $this->joomlaComponentName = $joomlaComponentName;
+    }
+    
+    function getJoomlaComponentName() {
+        if ($this->joomlaComponentName === false) {
+            $this->joomlaComponentName = $this->getConfigValue('joomlaComponentName');
+            if (!strlen($this->joomlaComponentName) && defined('JPATH_ROOT')) {
+                $classFile = $this->appClassFile;
+                $joomlaPath = realpath(JPATH_ROOT);
+                $appPath = realpath($classFile);
+                if ($joomlaPath !== false && strlen($appPath) > strlen($joomlaPath) && !strncmp($joomlaPath, $appPath, strlen($appPath))) {
+                    $found = false;
+                    do {
+                        $appPath = dirname($appPath);
+                        $b = basename($appPath);
+                        if (substr($b, 0, 4) == 'com_') {
+                            $this->joomlaComponentName = $b;
+                        }
+                    } while ((strlen($appPath) > strlen($joomlaPath)) && !strlen($this->joomlaComponentName));
+                }
+            }
+        }
+        return $this->joomlaComponentName;
+    }
     
     protected function guessOutput() {
         if (!isset($this->config[$k = 'output'])) {
@@ -47,6 +82,10 @@ class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
             $this->liveSite = $uri;
         }
         return $this->liveSite;
+    }
+    
+    function getSiteUrl() {
+        return $this->getLiveSite();
     }
 
     protected function doGetDefaultCachePrototype() {

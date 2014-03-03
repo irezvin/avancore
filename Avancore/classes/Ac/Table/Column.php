@@ -285,11 +285,18 @@ class Ac_Table_Column {
     
     function unfoldAssetString($string) {
         // Ugly...
-        $di = Ac_Application::getDefaultInstance();
-        if ($di) $ph = $di->getAssetPlaceholders(true);
+        $app = $this->getApplication();
+        if ($app) $ph = $app->getAssetPlaceholders(true);
             else $ph = array();
         return Ac_Legacy_Controller_Response_Html::unfoldAssetString($string, $ph);
     }
+
+    /**
+     * @return Ac_Application
+     */
+    function getApplication() {
+        return $this->_table->getApplication();
+    }    
     
 }
 

@@ -1,6 +1,6 @@
 <?php
 
-Ac_Dispatcher::loadClass('Ac_Hacks');
+Ac_Util::loadClass('Ac_Hacks');
 
 class HacksSample extends Ac_Hacks {
 	

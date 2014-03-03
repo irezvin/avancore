@@ -28,38 +28,15 @@ class Ac_Table_Column_Checked extends Ac_Table_Column {
     }
     
     function getData($record, $rowNo) {
-        if ($this->getCheckoutProcessing()) {
-            $res = $this->checkedOutProcessing ($record, $rowNo);
-        } else {
-            $id = parent::getData($record, $rowNo, $this->getIdPropName());
-            $res = $this->getIdBox ($rowNo, $id);  
-            
-            //mosHTML::idBox( $rowNo, parent::getData ($record, $rowNo, $this->getIdPropName()), false );   
-        }
+        $id = parent::getData($record, $rowNo, $this->getIdPropName());
+        $res = $this->getIdBox ($rowNo, $id);  
         
         return $res;
     }    
     
-    function getIdBox($rowNo, $id, $checkedOut = false) {
-        if ($checkedOut) $res = ''; else $res = '<input type="checkbox" id="cb'.$rowNo.'" name="cid[]" value="'.$id.'" onclick="isChecked(this.checked);" />';
+    function getIdBox($rowNo, $id) {
+        $res = '<input type="checkbox" id="cb'.$rowNo.'" name="cid[]" value="'.$id.'" onclick="isChecked(this.checked);" />';
         return $res;
-    }
-    
-    function checkedOut($row) {
-        if (class_exists('mosCommonHTML')) $res = mosCommonHTML::checkedOut($row);
-            else $res = 'Checked out';
-        return $res;
-    }
-    
-    function checkedOutProcessing ($record, $rowNo) {
-        $disp = Ac_Dispatcher::getInstance();
-        if ( $record->checked_out) {
-            $checked = $this->checkedOut($record);
-        } else {
-            $user = $disp->getUser();
-            $checked = $this->getIdBox( $i, $row->id, ($row->checked_out && $row->checked_out != $user->id ) );
-        }
-        return $checked;
     }
     
     function getHeaderAttribs($rowCount, $rowNo = 1) {
@@ -69,10 +46,5 @@ class Ac_Table_Column_Checked extends Ac_Table_Column {
         return $res;
     }
     
-    function getCheckoutProcessing() {
-        if (isset($this->settings['checkoutProcessing'])) $res = $this->settings['checkoutProcessing'];
-            else $res = false;
-        return $res;
-    }
 }
 
