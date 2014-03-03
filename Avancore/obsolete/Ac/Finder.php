@@ -104,7 +104,7 @@ class Ac_Finder extends Ac_Prototyped {
      */
     function getSqlDb() {
         if ($this->sqlDb === false) {
-            $this->sqlDb = new Ac_Sql_Db_Ae(Ac_Dispatcher::getInstance()->database);
+//            $this->sqlDb = Ac_Application::getDefaultInstance()->getDb();
         }
         return $this->sqlDb;
     }
@@ -152,8 +152,8 @@ class Ac_Finder extends Ac_Prototyped {
             $m = Ac_Model_Mapper::getMapper($this->mapperClass);
             $keys = $m->listPkFields(); 
         }
-        if (is_null($aeDb)) $aeDb = Ac_Dispatcher::getInstance()->database;
-        $sqlDb = new Ac_Sql_Db_Ae($aeDb);
+        if (is_null($aeDb)) $sqlDb = Ac_Application::getDefaultInstance()->getDb();
+        else $sqlDb = new Ac_Sql_Db_Ae($aeDb);
         $sql = $this->createSqlSelect($sqlDb);
         $c = array();
         foreach ($keys as $kName) $c[] = $sqlDb->nameQuote(array($sql->getEffectivePrimaryAlias(), $kName));

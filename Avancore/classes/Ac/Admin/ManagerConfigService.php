@@ -78,9 +78,9 @@ class Ac_Admin_ManagerConfigService {
     
     function getImagePrefix() {
         $imagePrefix = $this->getDefaultImagePrefix();
-        $conf = Ac_Dispatcher::getInstance()->config;
-        if (isset($conf->managerImagesUrl) && strlen($u = $conf->managerImagesUrl)) {
-            $imagePrefix = $conf->managerImagesUrl;
+        $managerImagesUrl = $this->getApplication()->getAdapter()->getConfigValue('managerImagesUrl');
+        if (!is_null($managerImagesUrl)) {
+            $imagePrefix = $managerImagesUrl;
         }
         $imagePrefix = rtrim($imagePrefix, '/').'/';
         return $imagePrefix;

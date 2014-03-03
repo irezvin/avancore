@@ -12,18 +12,10 @@ ini_set('include_path',
 
 ini_set('error_reporting', E_ALL);
 
-
-function __autoload($class) {
-    require(str_replace('_', '/', $class).'.php');
-}
+require('Ac/Util.php');
+Ac_Util::registerAutoload();
 
 ini_set('display_errors', 1);
 ini_set('html_errors', 1);
 
-/*
-Ac_Dispatcher::instantiate('avancore', false, 'english', 'Ac_Legacy_Adapter_Native', 'Ac_Dispatcher', array(
-	'configPath' => dirname(__FILE__).'/app.config.php',
-	'cachePath' => dirname(__FILE__).'/var'
-));
-*/
 ?>

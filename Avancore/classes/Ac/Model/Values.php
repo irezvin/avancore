@@ -391,10 +391,6 @@ class Ac_Model_Values {
             
         } else $callback = $cb;
         
-        /*if (is_array($callback) && is_string($callback[0])) {
-            if (!class_exists($callback[0])) Ac_Dispatcher::loadClass($callback[0]);
-        }*/
-        
         $res = call_user_func_array($callback, $params);
         return $res;
     }

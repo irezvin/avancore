@@ -44,11 +44,15 @@ class Ac_Debug_Log_FileWriter extends Ac_Debug_Log_AbstractWriter {
     }
     
     function guessDir() {
-        if (class_exists('Ac_Dispatcher', false) && Ac_Dispatcher::hasInstance())
-            $res = Ac_Dispatcher::getInstance()->config->cachePath;
-        elseif (defined('_DEPLOY_CACHE_PATH')) $res = _DEPLOY_CACHE_PATH;
-        elseif (defined('_PAX_TMP_PATH')) $res = _PAX_TMP_PATH;
-        else $res = '.';
+        if ($app = Ac_Application::getDefaultInstance()) {
+            $res = $app->getAdapter()->getVarLogsPath();
+        } else {
+            $res = Ac_Cache::getDefaultCacheDir();
+        }
+        if (!strlen($res)) {
+            if (defined('_PAX_TMP_PATH')) $res = _PAX_TMP_PATH;
+            else $res = '.';
+        }
         return $res;
     }
     

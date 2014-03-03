@@ -151,13 +151,5 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
 </html><?php        
     }
     
-    function _showQueries() {
-        $disp = Ac_Dispatcher::getInstance();
-        $db = $disp->database;
-        if (is_a($db, 'Ac_Legacy_Database_Native') && $db->trackQueries) {
-            foreach ($db->queries as $q) echo '<hr /><pre>'.htmlspecialchars($q).'</pre>';
-        }
-    }
-    
 }
 

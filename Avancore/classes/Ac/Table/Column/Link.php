@@ -81,8 +81,7 @@ class Ac_Table_Column_Link extends Ac_Table_Column {
     }
     
     function getUrl() {
-        $disp = Ac_Dispatcher::getInstance();
-        $url = $disp->getUrl();
+        $url = Ac_Url::guess();
         if (isset($GLOBALS['Itemid']) && $GLOBALS['Itemid']) $url->query['Itemid'] = $GLOBALS['Itemid'];
         $url->query['task'] = $this->taskName;
         if ($this->hideMainMenu) $url->query['hidemainmenu'] = 1;

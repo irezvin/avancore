@@ -67,7 +67,7 @@ class Ac_Cg_Frontend {
     }
     
     function getTitle() {
-        $res = "Avancore CodeGen v.0.0.4 &copy; 2008 &mdash; 2013 Ilya Rezvin";
+        $res = "Avancore CodeGen v. 0.0.5 &copy; 2008 &mdash; 2014 Ilya Rezvin";
         return $res;
     }
     
@@ -81,6 +81,9 @@ class Ac_Cg_Frontend {
         <meta http-equiv="content-type" content="text/html; charset=utf8" />
         <style type='text/css'>
             div {margin-left: 1em; padding-left: 1em; border-left: 1px dotted silver}
+            form div {border: none}
+            form .spanned {text-align: center}
+            form input[type=submit] {font-weight: bold; padding: 0.5em 1em}
         </style>
     </head>
     <body>
@@ -99,13 +102,43 @@ class Ac_Cg_Frontend {
             
         $gen = new Ac_Cg_Generator($this->configPath);
     
-        $hlp = new Ac_Form_Helper($dummy = null, false);
-        $hlp->alwaysWrap = false;
-    
-        $cleanOutputDir = isset($_REQUEST['cod']);
-        $createEditableFiles = isset($_REQUEST['cef']);
-        $createNonEditableFiles = isset($_REQUEST['cnf']);
-        $copyGen = isset($_REQUEST['cpg']);
+        $form = new Ac_Form(null, array(
+            'htmlAttribs' => array(
+                'style' => 'float: left; padding: 1em; border: 1px solid silver; margin: 0.5em; background-color: lightyellow',
+            ),
+            'submissionControl' => 'submitForm',
+            'controls' => array(
+                'cleanOutputDir' => array(
+                    'class' => 'Ac_Form_Control_Toggle',
+                    'caption' => 'Clean output dir',
+                ),
+                'createEditableFiles' => array(
+                    'class' => 'Ac_Form_Control_Toggle',
+                    'caption' => 'Create editable files',
+                ),
+                'createNonEditableFiles' => array(
+                    'class' => 'Ac_Form_Control_Toggle',
+                    'caption' => 'Create non-editable files',
+                ),
+                'copyGen' => array(
+                    'class' => 'Ac_Form_Control_Toggle',
+                    'caption' => 'Deploy non-editable files after generation',
+                ),
+                'submitForm' => array(
+                    'class' => 'Ac_Form_Control_Button', 'buttonType' => 'submit',
+                    'caption' => 'Generate',
+                    'wrapperTemplateClass' => 'Ac_Form_Control_Template_Basic',
+                    'wrapperTemplatePart' => 'trWrapperColspan',
+                ),
+            ),
+        ));
+        
+        $value = $form->getValue();
+        
+        $cleanOutputDir = (bool) $value['cleanOutputDir'];
+        $createEditableFiles = (bool) $value['createEditableFiles'];
+        $createNonEditableFiles = (bool) $value['createNonEditableFiles'];
+        $copyGen = (bool) $value['copyGen'];
         
         $gen->clearOutputDir =  $cleanOutputDir;
         $gen->genEditable = $createEditableFiles;
@@ -114,15 +147,8 @@ class Ac_Cg_Frontend {
 ?>
     <p><i><?php echo $this->getTitle(); ?></i></p>
     
-    <form method='post' style='float: left; padding: 1em; border: 1px solid silver; margin: 0.5em; background-color: lightyellow'>
-        <?php $hlp->showCheckbox('cod', $cleanOutputDir, false, array('id' => 'cod'), true); ?> <label for="cod">Clear output dir</label> <br />
-        <?php $hlp->showCheckbox('cef', $createEditableFiles, false, array('id' => 'cef'), true); ?> <label for="cef">Create editable files</label> <br /> 
-        <?php $hlp->showCheckbox('cnf', $createNonEditableFiles, false, array('id' => 'cnf'), true); ?> <label for="cnf">Create non-editable files</label> <br /> 
-        <?php $hlp->showCheckbox('cpg', $copyGen, false, array('id' => 'cpg'), true); ?> <label for="cpg">Deploy non-editable files after generation</label> <br />
-        <p style='text-align: center'> 
-        	<input type='submit' name='submit' style='height: 30px; width: 100px; font-weight: bold' value='Generate' />
-       	</p>
-    </form>
+    <?php echo $form->fetchPresentation(); ?>
+    
     <br style='clear: both' />
 
 <?php
@@ -162,7 +188,7 @@ class Ac_Cg_Frontend {
 
 <?php   } // foreach listDomains... ?>
 
-<?php   if (isset($_POST['submit'])) { ?>
+<?php   if ($form->isSubmitted()) { ?>
 	  	<pre>
 <?php         $gen->run(); ?>
 	  	</pre>
