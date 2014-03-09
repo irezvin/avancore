@@ -5,8 +5,6 @@
  */
 class Ac_Mail {
 
-    var $useNewMailer = true;
-    
     /**
      * Recipients
      * @var array 
@@ -364,8 +362,8 @@ class Ac_Mail {
     }
         
     protected function getMailerDir() {
-        $disp = Ac_Dispatcher::getInstance();
-        return $this->useNewMailer? $disp->getVendorDir().'/PHPMailerNew' : $disp->getVendorDir().'/PHPMailer';
+        $app = Ac_Avancore::getInstance();
+        return $app->getAdapter()->getVendorPath().'/PHPMailer';
     } 
     
     /**
@@ -404,6 +402,15 @@ class Ac_Mail {
         
         if ($firstOne) $res = count($res)? $res[0] : false;
         
+        return $res;
+    }
+    
+    function getMailContent(PHPMailer $mailer) {
+        $tmp = clone $mailer;
+        $tmp->preSend();
+        if(!empty($tmp->AltBody))
+            $tmp->ContentType = "multipart/alternative";
+        $res = ($tmp->createHeader()."\n\n".$tmp->createBody());
         return $res;
     }
     
@@ -459,17 +466,11 @@ class Ac_Mail {
             $errFileName = $this->debugFilename.'-error.txt';
         }
         if ($this->_error && $saveError && !$this->dontSaveErrors) touch($errFileName);
-            
-        if(!empty($mailer->AltBody))
-            $mailer->ContentType = "multipart/alternative";
-        $mailer->error_count = 0; // reset errors
-        $mailer->SetMessageType();
-        
+
         if ($saveEmail) {
             $file = fopen($emlFileName, "w");
             
-    
-            $this->_emailFileContent = $message = ($mailer->createHeader()."\n\n".$mailer->createBody());
+            $this->_emailFileContent = $message = $this->getMailContent($mailer);
             fputs($file, $message, strlen($message));
             fclose($file);
         } else {
