@@ -283,7 +283,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
             if (is_array($id)) {
                 $res = $this->loadRecordsArray($id);
             } else {
-                trigger_error (__FILE__."::".__FUNCTION__."Unsupported \$id type: ".gettype($id).", scalar or array must be provided", E_USER_ERROR);
+                trigger_error (__FILE__."::".__FUNCTION__."Unsupported \$id type: ".gettype($id).", scalar or array must be provided, ".Ac_Util::typeClass($id)." given", E_USER_ERROR);
             }
         }
         return $res;

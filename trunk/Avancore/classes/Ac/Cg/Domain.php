@@ -199,6 +199,8 @@ class Ac_Cg_Domain {
     
     var $tableLangStringPrefix = false;
     
+    var $addSubsystemsToMapperMethods = true;
+    
     protected $langStrings = array();
     
     /**

@@ -130,6 +130,15 @@ class Ac_Cg_Frontend {
                     'wrapperTemplateClass' => 'Ac_Form_Control_Template_Basic',
                     'wrapperTemplatePart' => 'trWrapperColspan',
                 ),
+                'reload' => array(
+                    'class' => 'Ac_Form_Control_Button', 'buttonType' => 'button',
+                    'caption' => 'Reload page',
+                    'htmlAttribs' => array(
+                        'onclick' => 'this.form.method="get";'
+                    ),
+                    'wrapperTemplateClass' => 'Ac_Form_Control_Template_Basic',
+                    'wrapperTemplatePart' => 'trWrapperColspan',
+                ),
             ),
         ));
         

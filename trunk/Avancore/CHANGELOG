@@ -171,3 +171,16 @@ Wide changes for Ac_Dispatcher deprecation. Some cleanup. A better (but russian)
   Ac_Mail_Message, Ac_Mail_PHPMailer implementations added. 
   Ac_Application::getMailSender() added too (uses $adapter->mailSenderPrototype)
 + Added Tr_ tree for hierarchical tests to tests/classes
+
+2014-03-06
+
+roadmap.txt; Cg fixes
+
+^ Added high-level roadmap to docs/roadmap.txt
++ Cg: Working Ac_Cg_Domain::addSubsystemsToMapperMethods
++ Cg: "Reload" button in Ac_Cg_Frontend (preserves selection)
++ Cg: small extra in Ac_Cg_Property_Object dump (shows common subsystems and subsystem prefixes)
+* Cg: Ac_Cg_Property_Simple: obey isEnabled() when providing 'objectProperty' meta-value
+* Form: Fixed warning in Ac_Form_Control_Button for buttons without values
+/ Ac_Model_Object::getChanges(): renamed $nonStict parameter to $strict
+* Brought back Ac_Dispatcher::loadClass for backwards compatibility

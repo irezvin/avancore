@@ -416,11 +416,11 @@ class Ac_Model_Object extends Ac_Model_Data {
      * @param bool $newValues: return new values instead of old ones
      * @return mixed Array or TRUE if record does not track changes
      */
-    function getChanges($newValues = false, $field = false, $nonStrict = false) {
+    function getChanges($newValues = false, $field = false, $strict = true) {
         if (!$this->tracksChanges()) return true;
         $res = array();
         foreach ($this->_oldValues as $fieldName => $fieldValue) {
-            if ($nonStrict? $this->$fieldName != $fieldValue : $this->$fieldName !== $fieldValue) $res[$fieldName] = $newValues? $this->$fieldName : $fieldValue;
+            if ($strict? $this->$fieldName !== $fieldValue : $this->$fieldName != $fieldValue) $res[$fieldName] = $newValues? $this->$fieldName : $fieldValue;
         }
         if ($field !== false) {
             if (array_key_exists($field, $res)) $res = $res[$field];
@@ -431,7 +431,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     function isChanged($field, $strict = true) {
         if (!$this->tracksChanges()) return true;
-        return array_key_exists($field, $this->_oldValues) && ($nonStrict? ($this->_oldValues[$field] != $this->{$field}) : ($this->_oldValues[$field] !== $this->{$field}));
+        return array_key_exists($field, $this->_oldValues) && ($strict? ($this->_oldValues[$field] !== $this->{$field}) : ($this->_oldValues[$field] != $this->{$field}));
     }
     
 /*    function getErrors($key = false) {
