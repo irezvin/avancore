@@ -184,3 +184,4 @@ roadmap.txt; Cg fixes
 * Form: Fixed warning in Ac_Form_Control_Button for buttons without values
 / Ac_Model_Object::getChanges(): renamed $nonStict parameter to $strict
 * Brought back Ac_Dispatcher::loadClass for backwards compatibility
+
