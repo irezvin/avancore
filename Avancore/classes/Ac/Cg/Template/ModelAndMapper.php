@@ -132,7 +132,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         else $class = 'Ac_Cg_Template_Assoc_Strategy_One';
 
         //$class = 'Ac_Cg_Template_Assoc_Strategy';
-        $res = new $class (array('relationId' => $relationId, 'prop' => & $prop, 'model' => & $this->model, 'template' => & $this));
+        $res = new $class (array('relationId' => $relationId, 'prop' => & $prop, 'model' => & $this->model, 'template' => & $this, 'domain' => $this->domain));
         return $res;
     }
     

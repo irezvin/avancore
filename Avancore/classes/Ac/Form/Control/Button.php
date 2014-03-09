@@ -38,6 +38,7 @@ class Ac_Form_Control_Button extends Ac_Form_Control {
         if (!($this->readOnly === true) && isset($this->_rqData['value']) && !is_array($this->_rqData['value'])) {
             $val = $this->_rqData['value'];
             if (strlen($val)) $res = $this->allowAnyButtonValue? $val : $this->getButtonValue();
+            else $res = $this->getButtonValue();
         } else {
             $res = false;
         }

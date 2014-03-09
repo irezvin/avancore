@@ -227,7 +227,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
                     if ($mod = $this->_model->_domain->searchModelByTable($foreignTbl->name)) {
                         foreach ($this->_model->listProperties() as $i) {
                             $p = $this->_model->getProperty($i);
-                            if (is_a($p, 'Ac_Cg_Property_Object') && $om = $p->getOtherModel()) {
+                            if (is_a($p, 'Ac_Cg_Property_Object') && ($p->isEnabled()) && ($om = $p->getOtherModel())) {
                                 if (Ac_Util::sameObject($om, $mod)) {
                                     $rel = $p->_rel;
                                     if (in_array($this->colName, array_keys($rel->columns))) {

@@ -144,6 +144,15 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         }
     }
     
+    function onShow() {
+        return array(
+            'otherEntityNameSingle' => $this->getOtherEntityName(),
+            'otherEntityNamePlural' => $this->getOtherEntityName(false),
+            'commonPrefixes' => implode(", ", $this->_model->getCommonSubsystemPrefixes($this->_other)),
+            'otherPrefixes' => implode(", ", $this->_other->subsystemPrefixes),
+        );
+    }
+    
     function getOtherEntityName($single = true) {
         if (!$single) 
             $res = $this->_other->plural;

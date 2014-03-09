@@ -113,6 +113,7 @@ class Ac_Cg_Strategy {
     function _createTemplate($templateName, $modelName = false) {
         $tpl = new $templateName;
         $tpl->generator = $this->_gen;
+        $tpl->domain = $this->_dom;
         if (strlen($modelName)) {
             $mod = $this->_dom->getModel($modelName);
             $tpl->model = $mod;

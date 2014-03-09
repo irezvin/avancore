@@ -377,6 +377,10 @@ class Ac_Dispatcher {
         return $c->save($value, $key, $cacheGroup);
     }
     
+    static function loadClass($className) {
+        return Ac_Util::loadClass($className);
+    }
+    
     function cacheCleanup($probability = true) {
         if (is_float($probability) && $probability != 0) {
             if (!(rand(0, ceil(1 / abs($probability))) == 1)) return false; 
