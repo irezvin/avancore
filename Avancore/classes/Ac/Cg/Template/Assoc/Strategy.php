@@ -95,7 +95,12 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
         }
 
         $this->thisPlural = Ac_Cg_Util::makeIdentifier($this->model->plural);
-        $this->otherPlural = Ac_Cg_Util::makeIdentifier($this->prop->getOtherEntityName(false));
+
+        if ($this->domain->addSubsystemsToMapperMethods) {
+            $this->otherPlural = Ac_Cg_Util::makeIdentifier($this->prop->getOtherEntityName(false));
+        } else {
+            $this->otherPlural = Ac_Cg_Util::makeIdentifier($this->otherModel->plural);
+        }
         
         if ($this->model->fixMapperMethodNames) {
             $this->otherPlural = Ac_Cg_Util::makeIdentifier($this->plural);

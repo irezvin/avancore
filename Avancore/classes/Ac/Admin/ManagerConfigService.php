@@ -74,8 +74,6 @@ class Ac_Admin_ManagerConfigService {
         return 'images';
     }
     
-    
-    
     function getImagePrefix() {
         $imagePrefix = $this->getDefaultImagePrefix();
         $managerImagesUrl = $this->getApplication()->getAdapter()->getConfigValue('managerImagesUrl');
