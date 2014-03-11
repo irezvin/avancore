@@ -81,10 +81,13 @@ class Ac_Table_Column_Link extends Ac_Table_Column {
     }
     
     function getUrl() {
-        $url = Ac_Url::guess();
+        $url = $this->_table->getApplication()->getAdapter()->getWebUrl();
+        
+        // TODO: fix this Joomla-related crap
         if (isset($GLOBALS['Itemid']) && $GLOBALS['Itemid']) $url->query['Itemid'] = $GLOBALS['Itemid'];
         $url->query['task'] = $this->taskName;
         if ($this->hideMainMenu) $url->query['hidemainmenu'] = 1;
+        
         if (is_array($this->urlExtraParams)) Ac_Util::ms($url->query, $this->urlExtraParams);
         return $url;
     }
