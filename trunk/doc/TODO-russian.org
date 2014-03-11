@@ -1,0 +1,205 @@
+* DONE Ac_Model_Relation::loadSrc/loadDest *DOES NOT WORK* for M-N relations (but should be quite useful) :model:bug:
+  - As it turned out, only loadSrc didn't work properly, in contrast to loadDest
+  Completed on [2013-09-27 Fri] 
+* DONE catcher of model errors that are not shown by form controls :admin:bug:
+  in some cases object isn't saved, but we don't see any error messages, since they belong to properties, which don't have respective controls.
+  - [X] control to show ALL form errors
+  - [X] by default, it must show ALL errors
+  - [X] we can try to exclude errors that are shown by other controls
+  - [X] ability to improve error list' look
+* TODO convert nullable empty foreign keys to NULL before saving since it annoys a lot :model:bug:
+  - [ ] we should report if field is part of foreign key
+  - [ ] test cases
+    - [ ] case A: field is an exact foreign key
+    - [ ] case B: field is a PART of foreign key
+* WORK switch to getters and seters instead of Ac_Model_Data::bind(). NN IDs must have priority over linked object (if it wasn't set?) :model:redesign:
+       when $this->_fooIds is changed, getFoos() should return proper values
+*** TODO gen. code: currently only data members with accessors should be protected
+*** TODO compatibility with Ac_Model_Relation using $this->__set('_foo') - calls peGet/peSet for specified fields or objects
+*** TODO check if all other model members can become *protected*
+    - [ ] replace "_" with "int"; 
+    - [ ] calliing __get for "int" property which is not a data field must show DEPRECATED warning;
+* WORK Translate this file to broken English [2014-02-07 Fri]
+* TODO think about fields that are part of foreign key [2014-03-05 Wed]
+  - Example A: userAvatar is referenced by both user->id and user->photoId. 
+    $user->id must serve as a restriction of photo ValueList while photoId must behave normally.
+    This behaviour must be enabled in case when second field is part of other foreign key or record unique index, 
+    or is a non-NULL value.
+* TODO [2014-02-05 Wed] Ability to use new Result, Template and Controller
+** TODO Ac_Response_Environment -> Ac_Result_Environment
+** TODO Ac_Result_Environment_Legacy
+** TODO Support new Controllers in Application
+* TODO Foreign 'ids' are lost in N-N relation of Ac_Model_Object during setFooIds() after getFoo() :model:bug:
+  steps to re-produce:
+  - we have some "property", which loads external object(s) during evaluation
+  - we setID/IDs in the form
+  - object begins to save 
+  - "validation" checks the "property", and related objects are loaded
+  - after that ID/IDs won't be used since we have object properties' populated
+* TODO Ac_Sql_Select: don't join tables, which are specified in $this->tables[$this->primaryAlias]->joinsAlias [2013-08-27 Tue] :sql:bug:
+* TODO [2013-11-23 Sat] tests for Ac_Form
+* TODO Finish hierarchical tests [2014-02-05 Wed]
+** TODO Complete basic test cycle: ability to run the tests
+   - [ ] Determined and well-specified execution order
+   - [ ] Compare probes' reports with nominal values
+   - [ ] Reporter, Writer
+** TODO Form tests
+** TODO Table tests
+** TODO SQL tests
+* TODO after model changes, the $form->fetchPresentation(true) should return updated data :forms:redesign:bug:
+  (at least when $form->updateFromModel() is called)
+  - a - pull-based forms
+  - b - make 'caching' more intelligent
+* TODO Forms and controls should not be descendants of Ac_Controller anymore :forms:redesign:
+  Практика показала, что это не имеет смысла, а только утяжеляет интерфейс и путает разработчика.
+** TODO устранить недостатки форм			     :forms:redesign:
+*** TODO неудобно и негибко организованы шаблоны и wrapper'ы 
+*** TODO не ясен ЖЦ элементов, а это должны быть полноценные виджеты
+*** TODO механизм сохранения значений формы по умолчанию
+*** TODO возможность элементов управления, возвращающих массивы, писать прямо в корень значения формы,
+         тогда появится возможность делать элементы, которые редактируют несколько свойств модели
+*** TODO однообразный способ обновления модели из форм
+    Сейчас модель может обновляться двумя способами: $form->updateModel() и $model->bind($form->getValue())
+    В некоторых случаях эти способы дают разные результаты.
+    - [ ] Посмотреть, каким способом работает Ac_Admin_Manager
+    - [ ] Сделать, чтобы всегда использовалась $form->updateModel()
+    - [ ] По умолчанию поведение максимально близкое к bind
+    - [ ] bind() у нас практически не используется, его, возможно, стоит убрать или улучши
+** TODO перевести на прототипы Ac_Sql_*, Ac_Form_*, Ac_Table_* :framework:redesign:incompat:
+   - [ ] перевести все var $foo в get/set, убедиться, что объекты действуют
+   - [ ] проверка конфигурации во всех объектах: выбрасывать ошибки, когда встречается неизвестное свойство
+*** Тесты
+** TODO [2013-11-23 Sat] тесты для Ac_Table*
+** TODO [2013-11-23 Sat] тесты для Ac_Sql*
+* DONE Get completely rid of Ac_Dispatcher (even for autoloading!!!) // DONE [2014-03-03 Mon]
+** DONE Ac_Cg_Frontend: don't use Ac_Form_Helper // DONE [2014-03-03 Mon]
+** DONE Remove Ac_Form_Helper, Ac_Form_Util // DONE [2014-03-03 Mon]
+* DONE Ac_Mail: better implementation (Avancore 0.3-style), remove ugliness like $useNewMailer [2013-08-27 Tue] :core:feature:
+       // DONE [2014-03-03 Mon]
+* DONE [2014-02-05 Wed] bring back really used classes from obsolete/, leave there classes which are not used
+* DONE [2014-02-05 Wed] Cg_ -> Ac_Cg
+* DONE [2014-02-05 Wed] getter setter maker, base64dec tools make part of the project
+* TODO [2014-02-05 Wed] Support composite PKs by stock Ac_Model_Mapper and Ac_Model_Object
+* TODO [2014-02-05 Wed] Admin: allow to sort table by clicking on headers
+** TODO basic solution
+** TODO ability to specify own sort expressions
+* DONE remove all closing "?>" 	    :framework:style:
+* DONE Ac_Sql_Db::getLastError(); add to Ac_Model_Mapper::peSave    :sql:bug:
+* DONE Ac_Sql_Db applies limits not through Dialect :sql:bug:
+* TODO [2013-11-11 Mon] Get rid of Ac_Model_Collection::getStatementTail(), since not all DBMS have limit clause
+** Make E_DEPRECATED, that's all
+* TODO [2013-11-11 Mon] Ac_Admin_Manager returnUrl on save()/cancel() :admin:feature:
+       Also $returnToReferer  would be nice.
+* DONE cloning of Ac_Sql_Select 				:sql:feature:
+* TODO decorators' access to the model :model:feature:
+* TODO Ac_Widget_Menu [2014-03-12 Wed]				     :widget:feature:
+* TODO [2013-10-26 Sat] Joomla output: не добавлять уже добавленные системой скрипты и CSS :js:bug:
+* TODO [2013-10-26 Sat] Добавить класс "библиотеки" для подключения JS и CSS средств. :js:feature:
+       Нужна возможность быстро подключить jquery, chosen, yui, bootstrap и так далее.
+       При этом адаптер может менять прототипы "библиотек", например для исключения конфликтов с CMS.
+* TODO Ac_Form_Control не выводит errors, если модель не checked :model:redesign:
+  А должно? 
+  Если я выставляю ошибки в модели "извне", то должно ли при этом также выставляться
+  checked? Как ошибки, переданные модели приложением, объединяются с собственными ошибками
+  модели?
+* TODO Ac_Sql_Db, Ac_Sql_Db_PDO: charset (как минимум utf-8 по ум.) :sql:bug:
+* TODO Ac_Model_Values_Records перевести на использование генерируемого Mapper'ом Select'а :model:feature:
+* TODO при попытке получить NN-связанный объект модель глючит с генерированным кодом :model:bug:
+  Пример: есть categories - NN - products
+  В категории при попытке $this->getField('products[0][foo]'), когда нет товара 0, выводится сообщение об ошибке, что объект не может быть загружен.
+* TODO Ac_Form_Control_Date не может выводить "zero date" в требуемом формате :forms:bug:
+* TODO при попытке получить транзитное свойство с индексом для несуществующего объекта выдавать NULL? (см. пример выше) :model:annoyance:
+* TODO невозможность задать сортировку по умочланию ДОКАНЫВАЕТ :admin:annoyance:
+* TODO "подружить" Ac_Prototyped c волшебными методами и наборот (через Ac_I_Accessor?) :base:feature:
+* TODO таблицу, actions, суб-менеджеры, фильтры объединить в единую форму (сделать элементами управления) :admin:feature:
+* WORK SELECT LIST'ы на основе Chosen или Select2 	  :forms:feature:hot:
+* TODO поддержка readOnly свойств модели (это должны понимать другие компоненты) :model:feature:
+* TODO придумать, наконец, формат документирования свойств :docs:design:
+* TODO PSR-2 стиль кода :global:
+* TODO совместимость с compozer'ом :global:
+* TODO однообразные термины :framework:redesign:incompat:
+  - [ ] title (а не caption)
+  - [ ] id (а не name)
+  - [ ] dataPath, а не fieldName, modelPropertyName, path etc
+  - [ ] visible, а не hidden
+  - [ ] enabled, а не disabled
+  - [ ] writeable, а не readOnly
+  - [ ] displayOrder/creationOrder, а не ordering или order
+* TODO наконец-то нормальную спецификацию path-а с getter'ом :base:design:
+  - Примеры:
+    - foo[bar.3][baz(true)][quxx]
+    - foo->getBar()[3]->getBaz(true)->quux
+  - Внимание! Если нет ни метода, ни свойства - ошибка; если они возвращают "не то" или нет индекса в массиве - ошибки нет
+    - foo[@bar] - если нет такого свойства, ошибки нет
+* TODO ? Ac_Prototyped::factory* переименовать в Ac_Prototyped::create* :base:incompat:
+* TODO Генератор тестов. :framework:feature:major:
+  Если генерируется scaffolding админки и модели, то автоматом можно генерировать к ним тесты (простые и через web), для обычного CRUD,
+  т.к. это позволяет моментально детектить ряд проблемных вопросов. В дальнейшем эти тесты можно сделать расширяемыми.
+  Также можно генерировать тестовые наборы данных.
+* TODO Генератор скелетов [2013-08-20 Tue] 	      :framework:feature:hot:
+** TODO Скелет для Джумлы
+** TODO Скелет для Standalone
+** TODO Скелеты должны включать в себя команды для упаковки Avancore внутрь дистрибутива
+* TODO Ac_Model_Sql_TableProvider: возможность связывания с таблицами, созданными пользователем :model:feature:
+  Мы сделали alias fooAlias, который читает из таблицы Model_Bar, связанной, в свою очередь, с моделью Baz. 
+  Нам нужно, чтобы TableProvider смог подключить alias fooAlias[baz] <- желательно, чтобы он сам всё понял, без наших подсказок.
+* DONE Ac_Sql_Db: формат вызова с подстановкой параметров  [2013-08-27 Tue] :model:sql:feature:medium:
+  $db->query($sql, ...) - вызов как обычно, если $sql - строка
+  $db->query(array(0 => $sql, 1=> posParam, 'foo' => fooParam)) - если вместо $sql используется массив, то срабатывает механизм подстановки параметров.
+  При этом %1 - позиционные парамеры, %foo - именованные параметры, #foo - экранируются как объекты БД (NameQuote). В идентификаторах не допускается использование non-word characters, также они не могут начинаться с подчеркивания.
+
+       (выполнил [2013-11-07])
+* TODO Сделать, наконец, тесты для модели и Sql :model:sql:tests:
+* TODO Автоматическая инъекция зависимостей в компоненты приложения [2013-08-27 Tue] :base:design:
+  Контроллер, преобразователь, сервисные объекты являются компонентами Приложения.
+  Например, если у них есть метод setDb(Ac_Sql_Db $db), то этот метод должен автоматически устанавливаться Ac_Application в $this->getDb(). Вопросы:
+  - Как находить соответствия?
+  - Как быть с компонентами, которые создаются компонентами?
+* TODO Полностью отказаться от "вытягивания" (pull) "умолчаний" из Ac_Application. [2013-08-27 Tue] :framework:redesign:
+  Объекты вроде Ac_Mail должны создаваться объектом, умолчания из которого устанавливаются. 
+* TODO Заготовки составных частей Sql Select'а и возможность собрать Select из них [2013-08-27 Tue] :sql:feature:
+  Пример: подключение "предков" или "потомков" в nested sets, столбец-путь, условия на вложенность и т.п.
+  Нужна возможность указывать параметры заготовок (подключаемые alias'ы, префиксы экспортируемых alias'ов и т.п.)
+* TODO Ac_Table_Column: вывод значений c учетом мета-свойств values, valueList [2013-08-28 Wed] :admin:feature:medium:
+  Нужно предусмотреть использование одного экземпляра Values для всех записей, чтобы сократить число обращений к БД.
+* TODO Удобный способ исключать/подключать все/некоторые подчиненные mapper'ы в админке [2013-08-28 Wed] :admin:feature:minor:
+* TODO Ac_Db_Mysqli, Ac_Db_Pg, Ac_Db_Ms [2013-09-08 Sun] 	:sql:feature:
+* TODO Параметры у Ac_Sql_Select (в т.ч. имена таблиц и баз данных) [2013-09-08 Sun] :sql:feature:medium:
+  Если я делаю станадртную форму "параметров", то она должна экранироваться при помощи Ac_Sql_Db::q()
+* TODO Подружить NN relation с IDs (если IDs заполнены, то они используются вместо инфы в таблице)  [2013-09-27 Fri] :model:feature:
+* TODO [2013-11-12 Tue] Нужна ли в Ac_Sql_Filter_Multiple/Ac_Sql_Order_Multiple поддержка $foo->getFilter|Order($sub)->bind()? :sql:design:
+* TODO [2013-12-06 Fri] Ac_Admin_Manager должен сохранять редактируемые нижестоящие записи, когда сохраняется верхняя
+* TODO [2013-12-06 Fri] Привести в порядок интерфейс и реализацию Ac_Model_Mapper
+* TODO [2013-12-06 Fri] Ac_Model_Mapper: возможность трансформации столбец<->свойство (а как быть с SQL?)
+* TODO [2013-12-09 Mon] Квалификаторы в связях 		:model:feature:major:
+  При этом возможна выборочная загрузка "квалифицированных" объектов, 
+  т.к. мы знаем их ключи.
+** Можно сделать $defaultQualifier у Mapper'а, чтобы те, кто "связывается" с данным видом
+   объектов, по умолчанию использовали это поле.
+** Обычно это id.
+* TODO [2013-12-09 Mon] Ac_Sql_Db::fetch*: если в качестве $keyColumn передается массив, то создаем многоуровневый :sql:feature:minor:
+  При этом если последнее значение в массиве true, то у нас в самом низу массива будут строки
+* TODO [2013-12-09 Mon] Ac_Sql_Db->debugNext()->query(...), Ac_Sql_Db->args(array)->query(...) :sql:feature:minor:
+  Возможность задать дополнительные параметры для следующего запроса (при этом возвращается экземпляр той же БД).
+** args/a: НЕЛЬЗЯ смешивать позиционные параметры, но можно именные.
+   После выполнения запроса параметры "забываются". Но args() без параметров позволяет их
+   "вспомнить".
+   $foo = 10; 
+   //...
+   $bar = 20;
+   //...
+   Ac_Sql_Db->args(compact('foo', 'bar'))->query("SELECT :foo, :bar");
+   //...
+** debugNext
+   Ac_Sql_Db->debugNext(Ac_Sql_Db::DEBUG_DIE_DONT_RUN)->query("SELECT 'stuff'");
+   // also DEBUG_SHOW_RESULT, DEBUG_DIE_AFTER, DEBUG_FIREPHP - bit mask 
+
+   отладка - в любом случае выведет запрос.
+   DEBUG_DIE_DONT_RUN = 1 //  DEBUG_DIE_AFTER = 2 // запрос выполняется, но потом die()
+   DEBUG_SHOW_RESULT = 4 // будет выведен результат после вывода запроса (max. 100 строк)
+   DEBUG_FIREPHP = 16 // вся информация передается через FirePHP
+* TODO [2013-12-14 Sat] Ac_Sql_Select::applyPrototype(), Ac_Sql_Select::getPrototype()
+* TODO [2014-02-05 Wed] Codegen: improve model browser
+* TODO [2014-02-07 Fri] Ac_Form_Control_Template_Basic: use <labels> in the captions where appropriate
+* TODO [2014-02-08 Sat] Re-work Ac_Table_Column_Link (to properly get current URL; now Ac_Url::guess() is used)
+* TODO [2014-02-09 Sun] Document all config values used by Ac_Application_Adapter 
