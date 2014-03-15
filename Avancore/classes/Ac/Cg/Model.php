@@ -631,6 +631,12 @@ class Ac_Cg_Model {
         for ($i = 0; $i < $n; $i++)
             if ($myPrefixes[$i] == $otherPrefixes[$i]) $res[] = $myPrefixes[$i];
                 else break;
+        $next = count($res);
+        
+        // Consider my name as a part of other subsystem' prefix (i.e. user => userItems)
+        if (isset($otherPrefixes[$next]) && !isset($myPrefixes[$next]) && $this->single == $otherPrefixes[$next]) {
+            $res[] = $this->single;
+        }
         return $res; 
     }
     
