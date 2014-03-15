@@ -8,7 +8,7 @@ if (!class_exists('Ac_Util', false)) {
 
 class Ac_Avancore extends Ac_Application {
     
-    const version = '0.3.0';
+    const version = '0.3.1-TRUNK';
     
     protected $defaultAssetsPlaceholder = '{AC}';
     
@@ -34,7 +34,7 @@ class Ac_Avancore extends Ac_Application {
     function getDefaultAssetPlaceholders() {
         $res = parent::getDefaultAssetPlaceholders();
         Ac_Util::ms($res, array(
-            '{JQUERY}' => '{AC}/assets/vendor/jquery.min.js'
+            '{JQUERY}' => '{AC}/vendor/jquery.min.js'
         ));
         return $res;
     }

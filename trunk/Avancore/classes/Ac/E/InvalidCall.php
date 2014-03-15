@@ -44,7 +44,7 @@ class Ac_E_InvalidCall extends Exception {
             else 
                 $allowedValues = array();
         }
-        if (strlen($class)) foreach ($allowedValues as $aValue) $value = $class.'::'.$aValue;
+        if (strlen($class)) foreach ($allowedValues as $k => & $aValue) $aValue = $class.'::'.$k." = '{$aValue}'";
         return new Ac_E_InvalidCall("Invalid \${$paramName} value '{$value}'; allowed values are ".implode(', ', $allowedValues));
     }
     
