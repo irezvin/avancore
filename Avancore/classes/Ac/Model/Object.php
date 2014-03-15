@@ -85,6 +85,9 @@ class Ac_Model_Object extends Ac_Model_Data {
     function doOnSaveFailed() {
     }
     
+    function doOnDeleteFailed() {
+    }
+    
     function doBeforeDelete() {
     }
     
@@ -271,18 +274,20 @@ class Ac_Model_Object extends Ac_Model_Data {
             
             $hyData[$k] = $tpk? $this->_origPk : $this->$k;
             $hyData = $this->mapper->peConvertForSave($hyData);
-            $res = (bool) $this->mapper->peSave($hyData, true, $error);
+            $res = (bool) $this->mapper->peSave($hyData, true, $error, $newData);
+            if (is_array($newData)) foreach ($newData as $k => $v) $this->$k = $v;
             if ($res) $this->mapper->markUpdated();
+            
         } else {
             
             $skipKey = ($aif = $mapper->getAutoincFieldName()) == $k;
             if ($skipKey) unset($hyData[$k]);
             
             $hyData = $this->mapper->peConvertForSave($hyData);
-            $newData = $this->mapper->peSave($hyData, false, $error);
-            if ($newData) {
+            $res = $this->mapper->peSave($hyData, false, $error, $newData);
+            if ($res) {
                 $this->mapper->markUpdated();
-                if ($aif) $this->$k = $newData[$k];
+                if (is_array($newData)) foreach ($newData as $k => $v) $this->$k = $v;
                 $res = true;
             } else {
                 $res = false;
@@ -348,6 +353,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             }
         } else {
             $res = false;
+            $this->doOnDeleteFailed();
         }
         if (!$res) $this->_isDeleted = false;
         return $res;

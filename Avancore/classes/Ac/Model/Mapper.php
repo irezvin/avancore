@@ -988,7 +988,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      * @param mixed $hyData Persistence data
      * @return mixed persistence data on success, FALSE on failure
      */
-    function peSave($hyData, $exists = null, & $error = null) {
+    function peSave($hyData, $exists = null, & $error = null, & $newData = array()) {
         if (is_null($exists)) $exists = array_key_exists($this->pk, $hyData);
         if ($exists) {
             $query = $this->db->updateStatement($this->tableName, $hyData, $this->pk, false);
@@ -1002,10 +1002,10 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         } else {
             $query = $this->db->insertStatement($this->tableName, $hyData);
             if ($this->db->query($query)) {
-                if (strlen($this->autoincFieldName)) {
-                    $hyData[$this->autoincFieldName] = $this->db->getLastInsertId();
+                if (strlen($ai = $this->getAutoincFieldName())) {
+                    $newData = array($ai => $this->getLastGeneratedId());
                 }
-                $res = $hyData;
+                $res = true;
             } else {
                 $descr = $this->db->getErrorDescr();
                 if (is_array($descr)) $descr = implode("; ", $descr);
@@ -1014,6 +1014,10 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
             }
         }
         return $res;
+    }
+    
+    protected function getLastGeneratedId() {
+        return $this->db->getLastInsertId();
     }
     
     /**

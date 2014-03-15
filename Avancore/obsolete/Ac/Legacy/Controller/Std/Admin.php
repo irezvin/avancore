@@ -69,6 +69,9 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
             
             $managerConfig = array('mapperClass' => $mapperId);
             $mapper = Ac_Model_Mapper::getMapper($mapperId);
+            
+            if (!$mapper) throw new Ac_Legacy_Controller_Exception("No such mapper: ".$mapperId, 404);
+            
             if (strlen($mapper->managerClass)) $class = $mapper->managerClass;
                 else $class = 'Ac_Admin_Manager';
             if ($extra = $mapper->getManagerConfig()) {

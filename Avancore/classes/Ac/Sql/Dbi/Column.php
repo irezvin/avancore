@@ -47,7 +47,7 @@ class Ac_Sql_Dbi_Column extends Ac_Sql_Dbi_Object {
                  $res = $ft->getColumn($kks[0]);
             }
         }
-
+        
         return $res;
     }
     

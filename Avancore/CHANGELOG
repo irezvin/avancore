@@ -185,3 +185,17 @@ roadmap.txt; Cg fixes
 / Ac_Model_Object::getChanges(): renamed $nonStict parameter to $strict
 * Brought back Ac_Dispatcher::loadClass for backwards compatibility
 
+2013-03-15
+
+Cg and model improvements; minor bugfixes
+
+* fixed Ac_Avancore::version
+* fixed jquery reference in Ac_Avancore::getDefaultAssetPlaceholders()
++ Cg: own model' name will be considered as a part of other subsystem' prefix 
+  (i.e. for user => userItems, user will have getItems() method)
++ Added Ac_Decorator_Text_FixJson (not tested and not used yet)
+* Ac_E_InvalidCall::outOfConst() shows constant values; bug fixed too
++ Ac_Model_Mapper::getLastGeneratedId()
++ Ac_Model_Mapper::peSave() accepts &newData array to return changes and generated values 
+  to the model
++ added Ac_Model_Object::doOnDeleteFailed() method

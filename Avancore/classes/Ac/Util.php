@@ -127,7 +127,7 @@ abstract class Ac_Util {
             }
             else {
                 if (!isset($paArray1[$sKey2])) $paArray1[$sKey2] = null;
-                $paArray1[$sKey2] = Ac_Util::array_merge_recursive2($paArray1[$sKey2], $sValue2, $preserveNumeric);
+                $paArray1[$sKey2] = Ac_Util::m($paArray1[$sKey2], $sValue2, $preserveNumeric);
             }
         }
         return $paArray1;
