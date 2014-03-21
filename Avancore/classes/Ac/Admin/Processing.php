@@ -6,6 +6,8 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
 
     var $header = '{title} started';
     
+    var $defaultToAllRecords = false;
+    
     /**
      * @var Ac_Admin_ReportEntry
      */
@@ -100,6 +102,8 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
             while ($rec = $coll->getNext()) {
                 if ($this->canProcessRecord($rec))
                     if ($this->_doProcessRecord($rec) === false) break;
+                $rec->cleanupMembers();
+                unset($rec);
             }
             $this->_doAfterProcess();
         }
@@ -170,14 +174,14 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     function _doGetRecordsCollection() {
         if ($this->_recordsCollection === false) {
             if (!$this->_extRecords) $this->_recordKeys = $this->_getRecordKeysFromRequest();
-            if ($this->_noRecords || is_array($this->_recordKeys) && !count($this->_recordKeys)) $this->_records = array();
+            if ($this->_noRecords || (!$this->defaultToAllRecords && is_array($this->_recordKeys) && !count($this->_recordKeys))) $this->_records = array();
             if (!$this->_recordsCollection) {
                 $this->_recordsCollection = new Ac_Model_Collection();
                 $this->_recordsCollection->setDatabase($this->application->getDb());
                 // Most straightforward way
                 if (is_array($this->_records)) {
                     $this->_recordsCollection->setRecords($this->_records);
-                } elseif (is_array($this->_recordKeys)) {
+                } elseif (is_array($this->_recordKeys) && $this->_recordKeys) {
                     $this->_getMapper();
                     $this->_recordsCollection->setKeys($this->_recordKeys, $this->_mapperClass);
                     $this->_applyDatalinkToCollection();

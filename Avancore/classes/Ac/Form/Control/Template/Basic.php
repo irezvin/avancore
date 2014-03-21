@@ -81,7 +81,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         ?>
         
         <form <?php echo Ac_Util::mkAttribs($attribs); ?> >
-<?php       if (!$form->baseUrlToAction && !$actionUrl) echo $actionUrl->getHidden(); ?>
+<?php       if (!$form->baseUrlToAction && $actionUrl) echo $actionUrl->getHidden(); ?>
 <?php   } 
 ?>
 
