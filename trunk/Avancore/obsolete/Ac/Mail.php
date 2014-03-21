@@ -384,7 +384,7 @@ class Ac_Mail {
     function createHtml2Text() {
         if (!class_exists('html2text', false)) {
             $disp = Ac_Dispatcher::getInstance();
-            require($disp->getVendorDir().'/html2text/html2text.php');
+            require($disp->getVendorPath().'/html2text/html2text.php');
         }
         $res = new html2text();
         return $res;

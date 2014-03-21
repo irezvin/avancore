@@ -243,7 +243,7 @@ class Ac_Dispatcher {
         return $interfaceName;
     }
     
-    function getVendorDir() {
+    function getVendorPath() {
         return dirname(dirname(dirname(__FILE__))).'/vendor';
     }
     
