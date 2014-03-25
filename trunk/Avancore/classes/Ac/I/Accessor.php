@@ -10,5 +10,4 @@ interface Ac_I_Accessor {
     
     function listProperties();
     
-    
 }

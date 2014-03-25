@@ -427,4 +427,29 @@ class Ac_Accessor implements Ac_I_Accessor {
         return $posParams;
     }
     
+    /**
+     * Checks whether object method' exists (uses Ac_I_WithMethods::hasMethod when necessary)
+     * 
+     * @param object|Ac_I_WithMethods $object
+     * @param string $methodName
+     * @return bool
+     */
+    static function methodExists($object, $methodName) {
+        if ($object instanceof Ac_I_Accessor_WithMethods) return $object->hasMethod($methodName);
+        else return method_exists($object, $methodName);
+    }
+    
+    /**
+     * Checks whether variable $name is callable (uses Ac_I_WithMethods::hasMethod when necessary)
+     * 
+     * @param Ac_I_WithMethods $name
+     * @return bool
+     */
+    static function isCallable($name) {
+        if (is_array($name) && isset($name[0]) && is_object($name[0]) 
+            && $name[0] instanceof Ac_I_WithMethods && isset($name[1]) && count($name) == 2) {
+            return self::methodExists($name[0], $name[1]);
+        } else return is_callable ($name);
+    }
+    
 }
