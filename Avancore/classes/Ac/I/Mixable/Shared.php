@@ -9,7 +9,7 @@
  */
 interface Ac_I_Mixable_Shared extends Ac_I_Mixable {
     
-    function callMixinMethod(Ac_I_Mixin $mixin, $method, array $args = array());
+    function callMixinMethod(Ac_I_Mixin $mixin, $method, array $arguments = array());
     
     function getMixinProperty(Ac_I_Mixin $mixin, $property);
     
