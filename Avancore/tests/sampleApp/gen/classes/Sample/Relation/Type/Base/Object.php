@@ -135,7 +135,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
      */
     function createRelation($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Relation_Mapper');
-        $res = $m->factory();
+        $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->addRelation($res);

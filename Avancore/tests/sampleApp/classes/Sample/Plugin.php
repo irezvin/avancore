@@ -24,7 +24,7 @@ class Sample_Plugin implements Ac_I_Mixable {
     function onInitialize() {
         $app = Ac_Event::getCurrent()->getIssuer();
         if ($app instanceof Ac_Application) {
-            var_dump("App init");
+            //var_dump("App init");
         }
     }
     

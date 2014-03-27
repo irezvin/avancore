@@ -59,7 +59,13 @@ class Ac_E_InvalidCall extends Exception {
      * @return Ac_E_InvalidCall 
      */
     static function wrongClass($paramName, $value, $allowedTypes) {
-        return new Ac_E_InvalidCall("Invalid class of \${$paramName}: '".self::gettype($value)."'; expected '".implode(', ', Ac_Util::toArray($allowedTypes))."'");
+        $list = "'".implode(', ', Ac_Util::toArray($allowedTypes))."'";
+        if (is_string($value)) {
+            $message = "Invalid class: {$paramName}; expected: {$list}";
+        } else {
+            $message = "Invalid class of \${$paramName}: '".self::gettype($value)."'; expected: {$list}";
+        }
+        return new Ac_E_InvalidCall($message);
     }
     
     /**

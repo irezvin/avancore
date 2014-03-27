@@ -110,7 +110,7 @@ abstract class <?php $this->d($this->domainGenClass); ?> extends <?php $this->d(
      * @return <?php $this->d($modelClass); ?> 
      */
     function create<?php $this->d($this->modelMethodSuffixes[$mapperClass]); ?> () {
-        return $this->getMapper(<?php $this->str($mapperClass); ?>)->factory();
+        return $this->getMapper(<?php $this->str($mapperClass); ?>)->createRecord();
     }
     
 <?php } ?>

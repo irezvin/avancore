@@ -69,7 +69,7 @@ abstract class Sample_DomainBase extends Ac_Application {
      * @return Sample_Orientation 
      */
     function createSampleOrientation () {
-        return $this->getMapper('Sample_Orientation_Mapper')->factory();
+        return $this->getMapper('Sample_Orientation_Mapper')->createRecord();
     }
     
  
@@ -84,7 +84,7 @@ abstract class Sample_DomainBase extends Ac_Application {
      * @return Sample_Person 
      */
     function createSamplePerson () {
-        return $this->getMapper('Sample_Person_Mapper')->factory();
+        return $this->getMapper('Sample_Person_Mapper')->createRecord();
     }
     
  
@@ -99,7 +99,7 @@ abstract class Sample_DomainBase extends Ac_Application {
      * @return Sample_Relation_Type 
      */
     function createSampleRelationType () {
-        return $this->getMapper('Sample_Relation_Type_Mapper')->factory();
+        return $this->getMapper('Sample_Relation_Type_Mapper')->createRecord();
     }
     
  
@@ -114,7 +114,7 @@ abstract class Sample_DomainBase extends Ac_Application {
      * @return Sample_Relation 
      */
     function createSampleRelation () {
-        return $this->getMapper('Sample_Relation_Mapper')->factory();
+        return $this->getMapper('Sample_Relation_Mapper')->createRecord();
     }
     
  
@@ -129,7 +129,7 @@ abstract class Sample_DomainBase extends Ac_Application {
      * @return Sample_Tag 
      */
     function createSampleTag () {
-        return $this->getMapper('Sample_Tag_Mapper')->factory();
+        return $this->getMapper('Sample_Tag_Mapper')->createRecord();
     }
     
 

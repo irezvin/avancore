@@ -62,9 +62,9 @@ class Ac_Sql_Dbi_Inspector {
      * @return array(indexName=>array('primary'=>true/false,'unique'=>true/false,'columns'=>array('fieldName1','fieldName2'))
      */
     function getIndicesForTable($tableName, $databaseName = false) {
-        $dbName = $this->_getQDbName($databaseName);
+        $dbName = $this->_getDbName($databaseName);
         $res = array();
-        foreach ($this->_db->fetchArray('SHOW INDEX FROM '.$this->_getQTableName($databaseName, $tableName)) as $idxData) {
+        foreach ($this->_db->fetchArray('SHOW INDEX FROM '.$this->_getQTableName($dbName, $tableName)) as $idxData) {
             $idxName = $idxData['Key_name'];
             if (!isset($res[$idxName])) $res[$idxName] = array(
                 'primary' => ($idxName === 'PRIMARY'), 

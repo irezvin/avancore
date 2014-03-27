@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Model_Mapper implements Ac_I_Prototyped {
+class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     
     protected $id = false;
     
@@ -89,13 +89,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     protected $allRecords = false;
     
     function __construct(array $options = array()) {
-        if ($options) Ac_Accessor::setObjectProperty ($this, $options);
-/*     
-        if (!$this->database) {
-            throw new Exception("No \$database provided");
-        }
-*/
-
+        parent::__construct($options);
         if (!$this->tableName) trigger_error (__FILE__."::".__FUNCTION__." - tableName missing", E_USER_ERROR);
     }
     
@@ -107,7 +101,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     }
 
     function setId($id) {
-        if ($this->id !== false) throw new Exception("Can setId() only once!");
+        if ($this->id !== false && $this->id !== $id) throw new Exception("Can setId() only once!");
         $this->id = $id;
     }
 
@@ -173,16 +167,12 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
     /**
      * @return Ac_Model_Mapper
      */
-    static function getMapper ($mapperClass, $application = null) {
+    static function getMapper ($mapperClass, Ac_Application $application = null) {
         if (is_object($mapperClass) && $mapperClass instanceof Ac_Model_Mapper) {
             $res = $mapperClass;
         } else {
             $res = null;
-            if ($application) {
-                if ($application instanceof Ac_Application) {
-                    $res = $application->getMapper($mapperClass);
-                } else throw new Exception("\$application should be an Ac_Application instance");
-            }
+            if ($application) $res = $application->getMapper($mapperClass);
             foreach(Ac_Application::listInstances() as $className => $ids) {
                 foreach ($ids as $appId) {
                     $app = Ac_Application::getApplicationInstance($className, $appId);
@@ -210,31 +200,53 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
         return $this->columnNames;
     }
 
+    
     /**
+     * Creates new record instance that is bound to $this mapper.
+     * 
+     * @param string|bool $className Class name of record instance (
+     * @throws Ac_E_InvalidCall if $className is NOT a sub-class of $this->recordClass
      * @return Ac_Model_Object
      */
-    function factory($className = false) {
+    function createRecord($className = false) {
+        if (isset($this))
         if ($className === false) $className = $this->recordClass;
         if ($this->useProto) {
             if (!isset($this->proto[$className])) {
                 $this->proto[$className] = new $className($this);
             }
             $proto = $this->proto[$className];
-            $res = $proto;
+            $res = clone $proto;
         } else {
-            $res = new $this->recordClass($this);
+            $res = new $className($this);
+        }
+        if ($className !== $this->recordClass) {
+            if (! $res instanceof $this->recordClass) 
+                throw Ac_E_InvalidCall::wrongClass ('className', $className, $this->recordClass);
         }
         $this->memorize($res);
         return $res;
     }
     
+    /**
+     * Deprecated - use Ac_Model_Mapper::createRecord() instead
+     * 
+     * @deprecated since 0.3.2
+     * @param string $className Same as createRecord::$className
+     * @return Ac_Model_Object
+     */
+    static function factory($className = false, 
+        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        throw new Exception("Cannot use Ac_Model_Mapper::factory() directly; using factory() in descendant "
+            . "classes is deprecated too. User createRecord() instead");
+    }
     
     /**
      * @param array $values
      * @return Ac_Model_Object
      */
     function reference($values = array()) {
-        $res = $this->factory();
+        $res = $this->createRecord();
         $res->setIsReference(true);
         foreach ($values as $k => $v) $res->{$k} = $v;
         return $res;
@@ -472,7 +484,7 @@ class Ac_Model_Mapper implements Ac_I_Prototyped {
      */
     function getPrototype() {
         if ($this->prototype === false) {
-            $this->prototype = $this->factory();
+            $this->prototype = $this->createRecord();
         }
         return $this->prototype;
     }

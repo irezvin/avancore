@@ -22,11 +22,18 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     
     protected $autoincFieldName = 'tagId';
     
+    function listSqlColumns() {
+        return $this->columnNames;
+    }
+    
     /**
      * @return Sample_Tag 
      */ 
-    function factory ($className = false) {
-        $res = parent::factory($className);
+    static function factory ($className = false,
+        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
+            "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
+        $res = Ac_Model_Mapper::getMapper('Sample_Tag_Mapper')->createRecord($className);
         return $res;
     }
     
@@ -78,13 +85,13 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                   'destCountVarName' => '_tagsCount',
                   'destNNIdsVarName' => '_tagIds',
                   'fieldLinks' => array (
-                      'tagId' => 'idOfTag',
+                      'tagId' => 'tagId',
                   ),
                   'srcIsUnique' => false,
                   'destIsUnique' => false,
                   'midTableName' => '#__people_tags',
                   'fieldLinks2' => array (
-                      'idOfPerson' => 'personId',
+                      'personId' => 'personId',
                   ),
               ),
         ));
@@ -92,12 +99,15 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     }
         
     protected function doGetInfoParams() {
-        return Ac_Util::m(parent::doGetInfoParams(), 
+        return Ac_Util::m( 
             array (
                   'singleCaption' => 'Tag',
                   'pluralCaption' => 'Tags',
                   'hasUi' => false,
-            )        );
+            ),
+            parent::doGetInfoParams()
+        );
+        
     }
     
         

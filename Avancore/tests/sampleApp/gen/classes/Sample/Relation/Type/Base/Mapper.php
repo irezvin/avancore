@@ -21,11 +21,18 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     
     protected $autoincFieldName = 'relationTypeId';
     
+    function listSqlColumns() {
+        return $this->columnNames;
+    }
+    
     /**
      * @return Sample_Relation_Type 
      */ 
-    function factory ($className = false) {
-        $res = parent::factory($className);
+    static function factory ($className = false,
+        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
+            "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
+        $res = Ac_Model_Mapper::getMapper('Sample_Relation_Type_Mapper')->createRecord($className);
         return $res;
     }
     
@@ -84,12 +91,15 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     }
         
     protected function doGetInfoParams() {
-        return Ac_Util::m(parent::doGetInfoParams(), 
+        return Ac_Util::m( 
             array (
                   'singleCaption' => 'Relation type',
                   'pluralCaption' => 'Relation types',
                   'hasUi' => false,
-            )        );
+            ),
+            parent::doGetInfoParams()
+        );
+        
     }
     
         
