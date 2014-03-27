@@ -93,7 +93,7 @@ abstract class Ac_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_Tree_N
                 $this->container = $this->mapper->loadRecord($id);
                 if (!$this->container) trigger_error("Can't load container with id '$id'", E_USER_NOTICE);
             } else {
-                $this->container = $this->mapper->factory();
+                $this->container = $this->mapper->createRecord();
             }
             if ($this->container) {
                 $containerImplSetter = $this->containerImplSetter;

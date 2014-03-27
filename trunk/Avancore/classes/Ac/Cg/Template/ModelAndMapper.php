@@ -412,8 +412,11 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     /**
      * @return <?php $this->d($this->modelClass); ?> 
      */ 
-    function factory ($className = false) {
-        $res = parent::factory($className);
+    static function factory ($className = false,
+        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
+            "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
+        $res = Ac_Model_Mapper::getMapper(<?php $this->str($this->mapperClass); ?>)->createRecord($className);
         return $res;
     }
     

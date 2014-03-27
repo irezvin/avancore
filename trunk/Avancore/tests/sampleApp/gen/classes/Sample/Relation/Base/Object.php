@@ -182,7 +182,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
      */
     function createRelationType($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Relation_Type_Mapper');
-        $res = $m->factory();
+        $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->setRelationType($res);
@@ -225,7 +225,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
      */
     function createOtherPerson($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Person_Mapper');
-        $res = $m->factory();
+        $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->setOtherPerson($res);
@@ -268,7 +268,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
      */
     function createPerson($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Person_Mapper');
-        $res = $m->factory();
+        $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->setPerson($res);

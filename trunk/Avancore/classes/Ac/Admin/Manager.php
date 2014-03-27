@@ -420,7 +420,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $this->_record = null;
             if ($this->isNewRecord()) {
                 $m = $this->getMapper();
-                $this->_record = $m->factory();
+                $this->_record = $m->createRecord();
                 $this->callFeatures('onCreate', $this->_record);
                 if ($this->_datalink) $this->_datalink->setRecordDefaults($this->_record);
             } elseif (($pk = $this->getPrimaryKey()) !== false) {

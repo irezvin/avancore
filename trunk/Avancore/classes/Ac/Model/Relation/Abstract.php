@@ -90,7 +90,7 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
             $res = $row;
         } elseif ($mapper) {
             //$res = new Nc_Element_Version;
-            $res = $mapper->factory($mapper->getRecordClass($row));
+            $res = $mapper->createRecord($mapper->getRecordClass($row));
             $res->load($row, true);
         } else {
             $res = $row;
