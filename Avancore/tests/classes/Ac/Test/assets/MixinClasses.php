@@ -60,10 +60,8 @@ class Body extends Ac_Mixin {
 
     protected $protVar = false;
     
-    function __construct(array $options = array()) {
-        $this->addMixable(new Weight);
-        $this->addMixable(new Dimensions);
-        parent::__construct($options);
+    protected function doGetCoreMixables() {
+        return array(new Weight, new Dimensions());
     }
     
     function getDensity() {
