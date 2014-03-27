@@ -333,8 +333,6 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
 		
 		$treeArr = array_values($treeArr);
 		
-		var_dump('Root node is ', $root);
-		
 		$this->saveTreeArr($treeArr, $tree1, $rootId, $this->getRootNodeId());
 			
 		if (!$dontApply) {
@@ -417,7 +415,7 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
             $andItemId = " AND (ns.id = ".($db->q($this->itemId)).")";
         } else {
             $andItemId = "";
-}
+        }
         
         $wrongParents = $db->fetchArray(
             "
