@@ -776,7 +776,7 @@ class Ac_Model_Object extends Ac_Model_Data {
      */
     function copy($asReference = null, $withPk = false) {
         $m = $this->getMapper();
-        $copy = $m->factory();
+        $copy = $m->createRecord();
         $flds = array_diff($this->_listOwnPublicVars(), $this->doListNonCopiedFields());
         if (!$asReference && !$withPk) $flds = array_diff($flds, $m->listPkFields());
         if ($withPk) $flds = array_merge($flds, $m->listPkFields());

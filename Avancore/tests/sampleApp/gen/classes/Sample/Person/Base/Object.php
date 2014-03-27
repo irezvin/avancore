@@ -207,7 +207,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      */
     function createOrientation($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Orientation_Mapper');
-        $res = $m->factory();
+        $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->setOrientation($res);
@@ -265,7 +265,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      */
     function createTag($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Tag_Mapper');
-        $res = $m->factory();
+        $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->addTag($res);
@@ -340,7 +340,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      */
     function createIncomingRelation($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Relation_Mapper');
-        $res = $m->factory();
+        $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->addIncomingRelation($res);
@@ -396,7 +396,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      */
     function createOutgoingRelation($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Relation_Mapper');
-        $res = $m->factory();
+        $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->addOutgoingRelation($res);

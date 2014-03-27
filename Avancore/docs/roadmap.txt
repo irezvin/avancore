@@ -1,14 +1,19 @@
 Avancore roadmap
 
 0.3.1 - now (Ac_Dispatcher deprecation) - check bugs and TAG it
-0.3.2 - focus on productivity
+0.3.2 - extensibiltiy, step 1
+    -   extensible model
+    -   extensible sql schema
+    -   extensible controller
+    -   extensible application
+0.3.3 - focus on productivity
     -   CLI tool
     -   New & Old Controllers are friends
     -   Jooomla and Standalone skeletons
     -   Support Config
     -   Simplify naming of controllers and templates
     -   Remove all language strings in "defines", switch to Ac_Lang_String
-0.3.3 - more consistent OOP
+0.3.4 - more consistent OOP
     -   no public members, no "_" vars (compat. using magic)
     -   only exceptions, no trigger_errors
     -   strict members
@@ -18,18 +23,13 @@ Avancore roadmap
     -   document all public members (oh, shit), generate docs
     -   cleanup project dir
     -   switch to GitHub; put roadmap & tasks there; add composer support
-0.3.4 - model improvements
+0.3.5 - model improvements
     -   new meta model (compat. with old one)
     -   better validation
     -   detect model & property names in Ac_Sql OR use Ac_Collection instead
     -   qualifiers
     -   support in-memory model editing and transactional saving
     -   support several-table-per-model concept?
-0.3.5 - extensibiltiy, step 1
-    -   extensible model
-    -   extensible sql schema
-    -   extensible controller
-    -   extensible application
 0.3.6 - new MVC improvements
     -   router
     -   better caching

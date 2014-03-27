@@ -26,11 +26,18 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     protected $autoincFieldName = 'personId';
     
+    function listSqlColumns() {
+        return $this->columnNames;
+    }
+    
     /**
      * @return Sample_Person 
      */ 
-    function factory ($className = false) {
-        $res = parent::factory($className);
+    static function factory ($className = false,
+        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
+            "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
+        $res = Ac_Model_Mapper::getMapper('Sample_Person_Mapper')->createRecord($className);
         return $res;
     }
     
@@ -91,13 +98,13 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                   'destCountVarName' => '_peopleCount',
                   'destNNIdsVarName' => '_personIds',
                   'fieldLinks' => array (
-                      'personId' => 'idOfPerson',
+                      'personId' => 'personId',
                   ),
                   'srcIsUnique' => false,
                   'destIsUnique' => false,
                   'midTableName' => '#__people_tags',
                   'fieldLinks2' => array (
-                      'idOfTag' => 'tagId',
+                      'tagId' => 'tagId',
                   ),
               ),
               '_incomingRelations' => array (
@@ -129,12 +136,15 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     }
         
     protected function doGetInfoParams() {
-        return Ac_Util::m(parent::doGetInfoParams(), 
+        return Ac_Util::m( 
             array (
                   'singleCaption' => 'People',
                   'pluralCaption' => 'People',
                   'hasUi' => false,
-            )        );
+            ),
+            parent::doGetInfoParams()
+        );
+        
     }
     
         

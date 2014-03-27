@@ -149,7 +149,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
      */
     function createPerson($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Person_Mapper');
-        $res = $m->factory();
+        $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->addPerson($res);

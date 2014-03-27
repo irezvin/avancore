@@ -2,7 +2,7 @@
 
 require(dirname(__FILE__).'/../sampleApp/deploy/app.config.php');
 
-$dbConf = $config['legacyDatabasePrototype']['__construct']['config'];
+$dbConf = $config['legacyDatabasePrototype']['__construct'][0];
 
 $config = array(
     'generator' => array(

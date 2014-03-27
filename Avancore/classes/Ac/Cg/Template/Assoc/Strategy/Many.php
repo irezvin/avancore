@@ -55,7 +55,7 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
      */
     function create<?php $this->d($ucSingle); ?>($values = array(), $isReference = false) {
         $m = $this->getMapper(<?php $this->str($this->prop->mapperClass); ?>);
-        $res = $m->factory();
+        $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->add<?php $this->d($ucSingle); ?>($res);
