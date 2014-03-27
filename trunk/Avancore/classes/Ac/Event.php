@@ -31,9 +31,6 @@ abstract class Ac_Event {
                     if (is_callable($callback)) $res[] = call_user_func_array($callback, $arguments);
                 }
             }
-            foreach($hh as $objectOrCallback) {
-                if (is_object($objectOrCallback)) $callback = array($objectOrCallback, $event);
-            }
             $tmp = array_pop(self::$stack);
             self::$current = $tmp[3];
         }

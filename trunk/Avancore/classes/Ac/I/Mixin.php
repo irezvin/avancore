@@ -86,4 +86,11 @@ interface Ac_I_Mixin extends Ac_I_WithMethods {
      */
     function setMixables(array $mixables, $addToExisting = false);
     
+    /**
+     * Returns list of "core" mixables that cannot be deleted or replaced
+     * 
+     * @return array
+     */
+    function getCoreMixables();
+    
 }

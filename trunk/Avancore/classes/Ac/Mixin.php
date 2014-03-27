@@ -13,6 +13,11 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
      * @param array $propertyName => mixableId
      */
     protected $mixPropertyMap = false;
+
+    /**
+     * @param array $id => $id IDs of 'core' mixables
+     */
+    protected $coreMixableIds = array();
     
     /**
      * @param array $id => $id IDs of Ac_I_Mixable_Shared
@@ -23,6 +28,20 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
     const ACCESS_SET = 1;
     const ACCESS_ISSET = 2;
     const ACCESS_UNSET = 3;
+
+    function __construct(array $prototype = array()) {
+        if ($m = $this->doGetCoreMixables()) {
+            $this->setMixables($m);
+            $ck = array_keys($this->mixables);
+            $this->coreMixableIds = array_combine($ck, $ck);
+        }
+        // TODO: initialize while providing values to mixables
+        parent::__construct($prototype);
+    }
+    
+    protected function doGetCoreMixables() {
+        return array();
+    }
     
     protected function clearMixMaps() {
         $this->mixMethodMap = false;
@@ -30,7 +49,7 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
     }
     
     public function addMixable(Ac_I_Mixable $mixable, $id = false, $canReplace = false) {
-        $id = $mixable->getMixableId();
+        if ($id === false) $id = $mixable->getMixableId();
         if (is_numeric($id) || !strlen($id)) {
             $this->mixables[] = $mixable;
             end($this->mixables);
@@ -50,6 +69,8 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
 
     public function deleteMixable($id, $dontThrow = false) {
         if (isset($this->mixables[$id])) {
+            if (isset($this->coreMixableIds[$id])) 
+                throw new Ac_E_InvalidUsage("Cannot delete core Mixable '$id'; check with getCoreMixables() first");
             $tmp = $this->mixables[$id];
             unset($this->mixables[$id]);
             $tmp->unregisterMixin($this);
@@ -77,6 +98,12 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
         }
         return $res;
     }
+    
+    public function getCoreMixables() {
+        $res = array();
+        foreach ($this->coreMixableIds as $id) $res[$id] = $this->mixables[$id];
+        return $res;
+    }
 
     public function listMixables($className = false) {
         if ($className === false) $res = array_keys($this->mixables);
@@ -91,26 +118,29 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
     public function setMixables(array $mixables, $addToExisting = false) {
         $this->clearMixMaps();
         if (!$addToExisting && count($this->mixables)) {
-            $tmp = $this->mixables;
-            $this->mixables = array();
-            foreach ($tmp as $mix) {
-                $mix->unregisterMixin($this);
+            foreach (array_diff(array_keys($this->mixables), $this->coreMixableIds) as $id) {
+                $tmp = $this->mixables[$id];
+                unset($this->mixables[$id]);
+                $tmp->unregisterMixin($this);
             }
         }
-        foreach ($mixables as $k => $v) {
+        foreach ($mixables as $id => $v) {
             if (!is_object($v)) $mix = Ac_Prototyped::factory($v, 'Ac_I_Mixable', $v);
                 else $mix = $v;
-            if (!$mix instanceof Ac_I_Mixable) throw Ac_E_InvalidCall("\$mixables['{$k}'] must implement "
+            if (!$mix instanceof Ac_I_Mixable) throw Ac_E_InvalidCall("\$mixables['{$id}'] must implement "
             . "Ac_I_Mixable,  ".Ac_Util::typeClass ($mix)." provided instead");
-            if (is_numeric($k)) $k = $mix->getMixableId();
-            if (is_numeric($k) || !strlen($k)) array_push($this->mixables, $mix);
+            if (is_numeric($id)) $id = $mix->getMixableId();
+            if (is_numeric($id) || !strlen($id)) array_push($this->mixables, $mix);
             else {
-                if (isset($this->mixables[$k])) {
-                    $tmp = $this->mixables[$k];
-                    unset($this->mixables[$k]);
+                if (isset($this->mixables[$id])) {
+                    if (isset($this->coreMixableIds[$id])) 
+                        throw new Ac_E_InvalidUsage("Cannot replace core Mixable '{$id}'; "
+                        . "check with getCoreMixables() first");
+                    $tmp = $this->mixables[$id];
+                    unset($this->mixables[$id]);
                     $tmp->unregisterMixin($this);
                 }
-                $this->mixables[$k] = $mix;
+                $this->mixables[$id] = $mix;
             }
             $mix->registerMixin($this);
         }

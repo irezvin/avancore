@@ -4,7 +4,46 @@ if (!class_exists('Ac_Util', false)) require_once(dirname(__FILE__).'/Util.php')
 if (!class_exists('Ac_I_ServiceProvider', false)) require_once(dirname(__FILE__).'/I/ServiceProvider.php');
 if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/Prototyped.php');
 
-abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvider {
+abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_ServiceProvider {
+
+    /**
+     * onInitialize
+     */
+    const EVENT_ON_INITIALIZE = 'onInitialize';
+    
+    /**
+     * onGetMapperPrototypes (array & $mapperPrototypes)
+     */
+    const EVENT_ON_GET_MAPPER_PROTOTYPES = 'onGetMapperPrototypes';
+    
+    /**
+     * onRegisterMappers (array $mappers)
+     */
+    const EVENT_ON_REGISTER_MAPPERS = 'onRegisterMappers';
+    
+    /**
+     * onGetControllerPrototypes(array & $controllerPrototypes)
+     */
+    const EVENT_ON_GET_CONTROLLER_PROTOTYPES = 'onGetControllerPrototypes';
+    
+    /**
+     * onRegisterControllers (array $controllers)
+     */
+    const EVENT_ON_REGISTER_CONTROLLERS = 'onRegisterControllers';
+    
+    /**
+     * onMapperNotFound ($id, & $instance = null)
+     */
+    const EVENT_ON_MAPPER_NOT_FOUND = 'onMapperNotFound';
+    
+    /**
+     * onControllerNotFound ($id, & $instance = null)
+     */
+    const EVENT_ON_CONTROLLER_NOT_FOUND = 'onControllerNotFound';
+    
+    const STAGE_CONSTRUCTING = 'constructing';
+    const STAGE_INITIALIZING = 'initializing';
+    const STAGE_INITIALIZED = 'initialized';    
     
     private static $instances = array();
     
@@ -16,11 +55,7 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     
     private static $ids = array();
 
-    const stConstructing = 'constructing';
-    const stInitializing = 'initializing';
-    const stInitialized = 'initialized';
-    
-    protected $stage = self::stConstructing;
+    protected $stage = self::STAGE_CONSTRUCTING;
     
     /**
      * @var Ac_Application_Adapter
@@ -160,7 +195,7 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
         $this->adapter = $adapter;
         $this->adapter->setAppClassFile($this->getAppClassFile());
         if (is_array($io = $this->adapter->getAppInitOptions())) $this->initFromPrototype($io);
-        if ($this->autoInitialize && $this->stage == self::stInitializing) $this->initialize();
+        if ($this->autoInitialize && $this->stage == self::STAGE_INITIALIZING) $this->initialize();
     }
     
     /**
@@ -191,21 +226,22 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     }
     
     function __construct (array $options = array()) {
-        $this->initFromPrototype($options);
-        $this->stage = self::stInitializing;
+        parent::__construct($options);
+        $this->stage = self::STAGE_INITIALIZING;
         if ($this->autoInitialize) $this->initialize();
     }
     
     function initialize() {
         $res = false;
-        if ($this->stage === self::stInitializing) {
+        if ($this->stage === self::STAGE_INITIALIZING) {
             $adapter = $this->getAdapter();
             if ($this->addIncludePaths) {
                 Ac_Util::addIncludePath($adapter->getClassPaths());
                 if (strlen($gp = $adapter->getGenPath()))Ac_Util::addIncludePath($adapter->getGenPath());
             }
             $this->doOnInitialize();
-            $this->stage = self::stInitialized;
+            $this->triggerEvent(self::EVENT_ON_INITIALIZE);
+            $this->stage = self::STAGE_INITIALIZED;
             Ac_Application::registerInstance($this);
             $res = true;
         }
@@ -278,9 +314,27 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
      */
     function listMappers() {
         if ($this->mappers === false) {
-            $this->mappers = Ac_Util::toArray($this->doGetMapperPrototypes());
+            $this->initMappers();
         }
         return array_keys($this->mappers);
+    }
+    
+    protected function initMappers() {
+        $this->mappers = array();
+        $mappers = Ac_Util::toArray($this->doGetMapperPrototypes());
+        $this->triggerEvent(self::EVENT_ON_GET_MAPPER_PROTOTYPES, array(& $mappers));
+        $this->mappers = $mappers;
+        $reg = array();
+        foreach ($this->mappers as $id => $m) {
+            if (is_object($m)) {
+                if ($m instanceof Ac_Model_Mapper) $reg[$id] = $m;
+                else throw new Ac_E_InvalidImplementation("All items in \$mappers collection "
+                    . "must be Ac_Model_Mapper descendants, but \$mappers['{$id}'] is ".get_class($m));
+                $reg->setId($id);
+                $reg->setApplication($this);
+            }
+        }
+        if ($reg) $this->triggerEvent(self::EVENT_ON_REGISTER_MAPPERS($reg));
     }
     
     function hasMapper($id) {
@@ -289,9 +343,11 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
     
     function addMapper(Ac_Model_Mapper $mapper) {
         $id = $mapper->getId();
-        if (in_array($id, $this->listMappers())) throw new Exception("Mapper '$id' already registered in ".get_class($this));
+        if (in_array($id, $this->listMappers())) 
+            throw Ac_E_InvalidCall::alreadySuchItem('Mapper', $id);
         $this->mappers[$id] = $mapper;
         $mapper->setApplication($this);
+        $this->triggerEvent(self::EVENT_ON_REGISTER_MAPPERS, array($id => $mapper));
     }
     
     protected function doGetMapperPrototypes() {
@@ -307,12 +363,20 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
                 $defaults = $this->mappers[$id];
                 if (!is_array($defaults)) $defaults = array('class' => $defaults);
                 $defaults['application'] = $this;
+                $defaults['id'] = $id;
                 $this->mappers[$id] = Ac_Prototyped::factory($defaults, 'Ac_Model_Mapper');
+                $this->triggerEvent(self::EVENT_ON_REGISTER_MAPPERS, array($id => $this->mappers[$id]));
             }
             $res = $this->mappers[$id];
         } else {
-            if (!$dontThrow) throw new Exception("No such mapper '{$id}' in ".get_class($this));
-            else $res = null;
+            $res = null;
+            $this->triggerEvent(self::EVENT_ON_MAPPER_NOT_FOUND, array($id, & $res));
+            if ($res) {
+                $res->setId($id);
+                $this->addMapper($res);
+            } else {
+                if (!$dontThrow) throw new Exception("No such mapper '{$id}' in ".get_class($this));
+            }
         }
         return $res;
     }
@@ -352,18 +416,6 @@ abstract class Ac_Application extends Ac_Prototyped implements Ac_I_ServiceProvi
             throw new Exception("No such controller with id '$id' registered in ".get_class($this));
         }
         return $res;
-    }
-    
-    /**
-     * @return Ac_UserConfig
-     */
-    function getConfig() {
-    }
-    
-    function setConfig(Ac_UserConfig $config) {
-    }
-    
-    function getConfigPrototype() {
     }
     
     function createOutput() {
