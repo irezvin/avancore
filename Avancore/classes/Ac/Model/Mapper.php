@@ -2,6 +2,83 @@
 
 class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     
+    /**
+     * function onAfterCreateRecord ($record)
+     */
+    const EVENT_AFTER_CREATE_RECORD = 'onAfterCreateRecord';
+
+    /**
+     * Not used at the time!
+     *
+     * function onAfterHydrateRecord($record)
+     */
+    const EVENT_AFTER_HYDRATE_RECORD = 'onAfterHydrateRecord';
+
+    /**
+     * function onBeforeStoreRecord($record, array & $hyData, array & $newData, & $exists, & $result, & $error)
+     */
+    const EVENT_BEFORE_STORE_RECORD = 'onBeforeStoreRecord';
+
+    /**
+     * function onAfterStoreRecord($record, array & $hyData, array & $newData, & $exists, & $result, & $error)
+     */
+    const EVENT_AFTER_STORE_RECORD = 'onAfterStoreRecord';
+
+    /**
+     * function onBeforeReplaceNNRecords($record, & $rowProto, & $rows, & $midTableName, & $result, & $errors)
+     */
+    const EVENT_BEFORE_REPLACE_NN_RECORDS = 'onBeforeReplaceNNRecords';
+
+    /**
+     * function onAfterReplaceNNRecords($record, & $rowProto, & $rows, & $midTableName, & $result, & $errors)
+     */
+    const EVENT_AFTER_REPLACE_NN_RECORDS = 'onAfterReplaceNNRecords';
+
+    /**
+     * function onBeforeDeleteRecord($record, array & $hyData, & $error, & $result)
+     */
+    const EVENT_BEFORE_DELETE_RECORD = 'onBeforeDeleteRecord';
+
+    /**
+     * function onAfterDeleteRecord($record, array & $hyData, & $error, & $result)
+     */
+    const EVENT_AFTER_DELETE_RECORD = 'onAfterDeleteRecord';
+
+    /**
+     * function onGetInfoParams(& $infoParams)
+     */
+    const EVENT_ON_GET_INFO_PARAMS = 'onGetInfoParams';
+
+    /**
+     * function onGetSelectPrototype(& $selectPrototype)
+     */
+    const EVENT_ON_GET_SELECT_PROTOTYPE = 'onGetSelectPrototype';
+
+    /**
+     * function onGetRelationPrototypes(& $relationPrototypes)
+     */
+    const EVENT_ON_GET_RELATION_PROTOTYPES = 'onGetRelationPrototype';
+
+    /**
+     * function onGetManagerConfig(& $managerConfig)
+     */
+    const EVENT_ON_GET_MANAGER_CONFIG = 'onGetManagerConfig';
+
+    /**
+     * function onConvertForLoad($record, & $hyData)
+     */
+    const EVENT_ON_CONVERT_FOR_LOAD = 'onConvertForLoad';
+
+    /**
+     * function onConvertForSave($record, & $hyData)
+     */
+    const EVENT_ON_CONVERT_FOR_SAVE = 'onConvertForSave';
+
+    /**
+     * function onRelationNotFound($id, & $res)
+     */
+    const EVENT_ON_RELATION_NOT_FOUND = 'onRelationNotFound';
+
     protected $id = false;
     
     /**
@@ -36,8 +113,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      
     protected $recordsCollection = array();
     
-    protected $fieldToSqlColMap = false;
-
     /**
      * Records that are not stored (only those that are created with Ac_Model_Mapper::factory() method).
      * Record will be removed from the array after it is stored.
@@ -224,6 +299,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
             if (! $res instanceof $this->recordClass) 
                 throw Ac_E_InvalidCall::wrongClass ('className', $className, $this->recordClass);
         }
+        $this->triggerEvent(self::EVENT_AFTER_CREATE_RECORD, array($record));
         $this->memorize($res);
         return $res;
     }
@@ -762,21 +838,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     	return array();
     }
     
-    /**
-     * @return array(modelFieldName => '{t}.colName', modelFieldName2 => 'SOME_FUNC({t}.colName1, {t}.colName2)'
-     */
-    protected function doGetFieldToSqlColMap() {
-    	return array();
-    }
-    
-    /**
-     * @return array(modelFieldName => '{t}.colName', modelFieldName2 => 'SOME_FUNC({t}.colName1, {t}.colName2)'
-     */
-    function getFieldToSqlColMap() {
-    	if ($this->fieldToSqlColMap === false) $this->fieldToSqlColMap = $this->doGetFieldToSqlColMap();
-    	return $this->fieldToSqlColMap;
-    }
-    
     // --------------- Function that work with associations and relations ---------------
 
     function listRelations() {
@@ -886,14 +947,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         $rel->loadDestNNIds($record);
     }
     
-    function canDelete ($record) {
-        // TODO: canDelete()
-    }
-
-    function beforeDelete ($record) {
-        // TODO: beforeDelete()
-    }
-
     // ----------------- Functions that work with arrays of records -------------
 
     /**
@@ -991,7 +1044,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @param mixed $primaryKey
      * @return array with persistence data | FALSE if record not found
      */
-    function peLoad($primaryKey, & $error = null) {
+    function peLoad($record, $primaryKey, & $error = null) {
         $data = $this->db->fetchRow('SELECT * FROM '.$this->db->n($this->tableName).' WHERE '.$this->pk.' = '.$this->db->q($primaryKey));
         return $data;
     }
@@ -1000,7 +1053,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @param mixed $hyData Persistence data
      * @return mixed persistence data on success, FALSE on failure
      */
-    function peSave($hyData, $exists = null, & $error = null, & $newData = array()) {
+    function peSave($record, $hyData, $exists = null, & $error = null, & $newData = array()) {
         if (is_null($exists)) $exists = array_key_exists($this->pk, $hyData);
         if ($exists) {
             $query = $this->db->updateStatement($this->tableName, $hyData, $this->pk, false);
@@ -1036,13 +1089,13 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @param type $hyData 
      * @return bool
      */
-    function peDelete($hyData, & $error = null) {
+    function peDelete($record, $hyData, & $error = null) {
         $key = $hyData[$this->pk];
         $res = (bool) $this->db->query("DELETE FROM ".$this->db->n($this->tableName)." WHERE ".$this->db->n($this->pk)." ".$this->db->eqCriterion($key));
         return $res;
     }
     
-    function peConvertForLoad($hyData) {
+    function peConvertForLoad($record, $hyData) {
         $res = $hyData;
         $d = $this->db->getDialect();
         if ($d->hasToConvertDatesOnLoad()) {
@@ -1051,7 +1104,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
-    function peConvertForSave($hyData) {
+    function peConvertForSave($record, $hyData) {
         $res = $hyData;
         $d = $this->db->getDialect();
         $df = $this->getDateFormats();
@@ -1065,7 +1118,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
-    function peReplaceNNRecords($rowProto, $rows, $midTableName, & $errors = array()) {
+    function peReplaceNNRecords($record, $rowProto, $rows, $midTableName, & $errors = array()) {
         $res = true;
         if (count($rowProto)) {
             $sqlDb = $this->db;
@@ -1140,7 +1193,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @return Ac_Sql_Select
      */
     function createSqlSelect(array $prototypeExtra = array(), $primaryAlias = 't') {
-        $res = new Ac_Sql_Select($this->getDb(), Ac_Util::m($this->getSqlSelectPrototype($primaryAlias), $prototypeExtra));
+        $res = new Ac_Sql_Select($this->getDb(), Ac_Util::m($this->getSqlSelectPrototype($primaryAlias), 
+            $prototypeExtra));
         return $res;
     }
     
