@@ -190,7 +190,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         if ($isRow) {
             $k = $this->_pk;
             $this->_otherValues = array();
-            $hyData = $this->mapper->peConvertForLoad($oid);
+            $hyData = $this->mapper->peConvertForLoad($this, $oid);
             foreach ($this->listOwnProperties() as $propName) {
                 if (array_key_exists($propName, $hyData)) {
                     $this->$propName = $oid[$propName];
@@ -236,8 +236,8 @@ class Ac_Model_Object extends Ac_Model_Data {
         
         $props = $this->listOwnProperties();
         
-        if ($hyData = $this->mapper->peLoad($this->getPrimaryKey())) {
-            $hyData = $this->mapper->peConvertForLoad($hyData);
+        if ($hyData = $this->mapper->peLoad($this, $this->getPrimaryKey())) {
+            $hyData = $this->mapper->peConvertForLoad($this, $hyData);
             foreach ($this->listOwnProperties() as $propName) {
                 if (array_key_exists($propName, $hyData)) {
                     $this->$propName = $hyData[$propName];
@@ -273,8 +273,8 @@ class Ac_Model_Object extends Ac_Model_Data {
         if ($this->isPersistent()) {
             
             $hyData[$k] = $tpk? $this->_origPk : $this->$k;
-            $hyData = $this->mapper->peConvertForSave($hyData);
-            $res = (bool) $this->mapper->peSave($hyData, true, $error, $newData);
+            $hyData = $this->mapper->peConvertForSave($this, $hyData);
+            $res = (bool) $this->mapper->peSave($this, $hyData, true, $error, $newData);
             if (is_array($newData)) foreach ($newData as $k => $v) $this->$k = $v;
             if ($res) $this->mapper->markUpdated();
             
@@ -283,8 +283,8 @@ class Ac_Model_Object extends Ac_Model_Data {
             $skipKey = ($aif = $mapper->getAutoincFieldName()) == $k;
             if ($skipKey) unset($hyData[$k]);
             
-            $hyData = $this->mapper->peConvertForSave($hyData);
-            $res = $this->mapper->peSave($hyData, false, $error, $newData);
+            $hyData = $this->mapper->peConvertForSave($this, $hyData);
+            $res = $this->mapper->peSave($this, $hyData, false, $error, $newData);
             if ($res) {
                 $this->mapper->markUpdated();
                 if (is_array($newData)) foreach ($newData as $k => $v) $this->$k = $v;
@@ -361,7 +361,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     function _legacyDelete() {
         $hyData = $this->getHyData();
-        $res = (bool) $this->mapper->peDelete($hyData, $error);
+        $res = (bool) $this->mapper->peDelete($this, $hyData, $error);
         if ($res) {
             $this->mapper->markUpdated();
         } else {
@@ -760,7 +760,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                     $rows[] = array_merge($row, $id);                   
                 }
             }
-            $this->mapper->peReplaceNNRecords($rowProto, $rows, $midTableName, $errors);
+            $this->mapper->peReplaceNNRecords($this, $rowProto, $rows, $midTableName, $errors);
             if ($errors) {
                 $this->_errors[$errorKey] = $errors;
                 return $res;
