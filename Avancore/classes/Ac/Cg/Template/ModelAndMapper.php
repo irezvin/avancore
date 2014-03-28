@@ -465,9 +465,9 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     <?php } ?>
     <?php if ($this->relationPrototypes) { ?>
     
-    protected function getRelationPrototypes() {
+    protected function doGetRelationPrototypes() {
 <?php   if (!in_array($this->genMapperClass, array('Ac_Model_Mapper', 'Ac_Model_CpkMapper'))) { ?>
-        return Ac_Util::m(parent::getRelationPrototypes(), <?php $this->exportArray($this->relationPrototypes, 8); ?>);
+        return Ac_Util::m(parent::doGetRelationPrototypes(), <?php $this->exportArray($this->relationPrototypes, 8); ?>);
 <?php   } else { ?>
         return <?php $this->exportArray($this->relationPrototypes, 8); ?>;
 <?php   } ?>        
