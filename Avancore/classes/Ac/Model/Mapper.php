@@ -1061,7 +1061,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
             $this->dateFormats = array();
             $p = $this->getPrototype();
             $this->dateFormats[$dataTypes] = array();
-            foreach ($p->listOwnFields(true) as $f) {
+            foreach ($p->listFields(true) as $f) {
                 $pi = $p->getPropertyInfo($f, true);
                 if (!$dataTypes) {
                     static $a = array('date', 'time', 'dateTime');

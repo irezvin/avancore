@@ -8,6 +8,74 @@
 
 class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
+    /**
+     * function onBind($data, $ignore)
+     */
+    const EVENT_ON_BIND = 'onBind';
+    
+    /**
+     * function onCheck(& $errors)
+     */
+    const EVENT_ON_CHECK = 'onCheck';
+    
+    /**
+     * function onListLists(& $lists)
+     */
+    const EVENT_ON_LIST_LISTS = 'onListLists';
+    
+    /**
+     * function onListAssociations(& $associations)
+     */
+    const EVENT_ON_LIST_ASSOCIATIONS = 'onListAssociations';
+
+    /**
+     * function onListFields(& $fileds)
+     */
+    const EVENT_ON_LIST_PROPERTIES = 'onListProperties';
+    
+    /**
+     * function onListAggregates(& $aggregates)
+     */
+    const EVENT_ON_LIST_AGGREGATES = 'onListAggregates';
+    
+    /**
+     * function onGetPropertiesInfo(& $propertiesInfo)
+     */
+    const EVENT_ON_GET_PROPERTIES_INFO = 'onGetPropertiesInfo';
+    
+    /**
+     * Don't cache any metadata (property lists, property info)
+     */
+    const META_CACHE_NONE = 0;
+    
+    /**
+     * Cache property lists for all compatible instances, don't cache property info
+     */
+    const META_CACHE_STRUCTURE = 1;
+    
+    /**
+     * Cache property lists and property info, but re-calculate property info 
+     * every time when data fields change
+     */
+    const META_CACHE_BY_STATE = 2;
+    
+    /**
+     * Cache both property lists and property info
+     */
+    const META_CACHE_ALL = 3;
+
+    protected static $metaCache = array();
+    
+    /**
+     * @var int How metadata is cached (one of META_CACHE_ consts)
+     */
+    protected $metaCacheMode = false;
+
+    /**
+     * @var string Which key is used to cache metadata
+     */
+    protected $metaClassId = false;
+    
     var $_bound = false;
     
     var $_beingChecked = false;
@@ -16,11 +84,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     var $_errors = array();
     
-    function Ac_Model_Data() {
-        if(strtolower(get_class($this)) == 'ae_data') trigger_error ('Attempt to instantiate abstract class', E_USER_ERROR);
-    }
-    
-    // +------------------ PROPERTY ENUMERATION METHODS - most should be overridden by developer of concrete class ---------------+  
+    // +------ TEMPLATE METHODS - most should be overridden by developer of concrete class -----+  
 
     /**
      * Should return true if this instance has same metadata as other ones of the class. This function is used to do some optimizations of algorhythms
@@ -31,10 +95,18 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         return false;
     }
     
+    function hasToConvertTypesOnBind() {
+        return false;
+    }
+    
+    function hasToModifyOnCheck() {
+        return true;
+    }
+    
     /**
      * @return array
      */
-    function getOwnPropertiesInfo() {
+    protected function getOwnPropertiesInfo() {
         return array();
     }
     
@@ -42,7 +114,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
      * Should be overridden in concrete class
      * @return array ('propName', 'propName2', ...)
      */
-    function listOwnProperties() {
+    protected function listOwnProperties() {
         return array();
     }
     
@@ -50,7 +122,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
      * Should be overridden in concrete class
      * @return array ('assocName' => 'assocClass', 'assocName2' => 'assocClass2', ...)
      */
-    function listOwnAssociations() {
+    protected function listOwnAssociations() {
         return array();
     }
     
@@ -58,7 +130,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
      * Should be overridden in concrete class
      * @return array ('assocName', 'assocName2', ...)
      */
-    function listOwnAggregates() {
+    protected function listOwnAggregates() {
         return array();
     }
     
@@ -66,17 +138,141 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
      * Should be overridden in concrete class 
      * @return array ('propName' => 'pluralName', 'propName2' => 'pluralName2', ...)
      */
-    function listOwnLists() {
+    protected function listOwnLists() {
         return array();
+    }
+    
+    // +--- metadata cache control routines ----+
+
+    function getMetaClassId() {
+        return $this->metaClassId;
+    }
+    
+    function setMetaClassId($metaClassId) {
+        $this->metaClassId = $metaClassId;
+    }
+    
+    function getMetaCacheMode() {
+        return $this->metaCacheMode;
+    }
+    
+    function setMetaCacheMode($metaCacheMode) {
+        if (!in_array($metaCacheMode, array(self::META_CACHE_NONE, self::META_CACHE_ALL, 
+            self::META_CACHE_STRUCTURE, self::META_CACHE_BY_STATE_C)))
+            throw Ac_E_InvalidCall::outOfConst ('metaCacheMode', $metaCacheMode, 'META_', __CLASS__);
+        $this->metaCacheMode = $metaCacheMode;
+    }
+    
+    function __construct(array $prototype = array()) {
+        $this->intAssignMetaCaching();
+        parent::__construct($prototype);
+    }
+    
+    protected function intAssignMetaCaching() {
+        if ($this->metaClassId === false)
+            $this->metaClassId = get_class($this);
+        if ($this->metaClassId === 'Ac_Model_Data') $this->metaCacheMode = self::META_CACHE_NONE;
+            else $this->metaCacheMode = 
+                $this->hasUniformPropertiesInfo ()? self::META_CACHE_ALL : self::META_CACHE_STRUCTURE;
+    }
+    
+    // +---- metadata-supplying public functions -----+
+
+    final function getPropertiesInfo() {
+        // TODO: implement META_CACHE_BY_STATE
+        
+        $c = $this->metaCacheMode == self::META_CACHE_ALL;
+        
+        if ($c && isset(self::$metaCache[$mc = $this->metaClassId])
+            && isset(self::$metaCache[$mc][__FUNCTION__]))
+            return self::$metaCache[$mc][__FUNCTION__];
+        
+        $res = $this->getOwnPropertiesInfo();
+        
+        $this->triggerEvent(self::EVENT_ON_GET_PROPERTIES_INFO, array(& $res));
+        
+        if ($c) self::$metaCache[$mc][__FUNCTION__] = $res;
+        return $res;
+    }
+    
+    /**
+     * @return array ('propName', 'propName2', ...)
+     */
+    final function listProperties() {
+        $c = $this->metaCacheMode > self::META_CACHE_NONE;
+        
+        if ($c && isset(self::$metaCache[$mc = $this->metaClassId])
+            && isset(self::$metaCache[$mc][__FUNCTION__]))
+            return self::$metaCache[$mc][__FUNCTION__];
+        
+        $res = $this->listOwnProperties();
+        
+        $this->triggerEvent(self::EVENT_ON_LIST_PROPERTIES, array(& $res));
+        
+        if ($c) self::$metaCache[$mc][__FUNCTION__] = $res;
+        return $res;
+    }
+    
+    /**
+     * @return array ('assocName' => 'assocClass', 'assocName2' => 'assocClass2', ...)
+     */
+    final function listAssociations() {
+        $c = $this->metaCacheMode > self::META_CACHE_NONE;
+        
+        if ($c && isset(self::$metaCache[$mc = $this->metaClassId])
+            && isset(self::$metaCache[$mc][__FUNCTION__]))
+            return self::$metaCache[$mc][__FUNCTION__];
+        
+        $res = $this->listOwnAssociations();
+        
+        $this->triggerEvent(self::EVENT_ON_LIST_ASSOCIATIONS, array(& $res));
+        
+        if ($c) self::$metaCache[$mc][__FUNCTION__] = $res;
+        return $res;
+    }
+    
+    /**
+     * @return array ('assocName', 'assocName2', ...)
+     */
+    final function listAggregates() {
+        $c = $this->metaCacheMode > self::META_CACHE_NONE;
+        
+        if ($c && isset(self::$metaCache[$mc = $this->metaClassId])
+            && isset(self::$metaCache[$mc][__FUNCTION__]))
+            return self::$metaCache[$mc][__FUNCTION__];
+        
+        $res = $this->listOwnAggregates();
+        
+        $this->triggerEvent(self::EVENT_ON_LIST_AGGREGATES, array(& $res));
+        
+        if ($c) self::$metaCache[$mc][__FUNCTION__] = $res;
+        return $res;
+    }
+    
+    /**
+     * @return array ('propName' => 'pluralName', 'propName2' => 'pluralName2', ...)
+     */
+    final function listLists() {
+        $c = $this->metaCacheMode > self::META_CACHE_NONE;
+        
+        if ($c && isset(self::$metaCache[$mc = $this->metaClassId])
+            && isset(self::$metaCache[$mc][__FUNCTION__]))
+            return self::$metaCache[$mc][__FUNCTION__];
+        
+        $res = $this->listOwnLists();
+        
+        $this->triggerEvent(self::EVENT_ON_LIST_LISTS, array(& $res));
+        
+        if ($c) self::$metaCache[$mc][__FUNCTION__] = $res;
+        return $res;
     }
     
     /**
      * @return array
-     * @final
      */
-    function listOwnFields($noLists = false) {
-        $res = array_diff($this->listOwnProperties(), array_keys($this->listOwnAssociations()));
-        if ($noLists) $res = array_diff($res, array_keys($this->listOwnLists()));
+    final function listFields($noLists = false) {
+        $res = array_diff($this->listProperties(), array_keys($this->listAssociations()));
+        if ($noLists) $res = array_diff($res, array_keys($this->listLists()));
         return $res;
     }
     
@@ -84,25 +280,30 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     function _hasVar($varName) {
         if (isset($this->$varName)) return true;
-        else return array_key_exists($varName, get_object_vars($this));
+        elseif (array_key_exists($varName, get_object_vars($this))) return true;
+        else {
+            if ($this->mixPropertyMap === false) $this->fillMixMaps();
+            return isset($this->mixPropertyMap[$varName]);
+        }
     }
     
     function _getPlural($propName) {
-        $plurals = $this->listOwnLists();
+        $plurals = $this->listLists();
         if (isset($plurals[$propName])) return $plurals[$propName];
         return false;
     }
     
     function _getAssocClass($propName) {
-        $assocClasses = $this->listOwnAssociations();
+        $assocClasses = $this->listAssociations();
         if (isset($assocClasses[$propName])) $res = $assocClasses[$propName];
             else $res = false;
         return $res;
     }
     
     function _getMethod($prefix, $suffix) {
-        if (!method_exists($this, $methodName = $prefix.$suffix)) return false; 
-        return $methodName;
+        if (method_exists($this, $methodName = $prefix.$suffix)) return $methodName; 
+        elseif ($this->hasMethod($methodName)) return $methodName;
+        return false;
     }
     
     // +------------------------ CONVERSION & VALIDATION METHODS -------------------------+
@@ -124,7 +325,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
 
         $this->mustRevalidate();
             
-        foreach ($this->listOwnProperties() as $propName) { 
+        foreach ($this->listProperties() as $propName) { 
             if ($plural = $this->_getPlural($propName)) $srcKey = $plural;
                 else $srcKey = $propName;
             
@@ -142,7 +343,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
                             }
                         }
                     } else {
-                        if (in_array($propName, $this->listOwnAggregates())) {
+                        if (in_array($propName, $this->listAggregates())) {
                             $assocObject = $this->getAssoc($propName);
                             $assocObject->bind($src[$propName]);
                         } else {
@@ -172,6 +373,8 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         
         $this->doOnBind($src, $ignore);
         
+        trigger_event(self::EVENT_ON_BIND, array(& $src, $ignore));
+        
         return true;
     }
     
@@ -186,6 +389,9 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
             $this->_checkOwnAssociations();
             // $this->_checkOverrideProperties(); // This function is not implemented yet 
             $this->doOnCheck();
+            
+            trigger_event(self::EVENT_ON_CHECK, array(& $this->_errors));
+            
             $this->_beingChecked = false;
             $this->_checked = true;
         }
@@ -194,6 +400,12 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     }
     
     function doOnCheck() {
+    }
+    
+    function mustRevalidate() {
+        $this->_bound = true;
+        $this->_errors = array();
+        $this->_checked = false;
     }
     
     function getError() {
@@ -219,14 +431,6 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         return $res;
     }
     
-    function hasToConvertTypesOnBind() {
-        return false;
-    }
-    
-    function hasToModifyOnCheck() {
-        return true;
-    }
-    
     function isBound() {
         return $this->_bound; 
     }
@@ -239,7 +443,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         $val = $this->_createValidator();
         $fieldsToCheck = false;
         $val->fieldList = array();
-        foreach ($this->listOwnFields() as $propName) {
+        foreach ($this->listFields() as $propName) {
             if ($this->_getPlural($propName) && $keys = $this->listProperty($propName)) {
                 $fieldsToCheck = array_merge($fieldsToCheck, Ac_Util::concatManyPaths($propName, $keys));
             } else $fieldsToCheck[] = $propName;
@@ -254,7 +458,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     }
     
     function _checkOwnAssociations() {
-        foreach ($this->listOwnAssociations() as $propName => $assocClass) {
+        foreach ($this->listAssociations() as $propName => $assocClass) {
             $pi = $this->getPropertyInfo($propName, true);
             if ($pi->loadToCheck || $this->isAssocLoaded($propName)) {
                 if ($pi->plural) {
@@ -294,7 +498,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     /**
      * @access private
      */
-    function _setErrorByPathCallback ($currPath, $element, $value) {
+    protected static function intSetErrorByPathCallback ($currPath, $element, $value) {
         $element = array($element);    
     }
     
@@ -306,7 +510,8 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
             $prefix = Ac_Util::concatPaths($propName, $key);
             foreach ($extraErrors as $path => $errors) {
                 $destPath = Ac_Util::concatPaths($prefix, $path);
-                Ac_Util::setArrayByPath($this->_errors, Ac_Util::pathToArray($destPath), $errors, array(& $this, '_setErrorByPathCallback'));
+                Ac_Util::setArrayByPath($this->_errors, Ac_Util::pathToArray($destPath), $errors, 
+                    array(__CLASS__, 'intSetErrorByPathCallback'));
             }
         }
     }
@@ -323,7 +528,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         
         //return $this->_getSingleFieldItem($propName);
         list($head, $tail) = Ac_Util::pathHeadTail($propName);
-        if (!in_array($head, $this->listOwnProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
+        if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         if ($assocClass = $this->_getAssocClass($head)) { 
             if ($tail) {
                 $res = $this->_getAssociatedField($head, $tail, $key);
@@ -409,7 +614,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     function listProperty($propName) {
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
-        if (!in_array($head, $this->listOwnProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
+        if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         if ($assocClass = $this->_getAssocClass($head)) { 
             if ($tail) $res = $this->_listAssociatedProperty($head, $tail);
                 else {
@@ -481,7 +686,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     function countProperty ($propName) {
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
-        if (!in_array($head, $this->listOwnProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
+        if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         $assocClass = $this->_getAssocClass($head);
         if ($assocClass && $tail) $res = $this->_countAssociatedProperty($head, $tail);
         else {
@@ -519,7 +724,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
 
     function hasAssoc ($propName, $key = false) {
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
-        if (!in_array($head, $this->listOwnProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
+        if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         $assocClass = $this->_getAssocClass($head);
         if ($assocClass && $tail) {
             if (($plural = $this->_getPlural($head)) && !strlen($key)) {
@@ -586,7 +791,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         if (isset($this->$s)) return $this->$s !== false;
         
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
-        if (!in_array($head, $this->listOwnProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
+        if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         $assocClass = $this->_getAssocClass($head);
         if ($assocClass && $tail) {
             if (($plural = $this->_getPlural($head)) && !strlen($key)) {
@@ -661,7 +866,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
      */
     function setListProperty ($propName, $list = array()) {
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
-        if (!in_array($head, $this->listOwnProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
+        if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         if (!is_array($list)) trigger_error('Array must be specified for setListProperty() of '.get_class($this).'::'.$propName, E_USER_ERROR);
         if ($assocClass = $this->_getAssocClass($head)) { 
             if ($tail) $res = $this->_setAssociatedListProperty($head, $tail, $list);
@@ -733,7 +938,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     function deletePropItem($propName, $key) {
         if (!strlen($key)) trigger_error ('Valid array key $key must be provided for deletePropItem()', E_USER_ERROR);
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
-        if (!in_array($head, $this->listOwnProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
+        if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         $assocClass = $this->_getAssocClass($head);
         if ($assocClass) {
             if ($tail) {
@@ -784,7 +989,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
 
     function deleteAssoc($propName, $key = false) {
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
-        if (!in_array($head, $this->listOwnProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
+        if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         $assocClass = $this->_getAssocClass($head);
         if ($assocClass) {
             if ($tail) {
@@ -872,7 +1077,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     function setField($propName, $value, $key = false) {
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
-        if (!in_array($head, $this->listOwnProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
+        if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         $assocClass = $this->_getAssocClass($head);
         if ($assocClass) {
             if ($tail) {
@@ -943,7 +1148,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
      */
     function getAssoc($propName, $key = false) {
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
-        if (!in_array($head, $this->listOwnProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
+        if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         $assocClass = $this->_getAssocClass($head);
         if ($assocClass) {
             if ($tail) {
@@ -1044,7 +1249,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         if (is_null($assocObject)) return $this->deleteAssoc($propName, $key);
         if (!is_object($assocObject) && !is_null($assocObject) && ($assocObject !== false)) trigger_error ('Wrong assocObject provided for setAssoc() of '.get_class($this).'::'.$propName, E_USER_ERROR);
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
-        if (!in_array($head, $this->listOwnProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
+        if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         $assocClass = $this->_getAssocClass($head);
         if ($assocClass) {
             if ($tail) {
@@ -1170,7 +1375,9 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         $arrPropInfo = $this->_getStaticPropertyInfoArr(Ac_Util::pathToArray($propName));
         $arrPropInfo['srcClass'] = get_class($this);
         if (!$onlyStatic) {
-            if (isset($arrPropInfo['isAbstract']) && $arrPropInfo['isAbstract']) trigger_error ('Only static info can be retrieved on abstract property '.get_class($this).'::'.$propName);
+            if (isset($arrPropInfo['isAbstract']) && $arrPropInfo['isAbstract']) 
+                trigger_error ('Only static info can be retrieved on abstract property '.get_class($this).'::'.$propName);
+            
             if (isset($arrPropInfo['assocClass']) && $arrPropInfo['assocClass']) $arrPropInfo['value'] = $this->getAssoc($propName);
                 else $arrPropInfo['value'] = $this->getField($propName);
             if ($errors = $this->getErrors($propName, false, false)) $arrPropInfo['error'] = $errors;
@@ -1186,7 +1393,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     function _getStaticPropertyInfoArr ($arrPath, $abstract = false, $trigger = true) {
         $head = $arrPath[0];
         $arrTail = array_slice($arrPath, 1);
-        if (!in_array($head, $this->listOwnProperties())) {
+        if (!in_array($head, $this->listProperties())) {
             if ($trigger) {
                 trigger_error (get_class($this).' does not have property "'.$head.'"', E_USER_ERROR);
             }
@@ -1246,7 +1453,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     }
     
     function _getOwnStaticPropertyInfoArr($head, $key, $plural, $abstract, $trigger) {
-        $opi = $this->getOwnPropertiesInfo();
+        $opi = $this->getPropertiesInfo();
         if (isset($opi[$head]) && is_array($opi[$head])) $arrInfo = $opi[$head];
             else $arrInfo = array();
         
@@ -1264,8 +1471,8 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     function getFormOptions($propName, $onlyStatic = true) {
         $pi = $this->getPropertyInfo($propName, $onlyStatic);
         return $pi->toFormOptions();
-    }
-    
+    }    
+
     //------------------------------ ACCESSOR METHODS' ALIASES ---------------------------+
 
     function countField($propName) { return $this->countProperty($propName); }
@@ -1276,41 +1483,13 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     function deleteAssocItem($propName, $key) { return $this->deletePropItem($propName, $key); }
     function setListField($propName, $list = array()) { return $this->setListProperty($propName, $list); }
     function setListAssoc($propName, $list = array()) { return $this->setListProperty($propName, $list); }
-    
-    //---------------------------- SUPPLEMENTARY STATIC METHODS --------------------------+
-
-    function isFieldEmpty($formOptions, $value = false) {
-        if (is_a($formOptions, 'Ac_Model_Property')) {
-            $fo = $formOptions->toFormOptions();
-        } elseif(is_array($formOptions)) {
-            $fo = $formOptions;
-        } else {
-            trigger_error ("Wrong formOptions format, Ac_Model_Property or array must be specified", E_USER_ERROR);
-        }
-        if (func_num_args() < 2) {
-            if (isset($fo['value'])) $value = $fo['value'];
-            else return true;
-        }
-        switch (true) {
-            case !isset($fo['value']) || !strlen($fo['value']):
-            case isset($fo['dataType']) && ($fo['dataType'] === 'dateTime') && ($fo['value']) === '0000-00-00 00:00:00':
-            case isset($fo['dataType']) && ($fo['dataType'] === 'date') && (($fo['value'] === '0000-00-00') || ($fo['value'] === '0000-00-00 00:00:00')):
-            case isset($fo['dataType']) && ($fo['dataType'] === 'int' || $fo['dataType'] === 'float' || $fo['dataType'] === 'bool') && $fo['value'] == 0:
-              $res = true;
-              break;
-            default:
-              $res = false;
-        }
-        return $res;
-    }
-    
+        
     //------------- serialization support methods -----------
     
     /**
      * @access protected
      */
     function _getSerializeSkip () {
-        //return array('_bound', '_beingChecked', '_checked', '_errors');
         return array();
     }
     
@@ -1325,11 +1504,4 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     function doOnWakeup() {
     }
     
-    function mustRevalidate() {
-        $this->_bound = true;
-        $this->_errors = array();
-        $this->_checked = false;
-    }
-    
 }
-
