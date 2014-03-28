@@ -291,7 +291,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         return parent::getMapper($mapperClass);
     }
     
-    function listOwnProperties() {
+    protected function listOwnProperties() {
 <?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
     return array_merge(parent::listOwnProperties(), <?php $this->exportArray($this->ownProperties, 0, false, true); ?>);
 <?php } else { ?>        
@@ -299,7 +299,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 <?php }?>        
     }
 
-    function listOwnLists() {
+    protected function listOwnLists() {
 <?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
     return array_merge(parent::listOwnLists(), <?php $this->exportArray($this->ownLists, 0, false, true); ?>);
 <?php } else { ?>        
@@ -307,7 +307,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 <?php }?>        
     }
 
-    function listOwnAssociations() {
+    protected function listOwnAssociations() {
 <?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
     return array_merge(parent::listOwnLists(), <?php $this->exportArray($this->ownAssociations, 0, false, true); ?>);
 <?php } else { ?>        
@@ -315,7 +315,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 <?php }?>        
     }
 
-    function getOwnPropertiesInfo() {
+    protected function getOwnPropertiesInfo() {
     	<?php if ($this->generator->php5) echo 'static $pi = false; if ($pi === false) '; ?>$pi = <?php $this->exportArray($this->ownPropInfo, 8, true); ?>;
 <?php   if ($this->parentClass === 'Ac_Model_Object') { ?>    
         return $pi;
@@ -352,7 +352,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 <?php if ($this->model->generateMethodPlaceholders) { ?>
     
     /*
-    function getOwnPropertiesInfo() {
+    protected function getOwnPropertiesInfo() {
         return Ac_Util::m(parent::getOwnPropertiesInfo(), array(
             '' => array(
                 'caption' => '',
@@ -362,19 +362,19 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
         ));
     }
     
-    function listOwnProperties() {
+    protected function listOwnProperties() {
         return array_merge(parent::listOwnProperties(), array(
             '', '',
         ));
     }
     
-    function listOwnLists() {
+    protected function listOwnLists() {
         return array_merge(parent::listOwnLists(), array(
             '' => '', '' => '',
         ));
     }
     
-    function listOwnAssociations() {
+    protected function listOwnAssociations() {
         return array_merge(parent::listOwnAssociations(), array(
             '' => '', '' => '',
         ));
