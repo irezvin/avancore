@@ -1,16 +1,12 @@
 <?php
 
-define('AC_ZERO_DATE', '0000-00-00');
-define('AC_ZERO_DATETIME', '0000-00-00 00:00:00');
-
-
 /**
  * TODO Consider moving all unified accessors into separate class (i.e. Ac_Model_Data_Accessor). Since during several requests they won't be used at all (it's not hard to imagine (c) Samsung)
  * TODO Another step: consider moving all mutation-related methods (bind, check.., set.., delete..) into other separate class (i.e. Ac_Model_Data_Mutator)
  * TODO If we will build web requests based on Ac_Model_Data, mutators will be used on each request. It's useful, it's unified... how fast it should be? 
  */
 
-class Ac_Model_Data {
+class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     var $_bound = false;
     
@@ -39,15 +35,6 @@ class Ac_Model_Data {
      * @return array
      */
     function getOwnPropertiesInfo() {
-        return array();
-    }
-    
-    /**
-     * Returns info on fields that are not own but belong to associated classes and override their properties during metadata retrieval
-     * Should be overridden in concrete class
-     * @return array
-     */
-    function getOverridePropertiesInfo() {
         return array();
     }
     
@@ -85,13 +72,6 @@ class Ac_Model_Data {
     
     /**
      * @return array
-     */
-    function listProperties() {
-        return array();
-    }
-    
-    /**
-     * @return array
      * @final
      */
     function listOwnFields($noLists = false) {
@@ -101,14 +81,6 @@ class Ac_Model_Data {
     }
     
     // +------------------ SUPPLEMENTARY REFLECTION METHODS - are called by accessors ---------------+
-    
-    function _isAggregate($propName) {
-        return in_array($propName, $this->listOwnAggregates());
-    }
-    
-    function _toArr($path) {
-        return explode('[', str_replace(']', '', $path));
-    }
     
     function _hasVar($varName) {
         if (isset($this->$varName)) return true;
@@ -170,7 +142,7 @@ class Ac_Model_Data {
                             }
                         }
                     } else {
-                        if ($this->_isAggregate($propName)) {
+                        if (in_array($propName, $this->listOwnAggregates())) {
                             $assocObject = $this->getAssoc($propName);
                             $assocObject->bind($src[$propName]);
                         } else {
@@ -204,11 +176,6 @@ class Ac_Model_Data {
     }
     
     function doOnBind($src, $ignore = false) {
-        
-    }
-    
-    function toArray() {
-        
     }
     
     function check() {
@@ -252,11 +219,6 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function getRawErrors() {
-        if (!$this->_checked && !$this->_beingChecked) $this->check();
-        return $this->_errors;
-    }
-    
     function hasToConvertTypesOnBind() {
         return false;
     }
@@ -282,7 +244,6 @@ class Ac_Model_Data {
                 $fieldsToCheck = array_merge($fieldsToCheck, Ac_Util::concatManyPaths($propName, $keys));
             } else $fieldsToCheck[] = $propName;
         }
-        $this->doBeforeCheckOwnFields($fieldsToCheck);
         if ($fieldsToCheck) {
             $val->fieldList = $fieldsToCheck;
             $val->check($this->hasToModifyOnCheck());
@@ -290,9 +251,6 @@ class Ac_Model_Data {
         }
         $f = false;
         $val->model = $f;
-    }
-    
-    function doBeforeCheckOwnFields($fieldsToCheck) {
     }
     
     function _checkOwnAssociations() {
@@ -322,21 +280,6 @@ class Ac_Model_Data {
                 }
             }
         }
-    }
-    
-    /**
-     * @access private
-     */
-    function _checkOverrideProperties() {
-        // TODO: implement _checkOverrideProperties(). The problem is: how to specify override fields info for association property memebers? 
-        
-        // [Q1] For example, I want to override subproperty 'color' of associated list property 'apples'
-        // A - use wildcards: i.e. apples[*][color]. Upside: it looks nice and clear. Downside: what if I would wish to have '*' key in my list? 
-        // B - use EMPTY path segments: apples[][color]. Downside: it looks a little strange. Upside: i can have any key in the list since '' is not a valid key at all.
-        
-        // [Q2] On which step these paths should be expanded?     
-        
-        trigger_error(__function__.' not implemented', E_USER_ERROR);
     }
     
     /**
@@ -401,12 +344,6 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeGetAssociatedField($head, $tail, $key, $value) {
-    }
-    
-    function doAfterGetAssociatedField($head, $tail, $key, $subKey, & $targetObject, $value) {
-    }
-    
     /**
      * @access private
      */
@@ -455,21 +392,15 @@ class Ac_Model_Data {
      */
     function _getAssociatedField($head, $tail, $key = false) {
         $value = null;
-        $bga = $this->doBeforeGetAssociatedField($head, $tail, $key, $value);
-        if ($bga === true) {
-            return $value;
+        if ($plural = $this->_getPlural($head)) {
+            list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
+            if (!$tail) trigger_error ('List key not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
         } else {
-            if ($plural = $this->_getPlural($head)) {
-                list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
-                if (!$tail) trigger_error ('List key not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
-            } else {
-                $subKey = false;
-            }
-            $target = $this->_getOwnAssoc($head, $subKey, $plural);
-            if (!$target) $value = null; else {
-                $value = $target->getField($tail, $key);
-            }
-            $this->doAfterGetAssociatedField($head, $tail, $key, $subKey, $target, $value);
+            $subKey = false;
+        }
+        $target = $this->_getOwnAssoc($head, $subKey, $plural);
+        if (!$target) $value = null; else {
+            $value = $target->getField($tail, $key);
         }
         return $value;
     }
@@ -497,32 +428,20 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeListAssociatedProperty($head, $tail, $list) {
-    }
-    
-    function doAfterListAssociatedProperty($head, $tail, $subKey, & $target, $value) {
-    }
-    
     /**
      * @access private
      */
     function _listAssociatedProperty($head, $tail) {
         $res = array();
-        $b = $this->doBeforeListAssociatedProperty($head, $tail, $res);
-        if ($b === true) {
-            return $res;
+        if ($plural = $this->_getPlural($head)) {
+            list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
+            if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
         } else {
-            if ($plural = $this->_getPlural($head)) {
-                list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
-                if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
-            } else {
-                $subKey = false;
-            }
-            //$target = $this->getAssoc($head, $subKey);
-            $target = $this->_getOwnAssoc($head, $subKey, $plural);
-            $value = $target->listProperty($tail);
-            $this->doAfterListAssociatedProperty($head, $tail, $subKey, $target, $value);
+            $subKey = false;
         }
+        //$target = $this->getAssoc($head, $subKey);
+        $target = $this->_getOwnAssoc($head, $subKey, $plural);
+        $value = $target->listProperty($tail);
         return $value;
     }
     
@@ -579,32 +498,20 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeCountAssociatedProperty($head, $tail, $count) {
-    }
-    
-    function doAfterCountAssociatedProperty($head, $tail, $subKey, & $target, $count) {
-    }
-    
     /**
      * @access private
      */
     function _countAssociatedProperty($head, $tail) {
         $count = 0;
-        $b = $this->doBeforeCountAssociatedProperty($head, $tail, $res);
-        if ($b === true) {
-            return $res;
+        if ($plural = $this->_getPlural($head)) {
+            list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
+            if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
         } else {
-            if ($plural = $this->_getPlural($head)) {
-                list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
-                if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
-            } else {
-                $subKey = false;
-            }
-            //$target = $this->getAssoc($head, $subKey);
-            $target = $this->_getOwnAssoc($head, $subKey, $plural);
-            $value = $target->countProperty($tail);
-            $this->doAfterCountAssociatedProperty($head, $tail, $subKey, $target, $value);
+            $subKey = false;
         }
+        //$target = $this->getAssoc($head, $subKey);
+        $target = $this->_getOwnAssoc($head, $subKey, $plural);
+        $value = $target->countProperty($tail);
         return $value;
     }
     
@@ -627,32 +534,20 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeCheckHasAssociatedAssoc($head, $tail, $has) {
-    }
-    
-    function doAfterCheckHasAssociatedAssoc($head, $tail, $subKey, & $target, $has) {
-    }
-    
     /**
      * @access private
      */
     function _hasAssociatedAssoc($head, $tail, $key) {
         $has = false;
-        $b = $this->doBeforeCheckHasAssociatedAssoc($head, $tail, $key, $has);
-        if ($b === true) {
-            return $value;
+        if ($plural = $this->_getPlural($head)) {
+            list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
+            if (!$tail) trigger_error ('List key not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
         } else {
-            if ($plural = $this->_getPlural($head)) {
-                list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
-                if (!$tail) trigger_error ('List key not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
-            } else {
-                $subKey = false;
-            }
-            //$target = $this->getAssoc($head, $subKey);
-            $target = $this->_getOwnAssoc($head, $subKey, $plural);
-            $has = $target->hasAssoc($tail, $key);
-            $this->doAfterCheckAssociatedAssoc($head, $tail, $key, $subKey, $target, $value);
+            $subKey = false;
         }
+        //$target = $this->getAssoc($head, $subKey);
+        $target = $this->_getOwnAssoc($head, $subKey, $plural);
+        $has = $target->hasAssoc($tail, $key);
         return $has;
     }
     
@@ -706,32 +601,20 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeCheckAssociatedAssocLoaded($head, $tail, $has) {
-    }
-    
-    function doAfterCheckAssociatedAssocLoaded($head, $tail, $subKey, & $target, $has) {
-    }
-    
     /**
      * @access private
      */
     function _isAssociatedAssocLoaded($head, $tail, $key) {
         $has = false;
-        $b = $this->doBeforeCheckAssociatedAssocLoaded($head, $tail, $key, $has);
-        if ($b === true) {
-            return $value;
+        if ($plural = $this->_getPlural($head)) {
+            list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
+            if (!$tail) trigger_error ('List key not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
         } else {
-            if ($plural = $this->_getPlural($head)) {
-                list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
-                if (!$tail) trigger_error ('List key not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
-            } else {
-                $subKey = false;
-            }
-            //$target = $this->getAssoc($head, $subKey);
-            $target = $this->_getOwnAssoc($head, $subKey, $plural);
-            $has = $target->isAssocLoaded($tail, $key);
-            $this->doAfterCheckAssociatedAssocLoaded($head, $tail, $key, $subKey, $target, $has);
+            $subKey = false;
         }
+        //$target = $this->getAssoc($head, $subKey);
+        $target = $this->_getOwnAssoc($head, $subKey, $plural);
+        $has = $target->isAssocLoaded($tail, $key);
         return $has;
     }
     
@@ -798,31 +681,19 @@ class Ac_Model_Data {
         return $res;
     }
      
-    function doBeforeSetAssociatedListProperty($head, $tail, $list) {
-    }
-    
-    function doAfterSetAssociatedListProperty($head, $tail, $subKey, $target, $list) {
-    }
-    
     /**
      * @access private
      */
     function _setAssociatedListProperty($head, $tail, $list) {
-        $b = $this->doBeforeSetAssociatedListProperty($head, $tail, $list);
-        if ($b === true) {
-            return $res;
+        if ($plural = $this->_getPlural($head)) {
+            list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
+            if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
         } else {
-            if ($plural = $this->_getPlural($head)) {
-                list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
-                if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
-            } else {
-                $subKey = false;
-            }
-            //$target = $this->getAssoc($head, $subKey);
-            $target = $this->_getOwnAssoc($head, $subKey, $plural);
-            $value = $target->setListProperty($tail, $list);
-            $this->doAfterSetAssociatedListProperty($head, $tail, $subKey, $target, $list);
+            $subKey = false;
         }
+        //$target = $this->getAssoc($head, $subKey);
+        $target = $this->_getOwnAssoc($head, $subKey, $plural);
+        $value = $target->setListProperty($tail, $list);
     }
     
     /**
@@ -882,28 +753,16 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeDeleteAssociatedPropItem($head, $tail) {
-    }
-    
-    function doAfterDeleteAssociatedPropItem($head, $tail, $subKey, $target) {
-    }
-    
     function _deleteAssociatedPropItem($head, $tail, $key) {
-        $b = $this->doBeforeDeleteAssociatedPropItem($head, $tail, $key);
-        if ($b === true) {
-            return $value;
+        if ($plural = $this->_getPlural($head)) {
+            list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
+            if (!$tail) trigger_error ('List key not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
         } else {
-            if ($plural = $this->_getPlural($head)) {
-                list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
-                if (!$tail) trigger_error ('List key not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
-            } else {
-                $subKey = false;
-            }
-            //$target = $this->getAssoc($head, $subKey);
-            $target = $this->_getOwnAssoc($head, $subKey, $plural);
-            $res = $target->deletePropItem($tail, $key);
-            $this->doAfterDeleteAssociatedPropItem($head, $tail, $key, $subKey, $target);
+            $subKey = false;
         }
+        //$target = $this->getAssoc($head, $subKey);
+        $target = $this->_getOwnAssoc($head, $subKey, $plural);
+        $res = $target->deletePropItem($tail, $key);
         return $res;
     }
     
@@ -960,28 +819,16 @@ class Ac_Model_Data {
     function handleDissociated($dissocObject, $assocName, $myKey) {
     }
     
-    function doBeforeDeleteAssociatedAssoc($head, $tail, $key) {
-    }
-    
-    function doAfterDeleteAssociatedAssoc($head, $tail, $subKey, $key, $target) {
-    }
-    
     function _deleteAssociatedAssoc($head, $tail, $key) {
-        $b = $this->doBeforeDeleteAssociatedAssoc($head, $tail, $key);
-        if ($b === true) {
-            return $res;
+        if ($plural = $this->_getPlural($head)) {
+            list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
+            if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
         } else {
-            if ($plural = $this->_getPlural($head)) {
-                list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
-                if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
-            } else {
-                $subKey = false;
-            }
-            //$target = $this->getAssoc($head, $subKey);
-            $target = $this->_getOwnAssoc($head, $subKey, $plural);
-            $target->deleteAssoc($tail, $key);
-            $this->doAfterDeleteAssociatedAssoc($head, $tail, $subKey, $target, $list);
+            $subKey = false;
         }
+        //$target = $this->getAssoc($head, $subKey);
+        $target = $this->_getOwnAssoc($head, $subKey, $plural);
+        $target->deleteAssoc($tail, $key);
     }
     
     function _deleteOwnAssoc($head, $key, $plural) {
@@ -1054,12 +901,6 @@ class Ac_Model_Data {
         $this->mustRevalidate();
     }
 
-    function doBeforeSetAssociatedField($head, $tail, $key, $value) {
-    }
-    
-    function doAfterSetAssociatedField($head, $tail, $key, $subKey, $target, $value) {
-    }
-    
     /**
      * @access private
      */
@@ -1084,20 +925,15 @@ class Ac_Model_Data {
      * @access private
      */
     function _setAssociatedField($head, $tail, $key, $value) {
-        $b = $this->doBeforeSetAssociatedField($head, $tail, $key, $value);
-        if ($b === true) {
+        if ($plural = $this->_getPlural($head)) {
+            list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
+            if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
         } else {
-            if ($plural = $this->_getPlural($head)) {
-                list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
-                if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
-            } else {
-                $subKey = false;
-            }
-            //$target = $this->getAssoc($head, $subKey);
-            $target = $this->_getOwnAssoc($head, $subKey, $plural);
-            $value = $target->setField($tail, $value, $key);
-            $this->doAfterSetAssociatedField($head, $tail, $key, $subKey, $target, $value);
+            $subKey = false;
         }
+        //$target = $this->getAssoc($head, $subKey);
+        $target = $this->_getOwnAssoc($head, $subKey, $plural);
+        $value = $target->setField($tail, $value, $key);
     }
     
     // +----------------------------------- getAssoc -------------------------------------+
@@ -1134,32 +970,20 @@ class Ac_Model_Data {
         return $res;
     }
     
-    function doBeforeGetAssociatedAssoc($head, $tail, $key, $assocObject) {
-    }
-    
-    function doAfterGetAssociatedAssoc($head, $tail, $subKey, $key, & $target, $assocObject) {
-    }
-    
     /**
      * @return Ac_Model_Data
      */
     function _getAssociatedAssoc($head, $tail, $key) {
         $res = null;
-        $b = $this->doBeforeGetAssociatedAssoc($head, $tail, $key, $res);
-        if ($b === true) {
-            return $res;
+        if ($plural = $this->_getPlural($head)) {
+            list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
+            if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
         } else {
-            if ($plural = $this->_getPlural($head)) {
-                list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
-                if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
-            } else {
-                $subKey = false;
-            }
-            //$target = $this->getAssoc($head, $subKey);
-            $target = $this->_getOwnAssoc($head, $subKey, $plural);
-            $res = $target->getAssoc($tail, $key);
-            $this->doAfterGetAssociatedAssoc($head, $tail, $subKey, $key, $target, $res);
+            $subKey = false;
         }
+        //$target = $this->getAssoc($head, $subKey);
+        $target = $this->_getOwnAssoc($head, $subKey, $plural);
+        $res = $target->getAssoc($tail, $key);
         return $res;
     }
     
@@ -1255,30 +1079,19 @@ class Ac_Model_Data {
     function handleAssociated($dissocObject, $assocName, $myKey) {
     }
     
-    function doBeforeSetAssociatedAssoc($head, $tail, $key, $assocObject) {
-    }
-    
-    function doAfterSetAssociatedAssoc($head, $tail, $subKey, $key, & $target, $assocObject) {
-    }
-    
     /**
      * @access private
      */
     function _setAssociatedAssoc($head, $tail, $key, $assocObject) {
-        $b = $this->doBeforeSetAssociatedAssoc($head, $tail, $key, $assocObject);
-        if ($b === true) {
+        if ($plural = $this->_getPlural($head)) {
+            list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
+            if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
         } else {
-            if ($plural = $this->_getPlural($head)) {
-                list($subKey, $tail) = Ac_Util::pathHeadTail($tail);
-                if (!$tail) trigger_error ('List key is not specified for associated list property '.get_class($this).'::'.$head, E_USER_ERROR);
-            } else {
-                $subKey = false;
-            }
-            //$target = $this->getAssoc($head, $subKey);
-            $target = $this->_getOwnAssoc($head, $subKey, $plural);
-            $value = $target->setAssoc($tail, $assocObject, $key);
-            $this->doAfterSetAssociatedAssoc($head, $tail, $key, $subKey, $target, $assocObject);
+            $subKey = false;
         }
+        //$target = $this->getAssoc($head, $subKey);
+        $target = $this->_getOwnAssoc($head, $subKey, $plural);
+        $value = $target->setAssoc($tail, $assocObject, $key);
     }
     
     /**
@@ -1363,15 +1176,11 @@ class Ac_Model_Data {
             if ($errors = $this->getErrors($propName, false, false)) $arrPropInfo['error'] = $errors;
         }
         $res = new Ac_Model_Property($this, $propName, $onlyStatic, $arrPropInfo);
-        $this->doAfterGetPropertyInfo($res);
         return $res; 
     }
     
     function hasProperty($propName) {
         return ($this->_getStaticPropertyInfoArr(Ac_Util::pathToArray($propName), false, false) !== false);
-    }
-    
-    function doAfterGetPropertyInfo($propInfo) {
     }
     
     function _getStaticPropertyInfoArr ($arrPath, $abstract = false, $trigger = true) {
@@ -1412,34 +1221,6 @@ class Ac_Model_Data {
             }
         } else {
             $res = $this->_getOwnStaticPropertyInfoArr($head, false, false, $abstract, $trigger);
-        }
-        
-        $osp = $this->getOverridePropertiesInfo();
-        if ($osp) {
-            foreach ($this->_matchPaths(array_keys($osp), $arrPath) as $ospKey) 
-                if (is_array($osp[$ospKey])) $res = array_merge($res, $osp[$ospKey]); 
-        }
-        
-        return $res;
-    }
-    
-    /**
-     * Searches $searchPaths to find paths that match to $arrPath.
-     * 
-     * '[]' within $searchPaths elements matches any segment, i.e. foo[][bar] matches foo[10][bar], foo[20][bar] and foo[][bar]
-     */
-    function _matchPaths($searchPaths, $arrPath) {
-        $res = array();
-        $c = count($arrPath);
-        foreach ($searchPaths as $testPath) {
-            $arr = Ac_Util::pathToArray($testPath);
-            if (count($arr) == $c) {
-                $match = true;
-                for ($i = 0; $i < $c; $i++) 
-                    if (strlen($arr[$i]) && ($arr[$i] != $arrPath[$i])) 
-                        { $match = false; break; }
-                if ($match) $res[] = $testPath;
-            }
         }
         return $res;
     }
