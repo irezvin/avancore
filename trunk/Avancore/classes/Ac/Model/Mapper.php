@@ -15,7 +15,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     const EVENT_AFTER_HYDRATE_RECORD = 'onAfterHydrateRecord';
 
     /**
-     * function onBeforeStoreRecord($record, array & $hyData, array & $newData, & $exists, & $result, & $error)
+     * function onBeforeStoreRecord($record, array & $hyData, array & $newData, & $exists, & $result, 
+     *                              & $error)
      */
     const EVENT_BEFORE_STORE_RECORD = 'onBeforeStoreRecord';
 
@@ -50,7 +51,17 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     const EVENT_ON_GET_INFO_PARAMS = 'onGetInfoParams';
 
     /**
-     * function onGetSelectPrototype(& $selectPrototype)
+     * function onConvertForLoad($record, $hyData, & $result)
+     */
+    const EVENT_ON_CONVERT_FOR_LOAD = 'onConvertForLoad';
+
+    /**
+     * function onConvertForSave($record, $hyData, & $result)
+     */
+    const EVENT_ON_CONVERT_FOR_SAVE = 'onConvertForSave';
+
+    /**
+     * function onGetSelectPrototype(& $selectPrototype, $primaryAlias)
      */
     const EVENT_ON_GET_SELECT_PROTOTYPE = 'onGetSelectPrototype';
 
@@ -63,16 +74,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * function onGetManagerConfig(& $managerConfig)
      */
     const EVENT_ON_GET_MANAGER_CONFIG = 'onGetManagerConfig';
-
-    /**
-     * function onConvertForLoad($record, & $hyData)
-     */
-    const EVENT_ON_CONVERT_FOR_LOAD = 'onConvertForLoad';
-
-    /**
-     * function onConvertForSave($record, & $hyData)
-     */
-    const EVENT_ON_CONVERT_FOR_SAVE = 'onConvertForSave';
 
     /**
      * function onRelationNotFound($id, & $res)
@@ -275,16 +276,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $this->columnNames;
     }
 
-    
-    /**
-     * Creates new record instance that is bound to $this mapper.
-     * 
-     * @param string|bool $className Class name of record instance (
-     * @throws Ac_E_InvalidCall if $className is NOT a sub-class of $this->recordClass
-     * @return Ac_Model_Object
-     */
-    function createRecord($className = false) {
-        if (isset($this))
+    protected function coreCreateRecord($className = false) {
         if ($className === false) $className = $this->recordClass;
         if ($this->useProto) {
             if (!isset($this->proto[$className])) {
@@ -299,8 +291,22 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
             if (! $res instanceof $this->recordClass) 
                 throw Ac_E_InvalidCall::wrongClass ('className', $className, $this->recordClass);
         }
-        $this->triggerEvent(self::EVENT_AFTER_CREATE_RECORD, array($record));
         $this->memorize($res);
+        return $res;
+    }
+    
+    /**
+     * Creates new record instance that is bound to $this mapper.
+     * 
+     * @param string|bool $className Class name of record instance (
+     * @throws Ac_E_InvalidCall if $className is NOT a sub-class of $this->recordClass
+     * @return Ac_Model_Object
+     */
+    final function createRecord($className = false) {
+        $res = $this->coreCreateRecord($className);
+        $this->triggerEvent(self::EVENT_AFTER_CREATE_RECORD, array(
+            $res
+        ));
         return $res;
     }
     
@@ -600,9 +606,17 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      */
     function getInfo() {
         if ($this->info === false) {
-            $this->info = new Ac_Model_MapperInfo(Ac_Util::fixClassName(get_class($this)), $this->doGetInfoParams());
+            $this->info = new Ac_Model_MapperInfo($this->getId(), $this->getInfoParams());
         }
         return $this->info;
+    }
+    
+    final function getInfoParams() {
+        $res = $this->doGetInfoParams();
+        $this->triggerEvent(self::EVENT_ON_GET_INFO_PARAMS, array(
+            & $res
+        ));
+        return $res;
     }
 
     protected function doGetInfoParams() {
@@ -859,9 +873,18 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
 
-    protected function getRelationPrototype($relId) {
-        if (!in_array($relId, $this->listRelations())) trigger_error ("No such relation: '{$relId}' in mapper ".get_class($this), E_USER_ERROR);
-        return $this->relationPrototypes[$relId];
+    protected final function getRelationPrototype($relId) {
+        if (!in_array($relId, $this->listRelations())) {
+            $res = null;
+            $this->triggerEvent(self::EVENT_ON_RELATION_NOT_FOUND, array(
+                $relId, & $res
+            ));
+            if (!$res)
+                trigger_error ("No such relation: '{$relId}' in mapper ".get_class($this), E_USER_ERROR);
+        } else {
+            $res = $this->relationPrototypes[$relId];
+        }
+        return $res;
     }
 
     /**
@@ -869,13 +892,22 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      */
     function createRelation($relId) {
         $proto = $this->getRelationPrototype($relId);
-        
-        // Replace mapper classes with mapper instances, if possible
-        if ($this->application) $proto['application'] = $this->application;
-        if (isset($proto['srcMapperClass']) && $proto['srcMapperClass'] == $this->getId()) {
-            $proto['srcMapper'] = $this;
-        } elseif (isset($proto['destMapperClass']) && $proto['destMapperClass'] == $this->getId()) {
-            $proto['destMapper'] = $this;
+        if (is_object($proto) && $proto instanceof Ac_Model_Relation) {
+            $proto->setApplication($this->application);
+            if ($proto->srcMapperClass == $this->getId()) {
+                $proto->setSrcMapper($this);
+            } elseif ($proto->destMapperClass == $this->getId()) {
+                $proto->setDestMapper($this);
+            }
+            $res = $proto;
+        } else {
+            // Replace mapper classes with mapper instances, if possible
+            if ($this->application) $proto['application'] = $this->application;
+            if (isset($proto['srcMapperClass']) && $proto['srcMapperClass'] == $this->getId()) {
+                $proto['srcMapper'] = $this;
+            } elseif (isset($proto['destMapperClass']) && $proto['destMapperClass'] == $this->getId()) {
+                $proto['destMapper'] = $this;
+            }
         }
         $res = Ac_Model_Relation::factory($proto);
         return $res;
@@ -918,11 +950,23 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      }
      */
 
-    protected function getRelationPrototypes() {
+    protected function doGetRelationPrototypes() {
         return array();
     }
 
-    // TODO: Add suport for records that are in random access collections (invoke methods listAssocFor(), loadAssocFor(), countAssocFor() for all records of collection)
+    final function getRelationPrototypes() {
+        if ($this->relationPrototypes === false) {
+            $this->relationPrototypes = $this->doGetRelationPrototypes();
+            $this->triggerEvent(self::EVENT_ON_GET_RELATION_PROTOTYPES, array(
+                & $this->relationPrototypes
+            ));
+        }
+        return $this->relationPrototypes;
+    }
+
+    // TODO: Add suport for records that are in random access collections (invoke 
+    // methods listAssocFor(), loadAssocFor(), countAssocFor() for all records 
+    // of collection)
     function loadAssocFor ($record, $relId) {
         $rel = $this->getRelation($relId);
         $rel->loadDest($record);
@@ -997,7 +1041,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
             $cr[] = $this->db->n($fn).' = '.$this->db->q($vals[$fn]);
         }
         return "(".implode(" AND ", $cr).")";
-    }
+    }            
 
     /**
      * @return Ac_Model_Validator
@@ -1049,11 +1093,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $data;
     }
 
-    /**
-     * @param mixed $hyData Persistence data
-     * @return mixed persistence data on success, FALSE on failure
-     */
-    function peSave($record, $hyData, $exists = null, & $error = null, & $newData = array()) {
+    protected function corePeSave($record, & $hyData, & $exists = null, & $error = null, & $newData = array()) {
         if (is_null($exists)) $exists = array_key_exists($this->pk, $hyData);
         if ($exists) {
             $query = $this->db->updateStatement($this->tableName, $hyData, $this->pk, false);
@@ -1081,6 +1121,24 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
+    /**
+     * @param mixed $hyData Persistence data
+     * @return mixed persistence data on success, FALSE on failure
+     */
+    final function peSave($record, $hyData, $exists = null, & $error = null, & $newData = array()) {
+        $res = null;
+        $this->triggerEvent(self::EVENT_BEFORE_STORE_RECORD, array(
+            $record, & $hyData, & $newData, & $exists, & $res, & $error
+        ));
+        if (is_null($res)) { // Do core code only if $res is not determied
+            $res = $this->corePeSave($record, $hyData, $exists, $error, $newData);
+        }
+        $this->triggerEvent(self::EVENT_AFTER_STORE_RECORD, array(
+            $record, & $hyData, & $newData, & $exists, & $res, & $error
+        ));
+        return $res;
+    }
+    
     protected function getLastGeneratedId() {
         return $this->db->getLastInsertId();
     }
@@ -1089,13 +1147,33 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @param type $hyData 
      * @return bool
      */
-    function peDelete($record, $hyData, & $error = null) {
+    protected function corePeDelete($record, $hyData, & $error = null) {
         $key = $hyData[$this->pk];
         $res = (bool) $this->db->query("DELETE FROM ".$this->db->n($this->tableName)." WHERE ".$this->db->n($this->pk)." ".$this->db->eqCriterion($key));
         return $res;
     }
     
-    function peConvertForLoad($record, $hyData) {
+    /**
+     * @param type $hyData 
+     * @return bool
+     */
+    final function peDelete($record, $hyData, & $error = null) {
+        $res = null;
+        
+        $this->triggerEvent(self::EVENT_BEFORE_DELETE_RECORD, array(
+            $record, & $hyData, & $error, & $res
+        ));
+        
+        if (is_null($res)) 
+            $res = $this->corePeDelete ($record, $hyData, $error);
+        
+        $this->triggerEvent(self::EVENT_AFTER_DELETE_RECORD, array(
+            $record, & $hyData, & $error, & $res
+        ));
+        return $res;
+    }
+    
+    protected function corePeConvertForLoad($record, $hyData) {
         $res = $hyData;
         $d = $this->db->getDialect();
         if ($d->hasToConvertDatesOnLoad()) {
@@ -1104,7 +1182,15 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
-    function peConvertForSave($record, $hyData) {
+    final function peConvertForLoad($record, $hyData) {
+        $res = $this->corePeConvertForLoad($record, $hyData);
+        $this->triggerEvent(self::EVENT_ON_CONVERT_FOR_LOAD, array(
+            $record, $hyData, & $res
+        ));
+        return $res;
+    }
+    
+    protected function corePeConvertForSave($record, $hyData) {
         $res = $hyData;
         $d = $this->db->getDialect();
         $df = $this->getDateFormats();
@@ -1118,7 +1204,15 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
-    function peReplaceNNRecords($record, $rowProto, $rows, $midTableName, & $errors = array()) {
+    final function peConvertForSave($record, $hyData) {
+        $res = $this->corePeConvertForSave($record, $hyData);
+        $this->triggerEvent(self::EVENT_ON_CONVERT_FOR_SAVE, array(
+            $record, $hyData, & $res
+        ));
+        return $res;
+    }
+
+    protected function corePeReplaceNNRecords($record, $rowProto, $rows, $midTableName, & $errors = array()) {
         $res = true;
         if (count($rowProto)) {
             $sqlDb = $this->db;
@@ -1133,6 +1227,21 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
                 }
             }
         }
+        return $res;
+    }
+    
+    final function peReplaceNNRecords($record, $rowProto, $rows, $midTableName, & $errors = array()) {
+        $res = null;
+        $this->triggerEvent(self::EVENT_BEFORE_REPLACE_NN_RECORDS, array(
+            $record, & $rowProto, & $rows, & $midTableName, & $res, & $errors
+        ));
+        
+        if (is_null($res)) 
+            $res = $this->corePeReplaceNNRecords ($record, $rowProto, $rows, $midTableName, $errors);
+        
+        $this->triggerEvent(self::EVENT_AFTER_REPLACE_NN_RECORDS, array(
+            $record, & $rowProto, & $rows, & $midTableName, & $res, & $errors
+        ));
         return $res;
     }
     
@@ -1170,7 +1279,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
-    function getSqlSelectPrototype($primaryAlias = 't') {
+    protected function doGetSqlSelectPrototype($primaryAlias = 't') {
         $res = array(
 			'tables' => array(
 				$primaryAlias => array(
@@ -1187,6 +1296,14 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
+    final function getSqlSelectPrototype($primaryAlias = 't') {
+        $res = $this->doGetSqlSelectPrototype($primaryAlias);
+        $this->triggerEvent(self::EVENT_ON_GET_SELECT_PROTOTYPE, array(
+            & $res, $primaryAlias
+        ));
+        return $res;
+    }
+    
     /**
      * @param array $prototypeExtra
      * @param string $primaryAlias
@@ -1198,11 +1315,16 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
-    function getManagerConfig() {
+    protected function doGetManagerConfig() {
         return array();
     }
     
+    final function getManagerConfig() {
+        $res = $this->doGetManagerConfig();
+        $this->triggerEvent(self::EVENT_ON_GET_MANAGER_CONFIG, array(
+            & $res
+        ));
+        return $res;
+    }
+    
 }
-    
-    
-

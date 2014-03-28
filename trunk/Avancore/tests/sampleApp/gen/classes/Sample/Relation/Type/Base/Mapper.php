@@ -72,8 +72,8 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         return 'title';   
     }
                 
-    protected function getRelationPrototypes() {
-        return Ac_Util::m(parent::getRelationPrototypes(), array (
+    protected function doGetRelationPrototypes() {
+        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
               '_relations' => array (
                   'srcMapperClass' => 'Sample_Relation_Type_Mapper',
                   'destMapperClass' => 'Sample_Relation_Mapper',
