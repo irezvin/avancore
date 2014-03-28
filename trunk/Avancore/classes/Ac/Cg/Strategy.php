@@ -87,12 +87,7 @@ class Ac_Cg_Strategy {
     function listTemplatesForModel($name) {
         $mod = $this->_dom->getModel($name);
         $res = $this->modelTemplates;
-        if (!$mod->noUi) $res = array_merge($res, $this->uiTemplates);
         
-        //if ($this->_gen->generatePmtFinders)
-        if ($mod->hasPmtFinder()) 
-            $res = array_merge($res, array('Ac_Cg_Template_PmtFinder'));
-            
         $res = array_unique($res);
         return $res;
     }

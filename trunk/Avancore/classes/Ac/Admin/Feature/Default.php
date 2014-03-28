@@ -76,7 +76,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
                 'headerAttribs' => array ('class' => 'w20'),
                 'cellAttribs' => array ('class' => 'w20 ctr'),
             );
-            foreach ($prot->listOwnFields() as $f) {
+            foreach ($prot->listFields() as $f) {
                 $pi = $prot->getPropertyInfo($f, true);
                 $s = false;
                 if (isset($pi->objectPropertyName) && strlen($opn = $pi->objectPropertyName)) {
@@ -186,7 +186,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
             if ($this->errorListPrototype && is_array($this->errorListPrototype)) 
                 Ac_Util::ms($formSettings['controls']['errorList'], $this->errorListPrototype);
         }
-        foreach ($rec->listOwnFields() as $p) {
+        foreach ($rec->listFields() as $p) {
             $prop = $rec->getPropertyInfo($p, true);
             if (isset($prop->showInForm) && !$prop->showInForm) continue;
             $conf = Ac_Util::m($this->formFieldDefaults, $conv->getControlSettings($prop));
@@ -227,8 +227,8 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
         $rec = $this->manager->getRecord();
         $mpr = $this->manager->getMapper();
         if ($mpr) {
-            $listProps = array_keys($rec->listOwnLists());
-            $assocProps = array_keys($rec->listOwnAssociations());
+            $listProps = array_keys($rec->listLists());
+            $assocProps = array_keys($rec->listAssociations());
             $aLists = array_intersect($listProps, $assocProps);
             foreach ($aLists as $propName) {
                 $p = $rec->getPropertyInfo($propName, true);

@@ -115,12 +115,6 @@ class Ac_Cg_Generator {
     var $php5 = true;
     
     /**
-     * Generate <App>_<Model>_<Finder> class extends Pmt_Finder for each model.
-     * @var bool
-     */
-    var $generatePmtFinders = false;
-    
-    /**
      * Number of bytes that were written during last run
      */
     var $_outputBytes = false;

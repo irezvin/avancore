@@ -73,23 +73,6 @@ class Ac_Cg_Model {
     var $parentFinderClassIsAbstract = false;
     
     /**
-     * @var bool Don't generate user interface for this model
-     */
-    var $noUi = false;
-    
-    /**
-     * Records can be created with UI
-     * @var bool
-     */
-    var $uiCanCreate = true;
-    
-    /**
-     * Records can be deleted with UI
-     * @var bool
-     */
-    var $uiCanDelete = true;
-    
-    /**
      * @var array User-specified property settings
      */
     var $properties = array();
@@ -201,8 +184,6 @@ class Ac_Cg_Model {
      */
     var $orderGroupProp = '?';
     
-    var $generatePmtFinder = '?';
-    
     /**
      * Whether to use unique index names instead of field names in mapper loadBy... methods 
      * @var bool
@@ -261,12 +242,6 @@ class Ac_Cg_Model {
             $this->_properties[$name] = new $cls ($this, $name, $this->_properties[$name]);
         }
         
-    }
-    
-    function hasPmtFinder() {
-        if ($this->generatePmtFinder === '?') $res = (bool) $this->_domain->_gen->generatePmtFinders;
-            else $res = (bool) $this->generatePmtFinder;
-        return $res;
     }
     
     /**
@@ -572,7 +547,6 @@ class Ac_Cg_Model {
         $res = array(
             'singleCaption' => $this->singleCaption,
             'pluralCaption' => $this->pluralCaption,
-            'hasUi' => !$this->noUi,
         );
         if ($this->getUseLangStrings()) {
             $s = $this->getTableLangStringPrefix($this->name).'_single';

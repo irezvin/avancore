@@ -1,18 +1,21 @@
 <?php
 
-/**
- * If $model::tracksChanges() returns true or AC_CHANGES_BEFORE_SAVE, changes will be destroyed immediately after database operation 
- * (and before afterSave() method)  
- */
-define('AC_CHANGES_BEFORE_SAVE', 1);
-
-/**
- * If $model::tracksChanges() returns true or AC_CHANGES_AFTER_SAVE, old values will be available in afterSave() method 
- */
-define('AC_CHANGES_AFTER_SAVE', 2);
-
 class Ac_Model_Object extends Ac_Model_Data {
 
+
+    /**
+     * If $model::tracksChanges() returns true or Ac_Model_Object::CHANGES_BEFORE_SAVE, 
+     * changes will be destroyed immediately after database operation 
+     * (and before doAfterSave() method)  
+     */
+    const CHANGES_BEFORE_SAVE = 1;
+    
+    /**
+     * If $model::tracksChanges() returns AC_CHANGES_AFTER_SAVE, old values will be available in 
+     * doAfterSave() method 
+     */
+    const CHANGES_AFTER_SAVE = 2;
+    
     /**
      * In-memory id
      * @var int
@@ -176,9 +179,17 @@ class Ac_Model_Object extends Ac_Model_Data {
         
         $this->_pk = $mapper->pk;
         $this->_tableName = $mapper->tableName;
-        $this->doOnCreate();
         
+        parent::__construct();
+               
         if ($this->tracksChanges()) $this->_memorizeFields();
+        
+        $this->doOnCreate();
+    }
+    
+    protected function intAssignMetaCaching() {
+        $this->metaClassId = $this->mapper->getId();
+        parent::intAssignMetaCaching();
     }
     
     /**
@@ -188,10 +199,9 @@ class Ac_Model_Object extends Ac_Model_Data {
     function load ($oid = null, $isRow = false) {
         
         if ($isRow) {
-            $k = $this->_pk;
             $this->_otherValues = array();
             $hyData = $this->mapper->peConvertForLoad($this, $oid);
-            foreach ($this->listOwnProperties() as $propName) {
+            foreach ($this->listDataProperties() as $propName) {
                 if (array_key_exists($propName, $hyData)) {
                     $this->$propName = $oid[$propName];
                     unset($oid[$propName]);
@@ -234,11 +244,11 @@ class Ac_Model_Object extends Ac_Model_Data {
         
         $this->reset();
         
-        $props = $this->listOwnProperties();
+        $props = $this->listDataProperties();
         
         if ($hyData = $this->mapper->peLoad($this, $this->getPrimaryKey())) {
             $hyData = $this->mapper->peConvertForLoad($this, $hyData);
-            foreach ($this->listOwnProperties() as $propName) {
+            foreach ($this->listDataProperties() as $propName) {
                 if (array_key_exists($propName, $hyData)) {
                     $this->$propName = $hyData[$propName];
                 }
@@ -302,7 +312,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             }
         } else {
             $mapper->forget($this);
-            if (($t = $this->tracksChanges()) && ($t !== AC_CHANGES_AFTER_SAVE)) $this->_memorizeFields();
+            if (($t = $this->tracksChanges()) && ($t !== self::CHANGES_AFTER_SAVE)) $this->_memorizeFields();
         }
         return $res;
     }
@@ -327,7 +337,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                 if ($res) {
                     $this->_isBeingStored = false;
                     if ($this->doAfterSave() === false) $res = false;
-                    if (($t = $this->tracksChanges()) && ($t === AC_CHANGES_AFTER_SAVE)) $this->_memorizeFields();
+                    if (($t = $this->tracksChanges()) && ($t === self::CHANGES_AFTER_SAVE)) $this->_memorizeFields();
                 } else {
                     $this->doOnSaveFailed();
                 }
@@ -393,7 +403,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     function bind($array, $ignore = '') {
         if (is_array($ignore)) $ignore = array_merge($ignore, $this->getBindIgnore());
             else $ignore .= $this->getBindIgnore();
-        $res = parent::bind($array, $ignore);
+        parent::bind($array, $ignore);
         $this->doOnBind($array, $ignore);
     }
     
@@ -447,14 +457,14 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     function reset() {
         $vars = get_class_vars(get_class($this));
-        foreach ($this->listOwnProperties() as $propName) if (isset($vars[$propName])) $this->$propName = $vars[$propName];
+        foreach ($this->listDataProperties() as $propName) if (isset($vars[$propName])) $this->$propName = $vars[$propName];
         $m = $this->getMapper();
         $this->setDefaultFields();
         $m->memorize($this);
         $this->_origPk = null;
     }
     
-    function listProperties() {
+    function listDataProperties() {
         
         $res = array();
         foreach (array_keys(get_class_vars(get_class($this))) as $v) {
@@ -462,7 +472,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         }
         return $res;
         
-        //return $this->listOwnFields();
+        //return $this->listFields();
     }
 
     function _listOwnPublicVars() {
@@ -473,7 +483,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     function _listSavedMembers() {
         if (get_class($this) == 'Ac_Model_Object') $res = array_intersect($this->_listOwnPublicVars(), $this->getMapper()->getColumnNames());
-        else $res = array_intersect($this->listOwnFields(), $this->getMapper()->getColumnNames());        
+        else $res = array_intersect($this->listFields(), $this->getMapper()->getColumnNames());        
         
         return $res;
     }
@@ -530,7 +540,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     function getDataFields($fieldNames = false, $returnFalseFields = true) {
         if ($fieldNames === false) {
             if (get_class($this) == 'Ac_Model_Object') $fieldNames = $this->_listOwnPublicVars();
-            else $fieldNames = array_intersect($this->listOwnFields(), $this->getMapper()->getColumnNames());
+            else $fieldNames = array_intersect($this->listFields(), $this->getMapper()->getColumnNames());
         }
         elseif (!is_array($fieldNames)) $fieldNames = array($fieldNames);
         $res = array();
@@ -961,12 +971,12 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function __isset($name) {
-        $res = in_array($name, $this->listOwnFields());
+        $res = in_array($name, $this->listFields());
         return $res;
     }
     
     function __get($name) {
-        if (in_array($name, $this->listOwnFields())) $res = $this->getField($name);
+        if (in_array($name, $this->listFields())) $res = $this->getField($name);
         elseif (!in_array($name, array_diff(array_keys(Ac_Util::getPublicVars($this)), array_keys(get_object_vars($this))))) {
             return $this->$name;
         } else {
@@ -980,7 +990,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function __set($name, $value) {
-        if (in_array($name, $this->listOwnFields())) $res = $this->setField($name, $value);
+        if (in_array($name, $this->listFields())) $res = $this->setField($name, $value);
         elseif (!in_array($name, array_diff(array_keys(Ac_Util::getPublicVars($this)), array_keys(get_object_vars($this))))) {
             $this->$name = $value;
         } else {
