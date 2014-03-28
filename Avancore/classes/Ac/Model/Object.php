@@ -440,32 +440,6 @@ class Ac_Model_Object extends Ac_Model_Data {
         return array_key_exists($field, $this->_oldValues) && ($strict? ($this->_oldValues[$field] !== $this->{$field}) : ($this->_oldValues[$field] != $this->{$field}));
     }
     
-/*    function getErrors($key = false) {
-        if ($this->_bound && !$this->_checked) {
-            if (!($checkResult = $this->check())) {
-                // $this->_errors['_error'] = 'Check() failed';
-            }
-            $this->_checked = true;
-        }
-        if ($this->_error) $this->_errors['_error'] = $this->_error;
-        $res = $this->_errors;
-        if ($key !== false) {
-            if (isset($res[$key])) $res = $res[$key];
-                else $res = false;
-        }
-        return $res;
-    }
-*/
-    function getCommonErrors() {
-        $res = array();
-        if (is_array($this->_errors)) {
-            foreach ($this->_errors as $k => $e) {
-                if (is_numeric($k)) $res[$k] = $e;
-            }
-        }
-        return $res;
-    }
-    
     function getError() {
         if ($errors = $this->getErrors()) return Ac_Util::implode_r(";\n", $errors);
         if ($this->_error) return $this->_error;
