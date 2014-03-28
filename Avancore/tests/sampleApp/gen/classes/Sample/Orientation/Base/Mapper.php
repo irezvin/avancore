@@ -71,8 +71,8 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
         return 'title';   
     }
                 
-    protected function getRelationPrototypes() {
-        return Ac_Util::m(parent::getRelationPrototypes(), array (
+    protected function doGetRelationPrototypes() {
+        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
               '_people' => array (
                   'srcMapperClass' => 'Sample_Orientation_Mapper',
                   'destMapperClass' => 'Sample_Person_Mapper',

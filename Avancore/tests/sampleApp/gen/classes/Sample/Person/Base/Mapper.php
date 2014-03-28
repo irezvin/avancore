@@ -73,8 +73,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     }
 
                 
-    protected function getRelationPrototypes() {
-        return Ac_Util::m(parent::getRelationPrototypes(), array (
+    protected function doGetRelationPrototypes() {
+        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
               '_orientation' => array (
                   'srcMapperClass' => 'Sample_Person_Mapper',
                   'destMapperClass' => 'Sample_Orientation_Mapper',
@@ -98,13 +98,13 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                   'destCountVarName' => '_peopleCount',
                   'destNNIdsVarName' => '_personIds',
                   'fieldLinks' => array (
-                      'personId' => 'personId',
+                      'personId' => 'idOfPerson',
                   ),
                   'srcIsUnique' => false,
                   'destIsUnique' => false,
                   'midTableName' => '#__people_tags',
                   'fieldLinks2' => array (
-                      'tagId' => 'tagId',
+                      'idOfTag' => 'tagId',
                   ),
               ),
               '_incomingRelations' => array (
