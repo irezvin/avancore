@@ -77,3 +77,51 @@ class Body extends Ac_Mixin {
     }
     
 }
+
+class ModelProp implements Ac_I_Mixable {
+    
+    protected $extraProp = false;
+    
+    var $extraPublicProp = false;
+    
+    public function getMixableId() {
+        return '';
+    }
+
+    public function listMixinMethods() {
+        return array('getExtraProp', 'setExtraProp');
+    }
+    
+    function setExtraProp($extraProp) {
+        $this->extraProp = $extraProp;
+    }
+
+    function getExtraProp() {
+        return $this->extraProp;
+    }
+   
+    function onListProperties(& $properties) {
+        $properties[] = 'extraProp';
+        $properties[] = 'extraPublicProp';
+    }
+    
+    public function listMixinProperties() {
+        return array('extraPublicProp');
+    }
+
+    public function registerMixin(Ac_I_Mixin $mixin) {
+        if ($mixin instanceof Ac_Model_Data) $mixin->addEventListener ($this,
+            Ac_Model_Data::EVENT_ON_LIST_PROPERTIES);
+    }
+
+    public function unregisterMixin(Ac_I_Mixin $mixin) {
+        if ($mixin instanceof Ac_Model_Data) $mixin->deleteEventListener ($this);
+    }    
+    
+}
+
+/*class ModelAggregate implements Ac_I_Mixable {
+    
+    
+    
+}*/
