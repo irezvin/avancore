@@ -157,14 +157,14 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
         $this->sharedMixableIds = array();
         $mm = $this->listOwnMethods();
         $mp = array();
-        foreach ($mm as $m) $this->mixMethodMap[$m] = false;
+        foreach ($mm as $m) $this->mixMethodMap[strtolower($m)] = false;
         foreach ($this->mixables as $id => $mix) {
             
             if ($mix instanceof Ac_I_Mixable_Shared)
                 $this->sharedMixableIds[$id] = $id;
             
             $nm = array_diff($mix->listMixinMethods(), $mm);
-            foreach ($nm as $m) $this->mixMethodMap[$m] = $id;
+            foreach ($nm as $m) $this->mixMethodMap[strtolower($m)] = $id;
             $mm = array_merge($mm, $nm);
             
             $np = array_diff($mix->listMixinProperties(), $mp);
@@ -174,7 +174,7 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
     
     public function hasMethod($methodName) {
         if ($this->mixMethodMap === false) $this->fillMixMaps();
-        $res = isset($this->mixMethodMap[$methodName]);
+        $res = isset($this->mixMethodMap[strtolower($methodName)]);
         return $res;
     }
     
@@ -238,10 +238,11 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
     
     public function __call($method, $arguments) {
         if ($this->mixMethodMap === false) $this->fillMixMaps();
-        if (isset($this->mixMethodMap[$method])) {
-            $id = $this->mixMethodMap[$method];
+        $cMethod = strtolower($method);
+        if (isset($this->mixMethodMap[$cMethod])) {
+            $id = $this->mixMethodMap[$cMethod];
             if ($id === false) {
-                $res = call_user_func_array(array($this, $method), $arguments);
+                $res = call_user_func_array(array($this, $cMethod), $arguments);
             }
             if (isset($this->sharedMixableIds[$id])) {
                 $res = $this->mixables[$id]->callMixinMethod($this, $method, $arguments);

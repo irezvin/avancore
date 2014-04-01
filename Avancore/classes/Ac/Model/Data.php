@@ -302,7 +302,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     function _getMethod($prefix, $suffix) {
         if (method_exists($this, $methodName = $prefix.$suffix)) return $methodName; 
-        elseif ($this->hasMethod($methodName)) return $methodName;
+        if ($this->hasMethod($methodName)) return $methodName;
         return false;
     }
     
