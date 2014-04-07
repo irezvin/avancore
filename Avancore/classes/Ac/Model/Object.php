@@ -2,7 +2,10 @@
 
 class Ac_Model_Object extends Ac_Model_Data {
 
-
+    const ACTUAL_REASON_LOAD = 1;
+    
+    const ACTUAL_REASON_SAVE = 2;
+    
     /**
      * If $model::tracksChanges() returns true or Ac_Model_Object::CHANGES_BEFORE_SAVE, 
      * changes will be destroyed immediately after database operation 
@@ -15,6 +18,86 @@ class Ac_Model_Object extends Ac_Model_Data {
      * doAfterSave() method 
      */
     const CHANGES_AFTER_SAVE = 2;
+
+    /**
+     * function onCreate()
+     */
+    const EVENT_ON_CREATE = 'onCreate';
+
+    /**
+     * function onActual($reason = self::ACTUAL_REASON_LOAD)
+     */
+    const EVENT_ON_ACTUAL = 'onActual';
+
+    /**
+     * function beforeSave(& $result)
+     */
+    const EVENT_BEFORE_SAVE = 'beforeSave';
+
+    /**
+     * function afterSave(& $result)
+     */
+    const EVENT_AFTER_SAVE = 'afterSave';
+
+    /**
+     * function onSaveFailed()
+     */
+    const EVENT_ON_SAVE_FAILED = 'onSaveFailed';
+
+    /**
+     * function onDeleteFailed()
+     */
+    const EVENT_ON_DELETE_FAILED = 'onDeleteFailed';
+
+    /**
+     * function beforeDelete(& $result)
+     */
+    const EVENT_BEFORE_DELETE = 'beforeDelete';
+
+    /**
+     * function afterDelete()
+     */
+    const EVENT_AFTER_DELETE = 'afterDelete';
+
+    /**
+     * function onCanDelete(& $result)
+     */
+    const EVENT_ON_CAN_DELETE = 'onCanDelete';
+
+    /**
+     * function onCopy(Ac_Model_Object $copy)
+     */
+    const EVENT_ON_COPY = 'onCopy';
+
+    /**
+     * function onCompare(Ac_Model_Object $other, & $compareResult)
+     */
+    const EVENT_ON_COMPARE = 'onCompare';
+
+    /**
+     * function onListDefaultComparedAssociations(array & $associations)
+     */
+    const EVENT_ON_LIST_DEFAULT_COMPARED_ASSOCIATIONS = 'onListDefaultComparedAssociations';
+
+    /**
+     * function onListNonCopiedFields(array & $fields)
+     */
+    const EVENT_ON_LIST_NON_COPIED_FIELDS = 'onListNonCopiedFields';
+
+    /**
+     * function onListNonComparedFields(array & $fields)
+     */
+    const EVENT_ON_LIST_NON_COMPARED_FIELDS = 'onListNonComparedFields';
+
+    /**
+     * function onSetDefaults()
+     */
+    const EVENT_ON_SET_DEFAULTS = 'onSetDefaults';
+    
+    /**
+     * function onCleanup()
+     */
+    const EVENT_ON_CLEANUP = 'onCleanup';
     
     /**
      * In-memory id
@@ -79,6 +162,9 @@ class Ac_Model_Object extends Ac_Model_Data {
     function doAfterLoad() {
     }
     
+    function doOnActual($reason = self::ACTUAL_REASON_LOAD) {
+    }
+    
     function doBeforeSave() {
     }
     
@@ -97,19 +183,63 @@ class Ac_Model_Object extends Ac_Model_Data {
     function doAfterDelete() {
     }
     
-    function canDelete() {
-        // TODO: implement this method with respect to the associations
-        return true;
+    function doOnCanDelete() {
+    }
+    
+    function doOnCreate() {
+        $this->setDefaultFields();
+    }
+    
+    function doListNonCopiedFields() {
+        $m = $this->getMapper();
+        $res = $this->getMapper()->listPkFields();
+        return $res;
+    }
+    
+    function doListNonComparedFields() {
+        $m = $this->getMapper();
+        $res = $this->getMapper()->listPkFields();
+        return $res;
+    }
+    
+    /**
+     * Should return list of associations (names of properties) that should be compared by default, in order of comparison. 
+     * The list can be recursive, i.e. ('assoc1', 'assoc2', 'assoc3' => array('assoc3.1', 'assoc3.2', ...))
+     * 
+     * @return array
+     */
+    function doListDefaultComparedAssociations() {
+        return array();
+    }
+    
+    /**
+     * Template method that should do extra comparison (especially with associations) with other object.
+     * This method will be called only when standard implementation (Ac_Model_Object::equals) already had successfully compared 
+     * this object's fields to other one's.
+     *
+     * @param Ac_Model_Object $otherObject
+     * @return mixed|bool The method should return FALSE if comparison fails (otherwise objec will be considered matching) 
+     */
+    function doOnExtraCompare ($otherObject) {
+    }
+    
+    /**
+     * @param Ac_Model_Object $copy
+     */
+    function doOnCopy($copy) {
+    }
+    
+    final function canDelete() {
+        $result = $this->doOnCanDelete();
+        $this->triggerEvent(self::EVENT_ON_CAN_DELETE, array (& $result));
+        $res  = $result !== false;
+        return $res;
     }
     
     function getExcludeList() {
         $vars = array_keys(get_object_vars($this));
         foreach ($vars as $i => $var) if ($var{0} == "_") unset($vars[$i]);
         return $vars;
-    }
-    
-    function doOnCreate() {
-        $this->setDefaultFields();
     }
     
     function _describeIndex($indexName, $indexFields = false) {
@@ -160,6 +290,16 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function __construct($mapperOrMapperClass = null) {
+        
+        if (is_array($mapperOrMapperClass)) {
+            $prototype = $mapperOrMapperClass;
+            if (isset($prototype['mapper'])) $mapperOrMapperClass = $prototype['mapper'];
+            elseif (isset($prototype['mapperClass'])) $mapperOrMapperClass = $prototype['mapperClass'];
+            else $mapperOrMapperClass = null;
+        } else {
+            $prototype = array();
+        }
+        
         static $imId = 0;
         $this->_imId = $imId++;
 
@@ -174,17 +314,19 @@ class Ac_Model_Object extends Ac_Model_Data {
         if (!$mapper) throw new Exception("Cannot determine \$mapper for ".get_class($this));
         
         $this->mapper = $mapper;
+        $this->mapper->registerRecord($this);
         
         if (!strlen($this->_mapperClass)) $this->_mapperClass = $mapper->getId();
         
         $this->_pk = $mapper->pk;
         $this->_tableName = $mapper->tableName;
         
-        parent::__construct();
+        parent::__construct($prototype);
                
         if ($this->tracksChanges()) $this->_memorizeFields();
         
         $this->doOnCreate();
+        $this->triggerEvent(self::EVENT_ON_CREATE);
     }
     
     protected function intAssignMetaCaching() {
@@ -218,6 +360,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             }
             $this->doAfterLoad();
         }
+        if ($res) $this->doOnActual(self::ACTUAL_REASON_LOAD);
         if ($this->tracksPk()) {
             $this->_origPk = $res? $this->getPrimaryKey() : null;
         }
@@ -326,7 +469,9 @@ class Ac_Model_Object extends Ac_Model_Data {
         if (!$this->_isBeingStored) { // we have to prevent recursion while saving complex in-memory record graphs
             $this->_isBeingStored = true;
             $this->intResetReferences();
-            if (($this->doBeforeSave() !== false)) {
+            $beforeSaveResult = $this->doBeforeSave();
+            $this->triggerEvent(self::EVENT_BEFORE_SAVE, array(& $beforeSaveResult));
+            if ($beforeSaveResult !== false) {
                 if ($this->_isReference && !$this->isPersistent()) $this->_loadReference();
                 $res = true;
                 
@@ -336,10 +481,17 @@ class Ac_Model_Object extends Ac_Model_Data {
                 $res = $res && ($this->_storeNNRecords() !== false);
                 if ($res) {
                     $this->_isBeingStored = false;
-                    if ($this->doAfterSave() === false) $res = false;
-                    if (($t = $this->tracksChanges()) && ($t === self::CHANGES_AFTER_SAVE)) $this->_memorizeFields();
+                    $afterSaveResult = $this->doAfterSave();
+                    $this->triggerEvent(self::EVENT_AFTER_SAVE_SAVE, array(& $afterSaveResult));
+                    if ($afterSaveResult === false) $res = false;
+                    if ($res !== false) {
+                        $this->doOnActual(self::ACTUAL_REASON_SAVE);
+                    }
+                    if (($t = $this->tracksChanges()) && ($t === self::CHANGES_AFTER_SAVE)) 
+                        $this->_memorizeFields();
                 } else {
                     $this->doOnSaveFailed();
+                    $this->triggerEvent(self::EVENT_ON_SAVE_FAILED);
                 }
             }
             else {
@@ -356,14 +508,18 @@ class Ac_Model_Object extends Ac_Model_Data {
         if ($this->_isDeleted) return true;
             else $this->_isDeleted = true;
         if ($this->_isReference && !$this->isPersistent()) $this->_loadReference();
-        if ($this->doBeforeDelete() !== false) {
+        $deleteResult = $this->doBeforeDelete();
+        $this->triggerEvent(self::EVENT_BEFORE_DELETE, array(& $deleteResult));
+        if ($deleteResult !== false) {
             if ($res = $this->_legacyDelete()) {
             	if ($this->tracksPk()) $this->_origPk = null;
                 $this->doAfterDelete();
+                $this->triggerEvent(self::EVENT_AFTER_DELETE);
             }
         } else {
             $res = false;
             $this->doOnDeleteFailed();
+            $this->triggerEvent(self::EVENT_ON_DELETE_FAILED);
         }
         if (!$res) $this->_isDeleted = false;
         return $res;
@@ -457,7 +613,9 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     function reset() {
         $vars = get_class_vars(get_class($this));
-        foreach ($this->listDataProperties() as $propName) if (isset($vars[$propName])) $this->$propName = $vars[$propName];
+        foreach ($this->listDataProperties() as $propName)
+            if (array_key_exists($propName, $vars))
+                $this->$propName = $vars[$propName];
         $m = $this->getMapper();
         $this->setDefaultFields();
         $m->memorize($this);
@@ -465,14 +623,11 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function listDataProperties() {
-        
         $res = array();
         foreach (array_keys(get_class_vars(get_class($this))) as $v) {
             if ($v{0} !== '_') $res[] = $v; 
         }
         return $res;
-        
-        //return $this->listFields();
     }
 
     function _listOwnPublicVars() {
@@ -770,6 +925,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         //$copy->_isReference = $this->_isReference;
         $copy->_setIsReference(is_null($asReference)? $this->isReference() : $asReference);
         $this->doOnCopy($copy);
+        $this->triggerEvent(self::EVENT_ON_COPY, array($copy));
         return $copy;
     }
     
@@ -792,6 +948,7 @@ class Ac_Model_Object extends Ac_Model_Data {
             $destFields = $otherObject->getDataFields();
             $res = true;
             $fields = array_diff(array_keys($srcFields), $this->doListNonComparedFields());
+            $this->triggerEvent(self::EVENT_ON_LIST_NON_COMPARED_FIELDS, array(& $fields));
             foreach ($fields as $k) {
                 $v = $srcFields[$k];
                 if (!array_key_exists($k, $destFields) || ($destFields[$k] != $v)) {
@@ -799,7 +956,11 @@ class Ac_Model_Object extends Ac_Model_Data {
                     break; 
                 }
             }
-            if ($assocList === false) $assocList = $this->doListDefaultComparedAssociations();
+            if ($assocList === false) {
+                $assocList = $this->doListDefaultComparedAssociations();
+                $this->triggerEvent(self::EVENT_ON_LIST_DEFAULT_COMPARED_ASSOCIATIONS, array(& $assocList));
+            }
+            
             if (is_array($assocList)) foreach ($assocList as $assocName => $subList) {
                 if (!is_array($subList)) {
                     $assocName = $subList;
@@ -814,21 +975,10 @@ class Ac_Model_Object extends Ac_Model_Data {
                 if ($this->doOnExtraCompare($otherObject) === false) {
                     $res = false;
                 }
+                $this->triggerEvent(self::EVENT_ON_COMPARE, array($otherObject, & $res));
             }
         }
         $this->_isBeingCompared = false;
-        return $res;
-    }
-    
-    function doListNonCopiedFields() {
-        $m = $this->getMapper();
-        $res = $this->getMapper()->listPkFields();
-        return $res;
-    }
-    
-    function doListNonComparedFields() {
-        $m = $this->getMapper();
-        $res = $this->getMapper()->listPkFields();
         return $res;
     }
     
@@ -889,33 +1039,6 @@ class Ac_Model_Object extends Ac_Model_Data {
         }
         return $res;
     }
-    
-    /**
-     * Should return list of associations (names of properties) that should be compared by default, in order of comparison. 
-     * The list can be recursive, i.e. ('assoc1', 'assoc2', 'assoc3' => array('assoc3.1', 'assoc3.2', ...))
-     * 
-     * @return array
-     */
-    function doListDefaultComparedAssociations() {
-        return array();
-    }
-    
-    /**
-     * Template method that should do extra comparison (especially with associations) with other object.
-     * This method will be called only when standard implementation (Ac_Model_Object::equals) already had successfully compared 
-     * this object's fields to other one's.
-     *
-     * @param Ac_Model_Object $otherObject
-     * @return mixed|bool The method should return FALSE if comparison fails (otherwise objec will be considered matching) 
-     */
-    function doOnExtraCompare ($otherObject) {
-    }
-    
-    /**
-     * @param Ac_Model_Object $copy
-     */
-    function doOnCopy($copy) {
-    }
 
     function cleanupReferences($otherObject) {
         foreach (array_keys(get_object_vars($this)) as $k) {
@@ -937,6 +1060,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         $vars = get_class_vars(get_class($this));
         $m = $this->getMapper();
         $m->forget($this);
+        $this->triggerEvent(self::EVENT_ON_CLEANUP);
         foreach (get_class_vars(get_class($this)) as $k => $v) if (isset($this->$k)) {
             if (is_array($this->$k)) {
                 $tmp = $this->$k;
