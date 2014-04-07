@@ -291,8 +291,19 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
             if (! $res instanceof $this->recordClass) 
                 throw Ac_E_InvalidCall::wrongClass ('className', $className, $this->recordClass);
         }
-        $this->memorize($res);
         return $res;
+    }
+    
+    final function registerRecord(Ac_Model_Object $record) {
+        $this->coreRegisterRecord($record);
+        $this->triggerEvent(self::EVENT_AFTER_CREATE_RECORD, array(
+            $record
+        ));
+    }
+    
+    protected function coreRegisterRecord(Ac_Model_Object $record) {
+        $this->isMyRecord($record, true);
+        $this->memorize($record);
     }
     
     /**
@@ -304,9 +315,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      */
     final function createRecord($className = false) {
         $res = $this->coreCreateRecord($className);
-        $this->triggerEvent(self::EVENT_AFTER_CREATE_RECORD, array(
-            $res
-        ));
         return $res;
     }
     
