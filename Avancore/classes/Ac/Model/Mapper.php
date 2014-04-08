@@ -1056,7 +1056,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      */
     function getCommonValidator() {
         if ($this->validator === false) {
-            $this->validator = new Ac_Model_Validator($this->getPrototype(), $this->getPrototype()->getOwnPropertiesInfo());
+            $this->validator = new Ac_Model_Validator($this->getPrototype(), $this->getPrototype()->getPropertiesInfo());
         }
         return $this->validator;
     }
