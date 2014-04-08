@@ -188,8 +188,6 @@ class Ac_Table {
             $trAttribs = array('class' => 'row'.$rMod);
             echo "<tr ".Ac_Util::mkAttribs($this->_trAttribs($record, $trAttribs)).">"; 
             
-            //$record->makeHtmlSafe();
-            
             for ($i = 0; $i < $nCols; $i++) {
                 $cols[$i]->showCell($record, $row);
             }

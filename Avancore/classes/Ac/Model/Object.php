@@ -25,6 +25,11 @@ class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_CREATE = 'onCreate';
 
     /**
+     * function afterLoad()
+     */
+    const EVENT_AFTER_LOAD = 'afterLoad';
+    
+    /**
      * function onActual($reason = self::ACTUAL_REASON_LOAD)
      */
     const EVENT_ON_ACTUAL = 'onActual';
@@ -349,17 +354,18 @@ class Ac_Model_Object extends Ac_Model_Data {
                     unset($oid[$propName]);
                 }
             }
+            $row = $oid;
             $this->_otherValues = $oid;
-            $this->doAfterLoad();
             $res = true;
         } else {
             if (!$this->isPersistent() && $this->isReference()) {
                 $res = $this->_loadReference();
             } else {
-                $res = $this->_legacyLoad($oid, $prefix);
+                $res = $this->_legacyLoad($oid, $row);
             }
-            $this->doAfterLoad();
         }
+        $this->doAfterLoad();
+        $this->triggerEvent(self::EVENT_AFTER_LOAD);
         if ($res) $this->doOnActual(self::ACTUAL_REASON_LOAD);
         if ($this->tracksPk()) {
             $this->_origPk = $res? $this->getPrimaryKey() : null;
@@ -372,7 +378,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
-    function _legacyLoad($oid, $prefix) {
+    function _legacyLoad($oid, & $row) {
         $k = $this->_pk;
 
         if ($oid !== null) {
@@ -390,8 +396,9 @@ class Ac_Model_Object extends Ac_Model_Data {
         $props = $this->listDataProperties();
         
         if ($hyData = $this->mapper->peLoad($this, $this->getPrimaryKey())) {
+            $row = & $hyData;
             $hyData = $this->mapper->peConvertForLoad($this, $hyData);
-            foreach ($this->listDataProperties() as $propName) {
+            foreach ($props as $propName) {
                 if (array_key_exists($propName, $hyData)) {
                     $this->$propName = $hyData[$propName];
                 }
@@ -638,7 +645,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     function _listSavedMembers() {
         if (get_class($this) == 'Ac_Model_Object') $res = array_intersect($this->_listOwnPublicVars(), $this->getMapper()->getColumnNames());
-        else $res = array_intersect($this->listFields(), $this->getMapper()->getColumnNames());        
+        else $res = array_intersect($this->listFields(), $this->getMapper()->getColumnNames());
         
         return $res;
     }
@@ -647,20 +654,6 @@ class Ac_Model_Object extends Ac_Model_Data {
         return $this->_listOwnPublicVars();
     }
     
-    function makeHtmlSafe($quote_style=ENT_QUOTES, $exclude_keys='') {
-        foreach (get_object_vars( $this ) as $k => $v) {
-                if (is_array( $v ) || is_object( $v ) || $v == NULL || substr( $k, 1, 1 ) == '_' ) {
-                        continue;
-                }
-                if (is_string( $exclude_keys ) && $k == $exclude_keys) {
-                        continue;
-                } else if (is_array( $exclude_keys ) && in_array( $k, $exclude_keys )) {
-                        continue;
-                }
-                $this->$k = htmlspecialchars( $v, $quote_style );
-        }
-    }
-
     function getPrimaryKey() {
         return $this->{$this->_pk};
     }
