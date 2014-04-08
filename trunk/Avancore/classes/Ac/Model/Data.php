@@ -373,7 +373,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         
         $this->doOnBind($src, $ignore);
         
-        trigger_event(self::EVENT_ON_BIND, array(& $src, $ignore));
+        $this->triggerEvent(self::EVENT_ON_BIND, array(& $src, $ignore));
         
         return true;
     }
@@ -390,7 +390,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
             // $this->_checkOverrideProperties(); // This function is not implemented yet 
             $this->doOnCheck();
             
-            trigger_event(self::EVENT_ON_CHECK, array(& $this->_errors));
+            $this->triggerEvent(self::EVENT_ON_CHECK, array(& $this->_errors));
             
             $this->_beingChecked = false;
             $this->_checked = true;

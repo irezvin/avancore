@@ -482,7 +482,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                 if ($res) {
                     $this->_isBeingStored = false;
                     $afterSaveResult = $this->doAfterSave();
-                    $this->triggerEvent(self::EVENT_AFTER_SAVE_SAVE, array(& $afterSaveResult));
+                    $this->triggerEvent(self::EVENT_AFTER_SAVE, array(& $afterSaveResult));
                     if ($afterSaveResult === false) $res = false;
                     if ($res !== false) {
                         $this->doOnActual(self::ACTUAL_REASON_SAVE);

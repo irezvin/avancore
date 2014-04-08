@@ -1044,13 +1044,21 @@ abstract class Ac_Util {
 }
 
 class _Ae_Util_ObjectVarGetter {
+    
     function getObjectVars($foo) {
-        return get_object_vars($foo);
+        if (is_object($foo)) {
+            return get_object_vars($foo);
+        } else {
+            return get_class_vars($foo);
+        }
     }
     
     function getObjectMethods($foo) {
-        return get_class_methods(get_class($foo));
+        if (is_object($foo)) $class = get_class($foo);
+            else $class = $foo;
+        return get_class_methods($class);
     }
+    
 }
 
 /**

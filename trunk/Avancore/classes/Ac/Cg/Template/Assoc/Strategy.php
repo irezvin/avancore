@@ -128,11 +128,11 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
         if (($this->mirrorProp = $this->prop->getMirrorProperty()) && $this->mirrorProp->isEnabled()) {
        
             $this->mirrorSingle = $this->mirrorProp->otherModelIdInMethodsSingle;
-            if ($this->mirrorProp->otherModelIdInMethodsSingle) $this->mirrorSingle  = $this->mirrorProp->otherModelIdInMethodsSingle.$sfx;
+            if ($this->mirrorProp->otherModelIdInMethodsSingle) $this->mirrorSingle  = $this->mirrorProp->otherModelIdInMethodsSingle;
             $this->ucMirrorSingle = ucfirst($this->mirrorSingle);
             
             $this->mirrorPlural = $this->mirrorProp->otherModelIdInMethodsPlural;
-            if ($this->mirrorProp->otherModelIdInMethodsPlural) $this->mirrorPlural  = $this->mirrorProp->otherModelIdInMethodsPlural.$sfx;
+            if ($this->mirrorProp->otherModelIdInMethodsPlural) $this->mirrorPlural  = $this->mirrorProp->otherModelIdInMethodsPlural;
             $this->ucMirrorPlural = ucfirst($this->mirrorPlural);
             
             if ($this->mirrorProp->isList()) {
