@@ -294,27 +294,30 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     protected function listOwnProperties() {
 <?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
     return array_merge(parent::listOwnProperties(), <?php $this->exportArray($this->ownProperties, 0, false, true); ?>);
-<?php } else { ?>        
+<?php } else { ?>
         return <?php $this->exportArray($this->ownProperties, 0, false, true); ?>;
-<?php }?>        
+<?php }?>
     }
-
+<?php if ($this->ownLists) { ?> 
     protected function listOwnLists() {
 <?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
     return array_merge(parent::listOwnLists(), <?php $this->exportArray($this->ownLists, 0, false, true); ?>);
 <?php } else { ?>        
         return <?php $this->exportArray($this->ownLists, 0, false, true); ?>;
-<?php }?>        
+<?php }?>
     }
 
+<?php } ?>    
+<?php if ($this->ownAssociations) { ?> 
     protected function listOwnAssociations() {
 <?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
     return array_merge(parent::listOwnLists(), <?php $this->exportArray($this->ownAssociations, 0, false, true); ?>);
-<?php } else { ?>        
+<?php } else { ?>
         return <?php $this->exportArray($this->ownAssociations, 0, false, true); ?>;
-<?php }?>        
+<?php }?>
     }
 
+<?php } ?>
     protected function getOwnPropertiesInfo() {
     	<?php if ($this->generator->php5) echo 'static $pi = false; if ($pi === false) '; ?>$pi = <?php $this->exportArray($this->ownPropInfo, 8, true); ?>;
 <?php   if ($this->parentClass === 'Ac_Model_Object') { ?>    

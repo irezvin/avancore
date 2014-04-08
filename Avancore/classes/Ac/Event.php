@@ -1,12 +1,14 @@
 <?php
 
 abstract class Ac_Event {
-
+    
     const EVENT_ON_ALL_EVENTS = 'onAllEvents';
     
     protected static $stack = array();
 
     protected static $current = false;
+
+    protected static $classEventCache = array();
     
     static function triggerEvent($issuer, $eventHandlers, $event, array $arguments = array()) {
         $a = isset($eventHandlers[Ac_Event::EVENT_ON_ALL_EVENTS]);
@@ -64,7 +66,13 @@ abstract class Ac_Event {
             $l = isset($eventHandlers[$event])? array($event) : array();
         foreach ($l as $key) {
             foreach ($eventHandlers[$key] as $subKey => $handler) {
-                if ($handler === $objectOrCallback) unset($eventHandlers[$key][$subKey]);
+                $unset = false;
+                if ($handler === $objectOrCallback) $unset = true; 
+                elseif (is_object($objectOrCallback) 
+                    && is_array($handler) 
+                    && isset($handler[0]) 
+                    && $handler[0] === $objectOrCallback) $unset = true;
+                if ($unset) unset($eventHandlers[$key][$subKey]);
             }
         }
     }
@@ -75,5 +83,19 @@ abstract class Ac_Event {
         return $res;
     }
     
+    static function listEventNames($class) {
+        if (is_object($class)) $class = classname($class);
+        $class = ''.$class;
+        if (!isset(self::$classEventCache[$class])) {
+            self::$classEventCache[$class] = array('EVENT_ON_ALL_EVENTS' => self::EVENT_ON_ALL_EVENTS);
+            $curr = $class;
+            do {
+                self::$classEventCache[$class] = array_merge(self::$classEventCache[$class], 
+                    Ac_Util::getClassConstants($curr, 'EVENT_'));
+                $curr = get_parent_class($class);
+            } while(strlen($curr));
+        }
+        return self::$classEventCache[$class];
+    }
     
 }
