@@ -63,6 +63,8 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
             foreach ($name as $v) $r[] = $this->n($v);
             if ($many) return implode(", ", $r);
             else return $this->implConcatNames($r);
+        } elseif (is_object($name) && $name instanceof Ac_I_Sql_Expression){
+            return $name->nameQuote($this);
         } elseif ($this->checkIfNameQuoted && $this->implIsNameQuoted($name)) return $name;
         $name = $this->implNameQuote($name);
         return $name;

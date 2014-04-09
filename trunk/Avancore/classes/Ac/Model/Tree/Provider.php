@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Tree_Provider implements Ac_I_Tree_Provider {
+class Ac_Model_Tree_Provider implements Ac_I_Tree_Provider {
 	
     /**
      * @var Ac_I_Tree_Mapper

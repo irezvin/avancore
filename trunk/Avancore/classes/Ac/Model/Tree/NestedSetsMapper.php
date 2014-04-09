@@ -1,22 +1,31 @@
 <?php
 
-class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapper_NestedSets {
+class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable implements Ac_I_Tree_Mapper_NestedSets {
 	
-    var $_nestedSets = false;
+    protected $mixableId = 'treeMapper';
     
-    var $_nsRelation = false;
+    protected $mixinClass = 'Ac_Model_Mapper';
     
-    var $_rootNodeId = false;
+    /**
+     * @var Ac_Model_Mapper
+     */
+    protected $mixin = false;
     
-    var $_childrenCountRelation = false;
+    protected $nestedSets = false;
     
-    var $_allChildrenCountRelation = false;
+    protected $nsRelation = false;
     
-    var $_childIdsRelation = false;
+    protected $rootNodeId = false;
     
-    var $_containersRelation = false;
+    protected $childrenCountRelation = false;
     
-    var $_treeProvider = false;
+    protected $allChildrenCountRelation = false;
+    
+    protected $childIdsRelation = false;
+    
+    protected $containersRelation = false;
+    
+    protected $treeProvider = false;
     
     // Variables to be overridden in concrete class
     
@@ -25,41 +34,78 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
      */
     var $nsTreeId = false; 
     
+    var $nsIdCol = false;
+    
+    var $nsTreeCol = false;
+    
     /**
      * Name of nestedSets table
      */
-    var $nsTableName = '#__nested_sets'; 
+    var $nsTableName = false; 
+    
+    var $addMixableToRecords = true;
     
     /**
      * Prototype of Ac_Sql_NestedSets
      */
     var $nsPrototype = array();
-
     
+    var $rootNodePrototype = array();
+    
+    function hasPublicVars() {
+        return true;
+    }
+    
+    /**
+     * @return Ac_Sql_Db
+     */
+    protected function getDb() {
+        return $this->mixin->getDb();
+    }
+    
+    protected function createRootNode() {
+        if (Ac_Accessor::methodExists($this->mixin, 'createRootNode')) {
+            $res = $this->mixin->createRootNode();
+        } else {
+            $ns = $this->getNestedSets();
+            $res = $ns->addRootNode(true, $this->rootNodePrototype);
+        }
+        return $res;
+    }
     
     function getRootNodeId() {
-        if ($this->_rootNodeId === false) {
+        if ($this->rootNodeId === false) {
             $ns = $this->getNestedSets();
             $root = $ns->getRootNode();
-            if ($root) $this->_rootNodeId = $root[$ns->idCol];
-                else $this->_rootNodeId = $ns->addRootNode(true, array('comment' => $this->recordClass));
+            if ($root) $this->rootNodeId = $root[$ns->idCol];
+                else $this->rootNodeId = $this->createRootNode();
         }
-        return $this->_rootNodeId;
+        return $this->rootNodeId;
     }
     
     /**
      * @return Ac_Sql_NestedSets
      */
     function getNestedSets() {
-        if ($this->_nestedSets === false) {
+        if ($this->nestedSets === false) {
             $proto = $this->nsPrototype;
             if (!isset($proto['blocker'])) $proto['blocker'] = new Ac_Sql_Blocker();
-            if (!isset($proto['db'])) $proto['db'] = new Ac_Sql_Db_Ae($this->database);
-            if (!isset($proto['tableName']) && strlen($this->nsTableName)) $proto['tableName'] = $this->nsTableName;
+            if (!isset($proto['db'])) $proto['db'] = $this->mixin->getDb();
+            if (!isset($proto['tableName'])) {
+                if (strlen($this->nsTableName)) 
+                    $proto['tableName'] = $this->nsTableName;
+                else
+                    $proto['tableName'] = $this->mixin->tableName;
+            }
+            if (!isset($proto['idCol'])) {
+                if (strlen($this->nsIdCol)) $proto['idCol'] = $this->nsIdCol;
+                else $proto['idCol'] = $this->mixin->pk;
+            }
             if (!isset($proto['treeId']) && strlen($this->nsTreeId)) $proto['treeId'] = $this->nsTreeId;
-        	$this->_nestedSets = new Ac_Sql_NestedSets($proto);
+            if (!isset($proto['treeCol'])) $proto['treeCol'] = $this->nsTreeCol;
+        	$this->nestedSets = new Ac_Sql_NestedSets($proto);
         }
-        return $this->_nestedSets;
+        return $this->nestedSets;
     }
     
     function listTopNodes() {
@@ -72,19 +118,30 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
     }
     
     function getNodeClass() {
-        return 'Ac_Tree_NestedSetsImpl';
+        return 'Ac_Model_Tree_NestedSetsImpl';
+    }
+    
+    protected function nsTreeCriterion($alias = false) {
+        if (strlen($tc = $this->getNestedSets()->treeCol)) {
+            $c = strlen($alias)? array($alias, $tc) : $tc;
+            $res = $this->getDb()->nameQuote($c) . $this->getDb()->eqCriterion($this->nsTreeId);
+        } else {
+            $res = "1";
+        }
+        return $res;
     }
     
     function loadNodes(array $ids) {
         $ns = $this->getNestedSets();
-        $this->database->setQuery("SELECT * FROM ".$ns->tableName
-            ." WHERE ".$ns->treeCol.' = '.$this->database->Quote($this->nsTreeId)
-            ." AND ".$ns->idCol." ".$this->database->sqlEqCriteria($ids)
+        if ($this)
+        $nodes = $this->getDb()->fetchArray(
+            "SELECT * FROM ".$ns->tableName
+            ." WHERE ".$this->nsTreeCriterion()
+            ." AND ".$ns->idCol." ".$this->getDb()->eqCriterion($ids)
         );
         $res = array();
-        $nodes = $this->database->loadAssocList($ns->idCol);
         foreach ($nodes as $id => $node) {
-            $objNode = new Ac_Tree_NestedSetsImpl(array(
+            $objNode = new Ac_Model_Tree_NestedSetsImpl(array(
                 'nodeData' => $node,
                 'mapper' => $this, 
             ));
@@ -98,18 +155,22 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
      */
     function getNsRelation() {
     	$ns = $this->getNestedSets();
-        if ($this->_nsRelation === false) {
-            $this->_nsRelation = new Ac_Model_Relation(array(
-                'srcTableName' => $ns->tableName,
-                'destMapperClass' => get_class($this),
-                'fieldLinks' => array($ns->idCol => $this->pk),
-                'srcIsUnique' => true,
-                'destIsUnique' => true,
-                'srcVarName' => 'modelObject',
-                'destVarName' => '_treeNode',
-            ));
+        if ($this->nsRelation === false && $this->mixin) {
+            if (strlen($this->nsTableName)) {
+                $this->nsRelation = new Ac_Model_Relation(array(
+                    'srcTableName' => $ns->tableName,
+                    'destMapperClass' => get_class($this),
+                    'fieldLinks' => array($ns->idCol => $this->mixin->pk),
+                    'srcIsUnique' => true,
+                    'destIsUnique' => true,
+                    'srcVarName' => 'modelObject',
+                    'destVarName' => '_treeNode',
+                ));
+            } else {
+                $this->nsRelation = null;
+            }
         }
-        return $this->_nsRelation;
+        return $this->nsRelation;
     }
 
     
@@ -141,10 +202,10 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
      * @return Ac_Model_Relation
      */
     function getNodeChildrenCountRelation() {
-        if ($this->_childrenCountRelation === false) {
+        if ($this->childrenCountRelation === false) {
             $ns = $this->getNestedSets();
-            $this->_childrenCountRelation = new Ac_Model_Relation(array(
-                'srcTableName' => $this->tableName,
+            $this->childrenCountRelation = new Ac_Model_Relation(array(
+                'srcTableName' => $this->mixin->tableName,
                 'destTableName' => new Ac_Sql_Expression("(
                     SELECT {$ns->parentCol} AS parentId, COUNT(ns.{$ns->idCol}) AS `count` 
                     FROM {$ns->tableName} AS ns 
@@ -160,17 +221,17 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
                 'database' => $this->database,
             ));
         }
-        return $this->_childrenCountRelation;
+        return $this->childrenCountRelation;
     }
     
     /**
      * @return Ac_Model_Relation
      */
     function getAllChildrenCountRelation() {
-        if ($this->_allChildrenCountRelation === false) {
+        if ($this->allChildrenCountRelation === false) {
             $ns = $this->getNestedSets();
-            $this->_allChildrenCountRelation = new Ac_Model_Relation(array(
-                'srcTableName' => $this->tableName,
+            $this->allChildrenCountRelation = new Ac_Model_Relation(array(
+                'srcTableName' => $this->mixin->tableName,
                 'destTableName' => new Ac_Sql_Expression("(
                     SELECT parents.{$ns->idCol} AS parentId, COUNT(children.{$ns->idCol}) AS `count` 
                     FROM {$ns->tableName} AS parents 
@@ -189,17 +250,17 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
                 'database' => $this->database,
             ));
         }
-        return $this->_allChildrenCountRelation;
+        return $this->allChildrenCountRelation;
     }
     
     /**
      * @return Ac_Model_Relation
      */
     function getNodeChildIdsRelation() {
-        if ($this->_childIdsRelation === false) {
+        if ($this->childIdsRelation === false) {
             $ns = $this->getNestedSets();
-        	$this->_childIdsRelation = new Ac_Model_Relation(array(
-                'srcTableName' => $this->tableName,
+        	$this->childIdsRelation = new Ac_Model_Relation(array(
+                'srcTableName' => $this->mixin->tableName,
                 'destTableName' => $ns->tableName,
                 'fieldLinks' => array(
                     'nodeId' => $ns->parentCol,
@@ -212,16 +273,16 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
                 'destOrdering' => $ns->leftCol,
             ));
         }
-        return $this->_childIdsRelation;
+        return $this->childIdsRelation;
     }
     
     /**
      * @return Ac_Model_Relation
      */
     function getNodeContainersRelation() {
-        if ($this->_containersRelation === false) {
+        if ($this->containersRelation === false) {
             $ns = $this->getNestedSets();
-            $this->_containersRelation = new Ac_Model_Relation(array(
+            $this->containersRelation = new Ac_Model_Relation(array(
                 'srcTableName' => $ns->tableName,
                 'destMapperClass' => get_class($this),
                 'fieldLinks' => array(
@@ -234,32 +295,40 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
                 'srcWhere' => $ns->treeCol.' = '.$this->database->Quote($this->nsTreeId)
             ));
         }
-        return $this->_containersRelation;
+        return $this->containersRelation;
     }
     
     /**
      * @return Ac_I_Tree_Provider
      */
     function getDefaultTreeProvider() {
-        if ($this->_treeProvider === false) {
-            $this->_treeProvider = $this->createTreeProvider();
+        if ($this->treeProvider === false) {
+            $this->treeProvider = $this->createTreeProvider();
         }
-        return $this->_treeProvider;
+        return $this->treeProvider;
     }
 
     /**
      * @return Ac_I_Tree_Provider
      */
     function createTreeProvider() {
-    	return new Ac_Tree_Provider($this);
+    	return new Ac_Model_Tree_Provider($this->mixin);
     }
 
     protected function getOrderingValuesColumns() {
-        return 't.'.$this->getTitleFieldName();
+        if (Ac_Accessor::methodExists($this->mixin, 'getOrderingValuesColumns'))
+            $res = $this->mixin->getOrderingValuesColumns();
+        else 
+            $res = 't.'.$this->mixin->getTitleFieldName();
+        return $res;
     }
     
     protected function getOrderingValuesLabel(array $entry) {
-        return implode(' - ', $entry);
+        if (Ac_Accessor::methodExists($this->mixin, 'getOrderingValuesLabel'))
+            $res = $this->mixin->getOrderingValuesLabel($entry);
+        else 
+            $res = implode(' - ', $entry);
+        return $res;
     }
     
     /** 
@@ -272,18 +341,20 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
         $ns = $this->getNestedSets();
         if (is_null($pId)) $pId = $this->getRootNodeId();
         $foundMyself = false;
+        $idCol = $this->mixin->pk;
+        $nIdCol = $this->getDb()->n($idCol);
         if (strlen($pId)) {
-            $this->database->setQuery($sql = "
-                SELECT ns.ordering, ".$this->getOrderingValuesColumns().", t.id 
-                FROM {$this->tableName} AS t 
-                INNER JOIN {$ns->tableName} AS ns ON t.id = ns.{$ns->idCol} 
-                WHERE ns.{$ns->treeCol} = {$this->nsTreeId} AND ns.{$ns->parentCol} = ".$this->database->Quote($pId)." 
+            $ords = $this->getDb()->fetchArray($sql = "
+                SELECT ns.ordering, ".$this->getOrderingValuesColumns().", t.{$nIdCol} 
+                FROM {$this->mixin->tableName} AS t 
+                INNER JOIN {$ns->tableName} AS ns ON t.{$nIdCol} = ns.{$ns->idCol} 
+                WHERE ".$this->nsTreeCriterion('ns')." 
+                AND ns.{$ns->parentCol} = ".$this->getDb()->q($pId)." 
                 ORDER BY ns.ordering ASC
             ");
-            $ords = $this->database->loadAssocList();
             foreach ($ords as $ord) {
                 $lbl = $this->getOrderingValuesLabel($ord);
-                if ($ord['id'] == $modelObject->id) {
+                if ($ord[$idCol] == $modelObject->$idCol) {
                     $lbl .= ' '.(new Ac_Lang_String('model_ordering_current'));
                     $foundMyself = true;
                 }
@@ -301,20 +372,18 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
      * @return Ac_I_Tree_Impl
      */
     function createTreeImpl(Ac_Model_Object $modelObject) {
-        return new Ac_Tree_NestedSetsImpl(array(
+        return new Ac_Model_Tree_NestedSetsImpl(array(
             'container' => $modelObject,
-            'mapper' => $this,
+            'mapper' => $this->mixin,
         ));        
     }
     
-    function hasOriginalData() {
-        return (bool) $this->getTreeNode();
-    }
-    
-
     function fixTree($dontApply = false, $extraColumns = '') {
         
         $treeTableName = $this->getNestedSets()->tableName;
+        
+        if (!strlen($this->getNestedSets()->treeCol)) 
+            throw new Exception("fixTree() without \$treeCol isn't supported yet");
         
 		$sql = new Ac_Sql_Db_Ae();
 		
@@ -360,7 +429,7 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
 		$query = "
 			SELECT ns.id, ns.parentId, ns.ordering {$extraColumns}
 			FROM {$treeTableName} ns
-				 LEFT JOIN {$this->tableName} c
+				 LEFT JOIN {$this->mixin->tableName} c
 				 ON c.{$this->pk} = ns.id
 			WHERE 
 				(NOT ISNULL(c.{$this->pk}) OR ns.depth = 0) 
@@ -403,8 +472,12 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
     function findProblems($fix = false, $itemId = false) {
         $db = $this->sqlDb;
         $ns = $this->getNestedSets();
-        $treeTableName = $this->nsTableName;
-        $myTableName = $this->tableName;
+        $treeTableName = $ns->tableName;
+        $myTableName = $this->mixin->tableName;
+        
+        if ($treeTableName == $myTableName) 
+            throw new Exception ("findProblems() isn't supported yet "
+                . "when NS table is the same as data table");
     
         $pk = $this->pk;
         $title = $this->getTitleFieldName();
@@ -476,6 +549,21 @@ class Ac_Tree_NestedSetsMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapp
         
         return $res;
                 
+    }
+    
+    protected function listNonMixedProperties() {
+        return array_merge(parent::listNonMixedProperties(), array(
+            'nsTreeId', 'nsIdCol', 'nsTableName', 'addMixaleToRecords', 'nsPrototype'
+        ));
+    }
+        
+    function onAfterCreateRecord(Ac_Model_Object $record) {
+        if ($this->addMixableToRecords) {
+            
+        }
+        if (!$record->listMixables('Ac_Model_Tree_Object')) {
+            $record->addMixable(new Ac_Model_Tree_Object);
+        }
     }
     
 }

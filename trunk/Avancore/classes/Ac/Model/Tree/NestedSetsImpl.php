@@ -1,8 +1,8 @@
 <?php
 
-class Ac_Tree_NestedSetsImpl extends Ac_Tree_AbstractImpl {
+class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     
-    const debugCallback = 'Pmt_Tree_NestedSetsImpl::debugCallback';
+    const debugCallback = 'Ac_Tree_NestedSetsImpl::debugCallback';
     const debugBeginStore = 'beginStore';
     const debugBeginSelfStore = 'beginSelfStore';
     const debugEndSelfStore = 'endSelfStore';
@@ -21,7 +21,7 @@ class Ac_Tree_NestedSetsImpl extends Ac_Tree_AbstractImpl {
     protected $treeNode = false;
     
     /**
-     * @var Ac_Tree_NestedSetsImpl
+     * @var Ac_Model_Tree_NestedSetsImpl
      */
     protected $tmpParent = false;
     
@@ -79,14 +79,17 @@ class Ac_Tree_NestedSetsImpl extends Ac_Tree_AbstractImpl {
     }
     
     function setParentNode(Ac_I_Tree_Node $parentNode = null) {
-        if ($parentNode && !($parentNode instanceof Ac_Tree_NestedSetsImpl))
-        	throw new Exception("\$parentNode can be only Ac_Tree_NestedSetsImpl instance, '".get_class($parentNode)."' given");
+        if ($parentNode && !($parentNode instanceof Ac_Model_Tree_NestedSetsImpl))
+        	throw new Exception("\$parentNode can be only Ac_Model_Tree_NestedSetsImpl instance, '".get_class($parentNode)."' given");
         parent::setParentNode($parentNode);
     }
     
-    function notifyChildNodeAdded(Ac_Tree_NestedSetsImpl $childNode) {
-        if ($childNode && !($childNode instanceof Ac_Tree_NestedSetsImpl))
-        	throw new Exception("\$childNode can be only Ac_Tree_NestedSetsImpl instance, '".get_class($childNode)."' given");
+    /**
+     * @param Ac_Model_Tree_NestedSetsImpl $childNode
+     */
+    function notifyChildNodeAdded(Ac_I_Tree_Node $childNode) {
+        if ($childNode && !($childNode instanceof Ac_Model_Tree_NestedSetsImpl))
+        	throw new Exception("\$childNode can be only Ac_Model_Tree_NestedSetsImpl instance, '".get_class($childNode)."' given");
         parent::notifyChildNodeAdded($childNode);
     }
 
@@ -100,8 +103,6 @@ class Ac_Tree_NestedSetsImpl extends Ac_Tree_AbstractImpl {
             else $res = false;
         return $res;        
     }
-    
-    
     
     function store() {
         if ($this->lockStore !== 0) return true;
@@ -121,6 +122,7 @@ class Ac_Tree_NestedSetsImpl extends Ac_Tree_AbstractImpl {
         $newId = $this->getParentIdIfChanged();
         $newOrdering = $this->getOrderingIfChanged(!!$newId);
         if ($res && (($newId !== false) || !is_null($newOrdering))) {
+            Ac_Debug::dd($newId, $newOrdering);
             if (($tn = $this->getTreeNode())) {
                 $oldParentId = $tn[$this->nestedSets->parentCol];
                 if ($newId === false) $newId = $oldParentId;
@@ -131,7 +133,9 @@ class Ac_Tree_NestedSetsImpl extends Ac_Tree_AbstractImpl {
                     $this->parentId = $newId;
                     $this->treeNode = false;
                     if (!is_null($actualNewOrdering)) $this->ordering = $actualNewOrdering;
+                    Ac_Debug::ddd("Ok");
                 } else {
+                    throw new Exception("WTF");
                     $res = false;
                 }
             } else {
@@ -197,7 +201,7 @@ class Ac_Tree_NestedSetsImpl extends Ac_Tree_AbstractImpl {
     }
     
     /**
-     * @return Ac_Tree_NestedSetsImpl
+     * @return Ac_Model_Tree_NestedSetsImpl
      */
     function createChildNode(Ac_Model_Object $container = null) {
         $prototype = array(
@@ -278,7 +282,7 @@ class Ac_Tree_NestedSetsImpl extends Ac_Tree_AbstractImpl {
     }
     
     /**
-     * @return Ac_Tree_NestedSetsImpl
+     * @return Ac_Model_Tree_NestedSetsImpl
      */
     function getChildNode($id) {
         return parent::getChildNode($id);

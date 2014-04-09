@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_Tree_Node {
+abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_Tree_Node {
 
     const csBeforeDelete = 'beforeDelete';
     const csAfterDelete = 'afterDelete';
@@ -130,7 +130,7 @@ abstract class Ac_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_Tree_N
     }
     
     /**
-     * @return Ac_Tree_Provider
+     * @return Ac_Model_Tree_Provider
      */
     function getTreeProvider() {
         return $this->treeProvider;
@@ -195,7 +195,7 @@ abstract class Ac_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_Tree_N
         }
     }
     
-    function notifyChildNodeRemoved(Ac_Tree_NestedSetsImpl $childNode) {
+    function notifyChildNodeRemoved(Ac_Model_Tree_NestedSetsImpl $childNode) {
         if ($id = $childNode->getNodeId()) {
             if ($this->childNodeIds !== false) $this->childNodeIds = array_diff($this->childNodeIds, array($id));
         }
@@ -204,7 +204,7 @@ abstract class Ac_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_Tree_N
                 unset($this->tmpChildren[$k]);
     }
     
-    function notifyChildNodeSaved(Ac_Tree_NestedSetsImpl $childNode) {
+    function notifyChildNodeSaved(Ac_Model_Tree_NestedSetsImpl $childNode) {
         if (strlen($nsId = $childNode->getNodeId())) {
             $this->childNodeIds = false;
             foreach (array_keys($this->tmpChildren) as $k) 

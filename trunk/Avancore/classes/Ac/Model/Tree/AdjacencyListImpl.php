@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Tree_AdjacencyListImpl extends Ac_Tree_AbstractImpl {
+class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
 
     protected $parentField = 'parentId';
     
@@ -13,12 +13,12 @@ class Ac_Tree_AdjacencyListImpl extends Ac_Tree_AbstractImpl {
     protected $origParentId = false;
     
     /**
-     * @var Ac_Tree_AdjacencyListMapper
+     * @var Ac_Model_Tree_AdjacencyListMapper
      */
     protected $mapper = false;
     
     /**
-     * @var Ac_Tree_AdjacencyListImpl
+     * @var Ac_Model_Tree_AdjacencyListImpl
      */
     protected $tmpParent = false;
     
