@@ -1,10 +1,12 @@
 <?php
 
-class Ac_Mixable implements Ac_I_Mixable {
+class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
     
     protected $mixableId = false;
     
-    protected $autoEventPrefix = 'event_';
+    protected $autoEventPrefix = 'on';
+    
+    protected $stripAutoEventPrefix = false;
     
     /**
      * @var Ac_I_Mixin
@@ -18,6 +20,14 @@ class Ac_Mixable implements Ac_I_Mixable {
     protected static $introducedPublicVars = array();
     
     protected static $eventHandlerMethods = array();
+    
+    protected function listNonMixedMethods() {
+        return array();
+    }
+    
+    protected function listNonMixedProperties() {
+        return array();
+    }
     
     function setMixableId($mixableId) {
         if ($this->mixableId !== false && $mixableId !== $this->mixableId)
@@ -40,7 +50,7 @@ class Ac_Mixable implements Ac_I_Mixable {
                 self::$introducedPublicMethods[$c] = array_diff(self::$introducedPublicMethods[$c], 
                     $this->listEventHandlerMethods());
         }
-        return self::$introducedPublicMethods[$c];
+        return array_diff(self::$introducedPublicMethods[$c], $this->listNonMixedMethods());
     }
     
     function listEventHandlerMethods() {
@@ -49,8 +59,12 @@ class Ac_Mixable implements Ac_I_Mixable {
             self::$eventHandlerMethods[$c] = array();
             if ($l = strlen($this->autoEventPrefix)) {
                 foreach (Ac_Util::getPublicMethods($c) as $m)
-                    if (!strncasecmp($m, $this->autoEventPrefix, $l))
-                        self::$eventHandlerMethods[$c][substr($m, $l)] = $m;
+                    if (!strncasecmp($m, $this->autoEventPrefix, $l)) {
+                        if ($this->stripAutoEventPrefix)
+                            self::$eventHandlerMethods[$c][substr($m, $l)] = $m;
+                        else 
+                            self::$eventHandlerMethods[$c][$m] = $m;
+                    }
             }
         }
         return self::$eventHandlerMethods[$c];
@@ -60,17 +74,18 @@ class Ac_Mixable implements Ac_I_Mixable {
         $c = get_class($this);
         if (!isset(self::$introducedPublicVars[$c])) {
             self::$introducedPublicVars[$c] = array_diff(
-                Ac_Util::getPublicVars($c), 
-                Ac_Util::getPublicVars('Ac_Mixable')
+                array_keys(Ac_Util::getPublicVars($c)), 
+                array_keys(Ac_Util::getPublicVars('Ac_Mixable'))
             );
         }
-        return self::$introducedPublicVars[$c];
+        return array_diff(self::$introducedPublicVars[$c], $this->listNonMixedProperties());
     }
 
     public function registerMixin(Ac_I_Mixin $mixin) {
 
         if ($this->mixinClass !== false)
-            throw Ac_E_InvalidCall::wrongClass ('mixin', $mixin, $this->mixinClass);
+            if (! $mixin instanceof $this->mixinClass)
+                throw Ac_E_InvalidCall::wrongClass ('mixin', $mixin, $this->mixinClass);
         
         $this->mixin = $mixin;
         if (strlen($this->autoEventPrefix) && $mixin instanceof Ac_I_WithEvents) 
@@ -88,9 +103,10 @@ class Ac_Mixable implements Ac_I_Mixable {
     protected function autoRegisterEvents($mixin) {
         if ($mixin instanceof Ac_I_WithEvents) {
             foreach ($this->listEventHandlerMethods() as $event => $method) {
-                $mixin->addEventListener(array($this, $method), $event);
+                $handler = $event === $method? $this : array($this, $method);
+                $mixin->addEventListener($handler, $event);
             }
         }
     }
-
+    
 }

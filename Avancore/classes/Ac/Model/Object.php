@@ -25,9 +25,9 @@ class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_CREATE = 'onCreate';
 
     /**
-     * function afterLoad()
+     * function onAfterLoad()
      */
-    const EVENT_AFTER_LOAD = 'afterLoad';
+    const EVENT_AFTER_LOAD = 'onAfterLoad';
     
     /**
      * function onActual($reason = self::ACTUAL_REASON_LOAD)
@@ -35,14 +35,14 @@ class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_ACTUAL = 'onActual';
 
     /**
-     * function beforeSave(& $result)
+     * function onBeforeSave(& $result)
      */
-    const EVENT_BEFORE_SAVE = 'beforeSave';
+    const EVENT_BEFORE_SAVE = 'onBeforeSave';
 
     /**
-     * function afterSave(& $result)
+     * function onAfterSave(& $result)
      */
-    const EVENT_AFTER_SAVE = 'afterSave';
+    const EVENT_AFTER_SAVE = 'onAfterSave';
 
     /**
      * function onSaveFailed()
@@ -55,14 +55,14 @@ class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_DELETE_FAILED = 'onDeleteFailed';
 
     /**
-     * function beforeDelete(& $result)
+     * function onBeforeDelete(& $result)
      */
-    const EVENT_BEFORE_DELETE = 'beforeDelete';
+    const EVENT_BEFORE_DELETE = 'onBeforeDelete';
 
     /**
-     * function afterDelete()
+     * function onAfterDelete()
      */
-    const EVENT_AFTER_DELETE = 'afterDelete';
+    const EVENT_AFTER_DELETE = 'onAfterDelete';
 
     /**
      * function onCanDelete(& $result)

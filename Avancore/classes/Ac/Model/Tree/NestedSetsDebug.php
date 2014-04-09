@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Tree_NestedSetsDebug {
+class Ac_Model_Tree_NestedSetsDebug {
     
     protected $buffer = false;
     

@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapper_AdjacencyList {
+class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapper_AdjacencyList {
 	
     var $_rootNodeId = false;
     
@@ -28,7 +28,7 @@ class Ac_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_Tree_M
     
     protected $nodeOrderField = 'ordering';
 
-    function Ac_Tree_AdjacencyListMapper($tableName, $recordClass, $pk = 'id') {
+    function Ac_Model_Tree_AdjacencyListMapper($tableName, $recordClass, $pk = 'id') {
     	parent::Ac_Model_Mapper($tableName, $recordClass, $pk);
     	$this->sqlDb = new Ac_Sql_Db_Ae($this->database);
     	$this->_stmtCache = new Ac_Sql_Statement_Cache(array(
@@ -49,10 +49,10 @@ class Ac_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_Tree_M
     }
     
     function getNodeClass() {
-        return 'Ac_Tree_AdjacencyListImpl';
+        return 'Ac_Model_Tree_AdjacencyListImpl';
     }
     
-    function loadOriginalDataForNode(Ac_Tree_AdjacencyListImpl $node) {
+    function loadOriginalDataForNode(Ac_Model_Tree_AdjacencyListImpl $node) {
         $nid = $node->getNodeId();
         Pm_Conversation::log("Mapper: loading original data for node $nid", gettype($nid));
         $res = false;
@@ -84,7 +84,7 @@ class Ac_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_Tree_M
         		'mapper' => $this,
         	    'originalData' => $node
             );
-            $objNode = new Ac_Tree_AdjacencyListImpl($prot);
+            $objNode = new Ac_Model_Tree_AdjacencyListImpl($prot);
             $res[$id] = $objNode;
         }
         return $res;
@@ -237,7 +237,7 @@ class Ac_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_Tree_M
      * @return Ac_I_Tree_Provider
      */
     function createTreeProvider() {
-    	return new Ac_Tree_Provider($this);
+    	return new Ac_Model_Tree_Provider($this);
     }
     
     function getNodeParentField() {
