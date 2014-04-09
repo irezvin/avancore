@@ -1,39 +1,18 @@
 <?php
 
+/**
+ * @method listTopNodes();
+ * @method getNodeClass();
+ * @method loadNodes(array $ids);
+ * @method Ac_I_Tree_Provider getDefaultTreeProvider();
+ * @method Ac_I_Tree_Provider createTreeProvider();
+ * @method loadNodeChildrenCounts(array $nodes);
+ * @method loadNodeAllChildrenCounts(array $nodes);
+ * @method loadNodeChildIds(array $nodes);
+ * @method loadNodeContainers(array $nodes);
+ * @method getOrderingValues(Ac_Model_Object $modelObject);
+ * @method Ac_I_Tree_Impl createTreeImpl(Ac_Model_Object $modelObject);
+ * 
+ */
 interface Ac_I_Tree_Mapper {
-	
-    function listTopNodes();
-	            
-    function getNodeClass();
-    
-    function loadNodes(array $ids);
-
-    /**
-     * @return Ac_I_Tree_Provider
-     */
-    function getDefaultTreeProvider();
-
-    /**
-     * @return Ac_I_Tree_Provider
-     */
-    function createTreeProvider();
-
-    function loadNodeChildrenCounts(array $nodes);
-    
-    function loadNodeAllChildrenCounts(array $nodes);
-    
-    function loadNodeChildIds(array $nodes);
-    
-    function loadNodeContainers(array $nodes);
-	
-    /** 
-     * @return array 
-     */
-    function getOrderingValues(Ac_Model_Object $modelObject);
-    
-    /**
-     * @return Ac_I_Tree_Impl
-     */
-    function createTreeImpl(Ac_Model_Object $modelObject);
-    
 }

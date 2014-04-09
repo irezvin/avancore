@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Sql_NestedSets {
+class Ac_Sql_NestedSets extends Ac_Prototyped {
     
     const debugStmtCallback = 'Ac_Sql_NestedSets::debugStmtCallback';
     const debugBeforeQuery = 'beforeQuery';
@@ -30,16 +30,15 @@ class Ac_Sql_NestedSets {
     var $treeId = false;
     
     var $autoLock = true;
-    var $parentIdOfRoot = false;
+    var $parentIdOfRoot = null;
     var $idIsUniqueForAllTrees = false;
     var $idIsAutoInc = false;
     var $cacheStatements = true;
     
     var $_stmtCache = array();
-
-    function Ac_Sql_NestedSets($options = array()) {
-        $this->parentIdOfRoot = null;
-        Ac_Util::smartBind($options, $this);
+    
+    function hasPublicVars() {
+        return true;
     }
     
     /**
@@ -56,7 +55,7 @@ class Ac_Sql_NestedSets {
     }
     
     /**
-     * @return Ac_Sql_Db_Ae
+     * @return Ac_Sql_Db
      */
     function getDb() {
         return $this->_db;
@@ -88,12 +87,12 @@ class Ac_Sql_NestedSets {
         if ($useCache) {
             $md = md5(serialize($parts));
             if (!isset($this->_stmtCache[$md])) {
-                $this->_stmtCache[$md] = Ac_Sql_Statement::factory($parts, $this->_getCommonParams()); 
+                $this->_stmtCache[$md] = Ac_Sql_Statement::create($parts, $this->_getCommonParams()); 
             }
             $this->_stmtCache[$md]->applyParams($params);
             $res = $this->_stmtCache[$md];
         } else {
-            $res = Ac_Sql_Statement::factory($parts, $this->_getCommonParams($params));
+            $res = Ac_Sql_Statement::create($parts, $this->_getCommonParams($params));
         }
         return $res;
     }
@@ -224,6 +223,9 @@ class Ac_Sql_NestedSets {
         } else {
             $data = array($this->idCol => $idOrData);
         }
+        
+        $c = new Ac_Sql_Expression($this->_db->valueCriterion($data));
+        
         $res = $this->_db->fetchRow($this->_stmt(
             'SELECT * FROM [[tableName]] WHERE [[crit]] [[tc]]',
             array('crit' => new Ac_Sql_Expression($this->_db->valueCriterion($data)))

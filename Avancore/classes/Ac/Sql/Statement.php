@@ -32,7 +32,7 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
      * @return Ac_Sql_Statement
      */
     
-    function factory($parts, $params = array(), $extraOptions = array()) {
+    static function create($parts, $params = array(), $extraOptions = array()) {
         if (!is_array($parts)) $parts = array('expression' => $parts);
         $options = array(
             'parts' => $parts,
