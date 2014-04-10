@@ -35,7 +35,7 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     
     protected function setNestedSets(Ac_Sql_NestedSets $nestedSets) {
         $this->nestedSets = $nestedSets;
-    }
+    } 
     
     /**
      * @return Ac_Sql_NestedSets

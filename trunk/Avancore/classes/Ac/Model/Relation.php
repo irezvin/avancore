@@ -268,11 +268,13 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function setSrcMapper(Ac_Model_Mapper $srcMapper) {
         $this->_srcMapper = $srcMapper;
         $this->srcMapperClass = $srcMapper->getId();
+        if ($this->srcTableName === false) $this->srcTableName = $srcMapper->tableName;
         if (!$this->database) $this->database = $this->_srcMapper->getApplication()->getDb();
     }
     
     function setDestMapper(Ac_Model_Mapper $destMapper) {
         $this->_destMapper = $destMapper;
+        if ($this->destTableName === false) $this->destTableName = $destMapper->tableName;
         if (!$this->database) $this->database = $this->_destMapper->getApplication()->getDb();
     }
     

@@ -208,11 +208,12 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
         }
     }
     
-    function onAfterSave(& $res) {
-        if ($res !== false) {
-            if ($this->mixin->isPersistent()) {
-                $res = $this->getTreeImpl()->afterContainerSave() !== false;
-            }
+    function onAfterSave() {
+        if ($this->mixin->isPersistent()) {
+            $this->getTreeImpl()->afterContainerSave();
+        } else {
+                $this->mixin->getPrimaryKey(), $this->mixin->tracksPk(), $this->mixin->_origPk
+            );
         }
     }
     

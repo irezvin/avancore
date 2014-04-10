@@ -484,6 +484,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                 
                 $res = $res && ($this->_storeReferencedRecords() !== false);
                 $res = $res && $this->_legacyStore();
+                if ($this->tracksPk()) $this->_origPk = $res? $this->getPrimaryKey() : null;
                 $res = $res && ($this->_storeReferencingRecords() !== false);
                 $res = $res && ($this->_storeNNRecords() !== false);
                 if ($res) {
@@ -504,7 +505,6 @@ class Ac_Model_Object extends Ac_Model_Data {
             else {
                 $res = false;
             }
-            if ($this->tracksPk()) $this->_origPk = $res? $this->getPrimaryKey() : null;
         } else {
             $res = true;
         }

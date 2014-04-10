@@ -121,12 +121,12 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable implements Ac_I_Tree_Map
         return 'Ac_Model_Tree_NestedSetsImpl';
     }
     
-    protected function nsTreeCriterion($alias = false) {
+    protected function nsTreeCriterion($alias = false, $expressionIfNone = "1") {
         if (strlen($tc = $this->getNestedSets()->treeCol)) {
             $c = strlen($alias)? array($alias, $tc) : $tc;
             $res = $this->getDb()->nameQuote($c) . $this->getDb()->eqCriterion($this->nsTreeId);
         } else {
-            $res = "1";
+            $res = $expressionIfNone;
         }
         return $res;
     }
@@ -159,7 +159,7 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable implements Ac_I_Tree_Map
             if (strlen($this->nsTableName)) {
                 $this->nsRelation = new Ac_Model_Relation(array(
                     'srcTableName' => $ns->tableName,
-                    'destMapperClass' => get_class($this),
+                    'destMapper' => $this->mixin,
                     'fieldLinks' => array($ns->idCol => $this->mixin->pk),
                     'srcIsUnique' => true,
                     'destIsUnique' => true,
@@ -209,8 +209,8 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable implements Ac_I_Tree_Map
                 'destTableName' => new Ac_Sql_Expression("(
                     SELECT {$ns->parentCol} AS parentId, COUNT(ns.{$ns->idCol}) AS `count` 
                     FROM {$ns->tableName} AS ns 
-                    WHERE NOT ISNULL({$ns->parentCol}) AND {$ns->treeCol} = ".$this->database->Quote($this->nsTreeId).' 
-                    GROUP BY parentId) AS nsc'
+                    WHERE NOT ISNULL({$ns->parentCol}) AND ".$this->nsTreeCriterion()." 
+                    GROUP BY parentId) AS nsc"
                 ),
                 'fieldLinks' => array(
                     'nodeId' => 'parentId',
@@ -218,7 +218,7 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable implements Ac_I_Tree_Map
                 'srcVarName' => 'childNodesCount',
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
-                'database' => $this->database,
+                'database' => $this->getDb(),
             ));
         }
         return $this->childrenCountRelation;
@@ -230,24 +230,27 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable implements Ac_I_Tree_Map
     function getAllChildrenCountRelation() {
         if ($this->allChildrenCountRelation === false) {
             $ns = $this->getNestedSets();
+            if (strlen($ns->treeCol))
+                $treeJoinCriterion = "children.{$ns->treeCol} = parents.{$ns->treeCol} AND ";
+            else 
+                $treeJoinCriterion = "";
             $this->allChildrenCountRelation = new Ac_Model_Relation(array(
                 'srcTableName' => $this->mixin->tableName,
                 'destTableName' => new Ac_Sql_Expression("(
                     SELECT parents.{$ns->idCol} AS parentId, COUNT(children.{$ns->idCol}) AS `count` 
                     FROM {$ns->tableName} AS parents 
                     INNER JOIN {$ns->tableName} AS children
-                        ON children.{$ns->treeCol} = parents.{$ns->treeCol} 
-                        AND children.{$ns->leftCol} > parents.{$ns->leftCol} 
+                        ON {$treeJoinCriterion} children.{$ns->leftCol} > parents.{$ns->leftCol} 
                         AND children.{$ns->leftCol} < parents.{$ns->rightCol}
-                    WHERE parents.{$ns->treeCol} = ".$this->database->Quote($this->nsTreeId).' 
-                    GROUP BY parentId) AS nsc'),
+                    WHERE  ".$this->nsTreeCriterion("parents")."
+                    GROUP BY parentId) AS nsc"),
                 'fieldLinks' => array(
                     'nodeId' => 'parentId',
                 ),
                 'srcVarName' => 'allChildNodesCount',
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
-                'database' => $this->database,
+                'database' => $this->getDb(),
             ));
         }
         return $this->allChildrenCountRelation;
@@ -268,8 +271,8 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable implements Ac_I_Tree_Map
                 'srcVarName' => 'childNodeIds',
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-                'database' => $this->database,
-                'destWhere' => $ns->treeCol.' = '.$this->database->Quote($this->nsTreeId),
+                'database' => $this->getDb(),
+                'destWhere' => $this->nsTreeCriterion(false, false),
                 'destOrdering' => $ns->leftCol,
             ));
         }
@@ -284,15 +287,15 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable implements Ac_I_Tree_Map
             $ns = $this->getNestedSets();
             $this->containersRelation = new Ac_Model_Relation(array(
                 'srcTableName' => $ns->tableName,
-                'destMapperClass' => get_class($this),
+                'destMapper' => $this->mixin,
                 'fieldLinks' => array(
-                    'nodeId' => $this->pk,
+                    'nodeId' => $this->mixin->pk,
                 ),
                 'srcVarName' => 'container',
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
-                'database' => $this->database,
-                'srcWhere' => $ns->treeCol.' = '.$this->database->Quote($this->nsTreeId)
+                'database' => $this->getDb(),
+                'srcWhere' => $this->nsTreeCriterion(false, false)
             ));
         }
         return $this->containersRelation;
