@@ -669,7 +669,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         $crit = $this->indexCrtieria($fields);
         if (strlen($where)) $crit = "($crit) AND ($where)";
         $recs = $this->loadRecordsByCriteria($crit);
-        //var_dump($crit);
         if ($searchNewRecords) {
             $newRecs = $this->find($fields);
             foreach (array_keys($newRecs) as $k) $recs[] = $newRecs[$k];
@@ -679,7 +678,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
             if (!$mustBeUnique || count($recs) == 1) $res = $recs[0];
         }
         if (!$res) {
-            //var_dump($fields, count($this->newRecords));
         }
         return $res;
     }
