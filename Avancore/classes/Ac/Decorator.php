@@ -26,7 +26,7 @@ class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
         return $value;
     }
     
-    static function decorate($decorator, $value, & $instance = null) {
+    static final function decorate($decorator, $value, & $instance = null) {
         $instance = self::instantiate($decorator);
         if ($instance) $value = $instance->apply($value);
         return $value;
