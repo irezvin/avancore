@@ -122,7 +122,6 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
         $newId = $this->getParentIdIfChanged();
         $newOrdering = $this->getOrderingIfChanged(!!$newId);
         if ($res && (($newId !== false) || !is_null($newOrdering))) {
-            Ac_Debug::dd($newId, $newOrdering);
             if (($tn = $this->getTreeNode())) {
                 $oldParentId = $tn[$this->nestedSets->parentCol];
                 if ($newId === false) $newId = $oldParentId;
@@ -133,9 +132,7 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
                     $this->parentId = $newId;
                     $this->treeNode = false;
                     if (!is_null($actualNewOrdering)) $this->ordering = $actualNewOrdering;
-                    Ac_Debug::ddd("Ok");
                 } else {
-                    throw new Exception("WTF");
                     $res = false;
                 }
             } else {

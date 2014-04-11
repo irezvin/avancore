@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable implements Ac_I_Tree_Mapper_NestedSets {
+class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
 	
     protected $mixableId = 'treeMapper';
     
@@ -143,7 +143,7 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable implements Ac_I_Tree_Map
         foreach ($nodes as $id => $node) {
             $objNode = new Ac_Model_Tree_NestedSetsImpl(array(
                 'nodeData' => $node,
-                'mapper' => $this, 
+                'mapper' => $this->mixable, 
             ));
             $res[$id] = $objNode;
         }

@@ -15,7 +15,7 @@ class Ac_Admin_Column_SaveOrder extends Ac_Table_Column_SaveOrder {
         return $res;
     }    
     
-    function showHeader($rowCount, $rowNo) {
+    function showHeader($rowCount, $rowNo = 1) {
         
         $saveOrderCall = new Ac_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
             $this->getTaskName(), true
