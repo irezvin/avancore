@@ -28,7 +28,7 @@ class Ac_Table_Column_SaveOrder extends Ac_Table_Column {
         return $res;
     }    
     
-    function showHeader($rowCount, $rowNo) {
+    function showHeader($rowCount, $rowNo = 1) {
         ?>
         <th <?php echo Ac_Util::mkAttribs($this->getHeaderAttribs($rowCount, $rowNo)); ?> > 
             <?php echo $this->getTitle(); ?> 

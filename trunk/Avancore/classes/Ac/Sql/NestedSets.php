@@ -573,7 +573,7 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
         
         if ($node) {
             if ($nLevels !== false)
-                $maxLevelExpression = Ac_Sql_Statement::factory(
+                $maxLevelExpression = Ac_Sql_Statement::create(
                     ' AND [[levelCol]] <= {{maxLevel}}', 
                     array('maxLevel' => $node['level'] + $nLevels) 
                 );
@@ -651,7 +651,7 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
             
             
             if ($nLevels !== false)
-                $maxLevelExpression = Ac_Sql_Statement::factory(
+                $maxLevelExpression = Ac_Sql_Statement::create(
                     ' AND [[levelCol]] <= {{maxLevel}}', 
                     array('maxLevel' => $node['level'] + $nLevels) 
                 );

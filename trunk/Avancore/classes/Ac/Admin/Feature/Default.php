@@ -191,7 +191,8 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
             if (isset($prop->showInForm) && !$prop->showInForm) continue;
             $conf = Ac_Util::m($this->formFieldDefaults, $conv->getControlSettings($prop));
             if ($do !== false) {
-                $conf['displayOrder'] = $do;
+                if (!isset($conf['displayOrder'])) 
+                    $conf['displayOrder'] = $do;
                 $do += $this->displayOrderStep;
             }
             if ($prop->propName === $aif) {

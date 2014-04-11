@@ -142,7 +142,8 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
     }    
     
     function getOrderingValues() {
-        return $this->getMapper()->getOrderingValues($this->mixin);
+        $res = $this->getMapper()->getOrderingValues($this->mixin);
+        return $res;
     }
     
     function canOrderUp() {
@@ -166,14 +167,14 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
         return $res;
     }
     
-    function onListOwnProperties(array & $properties) {
+    function onListProperties(array & $properties) {
         $properties = array_unique(array_merge($properties, array(
             'parentItemId', 'ordering',
         )));
     }
     
     function onGetPropertiesInfo(& $propertiesInfo) {
-        Ac_Util::ms($propertiesInfo, array(
+        $propertiesInfo = Ac_Util::m(array(
             'parentItemId' => array(
                 'caption' => new Ac_Lang_String('model_tree_parent', array('ucfirst' => true)),
             ),
@@ -181,7 +182,7 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
                 'caption' => new Ac_Lang_String('model_tree_ordering', array('ucfirst' => true)),
                 'valuesGetter' => 'getOrderingValues',
             ),
-        ));
+        ), $propertiesInfo);
     }
     
     function onCheck(& $errors) {
@@ -211,9 +212,6 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
     function onAfterSave() {
         if ($this->mixin->isPersistent()) {
             $this->getTreeImpl()->afterContainerSave();
-        } else {
-                $this->mixin->getPrimaryKey(), $this->mixin->tracksPk(), $this->mixin->_origPk
-            );
         }
     }
     
