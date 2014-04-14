@@ -34,6 +34,7 @@ $config = array(
         ),
         'autoTablesAll' => true,
 		'autoTablesIgnore' => array(
+            '#__tree_nested_sets',
         ),
         'defaultTitleColumn' => 'title',
         'dictionary' => array(

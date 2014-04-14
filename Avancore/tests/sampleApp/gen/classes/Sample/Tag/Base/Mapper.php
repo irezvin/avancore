@@ -85,13 +85,13 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                   'destCountVarName' => '_tagsCount',
                   'destNNIdsVarName' => '_tagIds',
                   'fieldLinks' => array (
-                      'tagId' => 'idOfTag',
+                      'tagId' => 'tagId',
                   ),
                   'srcIsUnique' => false,
                   'destIsUnique' => false,
                   'midTableName' => '#__people_tags',
                   'fieldLinks2' => array (
-                      'idOfPerson' => 'personId',
+                      'personId' => 'personId',
                   ),
               ),
         ));
@@ -103,7 +103,6 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
             array (
                   'singleCaption' => 'Tag',
                   'pluralCaption' => 'Tags',
-                  'hasUi' => false,
             ),
             parent::doGetInfoParams()
         );
