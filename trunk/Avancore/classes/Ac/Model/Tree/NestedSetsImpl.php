@@ -119,17 +119,17 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
         
         Ac_Callbacks::call(self::debugCallback, self::debugBeginSelfStore, $this);
         
-        $newId = $this->getParentIdIfChanged();
-        $newOrdering = $this->getOrderingIfChanged(!!$newId);
-        if ($res && (($newId !== false) || !is_null($newOrdering))) {
+        $newParentId = $this->getParentIdIfChanged();
+        $newOrdering = $this->getOrderingIfChanged(!!$newParentId);
+        if ($res && (($newParentId !== false) || !is_null($newOrdering))) {
             if (($tn = $this->getTreeNode())) {
                 $oldParentId = $tn[$this->nestedSets->parentCol];
-                if ($newId === false) $newId = $oldParentId;
-                if (is_null($newId)) $newId = $this->getRootNodeId();
+                if ($newParentId === false) $newParentId = $oldParentId;
+                if (is_null($newParentId)) $newParentId = $this->getRootNodeId();
                 if (is_null($newOrdering)) $newOrdering = false;
-                if ($this->nestedSets->moveNode($this->getNodeId(), $newId, $newOrdering, false, $actualNewOrdering)) {
+                if ($this->nestedSets->moveNode($this->getNodeId(), $newParentId, $newOrdering, false, $actualNewOrdering)) {
                     if (($node = $this->treeProvider->getNode($oldParentId, false))) $node->notifyChildNodeRemoved($this);
-                    $this->parentId = $newId;
+                    $this->parentId = $newParentId;
                     $this->treeNode = false;
                     if (!is_null($actualNewOrdering)) $this->ordering = $actualNewOrdering;
                 } else {
@@ -286,6 +286,16 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     }
     
     protected function doBeforeContainerSave() {
+        $mapper = $this->container->getMapper();
+        if ($mapper->getIsSameTable()) {
+            if (!$mapper->getIsCreatingRootNode()) {
+                $pc = $this->getNestedSets()->parentCol;
+                if (!strlen($this->container->$pc)) {
+                    $this->parentId = $mapper->getRootNodeId();
+                    $this->container->$pc = $this->parentId;
+                }
+            }
+        }
     }
     
     protected function doAfterContainerSave() {
@@ -313,6 +323,17 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     
     function hasOriginalData() {
         return (bool) $this->getTreeNode();
+    }
+    
+    function isRootObject() {
+        $res = false;
+        $mapper = $this->container->getMapper();
+        if ($mapper->isSameTable()) {
+            if ($this->container->getPrimaryKey() == $mapper->getRootNodeId()) {
+                $res = true;
+            }
+        }
+        return $res;
     }
     
 }

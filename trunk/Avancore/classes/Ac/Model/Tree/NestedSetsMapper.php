@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * 
+ */
+
 class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
 	
     protected $mixableId = 'treeMapper';
@@ -26,6 +30,8 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
     protected $containersRelation = false;
     
     protected $treeProvider = false;
+    
+    protected $isCreatingRootNode = false;
     
     // Variables to be overridden in concrete class
     
@@ -64,23 +70,36 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
     }
     
     protected function createRootNode() {
+        $this->isCreatingRootNode = true;
         if (Ac_Accessor::methodExists($this->mixin, 'createRootNode')) {
             $res = $this->mixin->createRootNode();
         } else {
             $ns = $this->getNestedSets();
             $res = $ns->addRootNode(true, $this->rootNodePrototype);
         }
+        $this->isCreatingRootNode = false;
         return $res;
     }
     
     function getRootNodeId() {
         if ($this->rootNodeId === false) {
-            $ns = $this->getNestedSets();
-            $root = $ns->getRootNode();
-            if ($root) $this->rootNodeId = $root[$ns->idCol];
-                else $this->rootNodeId = $this->createRootNode();
+            if (!$this->isCreatingRootNode) {
+                $ns = $this->getNestedSets();
+                $root = $ns->getRootNode();
+                if ($root) $this->rootNodeId = $root[$ns->idCol];
+                    else $this->rootNodeId = $this->createRootNode();
+            }
         }
         return $this->rootNodeId;
+    }
+    
+    function getIsSameTable() {
+        $res = $this->mixin->tableName == $this->getNestedSets()->tableName;
+        return $res;
+    }
+    
+    function getIsCreatingRootNode() {
+        return $this->isCreatingRootNode;
     }
     
     /**
@@ -103,6 +122,12 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
             }
             if (!isset($proto['treeId']) && strlen($this->nsTreeId)) $proto['treeId'] = $this->nsTreeId;
             if (!isset($proto['treeCol'])) $proto['treeCol'] = $this->nsTreeCol;
+            $aiField = $this->mixin->getAutoincFieldName();
+            if (!isset($proto['idIsAutoInc']) && $this->mixin->tableName == $proto['tableName']) {
+                if (strlen($aiField) && ($aiField == $proto['idCol'])) {
+                    $proto['idIsAutoInc'] = true;
+                }
+            }
         	$this->nestedSets = new Ac_Sql_NestedSets($proto);
         }
         return $this->nestedSets;
@@ -556,7 +581,7 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
     
     protected function listNonMixedProperties() {
         return array_merge(parent::listNonMixedProperties(), array(
-            'nsTreeId', 'nsIdCol', 'nsTableName', 'addMixaleToRecords', 'nsPrototype'
+            'nsTreeId', 'nsIdCol', 'nsTableName', 'addMixaleToRecords', 'nsPrototype', 'hasPublicVars'
         ));
     }
         

@@ -184,7 +184,7 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
             ),
         ), $propertiesInfo);
     }
-    
+  
     function onCheck(& $errors) {
         Ac_Util::ms($errors, $this->getTreeImpl()->getErrors(true, false, true, 'childItems'));
     }
@@ -215,4 +215,4 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
         }
     }
     
-} 
+        }

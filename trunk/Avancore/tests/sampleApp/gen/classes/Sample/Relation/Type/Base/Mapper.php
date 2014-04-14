@@ -95,7 +95,6 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
             array (
                   'singleCaption' => 'Relation type',
                   'pluralCaption' => 'Relation types',
-                  'hasUi' => false,
             ),
             parent::doGetInfoParams()
         );

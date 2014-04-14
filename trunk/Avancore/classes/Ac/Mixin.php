@@ -84,9 +84,10 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
     }
 
     public function getMixable($id, $dontThrow = false) {
-        if (isset($this->mixables[$id])) $res = $this->mixables;
+        if (isset($this->mixables[$id])) $res = $this->mixables[$id];
         elseif ($dontThrow) $res = null;
         else throw Ac_E_InvalidCall::noSuchItem ('mixable', $id, 'listMixables');
+        return $res;
     }
 
     public function getMixables($className = false) {

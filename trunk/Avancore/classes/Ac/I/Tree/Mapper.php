@@ -12,7 +12,6 @@
  * @method loadNodeContainers(array $nodes);
  * @method getOrderingValues(Ac_Model_Object $modelObject);
  * @method Ac_I_Tree_Impl createTreeImpl(Ac_Model_Object $modelObject);
- * 
  */
 interface Ac_I_Tree_Mapper {
 }

@@ -29,25 +29,22 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
         return parent::getMapper($mapperClass);
     }
     
-    function listOwnProperties() {
-        
+    protected function listOwnProperties() {
         return array ( 'relations', 'relationTypeId', 'title', 'isSymmetrical', );
-        
     }
-
-    function listOwnLists() {
+ 
+    protected function listOwnLists() {
         
         return array ( 'relations' => 'relations', );
-        
     }
 
-    function listOwnAssociations() {
-        
+    
+ 
+    protected function listOwnAssociations() {
         return array ( 'relations' => 'Sample_Relation', );
-        
     }
 
-    function getOwnPropertiesInfo() {
+    protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
               'relations' => array (
                   'className' => 'Sample_Relation',

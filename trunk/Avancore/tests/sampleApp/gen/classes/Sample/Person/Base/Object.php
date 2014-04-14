@@ -40,25 +40,22 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         return parent::getMapper($mapperClass);
     }
     
-    function listOwnProperties() {
-        
+    protected function listOwnProperties() {
         return array ( 'orientation', 'tags', 'tagIds', 'incomingRelations', 'outgoingRelations', 'personId', 'name', 'gender', 'isSingle', 'birthDate', 'lastUpdatedDatetime', 'createdTs', 'sexualOrientationId', );
-        
     }
-
-    function listOwnLists() {
+ 
+    protected function listOwnLists() {
         
         return array ( 'tags' => 'tags', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', );
-        
     }
 
-    function listOwnAssociations() {
-        
+    
+ 
+    protected function listOwnAssociations() {
         return array ( 'orientation' => 'Sample_Orientation', 'tags' => 'Sample_Tag', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', );
-        
     }
 
-    function getOwnPropertiesInfo() {
+    protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
               'orientation' => array (
                   'className' => 'Sample_Orientation',

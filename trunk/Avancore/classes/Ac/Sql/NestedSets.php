@@ -224,8 +224,6 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
             $data = array($this->idCol => $idOrData);
         }
         
-        $c = new Ac_Sql_Expression($this->_db->valueCriterion($data));
-        
         $res = $this->_db->fetchRow($this->_stmt(
             'SELECT * FROM [[tableName]] WHERE [[crit]] [[tc]]',
             array('crit' => new Ac_Sql_Expression($this->_db->valueCriterion($data)))
@@ -250,7 +248,7 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
             if (strlen($this->treeCol)) $insRow[$this->treeCol] = $this->treeId;
             if (strlen($this->levelCol)) $insRow[$this->levelCol] = 0;
             if (strlen($this->parentCol)) $insRow[$this->parentCol] = $this->parentIdOfRoot;
-            if (strlen($this->orderingCol)) $insRow[$this->orderingCol] = 0;
+            if (strlen($this->orderingCol)) $insRow[$this->orderingCol] = 1;
             if (!$this->idIsAutoInc && !isset($insRow[$this->idCol]))
                 $insRow[$this->idCol] = $this->getNextId();
             $this->query($stmt = $this->_db->insertStatement($this->tableName, $insRow));
