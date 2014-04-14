@@ -31,25 +31,22 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         return parent::getMapper($mapperClass);
     }
     
-    function listOwnProperties() {
-        
+    protected function listOwnProperties() {
         return array ( 'people', 'personIds', 'tagId', 'title', 'titleM', 'titleF', );
-        
     }
-
-    function listOwnLists() {
+ 
+    protected function listOwnLists() {
         
         return array ( 'people' => 'people', );
-        
     }
 
-    function listOwnAssociations() {
-        
+    
+ 
+    protected function listOwnAssociations() {
         return array ( 'people' => 'Sample_Person', );
-        
     }
 
-    function getOwnPropertiesInfo() {
+    protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
               'people' => array (
                   'className' => 'Sample_Person',

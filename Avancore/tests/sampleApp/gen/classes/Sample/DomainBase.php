@@ -19,6 +19,12 @@ abstract class Sample_DomainBase extends Ac_Application {
               'Sample_Tag_Mapper' => array (
                   'class' => 'Sample_Tag_Mapper',
               ),
+              'Sample_Tree_Combo_Mapper' => array (
+                  'class' => 'Sample_Tree_Combo_Mapper',
+              ),
+              'Sample_Tree_Record_Mapper' => array (
+                  'class' => 'Sample_Tree_Record_Mapper',
+              ),
         );
     }
     
@@ -55,6 +61,20 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function getSampleTagMapper() {
         return $this->getMapper('Sample_Tag_Mapper');
+    }
+    
+    /**
+     * @return Sample_Tree_Combo_Mapper 
+     */
+    function getSampleTreeComboMapper() {
+        return $this->getMapper('Sample_Tree_Combo_Mapper');
+    }
+    
+    /**
+     * @return Sample_Tree_Record_Mapper 
+     */
+    function getSampleTreeRecordMapper() {
+        return $this->getMapper('Sample_Tree_Record_Mapper');
     }
     
  
@@ -130,6 +150,36 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function createSampleTag () {
         return $this->getMapper('Sample_Tag_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Tree_Combo 
+     */
+    static function Sample_Tree_Combo ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Tree_Combo 
+     */
+    function createSampleTreeCombo () {
+        return $this->getMapper('Sample_Tree_Combo_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Tree_Record 
+     */
+    static function Sample_Tree_Record ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Tree_Record 
+     */
+    function createSampleTreeRecord () {
+        return $this->getMapper('Sample_Tree_Record_Mapper')->createRecord();
     }
     
 

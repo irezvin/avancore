@@ -115,7 +115,7 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
     	$this->modelIdField = $id; 
     }
     
-        function getModelIdField() {
+    function getModelIdField() {
     	return $this->modelIdField; 
     }
     
@@ -212,19 +212,21 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
                     unset($this->tmpChildren[$k]);
         }
     }
-    
         
     abstract function notifyParentNodeSaved();
     
     protected function getParentIdIfChanged() {
-        //Pm_Conversation::log("getParentIdIfChanged() ---");
         $currParentId = false;
         $res = false;
         if ($this->parentId !== false) {
             $log['this->parentId'] = $this->parentId; 
             $currParentId = $this->parentId;
         }
-        if (!strlen($currParentId) && !is_null($currParentId) && $this->tmpParent && (strlen($nsId = $this->tmpParent->getNodeId()))) {
+        if (!strlen($currParentId) 
+            && !is_null($currParentId) 
+            && $this->tmpParent 
+            && (strlen($nsId = $this->tmpParent->getNodeId()))
+        ) {
             $currParentId = $nsId;
             $log['nsId'] = $nsId;
         }
@@ -290,7 +292,7 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
                 if ($this->doGetInternalOrdering() != $this->ordering) $res = $this->ordering;
             }
         }
-        Ac_Debug_FirePHP::getInstance()->log(array(
+        Ac_Debug_Log::l(array(
         	"Item #" => $this->getNodeId(),
         	"ordering" =>  $this->ordering, 
         	"doGetInternalOrdering()" => $this->doGetInternalOrdering(),
@@ -590,4 +592,7 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
     }
     
     abstract function hasOriginalData();
+    
+    abstract function isRootObject();
+    
 } 

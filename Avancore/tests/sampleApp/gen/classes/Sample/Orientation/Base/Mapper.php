@@ -94,7 +94,6 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
             array (
                   'singleCaption' => 'Orientation',
                   'pluralCaption' => 'Orientation',
-                  'hasUi' => false,
             ),
             parent::doGetInfoParams()
         );

@@ -325,13 +325,14 @@ class Ac_Model_Object extends Ac_Model_Data {
         
         $this->_pk = $mapper->pk;
         $this->_tableName = $mapper->tableName;
-        
+     
         parent::__construct($prototype);
                
         if ($this->tracksChanges()) $this->_memorizeFields();
         
         $this->doOnCreate();
         $this->triggerEvent(self::EVENT_ON_CREATE);
+        
     }
     
     protected function intAssignMetaCaching() {
@@ -392,6 +393,10 @@ class Ac_Model_Object extends Ac_Model_Data {
         }
         
         $this->reset();
+
+        if ($oid !== null) {
+            $this->$k = $oid;
+        }
         
         $props = $this->listDataProperties();
         
@@ -630,11 +635,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function listDataProperties() {
-        $res = array();
-        foreach (array_keys(get_class_vars(get_class($this))) as $v) {
-            if ($v{0} !== '_') $res[] = $v; 
-        }
-        return $res;
+        return $this->_listOwnPublicVars();
     }
 
     function _listOwnPublicVars() {

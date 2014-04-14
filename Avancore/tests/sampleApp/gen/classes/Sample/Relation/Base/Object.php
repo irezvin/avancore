@@ -34,25 +34,16 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
         return parent::getMapper($mapperClass);
     }
     
-    function listOwnProperties() {
-        
+    protected function listOwnProperties() {
         return array ( 'relationType', 'otherPerson', 'person', 'relationId', 'personId', 'otherPersonId', 'relationTypeId', 'relationBegin', 'relationEnd', 'notes', );
-        
     }
-
-    function listOwnLists() {
-        
-        return array ( );
-        
-    }
-
-    function listOwnAssociations() {
-        
+    
+ 
+    protected function listOwnAssociations() {
         return array ( 'relationType' => 'Sample_Relation_Type', 'otherPerson' => 'Sample_Person', 'person' => 'Sample_Person', );
-        
     }
 
-    function getOwnPropertiesInfo() {
+    protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
               'relationType' => array (
                   'className' => 'Sample_Relation_Type',
