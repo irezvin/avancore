@@ -19,6 +19,9 @@ abstract class Sample_DomainBase extends Ac_Application {
               'Sample_Tag_Mapper' => array (
                   'class' => 'Sample_Tag_Mapper',
               ),
+              'Sample_Tree_Adjacent_Mapper' => array (
+                  'class' => 'Sample_Tree_Adjacent_Mapper',
+              ),
               'Sample_Tree_Combo_Mapper' => array (
                   'class' => 'Sample_Tree_Combo_Mapper',
               ),
@@ -61,6 +64,13 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function getSampleTagMapper() {
         return $this->getMapper('Sample_Tag_Mapper');
+    }
+    
+    /**
+     * @return Sample_Tree_Adjacent_Mapper 
+     */
+    function getSampleTreeAdjacentMapper() {
+        return $this->getMapper('Sample_Tree_Adjacent_Mapper');
     }
     
     /**
@@ -150,6 +160,21 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function createSampleTag () {
         return $this->getMapper('Sample_Tag_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Tree_Adjacent 
+     */
+    static function Sample_Tree_Adjacent ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Tree_Adjacent 
+     */
+    function createSampleTreeAdjacent () {
+        return $this->getMapper('Sample_Tree_Adjacent_Mapper')->createRecord();
     }
     
  

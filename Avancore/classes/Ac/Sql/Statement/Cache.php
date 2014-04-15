@@ -20,12 +20,12 @@ class Ac_Sql_Statement_Cache {
         if ($useCache) {
             $md = md5(serialize($parts));
             if (!isset($this->_stmtCache[$md])) {
-                $this->_stmtCache[$md] = Ac_Sql_Statement::factory($parts, $this->defaults); 
+                $this->_stmtCache[$md] = Ac_Sql_Statement::create($parts, $this->defaults); 
             }
             $this->_stmtCache[$md]->applyParams($params);
             return $this->_stmtCache[$md];
         } else {
-            $res = Ac_Sql_Statement::factory($parts, $this->defaults);
+            $res = Ac_Sql_Statement::create($parts, $this->defaults);
             return $res;
         }
     }

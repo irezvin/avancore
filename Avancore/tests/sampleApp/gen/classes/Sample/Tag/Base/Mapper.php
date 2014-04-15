@@ -12,6 +12,8 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 'tagId', 'title', 'titleM', 'titleF', ); 
 
+    var $nullableSqlColumns = array ( 'titleM', 'titleF', ); 
+
     var $defaults = array (
               'tagId' => NULL,
               'title' => NULL,

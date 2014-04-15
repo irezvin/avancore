@@ -12,6 +12,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 'personId', 'name', 'gender', 'isSingle', 'birthDate', 'lastUpdatedDatetime', 'createdTs', 'sexualOrientationId', ); 
 
+    var $nullableSqlColumns = array ( 'lastUpdatedDatetime', 'sexualOrientationId', ); 
+
     var $defaults = array (
               'personId' => NULL,
               'name' => NULL,

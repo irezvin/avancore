@@ -286,16 +286,6 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     }
     
     protected function doBeforeContainerSave() {
-        $mapper = $this->container->getMapper();
-        if ($mapper->getIsSameTable()) {
-            if (!$mapper->getIsCreatingRootNode()) {
-                $pc = $this->getNestedSets()->parentCol;
-                if (!strlen($this->container->$pc)) {
-                    $this->parentId = $mapper->getRootNodeId();
-                    $this->container->$pc = $this->parentId;
-                }
-            }
-        }
     }
     
     protected function doAfterContainerSave() {
@@ -325,15 +315,13 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
         return (bool) $this->getTreeNode();
     }
     
-    function isRootObject() {
-        $res = false;
-        $mapper = $this->container->getMapper();
-        if ($mapper->isSameTable()) {
-            if ($this->container->getPrimaryKey() == $mapper->getRootNodeId()) {
-                $res = true;
-            }
-        }
-        return $res;
+    function notifyMapperUpdated() {
+        $this->treeNode = false;
     }
+    
+    function afterContainerLoad() {
+        $this->treeNode = false;
+    }
+    
     
 }
