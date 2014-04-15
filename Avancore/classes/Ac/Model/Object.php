@@ -6,6 +6,16 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     const ACTUAL_REASON_SAVE = 2;
     
+    const OPERATION_NONE = 0;
+    
+    const OPERATION_LOAD = 1;
+    
+    const OPERATION_CREATE = 2;
+
+    const OPERATION_UPDATE = 6;
+    
+    const OPERATION_DELETE = 8;
+    
     /**
      * If $model::tracksChanges() returns true or Ac_Model_Object::CHANGES_BEFORE_SAVE, 
      * changes will be destroyed immediately after database operation 
@@ -139,6 +149,8 @@ class Ac_Model_Object extends Ac_Model_Data {
      * @var mixed
      */
     var $_origPk = null;
+    
+    protected $lastOperation = self::OPERATION_NONE;
     
     /**
      * @var Ac_Model_Mapper
@@ -376,6 +388,9 @@ class Ac_Model_Object extends Ac_Model_Data {
             $m->forget($this);
         }
         if ($this->tracksChanges()) $this->_memorizeFields();
+        
+        if ($res) $this->lastOperation = self::OPERATION_LOAD;
+        
         return $res;
     }
     
@@ -441,7 +456,6 @@ class Ac_Model_Object extends Ac_Model_Data {
             $hyData = $this->mapper->peConvertForSave($this, $hyData);
             $res = (bool) $this->mapper->peSave($this, $hyData, true, $error, $newData);
             if (is_array($newData)) foreach ($newData as $k => $v) $this->$k = $v;
-            if ($res) $this->mapper->markUpdated();
             
         } else {
             
@@ -451,7 +465,6 @@ class Ac_Model_Object extends Ac_Model_Data {
             $hyData = $this->mapper->peConvertForSave($this, $hyData);
             $res = $this->mapper->peSave($this, $hyData, false, $error, $newData);
             if ($res) {
-                $this->mapper->markUpdated();
                 if (is_array($newData)) foreach ($newData as $k => $v) $this->$k = $v;
                 $res = true;
             } else {
@@ -482,17 +495,21 @@ class Ac_Model_Object extends Ac_Model_Data {
             $this->_isBeingStored = true;
             $this->intResetReferences();
             $beforeSaveResult = $this->doBeforeSave();
+            if ($this->_isReference && !$this->isPersistent()) $this->_loadReference();
+            $isNew = !$this->isPersistent();
+            
             $this->triggerEvent(self::EVENT_BEFORE_SAVE, array(& $beforeSaveResult));
             if ($beforeSaveResult !== false) {
-                if ($this->_isReference && !$this->isPersistent()) $this->_loadReference();
                 $res = true;
-                
                 $res = $res && ($this->_storeReferencedRecords() !== false);
                 $res = $res && $this->_legacyStore();
                 if ($this->tracksPk()) $this->_origPk = $res? $this->getPrimaryKey() : null;
                 $res = $res && ($this->_storeReferencingRecords() !== false);
                 $res = $res && ($this->_storeNNRecords() !== false);
                 if ($res) {
+            
+                    $this->lastOperation = $isNew? self::OPERATION_CREATE : self::OPERATION_UPDATE;
+                    
                     $this->_isBeingStored = false;
                     $afterSaveResult = $this->doAfterSave();
                     $this->triggerEvent(self::EVENT_AFTER_SAVE, array(& $afterSaveResult));
@@ -524,6 +541,8 @@ class Ac_Model_Object extends Ac_Model_Data {
         $this->triggerEvent(self::EVENT_BEFORE_DELETE, array(& $deleteResult));
         if ($deleteResult !== false) {
             if ($res = $this->_legacyDelete()) {
+                $this->lastOperation = $isNew? self::OPERATION_CREATE : self::OPERATION_UPDATE;
+                
             	if ($this->tracksPk()) $this->_origPk = null;
                 $this->doAfterDelete();
                 $this->triggerEvent(self::EVENT_AFTER_DELETE);
@@ -541,7 +560,6 @@ class Ac_Model_Object extends Ac_Model_Data {
         $hyData = $this->getHyData();
         $res = (bool) $this->mapper->peDelete($this, $hyData, $error);
         if ($res) {
-            $this->mapper->markUpdated();
         } else {
             $this->_error = $error;
         }
@@ -1051,10 +1069,10 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function cleanupMembers() {
+        $this->triggerEvent(self::EVENT_ON_CLEANUP);
         $vars = get_class_vars(get_class($this));
         $m = $this->getMapper();
         $m->forget($this);
-        $this->triggerEvent(self::EVENT_ON_CLEANUP);
         foreach (get_class_vars(get_class($this)) as $k => $v) if (isset($this->$k)) {
             if (is_array($this->$k)) {
                 $tmp = $this->$k;

@@ -1,50 +1,91 @@
 <?php
 
-class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_Tree_Mapper_AdjacencyList {
+/**
+ * 
+ */
+class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
 	
-    var $_rootNodeId = false;
+    protected $mixableId = 'treeMapper';
     
-    var $_childrenCountRelation = false;
+    protected $mixinClass = 'Ac_Model_Mapper';
     
-    var $_childIdsRelation = false;
+    /**
+     * @var Ac_Model_Mapper
+     */
+    protected $mixin = false;
+	
+    protected $rootNodeId = false;
     
-    var $_containersRelation = false;
+    protected $childrenCountRelation = false;
     
-    var $_treeProvider = false;
+    protected $childIdsRelation = false;
+    
+    protected $containersRelation = false;
+    
+    protected $treeProvider = false;
     
     /**
      * @var Ac_Sql_Db_Ae
      */
-    var $sqlDb = false;
+    protected $sqlDb = false;
     
     /**
      * @var Ac_Sql_Statement_Cache
      */
-    var $_stmtCache = false;
-    
-    // Variables to be overridden in concrete class
+    protected $stmtCache = false;
 
-    protected $nodeParentField = 'parentId';
+    protected $defaultParentValue = false;
     
-    protected $nodeOrderField = 'ordering';
+    var $nodeParentField = 'parentId';
+    
+    var $nodeOrderField = 'ordering';
 
-    function Ac_Model_Tree_AdjacencyListMapper($tableName, $recordClass, $pk = 'id') {
-    	parent::Ac_Model_Mapper($tableName, $recordClass, $pk);
-    	$this->sqlDb = new Ac_Sql_Db_Ae($this->database);
-    	$this->_stmtCache = new Ac_Sql_Statement_Cache(array(
-    		'defaults' => array(
-    			'table' => $this->tableName,
-    			'pk' => $this->pk,
-    			'nodeParent' => $this->nodeParentField,
-    			'nodeOrder' => $this->nodeOrderField,
-    		),
-    	));
+    function registerMixin(Ac_I_Mixin $mixin) {
+
+        parent::registerMixin($mixin);
+        
+        if ($mixin instanceof Ac_Model_Mapper) {
+            $this->stmtCache = new Ac_Sql_Statement_Cache(array(
+                'defaults' => array(
+                    'table' => $mixin->tableName,
+                    'pk' => $mixin->pk,
+                    'nodeParent' => $this->nodeParentField,
+                    'nodeOrder' => $this->nodeOrderField,
+                ),
+            ));
+            if ($this->defaultParentValue === false) {
+                if (in_array($this->nodeParentField, $mixin->listNullableSqlColumns())) {
+                    $this->defaultParentValue = null;
+                } else {
+                    $this->defaultParentValue = 0;
+                }
+            }
+        }
+    }
+    
+    function setDefaultParentValue($defaultParentValue) {
+        $this->defaultParentValue = $defaultParentValue;
+    }
+
+    function getDefaultParentValue() {
+        return $this->defaultParentValue;
     }    
     
+    function hasPublicVars() {
+        return true;
+    }
+    
+    /**
+     * @return Ac_Sql_Db
+     */
+    protected function getDb() {
+        return $this->mixin->getDb();
+    }
+    
     function listTopNodes() {
-        $stmt = $this->_stmtCache->getStatement('SELECT [[pk]] FROM [[table]] WHERE '.$this->database->getIfnullFunction().'([[nodeParent]], 0) = 0 ORDER BY [[nodeOrder]]');
-        $res = $this->sqlDb->fetchColumn($stmt);
-        Pm_Conversation::log("topNodes are", $res);
+        $stmt = $this->stmtCache->getStatement('SELECT [[pk]] FROM [[table]] WHERE '.$this->getDb()->getIfnullFunction().'([[nodeParent]], 0) = 0 ORDER BY [[nodeOrder]]');
+        $res = $this->getDb()->fetchColumn($stmt);
+        Ac_Debug_Log::l("topNodes are", $res);
         return $res; 
     }
     
@@ -54,7 +95,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
     
     function loadOriginalDataForNode(Ac_Model_Tree_AdjacencyListImpl $node) {
         $nid = $node->getNodeId();
-        Pm_Conversation::log("Mapper: loading original data for node $nid", gettype($nid));
+        Ac_Debug_Log::l("Mapper: loading original data for node $nid", gettype($nid));
         $res = false;
         if ($nid !== false) {
             $od = array_values($this->loadOriginalData(array($nid)));
@@ -67,12 +108,12 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
     }
     
     function loadOriginalData(array $nodeIds) {
-    	$stmt = $this->_stmtCache->getStatement('
+    	$stmt = $this->stmtCache->getStatement('
     		SELECT [[pk]] AS nodeId, [[nodeParent]] AS parentId, [[nodeOrder]] AS ordering 
     		FROM [[table]] WHERE [[pk]] IN ({{ids}})
     	', array('ids' => $nodeIds));
         
-    	$res = $this->sqlDb->fetchArray($stmt, 'nodeId');
+    	$res = $this->getDb()->fetchArray($stmt, 'nodeId');
     	return $res;
     }
     
@@ -81,7 +122,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
         $res = array();
         foreach ($this->loadOriginalData($ids) as $id => $node) {
         	$prot = array(
-        		'mapper' => $this,
+        		'mapper' => $this->mixin,
         	    'originalData' => $node
             );
             $objNode = new Ac_Model_Tree_AdjacencyListImpl($prot);
@@ -141,8 +182,8 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
     }
     
     function getNodePath($id) {
-        $sql = $this->_stmtCache->getStatement('SELECT [[nodeParent]] FROM [[table]] WHERE [[pk]] = {{id}}', array('id' => $id));
-        $parentId = $this->sqlDb->fetchValue($sql, 0, null);
+        $sql = $this->stmtCache->getStatement('SELECT [[nodeParent]] FROM [[table]] WHERE [[pk]] = {{id}}', array('id' => $id));
+        $parentId = $this->getDb()->fetchValue($sql, 0, null);
         if (!is_null($parentId)) $res = array_merge($this->getNodePath($parentId), array($parentId));
             else $res = array();
         return $res;
@@ -152,14 +193,14 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
      * @return Ac_Model_Relation
      */
     function getNodeChildrenCountRelation() {
-        if ($this->_childrenCountRelation === false) {
-            $this->_childrenCountRelation = new Ac_Model_Relation(array(
-                'srcTableName' => $this->tableName,
+        if ($this->childrenCountRelation === false) {
+            $this->childrenCountRelation = new Ac_Model_Relation(array(
+                'srcTableName' => $this->mixin->tableName,
                 'destTableName' => new Ac_Sql_Expression("
                 (
-                    SELECT {$this->nodeParentField} AS parentId, COUNT(ns.{$this->pk}) AS ".$this->database->NameQuote('count')." 
-                    FROM {$this->tableName} AS ns 
-                    WHERE ".$this->database->getIfnullFunction()."({$this->nodeParentField}, 0) <> 0 
+                    SELECT {$this->nodeParentField} AS parentId, COUNT(ns.{$this->pk}) AS ".$this->getDb()->n('count')." 
+                    FROM {$this->mixin->tableName} AS ns 
+                    WHERE ".$this->getDb()->getIfnullFunction()."({$this->nodeParentField}, 0) <> 0 
                     GROUP BY {$this->nodeParentField}
                 )  AS nsc"),
                 'fieldLinks' => array(
@@ -168,26 +209,26 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
                 'srcVarName' => 'childNodesCount',
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
-                'database' => $this->database,
+                'database' => $this->getDb(),
             ));
         }
-        return $this->_childrenCountRelation;
+        return $this->childrenCountRelation;
     }
     
     /**
      * @return Ac_Model_Relation
      */
     function getNodeChildIdsRelation() {
-        if ($this->_childIdsRelation === false) {
-        	$this->_childIdsRelation = new Ac_Model_Relation(array(
-                'srcTableName' => $this->tableName,
+        if ($this->childIdsRelation === false) {
+        	$this->childIdsRelation = new Ac_Model_Relation(array(
+                'srcTableName' => $this->mixin->tableName,
                 'destTableName' => new Ac_Sql_Expression("
                 	( SELECT "
-        				.$this->database->NameQuote($this->nodeParentField)." AS id, "
-        				.$this->database->NameQuote($this->nodeOrderField)." AS ordering, "
-        				.$this->database->NameQuote($this->pk)." AS childId 
-        			  FROM ".$this->database->NameQuote($this->tableName)." 
-        			  WHERE ".$this->database->getIfnullFunction()."(".$this->database->NameQuote($this->nodeParentField).", 0) <> 0) AS childIds
+        				.$this->getDb()->n($this->nodeParentField)." AS id, "
+        				.$this->getDb()->n($this->nodeOrderField)." AS ordering, "
+        				.$this->getDb()->n($this->pk)." AS childId 
+        			  FROM ".$this->getDb()->nQuote($this->mixin->tableName)." 
+        			  WHERE ".$this->getDb()->getIfnullFunction()."(".$this->getDb()->n($this->nodeParentField).", 0) <> 0) AS childIds
                 "),
                 'fieldLinks' => array(
                     'nodeId' => 'id',
@@ -195,21 +236,21 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
                 'srcVarName' => 'childNodeIds',
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-                'database' => $this->database,
-                //'destOrdering' => $this->database->NameQuote($this->nodeOrderField),
+                'database' => $this->getDb(),
+                //'destOrdering' => $this->getDb()->NameQuote($this->nodeOrderField),
                 'destOrdering' => 'ordering',
             ));
         }
-        return $this->_childIdsRelation;
+        return $this->childIdsRelation;
     }
     
     /**
      * @return Ac_Model_Relation
      */
     function getNodeContainersRelation() {
-        if ($this->_containersRelation === false) {
-            $this->_containersRelation = new Ac_Model_Relation(array(
-                'srcTableName' => $this->tableName,
+        if ($this->containersRelation === false) {
+            $this->containersRelation = new Ac_Model_Relation(array(
+                'srcTableName' => $this->mixin->tableName,
                 'destMapperClass' => get_class($this),
                 'fieldLinks' => array(
                     'nodeId' => $this->pk,
@@ -217,27 +258,27 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
                 'srcVarName' => 'container',
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
-                'database' => $this->database,
+                'database' => $this->getDb(),
             ));
         }
-        return $this->_containersRelation;
+        return $this->containersRelation;
     }
     
     /**
      * @return Ac_I_Tree_Provider
      */
     function getDefaultTreeProvider() {
-        if ($this->_treeProvider === false) {
-            $this->_treeProvider = $this->createTreeProvider();
+        if ($this->treeProvider === false) {
+            $this->treeProvider = $this->createTreeProvider();
         }
-        return $this->_treeProvider;
+        return $this->treeProvider;
     }
 
     /**
      * @return Ac_I_Tree_Provider
      */
     function createTreeProvider() {
-    	return new Ac_Model_Tree_Provider($this);
+    	return new Ac_Model_Tree_Provider($this->mixin);
     }
     
     function getNodeParentField() {
@@ -247,7 +288,6 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
     function getNodeOrderField() {
         return $this->nodeOrderField;
     }
-    
 
     protected function getOrderingValuesColumns() {
         return 't.'.$this->getTitleFieldName();
@@ -266,19 +306,18 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
         $pId = $modelObject->getTreeImpl()->getParentNodeId();
         
         if (!strlen($pId) || ((string) $pId == '0')) {
-            $crit = $this->database->getIfnullFunction()."(t.{$this->nodeParentField},0) = 0";
+            $crit = $this->getDb()->getIfnullFunction()."(t.{$this->nodeParentField},0) = 0";
         } else {
-            $crit = "t.{$this->nodeParentField} = ".$this->database->Quote($pId);
+            $crit = "t.{$this->nodeParentField} = ".$this->getDb()->q($pId);
         }
             
         $foundMyself = false;
-        $this->database->setQuery($sql = "
-            SELECT t.".$this->database->NameQuote($this->nodeOrderField)." AS ordering, ".$this->getOrderingValuesColumns().", t.{$this->pk} 
-            FROM {$this->tableName} AS t 
+        $ords = $this->getDb()->fetchArray($sql = "
+            SELECT t.".$this->getDb()->n($this->nodeOrderField)." AS ordering, ".$this->getOrderingValuesColumns().", t.{$this->pk} 
+            FROM {$this->mixin->tableName} AS t 
             WHERE {$crit} 
-            ORDER BY t.".$this->database->NameQuote($this->nodeOrderField)." ASC
+            ORDER BY t.".$this->getDb()->n($this->nodeOrderField)." ASC
         ");
-        $ords = $this->database->loadAssocList();
         foreach ($ords as $ord) {
             $lbl = $this->getOrderingValuesLabel($ord);
             if ($ord[$this->pk] == $modelObject->{$this->pk}) {
@@ -294,6 +333,24 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
         return $res;
     }
     
+    function getLastOrdering($parentId) {
+        if (is_null($parentId)) {
+        $res = $this->getDb()->fetchValue($sql = $this->stmtCache->getStatement('
+                SELECT MAX([[nodeOrder]])
+                FROM [[table]] WHERE [[nodeParent]] IS NULL
+        '));
+        } else {
+            $res = $this->getDb()->fetchValue($sql = $this->stmtCache->getStatement('
+                    SELECT MAX([[nodeOrder]])
+                    FROM [[table]] WHERE [[nodeParent]] = {{parentId}}
+                ', array(
+                    'parentId' => $parentId, 
+                )
+            ));
+        }
+        return $res;
+    }
+    
     /**
      * @return Ac_I_Tree_Impl
      */
@@ -301,58 +358,82 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Model_Mapper implements Ac_I_
         $nc = $this->getNodeClass();
         return new $nc(array(
             'container' => $modelObject,
-            'mapper' => $this,
+            'mapper' => $this->mixin,
         ));        
     }
     
-    function reorderNode($oldParentId, $oldOrdering, $newParentId, $newOrdering) {
+    function reorderNode($id, $oldParentId, $oldOrdering, $newParentId, $newOrdering) {
                     
-        $db = $this->sqlDb;
+        $db = $this->getDb();
         
-                    if ($oldParentId != $newParentId) {
-                        
-                        // move with parent change...
-                        
-                        $db->query($this->_stmtCache->getStatement('
-                                UPDATE [[table]] 
-                                SET [[nodeOrder]] = [[nodeOrder]] + 1
-                                WHERE [[nodeParent]] = {{newParentId}} AND [[nodeOrder]] >= {{newOrdering}}
-                            ', array('newParentId' => $newParentId, 'newOrdering' => $newOrdering)
-                        ));
-                        
-                        $db->query($this->_stmtCache->getStatement('
-                                UPDATE [[table]] 
-                                SET [[nodeOrder]] = [[nodeOrder]] - 1
-                                WHERE [[nodeParent]] = {{oldParentId}} AND [[nodeOrder]] >= {{oldOrdering}}
-                            ', array('oldParentId' => $oldParentId, 'oldOrdering' => $oldOrdering)
-                        ));
-                    
-                    } else {
-                        
-                        if ($newOrdering > $oldOrdering) {
-                            $rightOrder = $newOrdering;
-                            $leftOrder = $oldOrdering;
-                            $delta = '-1';
-                        } elseif ($newOrdering < $oldOrdering) {
-                            $rightOrder = $oldOrdering;
-                            $leftOrder = $newOrdering;
-                            $delta = '+ 1';
-                        } else {
-                            $delta = false;
-                        }
-                        
-                        if ($delta !== false) { 
-                            
-                            $db->query($this->_stmtCache->getStatement('
-                                    UPDATE [[table]] 
-                                    SET [[nodeOrder]] = IF ([[pk]] = {{id}}, {{newOrdering}}, [[nodeOrder]] {{delta}})
-                                    WHERE ([[nodeOrder]] BETWEEN {{leftOrder}} AND {{rightOrder}}) AND [[nodeParent]] = {{parentId}}
-                                ', array('parentId' => $newParentId, 'leftOrder' => $leftOrder, 'rightOrder' => $rightOrder, 'newOrdering' => $newOrdering, 'id' => $id, 'delta' => new Ac_Sql_Expression($delta))
-                            ));
-                        
-                        }
-                        
-                    }        
+        if ($oldParentId != $newParentId) {
+
+            $oldCrit = is_null($oldParentId)? '[[nodeParent]] IS NULL' : '[[nodeParent]] = {{oldParentId}}';
+            $newCrit = is_null($newParentId)? '[[nodeParent]] IS NULL' : '[[nodeParent]] = {{newParentId}}';
+            
+            // move with parent change...
+
+            $db->query($this->stmtCache->getStatement('
+                    UPDATE [[table]] 
+                    SET [[nodeOrder]] = [[nodeOrder]] + 1
+                    WHERE '.$oldCrit.' AND [[nodeOrder]] >= {{newOrdering}}
+                ', array('newParentId' => $newParentId, 'newOrdering' => $newOrdering)
+            ));
+
+            $db->query($this->stmtCache->getStatement('
+                    UPDATE [[table]] 
+                    SET [[nodeOrder]] = [[nodeOrder]] - 1
+                    WHERE '.$newCrit.' AND [[nodeOrder]] >= {{oldOrdering}}
+                ', array('oldParentId' => $oldParentId, 'oldOrdering' => $oldOrdering)
+            ));
+
+        } else {
+            
+            if ($newOrdering > $oldOrdering) {
+                $rightOrder = $newOrdering;
+                $leftOrder = $oldOrdering;
+                $delta = '-1';
+            } elseif ($newOrdering < $oldOrdering) {
+                $rightOrder = $oldOrdering;
+                $leftOrder = $newOrdering;
+                $delta = '+ 1';
+            } else {
+                $delta = false;
+            }
+            
+            if ($delta !== false) { 
+
+                $crit = is_null($newParentId)? '[[nodeParent]] IS NULL' : '[[nodeParent]] = {{parentId}}';
+                
+                $db->query($stmt = $this->stmtCache->getStatement('
+                        UPDATE [[table]] 
+                        SET [[nodeOrder]] = IF ([[pk]] = {{id}}, {{newOrdering}}, [[nodeOrder]] {{delta}})
+                        WHERE ([[nodeOrder]] BETWEEN {{leftOrder}} AND {{rightOrder}}) AND '.$crit.'
+                    ', array(
+                        'parentId' => $newParentId, 
+                        'leftOrder' => $leftOrder, 
+                        'rightOrder' => $rightOrder, 
+                        'newOrdering' => $newOrdering, 
+                        'id' => $id, 
+                        'delta' => new Ac_Sql_Expression($delta)
+                    )
+                ));
+                
+            }
+
+        }        
+    }
+    
+    function onAfterCreateRecord(Ac_Model_Object $record) {
+        if (!$record->listMixables('Ac_Model_Tree_Object')) {
+            $record->addMixable(new Ac_Model_Tree_Object);
+        }
+    }
+    
+    protected function listNonMixedProperties() {
+        return array_merge(parent::listNonMixedProperties(), array(
+            'nodeParentField', 'nodeOrderField'
+        ));
     }
     
 

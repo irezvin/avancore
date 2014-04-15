@@ -25,6 +25,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     var $uniqueIndexData = false;
     var $createAccessors = false;
     var $accessors = array();
+    var $nullableSqlColumns = array();
     
     function _generateFilesList() {
         return array(
@@ -99,6 +100,8 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->mapperVars['tableName'] = $this->tableName;
         $this->mapperVars['id'] = $this->mapperClass;
         $this->mapperVars['columnNames'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->tableObject->listColumns(), 0, false, true, true));
+        if ($this->model->nullableSqlColumns) 
+            $this->mapperVars['nullableSqlColumns'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->nullableSqlColumns, 0, false, true, true));
         foreach ($this->model->tableObject->listColumns() as $nm) {
             $col = $this->model->tableObject->getColumn($nm);
             $this->mapperVars['defaults'][$nm] = $col->default;

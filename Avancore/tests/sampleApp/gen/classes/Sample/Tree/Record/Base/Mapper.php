@@ -12,6 +12,8 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 'id', 'title', 'tag', ); 
 
+    var $nullableSqlColumns = array ( 'tag', ); 
+
     var $defaults = array (
               'id' => NULL,
               'title' => '',

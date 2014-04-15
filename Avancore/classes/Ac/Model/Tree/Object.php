@@ -173,6 +173,28 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
         )));
     }
     
+    function onCreate() {
+        $m = $this->mixin->getMapper();
+        $m->addEventListener(array($this, 'mapperOnUpdated'), Ac_Model_Mapper::EVENT_ON_UPDATED);
+    }
+    
+    function onCleanup() {
+        $m = $this->mixin->getMapper();
+        $m->deleteEventListener(array($this, 'mapperOnUpdated'), Ac_Model_Mapper::EVENT_ON_UPDATED);
+    }
+    
+    function onAfterLoad() {
+        $this->getTreeImpl()->afterContainerLoad();
+    }
+    
+    function mapperOnUpdated() {
+        $this->getTreeImpl()->notifyMapperUpdated();
+    }
+    
+    function listNonMixedMethods() {
+        return array_merge(parent::listNonMixedMethods(), array('mapperUpdateHandler'));
+    }
+    
     function onGetPropertiesInfo(& $propertiesInfo) {
         $propertiesInfo = Ac_Util::m(array(
             'parentItemId' => array(
@@ -215,4 +237,4 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
         }
     }
     
-        }
+}

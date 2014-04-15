@@ -22,6 +22,8 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
      */
     protected $tmpParent = false;
     
+    protected $defaultParentValue = false;
+    
     function hasOriginalData() {
         return $this->origNodeId !== false;
     }
@@ -70,10 +72,13 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     }
     
     protected function doGetInternalParentId() {
-        if ($this->loadOriginalData(true)) {
-            $res = $this->origParentId;
-        } else {
-            $res = false;
+        if (!$this->container->isPersistent()) $res = $this->origParentId;
+        else {
+            if ($this->loadOriginalData(true)) {
+                $res = $this->origParentId;
+            } else {
+                $res = false;
+            }
         }
         return $res;
     }
@@ -107,7 +112,13 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         $this->modelIdField = $mapper->pk;
         $this->orderField = $mapper->getNodeOrderField();
         $this->parentField = $mapper->getNodeParentField();
+        $this->defaultParentValue = $mapper->getDefaultParentValue();
         parent::setMapper($mapper);
+    }
+    
+    function setContainer(Ac_Model_Object $container = null) {
+        parent::setContainer($container);
+        $this->updateFromContainer();
     }
     
     protected function updateContainer() {
@@ -123,7 +134,7 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         $this->origParentId = $this->container->{$this->parentField};
         $this->origNodeId = false;
         $this->parentId = false;
-        $this->ordering = false;
+        $this->ordering = null;
         $this->tmpParent = false;
     }
     
@@ -132,7 +143,7 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         $res = parent::hasToStoreContainer();
         return $res;
     }
-    
+
     function hasToStoreParent() {
         return $this->tmpParent && ($this->tmpParent->hasToStoreContainer() || $this->tmpParent->hasToStoreParent());
     }
@@ -154,14 +165,28 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         
         $pid = $this->getParentIdIfChanged(); 
         $ord = $this->getOrderingIfChanged($pid !== false);
+        
         if (strlen($pid) || strlen($ord)) {
             $origPid = $this->origParentId;
-            if ($origPid === false) $origPid = $this->parentId;
             
+            if ($origPid === false) $origPid = $this->parentId;
+            elseif ($pid === false) $pid = $origPid;
+                
             $origOrd = $this->origOrdering;
             if ($origOrd === false) $origOrd = $this->ordering;
-            $this->mapper->reorderNode($origPid, $origOrd, $this->parentId, $this->ordering);
+            
+            $newPid = $this->parentId;
+            if ($newPid === false) $newPid = $this->getDefaultParentValue();
+            
+            $this->mapper->reorderNode($this->getContainer()->getPrimaryKey(), $origPid, $origOrd, 
+                $newPid, $this->ordering);
+        } elseif (!$this->container->isPersistent()) {
+            $ord = $this->container->getMapper()->getLastOrdering($this->getCurrentParentId());
+            if (is_null($ord)) $ord = 1;
+            else $ord = $ord + 1;
+            $this->container->{$this->orderField} = $ord;
         }
+
         
         if ($res) {
             foreach ($this->listChildrenToStore() as $i) {
@@ -224,5 +249,17 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     protected function doAfterContainerDelete() {
         return $this->delete();
     }
+    
+    function afterContainerLoad() {
+        $this->updateFromContainer();
+    }
+
+    function setDefaultParentValue($defaultParentValue) {
+        $this->defaultParentValue = $defaultParentValue;
+    }
+
+    function getDefaultParentValue() {
+        return $this->defaultParentValue;
+    }    
     
 }

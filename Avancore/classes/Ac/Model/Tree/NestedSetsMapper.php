@@ -3,7 +3,6 @@
 /**
  * 
  */
-
 class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
 	
     protected $mixableId = 'treeMapper';
@@ -31,8 +30,6 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
     
     protected $treeProvider = false;
     
-    protected $isCreatingRootNode = false;
-    
     // Variables to be overridden in concrete class
     
     /**
@@ -49,14 +46,14 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
      */
     var $nsTableName = false; 
     
-    var $addMixableToRecords = true;
-    
     /**
      * Prototype of Ac_Sql_NestedSets
      */
     var $nsPrototype = array();
     
     var $rootNodePrototype = array();
+    
+    protected $isCreatingRootNode = false;
     
     function hasPublicVars() {
         return true;
@@ -93,11 +90,6 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
         return $this->rootNodeId;
     }
     
-    function getIsSameTable() {
-        $res = $this->mixin->tableName == $this->getNestedSets()->tableName;
-        return $res;
-    }
-    
     function getIsCreatingRootNode() {
         return $this->isCreatingRootNode;
     }
@@ -113,8 +105,10 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
             if (!isset($proto['tableName'])) {
                 if (strlen($this->nsTableName)) 
                     $proto['tableName'] = $this->nsTableName;
-                else
-                    $proto['tableName'] = $this->mixin->tableName;
+                else {
+                    throw new Ac_E_InvalidUsage("Cannot use ".__CLASS__." with same table as mapper; "
+                        . "plase provide \$nsTableName use Ac_Model_Tree_ComboMapper class");
+                }
             }
             if (!isset($proto['idCol'])) {
                 if (strlen($this->nsIdCol)) $proto['idCol'] = $this->nsIdCol;
@@ -581,14 +575,12 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
     
     protected function listNonMixedProperties() {
         return array_merge(parent::listNonMixedProperties(), array(
-            'nsTreeId', 'nsIdCol', 'nsTableName', 'addMixaleToRecords', 'nsPrototype', 'hasPublicVars'
+            'nsTreeId', 'nsIdCol', 'nsTableName', 'rootNodePrototype', 
+            'addMixableToRecords', 'nsPrototype', 'hasPublicVars'
         ));
     }
         
     function onAfterCreateRecord(Ac_Model_Object $record) {
-        if ($this->addMixableToRecords) {
-            
-        }
         if (!$record->listMixables('Ac_Model_Tree_Object')) {
             $record->addMixable(new Ac_Model_Tree_Object);
         }

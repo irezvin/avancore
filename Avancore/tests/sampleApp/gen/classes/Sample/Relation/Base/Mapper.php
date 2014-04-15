@@ -12,6 +12,8 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 'relationId', 'personId', 'otherPersonId', 'relationTypeId', 'relationBegin', 'relationEnd', 'notes', ); 
 
+    var $nullableSqlColumns = array ( 'relationBegin', 'relationEnd', ); 
+
     var $defaults = array (
               'relationId' => NULL,
               'personId' => NULL,
