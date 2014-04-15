@@ -160,7 +160,6 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
     }
     
     function setParentNodeId($parentId) {
-        //Pm_Conversation::log($this->getTitle()." - set \$parentId to ", $parentId, " old value was ", $this->getParentNodeId());
         $this->parentId = $parentId;
         if ($this->tmpParent && $this->tmpParent->getNodeId() !== $parentId) {
             $this->tmpParent->notifyChildNodeRemoved($this);
@@ -180,6 +179,9 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
     
 
     protected function doOnCreateChildNodePrototype(array $prototype, $container) {
+    }
+    
+    function notifyMapperUpdated() {
     }
     
     function notifyChildNodeAdded(Ac_I_Tree_Node $childNode) {
@@ -591,8 +593,13 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
         $this->containerState = false;
     }
     
+    function afterContainerLoad() {
+    }
+    
     abstract function hasOriginalData();
     
-    abstract function isRootObject();
+    function isRootObject() {
+        return false;
+    }
     
-} 
+}

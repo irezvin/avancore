@@ -79,6 +79,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * function onRelationNotFound($id, & $res)
      */
     const EVENT_ON_RELATION_NOT_FOUND = 'onRelationNotFound';
+    
+    /**
+     * function onUpdated()
+     */
+    const EVENT_ON_UPDATED = 'onUpdated';
 
     protected $id = false;
     
@@ -111,6 +116,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * Use records collection (records that already were loaded will not be loaded again)
      */
     var $useRecordsCollection = false;
+    
+    var $nullableSqlColumns = array();
      
     protected $recordsCollection = array();
     
@@ -210,6 +217,10 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         $this->db = $db;
         if (!strlen($this->pk)) {
             $dbi = $this->db->getInspector();
+            foreach ($dbi->getColumnsForTable($tableName) as $name => $data) {
+                $this->columnNames[] = $name;
+                if ($data['nullable']) $this->nullableSqlColumns[] = $name;
+            }
             $idxs = $dbi->getIndicesForTable($this->db->replacePrefix($this->tableName));
             $this->indexData = array();
             foreach ($idxs as $name => $idx) {
@@ -591,6 +602,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     
     function markUpdated() {
     	if (!$this->updateLevel) {
+            $this->triggerEvent(self::EVENT_ON_UPDATED);
     		$this->application->getFlags()->touch('mapper.'.$this->id);
     		$this->updateMark = false;
     	} else {
@@ -848,14 +860,14 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @return array('sqlCol1', 'sqlCol2'...)
      */
     function listSqlColumns() {
-    	return array();
+    	return $this->columnNames;
     }
     
     /**
      * @return array('sqlCol1', 'sqlCol2'...)
      */
     function listNullableSqlColumns() {
-    	return array();
+    	return $this->nullableSqlColumns;
     }
     
     // --------------- Function that work with associations and relations ---------------
@@ -1124,6 +1136,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
                 $res = false;
             }
         }
+        if ($res) $this->markUpdated();
         return $res;
     }
     
@@ -1156,6 +1169,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     protected function corePeDelete($record, $hyData, & $error = null) {
         $key = $hyData[$this->pk];
         $res = (bool) $this->db->query("DELETE FROM ".$this->db->n($this->tableName)." WHERE ".$this->db->n($this->pk)." ".$this->db->eqCriterion($key));
+        if ($res) $this->markUpdated();
         return $res;
     }
     

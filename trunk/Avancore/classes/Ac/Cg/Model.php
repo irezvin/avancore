@@ -132,6 +132,8 @@ class Ac_Cg_Model {
     var $tableLangStringPrefix = false;
     
     var $createAccessors = false;
+    
+    var $nullableSqlColumns = false;
 
     // ---------------------------------------------------------------------
     
@@ -359,6 +361,14 @@ class Ac_Cg_Model {
         if (!$this->className) $this->className = $this->getDefaultClassName();
         if (!$this->parentClassName) $this->parentClassName = $this->getDefaultParentClassName();
         if (!$this->parentMapperClassName) $this->parentMapperClassName = $this->getDefaultParentMapperClassName();
+        
+        if ($this->nullableSqlColumns === false) {
+            $this->nullableSqlColumns = array();
+            foreach ($this->tableObject->listColumns() as $i) {
+                $col = $this->tableObject->getColumn($i);
+                if ($col->nullable) $this->nullableSqlColumns[] = $i;
+            }
+        }
         
         $this->detectSpecialProperties();
     }
