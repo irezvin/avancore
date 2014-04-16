@@ -39,6 +39,8 @@ class Tr_Node implements ArrayAccess, RecursiveIterator {
     
     protected $result = false;
     
+    protected $childClass = 'Tr_Node';
+    
     function __construct($object, $extra = false, $index = false, Tr_Node $parent = null) {
         foreach (array('object', 'extra', 'index', 'parent') as $v) $this->$v = $$v;
         if ($index !== false && !$parent) throw new Exception("\$parent must be provided if index is non-false");
@@ -77,7 +79,7 @@ class Tr_Node implements ArrayAccess, RecursiveIterator {
      */
     function createNode($object, $extra = false, $index = false) {
         if ($index === false) $index = count($this->children);
-        $res = new Tr_Node($object, $extra, $index, $this);
+        $res = new $this->childClass ($object, $extra, $index, $this);
         return $res;
     }
     
