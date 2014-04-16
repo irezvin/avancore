@@ -3,15 +3,19 @@
 class Ac_Test_Tree extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
-    
-    function setUp() {
+
+    function resetCombos() {
         $this->getAeDb()->query("DELETE FROM #__tree_combos");
         $this->getAeDb()->query("ALTER TABLE #__tree_combos AUTO_INCREMENT=1");
-        
+    }
+    
+    function resetNs() {
         $this->getAeDb()->query("DELETE FROM #__tree_nested_sets");
         $this->getAeDb()->query("DELETE FROM #__tree_records");
         $this->getAeDb()->query("ALTER TABLE #__tree_records AUTO_INCREMENT=1");
-        
+    }
+    
+    function resetAdj() {
         $this->getAeDb()->query("DELETE FROM #__tree_adjacent");
         $this->getAeDb()->query("ALTER TABLE #__tree_adjacent AUTO_INCREMENT=1");
     }
@@ -27,7 +31,7 @@ class Ac_Test_Tree extends Ac_Test_Base {
     }
     
     function _testCombo() {
-        
+        $this->resetCombos();
         $s = $this->getSampleApp();
         $mapper = $s->getSampleTreeComboMapper();
         $mixable = $mapper->getMixable('treeMapper');
@@ -65,7 +69,7 @@ class Ac_Test_Tree extends Ac_Test_Base {
     }   
       
     function testNs() {
-        
+        $this->resetNs();
         $s = $this->getSampleApp();
         $mapper = $s->getSampleTreeRecordMapper();
         $mixable = $mapper->getMixable('treeMapper');
@@ -140,11 +144,14 @@ class Ac_Test_Tree extends Ac_Test_Base {
             $this->assertEqual($child2->id, 2);
             $this->assertEqual($child2->getOrdering(), 3);
             
+//            $tx = new Ac_Test_Tree_TextScanner();
+//            $nsData = $this->fetchNsData();
+//            var_dump(implode("\n", $tx->getTextFromNestedSets($nsData)));
         }
     }   
     
     function testAdjacent() {
-        
+        $this->resetAdj();
         $s = $this->getSampleApp();
         $mapper = $s->getSampleTreeAdjacentMapper();
         $mixable = $mapper->getMixable('treeMapper');
@@ -214,10 +221,276 @@ class Ac_Test_Tree extends Ac_Test_Base {
             $child2->load(); // this is required for adjacency lists!
             $this->assertEqual($child2->id, 2);
             $this->assertEqual($child2->getOrdering(), 3);
+            
+//            $tx = new Ac_Test_Tree_TextScanner();
+//            $db = $this->getSampleApp()->getDb();
+            //var_dump(implode("\n", $tx->getTextFromAdjacency($db, '#__tree_adjacent', null)));
+            
         }
     }   
     
+    function fetchNsData() {
+        $db = $this->getSampleApp()->getDb();
+        $res = $db->fetchArray(
+            "SELECT * FROM #__tree_nested_sets ns LEFT JOIN #__tree_records r "
+            . "ON ns.id = r.id ORDER BY ns.leftCol"
+        );
+        return $res;
+    }
+    
+    function testScanner() {
+        $tx = new Ac_Test_Tree_TextScanner();
+        $sc = new Tr_Scanner($tx);
+        $root = $sc->scan('
+            Foo
+              Bar
+              Baz
+              Qux
+                Aa
+                {"title": "Bb", "etc": "Bb Etc"}
+                Cc
+                Dd
+                # Commented out
+              Ee
+              Moo
+        ');
+        $root->setDumper($dumper = new Ac_Test_Tree_Dumper);
+
+        $root->dumpPre();
+        
+        $dumper->dumpStructure = true;
+        
+        $tp = new Ac_Test_Tree_Processor();
+        $tp->doAll($root, 'process');
+        
+        $root->dumpPre();
+    }
+    
 }
+
+class Ac_Test_Tree_Node extends Tr_Node {
+    
+    var $data = array();
+
+    var $left = 0;
+    
+    var $right = 0;
+    
+    var $ordering = 0;
+    
+    var $parentTitle = '';
+    
+    protected $childClass = 'Ac_Test_Tree_Node';
+    
+    function __construct($object, $extra = false, $index = false, \Tr_Node $parent = null) {
+        if (is_array($extra)) {
+            Ac_Accessor::setObjectProperty($this, $extra);
+            $extra = false;
+        }
+        parent::__construct($object, $extra, $index, $parent);
+    }
+    
+    function getStructure() {
+        return Ac_Accessor::getObjectProperty($this, array('left', 'right', 'ordering', 'parentTitle'));
+    }
+    
+    function dumpPre($withPre = true) {
+        $iter = new RecursiveTreeIterator($this->createSuperNode());
+        if ($withPre) echo "<pre>";
+        foreach ($iter as $line) echo("\n".$line);
+        if ($withPre) echo "</pre>";
+    }
+    
+}
+
+class Ac_Test_Tree_TextScanner implements Tr_I_ScannerImpl {
+    
+    var $defaultDataProperty = "title";
+    
+    /**
+     * @return Tr_Node
+     * $object a text or an array of lines:
+     * 
+     * node1
+     *  node1.1 
+     *  node1.2
+     * {"title": "node2", "field2": "value2"} 
+     * #lines beginning with '#' are ignored
+     *  node2.1
+     *   node2.1.1
+     *   node2.1.2
+     *  node2.2
+     *  node2.3
+     *  
+     * # Node is considered a child if it has more indent spaces than parent
+     * # First line is always considered root node and it's indent is ignored
+     */
+    function createRootNode($object) {
+        if (!is_array($object)) { // $object should be array of lines 
+            // split string into lines while removing empty lines
+            $object = preg_split("/\s*[\n\r]+/", trim($object)); 
+        }
+        $object = preg_grep('/^\s*(#.*)?$/', $object, PREG_GREP_INVERT); // remove comments
+        $object = array_values($object);
+        $first = array_shift($object);
+        return new Ac_Test_Tree_Node($object, $this->getExtra($first));
+    }
+
+    var $nsMap = array(
+        'left' => 'leftCol',
+        'right' => 'rightCol',
+        'depth' => 'depth',
+        'ordering' => 'ordering',
+    );
+    
+    var $adjMap = array(
+        'id' => 'id',
+        'parentId' => 'parentId',
+        'ordering' => 'ordering',
+    );
+    
+    function remap($src, $map) {
+        foreach ($map as $k => $v) $res[$k] = $src[$v];
+        return $res;
+    }
+    
+    /**
+     * $nsData must be ordered by 'left'!!!
+     * @param array $nsData
+     */
+    function getTextFromNestedSets(array $nsData) {
+        $res = array();
+        foreach ($nsData as $row) {
+            $data = $this->remap ($row, $this->nsMap);
+            $res[] = str_repeat(' ', $data['depth']).json_encode($data, JSON_UNESCAPED_UNICODE);
+        }
+        return $res;
+    }
+    
+    function getTextFromAdjacency(Ac_Sql_Db $db, $tableName, $rootParentId = null, $depth = 0) {
+        $res = array();
+        $crit = new Ac_Sql_Expression(is_null($rootParentId)? ' IS NULL' : '= '.$db->q($rootParentId));
+        $sql = Ac_Sql_Statement::create(
+            'SELECT * FROM [[tableName]] WHERE [[parentId]] [[crit]] ORDER BY [[ordering]]', 
+            array_merge(
+                $this->adjMap, 
+                array(
+                    'crit' => $crit,
+                    'tableName' => $tableName,
+                    'rootParentId' => $rootParentId
+                )
+            )
+        );
+        foreach ($db->fetchArray($sql) as $row) {
+            $data = $this->remap($row, $this->adjMap);
+            $res[] = str_repeat(' ', $depth + 1).json_encode($data, JSON_UNESCAPED_UNICODE);
+            $res = array_merge($res, $this->getTextFromAdjacency($db, $tableName, $data['id'], $depth + 1));
+        }
+        return $res;
+    }
+    
+    function scanNode(Tr_Node $node) {
+        $lines = $node->getObject();
+        
+        $indent = 0;
+        $top = false;
+        $body = array();
+        while (!is_null($curr = array_shift($lines))) {
+            $currIndent = $this->getIndent($curr);
+            if ($top === false) {
+                $top = $curr;
+                $indent = $currIndent;
+            } 
+            elseif($currIndent > $indent) $body[] = $curr;
+            else {
+                $node->createNode($body, $this->getExtra($top));
+                $body = array();
+                $top = $curr;
+                $indent = $currIndent;
+            }
+        }
+        if ($top !== false)
+            $node->createNode($body, $this->getExtra($top));
+    }
+    
+    function getIndent($string) {
+        $string = str_replace("\t", "    ", $string);
+        return strlen($string) - strlen(ltrim($string));
+    }
+    
+    function getExtra($string) {
+        $indent = $this->getIndent($string);
+        $string = trim($string);
+        $jd = json_decode($string, true);
+        if (json_last_error()) $jd = $string;
+        if (is_array($jd)) $res = array('data' => $jd);
+            else $res = array('data' => array($this->defaultDataProperty => $jd));
+        return $res;
+    }
+    
+}
+
+class Ac_Test_Tree_Dumper implements Tr_I_Dumper {
+    
+    var $dumpStructure = false;
+    
+    function dump(Tr_Node $node) {
+        if ($node instanceof Ac_Test_Tree_Node) {
+            $data = $node->data;
+            if ($this->dumpStructure) $data = array_merge($data, $node->getStructure());
+            return json_encode($data, JSON_UNESCAPED_UNICODE);
+        } else {
+            return Ac_Util::typeClass($node);
+        }
+    }
+}
+
+class Ac_Test_Tree_Processor {
+    
+    var $orderingStartsAt = 1;
+    
+    var $left = 0;
+    
+    function setRight(Ac_Test_Tree_Node $node, $right) {
+        $node->right = $right;
+        if ($p = $node->getParent()) $this->setRight($p, $right + 1);
+    }
+    
+    function process(Ac_Test_Tree_Node $node) {
+        $parent = $node->getParent();
+        if (($i = $node->getIndex()) > 0) $prev = $parent->getChild ($i - 1);
+            else $prev = null;
+        if (!$parent) $node->left = 0;
+        elseif ($prev) {
+            $node->left = $prev->right + 1;
+        } elseif ($parent) {
+            $node->left = $parent->left + 1;
+        }
+        $node->ordering = $node->getIndex() + $this->orderingStartsAt;
+        $node->right = $node->left + 1;
+        if ($parent) {
+            $this->setRight($parent, $node->right + 1);
+            $node->parentTitle = $parent->data['title'];
+        }
+    }
+    
+    function doAll($node, $method, $_ = null) {
+        if (!is_array($method)) $method = array($this, $method);
+        $iter = new RecursiveIteratorIterator($node->createSuperNode(), RecursiveIteratorIterator::SELF_FIRST);
+        $args = func_get_args();
+        array_shift($args);
+        array_shift($args);
+        $res = array();
+        foreach ($iter as $node) {
+            $m = $args;
+            array_unshift($m, $node);
+            $res[] = call_user_func_array($method, $m);
+        }
+        return $res;
+    }
+    
+}
+
 
 abstract class ImplNsGetter extends Ac_Model_Tree_NestedSetsImpl {
     
