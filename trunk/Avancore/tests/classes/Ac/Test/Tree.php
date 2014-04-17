@@ -144,6 +144,12 @@ class Ac_Test_Tree extends Ac_Test_Base {
             $this->assertEqual($child2->id, 2);
             $this->assertEqual($child2->getOrdering(), 3);
             
+            $this->getTreeFromNs()->dumpPre(true, true);
+            $this->getTreeFromText('root
+                child1
+                child2
+                child3')->dumpPre(true, true);
+            
 //            $tx = new Ac_Test_Tree_TextScanner();
 //            $nsData = $this->fetchNsData();
 //            var_dump(implode("\n", $tx->getTextFromNestedSets($nsData)));
@@ -222,12 +228,52 @@ class Ac_Test_Tree extends Ac_Test_Base {
             $this->assertEqual($child2->id, 2);
             $this->assertEqual($child2->getOrdering(), 3);
             
-//            $tx = new Ac_Test_Tree_TextScanner();
-//            $db = $this->getSampleApp()->getDb();
-            //var_dump(implode("\n", $tx->getTextFromAdjacency($db, '#__tree_adjacent', null)));
+            $this->getTreeFromAdjacency()->dumpPre(true, true);
+            $this->getTreeFromText('root
+                child1
+                child3
+                child2')->dumpPre(true, true);
             
         }
     }   
+    
+    function getTreeFromText($text) {
+        $tx = new Ac_Test_Tree_TextScanner();
+        $scn = new Tr_Scanner($tx);
+        $res = $scn->scan($text);
+        $res->prepare();
+        $res->setDumper(new Ac_Test_Tree_Dumper);
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Test_Tree_Node
+     */
+    function getTreeFromAdjacency($rootTitle = 'root', $tableName = '#__tree_adjacent', $rootParentId = null) {
+        $tx = new Ac_Test_Tree_TextScanner();
+        $db = $this->getSampleApp()->getDb();
+        $txt = $tx->getTextFromAdjacency($db, $tableName, $rootParentId);
+        $scn = new Tr_Scanner($tx);
+        array_unshift($txt, $rootTitle);
+        $res = $scn->scan($txt);
+        $res->prepare();
+        $res->setDumper(new Ac_Test_Tree_Dumper);
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Test_Tree_Node
+     */
+    function getTreeFromNs() {
+        $tx = new Ac_Test_Tree_TextScanner();
+        $data = $this->fetchNsData();
+        $txt = $tx->getTextFromNestedSets($data);
+        $scn = new Tr_Scanner($tx);
+        $res = $scn->scan($txt);
+        $res->setDumper(new Ac_Test_Tree_Dumper);
+        $res->prepare();
+        return $res;
+    }
     
     function fetchNsData() {
         $db = $this->getSampleApp()->getDb();
@@ -282,6 +328,8 @@ class Ac_Test_Tree_Node extends Tr_Node {
     
     protected $childClass = 'Ac_Test_Tree_Node';
     
+    protected $processed = false;
+    
     function __construct($object, $extra = false, $index = false, \Tr_Node $parent = null) {
         if (is_array($extra)) {
             Ac_Accessor::setObjectProperty($this, $extra);
@@ -294,11 +342,20 @@ class Ac_Test_Tree_Node extends Tr_Node {
         return Ac_Accessor::getObjectProperty($this, array('left', 'right', 'ordering', 'parentTitle'));
     }
     
-    function dumpPre($withPre = true) {
+    function dumpPre($withPre = true, $withStructure = null) {
         $iter = new RecursiveTreeIterator($this->createSuperNode());
+        if (!is_null($withStructure)) $this->getDumper ()->dumpStructure = $withStructure;
         if ($withPre) echo "<pre>";
         foreach ($iter as $line) echo("\n".$line);
         if ($withPre) echo "</pre>";
+    }
+    
+    function prepare() {
+        $root = $this->getRoot();
+        if ($root->processed) return;
+        $root->processed = true;
+        $pro = new Ac_Test_Tree_Processor;
+        $pro->doAll($root, 'process');
     }
     
 }
@@ -341,12 +398,14 @@ class Ac_Test_Tree_TextScanner implements Tr_I_ScannerImpl {
         'right' => 'rightCol',
         'depth' => 'depth',
         'ordering' => 'ordering',
+        'title' => 'title',
     );
     
     var $adjMap = array(
         'id' => 'id',
         'parentId' => 'parentId',
         'ordering' => 'ordering',
+        'title' => 'title',
     );
     
     function remap($src, $map) {
@@ -367,25 +426,39 @@ class Ac_Test_Tree_TextScanner implements Tr_I_ScannerImpl {
         return $res;
     }
     
+    function getChildRows($adjData, $id) {
+        $res = array();
+        foreach ($adjData as $row) {
+            if ($row['parentId'] === $id) $res[] = $row;
+        }
+        return $res;
+    }
+    
+    function makeAdjText($adjData, $parentId, $depth = 0) {
+        $res = array();
+        foreach ($this->getChildRows($adjData, $parentId) as $data) {
+            $res[] = str_repeat(' ', $depth + 1).json_encode($data, JSON_UNESCAPED_UNICODE);
+            $res = array_merge($res, $this->makeAdjText($adjData, $depth + 1));
+        }
+        return $res;
+    }
+    
     function getTextFromAdjacency(Ac_Sql_Db $db, $tableName, $rootParentId = null, $depth = 0) {
         $res = array();
-        $crit = new Ac_Sql_Expression(is_null($rootParentId)? ' IS NULL' : '= '.$db->q($rootParentId));
         $sql = Ac_Sql_Statement::create(
-            'SELECT * FROM [[tableName]] WHERE [[parentId]] [[crit]] ORDER BY [[ordering]]', 
+            'SELECT * FROM [[tableName]] ORDER BY [[ordering]]', 
             array_merge(
                 $this->adjMap, 
                 array(
-                    'crit' => $crit,
                     'tableName' => $tableName,
-                    'rootParentId' => $rootParentId
                 )
             )
         );
+        $mapped = array();
         foreach ($db->fetchArray($sql) as $row) {
-            $data = $this->remap($row, $this->adjMap);
-            $res[] = str_repeat(' ', $depth + 1).json_encode($data, JSON_UNESCAPED_UNICODE);
-            $res = array_merge($res, $this->getTextFromAdjacency($db, $tableName, $data['id'], $depth + 1));
+            $mapped[] = $this->remap($row, $this->adjMap);
         }
+        $res = $this->makeAdjText($mapped, $rootParentId);
         return $res;
     }
     
@@ -437,7 +510,7 @@ class Ac_Test_Tree_Dumper implements Tr_I_Dumper {
     function dump(Tr_Node $node) {
         if ($node instanceof Ac_Test_Tree_Node) {
             $data = $node->data;
-            if ($this->dumpStructure) $data = array_merge($data, $node->getStructure());
+            if ($this->dumpStructure) $data['structure'] = $node->getStructure();
             return json_encode($data, JSON_UNESCAPED_UNICODE);
         } else {
             return Ac_Util::typeClass($node);
