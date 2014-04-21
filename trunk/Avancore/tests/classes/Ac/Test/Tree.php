@@ -30,6 +30,105 @@ class Ac_Test_Tree extends Ac_Test_Base {
         return $this->assertEqual($a, $b, $message);
     }
     
+    function assertTreeMatch($treeOrText1, $treeOrText2, $message = '%s') {
+        if (!is_object($treeOrText1)) $treeOrText1 = $this->getTreeFromText($treeOrText1);
+        if (!is_object($treeOrText2)) $treeOrText2 = $this->getTreeFromText($treeOrText2);
+        if (!$treeOrText1 instanceof Ac_Test_Tree_Node) 
+            throw new Exception("\$treeOrText1 must be Ac_Test_Tree_Node");
+        if (!$treeOrText2 instanceof Ac_Test_Tree_Node) 
+            throw new Exception("\$treeOrText2 must be Ac_Test_Tree_Node");
+        
+        $pro = new Ac_Test_Tree_Processor();
+        
+        ob_start();
+        $pro->doAll($treeOrText1, 'dumpWithIndent');
+        $a = ltrim(ob_get_clean(), "\n");
+        
+        ob_start();
+        $pro->doAll($treeOrText2, 'dumpWithIndent');
+        $b = ltrim(ob_get_clean(), "\n");
+        
+        if (!($res = $this->assertEqual($a, $b, $message))) {
+?>
+            <table>
+                <tr><td style="vertical-align: top">
+                    <pre><?php echo nl2br(htmlspecialchars($a)); ?></pre>
+                </td></tr>
+                <tr><td style="vertical-align: top">
+                    <pre><?php echo nl2br(htmlspecialchars($b)); ?></pre>
+                </td></tr>
+            </table>
+<?php
+        }
+        return $res;
+    }
+    
+    function assertTreeStructureOk(Ac_Test_Tree_Node $root) {
+        $pro = new Ac_Test_Tree_Processor;
+        $titleToIdMap = array();
+        $pro->doAll($root, 'getTitleToIdMap', array(& $titleToIdMap));
+        $items = $pro->doAll($root, 'getStructureCompare', $titleToIdMap);
+        $allItems = call_user_func_array('array_merge', $items);
+        $ok = true;
+        foreach ($allItems as $key => $strData) {
+            if (!$strData['_match']) {
+                $ok = false;
+                foreach ($strData as $k => $v) {
+                    if (is_array($v)) {
+                        list ($a, $b) = $v;
+                        if ($a !== $b) $this->assertIdentical($a, $b, "{$k} must match for node $key, but %s");
+                    }
+                }
+                break;
+            }
+        }
+        if ($ok) $this->assertTrue($ok);
+        return $ok;
+    }
+    
+    function assertTreeNodes(Ac_Test_Tree_Node $root, array $items, 
+        array $strToItemMap, $compareToStructure = true) {
+        
+        $itemsByTitle = array();
+        foreach ($items as $item) {
+            $itemsByTitle['node_'.$item->title] = $item;
+        }
+        $pro = new Ac_Test_Tree_Processor;
+        $titleToIdMap = array();
+        $pro->doAll($root, 'getTitleToIdMap', array(& $titleToIdMap));
+        $items = $pro->doAll($root, 'getStructureCompare', $titleToIdMap);
+        $structure = call_user_func_array('array_merge', $items);
+        $matching = array_intersect_key($structure, $itemsByTitle);
+        if (count($itemsByTitle) != count($matching)) { // some items not found
+            $notFound = array_diff_key($itemsByTitle, $structure);
+        }
+        $ok = true;
+        if ($notFound) {
+            $ok = false;
+            $this->assertTrue(false, "Item(s) not found in structure: "
+                .implode(", ", array_keys($notFound)));
+        } else {
+            $ok = true;
+            foreach ($matching as $key => $strData) {
+                $node = $strData['_node'];
+                $match = $node->testModelObject($itemsByTitle[$key], $strToItemMap, 
+                    $titleToIdMap, $matchData, $compareToStructure);
+                if (!$match) {
+                    $matchData = array_diff($matchData);
+                    foreach ($matchData as $k => $v) {
+                        if (is_array($v)) {
+                            list ($a, $b) = $v;
+                            if ($a !== $b) $this->assertIdentical($a, $b, "{$k} must match for node $key, but %s");
+                        }
+                    }
+                    $ok = false;
+                    break;
+                }
+            }
+        }
+        return $ok;
+    }
+    
     function _testCombo() {
         $this->resetCombos();
         $s = $this->getSampleApp();
@@ -110,6 +209,15 @@ class Ac_Test_Tree extends Ac_Test_Base {
                 )
             );
             
+            $tns = $this->getTreeFromNs();
+            $this->assertTreeMatch($tns, trim("
+                root
+                 child1
+                 child2
+            "));
+            
+            $this->assertTreeStructureOk($tns);
+            
             $this->assertFalse($child1->canOrderUp());
             $this->assertTrue($child1->canOrderDown());
             $this->assertTrue($child2->canOrderUp());
@@ -143,12 +251,6 @@ class Ac_Test_Tree extends Ac_Test_Base {
             
             $this->assertEqual($child2->id, 2);
             $this->assertEqual($child2->getOrdering(), 3);
-            
-            $this->getTreeFromNs()->dumpPre(true, true);
-            $this->getTreeFromText('root
-                child1
-                child2
-                child3')->dumpPre(true, true);
             
 //            $tx = new Ac_Test_Tree_TextScanner();
 //            $nsData = $this->fetchNsData();
@@ -228,12 +330,6 @@ class Ac_Test_Tree extends Ac_Test_Base {
             $this->assertEqual($child2->id, 2);
             $this->assertEqual($child2->getOrdering(), 3);
             
-            $this->getTreeFromAdjacency()->dumpPre(true, true);
-            $this->getTreeFromText('root
-                child1
-                child3
-                child2')->dumpPre(true, true);
-            
         }
     }   
     
@@ -264,12 +360,13 @@ class Ac_Test_Tree extends Ac_Test_Base {
     /**
      * @return Ac_Test_Tree_Node
      */
-    function getTreeFromNs() {
+    function getTreeFromNs($rootTitle = "root") {
         $tx = new Ac_Test_Tree_TextScanner();
         $data = $this->fetchNsData();
         $txt = $tx->getTextFromNestedSets($data);
         $scn = new Tr_Scanner($tx);
         $res = $scn->scan($txt);
+        if ($rootTitle !== null) $res->data['title'] = $rootTitle;
         $res->setDumper(new Ac_Test_Tree_Dumper);
         $res->prepare();
         return $res;
@@ -284,7 +381,7 @@ class Ac_Test_Tree extends Ac_Test_Base {
         return $res;
     }
     
-    function testScanner() {
+    function _testScanner() {
         $tx = new Ac_Test_Tree_TextScanner();
         $sc = new Tr_Scanner($tx);
         $root = $sc->scan('
@@ -309,6 +406,8 @@ class Ac_Test_Tree extends Ac_Test_Base {
         $tp = new Ac_Test_Tree_Processor();
         $tp->doAll($root, 'process');
         
+        $this->assertTreeMatch($root, $root);
+        
         $root->dumpPre();
     }
     
@@ -326,6 +425,10 @@ class Ac_Test_Tree_Node extends Tr_Node {
     
     var $parentTitle = '';
     
+    var $canOrderUp = null;
+    
+    var $canOrderDown = null;
+    
     protected $childClass = 'Ac_Test_Tree_Node';
     
     protected $processed = false;
@@ -339,7 +442,8 @@ class Ac_Test_Tree_Node extends Tr_Node {
     }
     
     function getStructure() {
-        return Ac_Accessor::getObjectProperty($this, array('left', 'right', 'ordering', 'parentTitle'));
+        return Ac_Accessor::getObjectProperty($this, array('left', 'right', 'ordering', 'parentTitle', 
+            'canOrderUp', 'canOrderDown'));
     }
     
     function dumpPre($withPre = true, $withStructure = null) {
@@ -356,6 +460,71 @@ class Ac_Test_Tree_Node extends Tr_Node {
         $root->processed = true;
         $pro = new Ac_Test_Tree_Processor;
         $pro->doAll($root, 'process');
+    }
+    
+    function getDepth() {
+        $res = 0;
+        for ($n = $this->getParent(); $n; $n = $n->getParent()) $res++;
+        return $res;
+    }
+
+    function getStructureCompare(array $titleToIdMap, $strData = false, 
+        $data = false) {
+        
+        if ($data === false) $data = $this->data;
+        
+        $key = 'node_'.$data['title'];
+        
+        if ($strData === false)
+            $strData = $this->getStructure();
+        
+        
+        if (array_key_exists('parentTitle', $strData)) {
+            if (!is_null($strData['parentTitle'])) {
+                $pt = $strData['parentTitle'];
+                $parentId = isset($this->titleToIdMap[$pt])? 
+                    $this->titleToIdMap[$pt] : false;
+            } else {
+                $parentId = null;
+            }
+            $strData['parentId'] = $parentId;
+        }
+            
+        $match = true;
+        foreach ($strData as $k => $v) {
+            if (array_key_exists($k, $data)) {
+                $arr[$k] = array($data[$k], $v);
+                
+                // relax types for string vs numeric since DB often returns arrays
+                // as strings
+                if (is_string($k) && is_numeric($v)) $v = (string) $v;
+                elseif (is_numeric($k) && is_string($v)) $k = (string) $k;
+                
+                if ($data[$k] !== $v) $match = false;
+            }
+        }
+        $arr['_match'] = $match;
+        $arr['_node'] = $this;
+        $res[$key] = $arr;
+        return $res;
+    }
+    
+    function testModelObject(Ac_Model_Object $item, array $strToItemMap, 
+        array $titleToIdMap, 
+        array & $matchData = array(),
+        $compareToStructure = true) {
+        
+        $itemData = Ac_Accessor::getObjectProperty($item, array_values($strToItemMap));
+        $strFromItemData = Ac_Test_Tree_TextScanner::remap($itemData, $strToItemMap);
+        if ($compareToStructure) 
+            $matchData = $this->getStructureCompare($titleToIdMap, false, $data);
+        else {
+            $matchData = $this->getStructureCompare($titleToIdMap, $data, false);
+        }
+        
+        $res = (bool) $matchData['_match'];
+        
+        return $res;
     }
     
 }
@@ -408,7 +577,7 @@ class Ac_Test_Tree_TextScanner implements Tr_I_ScannerImpl {
         'title' => 'title',
     );
     
-    function remap($src, $map) {
+    static function remap($src, $map) {
         foreach ($map as $k => $v) $res[$k] = $src[$v];
         return $res;
     }
@@ -420,7 +589,7 @@ class Ac_Test_Tree_TextScanner implements Tr_I_ScannerImpl {
     function getTextFromNestedSets(array $nsData) {
         $res = array();
         foreach ($nsData as $row) {
-            $data = $this->remap ($row, $this->nsMap);
+            $data = self::remap ($row, $this->nsMap);
             $res[] = str_repeat(' ', $data['depth']).json_encode($data, JSON_UNESCAPED_UNICODE);
         }
         return $res;
@@ -456,7 +625,7 @@ class Ac_Test_Tree_TextScanner implements Tr_I_ScannerImpl {
         );
         $mapped = array();
         foreach ($db->fetchArray($sql) as $row) {
-            $mapped[] = $this->remap($row, $this->adjMap);
+            $mapped[] = self::remap($row, $this->adjMap);
         }
         $res = $this->makeAdjText($mapped, $rootParentId);
         return $res;
@@ -539,17 +708,35 @@ class Ac_Test_Tree_Processor {
         } elseif ($parent) {
             $node->left = $parent->left + 1;
         }
-        $node->ordering = $node->getIndex() + $this->orderingStartsAt;
+        $node->ordering = $i + $this->orderingStartsAt;
         $node->right = $node->left + 1;
         if ($parent) {
             $this->setRight($parent, $node->right + 1);
             $node->parentTitle = $parent->data['title'];
         }
+        $node->canOrderUp = $i > 0;
+        $node->canOrderDown = $parent && $i < count($parent->getChildren());
+    }
+    
+    function getTitleToIdMap(Ac_Test_Tree_Node $node, array $link) {
+        if (isset($node->data['id'])) {
+            var_dump($node->data);
+            $link[0][$node->data['title']] = $node->data['id'];
+        }
+    }
+    
+    function getStructureCompare(Ac_Test_Tree_Node $node, array $titleToIdMap) {
+        return $node->getStructureCompare($titleToIdMap);
+    }
+    
+    function dumpWithIndent(Ac_Test_Tree_Node $node) {
+        echo "\n".str_repeat(" ", $node->getDepth()).$node->data['title'];
     }
     
     function doAll($node, $method, $_ = null) {
         if (!is_array($method)) $method = array($this, $method);
-        $iter = new RecursiveIteratorIterator($node->createSuperNode(), RecursiveIteratorIterator::SELF_FIRST);
+        $iter = new RecursiveIteratorIterator($node->createSuperNode(), 
+            RecursiveIteratorIterator::SELF_FIRST);
         $args = func_get_args();
         array_shift($args);
         array_shift($args);
