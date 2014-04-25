@@ -39,19 +39,14 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
     var $nodeParentField = 'parentId';
     
     var $nodeOrderField = 'ordering';
-
+    
     function registerMixin(Ac_I_Mixin $mixin) {
 
         parent::registerMixin($mixin);
         
         if ($mixin instanceof Ac_Model_Mapper) {
             $this->stmtCache = new Ac_Sql_Statement_Cache(array(
-                'defaults' => array(
-                    'table' => $mixin->tableName,
-                    'pk' => $mixin->pk,
-                    'nodeParent' => $this->nodeParentField,
-                    'nodeOrder' => $this->nodeOrderField,
-                ),
+                'defaults' => $this->getStmtCacheDefaults(),
             ));
             if ($this->defaultParentValue === false) {
                 if (in_array($this->nodeParentField, $mixin->listNullableSqlColumns())) {
@@ -61,6 +56,15 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
                 }
             }
         }
+    }
+
+    protected function getStmtCacheDefaults() {
+        return array(
+            'table' => $this->mixin->tableName,
+            'pk' => $this->mixin->pk,
+            'nodeParent' => $this->nodeParentField,
+            'nodeOrder' => $this->nodeOrderField,
+        );
     }
     
     function setDefaultParentValue($defaultParentValue) {
@@ -107,11 +111,27 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
         return $res;
     }
     
+    protected function getOriginalDataMapForSql() {
+        return array(
+            'nodeId' => '[[pk]]',
+            'parentId' => '[[nodeParent]]',
+            'ordering' => '[[nodeOrder]]',
+        );
+    }
+    
     function loadOriginalData(array $nodeIds) {
-    	$stmt = $this->stmtCache->getStatement('
-    		SELECT [[pk]] AS nodeId, [[nodeParent]] AS parentId, [[nodeOrder]] AS ordering 
-    		FROM [[table]] WHERE [[pk]] IN ({{ids}})
-    	', array('ids' => $nodeIds));
+        $arrColumns = array();
+        foreach ($this->getOriginalDataMapForSql() as $alias => $sqlColumn) {
+            $arrColumns[] = "$sqlColumn AS $alias";
+        }
+        
+        // [[pk]] AS nodeId, [[nodeParent]] AS parentId, [[nodeOrder]] AS ordering
+        $strColumns = implode(", ", $arrColumns);
+        
+    	$stmt = $this->stmtCache->getStatement("
+            SELECT {$strColumns}
+            FROM [[table]] WHERE [[pk]] IN ({{ids}})
+    	", array('ids' => $nodeIds));
         
     	$res = $this->getDb()->fetchArray($stmt, 'nodeId');
     	return $res;
@@ -120,12 +140,13 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
     function loadNodes(array $ids) {
     	
         $res = array();
+        $c = $this->getNodeClass();
         foreach ($this->loadOriginalData($ids) as $id => $node) {
         	$prot = array(
         		'mapper' => $this->mixin,
         	    'originalData' => $node
             );
-            $objNode = new Ac_Model_Tree_AdjacencyListImpl($prot);
+            $objNode = new $c($prot);
             $res[$id] = $objNode;
         }
         return $res;
@@ -198,11 +219,11 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
                 'srcTableName' => $this->mixin->tableName,
                 'destTableName' => new Ac_Sql_Expression("
                 (
-                    SELECT {$this->nodeParentField} AS parentId, COUNT(ns.{$this->pk}) AS ".$this->getDb()->n('count')." 
-                    FROM {$this->mixin->tableName} AS ns 
+                    SELECT {$this->nodeParentField} AS parentId, COUNT(children.{$this->pk}) AS ".$this->getDb()->n('count')." 
+                    FROM {$this->mixin->tableName} AS children 
                     WHERE ".$this->getDb()->getIfnullFunction()."({$this->nodeParentField}, 0) <> 0 
                     GROUP BY {$this->nodeParentField}
-                )  AS nsc"),
+                )  AS childrenCount"),
                 'fieldLinks' => array(
                     'nodeId' => 'parentId',
                 ),
