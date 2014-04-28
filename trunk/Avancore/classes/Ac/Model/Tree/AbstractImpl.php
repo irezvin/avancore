@@ -2,10 +2,13 @@
 
 abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_Tree_Node {
 
-    const csBeforeDelete = 'beforeDelete';
-    const csAfterDelete = 'afterDelete';
-    const csBeforeSave = 'beforeSave';
-    const csAfterSave = 'afterSave';
+    const STATE_BEFORE_DELETE = 'beforeDelete';
+    const STATE_AFTER_DELETE = 'afterDelete';
+    const STATE_BEFORE_SAVE = 'beforeSave';
+    const STATE_AFTER_SAVE = 'afterSave';
+    
+    const SORT_FIRST = 0;
+    const SORT_LAST = -1;
     
     /**
      * @var Ac_Model_Object
@@ -13,7 +16,9 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
     protected $container = false;
 	
     /**
-     * During do(Before|After)Container(Save|Delete) specifies corresponding container state. One of self::cs* constants.
+     * During do(Before|After)Container(Save|Delete) specifies corresponding container state. 
+     * One of self::STATE* constants.
+     * 
      * @var string
      */
     protected $containerState = false;
@@ -125,7 +130,8 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
             
         if ($this->treeProvider !== $provider) {
             $this->treeProvider = $provider;
-            if ($provider && ($nsId = $this->getNodeId())) $this->treeProvider->registerNodes(array($this));
+            if ($provider && $this->getNodeId()) 
+                $this->treeProvider->registerNodes(array($this));
         }
     }
     
@@ -136,8 +142,18 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
         return $this->treeProvider;
     }
     
+    /**
+     * Returns ID of container object that contained in the Impl instance
+     * Is called only in case when Impl is detached from container
+     */
     abstract protected function doGetInternalNodeId();
     
+    /**
+     * Returns ID of container object
+     * If container is loaded and referenced, returns container' PK
+     * If container is not loaded, takes in-memory value from Impl ($this->doGetInternalNodeId())
+     * @return mixed
+     */
     function getNodeId() {
         if ($this->container) 
             $res = $this->container->{$this->modelIdField};
@@ -145,8 +161,16 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
         return $res;
     }
     
+    /**
+     * Returns ID of parent node that is contained in the Impl
+     */
     abstract protected function doGetInternalParentId();
     
+    /**
+     * Returns ID of parent node
+     * In-memory value from related parent' Impl object has preference over internal value
+     * @return int|null
+     */
     function getParentNodeId() {
         if ($this->parentId === false) {
             if ($this->tmpParent) $res = $this->tmpParent->getNodeId();
@@ -159,6 +183,15 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
         return $res;
     }
     
+    /**
+     * Sets ID of parent node.
+     * 
+     * If there is in-memory association with the "parent" Impl AND new ID is different 
+     * from ID of currently referenced parent' Impl object, current 'node' 
+     * is de-associated from old parent Impl.
+     * 
+     * @param mixed $parentId
+     */
     function setParentNodeId($parentId) {
         $this->parentId = $parentId;
         if ($this->tmpParent && $this->tmpParent->getNodeId() !== $parentId) {
@@ -167,6 +200,13 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
         }
     }
     
+    /**
+     * Sets instance of parent node.
+     * When persistent Impl (with assigned ID) is provided, DOES NOT create in-memory association
+     * and remembers it's ID instead
+     * 
+     * @param Ac_I_Tree_Node|null $parentNode
+     */
     function setParentNode(Ac_I_Tree_Node $parentNode = null) {
     	if (is_null($parentNode)) $this->setParentNodeId(null);
         elseif (strlen($id = $parentNode->getNodeId())) $this->setParentNodeId($id);
@@ -177,7 +217,6 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
         }
     }
     
-
     protected function doOnCreateChildNodePrototype(array $prototype, $container) {
     }
     
@@ -217,13 +256,20 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
         
     abstract function notifyParentNodeSaved();
     
-    protected function getParentIdIfChanged() {
+    protected function getParentIdIfChanged(& $currParentId = false) {
         $currParentId = false;
         $res = false;
+        $log = array();
+        
+        // 1. Determine current parent id ($currParentId)
+        
+        // we have $this->parentId? Use it
         if ($this->parentId !== false) {
             $log['this->parentId'] = $this->parentId; 
             $currParentId = $this->parentId;
         }
+        
+        // in other case let's try to obtain our associated $tmpParent's nodeId()
         if (!strlen($currParentId) 
             && !is_null($currParentId) 
             && $this->tmpParent 
@@ -232,40 +278,44 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
             $currParentId = $nsId;
             $log['nsId'] = $nsId;
         }
+        
+        // still no trace of the parent? get value from the container
         if (!strlen($currParentId) && !is_null($currParentId)) {
-            $log['doGetInternalParentId()'] = $this->doGetInternalParentId();
-            $currParentId = $this->doGetInternalParentId();
-        }
-        if (!strlen($currParentId) && !is_null($currParentId)) {
-            $log['getCurrentParentId()'] = $this->getCurrentParentId(); 
-            $currParentId = $this->getCurrentParentId();
+            $log['doGetInternalParentId()'] = $currParentId = $this->doGetInternalParentId();
         }
         
-        $log = array();
-        $log["currParentId"] = array($currParentId, gettype($currParentId));
+        if (!strlen($currParentId) && !is_null($currParentId)) {
+            $log['getParentIdFromDb()'] = $currParentId = $this->getParentIdFromDb();
+        }
         
-        if (($this->getCurrentParentId() !== false) && ((string) $currParentId !== (string) $this->getCurrentParentId())) {
-             $log['Way 1']['currParentId'] = array($currParentId, gettype($currParentId));
-             $log['Way 1']['getCurrentParentId()'] = array($this->getCurrentParentId(), gettype($this->getCurrentParentId()));
-             $res = $currParentId;
+        $log["currParentId"] = $currParentId;
+        
+        $pidFromDb = $this->getParentIdFromDb();
+        if (($pidFromDb !== false) && ((string) $currParentId !== (string) $pidFromDb)) {
+            $log['Way 1']['currParentId'] = $currParentId;
+            $log['Way 1']['getParentIdFromDb()'] = $this->getParentIdFromDb();
+            $res = $currParentId;
         } elseif (!$this->hasOriginalData()) {
+            // we are not persistent - return $currParentId
             $log['Way 2'] = true;
             $res = $currParentId;
+            
+            // default to top-level
+            if ($res === false) $res = null; 
         } else {
             $res = false;
         }
-                
 
-        $log["internal parent id"] = array($this->doGetInternalParentId(), gettype($this->doGetInternalParentId()));
-        $log["my parent id"] = array($this->parentId, gettype($this->doGetInternalParentId()));
-        $log["res"] = array($res, gettype($res));
+        $log["internal parent id"] = $this->doGetInternalParentId();
+        $log["my parent id"] = $this->parentId;
+        $log["res"] = $res;
         
 //        Ac_Debug_FirePHP::getInstance()->log($log, 'getParentIdIfChanged()');
         
         return $res;
     }
     
-    protected function getCurrentParentId() {
+    protected function getParentIdFromDb() {
         return $this->doGetInternalParentId();
     }
     
@@ -570,25 +620,25 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
     abstract protected function doAfterContainerDelete();
     
     final function beforeContainerSave() {
-        $this->containerState = self::csBeforeSave;
+        $this->containerState = self::STATE_BEFORE_SAVE;
         $this->doBeforeContainerSave();
         $this->containerState = false;
     }
     
     final function afterContainerSave() {
-        $this->containerState = self::csAfterSave;
+        $this->containerState = self::STATE_AFTER_SAVE;
         $this->doAfterContainerSave();
         $this->containerState = false;
     }
     
     final function beforeContainerDelete() {
-        $this->containerState = self::csBeforeDelete;
+        $this->containerState = self::STATE_BEFORE_DELETE;
         $this->doBeforeContainerDelete();
         $this->containerState = false;
     }
     
     final function afterContainerDelete() {
-        $this->containerState = self::csAfterDelete;
+        $this->containerState = self::STATE_AFTER_DELETE;
         $this->doAfterContainerDelete();
         $this->containerState = false;
     }
