@@ -15,6 +15,8 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
      */
     protected $nestedSets = false;
     
+    var $rootNodePrototype = array();
+    
     protected $isCreatingRootNode = false;
     
     protected $allChildrenCountRelation = false;
@@ -37,6 +39,7 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
                 'orderingCol' => $this->nodeOrderField,
                 'db' => $this->mixin->getDb(),
                 'blocker' => new Ac_Sql_Blocker(),
+                'idIsAutoInc' => $this->mixin->getAutoincFieldName() == $this->mixin->pk,
             ));
         }
         return $this->nestedSets;
@@ -52,6 +55,18 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
             }
         }
         return $this->rootNodeId;
+    }
+    
+    protected function createRootNode() {
+        $this->isCreatingRootNode = true;
+        if (Ac_Accessor::methodExists($this->mixin, 'createRootNode')) {
+            $res = $this->mixin->createRootNode();
+        } else {
+            $ns = $this->getNestedSets();
+            $res = $ns->addRootNode(true, $this->rootNodePrototype);
+        }
+        $this->isCreatingRootNode = false;
+        return $res;
     }
     
     function getIsCreatingRootNode() {
@@ -231,5 +246,23 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
         $res = $this->getDb()->fetchColumn($sql, 0, null);
         return $res;
     }
+    
+    protected function listNonMixedProperties() {
+        return array_merge(parent::listNonMixedProperties(), array(
+            'leftCol', 'rightCol', 'ignoreCol', 'levelCol',
+        ));
+    }
+    
+    function onBeforeStoreRecord(Ac_Model_Object $record, $hyData, & $exists, & $error, & $newData) {
+        // Nested sets' fields are managed by $this->nestedSets object
+        unset($hyData[$this->leftCol]);
+        unset($hyData[$this->rightCol]);
+    }
+    
+    function reorderNode($id, $oldParentId, $oldOrdering, $newParentId, $newOrdering) {
+        $ns = $this->getNestedSets();
+        $ns->moveNode($id, $newParentId, $newOrdering);
+    }
+    
     
 }

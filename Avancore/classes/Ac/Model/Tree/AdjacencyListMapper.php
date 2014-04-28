@@ -365,7 +365,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
                     SELECT MAX([[nodeOrder]])
                     FROM [[table]] WHERE [[nodeParent]] = {{parentId}}
                 ', array(
-                    'parentId' => $parentId, 
+                    'parentId' => $parentId,
                 )
             ));
         }
@@ -380,10 +380,10 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
         return new $nc(array(
             'container' => $modelObject,
             'mapper' => $this->mixin,
-        ));        
+        ));
     }
     
-    function reorderNode($id, $oldParentId, $oldOrdering, $newParentId, $newOrdering) {
+    function reorderNode($id, $oldParentId, $oldOrdering, $newParentId, $newOrdering, $ignoreTheNode = false) {
                     
         $db = $this->getDb();
         
@@ -391,20 +391,23 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
 
             $oldCrit = is_null($oldParentId)? '[[nodeParent]] IS NULL' : '[[nodeParent]] = {{oldParentId}}';
             $newCrit = is_null($newParentId)? '[[nodeParent]] IS NULL' : '[[nodeParent]] = {{newParentId}}';
+            $crit = '';
+            
+            if ($ignoreTheNode) $crit = " AND [[pk]] <> {{id}}";
             
             // move with parent change...
 
             $db->query($this->stmtCache->getStatement('
                     UPDATE [[table]] 
                     SET [[nodeOrder]] = [[nodeOrder]] + 1
-                    WHERE '.$oldCrit.' AND [[nodeOrder]] >= {{newOrdering}}
+                    WHERE '.$newCrit.$crit.' AND [[nodeOrder]] >= {{newOrdering}}
                 ', array('newParentId' => $newParentId, 'newOrdering' => $newOrdering)
             ));
 
             $db->query($this->stmtCache->getStatement('
                     UPDATE [[table]] 
                     SET [[nodeOrder]] = [[nodeOrder]] - 1
-                    WHERE '.$newCrit.' AND [[nodeOrder]] >= {{oldOrdering}}
+                    WHERE '.$oldCrit.$crit.' AND [[nodeOrder]] >= {{oldOrdering}}
                 ', array('oldParentId' => $oldParentId, 'oldOrdering' => $oldOrdering)
             ));
 
@@ -425,6 +428,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
             if ($delta !== false) { 
 
                 $crit = is_null($newParentId)? '[[nodeParent]] IS NULL' : '[[nodeParent]] = {{parentId}}';
+                if ($ignoreTheNode) $crit .= " AND  [[pk]] <> {{id}}";
                 
                 $db->query($stmt = $this->stmtCache->getStatement('
                         UPDATE [[table]] 
@@ -442,7 +446,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
                 
             }
 
-        }        
+        }
     }
     
     function onAfterCreateRecord(Ac_Model_Object $record) {
