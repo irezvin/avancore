@@ -52,4 +52,26 @@ class Ac_Test_Relation extends Ac_Test_Base {
         
     }
     
+    function testRelArray() {
+        $rel = new Ac_Model_Relation(array(
+                'srcTableName' => false,
+                'destTableName' => '#__people_tags',
+                'fieldLinks' => array(
+                    'personId' => 'idOfPerson',
+                ),
+                'srcVarName' => 'tagIds',
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+                'database' => $this->getAeDb()
+        ));
+        $src = array(
+            array('personId' => 4),
+            array('personId' => 3, 'tagIds' => false),
+            array('personId' => -2, 'tagIds' => null),
+            array('personId' => -1, 'tagIds' => array('foo')),
+        );
+        $rel->loadDest($src);
+        var_dump($src);
+    }
+    
 }

@@ -160,7 +160,7 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
                 'srcTableName' => $tableName,
                 'destTableName' => new Ac_Sql_Expression("
                     (
-                        SELECT parents.{$pk} AS parentId, children.{$pk} AS allChildIds
+                        SELECT parents.{$pk} AS parentId, children.{$pk} AS childId
                         FROM {$tableName} AS parents 
                         INNER JOIN {$tableName} AS children
                             ON children.{$this->leftCol} > parents.{$this->leftCol} 
@@ -186,21 +186,50 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
         foreach ($ids as $id) {
             $src[] = array('nodeId' => $id);
         }
-    	foreach ($ids as $id) 
-    		$nodes2load[] = array('nodeId' => $id, 'allChildIds' => false);
-        
-    	$this->getNodeChildIdsRelation()->loadDest($nodes2load, true, false);
-        
-    	foreach ($nodes2load as $node) {
-    		$childIds = array();
-    		if (isset($node['childNodeIds']) && is_array($node['childNodeIds'])) 
-    			foreach($node['childNodeIds'] as $nId) $childIds[] = $n['childId'];
-    		if ($childIds) $childrenRecursive = $this->loadChildIdsRecursive($childIds);
-    			else $childrenRecursive = array();
-    		$res[$node['nodeId']] = $childrenRecursive;
-    	}
+    	$items = $this->getNodeChildIdsRelation()->loadDest($src, true, false);
+        foreach ($src as $srcK => $item) {
+            /* 
+             * make child ids' tree for the respective item
+             */
+            $res[$item['nodeId']] = array();
+            if (is_array($item['allChildIds'])) {
+                $arr = $item['allChildIds'];
+                /*
+                 * original structure:
+                 * [ ['parentId' => id1, 'childId' => id1.1], ['parentId' => id1.1, 'childId' => id1.1.1]]
+                 * target structure:
+                 * [ id1 => [ id1.1 => [ id1.1.1 => [] ] ] ]
+                 */
+                $p2c = array();
+                foreach ($arr as $k => $v) {
+                    $p2c[$v['childId']] = array();
+                }
+                foreach ($arr as $k => $v) {
+                    if (isset($p2c[$v['parentId']])) {
+                        $p2c[$v['parentId']][$v['childId']] = & $p2c[$v['childId']];
+                    } elseif ($v['parentId'] == $item['nodeId']) {
+                        $res[$item['nodeId']] = & $p2c[$v['id']];
+                    } else {
+                        throw new Ac_E_Assertion("Invalid logic: child belongs neither to parent nor "
+                            . "to the nodes of parent's tree");
+                    }
+                }
+            } else {
+                $res[$item['nodeId']] = array();
+            }
+        }
     	return $res;
     }
     
+    function getNodePath($id) {
+        $sql = $this->stmtCache->getStatement(
+            'SELECT parent.[[pk]] FROM [[table]] parent INNER JOIN [[table]] child
+                ON parent.[[leftCol]] < child.[[leftCol]] AND parent.[[rightCol]] > child.[[rightCol]]
+                WHERE child.[[pk]] = {{id}}
+                ORDER BY parent.[[leftCol]] 
+            ', array('id' => $id));
+        $res = $this->getDb()->fetchColumn($sql, 0, null);
+        return $res;
+    }
     
 }
