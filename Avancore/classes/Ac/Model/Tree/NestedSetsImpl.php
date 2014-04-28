@@ -67,16 +67,6 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     function setTreeNodeTitleGetter($treeNodeTitleGetter) {
         $this->treeNodeTitleGetter = $treeNodeTitleGetter;
     }
-
-    protected function doGetInternalParentId() {
-        if (($n = $this->getTreeNode())) {
-            $res = $n[$this->nestedSets->parentCol];
-            if ($res === $this->getRootNodeId()) $res = null;
-        } else {
-            $res= false;
-        }
-        return $res;
-    }
     
     function setParentNode(Ac_I_Tree_Node $parentNode = null) {
         if ($parentNode && !($parentNode instanceof Ac_Model_Tree_NestedSetsImpl))
@@ -98,7 +88,6 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     }
     
     protected function doGetInternalOrdering() {
-//        Ac_Debug_FirePHP::getInstance()->log($this->getTreeNode(), "doGetInternalOrdering()");
         if (($tn = $this->getTreeNode())) $res = $tn[$this->nestedSets->orderingCol];
             else $res = false;
         return $res;        
@@ -300,13 +289,23 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
         return $this->delete();
     }
     
-    protected function getCurrentParentId() {
+    protected function getParentIdFromDb() {
         if ($tn = $this->getTreeNode()) {
             $res = $tn[$this->nestedSets->parentCol];
             if ($res == $this->getRootNodeId()) $res = null;
         } else {
             //$res = $this->getRootNodeId();
             $res = null;
+        }
+        return $res;
+    }
+
+    protected function doGetInternalParentId() {
+        if (($n = $this->getTreeNode())) {
+            $res = $n[$this->nestedSets->parentCol];
+            if ($res === $this->getRootNodeId()) $res = null;
+        } else {
+            $res = false;
         }
         return $res;
     }

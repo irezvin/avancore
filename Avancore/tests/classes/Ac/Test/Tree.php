@@ -129,13 +129,13 @@ class Ac_Test_Tree extends Ac_Test_Base {
         return $ok;
     }
     
-    function _testCombo() {
+    function testCombo() {
         $this->resetCombos();
         $s = $this->getSampleApp();
         $mapper = $s->getSampleTreeComboMapper();
         $mixable = $mapper->getMixable('treeMapper');
-        $this->assertIsA($mixable, 'Ac_Model_Tree_NestedSetsMapper');
-        if ($mixable instanceof Ac_Model_Tree_NestedSetsMapper) {
+        $this->assertIsA($mixable, 'Ac_Model_Tree_ComboMapper');
+        if ($mixable instanceof Ac_Model_Tree_ComboMapper) {
             $ns = $mixable->getNestedSets();
             $this->assertTrue($ns->idIsAutoInc);
             if ($this->assertEqual($id = $mixable->getRootNodeId(), 1)) {
@@ -167,7 +167,7 @@ class Ac_Test_Tree extends Ac_Test_Base {
         }
     }   
       
-    function testNs() {
+    function _testNs() {
         $this->resetNs();
         $s = $this->getSampleApp();
         $mapper = $s->getSampleTreeRecordMapper();
@@ -258,7 +258,7 @@ class Ac_Test_Tree extends Ac_Test_Base {
         }
     }   
     
-    function testAdjacent() {
+    function _testAdjacent() {
         $this->resetAdj();
         $s = $this->getSampleApp();
         $mapper = $s->getSampleTreeAdjacentMapper();

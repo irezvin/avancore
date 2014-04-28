@@ -17,6 +17,8 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
      */
     protected $mapper = false;
     
+    protected $requiredMapperClass = 'Ac_I_Tree_Mapper_AdjacencyList';
+    
     /**
      * @var Ac_Model_Tree_AdjacencyListImpl
      */
@@ -108,7 +110,8 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     }
     
     function setMapper(Ac_I_Tree_Mapper $mapper) {
-        if (!$mapper instanceof Ac_I_Tree_Mapper_AdjacencyList) throw new Exception("\$mapper must be an instance of Ac_I_Tree_Mapper");
+        if (!$mapper instanceof $this->requiredMapperClass) 
+            throw new Exception("\$mapper must be an instance of '{$this->requiredMapperClass}'");
         $this->modelIdField = $mapper->pk;
         $this->orderField = $mapper->getNodeOrderField();
         $this->parentField = $mapper->getNodeParentField();
@@ -148,6 +151,10 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         return $this->tmpParent && ($this->tmpParent->hasToStoreContainer() || $this->tmpParent->hasToStoreParent());
     }
     
+    protected function shouldReorder($parentIdIfChanged, $orderIfChanged) {
+        return strlen($parentIdIfChanged) || strlen($orderIfChanged);
+    }
+    
     function store() {
         $res = false;
         if ($this->lockStore !== 0) return true;
@@ -166,7 +173,7 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         $pid = $this->getParentIdIfChanged(); 
         $ord = $this->getOrderingIfChanged($pid !== false);
         
-        if (strlen($pid) || strlen($ord)) {
+        if ($res && $this->shouldReorder($pid, $ord)) {
             $origPid = $this->origParentId;
             
             if ($origPid === false) $origPid = $this->parentId;
@@ -180,8 +187,9 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
             
             $this->mapper->reorderNode($this->getContainer()->getPrimaryKey(), $origPid, $origOrd, 
                 $newPid, $this->ordering);
+            
         } elseif (!$this->container->isPersistent()) {
-            $ord = $this->container->getMapper()->getLastOrdering($this->getCurrentParentId());
+            $ord = $this->container->getMapper()->getLastOrdering($this->getParentIdFromDb());
             if (is_null($ord)) $ord = 1;
             else $ord = $ord + 1;
             $this->container->{$this->orderField} = $ord;
@@ -227,12 +235,14 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
                 }
             }
         }
+        
+        if ($res) $this->coreDelete();
+        
         if (($newId !== false) && ($newParent = $this->treeProvider->getNode($newId, false))) $newParent->notifyChildNodeRemoved($this);
         if (($oldId !== false) && ($oldParent = $this->treeProvider->getNode($oldId, false))) $oldParent->notifyChildNodeRemoved($this);
         $this->lockDelete--;
         return $res;
     }
-    
     
     protected function doBeforeContainerSave() {
         $this->store();
@@ -260,6 +270,9 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
 
     function getDefaultParentValue() {
         return $this->defaultParentValue;
-    }    
+    }
+
+    protected function coreDelete() {
+    }
     
 }

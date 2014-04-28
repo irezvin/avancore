@@ -1,14 +1,12 @@
 <?php
 
 class Sample_Tree_Combo_Mapper extends Sample_Tree_Combo_Base_Mapper 
-    implements Ac_I_Tree_Mapper_NestedSets {
+    implements Ac_I_Tree_Mapper_Combo {
     
     protected function doGetCoreMixables() {
         return array(
             'treeMapper' => array(
-                'class' => 'Ac_Model_Tree_NestedSetsMapper',
-                'nsPrototype' => array(
-                ),
+                'class' => 'Ac_Model_Tree_ComboMapper',
                 'rootNodePrototype' => array(
                     'title' => 'root',
                     'tag' => '999',
