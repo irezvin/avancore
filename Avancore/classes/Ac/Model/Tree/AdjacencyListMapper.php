@@ -384,7 +384,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
     }
     
     function reorderNode($id, $oldParentId, $oldOrdering, $newParentId, $newOrdering, $ignoreTheNode = false) {
-                    
+        
         $db = $this->getDb();
         
         if ($oldParentId != $newParentId) {
@@ -401,14 +401,14 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
                     UPDATE [[table]] 
                     SET [[nodeOrder]] = [[nodeOrder]] + 1
                     WHERE '.$newCrit.$crit.' AND [[nodeOrder]] >= {{newOrdering}}
-                ', array('newParentId' => $newParentId, 'newOrdering' => $newOrdering)
+                ', array('newParentId' => $newParentId, 'newOrdering' => $newOrdering, 'id' => $id)
             ));
 
             $db->query($this->stmtCache->getStatement('
                     UPDATE [[table]] 
                     SET [[nodeOrder]] = [[nodeOrder]] - 1
                     WHERE '.$oldCrit.$crit.' AND [[nodeOrder]] >= {{oldOrdering}}
-                ', array('oldParentId' => $oldParentId, 'oldOrdering' => $oldOrdering)
+                ', array('oldParentId' => $oldParentId, 'oldOrdering' => $oldOrdering, 'id' => $id)
             ));
 
         } else {
@@ -447,6 +447,31 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
             }
 
         }
+    }
+    
+    function placeNewNode($id, $parentId, $ordering, $ignoreTheNode = false) {
+        $db = $this->getDb();
+        $crit = is_null($parentId)? '[[nodeParent]] IS NULL' : '[[nodeParent]] = {{parentId}}';
+        if ($ignoreTheNode) $crit .= " AND [[pk]] <> {{id}}";
+        $res = $db->query($this->stmtCache->getStatement('
+                UPDATE [[table]] 
+                SET [[nodeOrder]] = [[nodeOrder]] + 1
+                WHERE '.$crit.' AND [[nodeOrder]] >= {{ordering}}
+            ', array('parentId' => $parentId, 'ordering' => $ordering, 'id' => $id)
+        )) !== false;
+        return $res;
+    }
+    
+    function removeNode($id, $parentId, $ordering) {
+        $db = $this->getDb();
+        $crit = is_null($parentId)? '[[nodeParent]] IS NULL' : '[[nodeParent]] = {{parentId}}';
+        $res = $db->query($this->stmtCache->getStatement('
+                UPDATE [[table]] 
+                SET [[nodeOrder]] = [[nodeOrder]] - 1
+                WHERE '.$crit.' AND [[nodeOrder]] >= {{ordering}}
+            ', array('parentId' => $parentId, 'ordering' => $ordering)
+        )) !== false;
+        return $res;
     }
     
     function onAfterCreateRecord(Ac_Model_Object $record) {

@@ -310,7 +310,7 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
         return $res;
     }
     
-    function hasOriginalData() {
+    function isPersistent() {
         return (bool) $this->getTreeNode();
     }
     

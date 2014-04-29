@@ -138,8 +138,8 @@ class Ac_Test_Tree extends Ac_Test_Base {
         if ($mixable instanceof Ac_Model_Tree_ComboMapper) {
             $ns = $mixable->getNestedSets();
             $this->assertTrue($ns->idIsAutoInc);
-            if ($this->assertEqual($id = $mixable->getRootNodeId(), 1)) {
-                $rec = $mapper->loadById($id);
+            if ($this->assertEqual($rootId = $mixable->getRootNodeId(), 1)) {
+                $rec = $mapper->loadById($rootId);
                 if ($this->assertTrue($rec && $rec instanceof Ac_Model_Object)) {
                     $this->assertEqual($rec->title, 'root');
                     $this->assertEqual($rec->tag, 999);
@@ -159,15 +159,27 @@ class Ac_Test_Tree extends Ac_Test_Base {
             $this->assertRowsMatch(
                 $currRows,
                 array(
-                    array(1, 'root', 0, 3, null, 0, 0),
-                    array(2, 'child1', 1, 2, 1, 0, 1),
+                    array(1, 'root', 0, 3, null, 1, 0),
+                    array(2, 'child1', 1, 2, 1, 1, 1),
                 )
+            );
+
+            $sample = array(
+                'leftCol' => 1, 
+                'rightCol' => 2, 
+                'parentId' => $rootId, 
+                'depth' => 1, 
+                'ordering' => 1
+            );
+            
+            $this->assertEqual(
+                Ac_Accessor::getObjectProperty($child1, array_keys($sample)), $sample
             );
             
         }
     }   
       
-    function _testNs() {
+    function testNs() {
         $this->resetNs();
         $s = $this->getSampleApp();
         $mapper = $s->getSampleTreeRecordMapper();
@@ -258,7 +270,7 @@ class Ac_Test_Tree extends Ac_Test_Base {
         }
     }   
     
-    function _testAdjacent() {
+    function testAdjacent() {
         $this->resetAdj();
         $s = $this->getSampleApp();
         $mapper = $s->getSampleTreeAdjacentMapper();
@@ -269,12 +281,13 @@ class Ac_Test_Tree extends Ac_Test_Base {
             $this->assertEqual($mapper->getDefaultParentValue(), null);
             
             $child1 = $mapper->createRecord();
+
+            $this->assertEqual($child1->getOrdering(), Ac_Model_Tree_AbstractImpl::ORDER_LAST);
+            
             $child1->title = 'child1';
             $child1->tag = 1;
             $this->assertTrue($child1->store());
 
-            $this->assertEqual($child1->getOrdering(), 1);
-            
             $child2 = $mapper->createRecord();
             $child2->title = 'child2';
             $child2->tag = 2;
@@ -304,7 +317,7 @@ class Ac_Test_Tree extends Ac_Test_Base {
             $child3->title = 'child3';
             $child3->tag = 3;
             $this->assertTrue($child3->store());
-            
+
             $this->assertFalse($child1->canOrderUp());
             $this->assertTrue($child1->canOrderDown());
             $this->assertTrue($child2->canOrderUp());

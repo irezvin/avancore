@@ -4,7 +4,7 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
 
     protected $parentField = 'parentId';
     
-    protected $orderField = 'ordering';
+    protected $orderingField = 'ordering';
     
     protected $origNodeId = false;
     
@@ -13,7 +13,7 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     protected $origParentId = false;
     
     /**
-     * @var Ac_Model_Tree_AdjacencyListMapper
+     * @var Ac_I_Tree_Mapper_AdjacencyList
      */
     protected $mapper = false;
     
@@ -26,8 +26,28 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     
     protected $defaultParentValue = false;
     
-    function hasOriginalData() {
-        return $this->origNodeId !== false;
+    protected $defaultOrderValue = self::ORDER_LAST;
+    
+    protected $lockParentId = 0;
+    
+    protected $lockOrdering = 0;
+    
+    /**
+     * Is used *only* during store() phase
+     */
+    protected $newParentId = false;
+    
+    /**
+     * Is used *only* during store() phase
+     */
+    protected $newOrdering = false;
+    
+    protected $wasNotPersistent = false;
+    
+    function isPersistent() {
+        if ($this->container) $res = $this->container->isPersistent();
+        else $res = $this->origNodeId !== false;
+        return $res;
     }
 
     function getOrigMap() {
@@ -41,7 +61,7 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     function getFieldMapToContainer() {
         return array(
             'nodeId' => $this->nodeIdField,
-            'ordering' => $this->orderField,
+            'ordering' => $this->orderingField,
             'parentId' => $this->parentField,
         );
     }
@@ -54,7 +74,7 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     }
     
     function loadOriginalData($dontReload) {
-        if ($dontReload && $this->hasOriginalData()) return true;
+        if ($dontReload && $this->isPersistent()) return true;
         if ($this->mapper) $res = $this->mapper->loadOriginalDataForNode($this);
             else $res = false;
         return $res;
@@ -113,7 +133,7 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         if (!$mapper instanceof $this->requiredMapperClass) 
             throw new Exception("\$mapper must be an instance of '{$this->requiredMapperClass}'");
         $this->modelIdField = $mapper->pk;
-        $this->orderField = $mapper->getNodeOrderField();
+        $this->orderingField = $mapper->getNodeOrderField();
         $this->parentField = $mapper->getNodeParentField();
         $this->defaultParentValue = $mapper->getDefaultParentValue();
         parent::setMapper($mapper);
@@ -122,22 +142,28 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     function setContainer(Ac_Model_Object $container = null) {
         parent::setContainer($container);
         $this->updateFromContainer();
+        
+        // apply defaults to the container
+        if (!$this->container->isPersistent()) { 
+            $this->setOrdering($this->defaultOrderValue);
+            $this->setParentNodeId($this->defaultParentValue);
+        }
     }
     
     protected function updateContainer() {
         if ($c = $this->getContainer()) {
-            $this->container->{$this->orderField} = $this->getOrdering();
+            $this->container->{$this->orderingField} = $this->getOrdering();
             $this->container->{$this->parentField} = $this->getParentNodeId();
         }
     }
     
     protected function updateFromContainer() {
         $this->origNodeId = $this->container->{$this->modelIdField};
-        $this->origOrdering = $this->container->{$this->orderField};
+        $this->origOrdering = $this->container->{$this->orderingField};
         $this->origParentId = $this->container->{$this->parentField};
-        $this->origNodeId = false;
         $this->parentId = false;
         $this->ordering = null;
+        $this->resetTreePositionChange();
         $this->tmpParent = false;
     }
     
@@ -156,59 +182,163 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     }
     
     function store() {
-        $res = false;
         if ($this->lockStore !== 0) return true;
+        
         $this->lockStore++;
+        
+        $res = $this->beginStore();
+        if ($res && $this->hasToStoreContainer()) 
+            if (!$this->container->store()) $res = false;
+        $this->endStore($res);
+        
+        $this->lockStore--;
+        
+        return $res;
+    }
+    
+    protected function getUpdatedOrdering($parentId, $ordering, $isParentIdChanged) {
+        
+        $res = $ordering;
+        
+        $maxO = $this->mapper->getLastOrdering($parentId);
+        if (!$maxO) $maxO = 0;
+        
+        //when our node is introducted to a new parent, 
+        //new ordering in new parent is greater than current max ordering by one
+        elseif ($maxO && $isParentIdChanged) $maxO += 1; 
+        
+        if ($res == self::ORDER_LAST || $res > $maxO) $res = $maxO;
+        if ($res < 1) $res = 1;
+
+        return $res;
+    }
+    
+    protected function checkAndEnqueueTreePositionChange() {
+        
+        $newParentId = $this->container->getField($this->parentField);
+        $newOrdering = $this->container->getField($this->orderingField);
+        
+        if (!strlen($newParentId)) $newParentId = $this->defaultParentValue;
+        
+        $isParentIdChanged = $newParentId != $this->origParentId;
+        
+        if (!$this->isPersistent()) {
+            // always enqueue for non-persistent items
+            $isParentIdChanged = true;
+            $this->newParentId = $newParentId;
+            $this->newOrdering = $this->getUpdatedOrdering($newParentId, $newOrdering, true);
+            $this->wasNotPersistent = true;
+            
+        } else {
+            
+            // is perisistent: check if parent changed,,,
+            if ($isParentIdChanged) {
+                $this->newParentId = $newParentId;
+                // always update ordering too
+                $this->newOrdering = $this->getUpdatedOrdering($newParentId, $newOrdering, true);
+            } else {
+                // otherwise update ordering only if it was changed
+                if ($newOrdering != $this->origOrdering) {
+                    // if index of last item was increased, it will put the changes back into bounds
+                    $newOrdering = $this->getUpdatedOrdering($newParentId, $newOrdering, false);
+                    // still different value?
+                    if ($newOrdering != $this->origOrdering) 
+                        $this->newOrdering = $newOrdering;
+                }
+            }
+            
+        }
+        
+        // update the model if there were changes
+        
+        if ($this->newParentId !== false) {
+            $this->lockParentId++;
+            $this->container->{$this->parentField} = $this->newParentId;
+            $this->lockParentId--;
+        }
+        if ($this->newOrdering !== false) {
+            $this->lockOrdering++;
+            $this->container->{$this->orderingField} = $this->newOrdering;
+            $this->lockOrdering--;
+        }
+        
+    }
+    
+    protected function isTreePositionChangeEnqueued() {
+        return $this->newParentId !== false || $this->newOrdering !== false;
+    }
+    
+    protected function applyTreePositionChange() {
         $res = true;
+        $id = $this->getNodeId();
+        $ignoreTheNode = true;
+        if ($this->getNodeId()) {
+            $newParentId = $this->newParentId !== false? $this->newParentId : $this->origParentId;
+            $newOrdering = $this->newOrdering !== false? $this->newOrdering : $this->origOrdering;
+            if ($this->wasNotPersistent) {
+                $this->mapper->placeNewNode($id, $newParentId, $newOrdering, $ignoreTheNode);
+            } else {
+                $this->mapper->reorderNode(
+                    $id, $this->origParentId, $this->origOrdering, 
+                    $newParentId, $newOrdering, $ignoreTheNode);
+            }
+        }
+        return $res;
+    }
+    
+    protected function resetTreePositionChange() {
+        $this->newParentId = false;
+        $this->newOrdering = false;
+        $this->wasNotPersistent = false;
+    }
+    
+    protected function beginStore() {
+        
+        $res = true;
+        
         $oldParentId = $this->origParentId;
+        
         if ($this->hasToStoreParent() && !$this->tmpParent->store()) $res = false;
         else {
             if ($this->hasToStoreContainer()) 
                 if (!$this->container->store()) $res = false;
         }
+        
         if ($oldParentId != $this->origParentId) {
-            if ($oldParent = $this->getTreeProvider()->getNode()) $oldParent->notifyChildNodeRemoved($this);
+            if ($oldParent = $this->getTreeProvider()->getNode()) 
+                $oldParent->notifyChildNodeRemoved($this);
         }
         
-        $pid = $this->getParentIdIfChanged(); 
-        $ord = $this->getOrderingIfChanged($pid !== false);
+        $this->resetTreePositionChange();
         
-        if ($res && $this->shouldReorder($pid, $ord)) {
-            $origPid = $this->origParentId;
-            
-            if ($origPid === false) $origPid = $this->parentId;
-            elseif ($pid === false) $pid = $origPid;
-                
-            $origOrd = $this->origOrdering;
-            if ($origOrd === false) $origOrd = $this->ordering;
-            
-            $newPid = $this->parentId;
-            if ($newPid === false) $newPid = $this->getDefaultParentValue();
-            
-            $this->mapper->reorderNode($this->getContainer()->getPrimaryKey(), $origPid, $origOrd, 
-                $newPid, $this->ordering);
-            
-        } elseif (!$this->container->isPersistent()) {
-            $ord = $this->container->getMapper()->getLastOrdering($this->getParentIdFromDb());
-            if (is_null($ord)) $ord = 1;
-            else $ord = $ord + 1;
-            $this->container->{$this->orderField} = $ord;
-        }
-
+        if ($res) $this->checkAndEnqueueTreePositionChange();
         
-        if ($res) {
-            foreach ($this->listChildrenToStore() as $i) {
-                if (!$this->getChildNode($i)->store()) {
-                    $res = false; 
-                    break;
-                }
-            }
-        }
-        if ($this->tmpParent) $this->tmpParent->notifyChildNodeSaved($this);
-        $this->lockStore--;
         return $res;
+
     }
     
+    protected function endStore($wasOk) {
+        
+        $res = $wasOk;
+        
+        if ($this->isTreePositionChangeEnqueued()) {
+            if (!$this->applyTreePositionChange()) $res = false;
+        }
+        
+        $this->resetTreePositionChange();
+        
+        foreach ($this->listChildrenToStore() as $i) {
+            if (!$this->getChildNode($i)->store()) {
+                $res = false; 
+                break;
+            }
+        }
+        
+        if ($res && $this->tmpParent) $this->tmpParent->notifyChildNodeSaved($this);
+        
+        return $res;
+        
+    }
         
     function notifyParentNodeSaved() {
         if ($nsId = $this->tmpParent->getNodeId()) {
@@ -245,15 +375,23 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     }
     
     protected function doBeforeContainerSave() {
-        $this->store();
+        if (!$this->lockStore) $this->beginStore();
     }
     
     protected function doAfterContainerSave() {
+        // update PK if non-persistent container was saved
+        if (!$this->isPersistent()) $this->origNodeId = $this->container->getPrimaryKey();
+        
+        if (!$this->lockStore) $this->endStore(true);
+        
         $this->updateFromContainer();
     }
     
+    protected function doOnContainerSaveFailed() {
+        if (!$this->lockStore) $this->endStore(false);
+    }
+    
     protected function doBeforeContainerDelete() {
-        
     }
     
     protected function doAfterContainerDelete() {
@@ -273,6 +411,27 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     }
 
     protected function coreDelete() {
+        $this->mapper->removeNode($this->getNodeId(), $this->origParentId, $this->origOrdering);
+    }
+    
+    function setParentNodeId($parentId) {
+        if (!$this->lockParentId) {
+            $this->lockParentId++;
+            $c = $this->getContainer();
+            parent::setParentNodeId($parentId);
+            $c->setField($this->parentField, $parentId);
+            $this->lockParentId--;
+        }
+    }
+    
+    function setOrdering($ordering) {
+        if (!$this->lockOrdering) {
+            $this->lockOrdering++;
+            $c = $this->getContainer();
+            parent::setOrdering($ordering);
+            $c->setField($this->orderingField, $ordering);
+            $this->lockOrdering--;
+        }
     }
     
 }
