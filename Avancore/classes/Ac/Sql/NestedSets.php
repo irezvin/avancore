@@ -171,7 +171,7 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
         return $res;
     }
     
-    function deleteNode($id) {
+    function deleteNode($id, $dontDeleteRows = false) {
         $res = false;
         if ($this->ensureTransaction()) {
             if (($row = $this->_db->fetchRow($this->_stmt(
@@ -181,7 +181,7 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
                 
                 $diff = $int['right'] - $int['left'] + 1;
                 
-                $this->query($this->_stmt('
+                if (!$dontDeleteRows) $this->query($this->_stmt('
                     DELETE FROM [[origTableName]] 
                         WHERE [[origLeftCol]] BETWEEN {{left}} AND {{right}}
                         [[origTc]]
@@ -258,46 +258,54 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
         return $res;
     }
     
-    function addNode($parentId, $order = false, $data = array()) {
+    function addNode($parentId, $order = false, $data = array(), $update = false, $dontInsert = false, & $insRow = array()) {
         $res = false;
         if ($this->ensureTransaction()) {
             if (($parentNode = $this->getInternalFields($this->getNode($parentId)))) {
+                
+                if ($update && isset($data[$this->idCol])) {
+                    $ignoreCrit = ' AND [[idCol]] <> {{key}}';
+                    $key = $data[$this->idCol];
+                } else {
+                    $ignoreCrit = '';
+                    $key = null;
+                }
                 
                 $left = $parentNode['left'] + 1;
                 
                 if ($order === false) {
                     $order = $this->_db->fetchValue($this->_stmt('
-                        SELECT MAX([[orderingCol]]) FROM [[tableName]] WHERE [[parentCol]] = {{parentId}} [[tc]]
-                    ', array('parentId' => $parentId)), 0, -1) + 1;
+                        SELECT MAX([[orderingCol]]) FROM [[tableName]] WHERE [[parentCol]] = {{parentId}} [[tc]] '.$ignoreCrit.'
+                    ', array('parentId' => $parentId, 'key' => $key)), 0, 0) + 1;
                 }
                 
                 $this->query($this->_stmt('
                         UPDATE [[tableName]] 
                         SET [[orderingCol]] = [[orderingCol]] + 1
-                        WHERE [[parentCol]] = {{parentId}} AND [[orderingCol]] >= {{order}} [[tc]]
-                    ', array('parentId' => $parentId, 'order' => $order)
+                        WHERE [[parentCol]] = {{parentId}} AND [[orderingCol]] >= {{order}} [[tc]] '.$ignoreCrit.'
+                    ', array('parentId' => $parentId, 'order' => $order, 'key' => $key)
                 ));
                 
                 if (($leftSibling = $this->getInternalFields($this->_db->fetchRow(
                     $this->_stmt('
                         SELECT * FROM [[tableName]]
-                        WHERE [[parentCol]] = {{parentId}} AND [[orderingCol]] < {{order}} [[tc]]
+                        WHERE [[parentCol]] = {{parentId}} AND [[orderingCol]] < {{order}} [[tc]] '.$ignoreCrit.'
                         ORDER BY [[orderingCol]] DESC
                         LIMIT 1
-                    ', array('parentId' => $parentId, 'order' => $order))
+                    ', array('parentId' => $parentId, 'order' => $order, 'key' => $key))
                 )))) $left = $leftSibling['right'] + 1;
                 
                 $right = $left + 1;
                 
                 $this->query($this->_stmt('
-                    UPDATE [[tableName]] SET [[leftCol]] = [[leftCol]] + 2
-                    WHERE [[leftCol]] >= {{left}} [[tc]]                    
-                ', array('left' => $left)));
+                    UPDATE [[tableName]] SET [[leftCol]] = [[leftCol]] + 2 
+                    WHERE [[leftCol]] >= {{left}} [[tc]] '.$ignoreCrit.'
+                ', array('left' => $left, 'key' => $key)));
                 
                 $this->query($this->_stmt('
                     UPDATE [[tableName]] SET [[rightCol]] = [[rightCol]] + 2
-                    WHERE [[rightCol]] >= {{left}} [[tc]]                   
-                ', array('left' => $left)));
+                    WHERE [[rightCol]] >= {{left}} [[tc]] '.$ignoreCrit.'
+                ', array('left' => $left, 'key' => $key)));
                 
                 $insRow = $data;
                 if (strlen($this->treeCol)) $insRow[$this->treeCol] = $this->treeId;
@@ -310,9 +318,33 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
                 }
                 if (!$this->idIsAutoInc && !isset($insRow[$this->idCol]))
                     $insRow[$this->idCol] = $this->getNextId();
-                $this->query($this->_db->insertStatement($this->tableName, $insRow));
-                if (isset($insRow[$this->idCol])) $res = $insRow[$this->idCol];
-                    else $res = $this->_db->getLastInsertId();  
+                if ($dontInsert) $res = $insRow;
+                else {
+                    if ($update && isset($data[$this->idCol])) {
+                        $data[$this->parentCol] = $parentId;
+                        $data[$this->leftCol] = $left;
+                        $data[$this->rightCol] = $right;
+                        $data[$this->orderingCol] = $order;
+                        if (strlen($this->levelCol) && isset($parentNode['level'])) {
+                            $data[$this->levelCol] = $parentNode['level'] + 1;
+                        }
+                        $stmt = $this->_db->updateStatement($this->tableName, $data, $this->idCol);
+                        if ($this->query($stmt) !== false) {
+                            if (isset($insRow[$this->idCol])) $res = $insRow[$this->idCol];
+                                else $res = $this->_db->getLastInsertId();  
+                        } else {
+                            $res = false;
+                        }
+                    } else {
+                        $stmt = $this->_db->insertStatement($this->tableName, $insRow);
+                        if ($this->query($stmt) !== false) {
+                            if (isset($insRow[$this->idCol])) $res = $insRow[$this->idCol];
+                                else $res = $this->_db->getLastInsertId();  
+                        } else {
+                            $res = false;
+                        }
+                    }
+                }
             }
         }
         return $res;
@@ -325,7 +357,11 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
         return $res;
     }
     
-    function moveNode($id, $parentId, $order = false, $dontCheckForParent = false, & $actualOrder = null) {
+    // TODO: optimize the implementation; 
+    // I'm more than sure that we can use at most one UPDATE with proper SWITCH
+    function moveNode($id, $parentId, $order = false, $dontCheckForParent = false, 
+        & $actualOrder = null) {
+        
         $res = false;
         if ($this->ensureTransaction() && ($node = $this->getInternalFields($this->getNode($id)))) {
             $parent = $this->getInternalFields($this->getNode($parentId));
@@ -348,7 +384,7 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
                     
                     $maxTargetOrder = $this->_db->fetchValue($this->_stmt('
                     	SELECT MAX([[orderingCol]]) FROM [[tableName]] WHERE [[parentCol]] = {{parentId}} [[tc]]
-                    ', array('parentId' => $parentId)), 0, -1) + 1;
+                    ', array('parentId' => $parentId)), 0, 0) + 1;
                                         
                     if ($order === false) {
                         $order = $maxTargetOrder;
@@ -374,7 +410,6 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
                             ', array('oldParentId' => $node['parent'], 'oldOrder' => $node['ordering'])
                         ));
                     
-                    
                         if (($leftSibling = $this->getInternalFields($this->_db->fetchRow(
                             $this->_stmt('
                                 SELECT * FROM [[tableName]]
@@ -385,22 +420,6 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
                         )))) $left = $leftSibling['right'] + 1;
                     
                     } else {
-                        
-                        // move within the same parent...
-                        
-//                      if ($leftSibling && ($leftSibling['id'] == $node['id']) && ($order > $node['ordering'])) {
-//                          $leftSibling = $this->getInternalFields($this->_db->fetchRow(
-//                          $this->_stmt('
-//                              SELECT * FROM [[tableName]]
-//                              WHERE [[parentCol]] = {{parentId}} AND [[orderingCol]] = {{order}} [[tc]]
-//                              ORDER BY [[orderingCol]] ASC
-//                              LIMIT 1
-//                          ', array('parentId' => $parentId, 'order' => $order))
-//                          ));
-//                          if ($leftSibling) {
-//                              $left = $leftSibling['right'] + 1;
-//                          }
-//                      }
                         
                         if ($order > $node['ordering']) {
                             $rightOrder = $order;
@@ -696,7 +715,7 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
             else $node = $this->getInternalFields($nodeIdOrNode);
         if ($node && $node['parent']) {
             $res = $this->_db->fetchRow($this->_stmt(
-                'SELECT * FROM [[tableName]] WHERE [[id]] = {{parentId}} [[tc]]', 
+                'SELECT * FROM [[tableName]] WHERE [[idCol]] = {{parentId}} [[tc]]', 
                 array('parentId' => $node['parent'])
             ));
         } else {
@@ -762,16 +781,5 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
         Ac_Callbacks::getInstance()->call(self::debugStmtCallback, $this, $stmt, self::debugAfterQuery);
         return $res;
     }
-    
-/*
-    function foo($id) {
-        $res = false;
-        if ($this->ensureTransaction()) {
-            // put some code here...
-        }
-        return $res;
-    }
- */ 
-    
+        
 }
-

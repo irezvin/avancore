@@ -6,9 +6,10 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
     const STATE_AFTER_DELETE = 'afterDelete';
     const STATE_BEFORE_SAVE = 'beforeSave';
     const STATE_AFTER_SAVE = 'afterSave';
+    const STATE_SAVE_FAILED = 'saveFailed';
     
-    const SORT_FIRST = 0;
-    const SORT_LAST = -1;
+    const ORDER_FIRST = 0;
+    const ORDER_LAST = -1;
     
     /**
      * @var Ac_Model_Object
@@ -295,7 +296,7 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
             $log['Way 1']['currParentId'] = $currParentId;
             $log['Way 1']['getParentIdFromDb()'] = $this->getParentIdFromDb();
             $res = $currParentId;
-        } elseif (!$this->hasOriginalData()) {
+        } elseif (!$this->isPersistent()) {
             // we are not persistent - return $currParentId
             $log['Way 2'] = true;
             $res = $currParentId;
@@ -646,10 +647,19 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
     function afterContainerLoad() {
     }
     
-    abstract function hasOriginalData();
+    abstract function isPersistent();
     
     function isRootObject() {
         return false;
+    }
+    
+    final function onContainerSaveFailed() {
+        $this->containerState = self::STATE_SAVE_FAILED;
+        $this->doOnContainerSaveFailed();
+        $this->containerState = false;
+    }
+    
+    protected function doOnContainerSaveFailed() {
     }
     
 }

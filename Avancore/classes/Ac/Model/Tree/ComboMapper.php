@@ -247,21 +247,27 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
         return $res;
     }
     
-    protected function listNonMixedProperties() {
-        return array_merge(parent::listNonMixedProperties(), array(
-            'leftCol', 'rightCol', 'ignoreCol', 'levelCol',
-        ));
-    }
-    
     function onBeforeStoreRecord(Ac_Model_Object $record, $hyData, & $exists, & $error, & $newData) {
         // Nested sets' fields are managed by $this->nestedSets object
         unset($hyData[$this->leftCol]);
         unset($hyData[$this->rightCol]);
     }
     
-    function reorderNode($id, $oldParentId, $oldOrdering, $newParentId, $newOrdering) {
+    function reorderNode($id, $oldParentId, $oldOrdering, $newParentId, $newOrdering, $ignoreTheNode = false) {
         $ns = $this->getNestedSets();
-        $ns->moveNode($id, $newParentId, $newOrdering);
+        $res = $ns->moveNode($id, $newParentId, $newOrdering);
+        return $res;
+    }
+    
+    function placeNewNode($id, $parentId, $ordering, $ignoreTheNode = false) {
+        $ns = $this->getNestedSets();
+        $res = $ns->addNode($parentId, $ordering, array($this->mixin->pk => $id), true) !== false;
+        return $res;
+    }
+    
+    function removeNode($id, $parentId, $ordering) {
+        $res = $this->getNestedSets()->deleteNode($id);
+        return $res;
     }
     
     
