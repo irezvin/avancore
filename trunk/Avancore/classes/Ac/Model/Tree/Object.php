@@ -150,6 +150,7 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
         return $this->getOrdering() > 1;
     }
     
+    // TODO: improve the implementation
     function canOrderDown() {
         if ($p = $this->getParentItem()) {
             $lst = $p->listChildItems();
@@ -235,6 +236,10 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
         if ($this->mixin->isPersistent()) {
             $this->getTreeImpl()->afterContainerSave();
         }
+    }
+    
+    function onSaveFailed() {
+        $this->getTreeImpl()->onContainerSaveFailed();
     }
     
 }
