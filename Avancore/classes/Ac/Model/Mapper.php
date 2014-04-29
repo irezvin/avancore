@@ -180,6 +180,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         if ($this->defaults === false) {
             $this->getColumnNames();
         }
+        if ($this->defaults === false) var_dump(''.(new Exception));
         return $this->defaults;
     }
 
@@ -217,10 +218,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         $this->db = $db;
         if (!strlen($this->pk)) {
             $dbi = $this->db->getInspector();
-            foreach ($dbi->getColumnsForTable($tableName) as $name => $data) {
-                $this->columnNames[] = $name;
-                if ($data['nullable']) $this->nullableSqlColumns[] = $name;
-            }
+            $this->getColumnNames();
             $idxs = $dbi->getIndicesForTable($this->db->replacePrefix($this->tableName));
             $this->indexData = array();
             foreach ($idxs as $name => $idx) {
@@ -276,10 +274,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         if ($this->columnNames === false) {
             $cols = $this->db->getInspector()->getColumnsForTable($this->db->replacePrefix($this->tableName));
             $this->defaults = array();
-            foreach ($cols as $nm => $col) {
-                $this->defaults[$nm] = $col['default'];
+            foreach ($cols as $name => $col) {
+                $this->defaults[$name] = $col['default'];
+                if ($col['nullable']) $this->nullableSqlColumns[] = $name;
                 if (isset($col['autoInc']) && $col['autoInc'] && ($this->autoincFieldName === false)) {
-                    $this->autoincFieldName = $nm;
+                    $this->autoincFieldName = $name;
                 }
             }
             $this->columnNames = array_keys($this->defaults);

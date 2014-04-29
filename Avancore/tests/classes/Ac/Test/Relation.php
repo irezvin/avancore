@@ -65,13 +65,21 @@ class Ac_Test_Relation extends Ac_Test_Base {
                 'database' => $this->getAeDb()
         ));
         $src = array(
-            array('personId' => 4),
-            array('personId' => 3, 'tagIds' => false),
-            array('personId' => -2, 'tagIds' => null),
-            array('personId' => -1, 'tagIds' => array('foo')),
+            'a' => array('personId' => 4),
+            'b' => array('personId' => 3, 'tagIds' => false),
+            'c' => array('personId' => -2, 'tagIds' => null),
+            'd' => array('personId' => -1, 'tagIds' => array('foo')),
         );
         $rel->loadDest($src);
-        var_dump($src);
+        $loaded = array();
+        
+        // TODO: think out how $ignoreLoaded property should behave
+        $this->assertTrue(isset($src['a']['tagIds']) && is_array($src['a']['tagIds']) 
+            && count($src['a']['tagIds']));
+        
+        $this->assertTrue(isset($src['b']['tagIds']) && is_array($src['b']['tagIds']));
+        $this->assertTrue(isset($src['c']['tagIds']) && is_array($src['c']['tagIds']));
+        $this->assertTrue(isset($src['d']['tagIds']) && is_array($src['d']['tagIds']));
     }
     
 }
