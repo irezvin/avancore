@@ -115,6 +115,11 @@ class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_CLEANUP = 'onCleanup';
     
     /**
+     * function onListDataProperties(array & $dataProperties)
+     */
+    const EVENT_ON_LIST_DATA_PROPERTIES = 'onListDataProperties';
+    
+    /**
      * In-memory id
      * @var int
      */
@@ -300,10 +305,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function _memorizeFields() {
-        $this->_oldValues = array();
-        foreach (get_object_vars($this) as $varName => $value) {
-            if ($varName{0} !== '_') $this->_oldValues[$varName] = $value; 
-        }
+        $this->_oldValues = $this->getDataFields();
     }
     
     function __construct($mapperOrMapperClass = null) {
@@ -432,13 +434,9 @@ class Ac_Model_Object extends Ac_Model_Data {
     }
     
     protected function getHyData() {
-        $sf = $this->_storesFalseValues(); 
         $res = array();
-        foreach ($this->_listSavedMembers() as $propName) {
-            $val = $this->$propName;  
-            if ($sf || ($val !== false)) {
-                $res[$propName] = $val;
-            }
+        foreach ($this->listDataProperties() as $propName) {
+            $res[$propName] = $this->$propName;
         }
         return $res;
     }
@@ -541,8 +539,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         $this->triggerEvent(self::EVENT_BEFORE_DELETE, array(& $deleteResult));
         if ($deleteResult !== false) {
             if ($res = $this->_legacyDelete()) {
-                $this->lastOperation = $isNew? self::OPERATION_CREATE : self::OPERATION_UPDATE;
-                
+                $this->lastOperation = self::OPERATION_DELETE;
             	if ($this->tracksPk()) $this->_origPk = null;
                 $this->doAfterDelete();
                 $this->triggerEvent(self::EVENT_AFTER_DELETE);
@@ -651,26 +648,37 @@ class Ac_Model_Object extends Ac_Model_Data {
         $m->memorize($this);
         $this->_origPk = null;
     }
-    
-    function listDataProperties() {
-        return $this->_listOwnPublicVars();
+
+    /**
+     * @deprecated
+     * use Ac_Model_Object::listDataProperties instead
+     * @return array
+     */
+    function listPublicProperties() {
+        return $this->listDataProperties();
     }
 
-    function _listOwnPublicVars() {
-        $res = array();
-        foreach (Ac_Util::getPublicVars($this) as $f => $v) if ($f{0} !== '_') $res[] = $f;
-        return $res;
-    }
-    
-    function _listSavedMembers() {
-        if (get_class($this) == 'Ac_Model_Object') $res = array_intersect($this->_listOwnPublicVars(), $this->getMapper()->getColumnNames());
-        else $res = array_intersect($this->listFields(), $this->getMapper()->getColumnNames());
+    /**
+     * TODO: either leave listPublicProperties or leave listDataProperties
+     * @return array
+     */
+    final function listDataProperties() {
+        $c = $this->metaCacheMode > self::META_CACHE_NONE;
         
+        if ($c && isset(self::$metaCache[$mc = $this->metaClassId])
+            && isset(self::$metaCache[$mc][__FUNCTION__]))
+            return self::$metaCache[$mc][__FUNCTION__];
+        
+        $res = $this->listOwnDataProperties();
+        
+        $this->triggerEvent(self::EVENT_ON_LIST_DATA_PROPERTIES, array(& $res));
+        
+        if ($c) self::$metaCache[$mc][__FUNCTION__] = $res;
         return $res;
     }
     
-    function listPublicProperties() {
-        return $this->_listOwnPublicVars();
+    protected function listOwnDataProperties() {
+        return $this->mapper->getColumnNames();
     }
     
     function getPrimaryKey() {
@@ -701,20 +709,16 @@ class Ac_Model_Object extends Ac_Model_Data {
     /**
      * Returns values of specified fields
      * @param bool|string|array $fieldNames Name(s) of fields to retrieve. All fields are returned by default.
-     * @param bool $returnFalseFields Whether to return field values that are FALSE (weren't initialized) or not
      * @return array ($fieldName => $fieldValue)
      */
-    function getDataFields($fieldNames = false, $returnFalseFields = true) {
+    function getDataFields($fieldNames = false) {
         if ($fieldNames === false) {
-            if (get_class($this) == 'Ac_Model_Object') $fieldNames = $this->_listOwnPublicVars();
-            else $fieldNames = array_intersect($this->listFields(), $this->getMapper()->getColumnNames());
+            $fieldNames = $this->listDataProperties();
         }
         elseif (!is_array($fieldNames)) $fieldNames = array($fieldNames);
         $res = array();
-        if ($returnFalseFields)
-            foreach ($fieldNames as $fn) $res[$fn] = $this->$fn;
-        else 
-           foreach ($fieldNames as $fn) if (($this->$fn !== false) && !is_null($this->$fn)) $res[$fn] = $this->$fn;
+        foreach ($fieldNames as $fn) 
+            $res[$fn] = $this->$fn;
         return $res;
     }
     
@@ -730,10 +734,6 @@ class Ac_Model_Object extends Ac_Model_Data {
     function checkDatabasePresence($dontReturnOwnKey = false, $checkNewRecords = false) {
        $mapper = $this->getMapper();
        return $mapper->checkRecordPresence($this, $dontReturnOwnKey, array(), array(), $checkNewRecords); 
-    }
-    
-    function _storesFalseValues() {
-        return true;
     }
     
     function isPersistent() {
@@ -770,7 +770,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                  * rely on isChanged() method; otherwise we assume that if field has default value, it was not changed (not too accurate).
                  */ 
                 if ($this->tracksChanges()) {
-                    foreach ($this->_listOwnPublicVars() as $v) {
+                    foreach ($this->listDataProperties() as $v) {
                         if (!$this->isChanged($v)) $this->$v = $rec->$v;
                     }
                 } else {
@@ -778,7 +778,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                     // we have to rely on object_vars of prototype record instead of class_vars since onCreate() method can alter default values
                     $defaultVars = get_object_vars($m->getPrototype());
                     
-                    foreach ($this->_listOwnPublicVars() as $v) {
+                    foreach ($this->listDataProperties() as $v) {
                         if ($this->$v === $defaultVars[$v]) $this->$v = $rec->$v;
                     }
                 }
@@ -928,7 +928,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     function copy($asReference = null, $withPk = false) {
         $m = $this->getMapper();
         $copy = $m->createRecord();
-        $flds = array_diff($this->_listOwnPublicVars(), $this->doListNonCopiedFields());
+        $flds = array_diff($this->listDataProperties(), $this->doListNonCopiedFields());
         if (!$asReference && !$withPk) $flds = array_diff($flds, $m->listPkFields());
         if ($withPk) $flds = array_merge($flds, $m->listPkFields());
         foreach ($flds as $v) {
