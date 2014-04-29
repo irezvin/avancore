@@ -87,13 +87,13 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                   'destCountVarName' => '_tagsCount',
                   'destNNIdsVarName' => '_tagIds',
                   'fieldLinks' => array (
-                      'tagId' => 'tagId',
+                      'tagId' => 'idOfTag',
                   ),
                   'srcIsUnique' => false,
                   'destIsUnique' => false,
                   'midTableName' => '#__people_tags',
                   'fieldLinks2' => array (
-                      'personId' => 'personId',
+                      'idOfPerson' => 'personId',
                   ),
               ),
         ));
