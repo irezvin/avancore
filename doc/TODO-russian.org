@@ -7,7 +7,7 @@
   - [X] by default, it must show ALL errors
   - [X] we can try to exclude errors that are shown by other controls
   - [X] ability to improve error list' look
-* TODO convert nullable empty foreign keys to NULL before saving since it annoys a lot :model:bug:
+* WORK convert nullable empty foreign keys to NULL before saving since it annoys a lot :model:bug:
   - [ ] we should report if field is part of foreign key
   - [ ] test cases
     - [ ] case A: field is an exact foreign key

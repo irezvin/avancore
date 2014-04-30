@@ -219,7 +219,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
                 'srcTableName' => $this->mixin->tableName,
                 'destTableName' => new Ac_Sql_Expression("
                 (
-                    SELECT {$this->nodeParentField} AS parentId, COUNT(children.{$this->pk}) AS ".$this->getDb()->n('count')." 
+                    SELECT {$this->nodeParentField} AS parentId, COUNT(children.{$this->mixin->pk}) AS ".$this->getDb()->n('count')." 
                     FROM {$this->mixin->tableName} AS children 
                     WHERE ".$this->getDb()->getIfnullFunction()."({$this->nodeParentField}, 0) <> 0 
                     GROUP BY {$this->nodeParentField}
@@ -247,8 +247,8 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
                 	( SELECT "
         				.$this->getDb()->n($this->nodeParentField)." AS id, "
         				.$this->getDb()->n($this->nodeOrderField)." AS ordering, "
-        				.$this->getDb()->n($this->pk)." AS childId 
-        			  FROM ".$this->getDb()->nQuote($this->mixin->tableName)." 
+        				.$this->getDb()->n($this->mixin->pk)." AS childId 
+        			  FROM ".$this->getDb()->n($this->mixin->tableName)." 
         			  WHERE ".$this->getDb()->getIfnullFunction()."(".$this->getDb()->n($this->nodeParentField).", 0) <> 0) AS childIds
                 "),
                 'fieldLinks' => array(
@@ -274,7 +274,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
                 'srcTableName' => $this->mixin->tableName,
                 'destMapperClass' => get_class($this),
                 'fieldLinks' => array(
-                    'nodeId' => $this->pk,
+                    'nodeId' => $this->mixin->pk,
                 ),
                 'srcVarName' => 'container',
                 'srcIsUnique' => true,
@@ -311,7 +311,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
     }
 
     protected function getOrderingValuesColumns() {
-        return 't.'.$this->getTitleFieldName();
+        return 't.'.$this->mixin->getTitleFieldName();
     }
     
     protected function getOrderingValuesLabel(array $entry) {
@@ -334,14 +334,14 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
             
         $foundMyself = false;
         $ords = $this->getDb()->fetchArray($sql = "
-            SELECT t.".$this->getDb()->n($this->nodeOrderField)." AS ordering, ".$this->getOrderingValuesColumns().", t.{$this->pk} 
+            SELECT t.".$this->getDb()->n($this->nodeOrderField)." AS ordering, ".$this->getOrderingValuesColumns().", t.{$this->mixin->pk} 
             FROM {$this->mixin->tableName} AS t 
             WHERE {$crit} 
             ORDER BY t.".$this->getDb()->n($this->nodeOrderField)." ASC
         ");
         foreach ($ords as $ord) {
             $lbl = $this->getOrderingValuesLabel($ord);
-            if ($ord[$this->pk] == $modelObject->{$this->pk}) {
+            if ($ord[$this->mixin->pk] == $modelObject->{$this->mixin->pk}) {
                 $lbl .= ' '.(new Ac_Lang_String('model_ordering_current'));
                 $foundMyself = true;
             }
@@ -349,7 +349,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
         }
         if (!count($ords)) $res[' 0'] = new Ac_Lang_String('model_ordering_only');
         elseif (!$foundMyself) {
-            $res[' '.($ord['ordering'] + 1)] = new Ac_Lang_String('model_ordering_last');
+            $res[Ac_Model_Tree_AbstractImpl::ORDER_LAST] = new Ac_Lang_String('model_ordering_last');
         }
         return $res;
     }

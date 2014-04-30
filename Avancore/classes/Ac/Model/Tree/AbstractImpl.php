@@ -174,7 +174,9 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
      */
     function getParentNodeId() {
         if ($this->parentId === false) {
-            if ($this->tmpParent) $res = $this->tmpParent->getNodeId();
+            if ($this->tmpParent) {
+                $res = $this->tmpParent->getNodeId();
+            }
             else {
             	$res = $this->doGetInternalParentId();
             }
