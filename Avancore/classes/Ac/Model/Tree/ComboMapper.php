@@ -34,6 +34,7 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
                 'rightCol' => $this->rightCol,
                 'idCol' => $this->mixin->pk,
                 'ignoreCol' => $this->ignoreCol,
+                'levelCol' => $this->levelCol,
                 'treeCol' => false,
                 'parentCol' => $this->nodeParentField,
                 'orderingCol' => $this->nodeOrderField,
@@ -269,6 +270,5 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
         $res = $this->getNestedSets()->deleteNode($id);
         return $res;
     }
-    
     
 }
