@@ -147,24 +147,29 @@ class Ac_Model_Tree_Object extends Ac_Mixable {
     }
     
     function canOrderUp() {
-        return $this->getOrdering() > 1;
+        if ($this->getTreeImpl()->isRootObject()) $res = false;
+            else $res = $this->getOrdering() > 1;
+        return $res;
     }
     
     // TODO: improve the implementation
     function canOrderDown() {
-        if ($p = $this->getParentItem()) {
-            $lst = $p->listChildItems();
-        } else {
-            $m = $this->getMapper();
-            $lst = $m->listTopNodes();
+        if ($this->getTreeImpl()->isRootObject()) $res = false;
+        else {
+            if ($p = $this->getParentItem()) {
+                $lst = $p->listChildItems();
+            } else {
+                $m = $this->getMapper();
+                $lst = $m->listTopNodes();
+            }
+            $ord = 1;
+            foreach ($lst as $i) {
+                if ($p) $ci = $p->getChildItem($i);
+                else $ci = $m->loadRecord($i);
+                if ($ci) $ord = max($ord, $ci->getOrdering()); 
+            }
+            $res = $this->getOrdering() < $ord;
         }
-        $ord = 1;
-        foreach ($lst as $i) {
-            if ($p) $ci = $p->getChildItem($i);
-            else $ci = $m->loadRecord($i);
-            if ($ci) $ord = max($ord, $ci->getOrdering()); 
-        }
-        $res = $this->getOrdering() < $ord;
         return $res;
     }
     

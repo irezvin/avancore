@@ -176,6 +176,22 @@ class Ac_Test_Tree extends Ac_Test_Base {
                 Ac_Accessor::getObjectProperty($child1, array_keys($sample)), $sample
             );
             
+            $this->assertEqual($child1->getTreeImpl()->getParentNodeId(), $sample['parentId']);
+            
+            $child1->load();
+            
+            $this->assertEqual($child1->getTreeImpl()->getParentNodeId(), $sample['parentId']);
+            
+            $child1copy = $mapper->loadById($child1->id);
+            
+            $this->assertEqual($child1copy->getTreeImpl()->getParentNodeId(), $sample['parentId']);
+            
+            $root = $mapper->loadById($rootId);
+            
+            $this->assertFalse($root->canOrderUp());
+            
+            $this->assertFalse($root->canOrderDown());
+            
         }
     }   
       

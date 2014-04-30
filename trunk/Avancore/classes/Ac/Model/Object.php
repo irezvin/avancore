@@ -379,12 +379,12 @@ class Ac_Model_Object extends Ac_Model_Data {
                 $res = $this->_legacyLoad($oid, $row);
             }
         }
-        $this->doAfterLoad();
-        $this->triggerEvent(self::EVENT_AFTER_LOAD);
-        if ($res) $this->doOnActual(self::ACTUAL_REASON_LOAD);
         if ($this->tracksPk()) {
             $this->_origPk = $res? $this->getPrimaryKey() : null;
         }
+        $this->doAfterLoad();
+        $this->triggerEvent(self::EVENT_AFTER_LOAD);
+        if ($res) $this->doOnActual(self::ACTUAL_REASON_LOAD);
         if ($this->isPersistent()) {
             $m = $this->getMapper();
             $m->forget($this);
@@ -595,7 +595,7 @@ class Ac_Model_Object extends Ac_Model_Data {
      * @return bool
      */
     function tracksChanges() {
-        return false;
+        return true;
     }
     
     /**
@@ -1151,16 +1151,19 @@ class Ac_Model_Object extends Ac_Model_Data {
     
     protected function intResetReferences() {
         foreach ($this->intListReferenceFields() as $fieldName => $objectFieldName) {
+            $c = false;
             if ($this->isChanged($fieldName, false)) {
+                $c = true;
                 $this->$objectFieldName = false;
+            }
+            // set nullable empty foreign keys to null
+            if ($c || $this->isChanged($fieldName, true)) {
+                if (!strlen($this->$fieldName) && in_array($fieldName, $this->mapper->listNullableSqlColumns())) {
+                    $this->$fieldName = null;
+                }
             }
         }
     }
-    
-//  function __destruct() {
-//      var_dump(get_class($this).' # '.$this->id.' destroyed');
-//  }
-    
     
 }
 
