@@ -180,7 +180,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         if ($this->defaults === false) {
             $this->getColumnNames();
         }
-        if ($this->defaults === false) var_dump(''.(new Exception));
         return $this->defaults;
     }
 
@@ -1124,7 +1123,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         } else {
             $query = $this->db->insertStatement($this->tableName, $hyData);
             if ($this->db->query($query)) {
-                if (strlen($ai = $this->getAutoincFieldName())) {
+                if (strlen($ai = $this->getAutoincFieldName()) && !isset($hyData[$ai])) {
                     $newData = array($ai => $this->getLastGeneratedId());
                 }
                 $res = true;
