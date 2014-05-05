@@ -184,7 +184,7 @@ class Ac_Model_Object extends Ac_Model_Data {
     function doAfterLoad() {
     }
     
-    function doOnActual($reason = self::ACTUAL_REASON_LOAD) {
+    function doOnActual($reason = Ac_Model_Object::ACTUAL_REASON_LOAD) {
     }
     
     function doBeforeSave() {
@@ -458,6 +458,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         } else {
             
             $skipKey = ($aif = $mapper->getAutoincFieldName()) == $k;
+            if (array_key_exists($k, $hyData) && !is_null($hyData[$k])) $skipKey = false;
             if ($skipKey) unset($hyData[$k]);
             
             $hyData = $this->mapper->peConvertForSave($this, $hyData);
