@@ -191,6 +191,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
                 if ($sfc->isPk()) {
                     $foreignTbl = $sfc->_table;
                     if ($mod = $this->_model->_domain->searchModelByTable($foreignTbl->name)) {
+                        if ($this->_col->nullable) $this->dummyCaption = new Ac_Cg_Php_Expression("''");
                         $this->values = array('class' => 'Ac_Model_Values_Records', 'mapperClass' => $mod->getMapperClass());
                         $controlType = 'selectList';
                     }
