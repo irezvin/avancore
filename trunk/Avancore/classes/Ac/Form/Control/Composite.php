@@ -39,6 +39,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     }
     
     function addControl($name, $settings = array()) {
+        if (is_null($settings) || $settings === false) return;
         if (isset($this->_controls[$name])) trigger_error ("Control with name '{$name}' already exists - delete it first", E_USER_ERROR);
             else {
                 if (!isset($settings['creationOrder'])) {
