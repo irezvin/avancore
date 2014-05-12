@@ -297,12 +297,12 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         Ac_Accessor::setObjectProperty($this, $config);
         
         if (($this->srcTableName === false) && strlen($this->srcMapperClass)) {
-            $this->_srcMapper = Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->application);
+            $this->_srcMapper = Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->application? $this->application : null);
             $this->srcTableName = $this->_srcMapper->tableName;
             if ($this->srcOrdering === false) $this->srcOrdering = $this->_srcMapper->getDefaultOrdering();
         }
         if (($this->destTableName === false) && strlen($this->destMapperClass)) {
-            $this->_destMapper = Ac_Model_Mapper::getMapper($this->destMapperClass, $this->application);
+            $this->_destMapper = Ac_Model_Mapper::getMapper($this->destMapperClass, $this->application? $this->application : null);
             $this->destTableName = $this->_destMapper->tableName;
             if ($this->destOrdering === false) $this->destOrdering = $this->_destMapper->getDefaultOrdering();
         }
@@ -947,7 +947,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                                 $rowKey = $this->_getValues($row[$tn], $rightKeyFields);
                                 $instance = Ac_Util::simpleGetArrayByPath($instances, $rowKey, false);
                                 if (!$instance) {
-                                    Ac_Util::simpleSetArrayByPath($instances, $rowKey, $instance = $this->$ifun ($row[$tn]));
+                                    Ac_Util::simpleSetArrayByPathNoRef($instances, $rowKey, $instance = $this->$ifun ($row[$tn]));
                                 }
                                 $res[$row['_mid_'][$key]][] = $instance;
                             }
@@ -956,7 +956,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 } else {
                     while($row = $this->database->resultFetchAssocByTables($rr, $fi)) {
                         $instance = $this->$ifun ($row[$tableName]);
-                        Ac_Util::simpleSetArrayByPath($res, $row['_mid_'], $instance, $unique);
+                        Ac_Util::simpleSetArrayByPathNoRef($res, $row['_mid_'], $instance, $unique);
                     }
                 }
             } else {

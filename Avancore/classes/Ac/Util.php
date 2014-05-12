@@ -557,7 +557,7 @@ abstract class Ac_Util {
         return true;
     }
     
-    static function simpleSetArrayByPath(& $arr, $arrPath, & $value, $unique = true) {
+    static function simpleSetArrayByPath(& $arr, $arrPath, & $value, $unique = true, $noRef = false) {
         if (!is_array($arrPath)) $arrPath = array($arrPath);
         $src = & $arr;
         $arrPath = array_reverse($arrPath);

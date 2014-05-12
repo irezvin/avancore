@@ -113,7 +113,6 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
             if ($control->hasValue && $control->isEnabled()) {
                 $resultPath = $control->getResultPath();
                 Ac_Util::setArrayByPath($res, Ac_Util::pathToArray($resultPath), $control->getValue(), true);
-                //$res[$k] = $control->getValue();
             }
         }
         return $res;
