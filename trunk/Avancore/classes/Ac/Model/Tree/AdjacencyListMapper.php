@@ -216,6 +216,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
     function getNodeChildrenCountRelation() {
         if ($this->childrenCountRelation === false) {
             $this->childrenCountRelation = new Ac_Model_Relation(array(
+                'application' => $this->mixin->getApplication(),
                 'srcTableName' => $this->mixin->tableName,
                 'destTableName' => new Ac_Sql_Expression("
                 (
@@ -242,6 +243,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
     function getNodeChildIdsRelation() {
         if ($this->childIdsRelation === false) {
         	$this->childIdsRelation = new Ac_Model_Relation(array(
+                'application' => $this->mixin->getApplication(),
                 'srcTableName' => $this->mixin->tableName,
                 'destTableName' => new Ac_Sql_Expression("
                 	( SELECT "
@@ -271,8 +273,9 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
     function getNodeContainersRelation() {
         if ($this->containersRelation === false) {
             $this->containersRelation = new Ac_Model_Relation(array(
+                'application' => $this->mixin->getApplication(),
                 'srcTableName' => $this->mixin->tableName,
-                'destMapperClass' => get_class($this),
+                'destMapperClass' => $this->mixin->getId(),
                 'fieldLinks' => array(
                     'nodeId' => $this->mixin->pk,
                 ),

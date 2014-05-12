@@ -347,9 +347,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
             } else {
                 $res = $this->_doGetDefault();
             }
-            if ($this->decorator) {
-                $res = Ac_Decorator::decorate ($this->decorator, $res, $this->decorator);            
-            }
         }
         return $res;
     }
@@ -978,7 +975,10 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
     
     function updateModel() {
-        if (($m = $this->getModel()) && strlen($p = $this->getPropertyName()) && $m->hasProperty($p)) {
+        if (($m = $this->getModel()) && !$this->isReadOnly() 
+            && strlen($p = $this->getPropertyName()) 
+            && $m->hasProperty($p)
+        ) {
             $m->setField($p, $this->getValue());
         }
     }
@@ -1081,6 +1081,15 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         else $res = Ac_Application::getDefaultInstance();
         return $res;
     }
+
+    function getDisplayValue() {
+        $res = $this->getValue();
+        if ($this->decorator) {
+            $res = Ac_Decorator::decorate ($this->decorator, $res, $this->decorator);            
+        }
+        return $res;
+    }
+    
     
 }
 

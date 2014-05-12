@@ -1345,4 +1345,27 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
+    /**
+     * Preloads direct and indirect relations 
+     *
+     * @param array $records Flat array of current mapper' records
+     * @param array $relationData array('relationId1', array('relationId2', 'relationId2.2'))
+     */
+    function preloadRelations(array $records, array $relationData) {
+        foreach ($relationData as $relId) {
+            $recs = $records;
+            $relId = Ac_Util::toArray($relId);
+            $mapper = $this;
+            while (($id = array_shift($relId)) !== null) {
+                $rel = $mapper->getRelation($id);
+                $recs = $rel->loadDest($recs);
+                if (count($relId)) {
+                    $mapper = $this->getApplication()->getMapper($rel->destMapperClass);
+                    $recs = Ac_Util::flattenArray($recs);
+                }
+            }
+        }
+    }
+    
+    
 }

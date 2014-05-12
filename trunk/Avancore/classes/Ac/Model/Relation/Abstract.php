@@ -105,12 +105,12 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
     
     function _putRowToArray(& $row, & $instance, & $array, $keys, $unique) {
         foreach ($keys as $key) $path[] = $row[$key];
-        Ac_Util::simpleSetArrayByPath($array, $path, $instance, $unique);
+        Ac_Util::simpleSetArrayByPathNoRef($array, $path, $instance, $unique);
     }
     
     function _putInstanceToArray(& $instance, & $array, $keys, $isDest, $unique) {
         $path = $this->_getValues($instance, $keys);
-        Ac_Util::simpleSetArrayByPath($array, $path, $instance, $unique);
+        Ac_Util::simpleSetArrayByPathNoRef($array, $path, $instance, $unique);
     }
     
     function _getFromArray($src, $fieldName) {
