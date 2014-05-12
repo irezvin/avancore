@@ -87,24 +87,23 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
         return 'Ac_Model_Tree_ComboImpl';
     }
     
-    function loadNodes(array $ids) {
+    /*function loadNodes(array $ids) {
         $ns = $this->getNestedSets();
         if ($this)
         $nodes = $this->getDb()->fetchArray(
             "SELECT * FROM ".$ns->tableName
-            ." WHERE ".$this->nsTreeCriterion()
-            ." AND ".$ns->idCol." ".$this->getDb()->eqCriterion($ids)
+            ." WHERE ".$ns->idCol." ".$this->getDb()->eqCriterion($ids)
         );
         $res = array();
         foreach ($nodes as $id => $node) {
-            $objNode = new Ac_Model_Tree_NestedSetsImpl(array(
+            $objNode = new Ac_Model_Tree_ComboImpl(array(
                 'nodeData' => $node,
-                'mapper' => $this->mixable, 
+                'mapper' => $this->mixin, 
             ));
             $res[$id] = $objNode;
         }
         return $res;
-    }
+    }*/
     
     protected function getStmtCacheDefaults() {
         $res = array_merge(parent::getStmtCacheDefaults(), array(
