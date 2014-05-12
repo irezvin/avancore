@@ -18,7 +18,7 @@ class Ac_Form_Control_Template_Autocomplete extends Ac_Form_Control_Template {
             $this->_showAutocompleterScript($control);
         } else { ?>
             <span class='readOnly'>
-                <?php if (strlen($control->getValue())) $this->d ($control->getOutputText(), $control->allowHtml); else $this->d($control->getEmptyCaption()); ?>
+                <?php if (strlen($control->getDisplayValue())) $this->d ($control->getOutputText(), $control->allowHtml); else $this->d($control->getEmptyCaption()); ?>
                 
             </span>       
 <?php   }

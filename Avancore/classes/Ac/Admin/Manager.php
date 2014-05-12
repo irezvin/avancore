@@ -1268,19 +1268,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             while ($rec = $this->_recordsCollection->getNext()) {
                 $myRecs[] = $rec;
             }
-            foreach ($pr as $relId) {
-                $recs = $myRecs;
-                $mpr = $this->getMapper();
-                $relId = Ac_Util::toArray($relId);
-                while (($id = array_shift($relId)) !== null) {
-                    $rel = $mpr->getRelation($id);
-                    $recs = $rel->loadDest($recs);
-                    if (count($relId)) {
-                        $mpr = $this->application->getMapper($rel->destMapperClass);
-                        $recs = Ac_Util::flattenArray($recs);
-                    }
-                }
-            }
+            $this->getMapper()->preloadRelations($myRecs, $pr);
         }
     }
         

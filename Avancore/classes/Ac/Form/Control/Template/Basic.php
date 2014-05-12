@@ -450,7 +450,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
                         ), $control->getHtmlAttribs());
                         echo $editor->display( 
                             $this->_mapNames($control, 'value'),  
-                            $control->getValue(), 
+                            $control->getDisplayValue(), 
                             $ha['width'], $ha['height'], 
                             $ha['size'], 
                             $ha['rows'],
@@ -473,7 +473,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             }
         } else { ?>
             <span class='readOnly' <?php if ($control->htmlAttribs) echo Ac_Util::mkAttribs($control->htmlAttribs); ?>>
-                <?php if (strlen($control->getValue())) $this->d ($control->getOutputText(), $control->allowHtml); else $this->d($control->getEmptyCaption()); ?>
+                <?php if (strlen($control->getDisplayValue())) $this->d ($control->getOutputText(), $control->allowHtml); else $this->d($control->getEmptyCaption()); ?>
                 
             </span>       
 <?php   }
@@ -534,7 +534,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             
 ?>            
             <<?php echo $control->tagName; ?> <?php echo Ac_Util::mkAttribs($attribs); ?>>
-                <?php if (strlen($control->getValue())) $this->d ($control->getValue(), $control->allowHtml); else $this->d($control->getEmptyCaption()); ?>
+                <?php if (strlen($control->getDisplayValue())) $this->d ($control->getDisplayValue(), $control->allowHtml); else $this->d($control->getEmptyCaption()); ?>
             </<?php echo $control->tagName; ?>>       
 <?php   
     }
@@ -724,7 +724,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             $attribs['name'] = $this->_mapNames($control, 'value');
             $attribs['value'] = 1;
             $attribs['type'] = 'checkbox';
-            if ($control->getValue()) $attribs['checked'] = true;
+            if ($control->getDisplayValue()) $attribs['checked'] = true;
 ?>
             <input <?php $this->attribs($attribs); ?> /><?php
     }
@@ -799,7 +799,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
     }
     
     function showErrorList(Ac_Form_Control_ErrorList $control) {
-        if ($control->showErrorsInMainArea && ($e = $control->getValue())) {
+        if ($control->showErrorsInMainArea && ($e = $control->getDisplayValue())) {
 ?>
         <li class="errors">
             <?php echo Ac_Util::implode_r("</li><li>", Ac_Util::flattenArray($e)); ?>

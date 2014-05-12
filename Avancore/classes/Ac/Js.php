@@ -13,7 +13,8 @@ class Ac_Js {
     static protected function iJsQuote($string) {
         if (is_bool($string)) return $string? 'true': 'false';
         if (is_int($string) || is_float($string)) return (string) $string;
-        return "'".addcslashes($string, "'\n\r\t\0\\")."'";
+        $res = "'".addcslashes($string, "'\n\r\t\0\\")."'";
+        return $res;
     }
     
     static protected function isArraySimple ($arr) {

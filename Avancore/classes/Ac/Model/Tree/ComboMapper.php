@@ -142,6 +142,7 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
             $pk = $this->mixin->pk;
             $tableName = $this->mixin->tableName;
             $this->allChildrenCountRelation = new Ac_Model_Relation(array(
+                'application' => $this->mixin->getApplication(),
                 'srcTableName' => $tableName,
                 'destTableName' => new Ac_Sql_Expression("
                     (
@@ -173,6 +174,7 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
             $pk = $this->mixin->pk;
             $tableName = $this->mixin->tableName;
             $this->allChildrenIdsRelation = new Ac_Model_Relation(array(
+                'application' => $this->mixin->getApplication(),
                 'srcTableName' => $tableName,
                 'destTableName' => new Ac_Sql_Expression("
                     (
