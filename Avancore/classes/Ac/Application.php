@@ -119,6 +119,22 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
      */
     protected $mailSender = false;
     
+    /**
+     * @var array Mixables that will be initialized adter application has been init'
+     */
+    protected $deferredMixables = array();
+    
+    protected $deferredCoreMixables = array();
+    
+    protected $deferredMixablesInit = false;
+    
+    protected $initsCoreMixables = false;
+    
+    /**
+     * @var array Properties that will be after deferred mixables are created
+     */
+    protected $deferredMixableProperties = array();
+    
     abstract function getAppClassFile();
     
     protected static function registerInstance(Ac_Application $instance) {
@@ -239,6 +255,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
                 Ac_Util::addIncludePath($adapter->getClassPaths());
                 if (strlen($gp = $adapter->getGenPath()))Ac_Util::addIncludePath($adapter->getGenPath());
             }
+            $this->initDeferredMixables();
             $this->doOnInitialize();
             $this->triggerEvent(self::EVENT_ON_INITIALIZE);
             $this->stage = self::STAGE_INITIALIZED;
@@ -600,5 +617,58 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
         }
         return $this->mailSender;
     }    
+
+    function setMixables(array $mixables, $addToExisting = false) {
+        // Since Application instance registers directory with classes during initialization phase,
+        // classes of mixables that re provided as prototypes may not be available at that moment.
+        // So we have to defer creation of mixables with classes that are not available at the moment
+        
+        if (!$this->deferredMixablesInit) {
+
+            if (!$addToExisting && !$this->initsCoreMixables)
+                $this->deferredMixables = array();
+
+            foreach ($mixables as $k => $mix) {
+                if (!is_object($mix)) {
+                    $class = false;
+                    if (isset($mix['class'])) $class = $mix['class'];
+                    elseif (is_string($mix)) $class = $mix;
+                    if ($class !== false) {
+                        if (!class_exists($class)) {
+                            $target = $this->initsCoreMixables? 'deferredCoreMixables' : 'deferredMixables';
+                        }
+                        if (is_numeric($k)) array_push($this->$target, $mix);
+                            else $this->$target[$k] = $mix;
+                        unset($mixables[$k]);
+                    }
+                }
+            }
+            
+        }
+        
+        parent::setMixables($mixables, $addToExisting);
+    }
+    
+    protected function registerCoreMixables() {
+        $this->initsCoreMixables = true;
+        parent::registerCoreMixables();
+        $this->initsCoreMixables = false;
+    }
+    
+    protected function initDeferredMixables() {
+        if ($this->deferredMixablesInit) throw new Ac_E_Assertion("initDeferredMixables() must be called "
+            . "with \$deferredMixablesInit === false");
+        $this->deferredMixablesInit = true;
+        if ($this->deferredCoreMixables) {
+            $this->setMixables($this->deferredCoreMixables, false);
+            $this->deferredCoreMixables = array();
+            $ck = array_keys($this->mixables);
+            $this->coreMixableIds = array_combine($ck, $ck);
+        }
+        if ($this->deferredMixables) {
+            $this->setMixables($this->deferredMixables, false);
+            $this->deferredMixables = array();
+        }
+    }
     
 }
