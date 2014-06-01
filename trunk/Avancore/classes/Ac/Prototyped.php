@@ -40,7 +40,7 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
         if ($v) $v = array_flip(array_keys(Ac_Util::getClassVars(get_class($this))));
         if (is_null($strictParams)) $strictParams = self::$strictParams;
         foreach ($prototype as $n => $opt) if ($n !== 'class') {
-            if (method_exists($this, $mn = 'set'.$n)) {
+            if (Ac_Accessor::methodExists($this, $mn = 'set'.$n)) {
                 $this->$mn($opt);
                 $gotKeys[] = $n;
             } elseif (isset($v[$n]) || method_exists($this, '__isset') && $this->__isset($n)) {
@@ -183,8 +183,5 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
         }
         return $res;
     }
-    
-    
-
 
 }

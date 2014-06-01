@@ -30,17 +30,61 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
     const ACCESS_UNSET = 3;
 
     function __construct(array $prototype = array()) {
+        $this->registerCoreMixables();
+        // TODO: initialize while providing values to mixables
+        parent::__construct($prototype);
+    }
+    
+    protected function initFromPrototype(array $prototype = array(), $strictParams = null) {
+        if (isset($prototype['mixables'])) { // always init mixables first
+            $this->setMixables($prototype['mixables']);
+            unset($prototype['mixables']);
+        }
+        if (count($this->mixables)) {
+            if (is_null($strictParams)) $strictParams = Ac_Prototyped::$strictParams;
+            $gotKeys = parent::initFromPrototype($prototype, false);
+            
+            if ($this->mixPropertyMap === false) $this->fillMixMaps();
+            
+            $extraProperties = array_diff_key($prototype, array_flip($gotKeys));
+            
+            foreach (array_intersect_key($extraProperties, $this->mixPropertyMap) as $prop => $val) {
+                $this->$prop = $val;
+                $gotKeys[] = $prop;
+                unset($extraProperties[$prop]);
+            }
+            
+            $acquired = array();
+            foreach ($this->mixables as $mixable) {
+                if ($mixable instanceof Ac_I_Mixable_WithInit) {
+                    $acquiredByMixin = $mixable->handleMixinInit($extraProperties, $this);
+                    if (is_array($acquiredByMixin)) $acquired = array_merge($acquired, $acquiredByMixin);
+                }
+            }
+            if ($strictParams) {
+                $missingKeys = array_diff(array_keys($extraProperties), $acquired);
+                $gotKeys = array_unique(array_merge($gotKeys, $acquired));
+                if ($missingKeys) { // mimic Ac_Prototyped behaviour if there are missing keys
+                    $first = array_shift($missingKeys);
+                    throw new Ac_E_InvalidPrototype("Unknown member '{$first}' in class '".get_class($this)."'");
+                }
+            }
+        } else {
+            $gotKeys = parent::initFromPrototype($prototype, $strictParams);
+        }
+        return $gotKeys;
+    }
+    
+    protected function doGetCoreMixables() {
+        return array();
+    }
+    
+    protected function registerCoreMixables() {
         if ($m = $this->doGetCoreMixables()) {
             $this->setMixables($m);
             $ck = array_keys($this->mixables);
             $this->coreMixableIds = array_combine($ck, $ck);
         }
-        // TODO: initialize while providing values to mixables
-        parent::__construct($prototype);
-    }
-    
-    protected function doGetCoreMixables() {
-        return array();
     }
     
     protected function clearMixMaps() {
@@ -126,10 +170,10 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
             }
         }
         foreach ($mixables as $id => $v) {
-            if (!is_object($v)) $mix = Ac_Prototyped::factory($v, 'Ac_I_Mixable', $v);
+            if (!is_object($v)) $mix = Ac_Prototyped::factory($v, 'Ac_I_Mixable');
                 else $mix = $v;
             if (!$mix instanceof Ac_I_Mixable) throw Ac_E_InvalidCall("\$mixables['{$id}'] must implement "
-            . "Ac_I_Mixable,  ".Ac_Util::typeClass ($mix)." provided instead");
+            . "Ac_I_Mixable, but ".Ac_Util::typeClass ($mix)." was provided instead");
             if (is_numeric($id)) $id = $mix->getMixableId();
             if (is_numeric($id) || !strlen($id)) array_push($this->mixables, $mix);
             else {
@@ -206,6 +250,11 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
         } else {
             $this->doAccessMissingProperty($property, self::ACCESS_SET, $value);
         }
+    }
+    
+    public function __list_magic() {
+        if ($this->mixPropertyMap === false) $this->fillMixMaps();
+        return array_keys($this->mixPropertyMap);
     }
     
     public function __isset($property) {
@@ -331,6 +380,12 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
         }
         return $res;
     }
+    
+    function hasPublicVars() {
+        if ($this->mixPropertyMap === false) $this->fillMixMaps();
+        return (bool) count($this->mixPropertyMap);
+    }
+    
     /*
     function __construct (array $prototype = array()) {
         $this->initFromPrototype($prototype);

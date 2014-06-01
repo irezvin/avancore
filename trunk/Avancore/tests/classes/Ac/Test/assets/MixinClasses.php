@@ -120,6 +120,21 @@ class ModelProp implements Ac_I_Mixable {
     
 }
 
+class ExtraPropCatcher extends Ac_Mixable implements Ac_I_Mixable_WithInit {
+    
+    var $extraProps = array();
+    
+    protected function listNonMixedProperties() {
+        return array('extraProps');
+    }
+    
+    public function handleMixinInit(array $extraProperties, Ac_I_Mixin $mixin) {
+        $this->extraProps = $extraProperties;
+        return array_keys($this->extraProps);
+    }
+    
+}
+
 /*class ModelAggregate implements Ac_I_Mixable {
     
     
