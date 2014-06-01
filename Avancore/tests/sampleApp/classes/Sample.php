@@ -14,8 +14,8 @@ class Sample extends Sample_DomainBase {
     }
     
     protected function doGetCoreMixables() {
-        require(dirname(__FILE__).'/Sample/Plugin.php');
-        return array_merge(parent::doGetCoreMixables(), array(new Sample_Plugin()));
+        //require(dirname(__FILE__).'/Sample/Plugin.php');
+        return array_merge(parent::doGetCoreMixables(), array(array('class' => 'Sample_Plugin')));
     }
 
 }

@@ -52,4 +52,19 @@ class Ac_Test_Mixin extends Ac_Test_Base {
         $this->assertEqual($md->getField('extraPublicProp'), 20);
     }
     
+    function testMixinProps() {
+        $m = new Ac_Mixin(array('length' => 1, 'width' => 2, 'height' => 3, 'mixables' => array('Dimensions')));
+        $this->assertEqual($m->getVolume(), 6);
+        Ac_Accessor::setObjectProperty($m, $a = array('length' => 2, 'width' => 3, 'height' => 4));
+        $this->assertEqual($m->getVolume(), 2*3*4);
+        $this->assertEqual($m->hasPublicVars(), true);
+        $this->assertEqual(Ac_Accessor::getObjectProperty($m, array_keys($a)), $a);
+        $b = new Body(array('length' => 1, 'width' => 2, 'height' => 3, 'weight' => 36));
+        $this->assertEqual($b->getVolume(), 6);
+        $this->assertEqual($b->getDensity(), 6);
+        $m = new Ac_Mixin(array('foo' => 1, 'bar' => 2, 'mixables' => array('xpc' => 'ExtraPropCatcher')));
+        $mx = $m->getMixable('xpc');
+        $this->assertEqual($mx->extraProps, array('foo' => 1, 'bar' => 2));
+    }
+    
 }

@@ -194,7 +194,11 @@ class Ac_Accessor implements Ac_I_Accessor {
                 else $res = $defaultValue;
             } elseif (
                 ($item instanceof Ac_I_Prototyped? $item->hasPublicVars() : true) 
-                && (array_key_exists($propertyName, Ac_Util::getPublicVars($item)))
+                && (
+                    array_key_exists($propertyName, Ac_Util::getPublicVars($item))
+                    || method_exists($item, '__list_magic') && in_array($propertyName, $item->__list_magic())
+                    || method_exists($item, '__list_all_properties') && in_array($propertyName, $item->__list_all_properties())
+                )
             ) {
                 $res = $item->$propertyName;
             } else {
