@@ -385,13 +385,13 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         if (!$this->_beingChecked && !$this->_checked) {
             $this->_beingChecked = true;
             $this->_errors = array();
+            
+            $this->doOnCheck();
+            $this->triggerEvent(self::EVENT_ON_CHECK, array(& $this->_errors));
+            
             $this->_checkOwnFields();
             $this->_checkOwnAssociations();
             // $this->_checkOverrideProperties(); // This function is not implemented yet 
-            $this->doOnCheck();
-            
-            $this->triggerEvent(self::EVENT_ON_CHECK, array(& $this->_errors));
-            
             $this->_beingChecked = false;
             $this->_checked = true;
         }
