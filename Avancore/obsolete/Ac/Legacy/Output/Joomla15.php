@@ -3,6 +3,10 @@
 class Ac_Legacy_Output_Joomla15 extends Ac_Legacy_Output_Joomla {
     
     var $removePathwayDuplicates = true;
+    
+    var $replaceMetaKeywords = false;
+    
+    var $replaceMetaDescription = false;
 
     function __construct() {
         $this->mainframe = JFactory::getApplication();
@@ -51,7 +55,7 @@ class Ac_Legacy_Output_Joomla15 extends Ac_Legacy_Output_Joomla {
     
     function appendMetaTag($name, $value) {
         $doc = JFactory::getDocument();
-        if ($name == 'description' || $name == 'keywords') {
+        if ($name == 'description' && !$this->replaceMetaDescription || $name == 'keywords' && !$this->replaceMetaKeywords) {
             $md = $doc->getMetaData($name, false);
             if (strlen($md)) $value = $md.', '.$value;
         }
