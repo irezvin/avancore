@@ -134,5 +134,10 @@ class Ac_Legacy_Database_Joomla extends Ac_Legacy_Database {
         return $a['prefix'];
     }
     
+    function getErrorCode() {
+        return $this->_db->getErrorNum();
+    }
+    
+    
 }
 
