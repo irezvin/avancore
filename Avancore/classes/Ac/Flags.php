@@ -17,7 +17,13 @@ class Ac_Flags {
     }    
     
     function touch($flag) {
-        touch($this->dir.'/'.$flag);
+        $f = $this->dir.'/'.$flag;
+        if (!is_dir($d = dirname($f))) {
+            if (!mkdir($d, 0777, true)) {
+                throw new Exception("Cannot create directory '{$d}' for flag '{$flag}'");
+            }
+        }
+        touch($f);
     }
     
     function getMtime($flag) {

@@ -32,7 +32,7 @@ class Ac_Util_Csv extends Ac_Prototyped {
     function setEnclose($enclose) {
         if ($enclose !== ($oldEnclose = $this->enclose)) {
             $this->enclose = $enclose;
-            $this->qEnclose = preg_quote($this->encolse, "/");
+            $this->qEnclose = preg_quote($this->enclose, "/");
             $this->encloseLen = strlen($this->enclose);
         }
     }

@@ -19,6 +19,12 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
     
     var $where = false;
     
+    /**
+     * Additional map of modelField => destTableField
+     * @var array
+     */
+    var $whereMap = array();
+    
     var $ordering = '?';
     
     var $extraJoins = false;
@@ -55,7 +61,23 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
     }
     
     function _doDefaultGetValueList() {
-        $ttls = $this->_mapper->getRecordTitles($this->where, $this->ordering, $this->extraJoins, $this->titleFieldName, $this->titleIsProperty, $this->valueFieldName, $this->valueIsProperty);
+        $where = $this->where;
+        if ($this->whereMap) {
+            $kc = array();
+            foreach ($this->whereMap as $src => $dest) {
+                if (is_numeric($src)) {
+                    $src = $dest;
+                }
+                $kc[$dest] = $this->data->getField($src);
+            }
+            $sKc = $this->_mapper->getDb()->valueCriterion($kc);
+            if (strlen($where)) {
+                $where = "($where) AND ({$sKc})";
+            } else {
+                $where = $sKc;
+            }
+        }
+        $ttls = $this->_mapper->getRecordTitles($where, $this->ordering, $this->extraJoins, $this->titleFieldName, $this->titleIsProperty, $this->valueFieldName, $this->valueIsProperty);
         //    if ($this->tableName === '#__element_versions')
         
         $res = array();

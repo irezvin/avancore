@@ -143,6 +143,10 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
         return $this->treeProvider;
     }
     
+    function setTreeNodeTitleGetter($treeNodeTitleGetter) {
+        $this->treeNodeTitleGetter = $treeNodeTitleGetter;
+    }
+    
     /**
      * Returns ID of container object that contained in the Impl instance
      * Is called only in case when Impl is detached from container
@@ -214,10 +218,31 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
     	if (is_null($parentNode)) $this->setParentNodeId(null);
         elseif (strlen($id = $parentNode->getNodeId())) $this->setParentNodeId($id);
         else {
+            if ($this->tmpParent && ($this->tmpParent !== $parentNode)) 
+                $this->tmpParent->notifyChildNodeRemoved($this);
             $this->tmpParent = $parentNode;
-            if (($this->tmpParent !== $parentNode)) $this->tmpParent->notifyChildNodeRemoved($this);
             $this->tmpParent->notifyChildNodeAdded($this);
         }
+    }
+    
+    /**
+     * @return Ac_Model_Tree_NestedSetsImpl
+     */
+    function createChildNode(Ac_Model_Object $container = null) {
+        $prototype = array(
+            'mapper' => $this->mapper,
+            'treeProvider' => $this->treeProvider,
+            'treeNodeTitleGetter' => $this->treeNodeTitleGetter,
+            'containerImplSetter' => $this->containerImplSetter,
+            'modelIdField' => $this->modelIdField,
+        );
+        
+        if ($container) $prototype['container'] = $container;
+        $this->doOnCreateChildNodePrototype($prototype, $container);
+        $c = get_class($this);
+        $res = new $c($prototype);
+        $res->setParentNode($this);
+        return $res;
     }
     
     protected function doOnCreateChildNodePrototype(array $prototype, $container) {
@@ -235,11 +260,14 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
                     break;
                 }
             }
-            if (!$hasNode) $this->tmpChildren['_tmp_'.($this->tmpc++)] = $childNode;
+            if (!$hasNode) {
+                $this->tmpChildren['_tmp_'.($this->tmpc++)] = $childNode;
+            }
+        } else {
         }
     }
     
-    function notifyChildNodeRemoved(Ac_Model_Tree_NestedSetsImpl $childNode) {
+    function notifyChildNodeRemoved(Ac_Model_Tree_AbstractImpl $childNode) {
         if ($id = $childNode->getNodeId()) {
             if ($this->childNodeIds !== false) $this->childNodeIds = array_diff($this->childNodeIds, array($id));
         }
