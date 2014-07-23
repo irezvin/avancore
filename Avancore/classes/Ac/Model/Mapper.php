@@ -600,12 +600,16 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     
     function markUpdated() {
     	if (!$this->updateLevel) {
-            $this->triggerEvent(self::EVENT_ON_UPDATED);
-    		$this->application->getFlags()->touch('mapper.'.$this->id);
+            $this->doMarkUpdated();
     		$this->updateMark = false;
     	} else {
     		$this->updateMark = true;
     	}
+    }
+    
+    protected function doMarkUpdated() {
+        $this->triggerEvent(self::EVENT_ON_UPDATED);
+        $this->application->getFlags()->touch('mapper.'.$this->id);
     }
     
     function beginUpdate() {

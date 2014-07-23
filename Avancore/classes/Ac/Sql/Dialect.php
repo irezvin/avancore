@@ -129,7 +129,7 @@ abstract class Ac_Sql_Dialect {
      * @param string $sql
      * @param string $replacePrefixWith What to replace '#__' to
      * @param array $quotedPosArgs Positional arguments, already escaped & quoted (? in statement)
-     * @param array $quotedNamedArgs Named arguments, already escaped & quoted (? in statement)
+     * @param array $quotedNamedArgs Named arguments, already escaped & quoted (:name in statement)
      * @return string
      * @throws Ac_E_InvalidUsage If positional or named arg not found
      */

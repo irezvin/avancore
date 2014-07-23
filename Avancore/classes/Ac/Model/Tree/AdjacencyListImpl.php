@@ -318,7 +318,6 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     }
     
     protected function endStore($wasOk) {
-        
         $res = $wasOk;
         
         if ($this->isTreePositionChangeEnqueued()) {

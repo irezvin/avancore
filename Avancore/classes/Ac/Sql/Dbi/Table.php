@@ -213,7 +213,7 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
             $columns = array_merge($columns, Ac_Util::array_values($rel->columns));
         }
         if (!count($ad = array_diff($this->listColumns(), $columns, $ignoredOtherColumns))) { // all fields are used in relations
-             $res = $relations;
+            $res = $relations;
         } else {
             $res = false;
         }

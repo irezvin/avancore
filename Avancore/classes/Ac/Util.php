@@ -87,7 +87,7 @@ abstract class Ac_Util {
             } elseif (!function_exists('__autoload')) {
 
                 function __autoload($className) {
-                    return Ac_Util::loadClass($className);
+                    return self::loadClass($className);
                 }
                 $res = true;
 
@@ -127,18 +127,18 @@ abstract class Ac_Util {
             }
             else {
                 if (!isset($paArray1[$sKey2])) $paArray1[$sKey2] = null;
-                $paArray1[$sKey2] = Ac_Util::m($paArray1[$sKey2], $sValue2, $preserveNumeric);
+                $paArray1[$sKey2] = self::m($paArray1[$sKey2], $sValue2, $preserveNumeric);
             }
         }
         return $paArray1;
     }
 
     static function ms(& $paArray1, $paArray2, $preserveNumeric = false) {
-        return $paArray1 = Ac_Util::m($paArray1, $paArray2, $preserveNumeric);
+        return $paArray1 = self::m($paArray1, $paArray2, $preserveNumeric);
     }
 
     static function array_merge_recursive2($paArray1, $paArray2, $preserveNumeric  = false) {
-        return Ac_Util::m($paArray1, $paArray2, $preserveNumeric);
+        return self::m($paArray1, $paArray2, $preserveNumeric);
     }
     
     static function mkAttribs ($attribs = array(), $quote='"', $quoteStyle = ENT_QUOTES, $charset = false, $doubleEncode = true, $addSpace = true) {
@@ -155,7 +155,7 @@ abstract class Ac_Util {
                 if (!$v) continue;
                 else $v = $k;
             }
-            $res[] = $k."=".$quote.Ac_Util::htmlspecialchars($v, $quoteStyle, $charset, $doubleEncode).$quote;
+            $res[] = $k."=".$quote.self::htmlspecialchars($v, $quoteStyle, $charset, $doubleEncode).$quote;
         }
         if ($res && $addSpace) array_unshift ($res, '');
         return implode(" ", $res);
@@ -163,7 +163,7 @@ abstract class Ac_Util {
     
     static function mkElement($tagName, $tagBody = false, $attribs = array(), $quote='"', $quoteStyle = ENT_QUOTES, $charset = false, $doubleEncode = true) {
         $res = '<'.$tagName;
-        if ($attribs) $res .= Ac_Util::mkAttribs($attribs, $quote, $quoteStyle, $charset, $doubleEncode = true);
+        if ($attribs) $res .= self::mkAttribs($attribs, $quote, $quoteStyle, $charset, $doubleEncode = true);
         if ($tagBody !== false) $res .= '>'.$tagBody.'</'.$tagName.'>';
             else $res .= ' />';
         return $res;
@@ -250,7 +250,7 @@ abstract class Ac_Util {
     
     static function createFilePath($filePath, $rights = 0777) {
         $dir = dirname($filePath);
-        Ac_Util::createDirPath($dir, $rights);
+        self::createDirPath($dir, $rights);
         $handle = fopen($filePath, "w");
         return $handle;
     }
@@ -260,7 +260,7 @@ abstract class Ac_Util {
         while($file = readdir($res)) {
             if($file != "." && $file != "..") {
                 if($recursive && is_dir("$dirPath/$file") && (!$dirRegex || preg_match($dirRegex, "$dirPath/$file"))) 
-                    $files=Ac_Util::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex);
+                    $files=self::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex);
                 else {
                     if (!$fileRegex || preg_match($fileRegex, "$dirPath/$file")) {
                         array_push($files,"$dirPath/$file");
@@ -316,10 +316,10 @@ abstract class Ac_Util {
      * @return array (body, tail) body is '' when only one segment is present
      */
     static function pathBodyTail ($path) {
-        $array = array_reverse(Ac_Util::pathToArray($path));
+        $array = array_reverse(self::pathToArray($path));
         if ($c = count($array)) {
             $tail = $array[$c - 1];
-            $body = Ac_Util::arrayToPath(array_slice($array, 0, $c - 1));    
+            $body = self::arrayToPath(array_slice($array, 0, $c - 1));    
         } else $body = $tail = '';
         return array($body, $tail);
     }
@@ -327,7 +327,7 @@ abstract class Ac_Util {
     static function concatPaths ($path1, $path2) {
         if (!strlen($path2)) return $path1;
         if (!strlen($path1)) return $path2;
-        $arr2 = Ac_Util::pathToArray($path2);
+        $arr2 = self::pathToArray($path2);
         $res = $path1.'['.implode('][', $arr2).']';
         return $res; 
     }
@@ -335,12 +335,12 @@ abstract class Ac_Util {
     static function concatManyPaths ($path1, $path2) {
         $res = array();
         if (is_array($path1)) {
-            foreach ($path1 as $p1) $res = array_merge($res, Ac_Util::concatManyPaths($p1, $path2));        
+            foreach ($path1 as $p1) $res = array_merge($res, self::concatManyPaths($p1, $path2));        
         } 
         elseif (is_array($path2)) {
-            foreach ($path2 as $p2) $res = array_merge($res, Ac_Util::concatManyPaths($path1, $p2));
+            foreach ($path2 as $p2) $res = array_merge($res, self::concatManyPaths($path1, $p2));
         } else {
-            $res[] = Ac_Util::concatPaths($path1, $path2);
+            $res[] = self::concatPaths($path1, $path2);
         }
         return $res;
     }
@@ -360,7 +360,7 @@ abstract class Ac_Util {
             if (is_array( $value )) {
                 $res = array();
                     foreach ($value as $key => $val) {
-                        $res[$key] = Ac_Util::stripSlashes( $val );
+                        $res[$key] = self::stripSlashes( $val );
                     }
                 } else {
                     $res = $value;
@@ -382,7 +382,7 @@ abstract class Ac_Util {
                         $ak = $k;
                     }
                     if (isset($array[$ak])) {
-                        $obj->$k = ($checkSlashes && $gmq) ? Ac_Util::stripSlashes($array[$ak]) : $array[$ak];
+                        $obj->$k = ($checkSlashes && $gmq) ? self::stripSlashes($array[$ak]) : $array[$ak];
                     }
                 }
             }
@@ -462,8 +462,8 @@ abstract class Ac_Util {
      * @return mixed
      */
     static function gap(array $arr, $path, $defaultValue = null) {
-        if (!is_array($path)) $path = Ac_Util::pathToArray($path);
-        return Ac_Util::getArrayByPath($arr, $path, $defaultValue);
+        if (!is_array($path)) $path = self::pathToArray($path);
+        return self::getArrayByPath($arr, $path, $defaultValue);
     }
     
     /**
@@ -483,12 +483,12 @@ abstract class Ac_Util {
      *      $arr = array('x' => array('x1' => 'valX1', 'x2' => 'valX2'));
      *      $arrPath = array('x', 'x1', 'x11');
      *      $overwrite = false;
-     *      var_dump(Ac_Util::setArrayByPath($arr, $arrPath, 'foo', $overwrite)); // Will return false; $arr will remain unchanged
+     *      var_dump(self::setArrayByPath($arr, $arrPath, 'foo', $overwrite)); // Will return false; $arr will remain unchanged
      * 
      *      $arr = array('x' => array('x1' => 'valX1', 'x2' => 'valX2'));
      *      $arrPath = array('x', 'x1', 'x11');
      *      $overwrite = false;
-     *      var_dump(Ac_Util::setArrayByPath($arr, $arrPath, 'foo', $overwrite)); // Will return true; 
+     *      var_dump(self::setArrayByPath($arr, $arrPath, 'foo', $overwrite)); // Will return true; 
      *      var_dump($arr); // array('x' => array('x1' => array('x11' => 'foo'), 'x2' => 'valX2'));
      * 
      *      static function overwriteCallback($currPath, & $element, $value) {
@@ -501,10 +501,10 @@ abstract class Ac_Util {
      * 
      *      $arr = array('x' => array('x1' => 'valX1', 'x2' => 'valX2'));
      *      $overwrite = 'overwriteCallback';
-     *      var_dump(Ac_Util::setArrayByPath($arr, array('x', 'x1', 'x11'), 'foo', $overwrite)); // Will return true
+     *      var_dump(self::setArrayByPath($arr, array('x', 'x1', 'x11'), 'foo', $overwrite)); // Will return true
      *      var_dump($arr); // array('x' => array('x1' => array('valX1', 'x11' => 'foo')), 'x2' => 'valX2');
      * 
-     *      var_dump(Ac_Util::setArrayByPath($arr, array('x2', 'x21'), 'foo', $overwrite)); // Will return false; $arr will remain unchanged
+     *      var_dump(self::setArrayByPath($arr, array('x2', 'x21'), 'foo', $overwrite)); // Will return false; $arr will remain unchanged
      * </code> 
      */
     static function setArrayByPath(& $arr, $arrPath, $value, $overwrite = false, $extraParams = array()) {
@@ -584,7 +584,7 @@ abstract class Ac_Util {
     }
     
     static function simpleSetArrayByPathNoRef(& $arr, $arrPath, $value, $unique = true) {
-    	return Ac_Util::simpleSetArrayByPath($arr, $arrPath, $value, $unique);
+    	return self::simpleSetArrayByPath($arr, $arrPath, $value, $unique);
     }
     
     static function & simpleGetArrayByPath($arr, $arrPath, $defaultValue = null) {
@@ -642,7 +642,7 @@ abstract class Ac_Util {
     }
     
     static function stripTrailingSlash($string, $slash = '/\\') {
-        return Ac_Util::removeTrailingSlash($string, $slash);
+        return self::removeTrailingSlash($string, $slash);
     }
     
     static function flattenArray($array, $level = -1, $keyGlue = false, $key = '') {
@@ -653,7 +653,7 @@ abstract class Ac_Util {
             } else {
                 $tk = false;
             }
-            if (is_array($v) && ($level != 0)) $res = array_merge($res, Ac_Util::flattenArray($v, $level-1, $keyGlue, $tk));
+            if (is_array($v) && ($level != 0)) $res = array_merge($res, self::flattenArray($v, $level-1, $keyGlue, $tk));
             elseif (strlen($tk)) {
                 $res[$tk] = & $array[$k];
             } else {
@@ -699,7 +699,7 @@ abstract class Ac_Util {
     static function sameInArray(& $obj, $array) {
         $res = false;
         foreach(array_keys($array) as $k) {
-            if (Ac_Util::sameObject($obj, $array[$k])) {
+            if (self::sameObject($obj, $array[$k])) {
                 $res = true;
                 break;
             }
@@ -759,7 +759,7 @@ abstract class Ac_Util {
        if (is_array($info)) {
            foreach ($info as $var => $val) {
                if (is_array($val)) {
-                   Ac_Util::_groupFileInfoByVariable($top[$var], $val, $attr);
+                   self::_groupFileInfoByVariable($top[$var], $val, $attr);
                } else {
                    $top[$var][$attr] = $val;
                }
@@ -829,7 +829,7 @@ abstract class Ac_Util {
     static function htmlEntityDecode($stringOrArray, $quoteStyle = ENT_QUOTES, $charset = null) {
         if (is_array($stringOrArray)) {
             $res = array();
-            foreach ($stringOrArray as $k => $v) $res[$k] = Ac_Util::htmlEntityDecode($v, $quoteStyle, $charset);
+            foreach ($stringOrArray as $k => $v) $res[$k] = self::htmlEntityDecode($v, $quoteStyle, $charset);
             return $res;
         }
         return html_entity_decode($stringOrArray, $quoteStyle, $charset);
@@ -855,12 +855,12 @@ abstract class Ac_Util {
     }
     
     static function addTrailingSlash($string, $slashes = '/\\', $slashType = DIRECTORY_SEPARATOR) {
-        $res = Ac_Util::removeTrailingSlash($string, $slashes).$slashType;
+        $res = self::removeTrailingSlash($string, $slashes).$slashType;
         return $res;
     }
     
     static function addLeadingSlash($string, $slashes = '/\\', $slashType = DIRECTORY_SEPARATOR) {
-        $res = $slashType.Ac_Util::removeLeadingSlash($string, $slashes);
+        $res = $slashType.self::removeLeadingSlash($string, $slashes);
         return $res;
     }
     
@@ -887,7 +887,7 @@ abstract class Ac_Util {
     				if ($unsetKeys) unset($item[$k]);
     			}
     		}
-    		if (count($path)) Ac_Util::simpleSetArrayByPath($res, $path, $item, $unique);
+    		if (count($path)) self::simpleSetArrayByPath($res, $path, $item, $unique);
     	}
     	return $res;
     }
@@ -943,7 +943,7 @@ abstract class Ac_Util {
      */
     static function getObjectsOfClass(array $arr, $requiredClasses, $withEmptyArrays = false) {
         $res = array();
-        $c = Ac_Util::toArray($requiredClasses);
+        $c = self::toArray($requiredClasses);
         foreach ($arr as $k => $v) {
             if (is_object($v)) {
                 foreach ($c as $class) 
@@ -1035,7 +1035,7 @@ abstract class Ac_Util {
                     foreach ($keyList as $i) if (isset($v[$i])) $path[] = $v[$i];
                         else $path[] = null;
                 }
-                Ac_Util::simpleSetArrayByPathNoRef ($res, $path, $v, $unique);
+                self::simpleSetArrayByPathNoRef ($res, $path, $v, $unique);
             }
         }
         return $res;
@@ -1066,5 +1066,5 @@ class _Ae_Util_ObjectVarGetter {
  * @param type $className 
  */
 function acUtilLoadClass($className) {
-    Ac_Util::loadClass(Ac_Util::fixClassName($className));
+    self::loadClass(self::fixClassName($className));
 }
