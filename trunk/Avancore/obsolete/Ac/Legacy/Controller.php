@@ -90,6 +90,8 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped {
      **/
     var $_methodParamName = 'action';
     
+    var $_resultToResponseVar = false;
+    
     /**
      * Name of a default method that will be used when method name is not provided in the request. If empty string is given, 'execute()' method will be called
      * @var string|bool Name of default method or FALSE to use fallback handler if no method name is provided
@@ -340,7 +342,8 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped {
                 $this->_response = new $rc;
                 if ($this->doBeforeExecute($methodName) !== false) {
                     if ($m = $this->getMethodName()) {
-                        $this->$m();
+                        $result = $this->$m();
+                        if ($this->_resultToResponseVar) $this->_response->{$this->_resultToResponseVar} = $result;
                     } else {
                         $this->execFallback($this->getMethodParamValue());
                     }

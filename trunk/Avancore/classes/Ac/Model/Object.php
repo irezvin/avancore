@@ -889,12 +889,16 @@ class Ac_Model_Object extends Ac_Model_Data {
                     foreach ($fieldLinks2 as $s => $d) {
                         $rc[$s] = $rec->$d;
                     }
-                    $ids[] = $rc;
+                    $ids[implode('-', $rc)] = $rc; // this will guarantee the uniqueness of multi-field values
                 }
             }
         }
         if ($res && is_array($ids)) {
-            $ids = array_unique($ids); //TODO: check why sometimes we receive duplicate IDs...
+            if (count($fieldLinks2) == 1) {
+                $ids = array_unique($ids); //TODO: check why sometimes we receive duplicate IDs...
+            } else {
+                $ids = array_values($ids);
+            }
             $rows = array();
             $rowProto = array();
             if (is_array($midWhere)) $rowProto = $midWhere;
@@ -1012,9 +1016,6 @@ class Ac_Model_Object extends Ac_Model_Data {
         $a1 = $this->getAssoc($assocName);
         $a2 = $otherObject->getAssoc($assocName);
         
-        //var_dump($a1, $a2);
-        
-        //var_dump($a1, $a2);
         $res = false;
         if ($a1 && $a2) {
             if (!is_array($a1) && !is_array($a2)) {

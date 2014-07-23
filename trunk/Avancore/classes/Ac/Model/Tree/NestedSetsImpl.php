@@ -64,10 +64,6 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
         return $this->mapper->getRootNodeId();        
     }
     
-    function setTreeNodeTitleGetter($treeNodeTitleGetter) {
-        $this->treeNodeTitleGetter = $treeNodeTitleGetter;
-    }
-    
     function setParentNode(Ac_I_Tree_Node $parentNode = null) {
         if ($parentNode && !($parentNode instanceof Ac_Model_Tree_NestedSetsImpl))
         	throw new Exception("\$parentNode can be only Ac_Model_Tree_NestedSetsImpl instance, '".get_class($parentNode)."' given");
@@ -183,26 +179,6 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
         }
         Ac_Callbacks::call(self::debugCallback, self::debugEndDelete, $this, $res);
         $this->lockDelete--;
-        return $res;
-    }
-    
-    /**
-     * @return Ac_Model_Tree_NestedSetsImpl
-     */
-    function createChildNode(Ac_Model_Object $container = null) {
-        $prototype = array(
-            'mapper' => $this->mapper,
-            'treeProvider' => $this->treeProvider,
-            'treeNodeTitleGetter' => $this->treeNodeTitleGetter,
-            'containerImplSetter' => $this->containerImplSetter,
-            'modelIdField' => $this->modelIdField,
-        );
-        
-        if ($container) $prototype['container'] = $container;
-        $this->doOnCreateChildNodePrototype($prototype, $container);
-        $c = get_class($this);
-        $res = new $c($prototype);
-        $res->setParentNode($this);
         return $res;
     }
     
