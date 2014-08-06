@@ -337,9 +337,10 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
         elseif (is_array($query)) {
             if (!isset($query[0])) 
                 throw new Ac_E_InvalidCall("array \$query must have element #0 (query-template string)");
-            if (!is_string($query[0])) 
-                throw new Ac_E_InvalidCall("\$query[0] must be a string");
-            $template = $query[0];
+            if (!is_string($query[0]) && !is_object($query[0])) {
+                throw new Ac_E_InvalidCall("\$query[0] must be a string or an object");
+            }
+            $template = ''.$query[0];
             unset($query[0]);
             $quotedPosArgs = array();
             $quotedNamedArgs = array();
