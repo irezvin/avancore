@@ -144,12 +144,14 @@ class Ac_Facet_Item extends Ac_Prototyped {
         $this->possibleValuesSupplied = $possibleValues !== false;
     }
     
-    function getValueCaption() {
+    function getValueCaption($glue = ", ") {
         $res = false;
-        if (($v = $this->getValue()) !== false) {
-            $vv = $this->getPossibleValues();
-            if (isset($vv[$v])) $res = $vv[$v]['title'];
+        $cap = array();
+        $vv = $this->getPossibleValues();
+        foreach (Ac_Util::toArray($this->getValue()) as $v) {
+            if (isset($vv[$v])) $cap[] = $vv[$v]['title'];
         }
+        if ($cap) $res = $glue === false? $cap : implode($glue, $cap);
         return $res;
     }
 
