@@ -12,6 +12,9 @@ class Ac_Sql_Filter_Equals extends Ac_Sql_Filter {
     var $convertNullToZero = false;
     var $invert = false;
     
+    var $explode = false;
+    var $explodeIsRegex = false;
+    
     function _colCriteria() {
         
         $vv = array();
@@ -53,7 +56,14 @@ class Ac_Sql_Filter_Equals extends Ac_Sql_Filter {
      */
     function _doBind($input) {
         $values = array();
-        if (!is_array($input)) $input = array($input);
+        if (!is_array($input)) {
+            if ($this->explode !== false) {
+                if ($this->explodeIsRegex) $input = preg_split($this->explode, $input);
+                else $input = explode($this->explode, $input);
+            } else {
+                $input = array($input);
+            }
+        }
         $n = 0;
         foreach ($input as $item) {
             $values[] = $item;
