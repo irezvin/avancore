@@ -16,28 +16,31 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `ac_orientation`
+-- Table structure for table `ac_album_photos`
 --
 
-DROP TABLE IF EXISTS `ac_orientation`;
+DROP TABLE IF EXISTS `ac_album_photos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
-CREATE TABLE `ac_orientation` (
-  `sexualOrientationId` int(10) unsigned NOT NULL AUTO_INCREMENT,
-  `title` varchar(45) NOT NULL,
-  PRIMARY KEY (`sexualOrientationId`),
-  KEY `Index_2` (`title`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+CREATE TABLE `ac_album_photos` (
+  `personId` int(10) unsigned NOT NULL,
+  `albumId` int(10) unsigned NOT NULL,
+  `photoId` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`photoId`,`albumId`,`personId`),
+  KEY `FK__ac_person_albums` (`personId`,`albumId`),
+  KEY `FK__ac_person_photos` (`personId`,`photoId`),
+  CONSTRAINT `FK__ac_person_albums` FOREIGN KEY (`personId`, `albumId`) REFERENCES `ac_person_albums` (`personId`, `albumId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK__ac_person_photos` FOREIGN KEY (`personId`, `photoId`) REFERENCES `ac_person_photos` (`personId`, `photoId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `ac_orientation`
+-- Dumping data for table `ac_album_photos`
 --
 
-LOCK TABLES `ac_orientation` WRITE;
-/*!40000 ALTER TABLE `ac_orientation` DISABLE KEYS */;
-INSERT INTO `ac_orientation` VALUES (2,'Бисексуальная'),(3,'Гомосексуальная'),(1,'Натуральная');
-/*!40000 ALTER TABLE `ac_orientation` ENABLE KEYS */;
+LOCK TABLES `ac_album_photos` WRITE;
+/*!40000 ALTER TABLE `ac_album_photos` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ac_album_photos` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -55,10 +58,13 @@ CREATE TABLE `ac_people` (
   `birthDate` date NOT NULL,
   `lastUpdatedDatetime` datetime DEFAULT NULL,
   `createdTs` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `sexualOrientationId` int(10) unsigned DEFAULT NULL,
+  `religionId` int(10) unsigned DEFAULT NULL,
+  `portraitId` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`personId`),
-  KEY `FK_ac_people_1` (`sexualOrientationId`),
-  CONSTRAINT `FK_ac_people_1` FOREIGN KEY (`sexualOrientationId`) REFERENCES `ac_orientation` (`sexualOrientationId`)
+  KEY `FK_ac_people_1` (`religionId`),
+  KEY `FK_ac_person_photos_ac_people_protrait` (`personId`,`portraitId`),
+  CONSTRAINT `FK_ac_person_religion` FOREIGN KEY (`religionId`) REFERENCES `ac_religion` (`religionId`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `FK_ac_person_photos_ac_people_protrait` FOREIGN KEY (`personId`, `portraitId`) REFERENCES `ac_person_photos` (`personId`, `photoId`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -68,7 +74,7 @@ CREATE TABLE `ac_people` (
 
 LOCK TABLES `ac_people` WRITE;
 /*!40000 ALTER TABLE `ac_people` DISABLE KEYS */;
-INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2009-12-22 16:22:36',1),(4,'Таня','F',0,'1981-12-23',NULL,'2009-12-22 16:22:36',1);
+INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2014-08-09 13:59:19',4,NULL),(4,'Таня','F',0,'1981-12-23',NULL,'2014-08-09 13:59:22',1,NULL);
 /*!40000 ALTER TABLE `ac_people` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -80,12 +86,12 @@ DROP TABLE IF EXISTS `ac_people_tags`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `ac_people_tags` (
-  `personId` int(10) unsigned NOT NULL,
-  `tagId` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`personId`,`tagId`),
-  KEY `FK_ac_people_tags_2` (`tagId`),
-  CONSTRAINT `FK_ac_people_tags_1` FOREIGN KEY (`personId`) REFERENCES `ac_people` (`personId`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK_ac_people_tags_2` FOREIGN KEY (`tagId`) REFERENCES `ac_tags` (`tagId`) ON DELETE CASCADE ON UPDATE CASCADE
+  `idOfPerson` int(10) unsigned NOT NULL,
+  `idOfTag` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`idOfPerson`,`idOfTag`),
+  KEY `FK_ac_people_tags_2` (`idOfTag`),
+  CONSTRAINT `FK_ac_people_tags_1` FOREIGN KEY (`idOfPerson`) REFERENCES `ac_people` (`personId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK_ac_people_tags_2` FOREIGN KEY (`idOfTag`) REFERENCES `ac_tags` (`tagId`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -97,6 +103,58 @@ LOCK TABLES `ac_people_tags` WRITE;
 /*!40000 ALTER TABLE `ac_people_tags` DISABLE KEYS */;
 INSERT INTO `ac_people_tags` VALUES (4,1),(4,2);
 /*!40000 ALTER TABLE `ac_people_tags` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_person_albums`
+--
+
+DROP TABLE IF EXISTS `ac_person_albums`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_person_albums` (
+  `albumId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `personId` int(10) unsigned NOT NULL DEFAULT '0',
+  `albumName` varchar(255) NOT NULL DEFAULT '''''',
+  PRIMARY KEY (`albumId`),
+  KEY `FK__ac_people` (`personId`),
+  CONSTRAINT `FK__ac_people` FOREIGN KEY (`personId`) REFERENCES `ac_people` (`personId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_person_albums`
+--
+
+LOCK TABLES `ac_person_albums` WRITE;
+/*!40000 ALTER TABLE `ac_person_albums` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ac_person_albums` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_person_photos`
+--
+
+DROP TABLE IF EXISTS `ac_person_photos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_person_photos` (
+  `photoId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `personId` int(10) unsigned NOT NULL,
+  `filename` varchar(45) NOT NULL DEFAULT '',
+  PRIMARY KEY (`photoId`),
+  KEY `FK_ac_person_photos_ac_people` (`personId`),
+  CONSTRAINT `FK_ac_person_photos_ac_people` FOREIGN KEY (`personId`) REFERENCES `ac_people` (`personId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_person_photos`
+--
+
+LOCK TABLES `ac_person_photos` WRITE;
+/*!40000 ALTER TABLE `ac_person_photos` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ac_person_photos` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -160,6 +218,31 @@ INSERT INTO `ac_relations` VALUES (1,3,4,1,'2004-04-15 00:00:00',NULL,'Счас�
 UNLOCK TABLES;
 
 --
+-- Table structure for table `ac_religion`
+--
+
+DROP TABLE IF EXISTS `ac_religion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_religion` (
+  `religionId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(45) NOT NULL,
+  PRIMARY KEY (`religionId`),
+  UNIQUE KEY `Index_2` (`title`)
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_religion`
+--
+
+LOCK TABLES `ac_religion` WRITE;
+/*!40000 ALTER TABLE `ac_religion` DISABLE KEYS */;
+INSERT INTO `ac_religion` VALUES (4,'Agnostic'),(3,'Atheist'),(1,'Christian'),(2,'Muslim');
+/*!40000 ALTER TABLE `ac_religion` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `ac_tags`
 --
 
@@ -185,6 +268,134 @@ LOCK TABLES `ac_tags` WRITE;
 INSERT INTO `ac_tags` VALUES (1,'Ум','Умный','Умница'),(2,'Красота','Красивый','Красавица');
 /*!40000 ALTER TABLE `ac_tags` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_tree_adjacent`
+--
+
+DROP TABLE IF EXISTS `ac_tree_adjacent`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_tree_adjacent` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `parentId` int(10) unsigned DEFAULT NULL,
+  `ordering` int(10) unsigned NOT NULL DEFAULT '0',
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `tag` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `index_4` (`parentId`),
+  KEY `index_5` (`ordering`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_tree_adjacent`
+--
+
+LOCK TABLES `ac_tree_adjacent` WRITE;
+/*!40000 ALTER TABLE `ac_tree_adjacent` DISABLE KEYS */;
+INSERT INTO `ac_tree_adjacent` VALUES (1,NULL,1,'child1',1),(2,NULL,3,'child2',2),(3,NULL,2,'child3',3);
+/*!40000 ALTER TABLE `ac_tree_adjacent` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_tree_combos`
+--
+
+DROP TABLE IF EXISTS `ac_tree_combos`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_tree_combos` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `leftCol` int(10) unsigned NOT NULL DEFAULT '0',
+  `rightCol` int(10) unsigned NOT NULL DEFAULT '1',
+  `parentId` int(10) unsigned DEFAULT NULL,
+  `ordering` int(10) NOT NULL DEFAULT '0',
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `tag` int(11) DEFAULT NULL,
+  `ignore` int(1) unsigned NOT NULL DEFAULT '0',
+  `depth` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `index_2` (`leftCol`),
+  KEY `index_3` (`rightCol`),
+  KEY `index_4` (`parentId`),
+  KEY `index_5` (`ordering`),
+  KEY `index_6` (`ignore`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_tree_combos`
+--
+
+LOCK TABLES `ac_tree_combos` WRITE;
+/*!40000 ALTER TABLE `ac_tree_combos` DISABLE KEYS */;
+INSERT INTO `ac_tree_combos` VALUES (1,0,3,NULL,1,'root',999,0,0),(2,1,2,1,1,'child1',1,0,1);
+/*!40000 ALTER TABLE `ac_tree_combos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_tree_nested_sets`
+--
+
+DROP TABLE IF EXISTS `ac_tree_nested_sets`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_tree_nested_sets` (
+  `id` int(10) unsigned NOT NULL,
+  `treeId` int(10) unsigned NOT NULL,
+  `leftCol` int(10) unsigned NOT NULL DEFAULT '0',
+  `rightCol` int(10) unsigned NOT NULL DEFAULT '1',
+  `parentId` int(10) unsigned DEFAULT NULL,
+  `ordering` int(10) unsigned NOT NULL DEFAULT '0',
+  `comment` varchar(40) NOT NULL,
+  `ignore` int(1) unsigned NOT NULL DEFAULT '0',
+  `depth` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`treeId`),
+  KEY `index_2` (`leftCol`),
+  KEY `index_3` (`rightCol`),
+  KEY `index_4` (`parentId`),
+  KEY `index_5` (`ordering`),
+  KEY `index_6` (`ignore`),
+  KEY `index_7` (`id`),
+  KEY `index_8` (`treeId`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_tree_nested_sets`
+--
+
+LOCK TABLES `ac_tree_nested_sets` WRITE;
+/*!40000 ALTER TABLE `ac_tree_nested_sets` DISABLE KEYS */;
+INSERT INTO `ac_tree_nested_sets` VALUES (0,1,0,7,NULL,1,'Sample_Tree_Record_Mapper',0,0),(1,1,1,2,0,1,'',0,1),(2,1,5,6,0,3,'',0,1),(3,1,3,4,0,2,'',0,1);
+/*!40000 ALTER TABLE `ac_tree_nested_sets` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_tree_records`
+--
+
+DROP TABLE IF EXISTS `ac_tree_records`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_tree_records` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `tag` int(11) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_tree_records`
+--
+
+LOCK TABLES `ac_tree_records` WRITE;
+/*!40000 ALTER TABLE `ac_tree_records` DISABLE KEYS */;
+INSERT INTO `ac_tree_records` VALUES (1,'child1',1),(2,'child2',2),(3,'child3',3);
+/*!40000 ALTER TABLE `ac_tree_records` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -195,4 +406,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2013-08-14  0:36:25
+-- Dump completed on 2014-08-09 17:02:02

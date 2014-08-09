@@ -3,10 +3,15 @@
 class Sample_Person_Base_Object extends Ac_Model_Object {
 
     public $_hasDefaults = true;
-    public $_orientation = false;
+    public $_protraitPersonPhoto = false;
+    public $_religion = false;
     public $_tags = false;
     public $_tagsCount = false;
     public $_tagIds = false;
+    public $_personAlbums = false;
+    public $_personAlbumsCount = false;
+    public $_personPhotos = false;
+    public $_personPhotosCount = false;
     public $_incomingRelations = false;
     public $_incomingRelationsCount = false;
     public $_outgoingRelations = false;
@@ -18,7 +23,8 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     public $birthDate = NULL;
     public $lastUpdatedDatetime = NULL;
     public $createdTs = false;
-    public $sexualOrientationId = NULL;
+    public $religionId = NULL;
+    public $portraitId = NULL;
     
     var $_mapperClass = 'Sample_Person_Mapper';
     
@@ -42,28 +48,36 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'orientation', 1 => 'tags', 2 => 'tagIds', 3 => 'incomingRelations', 4 => 'outgoingRelations', 5 => 'personId', 6 => 'name', 7 => 'gender', 8 => 'isSingle', 9 => 'birthDate', 10 => 'lastUpdatedDatetime', 11 => 'createdTs', 12 => 'sexualOrientationId', );
+        return array ( 0 => 'protraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'incomingRelations', 7 => 'outgoingRelations', 8 => 'personId', 9 => 'name', 10 => 'gender', 11 => 'isSingle', 12 => 'birthDate', 13 => 'lastUpdatedDatetime', 14 => 'createdTs', 15 => 'religionId', 16 => 'portraitId', );
     }
  
     protected function listOwnLists() {
         
-        return array ( 'tags' => 'tags', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', );
+        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', );
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'orientation' => 'Sample_Orientation', 'tags' => 'Sample_Tag', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', );
+        return array ( 'protraitPersonPhoto' => 'Sample_Person_Photo', 'religion' => 'Sample_Religion', 'tags' => 'Sample_Tag', 'personAlbums' => 'Sample_Person_Album', 'personPhotos' => 'Sample_Person_Photo', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', );
     }
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
-            'orientation' => array (
-                'className' => 'Sample_Orientation',
-                'mapperClass' => 'Sample_Orientation_Mapper',
-                'caption' => 'Orientation',
-                'relationId' => '_orientation',
-                'referenceVarName' => '_orientation',
+            'protraitPersonPhoto' => array (
+                'className' => 'Sample_Person_Photo',
+                'mapperClass' => 'Sample_Person_Photo_Mapper',
+                'otherModelIdInMethodsPrefix' => 'protrait',
+                'caption' => 'Person photo',
+                'relationId' => '_protraitPersonPhoto',
+                'referenceVarName' => '_protraitPersonPhoto',
+            ),
+            'religion' => array (
+                'className' => 'Sample_Religion',
+                'mapperClass' => 'Sample_Religion_Mapper',
+                'caption' => 'Religion',
+                'relationId' => '_religion',
+                'referenceVarName' => '_religion',
             ),
             'tags' => array (
                 'className' => 'Sample_Tag',
@@ -83,6 +97,22 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Tag_Mapper',
                 ),
                 'showInTable' => false,
+            ),
+            'personAlbums' => array (
+                'className' => 'Sample_Person_Album',
+                'mapperClass' => 'Sample_Person_Album_Mapper',
+                'caption' => 'Person albums',
+                'relationId' => '_personAlbums',
+                'countVarName' => '_personAlbumsCount',
+                'referenceVarName' => '_personAlbums',
+            ),
+            'personPhotos' => array (
+                'className' => 'Sample_Person_Photo',
+                'mapperClass' => 'Sample_Person_Photo_Mapper',
+                'caption' => 'Person photos',
+                'relationId' => '_personPhotos',
+                'countVarName' => '_personPhotosCount',
+                'referenceVarName' => '_personPhotos',
             ),
             'incomingRelations' => array (
                 'className' => 'Sample_Relation',
@@ -156,18 +186,31 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'internalDateFormat' => 'YmdHis',
                 'outputDateFormat' => 'Y-m-d H:i:s',
             ),
-            'sexualOrientationId' => array (
+            'religionId' => array (
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
                     'class' => 'Ac_Model_Values_Records',
-                    'mapperClass' => 'Sample_Orientation_Mapper',
+                    'mapperClass' => 'Sample_Religion_Mapper',
                 ),
-                'objectPropertyName' => 'orientation',
+                'objectPropertyName' => 'religion',
                 'isNullable' => true,
-                'caption' => 'Sexual Orientation Id',
+                'caption' => 'Religion Id',
+            ),
+            'portraitId' => array (
+                'dataType' => 'int',
+                'controlType' => 'selectList',
+                'maxLength' => '10',
+                'dummyCaption' => '',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Records',
+                    'mapperClass' => 'Sample_Person_Photo_Mapper',
+                ),
+                'objectPropertyName' => 'protraitPersonPhoto',
+                'isNullable' => true,
+                'caption' => 'Portrait Id',
             ),
         );
     
@@ -181,43 +224,86 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         
     
     /**
-     * @return Sample_Orientation 
+     * @return Sample_Person_Photo 
      */
-    function getOrientation() {
-        if ($this->_orientation === false) {
+    function getProtraitPersonPhoto() {
+        if ($this->_protraitPersonPhoto === false) {
             $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_orientation');
+            $mapper->loadAssocFor($this, '_protraitPersonPhoto');
         }
-        return $this->_orientation;
+        return $this->_protraitPersonPhoto;
     }
     
     /**
-     * @param Sample_Orientation $orientation 
+     * @param Sample_Person_Photo $protraitPersonPhoto 
      */
-    function setOrientation($orientation) {
-        if ($orientation === false) $this->_orientation = false;
-        elseif ($orientation === null) $this->_orientation = null;
+    function setProtraitPersonPhoto($protraitPersonPhoto) {
+        if ($protraitPersonPhoto === false) $this->_protraitPersonPhoto = false;
+        elseif ($protraitPersonPhoto === null) $this->_protraitPersonPhoto = null;
         else {
-            if (!is_a($orientation, 'Sample_Orientation')) trigger_error('$orientation must be an instance of Sample_Orientation', E_USER_ERROR);
-            if (!is_object($this->_orientation) && !Ac_Util::sameObject($this->_orientation, $orientation)) { 
-                $this->_orientation = $orientation;
+            if (!is_a($protraitPersonPhoto, 'Sample_Person_Photo')) trigger_error('$protraitPersonPhoto must be an instance of Sample_Person_Photo', E_USER_ERROR);
+            if (!is_object($this->_protraitPersonPhoto) && !Ac_Util::sameObject($this->_protraitPersonPhoto, $protraitPersonPhoto)) { 
+                $this->_protraitPersonPhoto = $protraitPersonPhoto;
             }
         }
     }
     
-    function clearOrientation() {
-        $this->orientation = null;
+    function clearProtraitPersonPhoto() {
+        $this->protraitPersonPhoto = null;
     }
     
     /**
-     * @return Sample_Orientation  
+     * @return Sample_Person_Photo  
      */
-    function createOrientation($values = array(), $isReference = false) {
-        $m = $this->getMapper('Sample_Orientation_Mapper');
+    function createProtraitPersonPhoto($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Person_Photo_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
-        $this->setOrientation($res);
+        $this->setProtraitPersonPhoto($res);
+        return $res;
+    }
+    
+        
+    
+    /**
+     * @return Sample_Religion 
+     */
+    function getReligion() {
+        if ($this->_religion === false) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_religion');
+        }
+        return $this->_religion;
+    }
+    
+    /**
+     * @param Sample_Religion $religion 
+     */
+    function setReligion($religion) {
+        if ($religion === false) $this->_religion = false;
+        elseif ($religion === null) $this->_religion = null;
+        else {
+            if (!is_a($religion, 'Sample_Religion')) trigger_error('$religion must be an instance of Sample_Religion', E_USER_ERROR);
+            if (!is_object($this->_religion) && !Ac_Util::sameObject($this->_religion, $religion)) { 
+                $this->_religion = $religion;
+            }
+        }
+    }
+    
+    function clearReligion() {
+        $this->religion = null;
+    }
+    
+    /**
+     * @return Sample_Religion  
+     */
+    function createReligion($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Religion_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        if ($isReference) $res->_setIsReference(true);
+        $this->setReligion($res);
         return $res;
     }
     
@@ -298,6 +384,118 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $this->_tags = array();
         $this->_tagIds = false;
     }               
+
+    function countPersonAlbums() {
+        if (is_array($this->_personAlbums)) return count($this->_personAlbums);
+        if ($this->_personAlbumsCount === false) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocCountFor($this, '_personAlbums');
+        }
+        return $this->_personAlbumsCount;
+    }
+
+    function listPersonAlbums() {
+        if ($this->_personAlbums === false) {
+            $mapper = $this->getMapper();
+            $mapper->listAssocFor($this, '_personAlbums');
+        }
+        return array_keys($this->_personAlbums);
+    }
+    
+    /**
+     * @return Sample_Person_Album 
+     */
+    function getPersonAlbum($id) {
+        if ($this->_personAlbums === false) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_personAlbums');
+        }
+        if (!isset($this->_personAlbums[$id])) trigger_error ('No such Person album: \''.$id.'\'', E_USER_ERROR);
+        if ($this->_personAlbums[$id] === false) {
+        }
+        return $this->_personAlbums[$id];
+    }
+    
+    /**
+     * @param Sample_Person_Album $personAlbum 
+     */
+    function addPersonAlbum($personAlbum) {
+        if (!is_a($personAlbum, 'Sample_Person_Album')) trigger_error('$personAlbum must be an instance of Sample_Person_Album', E_USER_ERROR);
+        $this->listPersonAlbums();
+        $this->_personAlbums[] = $personAlbum;
+        
+        $personAlbum->_person = $this;
+        
+    }
+    
+    /**
+     * @return Sample_Person_Album  
+     */
+    function createPersonAlbum($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Person_Album_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        if ($isReference) $res->_setIsReference(true);
+        $this->addPersonAlbum($res);
+        return $res;
+    }
+    
+
+    function countPersonPhotos() {
+        if (is_array($this->_personPhotos)) return count($this->_personPhotos);
+        if ($this->_personPhotosCount === false) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocCountFor($this, '_personPhotos');
+        }
+        return $this->_personPhotosCount;
+    }
+
+    function listPersonPhotos() {
+        if ($this->_personPhotos === false) {
+            $mapper = $this->getMapper();
+            $mapper->listAssocFor($this, '_personPhotos');
+        }
+        return array_keys($this->_personPhotos);
+    }
+    
+    /**
+     * @return Sample_Person_Photo 
+     */
+    function getPersonPhoto($id) {
+        if ($this->_personPhotos === false) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_personPhotos');
+        }
+        if (!isset($this->_personPhotos[$id])) trigger_error ('No such Person photo: \''.$id.'\'', E_USER_ERROR);
+        if ($this->_personPhotos[$id] === false) {
+        }
+        return $this->_personPhotos[$id];
+    }
+    
+    /**
+     * @param Sample_Person_Photo $personPhoto 
+     */
+    function addPersonPhoto($personPhoto) {
+        if (!is_a($personPhoto, 'Sample_Person_Photo')) trigger_error('$personPhoto must be an instance of Sample_Person_Photo', E_USER_ERROR);
+        $this->listPersonPhotos();
+        $this->_personPhotos[] = $personPhoto;
+        
+        $personPhoto->_person = $this;
+        
+    }
+    
+    /**
+     * @return Sample_Person_Photo  
+     */
+    function createPersonPhoto($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Person_Photo_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        if ($isReference) $res->_setIsReference(true);
+        $this->addPersonPhoto($res);
+        return $res;
+    }
+    
 
     function countIncomingRelations() {
         if (is_array($this->_incomingRelations)) return count($this->_incomingRelations);
@@ -416,9 +614,14 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $res = parent::_storeReferencedRecords() !== false;
         $mapper = $this->getMapper();
 
-        if (is_object($this->_orientation)) {
-            $rel = $mapper->getRelation('_orientation');
-            if (!$this->_autoStoreReferenced($this->_orientation, $rel->fieldLinks, 'orientation')) $res = false;
+        if (is_object($this->_protraitPersonPhoto)) {
+            $rel = $mapper->getRelation('_protraitPersonPhoto');
+            if (!$this->_autoStoreReferenced($this->_protraitPersonPhoto, $rel->fieldLinks, 'protraitPersonPhoto')) $res = false;
+        }
+
+        if (is_object($this->_religion)) {
+            $rel = $mapper->getRelation('_religion');
+            if (!$this->_autoStoreReferenced($this->_religion, $rel->fieldLinks, 'religion')) $res = false;
         }
  
         return $res;
@@ -427,6 +630,16 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function _storeReferencingRecords() {
         $res = parent::_storeReferencingRecords() !== false;
         $mapper = $this->getMapper();
+
+        if (is_array($this->_personAlbums)) {
+            $rel = $mapper->getRelation('_personAlbums');
+            if (!$this->_autoStoreReferencing($this->_personAlbums, $rel->fieldLinks, 'personAlbums')) $res = false;
+        }
+
+        if (is_array($this->_personPhotos)) {
+            $rel = $mapper->getRelation('_personPhotos');
+            if (!$this->_autoStoreReferencing($this->_personPhotos, $rel->fieldLinks, 'personPhotos')) $res = false;
+        }
 
         if (is_array($this->_incomingRelations)) {
             $rel = $mapper->getRelation('_incomingRelations');
@@ -455,7 +668,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
  
     protected function intListReferenceFields() {
         $res = array (
-            'sexualOrientationId' => '_orientation',
+            'religionId' => '_religion',
         );
         return $res;
     }

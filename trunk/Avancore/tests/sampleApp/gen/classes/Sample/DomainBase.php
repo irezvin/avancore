@@ -4,17 +4,23 @@ abstract class Sample_DomainBase extends Ac_Application {
 
     protected function doGetMapperPrototypes() {
         return array (
-            'Sample_Orientation_Mapper' => array (
-                'class' => 'Sample_Orientation_Mapper',
-            ),
             'Sample_Person_Mapper' => array (
                 'class' => 'Sample_Person_Mapper',
+            ),
+            'Sample_Person_Album_Mapper' => array (
+                'class' => 'Sample_Person_Album_Mapper',
+            ),
+            'Sample_Person_Photo_Mapper' => array (
+                'class' => 'Sample_Person_Photo_Mapper',
             ),
             'Sample_Relation_Type_Mapper' => array (
                 'class' => 'Sample_Relation_Type_Mapper',
             ),
             'Sample_Relation_Mapper' => array (
                 'class' => 'Sample_Relation_Mapper',
+            ),
+            'Sample_Religion_Mapper' => array (
+                'class' => 'Sample_Religion_Mapper',
             ),
             'Sample_Tag_Mapper' => array (
                 'class' => 'Sample_Tag_Mapper',
@@ -32,17 +38,24 @@ abstract class Sample_DomainBase extends Ac_Application {
     }
     
     /**
-     * @return Sample_Orientation_Mapper 
-     */
-    function getSampleOrientationMapper() {
-        return $this->getMapper('Sample_Orientation_Mapper');
-    }
-    
-    /**
      * @return Sample_Person_Mapper 
      */
     function getSamplePersonMapper() {
         return $this->getMapper('Sample_Person_Mapper');
+    }
+    
+    /**
+     * @return Sample_Person_Album_Mapper 
+     */
+    function getSamplePersonAlbumMapper() {
+        return $this->getMapper('Sample_Person_Album_Mapper');
+    }
+    
+    /**
+     * @return Sample_Person_Photo_Mapper 
+     */
+    function getSamplePersonPhotoMapper() {
+        return $this->getMapper('Sample_Person_Photo_Mapper');
     }
     
     /**
@@ -57,6 +70,13 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function getSampleRelationMapper() {
         return $this->getMapper('Sample_Relation_Mapper');
+    }
+    
+    /**
+     * @return Sample_Religion_Mapper 
+     */
+    function getSampleReligionMapper() {
+        return $this->getMapper('Sample_Religion_Mapper');
     }
     
     /**
@@ -89,21 +109,6 @@ abstract class Sample_DomainBase extends Ac_Application {
     
  
     /**
-     * @return Sample_Orientation 
-     */
-    static function Sample_Orientation ($object = null) {
-        return $object;
-    }
-    
-    /**
-     * @return Sample_Orientation 
-     */
-    function createSampleOrientation () {
-        return $this->getMapper('Sample_Orientation_Mapper')->createRecord();
-    }
-    
- 
-    /**
      * @return Sample_Person 
      */
     static function Sample_Person ($object = null) {
@@ -115,6 +120,36 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function createSamplePerson () {
         return $this->getMapper('Sample_Person_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Person_Album 
+     */
+    static function Sample_Person_Album ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Person_Album 
+     */
+    function createSamplePersonAlbum () {
+        return $this->getMapper('Sample_Person_Album_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Person_Photo 
+     */
+    static function Sample_Person_Photo ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Person_Photo 
+     */
+    function createSamplePersonPhoto () {
+        return $this->getMapper('Sample_Person_Photo_Mapper')->createRecord();
     }
     
  
@@ -145,6 +180,21 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function createSampleRelation () {
         return $this->getMapper('Sample_Relation_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Religion 
+     */
+    static function Sample_Religion ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Religion 
+     */
+    function createSampleReligion () {
+        return $this->getMapper('Sample_Religion_Mapper')->createRecord();
     }
     
  

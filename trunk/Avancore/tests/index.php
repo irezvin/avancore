@@ -32,7 +32,7 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
     $classes = array();
     foreach ($files = glob(dirname(__FILE__).'/classes/Ac/Test/*.php') as $file) {
         $class = 'Ac_Test_'.basename($file, '.php');
-        if ($class !== 'Ac_Test_Base') $classes[] = $class;
+        if ($class !== 'Ac_Test_Base' && $class !== 'Ac_Test_Reporter') $classes[] = $class;
     }
     foreach ($classes as $class) $t->add($class);
 		

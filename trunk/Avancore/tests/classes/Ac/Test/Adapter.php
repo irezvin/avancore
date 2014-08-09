@@ -22,6 +22,8 @@ class Ac_Test_Adapter extends Ac_Test_Base {
             'envName' => 'test',
         ));
         
+        $this->assertEqual($adapter->getEnvName(), 'test', 'Adapter should have proper envName');
+        
         // Test auto-detection of config files
         
         $adapterFiles = array();
@@ -29,11 +31,13 @@ class Ac_Test_Adapter extends Ac_Test_Base {
             if (is_file($f)) $adapterFiles[] = realpath($f);
         }
         
-        if (!$this->assertEqual($configFilesToLoad, $adapterFiles)) {
-            var_dump($configFilesToLoad, $adapterFiles);
+        if (!$this->assertEqual($configFilesToLoad, $adapterFiles, 'Adapter should load proper config files in deploy/')) {
+            var_dump('Required: ', $configFilesToLoad, 'Current: ', $adapterFiles);
         }
         
 
+        
+        
         // Test config overwrite priority
         
         $this->assertEqual($adapter->getConfigValue('keyOverwrittenInEnvOptions'), 'Value of test.env.config.php');
@@ -63,15 +67,14 @@ class Ac_Test_Adapter extends Ac_Test_Base {
         // Test developer-specified directory validation
         
         $badPath = 'SomeNonExistentDir';
-        $fooAdapter = new Ac_Application_Adapter(array('appClassFile' => $appClassFile, 'varFlagsPath' => $badPath));
-        
+        $fooAdapter = new Ac_Application_Adapter(array('appClassFile' => $appClassFile, 'checkDirs' => true, 'varFlagsPath' => $badPath));
         $ex = false;
         try {
             $fooAdapter->getVarFlagsPath();
         } catch (Exception $e) {
             $ex = $e;
         }
-        $this->assertTrue($e instanceof Exception && preg_match('/not found/', $e->getMessage()));
+        $this->assertTrue($ex instanceof Exception && preg_match('/not found/', $ex->getMessage()));
         
         // Test disabled directory detection
         

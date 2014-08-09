@@ -1,9 +1,9 @@
 <?php
 
-class Sample_Orientation extends Sample_Orientation_Base_Object {
+class Sample_Religion extends Sample_Religion_Base_Object {
     
     /*
-    function getOwnPropertiesInfo() {
+    protected function getOwnPropertiesInfo() {
         return Ac_Util::m(parent::getOwnPropertiesInfo(), array(
             '' => array(
                 'caption' => '',
@@ -13,19 +13,19 @@ class Sample_Orientation extends Sample_Orientation_Base_Object {
         ));
     }
     
-    function listOwnProperties() {
+    protected function listOwnProperties() {
         return array_merge(parent::listOwnProperties(), array(
             '', '',
         ));
     }
     
-    function listOwnLists() {
+    protected function listOwnLists() {
         return array_merge(parent::listOwnLists(), array(
             '' => '', '' => '',
         ));
     }
     
-    function listOwnAssociations() {
+    protected function listOwnAssociations() {
         return array_merge(parent::listOwnAssociations(), array(
             '' => '', '' => '',
         ));

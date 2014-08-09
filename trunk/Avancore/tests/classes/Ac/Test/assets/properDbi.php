@@ -2,16 +2,16 @@
 
 $properDbi = array (
       'tables' => array (  
-          '#__orientation' => array (    
+          '#__religion' => array (    
               'columns' => array (      
-                  'sexualOrientationId' => array (        
+                  'religionId' => array (        
                       'type' => 'int',
                       'unsigned' => true,
                       'width' => '10',
                       'nullable' => false,
                       'default' => NULL,
                       'autoInc' => true,
-                      'name' => 'sexualOrientationId',
+                      'name' => 'religionId',
                   ),
                   'title' => array (        
                       'type' => 'varchar',
@@ -26,13 +26,13 @@ $properDbi = array (
                       'primary' => true,
                       'unique' => true,
                       'columns' => array (          
-                          1 => 'sexualOrientationId',
+                          1 => 'religionId',
                       ),
                       'name' => 'PRIMARY',
                   ),
                   'Index_2' => array (        
                       'primary' => false,
-                      'unique' => false,
+                      'unique' => true,
                       'columns' => array (          
                           1 => 'title',
                       ),
@@ -94,22 +94,22 @@ $properDbi = array (
                       'default' => 'CURRENT_TIMESTAMP',
                       'name' => 'createdTs',
                   ),
-                  'sexualOrientationId' => array (        
+                  'religionId' => array (        
                       'type' => 'int',
                       'unsigned' => true,
                       'width' => '10',
                       'nullable' => true,
                       'default' => NULL,
-                      'name' => 'sexualOrientationId',
+                      'name' => 'religionId',
                   ),
               ),
               'relations' => array (      
-                  'FK_ac_people_1' => array (        
-                      'table' => '#__orientation',
+                  'FK_ac_person_religion' => array (        
+                      'table' => '#__religion',
                       'columns' => array (          
-                          'sexualOrientationId' => 'sexualOrientationId',
+                          'religionId' => 'religionId',
                       ),
-                      'name' => 'FK_ac_people_1',
+                      'name' => 'FK_ac_person_religion',
                   ),
               ),
               'indexes' => array (      
@@ -125,7 +125,7 @@ $properDbi = array (
                       'primary' => false,
                       'unique' => false,
                       'columns' => array (          
-                          1 => 'sexualOrientationId',
+                          1 => 'religionId',
                       ),
                       'name' => 'FK_ac_people_1',
                   ),
