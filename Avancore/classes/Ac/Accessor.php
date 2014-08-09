@@ -177,7 +177,7 @@ class Ac_Accessor implements Ac_I_Accessor {
         } elseif ($propertyName instanceof Ac_I_Getter) {
             $res = $propertyName->get($item, $defaultValue);
         } elseif (is_array($item)) {
-            if (array_key_exists($propertyName, $item)) $res = $propertyName[$item];
+            if (array_key_exists($propertyName, $item)) $res = $item[$propertyName];
                 else $res = $defaultValue;
         } elseif (is_object($item)) {
             $args = explode(':', $propertyName);

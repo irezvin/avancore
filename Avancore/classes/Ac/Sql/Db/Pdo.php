@@ -98,7 +98,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     }
     
     protected function implValueQuote($value) {
-         return $this->pdo->quote($value);
+        return $this->pdo->quote($value);
     }
     
     protected function implNameQuote($name) {
@@ -124,20 +124,27 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
         foreach ($q->fetchAll($withNumericKeys? PDO::FETCH_BOTH : PDO::FETCH_ASSOC) as $row) {
             $r = $row;
             if ($withNumericKeys) $r = array_merge($r, array_values($row));
-            if ($keyColumn !== false) $key = $r[$keyColumn];
+            if ($keyColumn !== false && !is_array($keyColumn)) $key = $r[$keyColumn];
                 else $key++;
             $res[$key] = $r;
         }
+        if (is_array($keyColumn)) $res = $this->indexRows ($res, $keyColumn);
         return $res;
     }
     
     function fetchObjects($query, $keyColumn = false) {
         $res = array();
+        $kc = false;
+        if (is_array($keyColumn)) {
+            $kc = $keyColumn;
+            $keyColumn = false;
+        }
         foreach ($this->fetchArray($query, $keyColumn) as $key => $row) {
             $o = new stdClass();
             foreach ($row as $k => $v) $o->$k = $v;
             $res[$key] = $o;
         }
+        if ($kc) $res = $this->indexRows($res, $keyColumn);
         return $res;
     }
 
@@ -145,6 +152,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
         $res = $default; 
         $k = -1;
         $stmt = $this->queryPdo($query);
+        if (is_array($keyColumn)) throw new Exception("Array \$keyColumn is not supported by ".__METHOD__);
         while ($row = $stmt->fetch($withNumericKeys? PDO::FETCH_BOTH : PDO::FETCH_ASSOC)) {
             $r = $row;
             if ($keyColumn !== false) $k = $r[$keyColumn];
@@ -162,12 +170,16 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
         $res = array();
         $key = -1;
         $withNumericKeys = (is_numeric($colNo) && ($keyColumn === false || is_numeric($keyColumn)));
-        foreach ($this->queryPdo($query) as $row) {
-            $r = $row;
-            if ($withNumericKeys) $r = array_merge($r, array_values($row));
-            if ($keyColumn !== false) $key = $r[$keyColumn];
-                else $key++;
-            $res[$key] = $r[$colNo];
+        if (is_array($keyColumn)) {
+            $res = $this->indexRows($this->fetchArray($query), $keyColumn, $colNo);
+        } else {
+            foreach ($this->queryPdo($query) as $row) {
+                $r = $row;
+                if ($withNumericKeys) $r = array_merge($r, array_values($row));
+                if ($keyColumn !== false) $key = $r[$keyColumn];
+                    else $key++;
+                $res[$key] = $r[$colNo];
+            }
         }
         return $res;
     }
@@ -264,7 +276,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     /**
      * @param PDOStatement $resultResource
      */
-    function resultFetchAssocByTables($resultResource, array $fieldsInfo = array()) {
+    function resultFetchAssocByTables($resultResource, array & $fieldsInfo = array()) {
         $row = $resultResource->fetch(PDO::FETCH_NUM);
         if ($row === false) $res = $row;
         else {

@@ -2,6 +2,7 @@
 
 class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
 
+    public $_hasDefaults = true;
     public $id = NULL;
     public $leftCol = 0;
     public $rightCol = 1;
@@ -34,83 +35,83 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 'id', 'leftCol', 'rightCol', 'parentId', 'ordering', 'title', 'tag', 'ignore', 'depth', );
+        return array ( 0 => 'id', 1 => 'leftCol', 2 => 'rightCol', 3 => 'parentId', 4 => 'ordering', 5 => 'title', 6 => 'tag', 7 => 'ignore', 8 => 'depth', );
     }
     
     protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
-              'id' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'caption' => 'Id',
-              ),
-              'leftCol' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'caption' => 'Left Col',
-              ),
-              'rightCol' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'caption' => 'Right Col',
-              ),
-              'parentId' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'isNullable' => true,
-                  'caption' => 'Parent Id',
-              ),
-              'ordering' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'caption' => 'Ordering',
-              ),
-              'title' => array (
-                  'maxLength' => '255',
-                  'caption' => 'Title',
-              ),
-              'tag' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '11',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'isNullable' => true,
-                  'caption' => 'Tag',
-              ),
-              'ignore' => array (
-                  'dataType' => 'bool',
-                  'controlType' => 'selectList',
-                  'maxLength' => '1',
-                  'valueList' => array (
-                      0 => 'No',
-                      1 => 'Yes',
-                  ),
-                  'caption' => 'Ignore',
-              ),
-              'depth' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'caption' => 'Depth',
-              ),
+            'id' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'caption' => 'Id',
+            ),
+            'leftCol' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'caption' => 'Left Col',
+            ),
+            'rightCol' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'caption' => 'Right Col',
+            ),
+            'parentId' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'isNullable' => true,
+                'caption' => 'Parent Id',
+            ),
+            'ordering' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'caption' => 'Ordering',
+            ),
+            'title' => array (
+                'maxLength' => '255',
+                'caption' => 'Title',
+            ),
+            'tag' => array (
+                'dataType' => 'int',
+                'maxLength' => '11',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'isNullable' => true,
+                'caption' => 'Tag',
+            ),
+            'ignore' => array (
+                'dataType' => 'bool',
+                'controlType' => 'selectList',
+                'maxLength' => '1',
+                'valueList' => array (
+                    0 => 'No',
+                    1 => 'Yes',
+                ),
+                'caption' => 'Ignore',
+            ),
+            'depth' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'caption' => 'Depth',
+            ),
         );
     
         return $pi;

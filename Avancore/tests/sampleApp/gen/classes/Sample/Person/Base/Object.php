@@ -2,6 +2,7 @@
 
 class Sample_Person_Base_Object extends Ac_Model_Object {
 
+    public $_hasDefaults = true;
     public $_orientation = false;
     public $_tags = false;
     public $_tagsCount = false;
@@ -41,7 +42,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 'orientation', 'tags', 'tagIds', 'incomingRelations', 'outgoingRelations', 'personId', 'name', 'gender', 'isSingle', 'birthDate', 'lastUpdatedDatetime', 'createdTs', 'sexualOrientationId', );
+        return array ( 0 => 'orientation', 1 => 'tags', 2 => 'tagIds', 3 => 'incomingRelations', 4 => 'outgoingRelations', 5 => 'personId', 6 => 'name', 7 => 'gender', 8 => 'isSingle', 9 => 'birthDate', 10 => 'lastUpdatedDatetime', 11 => 'createdTs', 12 => 'sexualOrientationId', );
     }
  
     protected function listOwnLists() {
@@ -57,108 +58,117 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
-              'orientation' => array (
-                  'className' => 'Sample_Orientation',
-                  'mapperClass' => 'Sample_Orientation_Mapper',
-                  'caption' => 'Orientation',
-                  'relationId' => '_orientation',
-              ),
-              'tags' => array (
-                  'className' => 'Sample_Tag',
-                  'mapperClass' => 'Sample_Tag_Mapper',
-                  'caption' => 'Tags',
-                  'relationId' => '_tags',
-              ),
-              'tagIds' => array (
-                  'dataType' => 'int',
-                  'arrayValue' => true,
-                  'controlType' => 'selectList',
-                  'values' => array (
-                      'class' => 'Ac_Model_Values_Records',
-                      'mapperClass' => 'Sample_Tag_Mapper',
-                  ),
-                  'showInTable' => false,
-              ),
-              'incomingRelations' => array (
-                  'className' => 'Sample_Relation',
-                  'mapperClass' => 'Sample_Relation_Mapper',
-                  'otherModelIdInMethodsSingle' => 'incomingRelation',
-                  'otherModelIdInMethodsPlural' => 'incomingRelations',
-                  'caption' => 'Relations',
-                  'relationId' => '_incomingRelations',
-              ),
-              'outgoingRelations' => array (
-                  'className' => 'Sample_Relation',
-                  'mapperClass' => 'Sample_Relation_Mapper',
-                  'otherModelIdInMethodsSingle' => 'outgoingRelation',
-                  'otherModelIdInMethodsPlural' => 'outgoingRelations',
-                  'caption' => 'Relations',
-                  'relationId' => '_outgoingRelations',
-              ),
-              'personId' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'caption' => 'Person Id',
-              ),
-              'name' => array (
-                  'maxLength' => '255',
-                  'caption' => 'Name',
-              ),
-              'gender' => array (
-                  'controlType' => 'selectList',
-                  'valueList' => array (
-                      'F' => 'F',
-                      'M' => 'M',
-                  ),
-                  'caption' => 'Gender',
-              ),
-              'isSingle' => array (
-                  'dataType' => 'bool',
-                  'controlType' => 'selectList',
-                  'maxLength' => '1',
-                  'valueList' => array (
-                      0 => 'No',
-                      1 => 'Yes',
-                  ),
-                  'caption' => 'Is Single',
-              ),
-              'birthDate' => array (
-                  'dataType' => 'date',
-                  'controlType' => 'dateInput',
-                  'caption' => 'Birth Date',
-                  'internalDateFormat' => 'Y-m-d',
-                  'outputDateFormat' => 'Y-m-d',
-              ),
-              'lastUpdatedDatetime' => array (
-                  'dataType' => 'dateTime',
-                  'controlType' => 'dateInput',
-                  'isNullable' => true,
-                  'caption' => 'Last Updated Datetime',
-                  'internalDateFormat' => 'Y-m-d H:i:s',
-                  'outputDateFormat' => 'Y-m-d H:i:s',
-              ),
-              'createdTs' => array (
-                  'dataType' => 'timestamp',
-                  'controlType' => 'dateInput',
-                  'caption' => 'Created Ts',
-                  'internalDateFormat' => 'YmdHis',
-                  'outputDateFormat' => 'Y-m-d H:i:s',
-              ),
-              'sexualOrientationId' => array (
-                  'dataType' => 'int',
-                  'controlType' => 'selectList',
-                  'maxLength' => '10',
-                  'values' => array (
-                      'class' => 'Ac_Model_Values_Records',
-                      'mapperClass' => 'Sample_Orientation_Mapper',
-                  ),
-                  'objectPropertyName' => 'orientation',
-                  'isNullable' => true,
-                  'caption' => 'Sexual Orientation Id',
-              ),
+            'orientation' => array (
+                'className' => 'Sample_Orientation',
+                'mapperClass' => 'Sample_Orientation_Mapper',
+                'caption' => 'Orientation',
+                'relationId' => '_orientation',
+                'referenceVarName' => '_orientation',
+            ),
+            'tags' => array (
+                'className' => 'Sample_Tag',
+                'mapperClass' => 'Sample_Tag_Mapper',
+                'caption' => 'Tags',
+                'relationId' => '_tags',
+                'countVarName' => '_tagsCount',
+                'nnIdsVarName' => '_tagIds',
+                'referenceVarName' => '_tags',
+            ),
+            'tagIds' => array (
+                'dataType' => 'int',
+                'arrayValue' => true,
+                'controlType' => 'selectList',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Records',
+                    'mapperClass' => 'Sample_Tag_Mapper',
+                ),
+                'showInTable' => false,
+            ),
+            'incomingRelations' => array (
+                'className' => 'Sample_Relation',
+                'mapperClass' => 'Sample_Relation_Mapper',
+                'otherModelIdInMethodsSingle' => 'incomingRelation',
+                'otherModelIdInMethodsPlural' => 'incomingRelations',
+                'caption' => 'Relations',
+                'relationId' => '_incomingRelations',
+                'countVarName' => '_incomingRelationsCount',
+                'referenceVarName' => '_incomingRelations',
+            ),
+            'outgoingRelations' => array (
+                'className' => 'Sample_Relation',
+                'mapperClass' => 'Sample_Relation_Mapper',
+                'otherModelIdInMethodsSingle' => 'outgoingRelation',
+                'otherModelIdInMethodsPlural' => 'outgoingRelations',
+                'caption' => 'Relations',
+                'relationId' => '_outgoingRelations',
+                'countVarName' => '_outgoingRelationsCount',
+                'referenceVarName' => '_outgoingRelations',
+            ),
+            'personId' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'caption' => 'Person Id',
+            ),
+            'name' => array (
+                'maxLength' => '255',
+                'caption' => 'Name',
+            ),
+            'gender' => array (
+                'controlType' => 'selectList',
+                'valueList' => array (
+                    'F' => 'F',
+                    'M' => 'M',
+                ),
+                'caption' => 'Gender',
+            ),
+            'isSingle' => array (
+                'dataType' => 'bool',
+                'controlType' => 'selectList',
+                'maxLength' => '1',
+                'valueList' => array (
+                    0 => 'No',
+                    1 => 'Yes',
+                ),
+                'caption' => 'Is Single',
+            ),
+            'birthDate' => array (
+                'dataType' => 'date',
+                'controlType' => 'dateInput',
+                'caption' => 'Birth Date',
+                'internalDateFormat' => 'Y-m-d',
+                'outputDateFormat' => 'Y-m-d',
+            ),
+            'lastUpdatedDatetime' => array (
+                'dataType' => 'dateTime',
+                'controlType' => 'dateInput',
+                'isNullable' => true,
+                'caption' => 'Last Updated Datetime',
+                'internalDateFormat' => 'Y-m-d H:i:s',
+                'outputDateFormat' => 'Y-m-d H:i:s',
+            ),
+            'createdTs' => array (
+                'dataType' => 'timestamp',
+                'controlType' => 'dateInput',
+                'caption' => 'Created Ts',
+                'internalDateFormat' => 'YmdHis',
+                'outputDateFormat' => 'Y-m-d H:i:s',
+            ),
+            'sexualOrientationId' => array (
+                'dataType' => 'int',
+                'controlType' => 'selectList',
+                'maxLength' => '10',
+                'dummyCaption' => '',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Records',
+                    'mapperClass' => 'Sample_Orientation_Mapper',
+                ),
+                'objectPropertyName' => 'orientation',
+                'isNullable' => true,
+                'caption' => 'Sexual Orientation Id',
+            ),
         );
     
         return $pi;
@@ -445,7 +455,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
  
     protected function intListReferenceFields() {
         $res = array (
-              'sexualOrientationId' => '_orientation',
+            'sexualOrientationId' => '_orientation',
         );
         return $res;
     }

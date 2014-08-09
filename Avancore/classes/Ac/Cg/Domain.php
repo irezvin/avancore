@@ -201,6 +201,8 @@ class Ac_Cg_Domain {
     
     var $addSubsystemsToMapperMethods = true;
     
+    var $overrideTypesUsingDocBlocks = true;
+    
     protected $langStrings = array();
     
     /**

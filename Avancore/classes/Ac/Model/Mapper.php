@@ -84,6 +84,21 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * function onUpdated()
      */
     const EVENT_ON_UPDATED = 'onUpdated';
+    
+    /**
+     * function onGetRecordClasses(array & $classes, array $rows)
+     */
+    const EVENT_ON_GET_RECORD_CLASSES = 'onGetRecordClasses';
+    
+    /**
+     * function onBeforeLoadFromRows(array & $rows, array & $records)
+     */
+    const EVENT_ON_BEFORE_LOAD_FROM_ROWS = 'onBeforeLoadFromRows';
+    
+    /**
+     * function onAfterLoadFromRows(array $rows, array & $records)
+     */
+    const EVENT_ON_AFTER_LOAD_FROM_ROWS = 'onAfterLoadFromRows';
 
     protected $id = false;
     
@@ -106,7 +121,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
 
     var $tableName = null;
 
-    var $recordClass = 'Ac_Model_Object';
+    var $recordClass = 'Ac_Model_Record';
 
     var $pk = null;
     
@@ -118,6 +133,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     var $useRecordsCollection = false;
     
     var $nullableSqlColumns = array();
+    
+    /**
+     * @var array ('indexName' => array('fieldName1', 'fieldName2'), ...)
+     */
+    var $indexData = array();
      
     protected $recordsCollection = array();
     
@@ -136,11 +156,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @var array of Ac_Model_Relation
      */
     protected $relations = array();
-
-    /**
-     * @var array ('indexName' => array('fieldName1', 'fieldName2'), ...)
-     */
-    protected $indexData = false;
 
     var $useProto = false;
 
@@ -164,6 +179,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     protected $dateFormats = array();
     
     var $managerClass = false;    
+    
+    protected $defaultQualifier = false;
     
     protected $columnNames = false;
     
@@ -350,7 +367,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         foreach ($values as $k => $v) $res->{$k} = $v;
         return $res;
     }
-    
 
     function listRecords() {
         $res = $this->db->fetchColumn("SELECT ".$this->db->n($this->pk)."  FROM ".$this->db->n($this->tableName));
@@ -366,7 +382,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         } else $res = false;
         return $res;
     }
-
+    
     /**
      * Loads record(s) -- id can be an array
      * @return Ac_Model_Object
@@ -374,27 +390,21 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     function loadRecord($id) {
         $res = null;
         if (is_array($id) && count($id) == 1) $id = array_pop($id);
-        if (is_scalar($id) && strlen($id)) {
+        if (is_array($id)) {
+            $res = $this->loadRecordsArray($id);
+        } else {
             if ($this->useRecordsCollection && isset($this->recordsCollection[$id])) {
                 $res = $this->recordsCollection[$id];
             } else {
-                $sql = "SELECT * FROM ".$this->db->n($this->tableName)." WHERE ".$this->db->n($this->pk)." = ".$this->db->q($id);
+                $sql = "SELECT * FROM ".$this->db->n($this->tableName)." WHERE ".$this->db->n($this->pk)." = ".$this->db->q($id)." LIMIT 1";
                 $rows = $this->db->fetchArray($sql);
-                if ($rows && $arrayRow = $rows[0]) {
-                    $className = $this->getRecordClass ($arrayRow);
-                    $record = new $className($this);
-                    $record->load ($arrayRow, true);
+                if (count($rows)) {
+                    $objects = $this->loadFromRows($rows);
+                    $res = array_pop($objects);
+                    if ($this->useRecordsCollection) $this->recordsCollection[$id] = $res;
                 } else {
-                    $record = null;
+                    $res = null;
                 }
-                $res = $record;
-                if ($this->useRecordsCollection && $res) $this->recordsCollection[$id] = $res;
-            }
-        } else {
-            if (is_array($id)) {
-                $res = $this->loadRecordsArray($id);
-            } else {
-                trigger_error (__FILE__."::".__FUNCTION__."Unsupported \$id type: ".gettype($id).", scalar or array must be provided, ".Ac_Util::typeClass($id)." given", E_USER_ERROR);
             }
         }
         return $res;
@@ -403,25 +413,22 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     /**
      * @param array ids - Array of record identifiers
      */
-    function loadRecordsArray($ids, $keysToList = false, $ordering = false) {
+    function loadRecordsArray($ids, $keysToList = false) {
+        if (!is_bool($keysToList)) throw Ac_E_InvalidCall::wrongType ('$keysToList', $keysToList, 'bool');
         if (!is_array($ids)) trigger_error (__FILE__."::".__FUNCTION__.'$ids must be an array', E_USER_ERROR);
         if ($ids) {
             $where = $this->db->n($this->pk)." ".$this->db->eqCriterion($ids);
-            $recs = $this->loadRecordsByCriteria($where, true, $ordering);
+            $recs = $this->loadRecordsByCriteria($where, true);
             $res = array();
-
-
             /**
              * This helps to maintain records in order that was specified in $ids
              */
-            if ($ordering === false)
             foreach ($ids as $id) {
                 if (isset($recs[$id])) {
                     if ($keysToList) $res[$id] = $recs[$id];
                     else $res[] = $recs[$id];
                 }
             }
-            else $res = $recs;
 
         } else {
             $res = array();
@@ -430,18 +437,19 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     }
     
     /**
-     * Loads records into already loaded rows that reference current table' objects by the key
-     * Does not work with objects and will overwrite values in $src[$i][$valueProperty]
+     * Loads records into rows that reference current table' objects by primary key.
+     * Does not work with objects and will overwrite values in $src[$i][$valueProperty].
      * 
      * @param array $src Array of arrays
      * @param string $keyProperty Key in $src elements that contains record key
-     * @param string $valueProperty Key in $dest elements that will contain record
+     * @param string $valueProperty Key in $dest elements that will contain record (defaults to keyProperty)
      * @param mixed $def Value to use if related object isn't found
-     * @return array All objects loaded, indexed by their IDs (as in loadRecrodsArray())
+     * @return array All objects loaded, indexed by their IDs (as in loadRecordsArray())
      */
-    function loadObjectsColumn(& $src, $keyProperty, $valueProperty, $def = null) {
+    function loadObjectsColumn(& $src, $keyProperty, $valueProperty = false, $def = null) {
         $ids = array();
         $objects = array();
+        if ($valueProperty === false) $valueProperty = $keyProperty;
         foreach ($src as $v) if (isset($v[$keyProperty])) {
             $ids[] = $v[$keyProperty];
         }
@@ -462,8 +470,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * Returns first record in the resultset (returns NULL if there are no records)
      * @return Ac_Model_Object
      */
-    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false) {
-        $arr = $this->loadRecordsByCriteria($where, false, $order, $joins, $limitOffset, 1);
+    function loadFirstRecord($where = '', $order = '', $joins = '', 
+            $limitOffset = false, $tableAlias = false) {
+        $arr = $this->loadRecordsByCriteria($where, false, $order, $joins, $limitOffset, 1, $tableAlias);
         if (count($arr)) $res = $arr[0];
             else $res = null;
         return $res;
@@ -476,24 +485,88 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * 
      * @return Ac_Model_Object
      */
-    function loadSingleRecord($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false) {
-        $arr = $this->loadRecordsByCriteria($where, $order, $joins, $limitOffset, $limitCount);
+    function loadSingleRecord($where = '', $order = '', $joins = '', 
+        $limitOffset = false, $limitCount = false, $tableAlias = false) 
+    {
+        $arr = $this->loadRecordsByCriteria($where, false, $order, $joins, $limitOffset, $limitCount, $tableAlias);
         if (count($arr) == 1) $res = $arr[0];
             else $res = null;
         return $res;
     }
+    
+    protected function groupRowsByPks(array $rows) {
+        $pkData = array();
+        $uniqueRows = array();
+        foreach ($rows as $i => $row) {
+            $pk = $row[$this->pk];
+            $pkData[$i] = $pk;
+            if (!isset($uniqueRows[$pk])) {
+                $uniqueRows[$pk] = $row;
+            }
+        }
+        return array($pkData, $uniqueRows);
+    }
+    
+    protected function ungroupRowsByPks(array $pkData, array $records) {
+        $res = array();
+        foreach ($pkData as $id => $pk) {
+            $res[$id] = $records[$pk];
+        }
+        return $res;
+    }
 
     /**
-     * @param array $rows Array of associative DB rows
+     * @param array $objects Array of associative DB rows
      * @return array
      */
-    function loadFromRows(array $rows) {
+    final function loadFromRows(array $rows, $keysToList = false) {
+        $objects = array();
+        
+        list($pkData, $uniqueRows) = $this->groupRowsByPks($rows);
+        
+        if ($this->useRecordsCollection) {
+            foreach ($uniqueRows as $pk => $row) {
+                if (isset($this->recordsCollection[$row[$this->pk]])) {
+                    $objects[$pk] = $this->recordsCollection[$row[$this->pk]];
+                    unset($uniqueRows[$pk]);
+                } else {
+                    $objects[$pk] = null;
+                }
+            }
+        }
+        
+        $this->triggerEvent(self::EVENT_ON_BEFORE_LOAD_FROM_ROWS, array(& $uniqueRows, & $objects));
+        $c = $this->getRecordClasses($uniqueRows);
+        $loaded = $this->coreLoadFromRows($uniqueRows, $c);
+        $this->triggerEvent(self::EVENT_ON_AFTER_LOAD_FROM_ROWS, array($uniqueRows, & $loaded));
+        
+        foreach ($loaded as $pk => $record) 
+            $objects[$pk] = $record;
+        
+        if ($this->useRecordsCollection) {
+            foreach ($loaded as $pk => $record) {
+                $this->recordsCollection[$record->getPrimaryKey()] = $record;
+            }
+        }
+        
+        $res = $this->ungroupRowsByPks($pkData, $objects);
+        
+        if ($keysToList) $res = $this->indexObjects($res, $keysToList);
+        
+        return $res;
+    }
+
+    protected function coreLoadFromRows(array $rows, array $recordClasses) {
         $res = array();
-        $c = $this->recordClass;
         foreach ($rows as $i => $row) {
-            $rec = new $c ($this);
-            $rec->load($row, true);
-            $res[$i] = $rec;
+            if ($this->useRecordsCollection && isset($this->recordsCollection[$row[$this->pk]])) {
+                $res[$i] = $this->recordsCollection[$row[$this->pk]];
+            } else {
+                $class = $recordClasses[$i];
+                $rec = new $class ($this);
+                $rec->load($row, true);
+                $res[$i] = $rec;
+            }
         }
         return $res;
     }
@@ -509,67 +582,67 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         if (is_numeric($limitCount)) {
             $sql = $this->db->applyLimits($sql, $limitCount, $limitOffset, strlen($order)? $order : false);
         }
-        
+        $res = $this->loadFromRows($this->db->fetchArray($sql), $keysToList);
+        return $res;
+    }
+    
+    /**
+     * All-in-one function to hash array of the mapper' records by one ore several keys.
+     * 
+     * - keysToList($objects, true) returns array(pk => record)
+     * - leysToList($objects, false) returns $objects
+     * - keysToList($objects, array('field1', 'field2', ...) 
+     *   returns array(field1value => array(field2value => recordOrRecords))
+     *   where recordOrRecords is SINGLE object when val1, val2 uniquely identify the records
+     * - keysToList($objects, array('field1', 'field2', TRUE)) - last level will always be record
+     * - keysToList($objects, array('field1', 'field2', FALSE)) - last level will always be array of records
+     * 
+     * @param array $objects
+     * @param true|false|key|array $keysToList
+     * @return array sorted by keys (multi-dimensional if there are several keys or single key is not unique)
+     */
+    function indexObjects(array $objects, $keysToList = true) {
         $res = array();
-
-        foreach($this->db->fetchArray($sql) as $row) {
-            $recId = $row[$this->pk];
-
-            if ($this->useRecordsCollection && isset($this->recordsCollection[$recId])) {
-                $rec = $this->recordsCollection[$recId];
-            } else {
-                $className = $this->getRecordClass($row);
-                $rec = new $className ($this);
-                $rec->load($row, true);
-                if ($this->useRecordsCollection) $this->recordsCollection[$recId] = $rec;
-
+        if ($keysToList === false) {
+            
+        } elseif ($keysToList === true || $keysToList === $this->pk 
+            || is_array($keysToList) && array_values($keysToList) == array($this->pk)) 
+        {
+            foreach ($objects as $rec) {
+                $res[$rec->getPrimaryKey()] = $rec;
             }
-            if ($keysToList) {
-                $res[$rec->{$this->pk}] = $rec;
-            } else {
-                $res[] = $rec;
+        } else {
+            $keys = Ac_Util::toArray($keysToList);
+            if (count($keys) > 1) {
+                $tmp = $keys;
+                $last = array_pop($tmp);
+                if ($last === true) $unique = true;
+                else if ($last === false) $unique = false;
             }
+            if (isset($unique)) {
+                $keys = $tmp;
+            } else {
+                $unique = $this->identifiesRecordBy($keys);
+            }
+            $res = Ac_Util::indexArray($objects, $keys, $unique);
         }
         return $res;
     }
     
     function getRecordClass($row) {
-        $res = $this->recordClass;
+        $classes = $this->getRecordClasses(array($row));
+        return $classes[0];
+    }
+    
+    protected function coreGetRecordClasses(array $rows) {
+        $res = array();
+        foreach ($rows as $k => $v) $res[$k] = $this->recordClass;
         return $res;
     }
-
-    /**
-     * Helper function to create search criterias for Joomla searchbots
-     *
-     * @param string $searchText text to search (words are split by whitespace); false to turn the search off
-     * @param string $searchMode matching option (exact|any|all)
-     */
-
-    static function getSearchCriteria ($fieldNames, $searchText, $searchMode) {
-        if (!in_array($searchMode, array('exact', 'any', 'all'))) {
-            trigger_error ('Invalid searchMode, \'exact\'|\'any\'|\'all\' expected, assuming \'exact\'', E_USER_WARNING);
-            $searchMode = 'exact';
-        }
-
-        $where = array();
-        if ($searchMode == 'exact') {
-            foreach ($fieldNames as $fieldName) {
-                $where[] = " LOWER($fieldName) LIKE LOWER('%$searchText%') ";
-            }
-            $res = implode (' OR ', $where);
-        } else {
-            $words = preg_split('/\\s+/', $searchText);
-            $where2 = array();
-            foreach ($words as $word) {
-                foreach ($fieldNames as $fieldName) {
-                    $where2[] = " LOWER($fieldName) LIKE LOWER('%$searchText%') ";
-                }
-                $where[] = '('.implode (' OR ', $where2).')';
-            }
-            if ($searchMode == 'any') $res = implode(' OR ', $where);
-            else $res = implode(' AND ', $where);
-        }
-        if (strlen($res)) $res = '('.$res.')';
+    
+    final function getRecordClasses($rows) {
+        $res = $this->coreGetRecordClasses($rows);
+        $this->triggerEvent(self::EVENT_ON_GET_RECORD_CLASSES, array (& $res, $rows));
         return $res;
     }
 
@@ -647,13 +720,50 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
 
     // --------------------------- in-memory records registry functions ---------------------------
 
-    function memorize($record) {
+    function memorize(Ac_Model_Object $record) {
+        if ($record->getMapper() !== $this) 
+            throw new Ac_E_InvalidUsage("Record '".get_class($record)."' does not belong to mapper '"
+                .$this->getId ()."'");
+        
         $this->newRecords[$record->_imId] = $record;
     }
 
-    function forget($record) {
+    function forget(Ac_Model_Object $record) {
+        if ($record->getMapper() !== $this) 
+            throw new Ac_E_InvalidUsage("Record '".get_class($record)."' does not belong to mapper '"
+                .$this->getId ()."'");
+        
+        if (isset($this->recordsCollection[$pk = $record->getPrimaryKey()])) {
+            unset($this->recordsCollection[$pk]);
+        }
         if (isset($this->newRecords[$record->_imId])) {
             unset($this->newRecords[$record->_imId]);
+        }
+    }
+    
+    function notifyKeyAssigned(Ac_Model_Object $record) {
+        if ($record->getMapper() !== $this) 
+            throw new Ac_E_InvalidUsage("Record '".get_class($record)."' does not belong to mapper '"
+                .$this->getId ()."'");
+        
+        if (!isset($this->recordsCollection[$pk = $record->getPrimaryKey()])) {
+            $this->recordsCollection[$pk] = $record;
+        }
+        if (isset($this->newRecords[$record->_imId])) {
+            unset($this->newRecords[$record->_imId]);
+        }
+    }
+    
+    function clearCollection() {
+        $this->recordsCollection = array();
+    }
+    
+    function register(Ac_Model_Object $record) {
+        if ($record->getMapper() !== $this) 
+            throw new Ac_E_InvalidUsage("Record '".get_class($record)."' does not belong to mapper '"
+                .$this->getId ()."'");
+        if ($this->useRecordsCollection && $record->isPersistent()) {
+            $this->recordsCollection[$record->getPrimaryKey()] = $record;
         }
     }
 
@@ -707,7 +817,22 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     function getDefaultOrdering() {
         return false;
     }
+    
+    function setDefaultQualifier($defaultQualifier) {
+        if ($defaultQualifier !== ($oldDefaultQualifier = $this->defaultQualifier)) {
+            $this->defaultQualifier = $defaultQualifier;
+            $this->relations = array();
+        }
+        $this->defaultQualifier = $defaultQualifier;
+    }
 
+    function getDefaultQualifier() {
+        if ($this->defaultQualifier === true) {
+            return $this->pk;
+        }
+        return $this->defaultQualifier;
+    }
+    
     /**
      * @return array (array($pk1, $title1), array($pk2, $title2), ...)
      */
@@ -772,20 +897,20 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * Note: PRIMARY index (primary key) is also listed!
      */
     function listUniqueIndices() {
-        if ($this->indexData === false) $this->indexData = $this->doGetUniqueIndexData();
-        return array_keys($this->indexData);
+        return array_keys($this->getIndexData());
     }
 
     function listUniqueIndexFields($indexName) {
         if (!in_array($indexName, $this->listUniqueIndices())) trigger_error("No such index: '{$indexName}'", E_USER_ERROR);
-        return $this->indexData[$indexName];
+        $indexData = $this->getIndexData();
+        return $indexData[$indexName];
     }
 
     /**
      * @return array ('indexName' => array('fieldName1', 'fieldName2'), ...)
      */
-    protected function doGetUniqueIndexData() {
-        return array();
+    function getIndexData() {
+        return $this->indexData;
     }
     
     /**
@@ -800,10 +925,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @param array|string $fieldNameOrNames Names of fields to check
      */
     function identifiesRecordBy($fieldNameOrNames) {
-        if ($this->indexData === false) $this->indexData = $this->doGetUniqueIndexData();
+        $indexData = $this->getIndexData();
+        $indexData['PRIMARY'] = array($this->pk);
         if (!is_array($fieldNameOrNames)) $fieldNameOrNames = array($fieldNameOrNames);
         $res = false;
-        foreach ($this->indexData as $fieldsOfIndex) {
+        foreach ($indexData as $fieldsOfIndex) {
             if (!array_diff($fieldsOfIndex, $fieldNameOrNames)) {
                 $res = true;
                 break;
@@ -880,10 +1006,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     }
 
     function listIncomingRelations() {
-        if ($this->relationPrototypes === false) $this->relationPrototypes = $this->getRelationPrototypes();
-        $res = array();
-        foreach ($this->relationPrototypes as $n => $p) {
-            if (!isset($p['srcOutgoing']) || !$p['srcOutgoing']) $res[] = $n;
+        foreach ($this->listRelations() as $relId) {
+            $rel = $this->getRelation($relId);
+            if (!$rel->srcOutgoing) $res[] = $relId;
         }
         return $res;
     }
@@ -952,23 +1077,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         } else $res = $this->relations[$relId];
         return $res;
     }
-
-    // TODO: make this work!
-    /*
-     function loadRelationCascade($left, $relations) {
-     if (!is_array($relations)) $relations = array($relations);
-     $na = func_num_args();
-     if ($na > 2) for ($i = 2; $i < $na - 1; $i++) $relations[] = func_get_arg($i);
-     $m = $this;
-     $curr = $left;
-     foreach ($relations as $r) {
-     $relation = $m->getRelation($r);
-     $recs = $relation->loadDest($curr);
-     $curr = Ac_Util::flattenArray($recs);
-     $m = Ac_Model_Mapper::getMapper($relation->destMapperClass);
-     }
-     }
-     */
 
     protected function doGetRelationPrototypes() {
         return array();
@@ -1371,5 +1479,10 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         }
     }
     
+    function reset() {
+        $this->recordsCollection = array();
+        $this->newRecords = array();
+        $this->relations = array();
+    }
     
 }

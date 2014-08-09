@@ -114,7 +114,13 @@ class Ac_Test_Base extends UnitTestCase {
 			//if ($pathsToProtectRx && preg_match($pathsToProtectRx, $path)) var_dump($path);
 			if (!array_key_exists($key, $left) && !($pathsToProtectRx && preg_match($pathsToProtectRx, $path))) {
 				unset($r[$key]);
-			} elseif (is_array($r[$key]) && is_array($left[$key])) $r[$key] = $this->stripRightArrayToLeft($left[$key], $r[$key], $pathsToProtectRx, $path);
+			} elseif (is_array($r[$key]) && is_array($left[$key])) {
+                $r[$key] = $this->stripRightArrayToLeft($left[$key], $r[$key], $pathsToProtectRx, $path);
+            } elseif (is_array($left[$key]) && is_object($right[$key])) {
+                $r[$key] = Ac_Accessor::getObjectProperty($right[$key], array_keys($left[$key]));
+                $r[$key]['__class'] = get_class($right[$key]);
+            }
+            
 		}
 		return $r;
 	}

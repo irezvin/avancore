@@ -10,11 +10,11 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Orientation_Mapper'; 
 
-    var $columnNames = array ( 'sexualOrientationId', 'title', ); 
+    var $columnNames = array ( 0 => 'sexualOrientationId', 1 => 'title', ); 
 
     var $defaults = array (
-              'sexualOrientationId' => NULL,
-              'title' => NULL,
+            'sexualOrientationId' => NULL,
+            'title' => NULL,
         ); 
  
     
@@ -53,8 +53,8 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
      * Returns first record in the resultset (returns NULL if there are no records)
      * @return Sample_Orientation 
      */ 
-    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false) {
-        return parent::loadFirstRecord($where, $order, $joins, $limitOffset);
+    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false, $tableAlias = false) {
+        return parent::loadFirstRecord($where, $order, $joins, $limitOffset, $tableAlias);
     }
     
     /**
@@ -62,8 +62,8 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
      * (returns NULL if there are no records or there is more than one record)
      * @return Sample_Orientation 
      */ 
-    function loadSingleRecord($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false) {
-        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount);
+    function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
         
@@ -73,18 +73,18 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
                 
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-              '_people' => array (
-                  'srcMapperClass' => 'Sample_Orientation_Mapper',
-                  'destMapperClass' => 'Sample_Person_Mapper',
-                  'srcVarName' => '_people',
-                  'srcCountVarName' => '_peopleCount',
-                  'destVarName' => '_orientation',
-                  'fieldLinks' => array (
-                      'sexualOrientationId' => 'sexualOrientationId',
-                  ),
-                  'srcIsUnique' => true,
-                  'destIsUnique' => false,
-              ),
+            '_people' => array (
+                'srcMapperClass' => 'Sample_Orientation_Mapper',
+                'destMapperClass' => 'Sample_Person_Mapper',
+                'srcVarName' => '_people',
+                'srcCountVarName' => '_peopleCount',
+                'destVarName' => '_orientation',
+                'fieldLinks' => array (
+                    'sexualOrientationId' => 'sexualOrientationId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+            ),
         ));
         
     }
@@ -92,8 +92,8 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                  'singleCaption' => 'Orientation',
-                  'pluralCaption' => 'Orientation',
+                'singleCaption' => 'Orientation',
+                'pluralCaption' => 'Orientation',
             ),
             parent::doGetInfoParams()
         );
@@ -103,9 +103,9 @@ class Sample_Orientation_Base_Mapper extends Ac_Model_Mapper {
         
     protected function doGetUniqueIndexData() {
         return array (
-              'PRIMARY' => array (
-                  'sexualOrientationId',
-              ),
+            'PRIMARY' => array (
+                0 => 'sexualOrientationId',
+            ),
         );
     }
         

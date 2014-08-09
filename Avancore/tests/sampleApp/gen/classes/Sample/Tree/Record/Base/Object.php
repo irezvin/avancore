@@ -2,6 +2,7 @@
 
 class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
 
+    public $_hasDefaults = true;
     public $id = NULL;
     public $title = '';
     public $tag = NULL;
@@ -28,32 +29,32 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 'id', 'title', 'tag', );
+        return array ( 0 => 'id', 1 => 'title', 2 => 'tag', );
     }
     
     protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
-              'id' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'caption' => 'Id',
-              ),
-              'title' => array (
-                  'maxLength' => '255',
-                  'caption' => 'Title',
-              ),
-              'tag' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '11',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'isNullable' => true,
-                  'caption' => 'Tag',
-              ),
+            'id' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'caption' => 'Id',
+            ),
+            'title' => array (
+                'maxLength' => '255',
+                'caption' => 'Title',
+            ),
+            'tag' => array (
+                'dataType' => 'int',
+                'maxLength' => '11',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'isNullable' => true,
+                'caption' => 'Tag',
+            ),
         );
     
         return $pi;

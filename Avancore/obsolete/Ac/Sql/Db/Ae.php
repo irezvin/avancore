@@ -51,7 +51,8 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
     
     function fetchRow($query, $key = false, $keyColumn = false, $withNumericKeys = false, $default = false) {
-    	$rows = $this->fetchArray($query, $keyColumn, $withNumericKeys);
+        if (is_array($keyColumn)) throw new Exception("Array \$keyColumn is not supported by ".__METHOD__);
+        $rows = $this->fetchArray($query, $keyColumn, $withNumericKeys);
         $res = $default;
         if ($key === false) {
             $myRow = array_slice($rows, 0, 1);
@@ -70,11 +71,14 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
             $res = array();
             $r = $this->_aeDb->getResultResource(false);
             while($ass = $this->_aeDb->fetchBoth($r)) {
-                if ($keyColumn !== false) $key = $ass[$keyColumn]; else $key = count($res); 
+                if ($keyColumn !== false && !is_array($keyColumn)) 
+                    $key = $ass[$keyColumn]; 
+                else $key = count($res); 
                 $res[$key] = $ass;
             }
             $this->_aeDb->freeResultResource($r);
         }
+        if (is_array($keyColumn)) $res = $this->indexRows($keyColumn);
         return $res;
     }
     
@@ -82,16 +86,21 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
         $res = array();
         $this->_aeDb->setQuery($this->intPreProcessQuery($query));
         $res = $this->_aeDb->loadObjectList();
+        if ($keyColumn !== false) $res = $this->indexRows($res, $keyColumn);
         return $res;
     }
     
     function fetchColumn($query, $colNo = 0, $keyColumn = false) {
         $this->_aeDb->setQuery($this->intPreProcessQuery($query));
         $res = array();
-        foreach ($this->_aeDb->loadAssocList() as $ass) {
-            $ass = array_merge($ass, array_values($ass));
-            if ($keyColumn !== false) $key = $ass[$keyColumn]; else $key = count($res); 
-            $res[$key] = $ass[$colNo];
+        if (!is_array($keyColumn)) {
+            foreach ($this->_aeDb->loadAssocList() as $ass) {
+                $ass = array_merge($ass, array_values($ass));
+                if ($keyColumn !== false) $key = $ass[$keyColumn]; else $key = count($res); 
+                $res[$key] = $ass[$colNo];
+            }
+        } else {
+            $res = $this->indexRows($this->_aeDb->loadAssocList(), $keyColumn, $colNo);
         }
         return $res;
     }
@@ -170,7 +179,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
         return $this->_aeDb->getFieldsInfo($resultResource);
     }
     
-    function resultFetchAssocByTables($resultResource, array $fieldsInfo = array()) {
+    function resultFetchAssocByTables($resultResource, array & $fieldsInfo = array()) {
         if (!$fieldsInfo) $fieldsInfo = $this->resultGetFieldsInfo ($resultResource);
         return $this->_aeDb->fetchAssocByTables($resultResource, $fieldsInfo);
     }

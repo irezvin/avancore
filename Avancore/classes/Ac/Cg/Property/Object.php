@@ -391,10 +391,18 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         if ($relId !== false) {
             $prot = $this->_model->getAeModelRelationPrototype($relId);
             if (isset($prot['srcVarName'])) {
-                if ($many) 
+                if ($many) {
                     $res[$this->varName]['relationId'] = $prot['srcVarName'];
-                else 
+                    if (strlen($m = $this->getCountMemberName())) $res[$this->varName]['countVarName'] = $m;
+                    if (strlen($m = $this->getIdsMemberName())) $res[$this->varName]['nnIdsVarName'] = $m;
+                    $res[$this->varName]['referenceVarName'] = $prot['srcVarName'];
+                }
+                else {
                     $res['relationId'] = $prot['srcVarName'];
+                    if (strlen($m = $this->getCountMemberName())) $res['countVarName'] = $m;
+                    if (strlen($m = $this->getIdsMemberName())) $res['nnIdsVarName'] = $m;
+                    $res['referenceVarName'] = $prot['srcVarName'];
+                }
             }
         }
         return $res;

@@ -2,6 +2,7 @@ Avancore roadmap
 
 0.3.1 - now (Ac_Dispatcher deprecation) - check bugs and TAG it
 0.3.2 - extensibiltiy, step 1
+    - 	fix long-term bugs
     -   extensible model
     -   extensible sql schema
     -   extensible controller
@@ -10,9 +11,12 @@ Avancore roadmap
     -   CLI tool
     -   New & Old Controllers are friends
     -   Jooomla and Standalone skeletons
-    -   Support Config
     -   Simplify naming of controllers and templates
     -   Remove all language strings in "defines", switch to Ac_Lang_String
+    -   Practical modules:
+    	- support Config
+	- support User & Session
+	- support "Userstate"
 0.3.4 - more consistent OOP
     -   no public members, no "_" vars (compat. using magic)
     -   only exceptions, no trigger_errors
@@ -40,18 +44,20 @@ Avancore roadmap
     -   new admin
     -   no dependency on 'obsolete' dir
     -   locking support
-0.3.8 - 'modules' concept
-0.3.9 - version-driven app architecture
-0.3.10 - switch to phpUnit tests, better tests, CI
-0.3.11 - documentation, website
-0.3.12 - public release
+0.3.8 - switch to phpUnit tests, better tests, CI
+0.3.9 - documentation, website
+0.3.10 - public release
 
-0.4
+0.4x
+-   'modules' concept
+-   version-driven app architecture
 -   get rid of 'obsolete' dir
 -   namespaces
 -   remove all @deprecated
 -   model-sql separation
--   develop practical modules
+-   develop some more practical modules
 -   better developer tools
     -   netbeans plugins
     -   proper (Zend-Like codegen)
+
+

@@ -10,18 +10,18 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Relation_Mapper'; 
 
-    var $columnNames = array ( 'relationId', 'personId', 'otherPersonId', 'relationTypeId', 'relationBegin', 'relationEnd', 'notes', ); 
+    var $columnNames = array ( 0 => 'relationId', 1 => 'personId', 2 => 'otherPersonId', 3 => 'relationTypeId', 4 => 'relationBegin', 5 => 'relationEnd', 6 => 'notes', ); 
 
-    var $nullableSqlColumns = array ( 'relationBegin', 'relationEnd', ); 
+    var $nullableSqlColumns = array ( 0 => 'relationBegin', 1 => 'relationEnd', ); 
 
     var $defaults = array (
-              'relationId' => NULL,
-              'personId' => NULL,
-              'otherPersonId' => NULL,
-              'relationTypeId' => NULL,
-              'relationBegin' => NULL,
-              'relationEnd' => NULL,
-              'notes' => NULL,
+            'relationId' => NULL,
+            'personId' => NULL,
+            'otherPersonId' => NULL,
+            'relationTypeId' => NULL,
+            'relationBegin' => NULL,
+            'relationEnd' => NULL,
+            'notes' => NULL,
         ); 
  
     
@@ -60,8 +60,8 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
      * Returns first record in the resultset (returns NULL if there are no records)
      * @return Sample_Relation 
      */ 
-    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false) {
-        return parent::loadFirstRecord($where, $order, $joins, $limitOffset);
+    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false, $tableAlias = false) {
+        return parent::loadFirstRecord($where, $order, $joins, $limitOffset, $tableAlias);
     }
     
     /**
@@ -69,52 +69,52 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
      * (returns NULL if there are no records or there is more than one record)
      * @return Sample_Relation 
      */ 
-    function loadSingleRecord($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false) {
-        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount);
+    function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
                 
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-              '_relationType' => array (
-                  'srcMapperClass' => 'Sample_Relation_Mapper',
-                  'destMapperClass' => 'Sample_Relation_Type_Mapper',
-                  'srcVarName' => '_relationType',
-                  'destVarName' => '_relations',
-                  'destCountVarName' => '_relationsCount',
-                  'fieldLinks' => array (
-                      'relationTypeId' => 'relationTypeId',
-                  ),
-                  'srcIsUnique' => false,
-                  'destIsUnique' => true,
-                  'srcOutgoing' => true,
-              ),
-              '_otherPerson' => array (
-                  'srcMapperClass' => 'Sample_Relation_Mapper',
-                  'destMapperClass' => 'Sample_Person_Mapper',
-                  'srcVarName' => '_otherPerson',
-                  'destVarName' => '_incomingRelations',
-                  'destCountVarName' => '_incomingRelationsCount',
-                  'fieldLinks' => array (
-                      'otherPersonId' => 'personId',
-                  ),
-                  'srcIsUnique' => false,
-                  'destIsUnique' => true,
-                  'srcOutgoing' => true,
-              ),
-              '_person' => array (
-                  'srcMapperClass' => 'Sample_Relation_Mapper',
-                  'destMapperClass' => 'Sample_Person_Mapper',
-                  'srcVarName' => '_person',
-                  'destVarName' => '_outgoingRelations',
-                  'destCountVarName' => '_outgoingRelationsCount',
-                  'fieldLinks' => array (
-                      'personId' => 'personId',
-                  ),
-                  'srcIsUnique' => false,
-                  'destIsUnique' => true,
-                  'srcOutgoing' => true,
-              ),
+            '_relationType' => array (
+                'srcMapperClass' => 'Sample_Relation_Mapper',
+                'destMapperClass' => 'Sample_Relation_Type_Mapper',
+                'srcVarName' => '_relationType',
+                'destVarName' => '_relations',
+                'destCountVarName' => '_relationsCount',
+                'fieldLinks' => array (
+                    'relationTypeId' => 'relationTypeId',
+                ),
+                'srcIsUnique' => false,
+                'destIsUnique' => true,
+                'srcOutgoing' => true,
+            ),
+            '_otherPerson' => array (
+                'srcMapperClass' => 'Sample_Relation_Mapper',
+                'destMapperClass' => 'Sample_Person_Mapper',
+                'srcVarName' => '_otherPerson',
+                'destVarName' => '_incomingRelations',
+                'destCountVarName' => '_incomingRelationsCount',
+                'fieldLinks' => array (
+                    'otherPersonId' => 'personId',
+                ),
+                'srcIsUnique' => false,
+                'destIsUnique' => true,
+                'srcOutgoing' => true,
+            ),
+            '_person' => array (
+                'srcMapperClass' => 'Sample_Relation_Mapper',
+                'destMapperClass' => 'Sample_Person_Mapper',
+                'srcVarName' => '_person',
+                'destVarName' => '_outgoingRelations',
+                'destCountVarName' => '_outgoingRelationsCount',
+                'fieldLinks' => array (
+                    'personId' => 'personId',
+                ),
+                'srcIsUnique' => false,
+                'destIsUnique' => true,
+                'srcOutgoing' => true,
+            ),
         ));
         
     }
@@ -122,8 +122,8 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                  'singleCaption' => 'Relation',
-                  'pluralCaption' => 'Relations',
+                'singleCaption' => 'Relation',
+                'pluralCaption' => 'Relations',
             ),
             parent::doGetInfoParams()
         );
@@ -133,9 +133,9 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         
     protected function doGetUniqueIndexData() {
         return array (
-              'PRIMARY' => array (
-                  'relationId',
-              ),
+            'PRIMARY' => array (
+                0 => 'relationId',
+            ),
         );
     }
         

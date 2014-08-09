@@ -237,7 +237,7 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     abstract function resultGetFieldsInfo($resultResource);
     
-    abstract function resultFetchAssocByTables($resultResource, array $fieldsInfo = array());
+    abstract function resultFetchAssocByTables($resultResource, array & $fieldsInfo = array());
     
     abstract function resultFetchAssoc($resultResource);
     
@@ -371,6 +371,36 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
         }
         $this->nextQueryArgs = $args;
         return $this;
+    }
+    
+    /**
+     * Function to hash array of rows by one ore several keys.
+     * 
+     * - keysToList($records, array('field1', 'field2', true)) 
+     *   returns array(field1value => array(field2value => record))
+     * - keysToList($records, array('field1', 'field2', false)) 
+     *   or keysToList($records, array('field1', 'field2'))
+     *   returns array(field1value => array(field2value => records))
+     * - keysToList($records, array('field1', 'field2'), 'field3') 
+     *   returns array(field1value => array(field2value => field3value))
+     * - keysToList($records, array('field1', 'field2'), array('field3', 'field4')) 
+     *   returns [field1value => [field2value => ['field3' => field3value, 'field4' => field4value]]]
+     * 
+     * @param array $rows
+     * @param key|array $keys
+     * @param array|string valueToInsert Replace rows by subset of them or single value
+     * @return array sorted by keys (multi-dimensional if TRUE not provided)
+     */
+    function indexRows($rows, $keys, $valueToInsert = false) {
+        $tmpKeys = $keys;
+        $last = array_pop($tmpKeys);
+        if (count($tmpKeys) && ($last === true || $last === false)) {
+            $unique = $last;
+            $keys = $tmpKeys;
+        } else {
+            $unique = false;
+        }
+        return Ac_Util::indexArray($rows, $keys, $unique, $valueToInsert);
     }
     
 }

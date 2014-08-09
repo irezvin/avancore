@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Model_Object extends Ac_Model_Data {
+abstract class Ac_Model_Object extends Ac_Model_Data {
 
     const ACTUAL_REASON_LOAD = 1;
     
@@ -148,6 +148,8 @@ class Ac_Model_Object extends Ac_Model_Data {
     var $_isBeingCompared = false;
     
     var $_isDeleted = false;
+    
+    var $_hasDefaults = false;
 
     /**
      * Original primary key; is used (to check record persistance and correctly update and delete record) only if $this->tracksPk() returns TRUE.
@@ -341,7 +343,11 @@ class Ac_Model_Object extends Ac_Model_Data {
         $this->_tableName = $mapper->tableName;
      
         parent::__construct($prototype);
-               
+        
+        if (!$this->_hasDefaults) {
+            foreach ($mapper->getDefaults() as $k => $v) $this->$k = $v;
+        }
+        
         if ($this->tracksChanges()) $this->_memorizeFields();
         
         $this->doOnCreate();
@@ -387,7 +393,7 @@ class Ac_Model_Object extends Ac_Model_Data {
         if ($res) $this->doOnActual(self::ACTUAL_REASON_LOAD);
         if ($this->isPersistent()) {
             $m = $this->getMapper();
-            $m->forget($this);
+            $m->notifyKeyAssigned($this);
         }
         if ($this->tracksChanges()) $this->_memorizeFields();
         
@@ -478,7 +484,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                 $this->_checked = true; // otherwise next getErrors() will trigger check() which will clean this error message
             }
         } else {
-            $mapper->forget($this);
+            $mapper->notifyKeyAssigned($this);
             if (($t = $this->tracksChanges()) && ($t !== self::CHANGES_AFTER_SAVE)) $this->_memorizeFields();
         }
         return $res;
@@ -784,7 +790,7 @@ class Ac_Model_Object extends Ac_Model_Data {
                     }
                 }
             }
-            if ($this->isPersistent()) $m->forget($this);
+            if ($this->isPersistent()) $m->notifyKeyAssigned($this);
         }
         return $res;
     }

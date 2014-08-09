@@ -2,6 +2,7 @@
 
 class Sample_Relation_Base_Object extends Ac_Model_Object {
 
+    public $_hasDefaults = true;
     public $_relationType = false;
     public $_otherPerson = false;
     public $_person = false;
@@ -35,7 +36,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 'relationType', 'otherPerson', 'person', 'relationId', 'personId', 'otherPersonId', 'relationTypeId', 'relationBegin', 'relationEnd', 'notes', );
+        return array ( 0 => 'relationType', 1 => 'otherPerson', 2 => 'person', 3 => 'relationId', 4 => 'personId', 5 => 'otherPersonId', 6 => 'relationTypeId', 7 => 'relationBegin', 8 => 'relationEnd', 9 => 'notes', );
     }
     
  
@@ -45,89 +46,92 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
-              'relationType' => array (
-                  'className' => 'Sample_Relation_Type',
-                  'mapperClass' => 'Sample_Relation_Type_Mapper',
-                  'caption' => 'Relation type',
-                  'relationId' => '_relationType',
-              ),
-              'otherPerson' => array (
-                  'className' => 'Sample_Person',
-                  'mapperClass' => 'Sample_Person_Mapper',
-                  'otherModelIdInMethodsSingle' => 'otherPerson',
-                  'otherModelIdInMethodsPlural' => 'otherPeople',
-                  'caption' => 'People',
-                  'relationId' => '_otherPerson',
-              ),
-              'person' => array (
-                  'className' => 'Sample_Person',
-                  'mapperClass' => 'Sample_Person_Mapper',
-                  'otherModelIdInMethodsSingle' => 'person',
-                  'otherModelIdInMethodsPlural' => 'people',
-                  'caption' => 'People',
-                  'relationId' => '_person',
-              ),
-              'relationId' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'caption' => 'Relation Id',
-              ),
-              'personId' => array (
-                  'dataType' => 'int',
-                  'controlType' => 'selectList',
-                  'maxLength' => '10',
-                  'values' => array (
-                      'class' => 'Ac_Model_Values_Records',
-                      'mapperClass' => 'Sample_Person_Mapper',
-                  ),
-                  'objectPropertyName' => 'person',
-                  'caption' => 'Person Id',
-              ),
-              'otherPersonId' => array (
-                  'dataType' => 'int',
-                  'controlType' => 'selectList',
-                  'maxLength' => '10',
-                  'values' => array (
-                      'class' => 'Ac_Model_Values_Records',
-                      'mapperClass' => 'Sample_Person_Mapper',
-                  ),
-                  'objectPropertyName' => 'otherPerson',
-                  'caption' => 'Other Person Id',
-              ),
-              'relationTypeId' => array (
-                  'dataType' => 'int',
-                  'controlType' => 'selectList',
-                  'maxLength' => '10',
-                  'values' => array (
-                      'class' => 'Ac_Model_Values_Records',
-                      'mapperClass' => 'Sample_Relation_Type_Mapper',
-                  ),
-                  'objectPropertyName' => 'relationType',
-                  'caption' => 'Relation Type Id',
-              ),
-              'relationBegin' => array (
-                  'dataType' => 'dateTime',
-                  'controlType' => 'dateInput',
-                  'isNullable' => true,
-                  'caption' => 'Relation Begin',
-                  'internalDateFormat' => 'Y-m-d H:i:s',
-                  'outputDateFormat' => 'Y-m-d H:i:s',
-              ),
-              'relationEnd' => array (
-                  'dataType' => 'dateTime',
-                  'controlType' => 'dateInput',
-                  'isNullable' => true,
-                  'caption' => 'Relation End',
-                  'internalDateFormat' => 'Y-m-d H:i:s',
-                  'outputDateFormat' => 'Y-m-d H:i:s',
-              ),
-              'notes' => array (
-                  'controlType' => 'textArea',
-                  'caption' => 'Notes',
-              ),
+            'relationType' => array (
+                'className' => 'Sample_Relation_Type',
+                'mapperClass' => 'Sample_Relation_Type_Mapper',
+                'caption' => 'Relation type',
+                'relationId' => '_relationType',
+                'referenceVarName' => '_relationType',
+            ),
+            'otherPerson' => array (
+                'className' => 'Sample_Person',
+                'mapperClass' => 'Sample_Person_Mapper',
+                'otherModelIdInMethodsSingle' => 'otherPerson',
+                'otherModelIdInMethodsPlural' => 'otherPeople',
+                'caption' => 'People',
+                'relationId' => '_otherPerson',
+                'referenceVarName' => '_otherPerson',
+            ),
+            'person' => array (
+                'className' => 'Sample_Person',
+                'mapperClass' => 'Sample_Person_Mapper',
+                'otherModelIdInMethodsSingle' => 'person',
+                'otherModelIdInMethodsPlural' => 'people',
+                'caption' => 'People',
+                'relationId' => '_person',
+                'referenceVarName' => '_person',
+            ),
+            'relationId' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'caption' => 'Relation Id',
+            ),
+            'personId' => array (
+                'dataType' => 'int',
+                'controlType' => 'selectList',
+                'maxLength' => '10',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Records',
+                    'mapperClass' => 'Sample_Person_Mapper',
+                ),
+                'objectPropertyName' => 'person',
+                'caption' => 'Person Id',
+            ),
+            'otherPersonId' => array (
+                'dataType' => 'int',
+                'controlType' => 'selectList',
+                'maxLength' => '10',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Records',
+                    'mapperClass' => 'Sample_Person_Mapper',
+                ),
+                'objectPropertyName' => 'otherPerson',
+                'caption' => 'Other Person Id',
+            ),
+            'relationTypeId' => array (
+                'dataType' => 'int',
+                'controlType' => 'selectList',
+                'maxLength' => '10',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Records',
+                    'mapperClass' => 'Sample_Relation_Type_Mapper',
+                ),
+                'objectPropertyName' => 'relationType',
+                'caption' => 'Relation Type Id',
+            ),
+            'relationBegin' => array (
+                'dataType' => 'dateTime',
+                'controlType' => 'dateInput',
+                'isNullable' => true,
+                'caption' => 'Relation Begin',
+                'internalDateFormat' => 'Y-m-d H:i:s',
+                'outputDateFormat' => 'Y-m-d H:i:s',
+            ),
+            'relationEnd' => array (
+                'dataType' => 'dateTime',
+                'controlType' => 'dateInput',
+                'isNullable' => true,
+                'caption' => 'Relation End',
+                'internalDateFormat' => 'Y-m-d H:i:s',
+                'outputDateFormat' => 'Y-m-d H:i:s',
+            ),
+            'notes' => array (
+                'controlType' => 'textArea',
+                'caption' => 'Notes',
+            ),
         );
     
         return $pi;
@@ -292,9 +296,9 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
  
     protected function intListReferenceFields() {
         $res = array (
-              'relationTypeId' => '_relationType',
-              'otherPersonId' => '_otherPerson',
-              'personId' => '_person',
+            'relationTypeId' => '_relationType',
+            'otherPersonId' => '_otherPerson',
+            'personId' => '_person',
         );
         return $res;
     }
