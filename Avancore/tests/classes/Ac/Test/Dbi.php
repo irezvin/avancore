@@ -87,22 +87,17 @@ class Ac_Test_Dbi extends Ac_Test_Base {
 		$dbi = $this->createDbiDatabaseWithDefaultInspector();
 		$tested = $this->collectDbInfo($dbi);
 		$standard = $this->getSampleDbInfo();
-		//$foo = $this->stripRightArrayToLeft($tested, $standard, '~^/tables(/[^/]+)?$~');
-		//echo "<table><tr><td valign='top'>"; var_dump($tested); echo "</td><td valign='top'>"; var_dump($standard); echo "</td></tr></table>"; 
-		$this->assertTrue(isset($standard['tables']));
-		$this->assertEqual(count($standard['tables']), count($tested['tables']), 'Found table counts don\'t match: %s');
-		$this->assertArraysMatch($tested, $standard, 'Default DBI info does not match: %s', '~^/tables(/[^/]+)?$~');
+        foreach (array_keys($standard['tables']) as $t) unset($standard['tables'][$t]['relations']);
+		$this->assertTrue(isset($tested['tables']));
+        $this->assertArraysMatch($standard, $tested, 'Default DBI info does not match: %s');
 	}
 	
 	function testDbiWithMySql5Inspector() {
 		$dbi = $this->createDbiDatabaseWithMySql5Inspector();
 		$tested = $this->collectDbInfo($dbi);
 		$standard = $this->getSampleDbInfo();
-		//var_dump($tested);
-		//var_dump($this->exportArray($tested, 0, true, false, true));
-		$this->assertTrue(isset($standard['tables']));
-		$this->assertEqual(count($standard['tables']), count($tested['tables']), 'Found table counts don\'t match: %s');
-		$this->assertArraysMatch($tested, $standard, 'Default DBI info does not match: %s', '~^/tables(/[^/]+)?$~');
+		$this->assertTrue(isset($tested['tables']));
+        $this->assertArraysMatch($standard, $tested, 'Default DBI info does not match: %s');
 	}
 	
     function testAvancoreLegacy() {

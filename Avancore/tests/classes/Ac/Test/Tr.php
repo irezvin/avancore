@@ -33,7 +33,7 @@ class Ac_Test_Tr extends Ac_Test_Base {
                         'class' => 'Ac_Form_Control_Date',
                         'displayParent' => '/tabs/general',
                     ),
-                    'sexualOrientationId' => array(
+                    'religionId' => array(
                         'class' => 'Ac_Form_Control_List',
                         'displayParent' => '../tabs/intimate',
                         'displayOrder' => 2,
@@ -56,7 +56,7 @@ class Ac_Test_Tr extends Ac_Test_Base {
         return get_class($control).'#'.$control->name;
     }
     
-    function testFormTr() {
+    function _testFormTr() {
         $tf1 = $this->createTestForm1();
         $trs = new Tr_Scanner(new Tr_Forms_Scanner);
         $root = $trs->scan($tf1);
@@ -115,11 +115,11 @@ class Ac_Test_Tr extends Ac_Test_Base {
         $plan->beginStage(0);
         $plan->execute();
 
-        foreach ($root->findNodesByObjectProps(array()) as $node) {
+        /*foreach ($root->findNodesByObjectProps(array()) as $node) {
             $dom = $node->getResult()->getDomNode();
             if ($dom) var_dump(Ac_Util::typeClass($node)."\n".$dom->ownerDocument->saveHTML($dom));
                 else var_dump($node.': not found');
-        }
+        }*/
         /*var_dump($dom->ownerDocument->saveHTML($dom->parentNode));
         var_dump($dom->ownerDocument->saveHTML($dom->parentNode->parentNode));*/
     }

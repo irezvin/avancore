@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Mail_Sender_PHPMailer extends Ac_Prototyped implements Ac_I_Mail_Sender_WithDumps {
+abstract class Ac_Mail_Sender_PHPMailer extends Ac_Prototyped implements Ac_I_Mail_Sender_WithDump {
 
     protected $lastDumpFilePrefix = false;
 
@@ -14,7 +14,7 @@ abstract class Ac_Mail_Sender_PHPMailer extends Ac_Prototyped implements Ac_I_Ma
     /**
      * @var int
      */
-    protected $dumpMode = Ac_I_Mail_Sender_WithDumps::DUMP_ALL_IF_NO_SEND;
+    protected $dumpMode = Ac_I_Mail_Sender_WithDump::DUMP_ALL_IF_NO_SEND;
 
     /**
      * @var string

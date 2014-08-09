@@ -10,9 +10,9 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Person_Mapper'; 
 
-    var $columnNames = array ( 0 => 'personId', 1 => 'name', 2 => 'gender', 3 => 'isSingle', 4 => 'birthDate', 5 => 'lastUpdatedDatetime', 6 => 'createdTs', 7 => 'sexualOrientationId', ); 
+    var $columnNames = array ( 0 => 'personId', 1 => 'name', 2 => 'gender', 3 => 'isSingle', 4 => 'birthDate', 5 => 'lastUpdatedDatetime', 6 => 'createdTs', 7 => 'religionId', 8 => 'portraitId', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'lastUpdatedDatetime', 1 => 'sexualOrientationId', ); 
+    var $nullableSqlColumns = array ( 0 => 'lastUpdatedDatetime', 1 => 'religionId', 2 => 'portraitId', ); 
 
     var $defaults = array (
             'personId' => NULL,
@@ -22,7 +22,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
             'birthDate' => NULL,
             'lastUpdatedDatetime' => NULL,
             'createdTs' => 'CURRENT_TIMESTAMP',
-            'sexualOrientationId' => NULL,
+            'religionId' => NULL,
+            'portraitId' => NULL,
         ); 
  
     
@@ -77,14 +78,27 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_orientation' => array (
+            '_protraitPersonPhoto' => array (
                 'srcMapperClass' => 'Sample_Person_Mapper',
-                'destMapperClass' => 'Sample_Orientation_Mapper',
-                'srcVarName' => '_orientation',
+                'destMapperClass' => 'Sample_Person_Photo_Mapper',
+                'srcVarName' => '_protraitPersonPhoto',
+                'destVarName' => '_protraitPerson',
+                'fieldLinks' => array (
+                    'personId' => 'personId',
+                    'portraitId' => 'photoId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => true,
+                'srcOutgoing' => true,
+            ),
+            '_religion' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Religion_Mapper',
+                'srcVarName' => '_religion',
                 'destVarName' => '_people',
                 'destCountVarName' => '_peopleCount',
                 'fieldLinks' => array (
-                    'sexualOrientationId' => 'sexualOrientationId',
+                    'religionId' => 'religionId',
                 ),
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
@@ -108,6 +122,30 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'fieldLinks2' => array (
                     'idOfTag' => 'tagId',
                 ),
+            ),
+            '_personAlbums' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Person_Album_Mapper',
+                'srcVarName' => '_personAlbums',
+                'srcCountVarName' => '_personAlbumsCount',
+                'destVarName' => '_person',
+                'fieldLinks' => array (
+                    'personId' => 'personId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+            ),
+            '_personPhotos' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Person_Photo_Mapper',
+                'srcVarName' => '_personPhotos',
+                'srcCountVarName' => '_personPhotosCount',
+                'destVarName' => '_person',
+                'fieldLinks' => array (
+                    'personId' => 'personId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
             ),
             '_incomingRelations' => array (
                 'srcMapperClass' => 'Sample_Person_Mapper',
@@ -168,32 +206,63 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     }
     
     /**
-     * Returns (but not loads!) several people of given one or more orientation 
-     * @param Sample_Person|array $orientation     
+     * Returns (but not loads!) one or more people of given one or more personPhotos 
+     * @param Sample_Person|array $protraitPersonPhotos     
      * @return Sample_Person|array of Sample_Person objects  
      */
-    function getOfOrientation($orientation) {
-        $rel = $this->getRelation('_orientation');
-        $res = $rel->getSrc($orientation); 
+    function getOfProtraitPersonPhotos($protraitPersonPhotos) {
+        $rel = $this->getRelation('_protraitPersonPhoto');
+        $res = $rel->getSrc($protraitPersonPhotos); 
         return $res;
     }
     
     /**
-     * Loads several people of given one or more orientation 
-     * @param Sample_Orientation|array $orientation of Sample_Person objects
+     * Loads one or more people of given one or more personPhotos 
+     * @param Sample_Person_Photo|array $protraitPersonPhotos of Sample_Person objects
      
      */
-    function loadForOrientation($orientation) {
-        $rel = $this->getRelation('_orientation');
-        return $rel->loadSrc($orientation); 
+    function loadForProtraitPersonPhotos($protraitPersonPhotos) {
+        $rel = $this->getRelation('_protraitPersonPhoto');
+        return $rel->loadSrc($protraitPersonPhotos); 
     }
 
     /**
-     * Loads several orientation of given one or more people 
+     * Loads one or more personPhotos of given one or more people 
      * @param Sample_Person|array $people     
      */
-    function loadOrientationFor($people) {
-        $rel = $this->getRelation('_orientation');
+    function loadProtraitPersonPhotosFor($people) {
+        $rel = $this->getRelation('_protraitPersonPhoto');
+        return $rel->loadDest($people); 
+    }
+
+
+    /**
+     * Returns (but not loads!) several people of given one or more religion 
+     * @param Sample_Person|array $religion     
+     * @return Sample_Person|array of Sample_Person objects  
+     */
+    function getOfReligion($religion) {
+        $rel = $this->getRelation('_religion');
+        $res = $rel->getSrc($religion); 
+        return $res;
+    }
+    
+    /**
+     * Loads several people of given one or more religion 
+     * @param Sample_Religion|array $religion of Sample_Person objects
+     
+     */
+    function loadForReligion($religion) {
+        $rel = $this->getRelation('_religion');
+        return $rel->loadSrc($religion); 
+    }
+
+    /**
+     * Loads several religion of given one or more people 
+     * @param Sample_Person|array $people     
+     */
+    function loadReligionFor($people) {
+        $rel = $this->getRelation('_religion');
         return $rel->loadDest($people); 
     }
 
@@ -235,6 +304,68 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      function loadTagIdsFor($people) {
         $rel = $this->getRelation('_tags');
         return $rel->loadDestNNIds($people); 
+    }
+
+
+    /**
+     * Returns (but not loads!) one or more people of given one or more personAlbums 
+     * @param Sample_Person|array $personAlbums     
+     * @return array of Sample_Person objects  
+     */
+    function getOfPersonAlbums($personAlbums) {
+        $rel = $this->getRelation('_personAlbums');
+        $res = $rel->getSrc($personAlbums); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more people of given one or more personAlbums 
+     * @param Sample_Person_Album|array $personAlbums of Sample_Person objects
+     
+     */
+    function loadForPersonAlbums($personAlbums) {
+        $rel = $this->getRelation('_personAlbums');
+        return $rel->loadSrc($personAlbums); 
+    }
+
+    /**
+     * Loads one or more personAlbums of given one or more people 
+     * @param Sample_Person|array $people     
+     */
+    function loadPersonAlbumsFor($people) {
+        $rel = $this->getRelation('_personAlbums');
+        return $rel->loadDest($people); 
+    }
+
+
+    /**
+     * Returns (but not loads!) one or more people of given one or more personPhotos 
+     * @param Sample_Person|array $personPhotos     
+     * @return array of Sample_Person objects  
+     */
+    function getOfPersonPhotos($personPhotos) {
+        $rel = $this->getRelation('_personPhotos');
+        $res = $rel->getSrc($personPhotos); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more people of given one or more personPhotos 
+     * @param Sample_Person_Photo|array $personPhotos of Sample_Person objects
+     
+     */
+    function loadForPersonPhotos($personPhotos) {
+        $rel = $this->getRelation('_personPhotos');
+        return $rel->loadSrc($personPhotos); 
+    }
+
+    /**
+     * Loads one or more personPhotos of given one or more people 
+     * @param Sample_Person|array $people     
+     */
+    function loadPersonPhotosFor($people) {
+        $rel = $this->getRelation('_personPhotos');
+        return $rel->loadDest($people); 
     }
 
 

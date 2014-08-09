@@ -54,7 +54,7 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     
     protected $config = false;
     
-    protected $overrides = false;
+    protected $overrides = array();
     
     protected $envName = false;
     
@@ -63,6 +63,8 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     protected $services = array();
     
     protected $classesDir = false;
+    
+    protected $isConstructing = true;
     
     function getEnvName() {
         if ($this->envName === false) {
@@ -129,6 +131,7 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         }
         if (isset($options['class'])) unset($options['class']);
         $this->configFromInit = $options;
+        $this->isConstructing = false;
     }
     
     protected function intGetOverrides() {
@@ -190,10 +193,11 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
      * @param type $autoValue 
      */
     protected function detectDir($configKey, $autoValue) {
+        if (isset($this->overrides['varFlagsPath']) && $configKey == 'varFlagsPath') Ac_Debug::dd(''.new Exception);
         if (!isset($this->config[$configKey])) {
-            if (!$this->config['checkDirs'] || is_dir($autoValue)) $this->config[$configKey] = $autoValue;
+            if (!$this->checkDirs || is_dir($autoValue)) $this->config[$configKey] = $autoValue;
         } else {
-            if ($this->config['checkDirs']) {
+            if ($this->checkDirs) {
                 if (is_array($this->config[$configKey])) {
                     foreach ($this->config[$configKey] as $i => $dir) {
                         if (!is_dir($dir))
@@ -317,6 +321,7 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     
     protected function intGetConfigValue($option, $fromFun = true) {
         $res = null;
+        if (array_key_exists($option, $this->overrides)) return $this->overrides[$option];
         if ($fromFun) $option{0} = strtolower($option{0});
         if (method_exists($this, $m = 'doGet'.$option)) $res = $this->$m();
         if (is_null($res)) {
@@ -533,6 +538,9 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     }
     
     function __isset($varName) {
+        // to avoid calling getConfigValue() during constructor phase
+        if ($this->isConstructing) return false; 
+        
         return $this->getConfigValue($varName, null) !== null;
     }
     

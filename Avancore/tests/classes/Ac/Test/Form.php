@@ -5,7 +5,7 @@ class Ac_Test_Form extends Ac_Test_Base {
     protected $bootSampleApp = true;
     
     function testErrorList () {
-        $person = Sample::getInstance()->getSamplePersonMapper()->factory();
+        $person = Sample::getInstance()->getSamplePersonMapper()->createRecord();
         $f = new Ac_Form(null, array(
             'controls' => array(
                 'errorList' => array(
@@ -77,7 +77,7 @@ class Ac_Test_Form extends Ac_Test_Base {
     }
     
     function testCreateForm() {
-        $p = Sample::getInstance()->getSamplePersonMapper()->factory();
+        $p = Sample::getInstance()->getSamplePersonMapper()->createRecord();
         $tf = $this->createTestForm1(array('model' => $p));
         $ctx = $tf->getContext();
         $ctx->updateData(array('name' => 'Name that user has entered'));
@@ -119,7 +119,7 @@ class Ac_Test_Form extends Ac_Test_Base {
                         'class' => 'Ac_Form_Control_Date',
                         'displayParent' => '/tabs/general',
                     ),
-                    'sexualOrientationId' => array(
+                    'religionId' => array(
                         'class' => 'Ac_Form_Control_List',
                         'displayParent' => '../tabs/intimate',
                         'displayOrder' => 2,
@@ -138,7 +138,7 @@ class Ac_Test_Form extends Ac_Test_Base {
         return $f1;
     }
     
-    function testFormTr() {
+    function _testFormTr() {
         $tf1 = $this->createTestForm1();
         $trs = new Tr_Scanner(new Tr_Forms_Scanner);
         $root = $trs->scan($tf1);

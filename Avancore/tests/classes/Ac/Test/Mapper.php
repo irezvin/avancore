@@ -6,7 +6,7 @@ require_once('simpletest/unit_tester.php');
 class Ac_Test_Mapper extends Ac_Test_Base {
 
     var $peopleCols = array(
-        'personId', 'name', 'gender', 'isSingle', 'birthDate', 'lastUpdatedDatetime', 'createdTs', 'sexualOrientationId'
+        'personId', 'name', 'gender', 'isSingle', 'birthDate', 'lastUpdatedDatetime', 'createdTs', 'religionId',  'portraitId'
     );
     
     function testMapper() {

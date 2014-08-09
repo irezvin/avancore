@@ -126,7 +126,9 @@ class Ac_Test_Base extends UnitTestCase {
 	}
 	
 	function assertArraysMatch($left, $right, $message = '%s', $exactItems = false) {
-		if ($exactItems !== true) $right = $this->stripRightArrayToLeft($left, $right, $exactItems); 
+		if ($exactItems !== true) {
+            $right = $this->stripRightArrayToLeft($left, $right, $exactItems); 
+        }
 		return $this->assertEqual($left, $right, $message);
 	}
     

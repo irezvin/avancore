@@ -5,15 +5,18 @@
       - *free foreign field*: is not part of PK or other FK, or has meta-property isRestricted == false
       - *restricted foreign field*: is part of PK or ther FK, or has meta-property isRestricted == true
     - [X] already implemented for single-field key
+    - [ ] we should report if field is part of foreign key
+      - [ ] Ac_Model_Mapper::getFkFieldsData()
+  	returns array ($fieldId => array($relId => array(
+              'objectProperty' => $objectProperty,
+              'isRestricted' => $isRestricted, 
+	      'otherFields' => array()
+        )))
     - [ ] should be converted to null if...
       - it is part of foreign key
       - is nullable and is "empty" (empty string, 0, '0')
 	- OR referenced object is set to NULL
       - this field is *free* (see above)
-    - [ ] we should report if field is part of foreign key
-      - [ ] report 'outgoingRelations' => array('relId1', 'relId2'...)
-      - [ ] intListReferenceFields() should use format 'field' => array('relationId' => 'objectPropertyName', ...)
-      - [ ] what should we do in that case? -- nullify
     - [ ] test cases
       - [ ] case A: field is an exact foreign key
       - [ ] case B: field is a PART of foreign key, other field is part of other FK or PK

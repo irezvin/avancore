@@ -63,7 +63,8 @@ class Ac_Test_RefChecker extends Ac_Test_Base {
 	
 	function testRefChecker() {
 		$rc = $this->createRefChecker();
-		$this->assertEqual(array_diff($rc->listTablesWithRelations(), array('#__people', '#__people_tags', '#__relations')), array());
+        
+		$this->assertTrue(!array_diff(array('#__people', '#__people_tags', '#__relations'), $rc->listTablesWithRelations()));
 		$select = $rc->createSelect('#__relations');
 		
 		$rightStatement = "
