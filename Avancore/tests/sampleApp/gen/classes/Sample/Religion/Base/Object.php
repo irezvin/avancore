@@ -1,17 +1,17 @@
 <?php
 
-class Sample_Orientation_Base_Object extends Ac_Model_Object {
+class Sample_Religion_Base_Object extends Ac_Model_Object {
 
     public $_hasDefaults = true;
     public $_people = false;
     public $_peopleCount = false;
-    public $sexualOrientationId = NULL;
+    public $religionId = NULL;
     public $title = '';
     
-    var $_mapperClass = 'Sample_Orientation_Mapper';
+    var $_mapperClass = 'Sample_Religion_Mapper';
     
     /**
-     * @var Sample_Orientation_Mapper 
+     * @var Sample_Religion_Mapper 
      */
     protected $mapper = false;
 
@@ -23,14 +23,14 @@ class Sample_Orientation_Base_Object extends Ac_Model_Object {
     }
     
     /**
-     * @return Sample_Orientation_Mapper 
+     * @return Sample_Religion_Mapper 
      */
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'people', 1 => 'sexualOrientationId', 2 => 'title', );
+        return array ( 0 => 'people', 1 => 'religionId', 2 => 'title', );
     }
  
     protected function listOwnLists() {
@@ -54,13 +54,13 @@ class Sample_Orientation_Base_Object extends Ac_Model_Object {
                 'countVarName' => '_peopleCount',
                 'referenceVarName' => '_people',
             ),
-            'sexualOrientationId' => array (
+            'religionId' => array (
                 'dataType' => 'int',
                 'maxLength' => '10',
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Sexual Orientation Id',
+                'caption' => 'Religion Id',
             ),
             'title' => array (
                 'maxLength' => '45',
@@ -115,7 +115,7 @@ class Sample_Orientation_Base_Object extends Ac_Model_Object {
         $this->listPeople();
         $this->_people[] = $person;
         
-        $person->_orientation = $this;
+        $person->_religion = $this;
         
     }
     
