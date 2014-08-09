@@ -12,13 +12,10 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
         return true;
     }
     
-    function _setRef(& $dest, $varName, $ref) {
-        if (is_array($dest)) $dest[$varName] = $ref;
-        elseif (method_exists($dest, $setter = 'set'.$varName)) $dest->$setter($ref);
-        else $dest->$varName = $ref;
-    }
-    
-    function _setVal(& $dest, $varName, $val) {
+    function _setVal(& $dest, $varName, $val, $qualifier = false) {
+        if ($qualifier !== false && $qualifier !== null && is_array($val)) {
+            $val = Ac_Util::indexArray($val, $qualifier, true);
+        }
         if (is_array($dest)) $dest[$varName] = $val;
         elseif (method_exists($dest, $setter = 'set'.$varName)) $dest->$setter($val);
         else $dest->$varName = $val;
@@ -33,41 +30,47 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
      * @param bool $toIsArray - if $linkTo is an array of an objects or an arrays
      * @param bool $linkedIsUnique - whether we should replace $linkTo->varName or add to it ($linkTo->varName[]) 
      */
-    function _linkBack(& $linkTo, & $linked, $varName, $toIsArray, $linkedIsUnique) {
+    function _linkBack(& $linkTo, & $linked, $varName, $toIsArray, $linkedIsUnique, $qualifier = false, $qKey = null) {
+        if (is_null($qualifier)) $qualifier = false;
+        elseif ($qualifier !== false) {
+            if ($qKey === null) $qKey = Ac_Accessor::getObjectProperty ($linked, $qualifier, true);
+        }
         if ($toIsArray) {
             foreach (array_keys($linkTo) as $k) {
-                $lt = $linkTo[$k];
-                if (is_object($lt)) {
-                    if ($linkedIsUnique) {
-                        $lt->$varName = $linked;
-                    } else {
-                        if (!isset($lt->$varName) || !is_array($lt->$varName)) $lt->$varName = array();
-                        $lt->{$varName}[] = $linked;
-                    }
-                } elseif (is_array($lt)) {
-                    if ($linkedIsUnique) {
-                        $lt[$varName] = $linked;
-                    } else {
-                        if (!isset($lt[$varName]) || !is_array($lt[$varName])) $lt[$varName] = array();
-                        $lt[$varName][] = $linked;
-                    }
-                }
+                $this->_linkBack($linkTo[$k], $linked, $varName, false, $linkedIsUnique, $qualifier, $qKey);
             }
         } else {
-            $lt = $linkTo;
+            $lt = & $linkTo;
             if (is_object($lt)) {
                 if ($linkedIsUnique) {
                     $lt->$varName = $linked;
                 } else {
-                    if (!isset($lt->$varName) || !is_array($lt->$varName)) $lt->$varName = array();
-                    $lt->{$varName}[] = $linked;
+                    if (Ac_Accessor::methodExists($lt, $m = 'add'.ucfirst($varName))) {
+                        if ($qKey !== null) {
+                            $lt->$m($linked, $qKey);
+                        } else {
+                            $lt->$m($linked);
+                        }
+                    } else {
+                        if (!isset($lt->$varName) || !is_array($lt->$varName)) $lt->$varName = array();
+                        if ($qKey !== null) {
+                            $lt->{$varName}[$qKey] = $linked;
+                        } else {
+                            $lt->{$varName}[] = $linked;
+                        }
+                    }
                 }
             } elseif (is_array($lt)) {
                 if ($linkedIsUnique) {
                     $lt[$varName] = $linked;
                 } else {
                     if (!isset($lt[$varName]) || !is_array($lt[$varName])) $lt[$varName] = array();
-                    $lt[$varName][] = $linked;
+                    if ($qKey !== null) {
+                        $lt[$varName][$qKey] = $linked;
+                    } else {
+                        $lt[$varName][] = $linked;
+                    }
+                        
                 }
             }
         }
@@ -80,27 +83,6 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
             if (is_null($v) || $v === false) return false;
         }
         return true;
-    }
-    
-    function _recordInstance($row, $recordClass, $mapper) {
-        if ($recordClass) {
-            $res = new $recordClass($mapper);
-            $res->load($row, true);
-        } elseif ($recordClass === '') {
-            $res = $row;
-        } elseif ($mapper) {
-            //$res = new Nc_Element_Version;
-            $res = $mapper->createRecord($mapper->getRecordClass($row));
-            $res->load($row, true);
-        } else {
-            $res = $row;
-        }
-        return $res;
-    }
-    
-    function _rowInstance($row) {
-        $res = $row;
-        return $res;
     }
     
     function _putRowToArray(& $row, & $instance, & $array, $keys, $unique) {

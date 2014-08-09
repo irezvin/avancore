@@ -10,15 +10,15 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Tag_Mapper'; 
 
-    var $columnNames = array ( 'tagId', 'title', 'titleM', 'titleF', ); 
+    var $columnNames = array ( 0 => 'tagId', 1 => 'title', 2 => 'titleM', 3 => 'titleF', ); 
 
-    var $nullableSqlColumns = array ( 'titleM', 'titleF', ); 
+    var $nullableSqlColumns = array ( 0 => 'titleM', 1 => 'titleF', ); 
 
     var $defaults = array (
-              'tagId' => NULL,
-              'title' => NULL,
-              'titleM' => NULL,
-              'titleF' => NULL,
+            'tagId' => NULL,
+            'title' => NULL,
+            'titleM' => NULL,
+            'titleF' => NULL,
         ); 
  
     
@@ -57,8 +57,8 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
      * Returns first record in the resultset (returns NULL if there are no records)
      * @return Sample_Tag 
      */ 
-    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false) {
-        return parent::loadFirstRecord($where, $order, $joins, $limitOffset);
+    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false, $tableAlias = false) {
+        return parent::loadFirstRecord($where, $order, $joins, $limitOffset, $tableAlias);
     }
     
     /**
@@ -66,8 +66,8 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
      * (returns NULL if there are no records or there is more than one record)
      * @return Sample_Tag 
      */ 
-    function loadSingleRecord($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false) {
-        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount);
+    function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
         
@@ -77,25 +77,25 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-              '_people' => array (
-                  'srcMapperClass' => 'Sample_Tag_Mapper',
-                  'destMapperClass' => 'Sample_Person_Mapper',
-                  'srcVarName' => '_people',
-                  'srcNNIdsVarName' => '_personIds',
-                  'srcCountVarName' => '_peopleCount',
-                  'destVarName' => '_tags',
-                  'destCountVarName' => '_tagsCount',
-                  'destNNIdsVarName' => '_tagIds',
-                  'fieldLinks' => array (
-                      'tagId' => 'idOfTag',
-                  ),
-                  'srcIsUnique' => false,
-                  'destIsUnique' => false,
-                  'midTableName' => '#__people_tags',
-                  'fieldLinks2' => array (
-                      'idOfPerson' => 'personId',
-                  ),
-              ),
+            '_people' => array (
+                'srcMapperClass' => 'Sample_Tag_Mapper',
+                'destMapperClass' => 'Sample_Person_Mapper',
+                'srcVarName' => '_people',
+                'srcNNIdsVarName' => '_personIds',
+                'srcCountVarName' => '_peopleCount',
+                'destVarName' => '_tags',
+                'destCountVarName' => '_tagsCount',
+                'destNNIdsVarName' => '_tagIds',
+                'fieldLinks' => array (
+                    'tagId' => 'idOfTag',
+                ),
+                'srcIsUnique' => false,
+                'destIsUnique' => false,
+                'midTableName' => '#__people_tags',
+                'fieldLinks2' => array (
+                    'idOfPerson' => 'personId',
+                ),
+            ),
         ));
         
     }
@@ -103,8 +103,8 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                  'singleCaption' => 'Tag',
-                  'pluralCaption' => 'Tags',
+                'singleCaption' => 'Tag',
+                'pluralCaption' => 'Tags',
             ),
             parent::doGetInfoParams()
         );
@@ -114,12 +114,12 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         
     protected function doGetUniqueIndexData() {
         return array (
-              'PRIMARY' => array (
-                  'tagId',
-              ),
-              'Index_2' => array (
-                  'title',
-              ),
+            'PRIMARY' => array (
+                0 => 'tagId',
+            ),
+            'Index_2' => array (
+                0 => 'title',
+            ),
         );
     }
         

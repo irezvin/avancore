@@ -10,19 +10,19 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Person_Mapper'; 
 
-    var $columnNames = array ( 'personId', 'name', 'gender', 'isSingle', 'birthDate', 'lastUpdatedDatetime', 'createdTs', 'sexualOrientationId', ); 
+    var $columnNames = array ( 0 => 'personId', 1 => 'name', 2 => 'gender', 3 => 'isSingle', 4 => 'birthDate', 5 => 'lastUpdatedDatetime', 6 => 'createdTs', 7 => 'sexualOrientationId', ); 
 
-    var $nullableSqlColumns = array ( 'lastUpdatedDatetime', 'sexualOrientationId', ); 
+    var $nullableSqlColumns = array ( 0 => 'lastUpdatedDatetime', 1 => 'sexualOrientationId', ); 
 
     var $defaults = array (
-              'personId' => NULL,
-              'name' => NULL,
-              'gender' => 'F',
-              'isSingle' => '1',
-              'birthDate' => NULL,
-              'lastUpdatedDatetime' => NULL,
-              'createdTs' => 'CURRENT_TIMESTAMP',
-              'sexualOrientationId' => NULL,
+            'personId' => NULL,
+            'name' => NULL,
+            'gender' => 'F',
+            'isSingle' => '1',
+            'birthDate' => NULL,
+            'lastUpdatedDatetime' => NULL,
+            'createdTs' => 'CURRENT_TIMESTAMP',
+            'sexualOrientationId' => NULL,
         ); 
  
     
@@ -61,8 +61,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      * Returns first record in the resultset (returns NULL if there are no records)
      * @return Sample_Person 
      */ 
-    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false) {
-        return parent::loadFirstRecord($where, $order, $joins, $limitOffset);
+    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false, $tableAlias = false) {
+        return parent::loadFirstRecord($where, $order, $joins, $limitOffset, $tableAlias);
     }
     
     /**
@@ -70,69 +70,69 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      * (returns NULL if there are no records or there is more than one record)
      * @return Sample_Person 
      */ 
-    function loadSingleRecord($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false) {
-        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount);
+    function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
                 
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-              '_orientation' => array (
-                  'srcMapperClass' => 'Sample_Person_Mapper',
-                  'destMapperClass' => 'Sample_Orientation_Mapper',
-                  'srcVarName' => '_orientation',
-                  'destVarName' => '_people',
-                  'destCountVarName' => '_peopleCount',
-                  'fieldLinks' => array (
-                      'sexualOrientationId' => 'sexualOrientationId',
-                  ),
-                  'srcIsUnique' => false,
-                  'destIsUnique' => true,
-                  'srcOutgoing' => true,
-              ),
-              '_tags' => array (
-                  'srcMapperClass' => 'Sample_Person_Mapper',
-                  'destMapperClass' => 'Sample_Tag_Mapper',
-                  'srcVarName' => '_tags',
-                  'srcNNIdsVarName' => '_tagIds',
-                  'srcCountVarName' => '_tagsCount',
-                  'destVarName' => '_people',
-                  'destCountVarName' => '_peopleCount',
-                  'destNNIdsVarName' => '_personIds',
-                  'fieldLinks' => array (
-                      'personId' => 'idOfPerson',
-                  ),
-                  'srcIsUnique' => false,
-                  'destIsUnique' => false,
-                  'midTableName' => '#__people_tags',
-                  'fieldLinks2' => array (
-                      'idOfTag' => 'tagId',
-                  ),
-              ),
-              '_incomingRelations' => array (
-                  'srcMapperClass' => 'Sample_Person_Mapper',
-                  'destMapperClass' => 'Sample_Relation_Mapper',
-                  'srcVarName' => '_incomingRelations',
-                  'srcCountVarName' => '_incomingRelationsCount',
-                  'destVarName' => '_otherPerson',
-                  'fieldLinks' => array (
-                      'personId' => 'otherPersonId',
-                  ),
-                  'srcIsUnique' => true,
-                  'destIsUnique' => false,
-              ),
-              '_outgoingRelations' => array (
-                  'srcMapperClass' => 'Sample_Person_Mapper',
-                  'destMapperClass' => 'Sample_Relation_Mapper',
-                  'srcVarName' => '_outgoingRelations',
-                  'srcCountVarName' => '_outgoingRelationsCount',
-                  'destVarName' => '_person',
-                  'fieldLinks' => array (
-                      'personId' => 'personId',
-                  ),
-                  'srcIsUnique' => true,
-                  'destIsUnique' => false,
-              ),
+            '_orientation' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Orientation_Mapper',
+                'srcVarName' => '_orientation',
+                'destVarName' => '_people',
+                'destCountVarName' => '_peopleCount',
+                'fieldLinks' => array (
+                    'sexualOrientationId' => 'sexualOrientationId',
+                ),
+                'srcIsUnique' => false,
+                'destIsUnique' => true,
+                'srcOutgoing' => true,
+            ),
+            '_tags' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Tag_Mapper',
+                'srcVarName' => '_tags',
+                'srcNNIdsVarName' => '_tagIds',
+                'srcCountVarName' => '_tagsCount',
+                'destVarName' => '_people',
+                'destCountVarName' => '_peopleCount',
+                'destNNIdsVarName' => '_personIds',
+                'fieldLinks' => array (
+                    'personId' => 'idOfPerson',
+                ),
+                'srcIsUnique' => false,
+                'destIsUnique' => false,
+                'midTableName' => '#__people_tags',
+                'fieldLinks2' => array (
+                    'idOfTag' => 'tagId',
+                ),
+            ),
+            '_incomingRelations' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Relation_Mapper',
+                'srcVarName' => '_incomingRelations',
+                'srcCountVarName' => '_incomingRelationsCount',
+                'destVarName' => '_otherPerson',
+                'fieldLinks' => array (
+                    'personId' => 'otherPersonId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+            ),
+            '_outgoingRelations' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Relation_Mapper',
+                'srcVarName' => '_outgoingRelations',
+                'srcCountVarName' => '_outgoingRelationsCount',
+                'destVarName' => '_person',
+                'fieldLinks' => array (
+                    'personId' => 'personId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+            ),
         ));
         
     }
@@ -140,8 +140,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                  'singleCaption' => 'People',
-                  'pluralCaption' => 'People',
+                'singleCaption' => 'People',
+                'pluralCaption' => 'People',
             ),
             parent::doGetInfoParams()
         );
@@ -151,9 +151,9 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
         
     protected function doGetUniqueIndexData() {
         return array (
-              'PRIMARY' => array (
-                  'personId',
-              ),
+            'PRIMARY' => array (
+                0 => 'personId',
+            ),
         );
     }
         

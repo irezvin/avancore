@@ -10,12 +10,12 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Relation_Type_Mapper'; 
 
-    var $columnNames = array ( 'relationTypeId', 'title', 'isSymmetrical', ); 
+    var $columnNames = array ( 0 => 'relationTypeId', 1 => 'title', 2 => 'isSymmetrical', ); 
 
     var $defaults = array (
-              'relationTypeId' => NULL,
-              'title' => NULL,
-              'isSymmetrical' => '0',
+            'relationTypeId' => NULL,
+            'title' => NULL,
+            'isSymmetrical' => '0',
         ); 
  
     
@@ -54,8 +54,8 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
      * Returns first record in the resultset (returns NULL if there are no records)
      * @return Sample_Relation_Type 
      */ 
-    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false) {
-        return parent::loadFirstRecord($where, $order, $joins, $limitOffset);
+    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false, $tableAlias = false) {
+        return parent::loadFirstRecord($where, $order, $joins, $limitOffset, $tableAlias);
     }
     
     /**
@@ -63,8 +63,8 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
      * (returns NULL if there are no records or there is more than one record)
      * @return Sample_Relation_Type 
      */ 
-    function loadSingleRecord($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false) {
-        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount);
+    function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
         
@@ -74,18 +74,18 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
                 
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-              '_relations' => array (
-                  'srcMapperClass' => 'Sample_Relation_Type_Mapper',
-                  'destMapperClass' => 'Sample_Relation_Mapper',
-                  'srcVarName' => '_relations',
-                  'srcCountVarName' => '_relationsCount',
-                  'destVarName' => '_relationType',
-                  'fieldLinks' => array (
-                      'relationTypeId' => 'relationTypeId',
-                  ),
-                  'srcIsUnique' => true,
-                  'destIsUnique' => false,
-              ),
+            '_relations' => array (
+                'srcMapperClass' => 'Sample_Relation_Type_Mapper',
+                'destMapperClass' => 'Sample_Relation_Mapper',
+                'srcVarName' => '_relations',
+                'srcCountVarName' => '_relationsCount',
+                'destVarName' => '_relationType',
+                'fieldLinks' => array (
+                    'relationTypeId' => 'relationTypeId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+            ),
         ));
         
     }
@@ -93,8 +93,8 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                  'singleCaption' => 'Relation type',
-                  'pluralCaption' => 'Relation types',
+                'singleCaption' => 'Relation type',
+                'pluralCaption' => 'Relation types',
             ),
             parent::doGetInfoParams()
         );
@@ -104,9 +104,9 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         
     protected function doGetUniqueIndexData() {
         return array (
-              'PRIMARY' => array (
-                  'relationTypeId',
-              ),
+            'PRIMARY' => array (
+                0 => 'relationTypeId',
+            ),
         );
     }
         

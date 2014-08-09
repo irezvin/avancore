@@ -2,6 +2,7 @@
 
 class Sample_Tag_Base_Object extends Ac_Model_Object {
 
+    public $_hasDefaults = true;
     public $_people = false;
     public $_peopleCount = false;
     public $_personIds = false;
@@ -32,7 +33,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 'people', 'personIds', 'tagId', 'title', 'titleM', 'titleF', );
+        return array ( 0 => 'people', 1 => 'personIds', 2 => 'tagId', 3 => 'title', 4 => 'titleM', 5 => 'titleF', );
     }
  
     protected function listOwnLists() {
@@ -48,44 +49,47 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
-              'people' => array (
-                  'className' => 'Sample_Person',
-                  'mapperClass' => 'Sample_Person_Mapper',
-                  'caption' => 'People',
-                  'relationId' => '_people',
-              ),
-              'personIds' => array (
-                  'dataType' => 'int',
-                  'arrayValue' => true,
-                  'controlType' => 'selectList',
-                  'values' => array (
-                      'class' => 'Ac_Model_Values_Records',
-                      'mapperClass' => 'Sample_Person_Mapper',
-                  ),
-                  'showInTable' => false,
-              ),
-              'tagId' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'caption' => 'Tag Id',
-              ),
-              'title' => array (
-                  'maxLength' => '45',
-                  'caption' => 'Title',
-              ),
-              'titleM' => array (
-                  'maxLength' => '45',
-                  'isNullable' => true,
-                  'caption' => 'Title M',
-              ),
-              'titleF' => array (
-                  'maxLength' => '45',
-                  'isNullable' => true,
-                  'caption' => 'Title F',
-              ),
+            'people' => array (
+                'className' => 'Sample_Person',
+                'mapperClass' => 'Sample_Person_Mapper',
+                'caption' => 'People',
+                'relationId' => '_people',
+                'countVarName' => '_peopleCount',
+                'nnIdsVarName' => '_personIds',
+                'referenceVarName' => '_people',
+            ),
+            'personIds' => array (
+                'dataType' => 'int',
+                'arrayValue' => true,
+                'controlType' => 'selectList',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Records',
+                    'mapperClass' => 'Sample_Person_Mapper',
+                ),
+                'showInTable' => false,
+            ),
+            'tagId' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'caption' => 'Tag Id',
+            ),
+            'title' => array (
+                'maxLength' => '45',
+                'caption' => 'Title',
+            ),
+            'titleM' => array (
+                'maxLength' => '45',
+                'isNullable' => true,
+                'caption' => 'Title M',
+            ),
+            'titleF' => array (
+                'maxLength' => '45',
+                'isNullable' => true,
+                'caption' => 'Title F',
+            ),
         );
     
         return $pi;

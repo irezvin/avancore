@@ -888,7 +888,7 @@ abstract class Ac_Util {
     			}
     		}
     		if (count($path)) self::simpleSetArrayByPath($res, $path, $item, $unique);
-    	}
+            }
     	return $res;
     }
     
@@ -1010,32 +1010,65 @@ abstract class Ac_Util {
     }
     
     /**
-     * Converts array(array('foo' => 'a'), array('foo' => 'b')) into array('a' => array('foo' => 'a'), 'b' => array('foo' => 'b'))
+     * Indexes array by keys and optionally replaces values by subset of them
      * 
-     * @param array $flatArray
-     * @param scalar|array $keyList
+     * Ac_Util::indexArray([['foo' => 'a'], ['foo' => 'b']], 'foo', true) 
+     *  will return ['a' => ['foo' => 'a'], 'b' => ['foo' => 'b']]
+     * 
+     * Ac_Util::indexArray([['foo' => 'a'], ['foo' => 'b']], 'foo', false) 
+     *  will return ['a' => [['foo' => 'a']], 'b' => [['foo' => 'b']]]
+     * 
+     * Ac_Util::indexArray([['foo' => 'a', 'bar' => 'b'], ['foo' => 'c', 'bar' => 'd'], ['foo', 'bar'], true)
+     *  will return ['a' => ['b' => ['foo' => 'a', 'bar' => 'b']], 'c' => ['d' => ['foo' => 'c', 'bar' => 'd']]]
+     * 
+     * Ac_Util::indexArray([['foo' => 'a', 'bar' => 'b'], ['foo' => 'c', 'bar' => 'd'], 'foo', true, 'bar')
+     *  will return array('a' => 'b', 'c' => 'd')
+     * 
+     * Ac_Util::indexArray([
+     *          ['foo' => 'a', 'bar' => 'b', 'baz' => 'c'], 
+     *          ['foo' => 'd', 'bar' => 'e', 'baz' => 'f'], 
+     *  ], 'foo', true, array('bar', 'baz')) 
+     *  will return ['a' => ['bar' => 'b', 'baz' => 'c'], ['bar' => 'e', 'baz' => 'f']]
+     * 
+     * @param array $flatArray Original array of members: arrays or objects
+     * @param scalar|array $keyList Keys to index array
+     * @param bool unique whether last level will be exact member of original list or array of members
+     * @param false|scalar|array $valueKeys if provided, members will be replaced by extracted keys' or
+     *      properties' values before placing into result array (scalar $valueKeys means sclar result member, 
+     *      array $valueKeys means always array result member)
+     * 
      */
-    static function indexArray(array $flatArray, $keyList, $unique = false) {
+    static function indexArray(array $flatArray, $keyList, $unique = false, $valueKeys = false) {
         $res = array();
         if (is_array($keyList) && count($keyList) == 1) $keyList = array_shift($keyList);
         if (!is_array($keyList)) {
             // simple version
             foreach ($flatArray as $v) {
-                if (is_object($v)) $k = Ac_Accessor::getObjectProperty($v, $keyList);
-                else $k = isset($v[$keyList])? $v[$keyList] : null;
+                if (is_object($v)) {
+                    $k = Ac_Accessor::getObjectProperty($v, $keyList);
+                }
+                else {
+                    $k = isset($v[$keyList])? $v[$keyList] : null;
+                }
+                if ($valueKeys !== false && !is_null($valueKeys))
+                    $v = Ac_Accessor::getObjectProperty($v, $valueKeys, null, true);
                 
                 if ($unique) $res[$k] = $v;
                 else $res[$k][] = $v;
             }
         } else {
             foreach ($flatArray as $v) {
-                if (is_object($v)) $path = array_values(Ac_Accessor::getObjectProperty($v, $keyList));
+                if (is_object($v)) {
+                    $path = array_values(Ac_Accessor::getObjectProperty($v, $keyList));
+                }
                 else {
                     $path = array();
                     foreach ($keyList as $i) if (isset($v[$i])) $path[] = $v[$i];
                         else $path[] = null;
                 }
-                self::simpleSetArrayByPathNoRef ($res, $path, $v, $unique);
+                if ($valueKeys !== false && !is_null($valueKeys))
+                    $v = Ac_Accessor::getObjectProperty($v, $valueKeys, null, true);
+                Ac_Util::simpleSetArrayByPathNoRef ($res, $path, $v, $unique);
             }
         }
         return $res;

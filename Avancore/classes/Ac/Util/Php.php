@@ -17,7 +17,7 @@ abstract class Ac_Util_Php {
     }
     
     protected static function replaceIndent($match) {
-        return "\n".str_repeat(" ", strlen($match[0])/2*4);
+        return "\n".str_repeat(" ", 4*strlen($match[1])/2);
     }
     
     static function export($foo, $return = false, $indent = 0) {
@@ -96,12 +96,12 @@ abstract class Ac_Util_Php {
     static function exportArray($foo, $indent = 0, $withNumericKeys = false, $oneLine = false, $return = false) {
         $vx = self::myVarExport($foo, 1);
         $vx = preg_replace("/=> \n([ ]+)array \\(/", "=> array (\\1", $vx);
-        $vx = preg_replace_callback("/\n[ ]+/", array('Ac_Util_Php', 'replaceIndent'), $vx);
+        $vx = preg_replace_callback("/\n([ ]*)/", array('Ac_Util_Php', 'replaceIndent'), $vx);
         if ($indent) {
             $ind = str_repeat(" ", $indent);
             $vx = preg_replace("/\n/", "\n".$ind, $vx);
         }
-        if (!$withNumericKeys) $vx = preg_replace ("/(\n[ ]+) \\d+ =>/", "\\1", $vx);
+        if (!$withNumericKeys) $vx = preg_replace ("/(\n[ ]+)\\d+=>/", "\\1", $vx);
         if ($oneLine) {
             $vx = preg_replace("/\n[ ]*/", " ", $vx);
         }
