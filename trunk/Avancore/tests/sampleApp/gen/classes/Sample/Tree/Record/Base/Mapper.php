@@ -10,14 +10,14 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Tree_Record_Mapper'; 
 
-    var $columnNames = array ( 'id', 'title', 'tag', ); 
+    var $columnNames = array ( 0 => 'id', 1 => 'title', 2 => 'tag', ); 
 
-    var $nullableSqlColumns = array ( 'tag', ); 
+    var $nullableSqlColumns = array ( 0 => 'tag', ); 
 
     var $defaults = array (
-              'id' => NULL,
-              'title' => '',
-              'tag' => NULL,
+            'id' => NULL,
+            'title' => '',
+            'tag' => NULL,
         ); 
  
     
@@ -56,8 +56,8 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
      * Returns first record in the resultset (returns NULL if there are no records)
      * @return Sample_Tree_Record 
      */ 
-    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false) {
-        return parent::loadFirstRecord($where, $order, $joins, $limitOffset);
+    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false, $tableAlias = false) {
+        return parent::loadFirstRecord($where, $order, $joins, $limitOffset, $tableAlias);
     }
     
     /**
@@ -65,8 +65,8 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
      * (returns NULL if there are no records or there is more than one record)
      * @return Sample_Tree_Record 
      */ 
-    function loadSingleRecord($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false) {
-        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount);
+    function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
         
@@ -77,8 +77,8 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                  'singleCaption' => 'Tree record',
-                  'pluralCaption' => 'Tree records',
+                'singleCaption' => 'Tree record',
+                'pluralCaption' => 'Tree records',
             ),
             parent::doGetInfoParams()
         );
@@ -88,9 +88,9 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
         
     protected function doGetUniqueIndexData() {
         return array (
-              'PRIMARY' => array (
-                  'id',
-              ),
+            'PRIMARY' => array (
+                0 => 'id',
+            ),
         );
     }
         

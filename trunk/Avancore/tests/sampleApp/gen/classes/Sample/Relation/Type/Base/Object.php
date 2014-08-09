@@ -2,6 +2,7 @@
 
 class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
 
+    public $_hasDefaults = true;
     public $_relations = false;
     public $_relationsCount = false;
     public $relationTypeId = NULL;
@@ -30,7 +31,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 'relations', 'relationTypeId', 'title', 'isSymmetrical', );
+        return array ( 0 => 'relations', 1 => 'relationTypeId', 2 => 'title', 3 => 'isSymmetrical', );
     }
  
     protected function listOwnLists() {
@@ -46,34 +47,36 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
-              'relations' => array (
-                  'className' => 'Sample_Relation',
-                  'mapperClass' => 'Sample_Relation_Mapper',
-                  'caption' => 'Relations',
-                  'relationId' => '_relations',
-              ),
-              'relationTypeId' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'caption' => 'Relation Type Id',
-              ),
-              'title' => array (
-                  'maxLength' => '45',
-                  'caption' => 'Title',
-              ),
-              'isSymmetrical' => array (
-                  'dataType' => 'bool',
-                  'controlType' => 'selectList',
-                  'maxLength' => '1',
-                  'valueList' => array (
-                      0 => 'No',
-                      1 => 'Yes',
-                  ),
-                  'caption' => 'Is Symmetrical',
-              ),
+            'relations' => array (
+                'className' => 'Sample_Relation',
+                'mapperClass' => 'Sample_Relation_Mapper',
+                'caption' => 'Relations',
+                'relationId' => '_relations',
+                'countVarName' => '_relationsCount',
+                'referenceVarName' => '_relations',
+            ),
+            'relationTypeId' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'caption' => 'Relation Type Id',
+            ),
+            'title' => array (
+                'maxLength' => '45',
+                'caption' => 'Title',
+            ),
+            'isSymmetrical' => array (
+                'dataType' => 'bool',
+                'controlType' => 'selectList',
+                'maxLength' => '1',
+                'valueList' => array (
+                    0 => 'No',
+                    1 => 'Yes',
+                ),
+                'caption' => 'Is Symmetrical',
+            ),
         );
     
         return $pi;

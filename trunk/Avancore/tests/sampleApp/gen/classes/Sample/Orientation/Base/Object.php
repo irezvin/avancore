@@ -2,6 +2,7 @@
 
 class Sample_Orientation_Base_Object extends Ac_Model_Object {
 
+    public $_hasDefaults = true;
     public $_people = false;
     public $_peopleCount = false;
     public $sexualOrientationId = NULL;
@@ -29,7 +30,7 @@ class Sample_Orientation_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 'people', 'sexualOrientationId', 'title', );
+        return array ( 0 => 'people', 1 => 'sexualOrientationId', 2 => 'title', );
     }
  
     protected function listOwnLists() {
@@ -45,24 +46,26 @@ class Sample_Orientation_Base_Object extends Ac_Model_Object {
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
-              'people' => array (
-                  'className' => 'Sample_Person',
-                  'mapperClass' => 'Sample_Person_Mapper',
-                  'caption' => 'People',
-                  'relationId' => '_people',
-              ),
-              'sexualOrientationId' => array (
-                  'dataType' => 'int',
-                  'maxLength' => '10',
-                  'attribs' => array (
-                      'size' => '6',
-                  ),
-                  'caption' => 'Sexual Orientation Id',
-              ),
-              'title' => array (
-                  'maxLength' => '45',
-                  'caption' => 'Title',
-              ),
+            'people' => array (
+                'className' => 'Sample_Person',
+                'mapperClass' => 'Sample_Person_Mapper',
+                'caption' => 'People',
+                'relationId' => '_people',
+                'countVarName' => '_peopleCount',
+                'referenceVarName' => '_people',
+            ),
+            'sexualOrientationId' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'caption' => 'Sexual Orientation Id',
+            ),
+            'title' => array (
+                'maxLength' => '45',
+                'caption' => 'Title',
+            ),
         );
     
         return $pi;

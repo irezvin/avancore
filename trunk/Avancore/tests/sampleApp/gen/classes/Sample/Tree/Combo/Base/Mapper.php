@@ -10,20 +10,20 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Tree_Combo_Mapper'; 
 
-    var $columnNames = array ( 'id', 'leftCol', 'rightCol', 'parentId', 'ordering', 'title', 'tag', 'ignore', 'depth', ); 
+    var $columnNames = array ( 0 => 'id', 1 => 'leftCol', 2 => 'rightCol', 3 => 'parentId', 4 => 'ordering', 5 => 'title', 6 => 'tag', 7 => 'ignore', 8 => 'depth', ); 
 
-    var $nullableSqlColumns = array ( 'parentId', 'tag', ); 
+    var $nullableSqlColumns = array ( 0 => 'parentId', 1 => 'tag', ); 
 
     var $defaults = array (
-              'id' => NULL,
-              'leftCol' => '0',
-              'rightCol' => '1',
-              'parentId' => NULL,
-              'ordering' => '0',
-              'title' => '',
-              'tag' => NULL,
-              'ignore' => '0',
-              'depth' => '0',
+            'id' => NULL,
+            'leftCol' => '0',
+            'rightCol' => '1',
+            'parentId' => NULL,
+            'ordering' => '0',
+            'title' => '',
+            'tag' => NULL,
+            'ignore' => '0',
+            'depth' => '0',
         ); 
  
     
@@ -62,8 +62,8 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
      * Returns first record in the resultset (returns NULL if there are no records)
      * @return Sample_Tree_Combo 
      */ 
-    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false) {
-        return parent::loadFirstRecord($where, $order, $joins, $limitOffset);
+    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false, $tableAlias = false) {
+        return parent::loadFirstRecord($where, $order, $joins, $limitOffset, $tableAlias);
     }
     
     /**
@@ -71,8 +71,8 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
      * (returns NULL if there are no records or there is more than one record)
      * @return Sample_Tree_Combo 
      */ 
-    function loadSingleRecord($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false) {
-        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount);
+    function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
         
@@ -87,8 +87,8 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                  'singleCaption' => 'Tree combo',
-                  'pluralCaption' => 'Tree combos',
+                'singleCaption' => 'Tree combo',
+                'pluralCaption' => 'Tree combos',
             ),
             parent::doGetInfoParams()
         );
@@ -98,9 +98,9 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
         
     protected function doGetUniqueIndexData() {
         return array (
-              'PRIMARY' => array (
-                  'id',
-              ),
+            'PRIMARY' => array (
+                0 => 'id',
+            ),
         );
     }
         

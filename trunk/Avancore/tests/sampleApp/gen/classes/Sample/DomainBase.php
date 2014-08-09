@@ -4,30 +4,30 @@ abstract class Sample_DomainBase extends Ac_Application {
 
     protected function doGetMapperPrototypes() {
         return array (
-              'Sample_Orientation_Mapper' => array (
-                  'class' => 'Sample_Orientation_Mapper',
-              ),
-              'Sample_Person_Mapper' => array (
-                  'class' => 'Sample_Person_Mapper',
-              ),
-              'Sample_Relation_Type_Mapper' => array (
-                  'class' => 'Sample_Relation_Type_Mapper',
-              ),
-              'Sample_Relation_Mapper' => array (
-                  'class' => 'Sample_Relation_Mapper',
-              ),
-              'Sample_Tag_Mapper' => array (
-                  'class' => 'Sample_Tag_Mapper',
-              ),
-              'Sample_Tree_Adjacent_Mapper' => array (
-                  'class' => 'Sample_Tree_Adjacent_Mapper',
-              ),
-              'Sample_Tree_Combo_Mapper' => array (
-                  'class' => 'Sample_Tree_Combo_Mapper',
-              ),
-              'Sample_Tree_Record_Mapper' => array (
-                  'class' => 'Sample_Tree_Record_Mapper',
-              ),
+            'Sample_Orientation_Mapper' => array (
+                'class' => 'Sample_Orientation_Mapper',
+            ),
+            'Sample_Person_Mapper' => array (
+                'class' => 'Sample_Person_Mapper',
+            ),
+            'Sample_Relation_Type_Mapper' => array (
+                'class' => 'Sample_Relation_Type_Mapper',
+            ),
+            'Sample_Relation_Mapper' => array (
+                'class' => 'Sample_Relation_Mapper',
+            ),
+            'Sample_Tag_Mapper' => array (
+                'class' => 'Sample_Tag_Mapper',
+            ),
+            'Sample_Tree_Adjacent_Mapper' => array (
+                'class' => 'Sample_Tree_Adjacent_Mapper',
+            ),
+            'Sample_Tree_Combo_Mapper' => array (
+                'class' => 'Sample_Tree_Combo_Mapper',
+            ),
+            'Sample_Tree_Record_Mapper' => array (
+                'class' => 'Sample_Tree_Record_Mapper',
+            ),
         );
     }
     

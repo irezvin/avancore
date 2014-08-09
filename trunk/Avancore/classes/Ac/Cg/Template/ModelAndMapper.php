@@ -68,6 +68,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
             if ($this->createAccessors && $prop instanceof Ac_Cg_Property_Simple) {
                 $this->accessors[$prop->getClassMemberName()] = $prop->getClassMemberName();
             }
+            $this->vars['_hasDefaults'] = true;
             //foreach ($gacm = $prop->getAllClassMembers() as $cm) if (!$cm) var_dump($prop->name, $gacm);
             $this->vars = array_merge($this->vars, $prop->getAllClassMembers());
         }
@@ -100,6 +101,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->mapperVars['tableName'] = $this->tableName;
         $this->mapperVars['id'] = $this->mapperClass;
         $this->mapperVars['columnNames'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->tableObject->listColumns(), 0, false, true, true));
+        if ($this->uniqueIndexData) $this->mapperVars['indexData'] = $this->indexData;
         if ($this->model->nullableSqlColumns) 
             $this->mapperVars['nullableSqlColumns'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->nullableSqlColumns, 0, false, true, true));
         foreach ($this->model->tableObject->listColumns() as $nm) {
@@ -444,8 +446,8 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
      * Returns first record in the resultset (returns NULL if there are no records)
      * @return <?php $this->d($this->modelClass); ?> 
      */ 
-    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false) {
-        return parent::loadFirstRecord($where, $order, $joins, $limitOffset);
+    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false, $tableAlias = false) {
+        return parent::loadFirstRecord($where, $order, $joins, $limitOffset, $tableAlias);
     }
     
     /**
@@ -453,8 +455,8 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
      * (returns NULL if there are no records or there is more than one record)
      * @return <?php $this->d($this->modelClass); ?> 
      */ 
-    function loadSingleRecord($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false) {
-        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount);
+    function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
     <?php if ($this->model->titleProp) { ?>

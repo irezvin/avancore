@@ -462,24 +462,15 @@ class Ac_Model_Collection {
     function _loadAllRecords() {
         $this->_canSetLimits = false;
         $stmt = $this->_getStatementTail(true, true, true, true);
-        $this->_records = array();
-        $i = count ($this->_records);
-        foreach ($this->_db->fetchArray($stmt) as $row) {
-            $key = $this->_matchKeys? $row[$this->_pkName] : $i;
-            if ($rc = $this->_getRecordClass($row)) {
-                if ($this->_mapper) {
-                    $this->_records[$key] = new $rc($this->_mapper);
-                } else {
-                    $this->_records[$key] = new $rc;
-                }
-                $this->_records[$key]->load($row, true);    
-            } else {
-                $this->_records[$key] = $row;
-            }
-            $i++;
+        if (count($this->_pkName) == 1) $pk = $this->_pkName[0];
+        else {
+            $pk = $this->_pkName;
+            $pk[] = true;
         }
+        $rows = $this->_db->fetchArray($stmt, $this->_matchKeys? $pk : false);
+        if ($this->_mapper) $this->_records = $this->_mapper->loadFromRows($rows);
+        else $this->_records = $rows;
         $this->_keys = array_keys($this->_records);
-        //$this->_db->freeResultResource($rr);
     }
     
     function _loadKeys() {

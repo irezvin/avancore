@@ -102,5 +102,3 @@ class Sample_Person_Mapper extends Sample_Person_Base_Mapper {
     */
     
 }
-    
-  

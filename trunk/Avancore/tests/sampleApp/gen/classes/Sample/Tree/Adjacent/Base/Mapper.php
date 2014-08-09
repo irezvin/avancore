@@ -10,16 +10,16 @@ class Sample_Tree_Adjacent_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Tree_Adjacent_Mapper'; 
 
-    var $columnNames = array ( 'id', 'parentId', 'ordering', 'title', 'tag', ); 
+    var $columnNames = array ( 0 => 'id', 1 => 'parentId', 2 => 'ordering', 3 => 'title', 4 => 'tag', ); 
 
-    var $nullableSqlColumns = array ( 'parentId', 'tag', ); 
+    var $nullableSqlColumns = array ( 0 => 'parentId', 1 => 'tag', ); 
 
     var $defaults = array (
-              'id' => NULL,
-              'parentId' => NULL,
-              'ordering' => '0',
-              'title' => '',
-              'tag' => NULL,
+            'id' => NULL,
+            'parentId' => NULL,
+            'ordering' => '0',
+            'title' => '',
+            'tag' => NULL,
         ); 
  
     
@@ -58,8 +58,8 @@ class Sample_Tree_Adjacent_Base_Mapper extends Ac_Model_Mapper {
      * Returns first record in the resultset (returns NULL if there are no records)
      * @return Sample_Tree_Adjacent 
      */ 
-    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false) {
-        return parent::loadFirstRecord($where, $order, $joins, $limitOffset);
+    function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false, $tableAlias = false) {
+        return parent::loadFirstRecord($where, $order, $joins, $limitOffset, $tableAlias);
     }
     
     /**
@@ -67,8 +67,8 @@ class Sample_Tree_Adjacent_Base_Mapper extends Ac_Model_Mapper {
      * (returns NULL if there are no records or there is more than one record)
      * @return Sample_Tree_Adjacent 
      */ 
-    function loadSingleRecord($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false) {
-        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount);
+    function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
         
@@ -83,8 +83,8 @@ class Sample_Tree_Adjacent_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                  'singleCaption' => 'Tree adjacent',
-                  'pluralCaption' => 'Tree adjacent',
+                'singleCaption' => 'Tree adjacent',
+                'pluralCaption' => 'Tree adjacent',
             ),
             parent::doGetInfoParams()
         );
@@ -94,9 +94,9 @@ class Sample_Tree_Adjacent_Base_Mapper extends Ac_Model_Mapper {
         
     protected function doGetUniqueIndexData() {
         return array (
-              'PRIMARY' => array (
-                  'id',
-              ),
+            'PRIMARY' => array (
+                0 => 'id',
+            ),
         );
     }
         

@@ -44,7 +44,9 @@ class Ac_Test_Relation extends Ac_Test_Base {
         
         $pm->loadTagIdsFor($recs2);
         $a = array();
-        foreach ($recs2 as $rec) $a = array_merge($a, $rec->_tagIds);
+        foreach ($recs2 as $rec) {
+            $a = array_merge($a, $rec->_tagIds);
+        }
         $a = array_unique($a);
         sort($a);
         
@@ -80,6 +82,37 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $this->assertTrue(isset($src['b']['tagIds']) && is_array($src['b']['tagIds']));
         $this->assertTrue(isset($src['c']['tagIds']) && is_array($src['c']['tagIds']));
         $this->assertTrue(isset($src['d']['tagIds']) && is_array($src['d']['tagIds']));
+    }
+    
+        
+    function testRelArrayQualifiers() {
+        $rel = new Ac_Model_Relation(array(
+                'srcTableName' => false,
+                'destTableName' => '#__people_tags',
+                'fieldLinks' => array(
+                    'personId' => 'idOfPerson',
+                ),
+                'srcVarName' => 'tagIds',
+                'destQualifier' => 'idOfTag',
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+                'database' => $this->getAeDb()
+        ));
+        $src = array(
+            'a' => array('personId' => 4),
+            'b' => array('personId' => 3, 'tagIds' => false),
+            'c' => array('personId' => -2, 'tagIds' => null),
+            'd' => array('personId' => -1, 'tagIds' => array('foo')),
+        );
+        $rel->loadDest($src);
+        
+        foreach ($src as $foo) {
+            if (isset($foo['tagIds']) && is_array($foo['tagIds'])) {
+                foreach ($foo['tagIds'] as $key => $id) {
+                    $this->assertEqual($key, $id['idOfTag']);
+                }
+            }
+        }
     }
     
 }
