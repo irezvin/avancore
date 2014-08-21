@@ -16,7 +16,9 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
         if ($qualifier !== false && $qualifier !== null && is_array($val)) {
             $val = Ac_Util::indexArray($val, $qualifier, true);
         }
-        if (is_array($dest)) $dest[$varName] = $val;
+        if (is_array($dest)) {
+            $dest[$varName] = $val;
+        }
         elseif (method_exists($dest, $setter = 'set'.$varName)) $dest->$setter($val);
         else $dest->$varName = $val;
     }
@@ -176,6 +178,18 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
         return $res;
     }
     
+    function _isVarEmpty($srcItem, $var) {
+        $res = true;
+        if (is_array($srcItem)) {
+            if (array_key_exists($var, $srcItem) && $srcItem[$var] !== false) $res = false;
+        } else {
+            if (Ac_Accessor::objectPropertyExists($srcItem, $var) 
+                && $this->_getValue($srcItem, $var) !== false) {
+                $res = false;
+            }
+        }
+        return $res;
+    }
     
 }
     

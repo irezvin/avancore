@@ -12,6 +12,8 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     public $_personAlbumsCount = false;
     public $_personPhotos = false;
     public $_personPhotosCount = false;
+    public $_personPosts = false;
+    public $_personPostsCount = false;
     public $_incomingRelations = false;
     public $_incomingRelationsCount = false;
     public $_outgoingRelations = false;
@@ -48,18 +50,18 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'protraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'incomingRelations', 7 => 'outgoingRelations', 8 => 'personId', 9 => 'name', 10 => 'gender', 11 => 'isSingle', 12 => 'birthDate', 13 => 'lastUpdatedDatetime', 14 => 'createdTs', 15 => 'religionId', 16 => 'portraitId', );
+        return array ( 0 => 'protraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'personPosts', 7 => 'incomingRelations', 8 => 'outgoingRelations', 9 => 'personId', 10 => 'name', 11 => 'gender', 12 => 'isSingle', 13 => 'birthDate', 14 => 'lastUpdatedDatetime', 15 => 'createdTs', 16 => 'religionId', 17 => 'portraitId', );
     }
  
     protected function listOwnLists() {
         
-        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', );
+        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', );
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'protraitPersonPhoto' => 'Sample_Person_Photo', 'religion' => 'Sample_Religion', 'tags' => 'Sample_Tag', 'personAlbums' => 'Sample_Person_Album', 'personPhotos' => 'Sample_Person_Photo', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', );
+        return array ( 'protraitPersonPhoto' => 'Sample_Person_Photo', 'religion' => 'Sample_Religion', 'tags' => 'Sample_Tag', 'personAlbums' => 'Sample_Person_Album', 'personPhotos' => 'Sample_Person_Photo', 'personPosts' => 'Sample_Person_Post', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', );
     }
 
     protected function getOwnPropertiesInfo() {
@@ -113,6 +115,14 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'relationId' => '_personPhotos',
                 'countVarName' => '_personPhotosCount',
                 'referenceVarName' => '_personPhotos',
+            ),
+            'personPosts' => array (
+                'className' => 'Sample_Person_Post',
+                'mapperClass' => 'Sample_Person_Post_Mapper',
+                'caption' => 'Person posts',
+                'relationId' => '_personPosts',
+                'countVarName' => '_personPostsCount',
+                'referenceVarName' => '_personPosts',
             ),
             'incomingRelations' => array (
                 'className' => 'Sample_Relation',
@@ -497,6 +507,62 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
 
+    function countPersonPosts() {
+        if (is_array($this->_personPosts)) return count($this->_personPosts);
+        if ($this->_personPostsCount === false) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocCountFor($this, '_personPosts');
+        }
+        return $this->_personPostsCount;
+    }
+
+    function listPersonPosts() {
+        if ($this->_personPosts === false) {
+            $mapper = $this->getMapper();
+            $mapper->listAssocFor($this, '_personPosts');
+        }
+        return array_keys($this->_personPosts);
+    }
+    
+    /**
+     * @return Sample_Person_Post 
+     */
+    function getPersonPost($id) {
+        if ($this->_personPosts === false) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_personPosts');
+        }
+        if (!isset($this->_personPosts[$id])) trigger_error ('No such Person post: \''.$id.'\'', E_USER_ERROR);
+        if ($this->_personPosts[$id] === false) {
+        }
+        return $this->_personPosts[$id];
+    }
+    
+    /**
+     * @param Sample_Person_Post $personPost 
+     */
+    function addPersonPost($personPost) {
+        if (!is_a($personPost, 'Sample_Person_Post')) trigger_error('$personPost must be an instance of Sample_Person_Post', E_USER_ERROR);
+        $this->listPersonPosts();
+        $this->_personPosts[] = $personPost;
+        
+        $personPost->_person = $this;
+        
+    }
+    
+    /**
+     * @return Sample_Person_Post  
+     */
+    function createPersonPost($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Person_Post_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        if ($isReference) $res->_setIsReference(true);
+        $this->addPersonPost($res);
+        return $res;
+    }
+    
+
     function countIncomingRelations() {
         if (is_array($this->_incomingRelations)) return count($this->_incomingRelations);
         if ($this->_incomingRelationsCount === false) {
@@ -641,6 +707,11 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
             if (!$this->_autoStoreReferencing($this->_personPhotos, $rel->fieldLinks, 'personPhotos')) $res = false;
         }
 
+        if (is_array($this->_personPosts)) {
+            $rel = $mapper->getRelation('_personPosts');
+            if (!$this->_autoStoreReferencing($this->_personPosts, $rel->fieldLinks, 'personPosts')) $res = false;
+        }
+
         if (is_array($this->_incomingRelations)) {
             $rel = $mapper->getRelation('_incomingRelations');
             if (!$this->_autoStoreReferencing($this->_incomingRelations, $rel->fieldLinks, 'incomingRelations')) $res = false;
@@ -664,13 +735,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         }
             
         return $res; 
-    }
- 
-    protected function intListReferenceFields() {
-        $res = array (
-            'religionId' => '_religion',
-        );
-        return $res;
     }
     
 }

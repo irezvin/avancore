@@ -40,6 +40,7 @@ CREATE TABLE `ac_album_photos` (
 
 LOCK TABLES `ac_album_photos` WRITE;
 /*!40000 ALTER TABLE `ac_album_photos` DISABLE KEYS */;
+INSERT INTO `ac_album_photos` VALUES (3,1,1),(3,1,2),(3,2,1);
 /*!40000 ALTER TABLE `ac_album_photos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -65,7 +66,7 @@ CREATE TABLE `ac_people` (
   KEY `FK_ac_person_photos_ac_people_protrait` (`personId`,`portraitId`),
   CONSTRAINT `FK_ac_person_religion` FOREIGN KEY (`religionId`) REFERENCES `ac_religion` (`religionId`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `FK_ac_person_photos_ac_people_protrait` FOREIGN KEY (`personId`, `portraitId`) REFERENCES `ac_person_photos` (`personId`, `photoId`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -74,7 +75,7 @@ CREATE TABLE `ac_people` (
 
 LOCK TABLES `ac_people` WRITE;
 /*!40000 ALTER TABLE `ac_people` DISABLE KEYS */;
-INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2014-08-09 13:59:19',4,NULL),(4,'Таня','F',0,'1981-12-23',NULL,'2014-08-09 13:59:22',1,NULL);
+INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2014-08-10 19:24:57',4,1),(4,'Таня','F',0,'1981-12-23',NULL,'2014-08-10 19:25:10',1,3);
 /*!40000 ALTER TABLE `ac_people` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -119,7 +120,7 @@ CREATE TABLE `ac_person_albums` (
   PRIMARY KEY (`albumId`),
   KEY `FK__ac_people` (`personId`),
   CONSTRAINT `FK__ac_people` FOREIGN KEY (`personId`) REFERENCES `ac_people` (`personId`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -128,6 +129,7 @@ CREATE TABLE `ac_person_albums` (
 
 LOCK TABLES `ac_person_albums` WRITE;
 /*!40000 ALTER TABLE `ac_person_albums` DISABLE KEYS */;
+INSERT INTO `ac_person_albums` VALUES (1,3,'personal'),(2,3,'all');
 /*!40000 ALTER TABLE `ac_person_albums` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -145,7 +147,7 @@ CREATE TABLE `ac_person_photos` (
   PRIMARY KEY (`photoId`),
   KEY `FK_ac_person_photos_ac_people` (`personId`),
   CONSTRAINT `FK_ac_person_photos_ac_people` FOREIGN KEY (`personId`) REFERENCES `ac_people` (`personId`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -154,6 +156,7 @@ CREATE TABLE `ac_person_photos` (
 
 LOCK TABLES `ac_person_photos` WRITE;
 /*!40000 ALTER TABLE `ac_person_photos` DISABLE KEYS */;
+INSERT INTO `ac_person_photos` VALUES (1,3,'ilya1.jpg'),(2,3,'ilya2.jpg'),(3,4,'tanya1.jpg');
 /*!40000 ALTER TABLE `ac_person_photos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -406,4 +409,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-08-09 17:02:02
+-- Dump completed on 2014-08-10 22:26:11

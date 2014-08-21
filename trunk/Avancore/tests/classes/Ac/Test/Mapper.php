@@ -97,4 +97,39 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         }
     }
     
+    function testRestrRelations() {
+        $sam = Sample::getInstance();
+        $m = $sam->getSamplePersonMapper();
+        $p = $m->loadByPersonId(3);
+        $port = $p->getProtraitPersonPhoto();
+        $this->assertTrue($port);
+        $p->religionId = '';
+        $p->portraitId = '';
+        $p->intResetReferences();
+        $port = $p->getProtraitPersonPhoto();
+        $this->assertTrue(!$port, 'Ensure association object is cleared after '
+            . 'I have changed the FK field value (multi-field FK)');
+        $this->assertEqual($p->personId, 3, 'Field that participates in PK or other FK must not be touched'
+            . ' and only part of FK must be cleared');
+        $this->assertIdentical($p->portraitId, NULL, 'Unrestricted part of FK must be cleared');
+        $this->assertIdentical($p->religionId, NULL, 'Unrestricted single-field FK\' field must be cleared');
+        //var_dump($m->getFkFieldsData());
+        
+        $pm = $sam->getSamplePersonPostMapper();
+        $post = $pm->loadById(1);
+        $this->assertIsA($post->getPersonPhoto(), 'Sample_Person_Photo');
+        $post->photoId = '';
+        $post->intResetReferences();
+        $this->assertNull($post->photoId);
+        $this->assertNotNull($post->personId);
+
+        $post = $pm->loadById(1);
+        $post->personId = '';
+        $post->intResetReferences();
+        $this->assertNull($post->photoId);
+        $this->assertNull($post->personId);
+    }
+    
+    
+    
 }
