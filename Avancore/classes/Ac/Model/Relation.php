@@ -1,20 +1,20 @@
 <?php
 /**
- * result rows will be returned as plain numeric array of rows
+ * result rows will be returned as plain numeric array
  * @see Ac_Model_Relation::getDest()
- * @see Ac_Model_Relation::getSrc())
+ * @see Ac_Model_Relation::getSrc()
  */
 define('AMR_PLAIN_RESULT', 0);
 /**
  * result rows will have DB keys of source records 
  * @see Ac_Model_Relation::getDest()
- * @see Ac_Model_Relation::getSrc())
+ * @see Ac_Model_Relation::getSrc()
  */
 define('AMR_RECORD_KEYS', 1);
 /**
  * result rows will have keys of original array 
  * @see Ac_Model_Relation::getDest()
- * @see Ac_Model_Relation::getSrc())
+ * @see Ac_Model_Relation::getSrc()
  */
 define('AMR_ORIGINAL_KEYS', 2);
 /**
@@ -22,7 +22,7 @@ define('AMR_ORIGINAL_KEYS', 2);
  * Values in places of missing result rows will have default value.
  *  
  * @see Ac_Model_Relation::getDest()
- * @see Ac_Model_Relation::getSrc())
+ * @see Ac_Model_Relation::getSrc()
  */
 define('AMR_ALL_ORIGINAL_KEYS', 6);
 
@@ -277,11 +277,25 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if ($this->srcOrdering === false) $this->srcOrdering = $this->_srcMapper->getDefaultOrdering();
     }
     
+    /**
+     * @return Ac_Model_Mapper
+     */
+    function getSrcMapper() {
+        return $this->_srcMapper;
+    }
+    
     function setDestMapper(Ac_Model_Mapper $destMapper) {
         $this->_destMapper = $destMapper;
         if ($this->destTableName === false) $this->destTableName = $destMapper->tableName;
         if (!$this->database) $this->database = $this->_destMapper->getApplication()->getDb();
         if ($this->destOrdering === false) $this->destOrdering = $this->_destMapper->getDefaultOrdering();
+    }
+    
+    /**
+     * @return Ac_Model_Mapper
+     */
+    function getDestMapper() {
+        return $this->_destMapper;
     }
     
     function setApplication(Ac_Application $application) {
@@ -344,7 +358,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             '_instantiateDest', 
             $this->destOrdering, 
             $this->destExtraJoins, 
-            $this->destWhere
+            $this->destWhere,
+            $this->srcNNIdsVarName
         );
         return $res;
     }
@@ -388,7 +403,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             '_instantiateSrc', 
             $this->srcOrdering, 
             $this->srcExtraJoins, 
-            $this->srcWhere
+            $this->srcWhere,
+            $this->destNNIdsVarName
         );
         return $res;
     }
@@ -431,20 +447,21 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $this->_deleteSrcOrDest($destData, $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcTableName, $this->srcWhere);
     }
     
-    function loadDest (& $srcData, $ignoreLoaded = true, $biDirectional = true) {
+    function loadDest (& $srcData, $dontOverwriteLoaded = true, $biDirectional = true) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         //if (!$this->srcVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $srcVarName is not set');
         $defaultValue = $this->destIsUnique? null : array();
         $biDirectional = $biDirectional && strlen($this->destVarName);
 
         $res = $this->_loadSrcOrDest ($srcData, $defaultValue, $this->srcVarName, $this->destVarName, 
-            $ignoreLoaded, $biDirectional, $this->fieldLinks, $this->fieldLinks2, $this->destIsUnique, 
+            $dontOverwriteLoaded, $biDirectional, $this->fieldLinks, $this->fieldLinks2, $this->destIsUnique, 
                 $this->srcIsUnique, $this->destTableName, '_instantiateDest', $this->destOrdering, 
-                $this->destExtraJoins, $this->destWhere, $this->destQualifier, $this->srcQualifier);
+                $this->destExtraJoins, $this->destWhere, $this->destQualifier, $this->srcQualifier, 
+                $this->srcNNIdsVarName);
         return $res;
     }
     
-    function loadSrc (& $destData, $ignoreLoaded = true, $biDirectional = true) {
+    function loadSrc (& $destData, $dontOverwriteLoaded = true, $biDirectional = true) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         if (!$this->destVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $destVarName is not set');
         $defaultValue = $this->srcIsUnique? null : array();
@@ -459,9 +476,9 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         }
         
         return $this->_loadSrcOrDest ($destData, $defaultValue, $this->destVarName, $this->srcVarName, 
-            $ignoreLoaded, $biDirectional, $fl1, $fl2, $this->srcIsUnique, $this->destIsUnique, 
+            $dontOverwriteLoaded, $biDirectional, $fl1, $fl2, $this->srcIsUnique, $this->destIsUnique, 
             $this->srcTableName, '_instantiateSrc', $this->srcOrdering, $this->srcExtraJoins, 
-            $this->srcWhere, $this->srcQualifier, $this->destQualifier);
+            $this->srcWhere, $this->srcQualifier, $this->destQualifier, $this->destNNIdsVarName);
     }
     
     function getStrMidWhere($alias = false) {
@@ -470,7 +487,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function loadDestNNIds($srcData, $ignoreLoaded = true) {
+    function loadDestNNIds($srcData, $dontOverwriteLoaded = true) {
         if (!$this->midTableName) trigger_error("This function is only applicable to relations with midTableName set", E_USER_ERROR);
         if (!strlen($this->srcNNIdsVarName)) trigger_error("Property \$srcNNIdsVarName should be set to non-empty string to use this method", E_USER_ERROR); 
         $relConfig = array(
@@ -487,11 +504,11 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             'destIsUnique' => false,
         );
         $rel = new Ac_Model_Relation($relConfig);
-        $res = $rel->loadDest($srcData, $ignoreLoaded);
+        $res = $rel->loadDest($srcData, $dontOverwriteLoaded);
         $this->_fixNNIds($srcData, array_keys($this->fieldLinks2), $this->srcNNIdsVarName);
     }
     
-    function loadSrcNNIds($destData, $ignoreLoaded = true) {
+    function loadSrcNNIds($destData, $dontOverwriteLoaded = true) {
         if (!$this->midTableName) trigger_error("This function is only applicable to relations with midTableName set", E_USER_ERROR);
         if (!strlen($this->destNNIdsVarName)) trigger_error("Property \$destNNIdsVarName should be set to non-empty string to use this method", E_USER_ERROR);
         $relConfig = array(
@@ -508,28 +525,28 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             'destIsUnique' => $this->srcIsUnique,
         );
         $rel = new Ac_Model_Relation($relConfig);
-        $rel->loadSrc($destData, $ignoreLoaded);
+        $rel->loadSrc($destData, $dontOverwriteLoaded);
         $this->_fixNNIds($destData, array_values($this->fieldLinks), $this->destNNIdsVarName);
     }
     
     /**
      * Counts destination objects and stores result in $srcCountVarName of each corresponding $srcData object
      */
-    function loadDestCount ($srcData, $ignoreLoaded = true) {
+    function loadDestCount ($srcData, $dontOverwriteLoaded = true) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         if (!$this->srcCountVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $srcCountVarName is not set');
-        return $this->_loadSrcOrDestCount ($srcData, $this->srcCountVarName, $ignoreLoaded, 
-            $this->fieldLinks, $this->fieldLinks2, $this->destTableName);
+        return $this->_loadSrcOrDestCount ($srcData, $this->srcCountVarName, $dontOverwriteLoaded, 
+            $this->fieldLinks, $this->fieldLinks2, $this->destTableName, $this->srcNNIdsVarName);
     }
     
     /**
      * Counts source objects and stores result in $destCountVarName of each corresponding $destData object
      */
-    function loadSrcCount ($destData, $ignoreLoaded = true) {
+    function loadSrcCount ($destData, $dontOverwriteLoaded = true) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         if (!$this->destCountVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $destCountVarName is not set');
-        return $this->_loadSrcOrDestCount ($destData, $this->destCountVarName, $ignoreLoaded, 
-            $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcTableName);
+        return $this->_loadSrcOrDestCount ($destData, $this->destCountVarName, $dontOverwriteLoaded, 
+            $this->_fieldLinksRev, $this->_fieldLinksRev2, $this->srcTableName, $this->destNNIdsVarName);
     }
 
     /**
@@ -591,84 +608,136 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * Extracts keys from source array and makes map (recordKeys => srcArrayKey). Format of $map will be array($keys, $sourceKey). By traversing the map later,
      * one can find corresponding records in the right table. 
      */
-    function _makeMapAndGetAllValues(& $source, & $map, & $values, $keys) {
+    function _makeMapAndGetAllValues(& $source, & $map, & $values, $keys, 
+        $varToCheck = false, $midIdsVar = false, &$midMap = null, & $midVals = null, $midKeys2 = array() ) {
         $map = array();
+        if (!is_array($midMap)) $midMap = array();
         $values = array();
+        if (!is_array($midVals)) $midVals = array();
         foreach(array_keys($source) as $k) {
             $srcItem = $source[$k];
-            $vals = $this->_getValues($srcItem, $keys, false, false);
-            //if (!$this->_isFull($vals)) continue;
-            //foreach ($vals as $v) if ($v === false) continue 2;
-            //Ac_Util::simpleSetArrayByPath($map, $vals, $source[$k], true);
-            $map[] = array($vals, $k);
-            $values[] = $vals;
-        }
-    }
-    
-    function _makeMapAndGetAllValuesIfVarNotFalse(& $source, & $map, & $values, $keys, $varName) {
-        $map = array();
-        $values = array();
-        foreach(array_keys($source) as $k) {
-            $srcItem = $source[$k];
-            if (is_array($srcItem)) $varFalse = isset($srcItem[$varName]) && ($srcItem[$varName] === false);
-                else $varFalse = isset($srcItem->$varName) && ($srcItem->$varName === false);
-            if (!$varFalse) {    
+            $hasIds = false;
+            if ($varToCheck !== false) {
+                if (!$this->_isVarEmpty($srcItem, $varToCheck)) continue;
+            }
+            if ($midIdsVar !== false && $midKeys2) {
+                $hasIds = is_array($ids = $this->_getValue($srcItem, $midIdsVar));
+                if ($hasIds) {
+                    $ids = $this->_nnIdsToValues($ids, $midKeys2);
+                    foreach ($ids as $v) {
+                        if (is_array($v)) {
+                            $mk = implode('-', $v);
+                        }
+                            else $mk = ''.$v;
+                        $midVals[$mk] = $v;
+                    }
+                    $midMap[$k] = array($ids, $k);
+                }
+            }
+            if (!$hasIds) {
                 $vals = $this->_getValues($srcItem, $keys, false, false);
-                //Ac_Util::simpleSetArrayByPath($map, $vals, $source[$k], true);
                 $map[] = array($vals, $k);
                 $values[] = $vals;
             }
         }
     }
     
-    function _getAllValues(& $source, & $values, $keys) {
+    function _getAllValues(& $source, & $values, $keys, $nnIdsVar = false, & $midVals = null, 
+        $midKeys = array()) {
+        
         $values = array();
+        if (!is_array($midVals)) $midVals = array();
         foreach (array_keys($source) as $k) {
-//            if ($this->_isFull($gv = $this->_getValues($source[$k], $keys, false, false))) $values[] = $gv;
-            $values[] = $this->_getValues($source[$k], $keys, false, false);
+            $hasIds = false;
+            $srcItem  = $source[$k];
+            if ($nnIdsVar !== false) {
+                $hasIds = is_array($ids = $this->_getValue($srcItem, $nnIdsVar));
+                if ($hasIds) {
+                    $ids = $this->_nnIdsToValues($ids, $midKeys);
+                    foreach ($ids as $v) {
+                        if (is_array($v)) $mk = implode('-', $v);
+                            else $mk = ''.$v;
+                        $midVals[$mk] = $v;
+                    }
+                }
+            }
+            if (!$hasIds) {
+                $values[] = $this->_getValues($srcItem, $keys, false, false);
+            }
         }
     }
     
-    function _getSrcOrDest ($data, $matchMode, $defaultValue, $hasDefaultValue, $fieldLinks, $fieldLinks2, $isUnique, $tableName, $instanceFunc, $ordering, $extraJoins, $extraWhere) {
+    function _getSrcOrDest ($data, $matchMode, $defaultValue, $hasDefaultValue, $fieldLinks, $fieldLinks2, 
+        $isUnique, $tableName, $instanceFunc, $ordering, $extraJoins, $extraWhere, $nnIdsVar = false) {
         $keys = array_keys($fieldLinks);
+        $midMap = false;
         if (is_array($data)) { // we assume that this array is of objects or rows
             $values = array();
+            $midKeys = is_array($fieldLinks2)? array_values($fieldLinks2) : array();
             if ($matchMode & AMR_ORIGINAL_KEYS) {
                 $map = array();
-                $this->_makeMapAndGetAllValues($data, $map, $values, $keys);
+                $midMap = array();
+                $this->_makeMapAndGetAllValues($data, $map, $values, $keys, false, $nnIdsVar, 
+                    $midMap, $midValues, $midKeys);
             } else {
-                $this->_getAllValues($data, $values, $keys);
+                $this->_getAllValues($data, $values, $keys, $nnIdsVar, $midValues, $midKeys);
             }
-            $rows = $this->_getWithValues($values, $this->midTableName? $fieldLinks2 : Ac_Util::array_values($fieldLinks), true, $isUnique, $matchMode > 0, $tableName, $instanceFunc, false, false, $this->midTableName, $ordering, $extraJoins, $extraWhere);
-            if ($matchMode & AMR_ORIGINAL_KEYS) {
-                if (!$hasDefaultValue) $defaultValue = $isUnique? null : array();
-                $res = array();
-                if (count($keys) === 1) {
-                    foreach ($map as $m) {
-                        if ($matchMode == AMR_ALL_ORIGINAL_KEYS) {
-                            if (isset($rows[$rowKey = $m[0][0]])) $res[$m[1]] = $rows[$rowKey]; else $res[$m[1]] = $defaultValue; 
-                        } else {
-                            if (isset($rows[$rowKey = $m[0][0]])) $res[$m[1]] = $rows[$rowKey];
-                        } 
-                    }
+
+            $rows = array();
+            $rows2 = array();
+
+            if ($values) {
+                $rows = $this->_getWithValues($values, 
+                    $this->midTableName? array($fieldLinks, $fieldLinks2) : Ac_Util::array_values($fieldLinks), 
+                    true, $isUnique, $matchMode > 0, $tableName, $instanceFunc, false, false, $this->midTableName, 
+                    $ordering, $extraJoins, $extraWhere, 
+                    $midValues? array_values($fieldLinks2) : false, $midValues);
+
+                if ($midValues) {
+                    list ($rows, $rows2) = $rows;
+                }
+                
+            } else {
+                if ($midValues) {
+                    $rows2 = $this->_getWithValues($midValues, 
+                            array_values($fieldLinks2), 
+                            true, $isUnique, true, $tableName, $instanceFunc, false, false, false, 
+                            $ordering, $extraJoins, $extraWhere);
                 } else {
-                    $rowPath = $m[0];
-                    foreach ($map as $m) {
-                        $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
-                        if ($row !== false)
-                            $res[$m[1]] = $row;
-                        elseif ($matchMode == AMR_ALL_ORIGINAL_KEYS) 
-                            $res[$m[1]] = $row; 
-                    }
+                    $rows2 = array();
+                }
+            }
+            
+            if ($matchMode & AMR_ORIGINAL_KEYS) {
+                $res = array();
+                if ($rows) $this->_unmapResult($keys, $map, $matchMode, $res, $rows, $defaultValue, $isUnique, 
+                    false);
+                if ($midMap) {
+                    $this->_unmapResult(array_values($fieldLinks2), $midMap, $matchMode, $res, $rows2, 
+                        $defaultValue, $isUnique, true);                    
                 }
             } else {
                 $res = $rows;
+                if (!$res && $rows2) {
+                    if ($isUnique) $res = array_values($rows2);
+                    else foreach ($rows2 as $k => $rows) $res = array_merge($res, $rows);
+                }
             }
         } elseif (is_a($data, 'Ac_Model_Collection')) {
             trigger_error ('Collection as $srcData/$destData is not implemented yet', E_USER_ERROR);
         } elseif (is_object($data)) {
             $values = $this->_getValues($data, $keys, false, false);
-            $rows = $this->_getWithValues($values, $this->midTableName? $fieldLinks2 : Ac_Util::array_values($fieldLinks), false, $isUnique, $matchMode > 0, $tableName, $instanceFunc, false, false, $this->midTableName, $ordering, $extraJoins, $extraWhere);
+            if ($nnIdsVar && isset($data->$nnIdsVar) && is_array($ids = $data->$nnIdsVar)) {
+                $ids = $this->_nnIdsToValues($ids, array_values($fieldLinks2));
+                $rows = $this->_getWithValues($ids, array_values($fieldLinks2), 
+                    true, $isUnique, false, $tableName, $instanceFunc, false, false, 
+                    false, $ordering, $extraJoins, $extraWhere);
+            } else {
+                $rows = $this->_getWithValues($values, 
+                        $this->midTableName? array($fieldLinks, $fieldLinks2) : Ac_Util::array_values($fieldLinks), 
+                        false, $isUnique, (bool) $matchMode, $tableName, $instanceFunc, false, false, 
+                        $this->midTableName, $ordering, $extraJoins, $extraWhere);
+            }
             if ($rows) $res = $rows;
                 else {
                     if (!$hasDefaultValue) $defaultValue = $this->destIsUnique? null : array();
@@ -680,17 +749,80 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function _countSrcOrDest ($data, $separate = true, $matchMode = AMR_PLAIN_RESULT, $fieldLinks, $fieldLinks2, $isUnique, $tableName) {
+    function _unmapResult($keys, $map, $matchMode, & $res, $rows, $defaultValue, $isUnique, $mapMultiple) {
+        if (count($keys) === 1) {
+            foreach ($map as $m) {
+                $toSet = false;
+                if ($mapMultiple && !$isUnique) {
+                    $toSet = array();
+                    foreach ($m[0] as $rowKey) {
+                        if (isset($rows[$rowKey])) {
+                            $toSet = array_merge($toSet, $rows[$rowKey]);
+                        }
+                    }
+                } else {
+                    if (isset($rows[$rowKey = $m[0][0]])) $toSet = $rows[$rowKey]; 
+                }
+                if ($toSet === false) {
+                    if ($matchMode == AMR_ALL_ORIGINAL_KEYS) {
+                        $toSet = $defaultValue;
+                    } else {
+                        continue;
+                    }
+                }
+                $res[$m[1]] = $toSet; 
+            }
+        } else {
+            foreach ($map as $m) {
+                $toSet = false;
+                if ($mapMultiple && !$isUnique) {
+                    $toSet = array();
+                    foreach ($m[0] as $rowPath) {
+                        $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
+                        if ($row !== false) {
+                           $toSet = array_merge($toSet, $row);
+                        }
+                        if (isset($rows[$rowKey])) {
+                            if ($isUnique) $rr = array($rows[$rowKey]);
+                                else $rr = $rows[$rowKey];
+                            $toSet = array_merge($toSet, $rr);
+                        }
+                    }
+                } else {
+                    $rowPath = $m[0];
+                    $dataKey = $m[1];
+                    $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
+                    if ($row !== false) {
+                       $toSet = $row;
+                    }
+                }
+                if ($toSet === false) {
+                    if ($matchMode == AMR_ALL_ORIGINAL_KEYS) {
+                        $toSet = $defaultValue;
+                    } else {
+                        continue;
+                    }
+                }
+                $res[$m[1]] = $toSet; 
+            }
+        }
+    }
+    
+    function _countSrcOrDest ($data, $separate = true, $matchMode = AMR_PLAIN_RESULT, $fieldLinks, $fieldLinks2, 
+        $isUnique, $tableName) {
         $keys = array_keys($fieldLinks);
         if (is_array($data)) { // we assume that this is array of objects or array of rows
             $values = array();
             if ($separate && ($matchMode & AMR_ORIGINAL_KEYS)) {
                 $map = array();
-                $this->_makeMapAndGetAllValues($data, $map, $values, $keys);
+                $this->_makeMapAndGetAllValues($data, $map, $values, $keys, 
+                    is_array($fieldLinks2)? array_values($fieldLinks2) : array());
             } else {
                 $this->_getAllValues($data, $values, $keys);
             }
-            $counts = $this->_countWithValues($values, $this->midTableName? $fieldLinks2 : Ac_Util::array_values($fieldLinks), true, $separate, $matchMode > 0, $tableName, false, false, $this->midTableName, $this->midTableName? $fieldLinks : false);
+            $counts = $this->_countWithValues($values, $this->midTableName? $fieldLinks2 : Ac_Util::array_values($fieldLinks), 
+                true, $separate, $matchMode > 0, $tableName, false, false, $this->midTableName, 
+                $this->midTableName? array_keys($fieldLinks) : false);
             if (!$separate) {
                 $res = $counts;
             } else {
@@ -759,49 +891,79 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function _loadSrcOrDest (& $data, $defaultValue, $varName, $otherVarName, $ignoreLoaded, $biDirectional, $fieldLinks, $fieldLinks2, $isUnique, $otherIsUnique, $tableName, $instanceFunc, $ordering = false, $extraJoins = false, $extraWhere = false, $qualifier = false, $otherQualifier = false) {
+    function _loadSrcOrDest (& $data, $defaultValue, $varName, $otherVarName, $dontOverwriteLoaded, $biDirectional, 
+            $fieldLinks, $fieldLinks2, $isUnique, $otherIsUnique, $tableName, $instanceFunc, $ordering = false, 
+            $extraJoins = false, $extraWhere = false, $qualifier = false, $otherQualifier = false, 
+            $nnIdsVar = false) {
         $keys = array_keys($fieldLinks);
         $res = array();
         if (is_array($data)) { // we assume that this array is of objects or rows
             $values = array();
             $map = array();
-            if ($ignoreLoaded) {
-                $this->_makeMapAndGetAllValues($data, $map, $values, $keys);
-            } else {
-                $this->_makeMapAndGetAllValuesIfVarNotFalse($data, $map, $values, $keys, $varName);
-            }
-            $rows = $this->_getWithValues($values, $this->midTableName? array($fieldLinks, $fieldLinks2) : Ac_Util::array_values($fieldLinks), true, $isUnique, true, $tableName, $instanceFunc, false, false, $this->midTableName, $ordering, $extraJoins, $extraWhere);
-            if (count($keys) === 1) {
-                foreach ($map as $m) {
-                    $dataKey = $m[1];
-                    if (isset($rows[$rowKey = $m[0][0]])) {
-                        $toSet = $rows[$rowKey];
-                        if ($biDirectional) $this->_linkBack($rows[$rowKey], $data[$dataKey], $otherVarName, !$isUnique, $otherIsUnique, $otherQualifier); 
-                    } else $toSet = $defaultValue;
-                    $this->_setVal($data[$dataKey], $varName, $toSet, $qualifier);
+            $midValues = array();
+
+            $varToCheck = $dontOverwriteLoaded? $varName : false;
+            $this->_makeMapAndGetAllValues($data, $map, $values, $keys, $varToCheck, $nnIdsVar, $midMap, 
+                $midValues, is_array($fieldLinks2)? array_values($fieldLinks2) : array());
+            
+            $rows = array();
+                
+            if ($values) {
+                
+                $rows = $this->_getWithValues($values, 
+                        $this->midTableName? array($fieldLinks, $fieldLinks2) : Ac_Util::array_values($fieldLinks), 
+                        true, $isUnique, true, $tableName, $instanceFunc, false, false, $this->midTableName, 
+                        $ordering, $extraJoins, $extraWhere, 
+                        $midValues? array_values($fieldLinks2) : false, $midValues);
+                
+                // _getWithValues returns two mapped sets of same rows in that case
+                
+                if ($midValues) {
+                    list($rows, $rows2) = $rows;
                 }
-            } else {
-                foreach ($map as $m) {
-                    $rowPath = $m[0];
-                    $dataKey = $m[1];
-                    $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
-                    if ($row !== false) {
-                       $toSet = $row;
-                       if ($biDirectional) $this->_linkBack($row, $data[$dataKey], $otherVarName, !$isUnique, $otherIsUnique, $otherQualifier);
-                    }
-                    else {
-                        $toSet = $defaultValue;
-                    }
-                    $this->_setVal($data[$dataKey], $varName, $toSet, $qualifier);
+                
+                $this->_unmap($keys, $map, $rows, $data, $defaultValue, $biDirectional, $varName, 
+                    $otherVarName, $isUnique, $otherIsUnique, $qualifier, $otherQualifier);
+                
+                if ($midMap) {
+                    if (!$midValues) $rows2 = array();
+                    $this->_unmap(array_values($fieldLinks2), $midMap, $rows2, $data, $defaultValue, $biDirectional, 
+                        $varName, $otherVarName, $isUnique, $otherIsUnique, $qualifier, $otherQualifier, true);
                 }
+                
+                
+            } elseif ($midMap) {
+                // Degrade to loading dest with known values
+                if ($midValues) {
+                    $rows = $this->_getWithValues($midValues, 
+                            array_values($fieldLinks2), 
+                            true, $isUnique, true, $tableName, $instanceFunc, false, false, false, 
+                            $ordering, $extraJoins, $extraWhere);
+                } else {
+                    $rows = array();
+                }
+                $this->_unmap(array_keys($fieldLinks2), $midMap, $rows, $data, $defaultValue, $biDirectional, 
+                    $varName, $otherVarName, $isUnique, $otherIsUnique, $qualifier, $otherQualifier, true);
             }
             $res = $rows;
         } elseif (is_a($data, 'Ac_Model_Collection')) {
             trigger_error ('Collection as $srcData/$destData is not implemented yet', E_USER_ERROR);
         } elseif (is_object($data)) {
-            if (!($ignoreLoaded && isset($data->$varName) && $data->$varName !== false)) {  
-                $values = $this->_getValues($data, $keys, false, false);
-                $rows = $this->_getWithValues($values, $this->midTableName? array($fieldLinks, $fieldLinks2) : Ac_Util::array_values($fieldLinks), false, $isUnique, false, $tableName, $instanceFunc, false, false, $this->midTableName, $ordering, $extraJoins, $extraWhere);
+            if (!$dontOverwriteLoaded || $this->_isVarEmpty($data, $varName)) {  
+                // check for NN ids
+                if ($nnIdsVar && isset($data->$nnIdsVar) && is_array($ids = $data->$nnIdsVar)) {
+                    $values = $this->_nnIdsToValues($ids, array_values($fieldLinks2));
+                    $rows = $this->_getWithValues($values,  array_values($fieldLinks2), 
+                        true, $isUnique, false, $tableName, $instanceFunc, false, false, 
+                        false, $ordering, $extraJoins, $extraWhere);
+                } else {
+                    $values = $this->_getValues($data, $keys, false, false);
+                    
+                    $rows = $this->_getWithValues($values, 
+                        $this->midTableName? array($fieldLinks, $fieldLinks2) : Ac_Util::array_values($fieldLinks), 
+                        false, $isUnique, false, $tableName, $instanceFunc, false, false, 
+                        $this->midTableName, $ordering, $extraJoins, $extraWhere);
+                }
                 if ($rows) {
                     $toSet = $rows;
                     if ($biDirectional) $this->_linkBack($rows, $data, $otherVarName, !$isUnique, $otherIsUnique, $otherQualifier);
@@ -815,57 +977,155 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    function _loadSrcOrDestCount ($data, $varName, $ignoreLoaded, $fieldLinks, $fieldLinks2, $tableName) {
+    function _nnIdsToValues($idsArray, $keys) {
+        $res = array();
+        if (count($keys) == 1) {
+            $key = array_pop($keys);
+            foreach ($idsArray as $id) {
+                if (is_array($id)) {
+                    if (isset($id[$key])) $res[] = $id[$key];
+                } else {
+                    $res[] = $id;
+                }
+            }
+        } else {
+            $ck = count($keys);
+            foreach ($idsArray as $id) {
+                $r = array();
+                if (is_array($id)) {
+                    foreach ($keys as $key) {
+                        if (isset($id[$key])) $r[] = $id[$key];
+                    }
+                }
+                if (count($r) == $ck) $res[] = $r;
+            }
+        }
+        return $res;
+    }
+    
+    function _unmap($keys, $map, & $rows, & $data, $defaultValue, $biDirectional, $varName, $otherVarName, 
+            $isUnique, $otherIsUnique, $qualifier, $otherQualifier, $mapMultiple = false) {
+        if (count($keys) === 1) {
+            foreach ($map as $m) {
+                $dataKey = $m[1];
+                if ($mapMultiple && !$isUnique) {
+                    $toSet = array();
+                    foreach ($m[0] as $rowKey) {
+                        if (isset($rows[$rowKey])) {
+                            $toSet = array_merge($toSet, $rows[$rowKey]);
+                            if ($biDirectional) {
+                                $this->_linkBack($rows[$rowKey], $data[$dataKey], $otherVarName, 
+                                    !$isUnique, $otherIsUnique, $otherQualifier); 
+                            }
+                        }
+                    }
+                } else {
+                    if (isset($rows[$rowKey = $m[0][0]])) {
+                        $toSet = $rows[$rowKey];
+                        if ($biDirectional) $this->_linkBack($rows[$rowKey], $data[$dataKey], $otherVarName, 
+                            !$isUnique, $otherIsUnique, $otherQualifier); 
+                    } else {
+                        $toSet = $defaultValue;
+                    }
+                }
+                $this->_setVal($data[$dataKey], $varName, $toSet, $qualifier);
+            }
+        } else {
+            foreach ($map as $m) {
+                $dataKey = $m[1];
+                if ($mapMultiple && !$isUnique) {
+                    $toSet = array();
+                    foreach ($m[0] as $rowPath) {
+                        $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
+                        if ($row !== false) {
+                           $toSet = array_merge($toSet, $row);
+                           if ($biDirectional) $this->_linkBack($row, $data[$dataKey], $otherVarName, 
+                               !$isUnique, $otherIsUnique, $otherQualifier);
+                        }
+                    }
+                } else {
+                    $rowPath = $m[0];
+                    $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
+                    if ($row !== false) {
+                       $toSet = $row;
+                       if ($biDirectional) $this->_linkBack($row, $data[$dataKey], $otherVarName, !$isUnique, $otherIsUnique, $otherQualifier);
+                    }
+                    else {
+                        $toSet = $defaultValue;
+                    }
+                }
+                $this->_setVal($data[$dataKey], $varName, $toSet, $qualifier);
+            }
+        }
+    }
+    
+    function _loadSrcOrDestCount ($data, $varName, $dontOverwriteLoaded, $fieldLinks, $fieldLinks2, 
+        $tableName, $nnIdsVar = false) {
         $keys = array_keys($fieldLinks);
         if (is_array($data)) { // we assume that this array is of objects or rows
             $values = array();
             $map = array();
-                
-            if ($ignoreLoaded) {
-                $this->_makeMapAndGetAllValues($data, $map, $values, $keys);
-            } else {
-                $this->_makeMapAndGetAllValuesIfVarNotFalse($data, $map, $values, $keys, $varName);
-            }
-                        
-            $counts = $this->_countWithValues($values, $this->midTableName? $fieldLinks2 : Ac_Util::array_values($fieldLinks), true, true, true, $tableName, false, false, $this->midTableName);
-            if (count($keys) === 1) {
-                foreach ($map as $m) {
+            
+            $this->_makeMapAndGetAllValues($data, $map, $values, $keys, 
+                $dontOverwriteLoaded? $varName : false, $nnIdsVar, $midMap, $midValues,
+                is_array($fieldLinks2)? array_values($fieldLinks2) : array());
+            
+            if ($midMap) {
+                foreach ($midMap as $m) {
                     $dataKey = $m[1];
-                    if (isset($counts[$countKey = $m[0][0]])) {
-                        $toSet = $counts[$countKey];
-                    } else $toSet = 0;
-                    $this->_setVal($data[$dataKey], $varName, $toSet); 
+                    $this->_setVal($data[$dataKey], $varName, count($m[0])); 
                 }
-            } else {
-                $countPath = $m[0];
-                $dataKey = $m[1];
-                foreach ($map as $m) {
-                    $count = Ac_Util::simpleGetArrayByPath($counts, $countPath, 0);
-                    $this->_setLoaded($data[$dataKey], $varName, $count);
+            }
+
+            if ($values) {
+                
+                $counts = $this->_countWithValues($values, 
+                    $this->midTableName? $fieldLinks2 : Ac_Util::array_values($fieldLinks), 
+                    true, true, true, $tableName, false, false, $this->midTableName, 
+                    $fieldLinks);
+                
+                if (count($keys) === 1) {
+                    foreach ($map as $m) {
+                        $dataKey = $m[1];
+                        if (isset($counts[$countKey = $m[0][0]])) {
+                            $toSet = $counts[$countKey];
+                        } else $toSet = 0;
+                        $this->_setVal($data[$dataKey], $varName, $toSet); 
+                    }
+                } else {
+                    foreach ($map as $m) {
+                        $countPath = $m[0];
+                        $dataKey = $m[1];
+                        $count = Ac_Util::simpleGetArrayByPath($counts, $countPath, 0);
+                        $this->_setVal($data[$dataKey], $varName, $count);
+                    }
                 }
             }
         } elseif (is_a($data, 'Ac_Model_Collection')) {
             trigger_error ('Collection as $srcData/$destData is not implemented yet', E_USER_ERROR);
         } elseif (is_object($data)) {
-            if (!($ignoreLoaded && isset($data->$varName) && $data->$varName !== false)) {  
+            if ($nnIdsVar && is_array($v = $this->_getValue($data, $nnIdsVar))) {
+                $this->_setVal($data, $varName, count($v));
+            }
+            if (!$dontOverwriteLoaded || $this->_isVarEmpty($data, $varName)) {  
                 $values = $this->_getValues($data, $keys, false, false);
-                $data->$varName = $this->_countWithValues($values, $this->midTableName? $fieldLinks2 : Ac_Util::array_values($fieldLinks), false, false, false, $tableName, false, false, $this->midTableName);
+                $this->_setVal($data, $varName, $k = $this->_countWithValues(
+                    $values, 
+                    $this->midTableName? $fieldLinks2 : Ac_Util::array_values($fieldLinks), 
+                    false, false, false, $tableName, false, false, $this->midTableName, $fieldLinks)
+                );
             }
         } else {
             trigger_error ('$srcData/$destData must be an array, a collection or an object', E_USER_ERROR);
         }
     }
     
-    function _getWithValues ($values, $keys, $multipleValues, $unique, $byKeys, $tableName, $ifun, $orderByKeys = false, $retSql = false, $midTableName = '', $ordering = false, $extraJoins = false, $extraWhere = false) {
-        if (!$extraJoins) {
-            $ta = '';
-            $asTa = '';
-            $cols = '*';
-        } else {
-            $ta = 't';
-            $asTa = 'AS t';
-            $cols = 't.*'; 
-        }
+    function _getWithValues ($values, $keys, $multipleValues, $unique, $byKeys, $tableName, $ifun, 
+            $orderByKeys = false, $retSql = false, $midTableName = '', $ordering = false, 
+            $extraJoins = false, $extraWhere = false, $keys2 = false, $values2 = false) {
+        $ta = 't';
+        $asTa = 'AS t';
+        $cols = 't.*'; 
         if (!$multipleValues) $values = array($values);
             elseif (!count($values)) {
                 $res = array();
@@ -875,10 +1135,16 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $allKeys = $keys;
             $selKeys = array_values($allKeys[0]);
             $keys = array_values($allKeys[0]);            
-            //$selKeys = array_keys($keys);
             $lta = '_mid_.';
-            $fromWhere = ' FROM '.$this->database->n($midTableName).' AS _mid_ '.$this->_getJoin('INNER', '_mid_', $tableName, $ta, $allKeys[1]);
             $crit = $this->_makeSqlCriteria($values, $selKeys, '_mid_');
+            if ($keys2) {
+                $join = 'LEFT';
+                $crit = "(".$crit.") OR (".$this->_makeSqlCriteria($values2, $keys2, strlen($ta)? $ta : $tableName).")";
+            } else {
+                $join = 'INNER';
+            }
+            $fromWhere = ' FROM '.$this->database->n($midTableName).' AS _mid_ '
+                .$this->_getJoin($join, '_mid_', $tableName, $ta, $allKeys[1]);
         } else {
             $fromWhere = ' FROM '.$this->database->n($tableName).$asTa;
             $selKeys = $keys;    
@@ -888,8 +1154,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if ($extraJoins) $fromWhere .= ' '.$extraJoins;
         $fromWhere .= ' WHERE ('.$crit.')';
         if ($extraWhere) $fromWhere .= ' AND '.$extraWhere; 
-        
-        $qKeys = array();
+            
+
         foreach ($keys as $key) $qKeys[] = $lta.$this->database->n($key);
         $sKeys = implode(', ', $qKeys);
         $sql = 'SELECT ';
@@ -905,7 +1171,6 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         }
         if ($retSql) return $sql;
         $res = array();
-        
         
         if ($midTableName && $byKeys && !$unique) {
             //return $res;
@@ -941,17 +1206,25 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                             $res[$keyValue[$key]][] = $objects[$i];
                     }
                 } else {
-                    foreach ($mid as $i => $keyValue) 
-                        Ac_Util::simpleSetArrayByPathNoRef($res, $keyValue, $objects[$i], $unique);
+                    foreach ($mid as $i => $keyValue) {
+                        Ac_Util::simpleSetArrayByPathNoRef($res, array_values($keyValue), $objects[$i], $unique);
+                    }
                 }
             } else {
                 $res = $objects;
             }
             $this->database->resultFreeResource($rr);
-        } else {
-            $rows = $this->database->fetchArray($sql);
-            $objects = $this->$ifun($rows);
-            
+        }
+        if (!$midTableName || $keys2) {
+            if ($keys2) {
+                $tmp = $res;
+                $res = array();
+                $keys = $keys2;
+                // we already have $rows and $objects populated
+            } else {
+                $rows = $this->database->fetchArray($sql);
+                $objects = $this->$ifun($rows);
+            }
             if ($byKeys) {
                 if (count($keys) === 1) {
                     $key = $keys[0];
@@ -969,8 +1242,10 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             } else {
                 $res = $objects;     
             }
+            // return two alternative mapping sets
+            if ($keys2) $res = array($tmp, $res);
         }
-        if (!$multipleValues && $unique && count($res)) {
+        if (!$multipleValues && !$keys2 && $unique && count($res)) {
             $tmp = $res[0];
             return $tmp;
         }
@@ -979,13 +1254,14 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     
     // TODO: optimize _countWithValues and _getWithValues to place instances into nested array faster when resultset is ordered
     
-    function _countWithValues($values, $keys, $multipleValues, $separateCounts, $byKeys, $tableName, $orderByKeys = false, $retSql = false, $midTableName = '', $otherKeys = false) {
+    function _countWithValues($values, $keys, $multipleValues, $separateCounts, $byKeys, $tableName, 
+            $orderByKeys = false, $retSql = false, $midTableName = '', $otherKeys = false) {
         if (!$multipleValues) $values = array($values);
             elseif (!count($values)) return $separateCounts? array() : 0;
         if ($midTableName) {
             $fromWhere = ' FROM '.$this->database->n($midTableName).' AS _mid_ '/*.$this->_getJoin('INNER', '_mid_', $tableName, '', $keys)*/;
-            $selKeys = array_keys($keys);
             $keys = array_values($otherKeys); 
+            $selKeys = $keys;
             $lta = '_mid_.';
             $crit = $this->_makeSqlCriteria($values, $keys, '_mid_');
             if ($this->midWhere !== false) $crit = "( $crit ) AND (".$this->getStrMidWhere('_mid_').")";
@@ -1015,8 +1291,9 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if ($byKeys && $multipleValues) {
             if (count($selKeys) === 1) {
                 $key = $selKeys[0];
-                while($row = $this->database->resultFetchAssoc($rr)) 
+                while($row = $this->database->resultFetchAssoc($rr)) {
                     $res[$row[$key]] = $row[$cntColumn];        
+                }
             } else {
                 while($row = $this->database->resultFetchAssoc($rr)) {
                     $this->_putRowToArray($row, $row[$cntColumn], $res, $selKeys, true);        
@@ -1072,7 +1349,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             if (count($keyFields) === 1) {
                 $qValues = array();
                 $qKeyField = $db->n($keyFields[0]);
-                foreach ($values as $val) $qValues[] = $db->q($val[0]);
+                foreach ($values as $val) $qValues[] = $db->q(is_array($val)? $val[0] : $val);
                 $qValues = array_unique($qValues);
                 if (count($qValues) === 1) $res = $qAlias.$qKeyField.' = '.$qValues[0];
                     else $res = $qAlias.$qKeyField.' IN('.implode(",", $qValues).')';
@@ -1085,7 +1362,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 foreach ($values as $valArray) {
                     $c = '';
                     for ($i = 0; $i < $bKeyFields; $i++) {
-                         $c .= $qKeyFields[$i].'='.$db->q($valArray[$i]).' AND ';
+                        $c .= $qKeyFields[$i].'='.$db->q($valArray[$i]).' AND ';
                     }
                     $crit[] = $c.$qKeyFields[$bKeyFields].' = '.$db->q($valArray[$bKeyFields]);
                 }
@@ -1170,6 +1447,4 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         }
     }
     
-    
 }
-

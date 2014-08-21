@@ -253,13 +253,6 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
             
         return $res; 
     }
- 
-    protected function intListReferenceFields() {
-        $res = array (
-            'personId' => '_person',
-        );
-        return $res;
-    }
     
 }
 

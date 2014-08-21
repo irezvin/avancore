@@ -43,6 +43,14 @@ class Sample_Tree_Adjacent_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Tree_Adjacent 
      */ 
+    function createRecord ($className = false) {
+        $res = parent::createRecord($className);
+        return $res;
+    }
+    
+    /**
+     * @return Sample_Tree_Adjacent 
+     */ 
     function reference ($values = array()) {
         return parent::reference($values);
     }

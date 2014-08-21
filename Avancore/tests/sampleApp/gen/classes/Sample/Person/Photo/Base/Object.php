@@ -8,6 +8,8 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     public $_personAlbumsCount = false;
     public $_personAlbumIds = false;
     public $_protraitPerson = false;
+    public $_personPosts = false;
+    public $_personPostsCount = false;
     public $photoId = NULL;
     public $personId = 0;
     public $filename = '';
@@ -34,18 +36,18 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'person', 1 => 'personAlbums', 2 => 'personAlbumIds', 3 => 'protraitPerson', 4 => 'photoId', 5 => 'personId', 6 => 'filename', );
+        return array ( 0 => 'person', 1 => 'personAlbums', 2 => 'personAlbumIds', 3 => 'protraitPerson', 4 => 'personPosts', 5 => 'photoId', 6 => 'personId', 7 => 'filename', );
     }
  
     protected function listOwnLists() {
         
-        return array ( 'personAlbums' => 'personAlbums', );
+        return array ( 'personAlbums' => 'personAlbums', 'personPosts' => 'personPosts', );
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'person' => 'Sample_Person', 'personAlbums' => 'Sample_Person_Album', 'protraitPerson' => 'Sample_Person', );
+        return array ( 'person' => 'Sample_Person', 'personAlbums' => 'Sample_Person_Album', 'protraitPerson' => 'Sample_Person', 'personPosts' => 'Sample_Person_Post', );
     }
 
     protected function getOwnPropertiesInfo() {
@@ -83,6 +85,14 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
                 'caption' => 'People',
                 'relationId' => '_protraitPerson',
                 'referenceVarName' => '_protraitPerson',
+            ),
+            'personPosts' => array (
+                'className' => 'Sample_Person_Post',
+                'mapperClass' => 'Sample_Person_Post_Mapper',
+                'caption' => 'Person posts',
+                'relationId' => '_personPosts',
+                'countVarName' => '_personPostsCount',
+                'referenceVarName' => '_personPosts',
             ),
             'photoId' => array (
                 'dataType' => 'int',
@@ -279,6 +289,62 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         return $res;
     }
     
+
+    function countPersonPosts() {
+        if (is_array($this->_personPosts)) return count($this->_personPosts);
+        if ($this->_personPostsCount === false) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocCountFor($this, '_personPosts');
+        }
+        return $this->_personPostsCount;
+    }
+
+    function listPersonPosts() {
+        if ($this->_personPosts === false) {
+            $mapper = $this->getMapper();
+            $mapper->listAssocFor($this, '_personPosts');
+        }
+        return array_keys($this->_personPosts);
+    }
+    
+    /**
+     * @return Sample_Person_Post 
+     */
+    function getPersonPost($id) {
+        if ($this->_personPosts === false) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_personPosts');
+        }
+        if (!isset($this->_personPosts[$id])) trigger_error ('No such Person post: \''.$id.'\'', E_USER_ERROR);
+        if ($this->_personPosts[$id] === false) {
+        }
+        return $this->_personPosts[$id];
+    }
+    
+    /**
+     * @param Sample_Person_Post $personPost 
+     */
+    function addPersonPost($personPost) {
+        if (!is_a($personPost, 'Sample_Person_Post')) trigger_error('$personPost must be an instance of Sample_Person_Post', E_USER_ERROR);
+        $this->listPersonPosts();
+        $this->_personPosts[] = $personPost;
+        
+        $personPost->_personPhoto = $this;
+        
+    }
+    
+    /**
+     * @return Sample_Person_Post  
+     */
+    function createPersonPost($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Person_Post_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        if ($isReference) $res->_setIsReference(true);
+        $this->addPersonPost($res);
+        return $res;
+    }
+    
   
 
     function _storeReferencedRecords() {
@@ -293,6 +359,17 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         return $res;
     }
 
+    function _storeReferencingRecords() {
+        $res = parent::_storeReferencingRecords() !== false;
+        $mapper = $this->getMapper();
+
+        if (is_array($this->_personPosts)) {
+            $rel = $mapper->getRelation('_personPosts');
+            if (!$this->_autoStoreReferencing($this->_personPosts, $rel->fieldLinks, 'personPosts')) $res = false;
+        }
+        return $res; 
+    }
+
     function _storeNNRecords() {
         $res = parent::_storeNNRecords() !== false;
         $mapper = $this->getMapper();
@@ -304,13 +381,6 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         }
             
         return $res; 
-    }
- 
-    protected function intListReferenceFields() {
-        $res = array (
-            'personId' => '_person',
-        );
-        return $res;
     }
     
 }

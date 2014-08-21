@@ -38,6 +38,14 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Religion 
      */ 
+    function createRecord ($className = false) {
+        $res = parent::createRecord($className);
+        return $res;
+    }
+    
+    /**
+     * @return Sample_Religion 
+     */ 
     function reference ($values = array()) {
         return parent::reference($values);
     }

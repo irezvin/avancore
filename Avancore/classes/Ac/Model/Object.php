@@ -355,6 +355,10 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         
     }
     
+    function hasPublicVars() {
+        return true;
+    }
+    
     protected function intAssignMetaCaching() {
         $this->metaClassId = $this->mapper->getId();
         parent::intAssignMetaCaching();
@@ -1150,24 +1154,38 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     protected function notifyFieldChanged($field) {
     }
     
-    /**
-     * @return array($foreignKeyPropertyName => $objectPropertyName)
-     */
-    protected function intListReferenceFields() {
-        return array();
-    }
-    
     protected function intResetReferences() {
-        foreach ($this->intListReferenceFields() as $fieldName => $objectFieldName) {
-            $c = false;
-            if ($this->isChanged($fieldName, false)) {
-                $c = true;
-                $this->$objectFieldName = false;
-            }
-            // set nullable empty foreign keys to null
-            if ($c || $this->isChanged($fieldName, true)) {
-                if (!strlen($this->$fieldName) && in_array($fieldName, $this->mapper->listNullableSqlColumns())) {
-                    $this->$fieldName = null;
+        $fkData = $this->getMapper()->getFkFieldsData();
+        foreach ($fkData as $fieldName => $details) {
+            $null = false;
+            if (is_null($fieldName)) {
+                $null = true;
+            } else {
+                foreach ($details['relations'] as $relId => $inf) {
+                    $objectFieldName = $inf['varName'];
+                    $c = false;
+                    if ($this->isChanged($fieldName, false) && strlen($objectFieldName)) {
+                        $c = true;
+                        $this->$objectFieldName = false;
+                    }
+                    // set nullable empty foreign keys to null
+                    if ($c || $this->isChanged($fieldName, true)) {
+                        if (!strlen($this->$fieldName) && $details['isNullable']) {
+                            $this->$fieldName = null;
+                            $null = true;
+                        }
+                    }
+                    if ($null) {
+                        if ($inf['otherFields']) {
+                            foreach ($inf['otherFields'] as $otherField) {
+                                if (isset($fkData[$otherField])) {
+                                    $other = $fkData[$otherField];
+                                    if ($other['isNullable'] && !$other['isRestricted'])
+                                        $this->$otherField = null;
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

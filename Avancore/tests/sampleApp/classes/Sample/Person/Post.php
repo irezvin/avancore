@@ -1,13 +1,14 @@
 <?php
 
-class Sample_Person extends Sample_Person_Base_Object {
-    
+class Sample_Person_Post extends Sample_Person_Post_Base_Object {
+
     function intResetReferences() {
         return parent::intResetReferences();
     }
     
+    
     /*
-    function getOwnPropertiesInfo() {
+    protected function getOwnPropertiesInfo() {
         return Ac_Util::m(parent::getOwnPropertiesInfo(), array(
             '' => array(
                 'caption' => '',
@@ -17,19 +18,19 @@ class Sample_Person extends Sample_Person_Base_Object {
         ));
     }
     
-    function listOwnProperties() {
+    protected function listOwnProperties() {
         return array_merge(parent::listOwnProperties(), array(
             '', '',
         ));
     }
     
-    function listOwnLists() {
+    protected function listOwnLists() {
         return array_merge(parent::listOwnLists(), array(
             '' => '', '' => '',
         ));
     }
     
-    function listOwnAssociations() {
+    protected function listOwnAssociations() {
         return array_merge(parent::listOwnAssociations(), array(
             '' => '', '' => '',
         ));

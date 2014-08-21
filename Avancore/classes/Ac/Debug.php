@@ -106,6 +106,31 @@ class Ac_Debug {
         self::$misc = array();
     }
     
+    /**
+     * @param mixed $foo
+     * Replaces Ac_Model_Objects with their values & class
+     */
+    static function dr($foo, $dump = false) {
+        if (is_array($foo)) {
+            $res = array(); 
+            foreach ($foo as $k => $v) {
+                $res[$k] = self::dr($v);
+            }
+        } elseif (is_object($foo) && $foo instanceof Ac_Model_Object) {
+            $res = array_merge(array('__class' => get_class($foo)), $foo->getDataFields());
+        } else {
+            $res = $foo;
+        }
+        if ($dump) var_dump($res);
+        return $res;
+    }
+    
+    static function drr($foo) {
+        foreach (func_get_args() as $arg) {
+            self::dr($arg, true);
+        }
+    }
+    
     static function reportConstruct($obj) {
         $c = get_class($obj);
         if (!isset(self::$created[$c])) self::$created[$c] = 1;

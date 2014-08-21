@@ -286,8 +286,9 @@ class Ac_Accessor implements Ac_I_Accessor {
             if (strlen($propertyName) && method_exists($item, $g = 'get'.$propertyName)) {
                 $res = true;
             } elseif ($item instanceof Ac_Model_Data && $item->hasProperty($propertyName)) {
-                $res = $item->hasProperty($propertyName);
-            } elseif (($item instanceof Ac_I_Prototyped? $item->hasPublicVars() : true) && (array_key_exists($propertyName, Ac_Util::getClassVars(get_class($item))))) {
+                $res = true;
+            } elseif (($item instanceof Ac_I_Prototyped? $item->hasPublicVars() : true)) {
+                $res = (array_key_exists($propertyName, Ac_Util::getClassVars(get_class($item))));
                 $res = true;
             } else {
                 $res = false;
