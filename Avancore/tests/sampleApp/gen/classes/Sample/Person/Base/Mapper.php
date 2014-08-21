@@ -47,6 +47,14 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Person 
      */ 
+    function createRecord ($className = false) {
+        $res = parent::createRecord($className);
+        return $res;
+    }
+    
+    /**
+     * @return Sample_Person 
+     */ 
     function reference ($values = array()) {
         return parent::reference($values);
     }
@@ -140,6 +148,18 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'destMapperClass' => 'Sample_Person_Photo_Mapper',
                 'srcVarName' => '_personPhotos',
                 'srcCountVarName' => '_personPhotosCount',
+                'destVarName' => '_person',
+                'fieldLinks' => array (
+                    'personId' => 'personId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+            ),
+            '_personPosts' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Person_Post_Mapper',
+                'srcVarName' => '_personPosts',
+                'srcCountVarName' => '_personPostsCount',
                 'destVarName' => '_person',
                 'fieldLinks' => array (
                     'personId' => 'personId',
@@ -365,6 +385,37 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      */
     function loadPersonPhotosFor($people) {
         $rel = $this->getRelation('_personPhotos');
+        return $rel->loadDest($people); 
+    }
+
+
+    /**
+     * Returns (but not loads!) one or more people of given one or more personPosts 
+     * @param Sample_Person|array $personPosts     
+     * @return array of Sample_Person objects  
+     */
+    function getOfPersonPosts($personPosts) {
+        $rel = $this->getRelation('_personPosts');
+        $res = $rel->getSrc($personPosts); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more people of given one or more personPosts 
+     * @param Sample_Person_Post|array $personPosts of Sample_Person objects
+     
+     */
+    function loadForPersonPosts($personPosts) {
+        $rel = $this->getRelation('_personPosts');
+        return $rel->loadSrc($personPosts); 
+    }
+
+    /**
+     * Loads one or more personPosts of given one or more people 
+     * @param Sample_Person|array $people     
+     */
+    function loadPersonPostsFor($people) {
+        $rel = $this->getRelation('_personPosts');
         return $rel->loadDest($people); 
     }
 

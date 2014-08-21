@@ -293,15 +293,6 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
  
         return $res;
     }
- 
-    protected function intListReferenceFields() {
-        $res = array (
-            'relationTypeId' => '_relationType',
-            'otherPersonId' => '_otherPerson',
-            'personId' => '_person',
-        );
-        return $res;
-    }
     
 }
 

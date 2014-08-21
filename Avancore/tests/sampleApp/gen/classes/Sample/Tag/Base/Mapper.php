@@ -42,6 +42,14 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Tag 
      */ 
+    function createRecord ($className = false) {
+        $res = parent::createRecord($className);
+        return $res;
+    }
+    
+    /**
+     * @return Sample_Tag 
+     */ 
     function reference ($values = array()) {
         return parent::reference($values);
     }

@@ -188,6 +188,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     
     protected $allRecords = false;
     
+    protected $fkFieldsData = false;
+    
     function __construct(array $options = array()) {
         parent::__construct($options);
         if (!$this->tableName) trigger_error (__FILE__."::".__FUNCTION__." - tableName missing", E_USER_ERROR);
@@ -339,7 +341,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @throws Ac_E_InvalidCall if $className is NOT a sub-class of $this->recordClass
      * @return Ac_Model_Object
      */
-    final function createRecord($className = false) {
+    function createRecord($className = false) {
         $res = $this->coreCreateRecord($className);
         return $res;
     }
@@ -1483,6 +1485,77 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         $this->recordsCollection = array();
         $this->newRecords = array();
         $this->relations = array();
+        $this->fkFieldsData = false;
     }
+
+    /**
+     * @return array information about fields that are parts of foreign keys 
+     * Return format:
+     * [ $fieldId => [ 
+     *        'isRestricted' => bool, 
+     *        'isOutgoing' => bool,
+     *        'isNullable' => bool,
+     *        'relations' => [ $relId => [
+     *          'objectProperty' => $objectProperty,
+     *          'varName' => $varName, 
+     *          'isRestricted' => $isRestricted, 
+     *          'otherFields' => [ ... ]
+     *        ] ]
+     * ] ]
+     */
+    function getFkFieldsData() {
+        if ($this->fkFieldsData === false) {
+            $this->fkFieldsData = array();
+            $proto = $this->getPrototype();
+            $rel2propMap = array();
+            foreach (array_keys($proto->listAssociations()) as $propName) {
+                $prop = $proto->getPropertyInfo($propName, true);
+                if (isset($prop->relationId) && strlen($prop->relationId)) {
+                    $rel2propMap[$prop->relationId] = $propName;
+                }
+            }
+            
+            // step1: list all participating fields
+            foreach ($this->listRelations() as $relId) {
+                $rel = $this->getRelation($relId);
+                if (($rel->srcOutgoing && $rel->getSrcMapper() === $this && $rel->getDestMapper())) {
+                    $fl = $rel->fieldLinks;
+                    $fields = array_keys($fl);
+                    foreach ($fields as $fieldId) {
+                        if (isset($rel2propMap[$relId])) $inf['objectProperty'] = $rel2propMap[$relId];
+                            else $inf['objectProperty'] = false;
+                        $inf = array(
+                            'otherFields' => array_diff($fields, array($fieldId)),
+                            'varName' => $rel->srcVarName                        
+                        );
+                        $this->fkFieldsData[$fieldId]['relations'][$relId] = $inf;
+                    }
+                }
+            }
+            
+            $null = array_flip(array_intersect(
+                array_keys($this->fkFieldsData), 
+                $this->listNullableSqlColumns()
+            ));
+            
+            // step2: calculate restricted fields
+            foreach ($this->fkFieldsData as $fieldId => $rels) {
+                $this->fkFieldsData[$fieldId]['isNullable'] = isset($null[$fieldId]);
+                $pi = $proto->getPropertyInfo($fieldId, true);
+                foreach ($rels as $relId => $inf) {
+                    $isRestricted = false;
+                    if (isset($pi->isRestricted)) $isRestricted = $pi->isRestricted;
+                    else {
+                        if ($fieldId === $this->pk) $isRestricted = true;
+                        elseif (count($rels['relations']) > 1) {
+                            $isRestricted = true;
+                        }
+                    }
+                    $this->fkFieldsData[$fieldId]['isRestricted'] = $isRestricted;
+                }
+            }
+        }
+        return $this->fkFieldsData;
+    }    
     
 }

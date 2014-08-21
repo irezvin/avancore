@@ -251,12 +251,6 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 <?php           
         }
         
-        if (($rf = $this->model->getReferenceFieldsData())) { ?> 
-    protected function intListReferenceFields() {
-        $res = <?php echo $this->exportArray($rf, 8); ?>;
-        return $res;
-    }
-<?php   }
     }
     
     function showModelGenObject() {  
@@ -425,6 +419,14 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper(<?php $this->str($this->mapperClass); ?>)->createRecord($className);
+        return $res;
+    }
+    
+    /**
+     * @return <?php $this->d($this->modelClass); ?> 
+     */ 
+    function createRecord ($className = false) {
+        $res = parent::createRecord($className);
         return $res;
     }
     

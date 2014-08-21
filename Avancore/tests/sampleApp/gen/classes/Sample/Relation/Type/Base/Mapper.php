@@ -39,6 +39,14 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Relation_Type 
      */ 
+    function createRecord ($className = false) {
+        $res = parent::createRecord($className);
+        return $res;
+    }
+    
+    /**
+     * @return Sample_Relation_Type 
+     */ 
     function reference ($values = array()) {
         return parent::reference($values);
     }
