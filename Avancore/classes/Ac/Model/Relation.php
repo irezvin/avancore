@@ -822,7 +822,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             }
             $counts = $this->_countWithValues($values, $this->midTableName? $fieldLinks2 : Ac_Util::array_values($fieldLinks), 
                 true, $separate, $matchMode > 0, $tableName, false, false, $this->midTableName, 
-                $this->midTableName? array_keys($fieldLinks) : false);
+                $this->midTableName? $fieldLinks : false);
             if (!$separate) {
                 $res = $counts;
             } else {

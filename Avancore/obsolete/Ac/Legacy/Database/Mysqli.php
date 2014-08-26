@@ -141,7 +141,7 @@ class Ac_Legacy_Database_Mysqli extends Ac_Legacy_Database_Native {
     }
     
     function fetchBoth($resultResource) {
-        return mysqli_fetch_array($resultResource, mysqli_BOTH);
+        return mysqli_fetch_array($resultResource, MYSQLI_BOTH);
     }
     
     function freeResultResource($resultResource) {
@@ -152,6 +152,24 @@ class Ac_Legacy_Database_Mysqli extends Ac_Legacy_Database_Native {
         return mysqli_affected_rows($this->_connection);
     }
     
+    function getFieldsInfo($resultResource, $noTableKey = 0) {
+        $res = array();
+        $tmp = 0;
+        while ($finfo = $resultResource->fetch_field()) {
+            $res[] = array($finfo->table, $finfo->name);
+            $tmp++;
+        }
+        return $res;
+    }
+    
+    function fetchAssocByTables($resultResource, $fieldsInfo = false) {
+        $row = mysqli_fetch_array($resultResource, MYSQLI_NUM);
+        if (!$row) return $row;
+        foreach ($fieldsInfo as $i => $fi) {
+            $res[$fi[0]][$fi[1]] = $row[$i];
+        }
+        return $res;
+    }
+    
+
 }
-
-
