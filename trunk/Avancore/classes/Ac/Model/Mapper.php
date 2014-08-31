@@ -76,11 +76,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     const EVENT_ON_GET_MANAGER_CONFIG = 'onGetManagerConfig';
 
     /**
-     * function onRelationNotFound($id, & $res)
-     */
-    const EVENT_ON_RELATION_NOT_FOUND = 'onRelationNotFound';
-    
-    /**
      * function onUpdated()
      */
     const EVENT_ON_UPDATED = 'onUpdated';
@@ -107,11 +102,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      */
     protected $application = false;
 
-    /**
-     * @var Ac_Legacy_Database
-     */
-    protected $database = false;
-    
     protected $autoincFieldName = false;
 
     /**
@@ -155,13 +145,23 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * Relations that were created (used only if $this->remembersRelations())
      * @var array of Ac_Model_Relation
      */
-    protected $relations = array();
+    protected $relations = false;
+    
+    /**
+     * List of 'intrinsic' relations that cannot be deleted
+     * @var array
+     */
+    protected $intrinsicRelations = false;
 
+    /**
+     * List of relations that were added
+     * @var array
+     */
+    protected $additionalRelations = array();
+    
     var $useProto = false;
 
     protected $proto = array();
-
-    protected $relationPrototypes = false;
 
     /**
      * @var Ac_Model_MapperInfo
@@ -219,8 +219,12 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
 
     function setApplication(Ac_Application $application) {
         $this->application = $application;
-        if (!$this->database && !$this->db) {
-            //$this->setDatabase($this->application->getLegacyDatabase());
+        if ($this->relations) {
+            foreach ($this->relations as $rel) {
+                if (is_object($rel)) $rel->setApplication($application);
+            }
+        }
+        if (!$this->db) {
             $this->setDb($this->application->getDb());
         }
     }
@@ -1003,8 +1007,16 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     // --------------- Function that work with associations and relations ---------------
 
     function listRelations() {
-        if ($this->relationPrototypes === false) $this->relationPrototypes = $this->getRelationPrototypes();
-        return array_keys($this->relationPrototypes);
+        if ($this->relations === false) {
+            $this->relations = $this->getRelationPrototypes();
+            foreach ($this->relations as $k => $rel) {
+                if (is_object($rel)) {
+                    $rel->setImmutable(true);
+                }
+            }
+            $this->intrinsicRelations = array_keys($this->relations);
+        }
+        return array_keys($this->relations);
     }
 
     function listIncomingRelations() {
@@ -1020,78 +1032,99 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
 
-    protected final function getRelationPrototype($relId) {
-        if (!in_array($relId, $this->listRelations())) {
-            $res = null;
-            $this->triggerEvent(self::EVENT_ON_RELATION_NOT_FOUND, array(
-                $relId, & $res
-            ));
-            if (!$res)
-                trigger_error ("No such relation: '{$relId}' in mapper ".get_class($this), E_USER_ERROR);
-        } else {
-            $res = $this->relationPrototypes[$relId];
-        }
-        return $res;
-    }
-
     /**
      * @return Ac_Model_Relation
      */
-    function createRelation($relId) {
-        $proto = $this->getRelationPrototype($relId);
-        if (is_object($proto) && $proto instanceof Ac_Model_Relation) {
-            $proto->setApplication($this->application);
-            if ($proto->srcMapperClass == $this->getId()) {
-                $proto->setSrcMapper($this);
-            } elseif ($proto->destMapperClass == $this->getId()) {
-                $proto->setDestMapper($this);
-            }
-            $res = $proto;
-        } else {
-            // Replace mapper classes with mapper instances, if possible
-            if ($this->application) $proto['application'] = $this->application;
-            if (isset($proto['srcMapperClass']) && $proto['srcMapperClass'] == $this->getId()) {
-                $proto['srcMapper'] = $this;
-            } elseif (isset($proto['destMapperClass']) && $proto['destMapperClass'] == $this->getId()) {
-                $proto['destMapper'] = $this;
-            }
+    protected function createRelation($proto) {
+        // Replace mapper classes with mapper instances, if possible
+        if ($this->application) $proto['application'] = $this->application;
+        if (isset($proto['srcMapperClass']) && $proto['srcMapperClass'] == $this->getId()) {
+            $proto['srcMapper'] = $this;
+        } elseif (isset($proto['destMapperClass']) && $proto['destMapperClass'] == $this->getId()) {
+            $proto['destMapper'] = $this;
         }
-        $res = Ac_Model_Relation::factory($proto);
+        $proto['immutable'] = true;
+        $res = Ac_Prototyped::factory($proto, 'Ac_Model_Relation');
         return $res;
-    }
-
-    /**
-     * @return bool Whether Mapper has to store created relations
-     *
-     * This function can be overridden in child classes.
-     */
-    function remembersRelations() {
-        return false;
     }
 
     /**
      * @return Ac_Model_Relation
      */
     function getRelation($relId) {
-        if (!isset($this->relations[$relId])) {
-            $res = $this->createRelation($relId);
-            if ($this->remembersRelations()) $this->relations[$relId] = $res;
-        } else $res = $this->relations[$relId];
+        if ($this->relations === false) $this->listRelations();
+        if (isset($this->relations[$relId])) {
+            if (is_array($this->relations[$relId])) {
+                $res = $this->createRelation($this->relations[$relId]);
+                $this->relations[$relId] = $res;
+            } else {
+                $res = $this->relations[$relId];
+            }
+        } else {
+            throw Ac_E_InvalidCall::noSuchItem('relation', $relId, 'listRelations');
+        }
         return $res;
     }
-
+    
+    function addRelation($id, $relation) {
+        if (!in_array($id, $this->listRelations())) {
+            $this->additionalRelations[] = $id;
+            if (is_array($relation)) {
+                // prototype will be stored for future use
+            } elseif (is_object($relation) && $relation instanceof Ac_Model_Relation) {
+                $relation->setApplication($this->application);
+                if ($relation->srcMapperClass == $this->getId()) {
+                    $relation->setSrcMapper($this);
+                } elseif ($relation->destMapperClass == $this->getId()) {
+                    $relation->setDestMapper($this);
+                }
+                $relation->setImmutable(true);
+                $this->relations[$id] = $relation;
+            } else {
+                throw Ac_E_InvalidCall::wrongType('relation', $relation, array('array', 'Ac_Model_Relation'));
+            }
+        } else {
+            throw Ac_E_InvalidCall::alreadySuchItem('relation', $id, 'deleteRelation');
+        }
+    }
+    
+    function deleteRelation($id) {
+        if (in_array($id, $this->listRelations())) {
+            if (!in_array($id, $this->listIntrinsicRelations())) {
+                unset($this->relations[$id]);
+                $this->additionalRelations = array_diff($this->additionalRelations, array($id));
+            } else {
+                throw new Ac_E_InvalidCall("Cannot delete relation '{$id}' that is intrinsic to "
+                    .$this->getId()." mapper; check with listIntrinsicRelations() next time");
+            }
+        } else {
+            throw Ac_E_InvalidCall::noSuchItem('relation', $id, 'listRelations');
+        }
+    }
+    
+    function listIntrinsicRelations() {
+        if ($this->intrinsicRelations === false) $this->listRelations();
+        return $this->intrinsicRelations;
+    }
+    
+    function isIntrinsicRelation($id) {
+        return in_array($id, $this->listIntrinsicRelations());
+    }
+    
+    function listAdditionalRelations() {
+        return $this->additionalRelations;
+    }
+    
     protected function doGetRelationPrototypes() {
         return array();
     }
 
     final function getRelationPrototypes() {
-        if ($this->relationPrototypes === false) {
-            $this->relationPrototypes = $this->doGetRelationPrototypes();
-            $this->triggerEvent(self::EVENT_ON_GET_RELATION_PROTOTYPES, array(
-                & $this->relationPrototypes
-            ));
-        }
-        return $this->relationPrototypes;
+        $res = $this->doGetRelationPrototypes();
+        $this->triggerEvent(self::EVENT_ON_GET_RELATION_PROTOTYPES, array(
+            & $res
+        ));
+        return $res;
     }
 
     // TODO: Add suport for records that are in random access collections (invoke 
@@ -1121,44 +1154,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         $rel->loadDestNNIds($record);
     }
     
-    // ----------------- Functions that work with arrays of records -------------
-
-    /**
-     * @param Ac_Model_Object $record
-     * @param array $dest
-     */
-    function putToArrayByPk(& $record, $dest) {
-        $dest[$record->{$this->pk}] = $record;
-    }
-
-    /**
-     * @param array $src
-     * @param string $pk
-     * @return Ac_Model_Object or $default if it is not found
-     */
-    function getFromArrayByPk($src, $pk, $default = null) {
-        $res = $default;
-        if (isset($src[$pk])) $res = $src[$pk];
-        return $res;
-    }
-
-    /**
-     * @param array $src
-     * @return array(array($pk1, & $rec1), array($pk2, & $rec2), ...)
-     */
-    function getFlatArrayWithPks($src) {
-        $res = array();
-        foreach (array_keys($src) as $pk) {
-            $res[] = array($pk, & $src[$pk]);
-        }
-        return $res;
-    }
-     
-    // ----------------- Functions that work with records -----------------
-
-    // ----------------- Supplementary functions -----------------
-
-
     /**
      * @param Ac_Model_Object $record
      * @return string|false
@@ -1209,7 +1204,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     function isMyRecord($rec, $throw = false) {
         $res = $rec instanceof $this->recordClass;
         if ($throw && !$rec) {
-            throw new Ac_E_InvalidUsage("\$rec is of class ".get_class($rec).", must be an instance of ".$this->recordClass." to be supported by persistence functions of ".get_class($this));
+            throw new Ac_E_InvalidUsage("\$rec is of class ".get_class($rec).", must be an instance of "
+                .$this->recordClass." to be supported by persistence functions of ".get_class($this));
         }
         return $res;
     }
@@ -1280,7 +1276,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      */
     protected function corePeDelete($record, $hyData, & $error = null) {
         $key = $hyData[$this->pk];
-        $res = (bool) $this->db->query("DELETE FROM ".$this->db->n($this->tableName)." WHERE ".$this->db->n($this->pk)." ".$this->db->eqCriterion($key));
+        $res = (bool) $this->db->query("DELETE FROM ".$this->db->n($this->tableName)." WHERE "
+            .$this->db->n($this->pk)." ".$this->db->eqCriterion($key));
         if ($res) $this->markUpdated();
         return $res;
     }

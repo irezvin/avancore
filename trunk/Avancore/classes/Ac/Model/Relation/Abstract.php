@@ -4,15 +4,34 @@
  * Defines members and methods that are common to Ac_Model_Relation and Ac_Model_Relation_Tree objects
  * (that are used mostly for data retrieval)
  */
-class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
+class Ac_Model_Relation_Abstract extends Ac_Prototyped {
     
-    var $debug = false;
+    protected $debug = false;
 
-    function hasPublicVars() {
-        return true;
+    function __get($var) {
+        if (method_exists($this, $m = 'get'.$var)) return $this->$m();
+        else Ac_E_InvalidCall::noSuchProperty ($this, $var);
+    }
+
+    function __set($var, $value) {
+        if (method_exists($this, $m = 'set'.$var)) $this->$m($value);
+        else throw Ac_E_InvalidCall::noSuchProperty ($this, $var);
     }
     
-    function _setVal(& $dest, $varName, $val, $qualifier = false) {
+    function setDebug($debug) {
+        $this->debug = (bool) $debug;
+    }
+
+    function getDebug() {
+        return $this->debug;
+    }
+
+
+    function hasPublicVars() {
+        return false;
+    }
+    
+    protected function setVal(& $dest, $varName, $val, $qualifier = false) {
         if ($qualifier !== false && $qualifier !== null && is_array($val)) {
             $val = Ac_Util::indexArray($val, $qualifier, true);
         }
@@ -32,14 +51,14 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
      * @param bool $toIsArray - if $linkTo is an array of an objects or an arrays
      * @param bool $linkedIsUnique - whether we should replace $linkTo->varName or add to it ($linkTo->varName[]) 
      */
-    function _linkBack(& $linkTo, & $linked, $varName, $toIsArray, $linkedIsUnique, $qualifier = false, $qKey = null) {
+    protected function linkBack(& $linkTo, & $linked, $varName, $toIsArray, $linkedIsUnique, $qualifier = false, $qKey = null) {
         if (is_null($qualifier)) $qualifier = false;
         elseif ($qualifier !== false) {
             if ($qKey === null) $qKey = Ac_Accessor::getObjectProperty ($linked, $qualifier, true);
         }
         if ($toIsArray) {
             foreach (array_keys($linkTo) as $k) {
-                $this->_linkBack($linkTo[$k], $linked, $varName, false, $linkedIsUnique, $qualifier, $qKey);
+                $this->linkBack($linkTo[$k], $linked, $varName, false, $linkedIsUnique, $qualifier, $qKey);
             }
         } else {
             $lt = & $linkTo;
@@ -78,7 +97,7 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
         }
     }
     
-    function _isFull($v) {
+    protected function isFull($v) {
         if (is_array($v)) foreach ($v as $vv) {
             if (is_null($vv) || $vv === false) return false; 
         } else {
@@ -87,30 +106,30 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
         return true;
     }
     
-    function _putRowToArray(& $row, & $instance, & $array, $keys, $unique) {
+    protected function putRowToArray(& $row, & $instance, & $array, $keys, $unique) {
         foreach ($keys as $key) $path[] = $row[$key];
         Ac_Util::simpleSetArrayByPathNoRef($array, $path, $instance, $unique);
     }
     
-    function _putInstanceToArray(& $instance, & $array, $keys, $isDest, $unique) {
-        $path = $this->_getValues($instance, $keys);
+    protected function putInstanceToArray(& $instance, & $array, $keys, $isDest, $unique) {
+        $path = $this->getValues($instance, $keys);
         Ac_Util::simpleSetArrayByPathNoRef($array, $path, $instance, $unique);
     }
     
-    function _getFromArray($src, $fieldName) {
+    protected function getFromArray($src, $fieldName) {
         return $src[$fieldName];
     }
     
-    function _getFromMember($src, $fieldName) {
+    protected function getFromMember($src, $fieldName) {
         return $src->$fieldName;
     }
     
-    function _getFromGetter($src, $fieldName) {
+    protected function getFromGetter($src, $fieldName) {
         $m = 'get'.ucfirst($fieldName);
         return $src->$m();
     }
     
-    function _getFromAeData($src, $fieldName) {
+    protected function getFromAeData($src, $fieldName) {
         return $src->getField($fieldName);
     }
     
@@ -118,7 +137,7 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
      * Retrieves field value from source object or array. Caches retrieval strategy for different classes in static variable (as in Ac_Table_Column).
      * Triggers error if retrieval is not possible.
      */
-    function _getValue($src, $fieldName) {
+    protected function getValue($src, $fieldName) {
         static $g = array();
         if (is_array($src)) {
             if (!isset($src[$fieldName])) trigger_error('Cannot extract field \''.$fieldName.'\' from an array', E_USER_ERROR);
@@ -128,9 +147,9 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
             if (isset($g[$cls]) && isset($g[$cls][$fieldName])) $getter = $g[$cls][$fieldName];
             else {
                 switch(true) {
-                    case in_array($fieldName, array_keys(get_class_vars($cls))): $getter = '_getFromMember'; break;
-                    case method_exists($src, 'get'.$fieldName): $getter = '_getFromGetter'; break;
-                    case is_a($src, 'Ac_Model_Data'): $getter = '_getFromAeData'; break;
+                    case in_array($fieldName, array_keys(get_class_vars($cls))): $getter = 'getFromMember'; break;
+                    case method_exists($src, 'get'.$fieldName): $getter = 'getFromGetter'; break;
+                    case is_a($src, 'Ac_Model_Data'): $getter = 'getFromAeData'; break;
                     default:
                         trigger_error('Cannot extract field \''.$fieldName.'\' from an object', E_USER_ERROR);
                 }
@@ -141,7 +160,7 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
         return $res;
     }
     
-    function _mapValues($values, $fieldNames) {
+    protected function mapValues($values, $fieldNames) {
         $i = 0;
         $res = array();
         foreach ($values as $value) {
@@ -160,31 +179,37 @@ class Ac_Model_Relation_Abstract implements Ac_I_Prototyped {
      * @return array Field values
      * @access private 
      */
-    function _getValues($src, $fieldNames, $originalKeys = false, $single = false) {
+    protected function getValues($src, $fieldNames, $originalKeys = false, $single = false) {
         $res = array();
         if ($single) {
-            $res = $this->_getValue($src, $fieldNames);
+            $res = $this->getValue($src, $fieldNames);
         } else {
             $c = count($fieldNames);
             if ($originalKeys)
                 for ($i = 0; $i < $c; $i++) {
-                    $res[$fieldNames[$i]] = $this->_getValue($src, $fieldName);
+                    $res[$fieldNames[$i]] = $this->getValue($src, $fieldName);
                 }
             else
                foreach ($fieldNames as $fieldName) {
-                    $res[] = $this->_getValue($src, $fieldName);
+                    $res[] = $this->getValue($src, $fieldName);
                 }
         }
         return $res;
     }
     
-    function _isVarEmpty($srcItem, $var) {
+    protected function isVarEmpty($srcItem, $var, & $value = false) {
         $res = true;
+        $value = false;
         if (is_array($srcItem)) {
-            if (array_key_exists($var, $srcItem) && $srcItem[$var] !== false) $res = false;
+            if (array_key_exists($var, $srcItem)) {
+                if ($srcItem[$var] !== false) {
+                    $value = $srcItem[$var];
+                    $res = false;
+                }
+            }
         } else {
             if (Ac_Accessor::objectPropertyExists($srcItem, $var) 
-                && $this->_getValue($srcItem, $var) !== false) {
+                && ($value = $this->getValue($srcItem, $var)) !== false) {
                 $res = false;
             }
         }

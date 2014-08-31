@@ -64,9 +64,9 @@ CREATE TABLE `ac_people` (
   PRIMARY KEY (`personId`),
   KEY `FK_ac_people_1` (`religionId`),
   KEY `FK_ac_person_photos_ac_people_protrait` (`personId`,`portraitId`),
-  CONSTRAINT `FK_ac_person_religion` FOREIGN KEY (`religionId`) REFERENCES `ac_religion` (`religionId`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `FK_ac_person_photos_ac_people_protrait` FOREIGN KEY (`personId`, `portraitId`) REFERENCES `ac_person_photos` (`personId`, `photoId`)
-) ENGINE=InnoDB AUTO_INCREMENT=47 DEFAULT CHARSET=utf8;
+  CONSTRAINT `FK_ac_person_photos_ac_people_protrait` FOREIGN KEY (`personId`, `portraitId`) REFERENCES `ac_person_photos` (`personId`, `photoId`),
+  CONSTRAINT `FK_ac_person_religion` FOREIGN KEY (`religionId`) REFERENCES `ac_religion` (`religionId`) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -158,6 +158,37 @@ LOCK TABLES `ac_person_photos` WRITE;
 /*!40000 ALTER TABLE `ac_person_photos` DISABLE KEYS */;
 INSERT INTO `ac_person_photos` VALUES (1,3,'ilya1.jpg'),(2,3,'ilya2.jpg'),(3,4,'tanya1.jpg');
 /*!40000 ALTER TABLE `ac_person_photos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_person_posts`
+--
+
+DROP TABLE IF EXISTS `ac_person_posts`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_person_posts` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `personId` int(10) unsigned DEFAULT NULL,
+  `photoId` int(10) unsigned DEFAULT NULL,
+  `title` varchar(255) DEFAULT '',
+  `content` longtext,
+  PRIMARY KEY (`id`),
+  KEY `personId` (`personId`),
+  KEY `FK__ac_post_photo` (`personId`,`photoId`),
+  CONSTRAINT `FK__ac_post_person` FOREIGN KEY (`personId`) REFERENCES `ac_people` (`personId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `FK__ac_post_photo` FOREIGN KEY (`personId`, `photoId`) REFERENCES `ac_person_photos` (`personId`, `photoId`) ON DELETE SET NULL ON UPDATE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_person_posts`
+--
+
+LOCK TABLES `ac_person_posts` WRITE;
+/*!40000 ALTER TABLE `ac_person_posts` DISABLE KEYS */;
+INSERT INTO `ac_person_posts` VALUES (1,3,1,'Post 1 by Ilya','The text 1'),(2,3,NULL,'Post 2 by Ilya (no photo)','No photo this time'),(3,4,3,'Post by Tanya','Hello, world!');
+/*!40000 ALTER TABLE `ac_person_posts` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -259,7 +290,7 @@ CREATE TABLE `ac_tags` (
   `titleF` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`tagId`),
   UNIQUE KEY `Index_2` (`title`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -268,7 +299,7 @@ CREATE TABLE `ac_tags` (
 
 LOCK TABLES `ac_tags` WRITE;
 /*!40000 ALTER TABLE `ac_tags` DISABLE KEYS */;
-INSERT INTO `ac_tags` VALUES (1,'Ум','Умный','Умница'),(2,'Красота','Красивый','Красавица');
+INSERT INTO `ac_tags` VALUES (1,'Ум','Умный','Умница'),(2,'Красота','Красивый','Красавица'),(3,'Хитрость','Хитрюга','Хитрюга');
 /*!40000 ALTER TABLE `ac_tags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -409,4 +440,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-08-10 22:26:11
+-- Dump completed on 2014-08-29 23:59:40
