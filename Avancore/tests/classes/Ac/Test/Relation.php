@@ -4,6 +4,246 @@ class Ac_Test_Relation extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
     
+    function testLoadReturnsRecords() {
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        
+        $pers = $pm->loadByPersonId(3);
+        $pers2 = $pm->loadByPersonId(4);
+        $pers->setTagIds(array(3));
+        $records = $pm->loadTagsFor(array($pers, $pers2));
+        $records = Ac_Util::indexArray(Ac_Util::flattenArray($records), 'tagId', true);
+        ksort($records);
+        $this->assertEqual(array_keys($records), array(1, 2, 3));
+        
+        $pers = $pm->loadByPersonId(3);
+        $pers2 = $pm->loadByPersonId(4);
+        $pers->setTagIds(array(1, 3));
+        $pers2->setTagIds(array());
+        
+        $records = $pm->loadTagsFor(array($pers, $pers2));
+        $records = Ac_Util::indexArray(Ac_Util::flattenArray($records), 'tagId', true);
+        ksort($records);
+        $this->assertEqual(array_keys($records), array(1, 3));
+
+        // second load
+        $records = $pm->loadTagsFor(array($pers, $pers2));
+        $this->assertEqual(array_keys($records), array('__alreadyLoaded'));
+        $records = Ac_Util::indexArray(Ac_Util::flattenArray($records), 'tagId', true);
+        ksort($records);
+        $this->assertEqual(array_keys($records), array(1, 3));
+        
+        $pers = $pm->loadByPersonId(3);
+        $pers->setTagIds(array());
+        $pers2 = $pm->loadByPersonId(4);
+        $pm->loadTagsFor($pers);
+        $records = $pm->loadTagsFor(array($pers, $pers2));
+        $this->assertTrue(!array_key_exists('__alreadyLoaded', $records));
+        
+        $pers = $pm->loadByPersonId(3);
+        $pers->setTagIds(array(1, 3));
+        $pers2 = $pm->loadByPersonId(4);
+        $pm->loadTagsFor($pers);
+        $records = $pm->loadTagsFor(array($pers, $pers2));
+        $this->assertTrue(isset($records['__alreadyLoaded']) && count($records['__alreadyLoaded'][0]) == 2);
+    }
+
+    function testAmrPlainResult() {
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        
+        $a = $pm->loadByPersonId(3);
+        $b = $pm->loadByPersonId(4);
+        
+        $rel = clone $pm->getRelation('_tags');
+        $rel->setDestOrdering('tagId DESC');
+        $a->setTagIds(array(3));
+        $d = $rel->getDest(array($a, $b), AMR_PLAIN_RESULT);
+        if (!$this->assertArraysMatch(array(
+            array('tagId' => 3, '__class' => 'Sample_Tag'),
+            array('tagId' => 2, '__class' => 'Sample_Tag'),
+            array('tagId' => 1, '__class' => 'Sample_Tag'),
+        ), $d))
+            Ac_Debug::drr($d);
+        
+        $a = $pm->loadByPersonId(3);
+        $b = $pm->loadByPersonId(4);
+        $rel = clone $pm->getRelation('_tags');
+        $rel->setDestOrdering('tagId DESC');
+        $a->setTagIds(array(1));
+        $b->setTagIds(array(3));
+        $d = $rel->getDest(array($a, $b), AMR_PLAIN_RESULT);
+        
+        if (!$this->assertArraysMatch(array(
+            array('tagId' => 3, '__class' => 'Sample_Tag'),
+            array('tagId' => 1, '__class' => 'Sample_Tag'),
+        ), $d))
+            Ac_Debug::drr($d);
+        
+        
+        $d = $rel->getDest($b, AMR_PLAIN_RESULT);
+        if (!$this->assertArraysMatch(array(
+            array('tagId' => 3, '__class' => 'Sample_Tag'),
+        ), $d))
+            Ac_Debug::drr($d);
+        
+        $this->assertEqual($d = $rel->countDest($a, true, AMR_PLAIN_RESULT), 1);
+        $this->assertEqual($d = $rel->countDest($b, true, AMR_PLAIN_RESULT), 1);
+        
+    }
+    
+    function testGetOrCountRecordKeys() {
+        
+        $am = Sample::getInstance()->getSamplePersonAlbumMapper();
+        $a1 = $am->loadByAlbumId(1);
+        $a2 = $am->loadByAlbumId(2);
+        $rel = $am->getRelation('_personPhotos');
+        
+        $d = $rel->getDest(array($a1, $a2), AMR_RECORD_KEYS);
+        if (!$this->assertArraysMatch($a = array(
+            $a1->personId => array(
+                $a1->albumId => array(
+                    array('__class' => 'Sample_Person_Photo', 'photoId' => 1, 'personId' => $a1->personId),
+                    array('__class' => 'Sample_Person_Photo', 'photoId' => 2, 'personId' => $a1->personId),
+                ),
+                $a2->albumId => array(
+                    array('__class' => 'Sample_Person_Photo', 'photoId' => 1, 'personId' => $a2->personId),
+                )
+            )
+        ), $d)) 
+            Ac_Debug::drr($d);
+        
+        $a1 = $am->loadByAlbumId(1);
+        $a2 = $am->loadByAlbumId(2);
+        $a1->setPersonPhotoIds(array(
+            array('personId' => $a1->personId, 'photoId' => 1),
+        ));
+        $a2->setPersonPhotoIds(array(
+            array('personId' => $a2->personId, 'photoId' => 1),
+        ));
+        $d = $rel->getDest(array($a1, $a2), AMR_RECORD_KEYS);
+        if (!$this->assertArraysMatch($a = array(
+            $a1->personId => array(
+                $a1->albumId => array(
+                    array('__class' => 'Sample_Person_Photo', 'photoId' => 1, 'personId' => $a1->personId),
+                ),
+                $a2->albumId => array(
+                    array('__class' => 'Sample_Person_Photo', 'photoId' => 1, 'personId' => $a2->personId),
+                )
+            )
+        ), $d)) 
+            Ac_Debug::drr($d);
+        
+        $a1 = $am->loadByAlbumId(1);
+        $a2 = $am->loadByAlbumId(2);
+        $a1->setPersonPhotoIds(array(
+            array('personId' => $a1->personId, 'photoId' => 2),
+        ));
+        $d = $rel->getDest(array($a1, $a2), AMR_RECORD_KEYS);
+        if (!$this->assertArraysMatch($a = array(
+            $a1->personId => array(
+                $a1->albumId => array(
+                    array('__class' => 'Sample_Person_Photo', 'photoId' => 2, 'personId' => $a1->personId),
+                ),
+                $a2->albumId => array(
+                    array('__class' => 'Sample_Person_Photo', 'photoId' => 1, 'personId' => $a2->personId),
+                )
+            )
+        ), $d)) 
+            Ac_Debug::drr($d);
+    }
+    
+    function testGetOrCountRecords() {
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        
+        $a = $pm->loadByPersonId(3);
+        $b = $pm->loadByPersonId(4);
+        
+        $rel = $pm->getRelation('_tags');
+        //Ac_Debug::drr($rel->getDest(array($a, $b), AMR_RECORD_KEYS));
+        //Ac_Debug::drr($rel->getDest(array($a, $b), AMR_PLAIN_RESULT));
+        $d = $rel->getDest(array($a, $b), AMR_ALL_ORIGINAL_KEYS);
+        $this->assertTrue(is_array($d[0]) && !count($d[0])); // first person does not have tags
+        
+        
+        /*
+        $am = Sample::getInstance()->getSamplePersonAlbumMapper();
+        $a1 = $am->loadByAlbumId(1);
+        $a2 = $am->loadByAlbumId(2);
+        $rel = $am->getRelation('_personPhotos');
+         */
+        
+        //Ac_Debug::drr($rel->getDest(array($a1, $a2), AMR_RECORD_KEYS));
+        //Ac_Debug::drr($rel->getDest(array($a1, $a2), AMR_PLAIN_RESULT));
+        //Ac_Debug::drr($rel->getDest(array($a1, $a2), AMR_ALL_ORIGINAL_KEYS));
+        
+    }
+    
+    function testCountNNRecords() {
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        
+        $a = $pm->loadByPersonId(3);
+        $b = $pm->loadByPersonId(4);
+        
+        $pm->loadAssocCountFor($a, '_tags');
+        $pm->loadAssocCountFor($b, '_tags');
+        $this->assertEqual($a->_tagsCount, 0);
+        $this->assertEqual($b->_tagsCount, 2);
+        
+        $a = $pm->loadByPersonId(3);
+        $b = $pm->loadByPersonId(4);
+        $this->assertEqual($a->countTags(), 0);
+        $this->assertEqual($b->countTags(), 2);
+        
+        $rel = $pm->getRelation('_tags');
+        $a = $pm->loadByPersonId(3);
+        $b = $pm->loadByPersonId(4);
+        $rel->loadDestCount(array($a, $b));
+        $this->assertEqual($a->_tagsCount, 0);
+        $this->assertEqual($b->_tagsCount, 2);
+        
+        $a = $pm->loadByPersonId(3);
+        $b = $pm->loadByPersonId(4);
+        $this->assertEqual($rel->countDest($a), 0);
+        $this->assertEqual($rel->countDest($b), 2);
+        
+        $a = $pm->loadByPersonId(3);
+        $b = $pm->loadByPersonId(4);
+        
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), true, AMR_ALL_ORIGINAL_KEYS), array(0, 2))) {
+            var_dump($c);
+        }
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), false, AMR_ALL_ORIGINAL_KEYS), 2)) {
+            var_dump($c);
+        }
+        
+        
+        
+        $a = $pm->loadByPersonId(3);
+        $b = $pm->loadByPersonId(4);
+        
+        $a->setTagIds(array(3));
+
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), true, AMR_ALL_ORIGINAL_KEYS), array(1, 2))) {
+            var_dump($c);
+        }
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), false, AMR_ALL_ORIGINAL_KEYS), 3)) {
+            var_dump($c);
+        }
+        
+        $a = $pm->loadByPersonId(3);
+        $b = $pm->loadByPersonId(4);
+        
+        $a->setTagIds(array(1));
+        $b->setTagIds(array());
+
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), true, AMR_ALL_ORIGINAL_KEYS), array(1, 0))) {
+            var_dump($c);
+        }
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), false, AMR_ALL_ORIGINAL_KEYS), 1)) {
+            var_dump($c);
+        }
+        
+    }
+    
     function testMemNNRecordsCK() {
         $am = Sample::getInstance()->getSamplePersonAlbumMapper();
         
@@ -31,7 +271,10 @@ class Ac_Test_Relation extends Ac_Test_Base {
         
         $a1 = $am->loadByAlbumId(1);
         $a2 = $am->loadByAlbumId(2);
-        $rel = $am->getRelation('_personPhotos');
+        
+        $a1 = $am->loadByAlbumId(1);
+        $a2 = $am->loadByAlbumId(2);
+        $rel = clone $am->getRelation('_personPhotos');
         $a1->setPersonPhotoIds(array(array('personId' => $a1->personId, 'photoId' => 2)));
         
         $rel->destOrdering = 'photoId ASC';
@@ -124,9 +367,8 @@ class Ac_Test_Relation extends Ac_Test_Base {
         
         $pers = $pm->loadByPersonId(3);
         $pers2 = $pm->loadByPersonId(4);
-        $pers->setTagIds(array(1, 2));
-        $this->assertEqual(count($pers->listTags()), 2, 'objects are in list after NN ids are set');
-        $pm->loadTagsFor(array($pers, $pers2));
+        $pers->setTagIds(array(3));
+        $this->assertEqual(count($pers->listTags()), 1, 'objects are in list after NN ids are set');
         
         $pers = $pm->loadByPersonId(3);
         $pers2 = $pm->loadByPersonId(4);
@@ -170,7 +412,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $pers = $pm->loadByPersonId(3);
         $pers2 = $pm->loadByPersonId(4);
         $pers->setTagIds(array(1));
-        $rel = $pm->getRelation('_tags');
+        $rel = clone $pm->getRelation('_tags');
         $rel->destOrdering = 'tagId';
         $pp = array('first' => $pers, 'second' => $pers2);
         $dd = $rel->getDest($pp, AMR_PLAIN_RESULT);
@@ -202,7 +444,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $pers = $pm->loadByPersonId(3);
         $pers2 = $pm->loadByPersonId(4);
         $pers->setTagIds(array());
-        $rel = $pm->getRelation('_tags');
+        $rel = clone $pm->getRelation('_tags');
         $rel->destOrdering = 'tagId';
         $pp = array('first' => $pers, 'second' => $pers2);
         $dd = $rel->getDest($pp, AMR_ORIGINAL_KEYS);
@@ -225,7 +467,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $pers2 = $pm->loadByPersonId(4);
         $pers->setTagIds(array(1));
         $pers2->setTagIds(array(2));
-        $rel = $pm->getRelation('_tags');
+        $rel = clone $pm->getRelation('_tags');
         $rel->destOrdering = 'tagId';
         $pp = array('first' => $pers, 'second' => $pers2);
         $dd = $rel->getDest($pp);
@@ -238,7 +480,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $pers2 = $pm->loadByPersonId(4);
         $pers->setTagIds(array());
         $pers2->setTagIds(array(2));
-        $rel = $pm->getRelation('_tags');
+        $rel = clone $pm->getRelation('_tags');
         $rel->destOrdering = 'tagId';
         $pp = array('first' => $pers, 'second' => $pers2);
         $dd = $rel->getDest($pp, AMR_ALL_ORIGINAL_KEYS);
@@ -253,7 +495,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $pers2 = $pm->loadByPersonId(4);
         $pers->setTagIds(array(2));
         $pers2->setTagIds(array());
-        $rel = $pm->getRelation('_tags');
+        $rel = clone $pm->getRelation('_tags');
         $rel->destOrdering = 'tagId';
         $pp = array('first' => $pers, 'second' => $pers2);
         $this->assertTrue(!count($rel->getDest($pers2)));
