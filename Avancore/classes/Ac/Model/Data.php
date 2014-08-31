@@ -1213,7 +1213,14 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
                 if (!$this->_isOwnAssocLoaded($head, $key)) {
                     if (($m = $this->_getMethod('load', $head.'Item')) || ($m = $this->_getMethod('load', $head))) $this->$m($key);
                     elseif ($m = $this->_getMethod('load', $head.'Items')) $this->$m();
-                    else trigger_error ('Cannot load item of associated list '.get_class($this).'::'.$head.'; consider implementing load/loadItem/loadItems method', E_USER_ERROR);
+                    else {
+                        // try to LIST that property as a last resort in hope it will be loaded by lister method
+                        $this->_listOwnProperty($head, $plural);
+                        if (!$this->_isOwnAssocLoaded($head, $key)) {
+                            trigger_error ('Cannot load item of associated list '.get_class($this).'::'.$head
+                                .'; consider implementing load/loadItem/loadItems method', E_USER_ERROR);
+                        }
+                    }
                 }
                 if ((isset($this->$vn) || $this->_hasVar($vn)) && is_array($this->$vn) && isset($this->{$vn}[$key]) && is_object($this->{$vn}[$key])) {
                     $res = $this->{$vn}[$key];
