@@ -739,22 +739,47 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
             throw new Ac_E_InvalidUsage("Record '".get_class($record)."' does not belong to mapper '"
                 .$this->getId ()."'");
         
-        if (isset($this->recordsCollection[$pk = $record->getPrimaryKey()])) {
+        $pk = $record->getPrimaryKey();
+        
+        if (isset($this->recordsCollection[$pk])) {
             unset($this->recordsCollection[$pk]);
         }
         if (isset($this->newRecords[$record->_imId])) {
             unset($this->newRecords[$record->_imId]);
         }
+        
+        if (is_array($this->allRecords) && isset($this->allRecords[$pk]) 
+            && $this->allRecords[$pk] === $record) {
+            $this->allRecords = false;
+        }
     }
     
-    function notifyKeyAssigned(Ac_Model_Object $record) {
+    function notifyKeyAssigned(Ac_Model_Object $record, $oldPk = null) {
+        
+        if ($oldPk !== null) {
+            if (isset($this->recordsCollection[$oldPk])) {
+                unset($this->recordsCollection[$oldPk]);
+            }
+        }
+        
+        $pk = $record->getPrimaryKey();
+        
         if ($record->getMapper() !== $this) 
             throw new Ac_E_InvalidUsage("Record '".get_class($record)."' does not belong to mapper '"
                 .$this->getId ()."'");
         
-        if (!isset($this->recordsCollection[$pk = $record->getPrimaryKey()])) {
+        if ($this->useRecordsCollection && !isset($this->recordsCollection[$pk])) {
             $this->recordsCollection[$pk] = $record;
         }
+        
+        if (is_array($this->allRecords)) {
+            if ($oldPk !== null) {
+                unset($this->allRecords[$oldPk]);
+            }
+            if ($record->hasFullPrimaryKey()) 
+                $this->allRecords[isset($pk)? $pk : $record->getPrimaryKey ()] = $record;
+        }
+        
         if (isset($this->newRecords[$record->_imId])) {
             unset($this->newRecords[$record->_imId]);
         }
@@ -1481,7 +1506,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     function reset() {
         $this->recordsCollection = array();
         $this->newRecords = array();
-        $this->relations = array();
+        $this->allRecords = false;
         $this->fkFieldsData = false;
     }
 

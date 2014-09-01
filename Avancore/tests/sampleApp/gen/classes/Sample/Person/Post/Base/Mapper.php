@@ -92,6 +92,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_person',
                 'destVarName' => '_personPosts',
                 'destCountVarName' => '_personPostsCount',
+                'destLoadedVarName' => '_personPostsLoaded',
                 'fieldLinks' => array (
                     'personId' => 'personId',
                 ),
@@ -105,6 +106,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_personPhoto',
                 'destVarName' => '_personPosts',
                 'destCountVarName' => '_personPostsCount',
+                'destLoadedVarName' => '_personPostsLoaded',
                 'fieldLinks' => array (
                     'personId' => 'personId',
                     'photoId' => 'photoId',

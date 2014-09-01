@@ -1,9 +1,24 @@
 <?php
 
 class Sample_Person extends Sample_Person_Base_Object {
+
+    static $destructed = array();
+    
+    static $lastInstanceId = 0;
+    
+    var $instanceId = 0;
+    
+    function __construct($mapperOrMapperClass = null) {
+        parent::__construct($mapperOrMapperClass);
+        $this->instanceIf = self::$lastInstanceId++;
+    }
     
     function intResetReferences() {
         return parent::intResetReferences();
+    }
+    
+    function __destruct() {
+        self::$destructed[$this->instanceId] = true;
     }
     
     /*

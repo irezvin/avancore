@@ -6,6 +6,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
     public $_person = false;
     public $_personPhotos = false;
     public $_personPhotosCount = false;
+    public $_personPhotosLoaded = false;
     public $_personPhotoIds = false;
     public $albumId = NULL;
     public $personId = 0;
@@ -161,7 +162,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
     }
 
     function listPersonPhotos() {
-        if ($this->_personPhotos === false) {
+        if (!$this->_personPhotosLoaded) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, '_personPhotos');
         }
@@ -169,10 +170,17 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return bool
+     */
+    function isPersonPhotosLoaded() {
+        return $this->_personPhotosLoaded;
+    }
+    
+    /**
      * @return Sample_Person_Photo 
      */
     function getPersonPhoto($id) {
-        if ($this->_personPhotos === false) {
+        if (!$this->_personPhotosLoaded) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_personPhotos');
         }

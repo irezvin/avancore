@@ -172,6 +172,16 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     protected $destCountVarName = false;
     
     /**
+     * @var bool|string
+     */
+    protected $srcLoadedVarName = false;
+    
+    /**
+     * @var bool|string
+     */
+    protected $destLoadedVarName = false;
+    
+    /**
      * @var Ac_Sql_Db
      */
     protected $db = false;
@@ -806,6 +816,72 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function getDestCountVarName() {
         return $this->destCountVarName;
     }
+    
+    /**
+     * Assigns variable in SRC that denotes that DEST objects are fully loaded (For partially-loaded
+     * associations feature)
+     * 
+     * Is only applicable when !$destIsUnique.
+     * 
+     * FALSE = feature not used (any non-FALSE value of $srcVarName is treated as the association
+     * is fully loaded)
+     * 
+     * @param string|bool $srcLoadedVarName
+     */
+    function setSrcLoadedVarName($srcLoadedVarName) {
+        if ($srcLoadedVarName !== ($oldSrcLoadedVarName = $this->srcLoadedVarName)) {
+            if ($this->immutable) throw self::immutableException();
+            $this->srcLoadedVarName = $srcLoadedVarName;
+        }
+    }
+
+    /**
+     * Returns variable in SRC that denotes that DEST objects are fully loaded (For partially-loaded
+     * associations feature)
+     * 
+     * Is only applicable when !$destIsUnique.
+     * 
+     * FALSE = feature not used (any non-FALSE value of $srcVarName is treated as the association
+     * is fully loaded)
+     * 
+     * @return string|bool
+     */
+    function getSrcLoadedVarName() {
+        return $this->srcLoadedVarName;
+    }
+
+    /**
+     * Assigns variable in DEST that denotes that SRC objects are fully loaded (For partially-loaded
+     * associations feature)
+     * 
+     * Is only applicable when !$srcIsUnique.
+     * 
+     * FALSE = feature not used (any non-FALSE value of $destVarName is treated as the association
+     * is fully loaded)
+     * 
+     * @param string|bool $destLoadedVarName
+     */
+    function setDestLoadedVarName($destLoadedVarName) {
+        if ($destLoadedVarName !== ($oldDestLoadedVarName = $this->destLoadedVarName)) {
+            if ($this->immutable) throw self::immutableException();
+            $this->destLoadedVarName = $destLoadedVarName;
+        }
+    }
+
+    /**
+     * Returns variable in DEST that denotes that SRC objects are fully loaded (For partially-loaded
+     * associations feature)
+     * 
+     * Is only applicable when !$srcIsUnique.
+     * 
+     * FALSE = feature not used (any non-FALSE value of $srcVarName is treated as the association
+     * is fully loaded)
+     * 
+     * @return string|bool
+     */
+    function getDestLoadedVarName() {
+        return $this->destLoadedVarName;
+    }    
 
     /**
      * Assign database driver' instance that will be used to perform all
@@ -1206,11 +1282,18 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         $defaultValue = $this->destIsUnique? null : array();
         $biDirectional = $biDirectional && strlen($this->destVarName);
 
+        $lvn = $this->srcLoadedVarName;
+        if ($lvn !== false && !$this->destMapper) {
+            trigger_error("\$srcLoadedVarName is set, but \$destMapper isn't - partially-loaded 
+                associations will not be supported and \$srcLoadedVarName is ignored", E_USER_NOTICE);
+            $lvn = false;
+        }
+        
         $res = $this->loadSrcOrDest ($srcData, $defaultValue, $this->srcVarName, $this->destVarName, 
             $dontOverwriteLoaded, $biDirectional, $this->fieldLinks, $this->fieldLinks2, $this->destIsUnique, 
                 $this->srcIsUnique, $this->destTableName, 'instantiateDest', $this->destOrdering, 
                 $this->destExtraJoins, $this->destWhere, $this->destQualifier, $this->srcQualifier, 
-                $this->srcNNIdsVarName, $returnAll);
+                $this->srcNNIdsVarName, $returnAll, $lvn);
         return $res;
     }
     
@@ -1228,10 +1311,18 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $fl2 = $this->fieldLinksRev2;
         }
         
+        $lvn = $this->destLoadedVarName;
+        if ($lvn !== false && !$this->srcMapper) {
+            trigger_error("\$destLoadedVarName is set, but \$srcMapper isn't - partially-loaded 
+                associations will not be supported and \$destLoadedVarName is ignored", E_USER_NOTICE);
+            $lvn = false;
+        }
+        
         return $this->loadSrcOrDest ($destData, $defaultValue, $this->destVarName, $this->srcVarName, 
             $dontOverwriteLoaded, $biDirectional, $fl1, $fl2, $this->srcIsUnique, $this->destIsUnique, 
             $this->srcTableName, 'instantiateSrc', $this->srcOrdering, $this->srcExtraJoins, 
-            $this->srcWhere, $this->srcQualifier, $this->destQualifier, $this->destNNIdsVarName, $returnAll);
+            $this->srcWhere, $this->srcQualifier, $this->destQualifier, $this->destNNIdsVarName, $returnAll,
+            $lvn);
     }
     
     function getStrMidWhere($alias = false) {
@@ -1349,19 +1440,51 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      */
     protected function makeMapAndGetAllValues(& $source, & $map, & $values, $keys, 
         $varToCheck = false, $midIdsVar = false, &$midMap = null, & $midVals = null, $midKeys2 = array(), 
-        $useKeysForMidMapWriteKeys = false, & $alreadyLoaded = null) {
+        $useKeysForMidMapWriteKeys = false, & $alreadyLoaded = null, $loadedVarName = false, 
+        & $alreadyLoadedByPk = null) {
         $map = array();
         if (!is_array($midMap)) $midMap = array();
         if (!is_array($alreadyLoaded)) $alreadyLoaded = array();
+        if (!is_array($alreadyLoadedByPk)) $alreadyLoadedByPk = array();
         $values = array();
         if (!is_array($midVals)) $midVals = array();
         foreach(array_keys($source) as $k) {
             $srcItem = $source[$k];
             $hasIds = false;
+            $items = array();
+            $pks = array();
             if ($varToCheck !== false) {
-                if (!$this->isVarEmpty($srcItem, $varToCheck, $v)) {
-                    if (!is_null($v) && !(is_array($v) && !count($v))) $alreadyLoaded[$k] = $v;
-                    continue;
+                $v = false;
+                $hasVar = !$this->isVarEmpty($srcItem, $varToCheck, $v);
+                if ($hasVar) {
+                    if (!is_null($v) && !(is_array($v) && !count($v))) {
+                        $alreadyLoaded[$k] = $v;
+                    } else {
+                        $v = false;
+                    }
+                }
+                if ($hasVar) {
+                    if ($loadedVarName !== false) {
+                        if (is_object($v) && $v instanceof Ac_Model_Object && $v->hasFullPrimaryKey()) {
+                            $pk = $v->getPrimaryKey();
+                            $itemsByPk[$pk] = $alreadyLoadedByPk[$pk] = $v;
+                        } elseif (is_array($v)) {
+                            $items = $v;
+                            foreach ($v as $item) {
+                                if (is_object($item) && $item instanceof Ac_Model_Object 
+                                    && $item->hasFullPrimaryKey()) {
+                                    $pk = $item->getPrimaryKey();
+                                    $pks[$pk] = true;
+                                    $alreadyLoadedByPk[$pk] = $item;
+                                }
+                            }
+                        }
+                        if ($this->getValue($srcItem, $loadedVarName)) {
+                            continue;
+                        }
+                    } else {
+                        continue;
+                    }
                 }
             }
             if ($midIdsVar !== false && $midKeys2) {
@@ -1381,15 +1504,15 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                         } else {
                             $tk = $this->getValues($srcItem, $keys);
                         }
-                        $midMap[$k] = array($ids, $tk);
+                        $midMap[$k] = array($ids, $tk, $items, $pks);
                     } else {
-                        $midMap[$k] = array($ids, $k);
+                        $midMap[$k] = array($ids, $k, $items, $pks);
                     }
                 }
             }
             if (!$hasIds) {
                 $vals = $this->getValues($srcItem, $keys, false, false);
-                $map[] = array($vals, $k);
+                $map[] = array($vals, $k, $items, $pks);
                 $values[] = $vals;
             }
         }
@@ -1695,7 +1818,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     protected function loadSrcOrDest (& $data, $defaultValue, $varName, $otherVarName, $dontOverwriteLoaded, $biDirectional, 
             $fieldLinks, $fieldLinks2, $isUnique, $otherIsUnique, $tableName, $instanceFunc, $ordering = false, 
             $extraJoins = false, $extraWhere = false, $qualifier = false, $otherQualifier = false, 
-            $nnIdsVar = false, $returnAll = false) {
+            $nnIdsVar = false, $returnAll = false, $loadedVarName = false) {
         $keys = array_keys($fieldLinks);
         $res = array();
         if (is_array($data)) { // we assume that this array is of objects or rows
@@ -1704,11 +1827,12 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $midValues = array();
             
             $alreadyLoaded = array();
+            $alreadyLoadedByPk = array();
 
             $varToCheck = $dontOverwriteLoaded? $varName : false;
             $this->makeMapAndGetAllValues($data, $map, $values, $keys, $varToCheck, $nnIdsVar, $midMap, 
                 $midValues, is_array($fieldLinks2)? array_values($fieldLinks2) : array(), false, 
-                $alreadyLoaded);
+                $alreadyLoaded, $loadedVarName, $alreadyLoadedByPk);
             
             $rows = array();
                 
@@ -1728,12 +1852,14 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 }
                 
                 $this->unmap($keys, $map, $rows, $data, $defaultValue, $biDirectional, $varName, 
-                    $otherVarName, $isUnique, $otherIsUnique, $qualifier, $otherQualifier);
+                    $otherVarName, $isUnique, $otherIsUnique, $qualifier, $otherQualifier, false, 
+                    $loadedVarName);
                 
                 if ($midMap) {
                     if (!$midValues) $rows2 = array();
                     $this->unmap(array_values($fieldLinks2), $midMap, $rows2, $data, $defaultValue, $biDirectional, 
-                        $varName, $otherVarName, $isUnique, $otherIsUnique, $qualifier, $otherQualifier, true);
+                        $varName, $otherVarName, $isUnique, $otherIsUnique, $qualifier, $otherQualifier, true,
+                        $loadedVarName);
                 }
                 
                 
@@ -1748,15 +1874,40 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                     $rows = array();
                 }
                 $this->unmap(array_keys($fieldLinks2), $midMap, $rows, $data, $defaultValue, $biDirectional, 
-                    $varName, $otherVarName, $isUnique, $otherIsUnique, $qualifier, $otherQualifier, true);
+                    $varName, $otherVarName, $isUnique, $otherIsUnique, $qualifier, $otherQualifier, true,
+                    $loadedVarName);
             }
             if (!$res) $res = $rows;
-            if ($alreadyLoaded) $res['__alreadyLoaded'] = $alreadyLoaded;
+            if ($returnAll && $alreadyLoaded) $res['__alreadyLoaded'] = $alreadyLoaded;
         } elseif (is_a($data, 'Ac_Model_Collection')) {
             trigger_error ('Collection as $srcData/$destData is not implemented yet', E_USER_ERROR);
         } elseif (is_object($data)) {
             $loaded = false;
-            if (!$dontOverwriteLoaded || $this->isVarEmpty($data, $varName, $loaded)) {  
+            $items = array();
+            $pks = array();
+            $skip = false;
+            if ($dontOverwriteLoaded) {  
+                $isEmpty = $this->isVarEmpty($data, $varName, $loaded);
+                if (!$isEmpty) {
+                    if ($loadedVarName !== false) {
+                        if ($this->getValue($data, $loadedVarName)) {
+                            $skip = true;
+                        } else {
+                            if (is_array($loaded)) {
+                                $items = $loaded;
+                                foreach ($loaded as $item) {
+                                    if (is_object($item) && $item instanceof Ac_Model_Object) {
+                                        if ($item->hasFullPrimaryKey()) $pks[$item->getPrimaryKey()] = $item;
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        $skip = true;
+                    }
+                }
+            }
+            if (!$skip) {  
                 // check for NN ids
                 if ($nnIdsVar && isset($data->$nnIdsVar) && is_array($ids = $data->$nnIdsVar)) {
                     $values = $this->nnIdsToValues($ids, array_values($fieldLinks2));
@@ -1765,7 +1916,6 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                         false, $ordering, $extraJoins, $extraWhere);
                 } else {
                     $values = $this->getValues($data, $keys, false, false);
-                    
                     $rows = $this->getWithValues($values, 
                         $this->midTableName? array($fieldLinks, $fieldLinks2) : Ac_Util::array_values($fieldLinks), 
                         false, $isUnique, false, $tableName, $instanceFunc, false, false, 
@@ -1775,10 +1925,16 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                     $toSet = $rows;
                     if ($biDirectional) $this->linkBack($rows, $data, $otherVarName, !$isUnique, $otherIsUnique, $otherQualifier);
                 } else $toSet = $defaultValue;
+                if ($items && is_array($toSet)) {
+                    $toSet = $this->mergeByPk($toSet, $items, $pks);
+                }
                 $this->setVal($data, $varName, $toSet, $qualifier);
+                if ($loadedVarName !== false) {
+                    $this->setVal($data, $loadedVarName, true);
+                }
                 if ($isUnique) $res = array(& $rows); else $res = $rows;
             } else {
-                if (!is_null($loaded)) {
+                if ($returnAll && !is_null($loaded)) {
                     $res = is_array($loaded)? $loaded : array($loaded);
                 } else {
                     $res = array();
@@ -1817,7 +1973,9 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     }
     
     protected function unmap($keys, $map, & $rows, & $data, $defaultValue, $biDirectional, $varName, $otherVarName, 
-            $isUnique, $otherIsUnique, $qualifier, $otherQualifier, $mapMultiple = false) {
+            $isUnique, $otherIsUnique, $qualifier, $otherQualifier, $mapMultiple = false, 
+            $loadedVarName = false) {
+        
         if (count($keys) === 1) {
             foreach ($map as $m) {
                 $dataKey = $m[1];
@@ -1841,7 +1999,13 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                         $toSet = $defaultValue;
                     }
                 }
+                if (!$isUnique && $loadedVarName) {
+                    $toSet = $this->mergeByPk($toSet, $m[2], $m[3]);
+                }
                 $this->setVal($data[$dataKey], $varName, $toSet, $qualifier);
+                if ($loadedVarName !== false) {
+                    $this->setVal($data[$dataKey], $loadedVarName, true);
+                }
             }
         } else {
             foreach ($map as $m) {
@@ -1867,9 +2031,23 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                         $toSet = $defaultValue;
                     }
                 }
+                if (!$isUnique && $loadedVarName !== false) {
+                    $toSet = $this->mergeByPk($toSet, $m[2], $m[3]);
+                }
                 $this->setVal($data[$dataKey], $varName, $toSet, $qualifier);
+                if ($loadedVarName !== false) {
+                    $this->setVal($data[$dataKey], $loadedVarName, true);
+                }
             }
         }
+    }
+    
+    protected function mergeByPk(array $newRecords, array $currentRecords, array $pks) {
+        $res = $currentRecords;
+        foreach ($newRecords as $rec) {
+            if (!isset($pks[$rec->getPrimaryKey()])) $res[] = $rec;
+        }
+        return $res;
     }
     
     protected function loadSrcOrDestCount ($data, $varName, $dontOverwriteLoaded, $fieldLinks, $fieldLinks2, 
@@ -1950,14 +2128,21 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $keys = array_values($allKeys[0]);            
             $lta = $this->midTableAlias.'.';
             $crit = $this->makeSqlCriteria($values, $selKeys, $this->midTableAlias);
+            $extraJoinCrit = false;
             if ($keys2) {
                 $join = 'RIGHT';
-                $crit = "(".$crit.") OR (".$this->makeSqlCriteria($values2, $keys2, strlen($ta)? $ta : $tableName).")";
+                $notNullC = array();
+                foreach (array_keys($allKeys[1]) as $fieldName) {
+                    $notNullC[$fieldName] = $this->midTableAlias.".".$fieldName." IS NOT NULL";
+                }
+                $notNullC = "(".implode(" AND ", $notNullC).")";
+                $extraJoinCrit = $crit;
+                $crit = $notNullC." OR (".$this->makeSqlCriteria($values2, $keys2, strlen($ta)? $ta : $tableName).")";
             } else {
                 $join = 'INNER';
             }
             $fromWhere = ' FROM '.$this->db->n($midTableName).' AS '.$this->midTableAlias
-                .' '.$this->getJoin($join, $this->midTableAlias, $tableName, $ta, $allKeys[1]);
+                .' '.$this->getJoin($join, $this->midTableAlias, $tableName, $ta, $allKeys[1], $extraJoinCrit);
         } else {
             $fromWhere = ' FROM '.$this->db->n($tableName).$asTa;
             $selKeys = $keys;    
@@ -2080,12 +2265,19 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 $keys = array_values($allKeys[0]);            
                 $lta = $this->midTableAlias.'.';
                 $crit = $this->makeSqlCriteria($values, $selKeys, $this->midTableAlias);
+                $extraJoinCrit = false;
                 if ($keys2) {
                     $join = 'RIGHT';
-                    $crit = "(".$crit.") OR (".$this->makeSqlCriteria($values2, $keys2, $tableName).")";
+                    $notNullC = array();
+                    foreach (array_keys($allKeys[1]) as $fieldName) {
+                        $notNullC[$fieldName] = $this->midTableAlias.".".$fieldName." IS NOT NULL";
+                    }
+                    $notNullC = "(".implode(" AND ", $notNullC).")";
+                    $extraJoinCrit = $crit;
+                    $crit = $notNullC." OR (".$this->makeSqlCriteria($values2, $keys2, $tableName).")";
                 }
                 $fromWhere = ' FROM '.$this->db->n($midTableName).' AS '.$this->midTableAlias
-                    .' '.$this->getJoin($join, $this->midTableAlias, $tableName, $tableName, $allKeys[1]);
+                    .' '.$this->getJoin($join, $this->midTableAlias, $tableName, $tableName, $allKeys[1], $extraJoinCrit);
                 
             } else {
                 $fromWhere = ' FROM '.$this->db->n($midTableName).' AS '.$this->midTableAlias;
@@ -2227,7 +2419,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         foreach ($fieldNames as $leftField => $rightField) {
             $on[] = $la.'.'.$db->NameQuote($leftField).' = '.$ra.'.'.$db->NameQuote($rightField);
         }
-        if ($extraCrit) $res[] = "($extraCrit)";
+        if ($extraCrit) $on[] = "($extraCrit)";
         $res .= implode(' AND ', $on);
         return $res;
     }    

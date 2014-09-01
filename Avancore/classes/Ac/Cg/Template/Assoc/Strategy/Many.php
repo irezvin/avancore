@@ -19,7 +19,7 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
 <?php } ?>
 
     function list<?php $this->d($ucPlural); ?>() {
-        if (<?php $this->d($varId); ?> === false) {
+        if (!<?php $this->d($this->loadedId); ?>) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, <?php $this->str($relationId); ?>);
         }
@@ -27,10 +27,17 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
     }
     
     /**
+     * @return bool
+     */
+    function is<?php $this->d($ucPlural); ?>Loaded() {
+        return <?php $this->d($loadedId); ?>;
+    }
+    
+    /**
      * @return <?php $this->d($prop->className); ?> 
      */
     function get<?php $this->d($ucSingle); ?>($id) {
-        if (<?php $this->d($varId); ?> === false) {
+        if (!<?php $this->d($this->loadedId); ?>) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, <?php $this->str($relationId); ?>);
         }

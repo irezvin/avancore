@@ -667,17 +667,7 @@ abstract class Ac_Util {
      * @return bool True if $object1 and $object2 are both references to the same object
      */
     static function sameObject(& $object1, & $object2) {
-        
-        if (AC_PHP_VERSION_MAJOR >= 5) return $object1 === $object2;
-        
-        if (!is_object($object1) || !is_object($object2)) return false;
-        $p = $v = '_p_'.md5(microtime());
-        $object1->$p = $v;
-        if (isset($object2->$p) && $object2->$p === $v) {
-            $res = true;
-        } else $res = false;
-        unset($object1->$p);
-        return $res;
+        return $object1 === $object2;
     }
     
     static function array_unique($arr, $strict = false) {

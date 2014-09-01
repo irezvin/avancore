@@ -66,7 +66,7 @@ CREATE TABLE `ac_people` (
   KEY `FK_ac_person_photos_ac_people_protrait` (`personId`,`portraitId`),
   CONSTRAINT `FK_ac_person_photos_ac_people_protrait` FOREIGN KEY (`personId`, `portraitId`) REFERENCES `ac_person_photos` (`personId`, `photoId`),
   CONSTRAINT `FK_ac_person_religion` FOREIGN KEY (`religionId`) REFERENCES `ac_religion` (`religionId`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,7 +75,7 @@ CREATE TABLE `ac_people` (
 
 LOCK TABLES `ac_people` WRITE;
 /*!40000 ALTER TABLE `ac_people` DISABLE KEYS */;
-INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2014-08-10 19:24:57',4,1),(4,'Таня','F',0,'1981-12-23',NULL,'2014-08-10 19:25:10',1,3);
+INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2014-08-10 19:24:57',4,1),(4,'Таня','F',0,'1981-12-23',NULL,'2014-08-10 19:25:10',1,3),(6,'Ян','M',1,'1981-09-21',NULL,'2014-08-31 13:03:07',4,NULL),(7,'Оля','F',1,'1981-09-08',NULL,'2014-08-31 13:04:00',1,NULL);
 /*!40000 ALTER TABLE `ac_people` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,7 +102,7 @@ CREATE TABLE `ac_people_tags` (
 
 LOCK TABLES `ac_people_tags` WRITE;
 /*!40000 ALTER TABLE `ac_people_tags` DISABLE KEYS */;
-INSERT INTO `ac_people_tags` VALUES (4,1),(4,2);
+INSERT INTO `ac_people_tags` VALUES (4,1),(6,1),(4,2),(7,2),(6,3);
 /*!40000 ALTER TABLE `ac_people_tags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -440,4 +440,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-08-29 23:59:40
+-- Dump completed on 2014-08-31 16:07:14

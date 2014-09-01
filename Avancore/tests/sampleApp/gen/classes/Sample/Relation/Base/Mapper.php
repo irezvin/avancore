@@ -90,6 +90,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_relationType',
                 'destVarName' => '_relations',
                 'destCountVarName' => '_relationsCount',
+                'destLoadedVarName' => '_relationsLoaded',
                 'fieldLinks' => array (
                     'relationTypeId' => 'relationTypeId',
                 ),
@@ -103,6 +104,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_otherPerson',
                 'destVarName' => '_incomingRelations',
                 'destCountVarName' => '_incomingRelationsCount',
+                'destLoadedVarName' => '_incomingRelationsLoaded',
                 'fieldLinks' => array (
                     'otherPersonId' => 'personId',
                 ),
@@ -116,6 +118,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_person',
                 'destVarName' => '_outgoingRelations',
                 'destCountVarName' => '_outgoingRelationsCount',
+                'destLoadedVarName' => '_outgoingRelationsLoaded',
                 'fieldLinks' => array (
                     'personId' => 'personId',
                 ),

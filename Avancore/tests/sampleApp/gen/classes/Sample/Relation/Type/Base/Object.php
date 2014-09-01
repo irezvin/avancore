@@ -5,6 +5,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     public $_hasDefaults = true;
     public $_relations = false;
     public $_relationsCount = false;
+    public $_relationsLoaded = false;
     public $relationTypeId = NULL;
     public $title = '';
     public $isSymmetrical = 0;
@@ -97,7 +98,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
 
     function listRelations() {
-        if ($this->_relations === false) {
+        if (!$this->_relationsLoaded) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, '_relations');
         }
@@ -105,10 +106,17 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return bool
+     */
+    function isRelationsLoaded() {
+        return $this->_relationsLoaded;
+    }
+    
+    /**
      * @return Sample_Relation 
      */
     function getRelation($id) {
-        if ($this->_relations === false) {
+        if (!$this->_relationsLoaded) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_relations');
         }

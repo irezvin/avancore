@@ -5,6 +5,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     public $_hasDefaults = true;
     public $_people = false;
     public $_peopleCount = false;
+    public $_peopleLoaded = false;
     public $religionId = NULL;
     public $title = '';
     
@@ -86,7 +87,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     }
 
     function listPeople() {
-        if ($this->_people === false) {
+        if (!$this->_peopleLoaded) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, '_people');
         }
@@ -94,10 +95,17 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return bool
+     */
+    function isPeopleLoaded() {
+        return $this->_peopleLoaded;
+    }
+    
+    /**
      * @return Sample_Person 
      */
     function getPerson($id) {
-        if ($this->_people === false) {
+        if (!$this->_peopleLoaded) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_people');
         }

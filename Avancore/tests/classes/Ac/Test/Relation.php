@@ -3,6 +3,57 @@
 class Ac_Test_Relation extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
+
+    function testPartialLoad() {
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        $rm = Sample::getInstance()->getSampleReligionMapper();
+        
+        $pers = $pm->loadByPersonId(3);
+        $pers2 = $pm->loadByPersonId(4);
+        $rel1 = $pers->getReligion();
+        $rel2 = $pers2->getReligion();
+        
+        $this->assertTrue($pers->isAssocLoaded('religion'));
+        $this->assertFalse($rel1->isAssocLoaded('people'));
+        
+        $lp1 = $rel1->listPeople();
+        $lp2 = $rel2->listPeople();
+        
+        $rel1a = $rm->loadByReligionId($rel1->religionId);
+        $rel2a = $rm->loadByReligionId($rel1->religionId);
+        $lp1a = $rel1a->listPeople();
+        $lp2a = $rel2a->listPeople();
+        
+        $this->assertEqual($lp1, $lp1a);
+        $this->assertEqual($lp2, $lp2a);
+        
+        $pers = $pm->loadByPersonId(3);
+        $this->assertSame($pers->getReligion()->_people[0], $pers);
+        $this->assertFalse($pers->getReligion()->isAssocLoaded('people'));
+        $recs = $pm->loadForReligion(array($pers->getReligion()));
+        $this->assertTrue($pers->getReligion()->isAssocLoaded('people'));
+        $tmp = $pers->getReligion();
+        $this->assertSame($tmp, $pers->getReligion());
+        $this->assertTrue($pers->isAssocLoaded('religion'));
+        $this->assertSame($pers->getReligion()->_people[0], $pers);
+        
+        $rel1a = $rm->loadByTitle('christian');
+        $list = $rel1a->listPeople();
+        
+        $rel1 = $rm->loadByTitle('christian');
+        $pers = $rel1->createPerson();
+        $this->assertEqual(count($rel1->listPeople()), count($rel1a->listPeople()) + 1, 
+            'Ensure in-memory records are not touched by association\' load');
+        
+        $rel = $rm->loadByTitle('christian');
+        $p1 = $rel->getPerson(0);
+        $this->assertTrue($rel->isAssocLoaded('people'));
+        $iid = $p1->instanceId;
+        $p1->cleanupMembers();
+        unset($p1);
+        $this->assertTrue(isset(Sample_Person::$destructed[$iid]));
+        $this->assertFalse($rel->isAssocLoaded('people'));
+    }
     
     function testLoadReturnsRecords() {
         $pm = Sample::getInstance()->getSamplePersonMapper();
@@ -530,9 +581,6 @@ class Ac_Test_Relation extends Ac_Test_Base {
         ');
         sort($allTagIds);
         
-        //restore_exception_handler();
-        //restore_error_handler();
-        
         $recs = $pm->getAllRecords();
         $tags = Ac_Util::flattenArray($pm->loadTagsFor($recs));
 
@@ -541,8 +589,9 @@ class Ac_Test_Relation extends Ac_Test_Base {
         
         $ppl = $pm->loadRecordsArray($pm->listRecords());
         
-        $this->assertEqual($allTags, $allTags2);
-
+        if (!$this->assertEqual($allTags, $allTags2)) {
+            Ac_Debug::drr($allTags, $allTags2);
+        }
         
         $tm = Sample::getInstance()->getSampleTagMapper();
         $recs2 = $pm->loadRecordsArray($pm->listRecords());
