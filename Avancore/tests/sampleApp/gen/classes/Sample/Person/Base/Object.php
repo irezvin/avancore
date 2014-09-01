@@ -7,17 +7,23 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     public $_religion = false;
     public $_tags = false;
     public $_tagsCount = false;
+    public $_tagsLoaded = false;
     public $_tagIds = false;
     public $_personAlbums = false;
     public $_personAlbumsCount = false;
+    public $_personAlbumsLoaded = false;
     public $_personPhotos = false;
     public $_personPhotosCount = false;
+    public $_personPhotosLoaded = false;
     public $_personPosts = false;
     public $_personPostsCount = false;
+    public $_personPostsLoaded = false;
     public $_incomingRelations = false;
     public $_incomingRelationsCount = false;
+    public $_incomingRelationsLoaded = false;
     public $_outgoingRelations = false;
     public $_outgoingRelationsCount = false;
+    public $_outgoingRelationsLoaded = false;
     public $personId = NULL;
     public $name = '';
     public $gender = 'F';
@@ -328,7 +334,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
 
     function listTags() {
-        if ($this->_tags === false) {
+        if (!$this->_tagsLoaded) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, '_tags');
         }
@@ -336,10 +342,17 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return bool
+     */
+    function isTagsLoaded() {
+        return $this->_tagsLoaded;
+    }
+    
+    /**
      * @return Sample_Tag 
      */
     function getTag($id) {
-        if ($this->_tags === false) {
+        if (!$this->_tagsLoaded) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_tags');
         }
@@ -405,7 +418,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
 
     function listPersonAlbums() {
-        if ($this->_personAlbums === false) {
+        if (!$this->_personAlbumsLoaded) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, '_personAlbums');
         }
@@ -413,10 +426,17 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return bool
+     */
+    function isPersonAlbumsLoaded() {
+        return $this->_personAlbumsLoaded;
+    }
+    
+    /**
      * @return Sample_Person_Album 
      */
     function getPersonAlbum($id) {
-        if ($this->_personAlbums === false) {
+        if (!$this->_personAlbumsLoaded) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_personAlbums');
         }
@@ -461,7 +481,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
 
     function listPersonPhotos() {
-        if ($this->_personPhotos === false) {
+        if (!$this->_personPhotosLoaded) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, '_personPhotos');
         }
@@ -469,10 +489,17 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return bool
+     */
+    function isPersonPhotosLoaded() {
+        return $this->_personPhotosLoaded;
+    }
+    
+    /**
      * @return Sample_Person_Photo 
      */
     function getPersonPhoto($id) {
-        if ($this->_personPhotos === false) {
+        if (!$this->_personPhotosLoaded) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_personPhotos');
         }
@@ -517,7 +544,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
 
     function listPersonPosts() {
-        if ($this->_personPosts === false) {
+        if (!$this->_personPostsLoaded) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, '_personPosts');
         }
@@ -525,10 +552,17 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return bool
+     */
+    function isPersonPostsLoaded() {
+        return $this->_personPostsLoaded;
+    }
+    
+    /**
      * @return Sample_Person_Post 
      */
     function getPersonPost($id) {
-        if ($this->_personPosts === false) {
+        if (!$this->_personPostsLoaded) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_personPosts');
         }
@@ -573,7 +607,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
 
     function listIncomingRelations() {
-        if ($this->_incomingRelations === false) {
+        if (!$this->_incomingRelationsLoaded) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, '_incomingRelations');
         }
@@ -581,10 +615,17 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return bool
+     */
+    function isIncomingRelationsLoaded() {
+        return $this->_incomingRelationsLoaded;
+    }
+    
+    /**
      * @return Sample_Relation 
      */
     function getIncomingRelation($id) {
-        if ($this->_incomingRelations === false) {
+        if (!$this->_incomingRelationsLoaded) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_incomingRelations');
         }
@@ -629,7 +670,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
 
     function listOutgoingRelations() {
-        if ($this->_outgoingRelations === false) {
+        if (!$this->_outgoingRelationsLoaded) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, '_outgoingRelations');
         }
@@ -637,10 +678,17 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return bool
+     */
+    function isOutgoingRelationsLoaded() {
+        return $this->_outgoingRelationsLoaded;
+    }
+    
+    /**
      * @return Sample_Relation 
      */
     function getOutgoingRelation($id) {
-        if ($this->_outgoingRelations === false) {
+        if (!$this->_outgoingRelationsLoaded) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_outgoingRelations');
         }

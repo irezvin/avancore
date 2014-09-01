@@ -86,6 +86,7 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_people',
                 'srcCountVarName' => '_peopleCount',
+                'srcLoadedVarName' => '_peopleLoaded',
                 'destVarName' => '_religion',
                 'fieldLinks' => array (
                     'religionId' => 'religionId',

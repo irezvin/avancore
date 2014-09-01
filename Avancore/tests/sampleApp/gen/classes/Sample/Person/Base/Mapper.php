@@ -105,6 +105,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_religion',
                 'destVarName' => '_people',
                 'destCountVarName' => '_peopleCount',
+                'destLoadedVarName' => '_peopleLoaded',
                 'fieldLinks' => array (
                     'religionId' => 'religionId',
                 ),
@@ -118,8 +119,10 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_tags',
                 'srcNNIdsVarName' => '_tagIds',
                 'srcCountVarName' => '_tagsCount',
+                'srcLoadedVarName' => '_tagsLoaded',
                 'destVarName' => '_people',
                 'destCountVarName' => '_peopleCount',
+                'destLoadedVarName' => '_peopleLoaded',
                 'destNNIdsVarName' => '_personIds',
                 'fieldLinks' => array (
                     'personId' => 'idOfPerson',
@@ -136,6 +139,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'destMapperClass' => 'Sample_Person_Album_Mapper',
                 'srcVarName' => '_personAlbums',
                 'srcCountVarName' => '_personAlbumsCount',
+                'srcLoadedVarName' => '_personAlbumsLoaded',
                 'destVarName' => '_person',
                 'fieldLinks' => array (
                     'personId' => 'personId',
@@ -148,6 +152,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'destMapperClass' => 'Sample_Person_Photo_Mapper',
                 'srcVarName' => '_personPhotos',
                 'srcCountVarName' => '_personPhotosCount',
+                'srcLoadedVarName' => '_personPhotosLoaded',
                 'destVarName' => '_person',
                 'fieldLinks' => array (
                     'personId' => 'personId',
@@ -160,6 +165,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'destMapperClass' => 'Sample_Person_Post_Mapper',
                 'srcVarName' => '_personPosts',
                 'srcCountVarName' => '_personPostsCount',
+                'srcLoadedVarName' => '_personPostsLoaded',
                 'destVarName' => '_person',
                 'fieldLinks' => array (
                     'personId' => 'personId',
@@ -172,6 +178,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'destMapperClass' => 'Sample_Relation_Mapper',
                 'srcVarName' => '_incomingRelations',
                 'srcCountVarName' => '_incomingRelationsCount',
+                'srcLoadedVarName' => '_incomingRelationsLoaded',
                 'destVarName' => '_otherPerson',
                 'fieldLinks' => array (
                     'personId' => 'otherPersonId',
@@ -184,6 +191,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'destMapperClass' => 'Sample_Relation_Mapper',
                 'srcVarName' => '_outgoingRelations',
                 'srcCountVarName' => '_outgoingRelationsCount',
+                'srcLoadedVarName' => '_outgoingRelationsLoaded',
                 'destVarName' => '_person',
                 'fieldLinks' => array (
                     'personId' => 'personId',

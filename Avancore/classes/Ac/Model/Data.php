@@ -787,8 +787,6 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
      * Such behavior is different from other functions' one, since usually error is thrown when non-existing key is specified     
      */
     function isAssocLoaded ($propName, $key = false) {
-        $s = '_'.$propName;
-        if (isset($this->$s)) return $this->$s !== false;
         
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
         if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
@@ -832,23 +830,23 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         if ($plural) {
             $vn = '_'.$plural;
             if (strlen($key)) { 
-                 if (($m = $this->_getMethod('is', $head.'ItemLoaded'))) $res = $this->$m($key);
-                 else {
-                     if (isset($this->$vn) || $this->_hasVar($vn)) {
-                         if (!is_array($this->$vn)) $res = false;
-                         elseif (!isset($this->{$vn}[$key])) $res = true; // Not exists does not mean "not loaded"
-                         elseif (is_object($this->{$vn}[$key])) $res = true;
-                         else $res = false;
-                     } else $res = true;
-                 }
-             } else {
-                 if (($m = $this->_getMethod('are', $head.'ItemsLoaded'))) $res = $this->$m();
-                 else {
-                     if (isset($this->$vn) || $this->_hasVar($vn)) {
-                         $res = is_array($this->$vn);
-                     } else $res = true;
-                 }
-             }
+                if (($m = $this->_getMethod('is', $head.'Loaded'))) $res = $this->$m($key);
+                else {
+                    if (isset($this->$vn) || $this->_hasVar($vn)) {
+                        if (!is_array($this->$vn)) $res = false;
+                        elseif (!isset($this->{$vn}[$key])) $res = true; // Not exists does not mean "not loaded"
+                        elseif (is_object($this->{$vn}[$key])) $res = true;
+                        else $res = false;
+                    } else $res = true;
+                }
+            } else {
+                if (($m = $this->_getMethod('is', $head.'Loaded'))) $res = $this->$m();
+                else {
+                    if (isset($this->$vn) || $this->_hasVar($vn)) {
+                        $res = is_array($this->$vn);
+                    } else $res = true;
+                }
+            }
         } else {
             $vn = '_'.$head;
             if (strlen($key)) trigger_error ('List key specified for non-list association '.get_class($this).'::'.$head, E_USER_ERROR);

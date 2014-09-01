@@ -481,6 +481,12 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
             }
             
         }
+        
+        if ($tpk) {
+            if ($this->_origPk != $this->$k) {
+                $this->mapper->notifyKeyAssigned($this, $this->_origPk);
+            }
+        }
 
         if (!$res) {
             if ($error !== false) {
@@ -554,6 +560,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
             	if ($this->tracksPk()) $this->_origPk = null;
                 $this->doAfterDelete();
                 $this->triggerEvent(self::EVENT_AFTER_DELETE);
+                $this->mapper->forget($this);
             }
         } else {
             $res = false;
@@ -1065,17 +1072,23 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
 
     function cleanupReferences($otherObject) {
-        foreach (array_keys(get_object_vars($this)) as $k) {
+        foreach (array_keys($vars = get_object_vars($this)) as $k) {
             if (is_object($this->$k) && Ac_Util::sameObject($this->$k, $otherObject)) {
                 $this->$k = null;
             } elseif (is_array($this->$k)) {
                 $tmp = $this->$k;
+                $loaded = $k.'Loaded';
                 foreach (array_keys($tmp) as $kk) {
-                    if (is_object($tmp[$kk]) && Ac_Util::sameObject($tmp[$kk], $otherObject)) {
+                    if (is_object($tmp[$kk]) && $tmp[$kk] === $otherObject) {
                         unset($tmp[$kk]);
+                        if (array_key_exists($loaded, $vars)) {
+                            if ($otherObject instanceof Ac_Model_Object && $otherObject->isPersistent()) {
+                                $this->$loaded = false;
+                            }
+                        }
                     }
                 }
-                unset($tmp);
+                $this->$k = $tmp;
             }
         }
     }

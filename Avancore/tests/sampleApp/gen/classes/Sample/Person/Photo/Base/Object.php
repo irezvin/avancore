@@ -6,10 +6,12 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     public $_person = false;
     public $_personAlbums = false;
     public $_personAlbumsCount = false;
+    public $_personAlbumsLoaded = false;
     public $_personAlbumIds = false;
     public $_protraitPerson = false;
     public $_personPosts = false;
     public $_personPostsCount = false;
+    public $_personPostsLoaded = false;
     public $photoId = NULL;
     public $personId = 0;
     public $filename = '';
@@ -180,7 +182,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     }
 
     function listPersonAlbums() {
-        if ($this->_personAlbums === false) {
+        if (!$this->_personAlbumsLoaded) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, '_personAlbums');
         }
@@ -188,10 +190,17 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return bool
+     */
+    function isPersonAlbumsLoaded() {
+        return $this->_personAlbumsLoaded;
+    }
+    
+    /**
      * @return Sample_Person_Album 
      */
     function getPersonAlbum($id) {
-        if ($this->_personAlbums === false) {
+        if (!$this->_personAlbumsLoaded) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_personAlbums');
         }
@@ -300,7 +309,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     }
 
     function listPersonPosts() {
-        if ($this->_personPosts === false) {
+        if (!$this->_personPostsLoaded) {
             $mapper = $this->getMapper();
             $mapper->listAssocFor($this, '_personPosts');
         }
@@ -308,10 +317,17 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return bool
+     */
+    function isPersonPostsLoaded() {
+        return $this->_personPostsLoaded;
+    }
+    
+    /**
      * @return Sample_Person_Post 
      */
     function getPersonPost($id) {
-        if ($this->_personPosts === false) {
+        if (!$this->_personPostsLoaded) {
             $mapper = $this->getMapper();
             $mapper->loadAssocFor($this, '_personPosts');
         }

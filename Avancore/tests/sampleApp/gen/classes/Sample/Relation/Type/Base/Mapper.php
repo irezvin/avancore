@@ -87,6 +87,7 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
                 'destMapperClass' => 'Sample_Relation_Mapper',
                 'srcVarName' => '_relations',
                 'srcCountVarName' => '_relationsCount',
+                'srcLoadedVarName' => '_relationsLoaded',
                 'destVarName' => '_relationType',
                 'fieldLinks' => array (
                     'relationTypeId' => 'relationTypeId',

@@ -256,9 +256,11 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         $res['srcVarName'] = $this->getClassMemberName();
         if ($this->isManyToMany()) $res['srcNNIdsVarName'] = $this->getIdsMemberName();
         if ($cmn  = $this->getCountMemberName()) $res['srcCountVarName'] = $cmn;
+        if ($cmn  = $this->getLoadedMemberName()) $res['srcLoadedVarName'] = $cmn;
         if (($mirrorProp = $this->getMirrorProperty()) && $mirrorProp->isEnabled()) {
             $res['destVarName'] = $mirrorProp->getClassMemberName();
             if ($cmn  = $mirrorProp->getCountMemberName()) $res['destCountVarName'] = $cmn;
+            if ($cmn  = $mirrorProp->getLoadedMemberName()) $res['destLoadedVarName'] = $cmn;
             if ($this->isManyToMany()) $res['destNNIdsVarName'] = $mirrorProp->getIdsMemberName();
         }
         if ($this->isIncoming) {
@@ -306,6 +308,15 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         return $res;
     }
     
+    function getLoadedMemberName() {
+        if ($this->pluralForList) {
+            $res = '_'.$this->pluralForList.'Loaded';
+        } else {
+            $res = false;
+        }
+        return $res;
+    }
+    
     /**
      * Name of member that holds foreign IDs for many-to-many relations
      */
@@ -346,6 +357,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     function getAllClassMembers() {
         $res = parent::getAllClassMembers();
         if ($cmn = $this->getCountMemberName()) $res[$cmn] = false;
+        if ($lmn = $this->getLoadedMemberName()) $res[$lmn] = false;
         if ($imn = $this->getIdsMemberName()) $res[$imn] = false;
         return $res;
     }
