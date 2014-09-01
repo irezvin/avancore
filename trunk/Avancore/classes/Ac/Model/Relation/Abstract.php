@@ -66,14 +66,22 @@ class Ac_Model_Relation_Abstract extends Ac_Prototyped {
                 if ($linkedIsUnique) {
                     $lt->$varName = $linked;
                 } else {
-                    if (Ac_Accessor::methodExists($lt, $m = 'add'.ucfirst($varName))) {
-                        if ($qKey !== null) {
-                            $lt->$m($linked, $qKey);
-                        } else {
-                            $lt->$m($linked);
+                    $skip = false;
+                    if (isset($lt->$varName) && is_array($v = $lt->$varName)) {
+                        if ($lt instanceof Ac_Model_Object && $lt->hasFullPrimaryKey()) {
+                            $pk = $lt->getPrimaryKey();
+                            foreach ($v as $item) {
+                                if (is_object($item) && $item instanceof Ac_Model_Object 
+                                    && $item->hasFullPrimaryKey() && $item->getPrimaryKey() == $pk) {
+                                    $skip = true;
+                                    break;
+                                }
+                            }
                         }
                     } else {
-                        if (!isset($lt->$varName) || !is_array($lt->$varName)) $lt->$varName = array();
+                        $lt->$varName = array();
+                    }
+                    if (!$skip) {
                         if ($qKey !== null) {
                             $lt->{$varName}[$qKey] = $linked;
                         } else {
@@ -85,7 +93,12 @@ class Ac_Model_Relation_Abstract extends Ac_Prototyped {
                 if ($linkedIsUnique) {
                     $lt[$varName] = $linked;
                 } else {
-                    if (!isset($lt[$varName]) || !is_array($lt[$varName])) $lt[$varName] = array();
+                    if (isset($lt[$varName]) && is_array($lt[$varName])) {
+                        // TODO: check that record with same key not already there
+                        // PKs of array records is not supported yet
+                    } else {
+                        $lt[$varName] = array();
+                    }
                     if ($qKey !== null) {
                         $lt[$varName][$qKey] = $linked;
                     } else {

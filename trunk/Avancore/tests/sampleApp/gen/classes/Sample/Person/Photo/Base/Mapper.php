@@ -84,6 +84,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_person',
                 'destVarName' => '_personPhotos',
                 'destCountVarName' => '_personPhotosCount',
+                'destLoadedVarName' => '_personPhotosLoaded',
                 'fieldLinks' => array (
                     'personId' => 'personId',
                 ),
@@ -97,8 +98,10 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_personAlbums',
                 'srcNNIdsVarName' => '_personAlbumIds',
                 'srcCountVarName' => '_personAlbumsCount',
+                'srcLoadedVarName' => '_personAlbumsLoaded',
                 'destVarName' => '_personPhotos',
                 'destCountVarName' => '_personPhotosCount',
+                'destLoadedVarName' => '_personPhotosLoaded',
                 'destNNIdsVarName' => '_personPhotoIds',
                 'fieldLinks' => array (
                     'personId' => 'personId',
@@ -129,6 +132,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
                 'destMapperClass' => 'Sample_Person_Post_Mapper',
                 'srcVarName' => '_personPosts',
                 'srcCountVarName' => '_personPostsCount',
+                'srcLoadedVarName' => '_personPostsLoaded',
                 'destVarName' => '_personPhoto',
                 'fieldLinks' => array (
                     'personId' => 'personId',

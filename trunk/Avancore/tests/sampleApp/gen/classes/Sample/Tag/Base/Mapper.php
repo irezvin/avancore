@@ -91,8 +91,10 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_people',
                 'srcNNIdsVarName' => '_personIds',
                 'srcCountVarName' => '_peopleCount',
+                'srcLoadedVarName' => '_peopleLoaded',
                 'destVarName' => '_tags',
                 'destCountVarName' => '_tagsCount',
+                'destLoadedVarName' => '_tagsLoaded',
                 'destNNIdsVarName' => '_tagIds',
                 'fieldLinks' => array (
                     'tagId' => 'idOfTag',

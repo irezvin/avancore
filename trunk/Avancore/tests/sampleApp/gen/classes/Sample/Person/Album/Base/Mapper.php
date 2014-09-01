@@ -84,6 +84,7 @@ class Sample_Person_Album_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_person',
                 'destVarName' => '_personAlbums',
                 'destCountVarName' => '_personAlbumsCount',
+                'destLoadedVarName' => '_personAlbumsLoaded',
                 'fieldLinks' => array (
                     'personId' => 'personId',
                 ),
@@ -97,8 +98,10 @@ class Sample_Person_Album_Base_Mapper extends Ac_Model_Mapper {
                 'srcVarName' => '_personPhotos',
                 'srcNNIdsVarName' => '_personPhotoIds',
                 'srcCountVarName' => '_personPhotosCount',
+                'srcLoadedVarName' => '_personPhotosLoaded',
                 'destVarName' => '_personAlbums',
                 'destCountVarName' => '_personAlbumsCount',
+                'destLoadedVarName' => '_personAlbumsLoaded',
                 'destNNIdsVarName' => '_personAlbumIds',
                 'fieldLinks' => array (
                     'personId' => 'personId',

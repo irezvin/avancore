@@ -38,6 +38,8 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
     var $singleId = false;
     var $count = false;
     var $countId = false;
+    var $loaded = false;
+    var $loadedId = false;
 
     var $thisPlural = false;
     var $otherPlural = false;
@@ -92,6 +94,8 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
         if ($this->prop->isList()) {
             $this->count = $this->prop->getCountMemberName();
             $this->countId = '$this->'.$this->count;
+            $this->loaded = $this->prop->getLoadedMemberName();
+            $this->loadedId = '$this->'.$this->loaded;
         }
 
         $this->thisPlural = Ac_Cg_Util::makeIdentifier($this->model->plural);
