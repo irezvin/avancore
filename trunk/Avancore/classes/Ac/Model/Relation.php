@@ -139,11 +139,6 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     protected $srcNNIdsVarName = false;
     
     /**
-     * If $srcIsUnique is false and $srcVarName property in the source object is array, whether keys in that array match to keys of the db records 
-     */
-    protected $srcKeyMatch = false;
-    
-    /**
      * Name of variable in destination object that contains reference to source object (if $srcIsMultiple is true, it has to be an array with references)
      */
     protected $destVarName = false;

@@ -728,5 +728,15 @@ class Ac_Cg_Model {
         return array('getReferenceFieldsData()' => $this->getReferenceFieldsData());
     }
     
+    function getInternalDefaults() {
+        $res = array();
+        foreach ($this->listProperties() as $i) {
+            $prop = $this->getProperty($i);
+            if ($prop->enabled && $prop instanceof Ac_Cg_Property_Object) {
+                Ac_Util::ms($res, $prop->getAllClassMembers());
+            }
+        }
+        return $res;
+    }    
     
 }
