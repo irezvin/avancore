@@ -4,6 +4,40 @@ class Ac_Test_Model extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
     
+    function testReset() {
+        
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        
+        $pers = $pm->createRecord();
+        
+        $this->assertTrue(strtotime($pers->createdTs) > 0, 'Check for default for CURRENT_TIMESTAMP');
+        
+        $pers = $pm->loadByPersonId(4);
+        $pers->listTags();
+        $pers->getReligion();
+        $pers->countTags();
+        $pers->reset();
+        $this->assertFalse($pers->isPersistent());
+        $this->assertFalse($pers->hasFullPrimaryKey());
+        $this->assertTrue($pers->_tags === false);
+        $this->assertTrue($pers->_tagIds === false);
+        $this->assertTrue($pers->_tagsLoaded === false);
+        $this->assertTrue($pers->_tagsCount === false);
+        $this->assertTrue($pers->_religion === false);
+        
+        $pers = $pm->loadByPersonId(4);
+        $old = $pers->getDataFields();
+        $pers->listTags();
+        $pers->getReligion();
+        $pers->countTags();
+        $pers->name = 'Foobar';
+        $pers->reset(true);
+        $this->assertTrue($pers->isPersistent());
+        $this->assertTrue($pers->hasFullPrimaryKey());
+        $this->assertTrue(!$pers->getChanges());
+        $this->assertEqual($pers->getDataFields(), $old);
+    }
+    
     function testGetNNRecPi() {
         
         $pm = Sample::getInstance()->getSamplePersonMapper();

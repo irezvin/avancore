@@ -406,9 +406,15 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     
     protected $autoincFieldName = <?php $this->str($this->autoincFieldName) ?>;
     
+    protected $askRelationsForDefaults = false;
+    
 <?php } ?>
     function listSqlColumns() {
         return $this->columnNames;
+    }
+    
+    function doGetInternalDefaults() {
+        return <?php $this->exportArray($this->model->getInternalDefaults(), 8); ?>;
     }
     
     /**

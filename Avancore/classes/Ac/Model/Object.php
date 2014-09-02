@@ -105,7 +105,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_LIST_NON_COMPARED_FIELDS = 'onListNonComparedFields';
 
     /**
-     * function onSetDefaults()
+     * function onSetDefaults(array & $defaults, $full)
      */
     const EVENT_ON_SET_DEFAULTS = 'onSetDefaults';
     
@@ -211,7 +211,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function doOnCreate() {
-        $this->setDefaultFields();
     }
     
     function doListNonCopiedFields() {
@@ -350,6 +349,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         
         if ($this->tracksChanges()) $this->_memorizeFields();
         
+        $this->setDefaults();
         $this->doOnCreate();
         $this->triggerEvent(self::EVENT_ON_CREATE);
         
@@ -656,17 +656,19 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         if ($this->_error) return $this->_error;
     }
     
-    function reset() {
-        $vars = get_class_vars(get_class($this));
-        foreach ($this->listDataProperties() as $propName)
-            if (array_key_exists($propName, $vars))
-                $this->$propName = $vars[$propName];
-        $m = $this->getMapper();
-        $this->setDefaultFields();
-        $m->memorize($this);
-        $this->_origPk = null;
+    function reset($revert = false) {
+        $this->setDefaults(true);
+        if ($revert && $this->_oldValues) {
+            foreach ($this->_oldValues as $k => $v) {
+                $this->$k = $v;
+            }
+        } else {
+            $this->_origPk = null;
+            $this->_memorizeFields();
+        }
+        if (!$this->isPersistent()) $this->mapper->memorize($this);
     }
-
+    
     /**
      * @deprecated
      * use Ac_Model_Object::listDataProperties instead
@@ -1120,14 +1122,18 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         }
     }
     
-    function setDefaultFields() {
-        $cv = get_class_vars(get_class($this));
-        $defs = $this->getMapper()->getDefaults();
+    final function setDefaults($full = false) {
+        $defs = $this->mapper->getDefaults($full);
+        $this->doOnSetDefaults($defs, $full);
+        $this->triggerEvent(self::EVENT_ON_SET_DEFAULTS, array(& $defs, $full));
         foreach ($defs as $k => $v) {
-            if (array_key_exists($k, $cv)) {
-                $v = $cv[$k];
-            }
             $this->$k = $v;
+        }
+    }
+    
+    protected function doOnSetDefaults(array & $defaults, $full = false) {
+        foreach ($defaults as $k => $v) {
+            if ($v === 'CURRENT_TIMESTAMP') $defaults[$k] = date('Y-m-d H:i:s');
         }
     }
     

@@ -21,8 +21,20 @@ class Sample_Person_Album_Base_Mapper extends Ac_Model_Mapper {
     
     protected $autoincFieldName = 'albumId';
     
+    protected $askRelationsForDefaults = false;
+    
     function listSqlColumns() {
         return $this->columnNames;
+    }
+    
+    function doGetInternalDefaults() {
+        return array (
+            '_person' => false,
+            '_personPhotos' => false,
+            '_personPhotosCount' => false,
+            '_personPhotosLoaded' => false,
+            '_personPhotoIds' => false,
+        );
     }
     
     /**

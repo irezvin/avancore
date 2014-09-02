@@ -20,8 +20,18 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
     
     protected $autoincFieldName = 'religionId';
     
+    protected $askRelationsForDefaults = false;
+    
     function listSqlColumns() {
         return $this->columnNames;
+    }
+    
+    function doGetInternalDefaults() {
+        return array (
+            '_people' => false,
+            '_peopleCount' => false,
+            '_peopleLoaded' => false,
+        );
     }
     
     /**

@@ -21,8 +21,18 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     
     protected $autoincFieldName = 'relationTypeId';
     
+    protected $askRelationsForDefaults = false;
+    
     function listSqlColumns() {
         return $this->columnNames;
+    }
+    
+    function doGetInternalDefaults() {
+        return array (
+            '_relations' => false,
+            '_relationsCount' => false,
+            '_relationsLoaded' => false,
+        );
     }
     
     /**
