@@ -94,6 +94,16 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * function onAfterLoadFromRows(array $rows, array & $records)
      */
     const EVENT_ON_AFTER_LOAD_FROM_ROWS = 'onAfterLoadFromRows';
+    
+    /**
+     * function onGetDefaults(array & $defaults)
+     */
+    const EVENT_ON_GET_DEFAULTS = 'onGetDefaults';
+    
+    /**
+     * function onGetInternalDefaults(array & $defaults)
+     */
+    const EVENT_ON_GET_INTERNAL_DEFAULTS = 'onGetInternalDefaults';
 
     protected $id = false;
     
@@ -190,18 +200,17 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     
     protected $fkFieldsData = false;
     
+    protected $internalDefaults = false;
+    
+    protected $askRelationsForDefaults = true;
+    
+    protected $computedDefaults = false;
+    
     function __construct(array $options = array()) {
         parent::__construct($options);
         if (!$this->tableName) trigger_error (__FILE__."::".__FUNCTION__." - tableName missing", E_USER_ERROR);
     }
     
-    function getDefaults() {
-        if ($this->defaults === false) {
-            $this->getColumnNames();
-        }
-        return $this->defaults;
-    }
-
     function setId($id) {
         if ($this->id !== false && $this->id !== $id) throw new Exception("Can setId() only once!");
         $this->id = $id;
@@ -1579,5 +1588,63 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         }
         return $this->fkFieldsData;
     }    
+    
+    function addEventListener($objectOrCallback, $event) {
+        if ($event === self::EVENT_ON_GET_RELATION_PROTOTYPES) {
+            $this->askRelationsForDefaults = true;
+        }
+        elseif ($event === self::EVENT_ON_GET_DEFAULTS) {
+            $this->computedDefaults = false;
+        }
+        elseif ($event === self::EVENT_ON_GET_INTERNAL_DEFAULTS) {
+            $this->internalDefaults = false;
+        }
+        return parent::addEventListener($objectOrCallback, $event);
+    }
+    
+    function getDefaults($full = false) {
+        if ($this->computedDefaults === false) {
+            if ($this->defaults === false)
+                $this->getColumnNames();
+            $this->computedDefaults = $this->defaults;
+            $this->triggerEvent(self::EVENT_ON_GET_DEFAULTS, array(& $this->computedDefaults));
+        }
+        $res = $this->computedDefaults;
+        if ($full) Ac_Util::ms($res, $this->getInternalDefaults());
+        return $res;
+    }
+    
+    final function getInternalDefaults() {
+        if ($this->internalDefaults === false) {
+            $this->internalDefaults = $this->doGetInternalDefaults();
+            $this->triggerEvent(self::EVENT_ON_GET_INTERNAL_DEFAULTS, array(& $this->internalDefaults));
+            if ($this->askRelationsForDefaults || $this->additionalRelations) {
+                Ac_Util::ms($this->internalDefaults, $this->getRelationDefaults());
+            }
+        }
+        return $this->internalDefaults;
+    }
+    
+    protected function doGetInternalDefaults() {
+        return array();
+    }
+    
+    protected function getRelationDefaults() {
+        if ($this->askRelationsForDefaults) $kk = array_keys($this->relations);
+            else $kk = $this->additionalRelations;
+        $res = array();
+        foreach ($kk as $k) {
+            $rel = $this->getRelation($k);
+            if ($rel->getSrcMapper() === $this) {
+                foreach (array('getSrcVarName', 'getSrcNNIdsVarName', 'getSrcCountVarName', 
+                    'getSrcLoadedVarName') as $p) {
+                    if (strlen($var = $rel->$p())) $res[$var] = false;
+                }
+            }
+        }
+        return $res;
+    }
+    
+    
     
 }

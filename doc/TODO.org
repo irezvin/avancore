@@ -44,24 +44,10 @@
     - [X] Ac_Model_Relation::protected members, setters & getters
       - [X] better phpdoc comments
       - [X] internal relations maintainance
-*** TODO Ac_Model_Object::reset() fix [2014-07-25 Fri] 	       :model:cg:bug:
-    - [ ] Ac_Model_Mapper::EVENT_ON_GET_DEFAULTS
-      - [ ] is called once
-      - [ ] cached result is cleared if addEventLister(EVENT_ON_GET_DEFAULTS)
-    - [ ] Ac_Model_Mapper::getRelationDefaults() - returns fields necessary for relations' implementation
-      - [ ] generated mapper has pre-filled array
-      - [ ] for non-generated mapper relations are asked
-      - [ ] relations are asked too for
-	- [ ] generated mapper with altered relations
-	- [ ] for mapper with defined handlers for EVENT_ON_GET_RELATION_PROTOTYPES
-	- [ ] for mapper that created any relations after triggering EVENT_ON_RELATION_NOT_FOUND
-    - [ ] reset(), doOnReset() also call mixables
-    - [ ] reset() un-registers record from mappers' $recordsCollection
-    - [ ] should also nullify internal fields with relation data (counts, ids, relation references)
-      - [ ] list of such internal fields must be provided by Cg
-    - [ ] Ac_Model_Record::reset() should load defaults from mapper
-    - [ ] Ac_Model_Object::getOwnResetData() <- is overridden in generated version; returns defaults in Record 
-*** TODO Ac_Sql_Select: don't join tables, which are specified in $this->tables[$this->primaryAlias]->joinsAlias [2013-08-27 Tue] :sql:bug:
+*** DONE Ac_Model_Object::reset() fix [2014-07-25 Fri]	       :model:cg:bug:
+    - Ac_Model_Mapper::EVENT_ON_GET_DEFAULTS, EVENT_ON_GET_INTERNAL_DEFAULTS
+    - Ac_Model_Object::EVENT_ON_SET_DEFAULTS
+    - Ac_Model_Object::reset() now accept parameter $revert to reset object to last loaded state
 *** TODO after model changes, the $form->fetchPresentation(true) should return updated data :forms:redesign:bug:
     (at least when $form->updateFromModel() is called)
     - a - pull-based forms

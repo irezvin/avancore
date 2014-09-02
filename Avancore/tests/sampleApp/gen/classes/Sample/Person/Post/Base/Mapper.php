@@ -25,8 +25,17 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     
     protected $autoincFieldName = 'id';
     
+    protected $askRelationsForDefaults = false;
+    
     function listSqlColumns() {
         return $this->columnNames;
+    }
+    
+    function doGetInternalDefaults() {
+        return array (
+            '_person' => false,
+            '_personPhoto' => false,
+        );
     }
     
     /**

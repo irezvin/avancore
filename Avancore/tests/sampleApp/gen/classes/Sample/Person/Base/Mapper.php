@@ -29,8 +29,36 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     protected $autoincFieldName = 'personId';
     
+    protected $askRelationsForDefaults = false;
+    
     function listSqlColumns() {
         return $this->columnNames;
+    }
+    
+    function doGetInternalDefaults() {
+        return array (
+            '_protraitPersonPhoto' => false,
+            '_religion' => false,
+            '_tags' => false,
+            '_tagsCount' => false,
+            '_tagsLoaded' => false,
+            '_tagIds' => false,
+            '_personAlbums' => false,
+            '_personAlbumsCount' => false,
+            '_personAlbumsLoaded' => false,
+            '_personPhotos' => false,
+            '_personPhotosCount' => false,
+            '_personPhotosLoaded' => false,
+            '_personPosts' => false,
+            '_personPostsCount' => false,
+            '_personPostsLoaded' => false,
+            '_incomingRelations' => false,
+            '_incomingRelationsCount' => false,
+            '_incomingRelationsLoaded' => false,
+            '_outgoingRelations' => false,
+            '_outgoingRelationsCount' => false,
+            '_outgoingRelationsLoaded' => false,
+        );
     }
     
     /**
