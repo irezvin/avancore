@@ -1124,6 +1124,11 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     final function setDefaults($full = false) {
         $defs = $this->mapper->getDefaults($full);
+        $cv = get_class_vars(get_class($this));
+        // Take defaults from class vars since they can be overridden there
+        foreach (array_intersect_key($cv, $defs) as $k => $v) {
+            $defs[$k] = $v;
+        }
         $this->doOnSetDefaults($defs, $full);
         $this->triggerEvent(self::EVENT_ON_SET_DEFAULTS, array(& $defs, $full));
         foreach ($defs as $k => $v) {
