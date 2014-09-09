@@ -10,13 +10,14 @@ class Ac_Test_Model extends Ac_Test_Base {
         
         $pers = $pm->createRecord();
         
-        $this->assertTrue(strtotime($pers->createdTs) > 0, 'Check for default for CURRENT_TIMESTAMP');
+        //$this->assertTrue(strtotime($pers->createdTs) > 0, 'Check for default for CURRENT_TIMESTAMP');
         
         $pers = $pm->loadByPersonId(4);
         $pers->listTags();
         $pers->getReligion();
         $pers->countTags();
         $pers->reset();
+        $this->assertEqual($pers->isSingle, 0);
         $this->assertFalse($pers->isPersistent());
         $this->assertFalse($pers->hasFullPrimaryKey());
         $this->assertTrue($pers->_tags === false);

@@ -8,6 +8,9 @@ class Sample_Person extends Sample_Person_Base_Object {
     
     var $instanceId = 0;
     
+    // override default value for testing purposes
+    var $isSingle = 0;
+    
     function __construct($mapperOrMapperClass = null) {
         parent::__construct($mapperOrMapperClass);
         $this->instanceIf = self::$lastInstanceId++;
