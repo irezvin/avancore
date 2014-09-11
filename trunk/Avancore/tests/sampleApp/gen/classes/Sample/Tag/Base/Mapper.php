@@ -36,6 +36,10 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
             '_peopleCount' => false,
             '_peopleLoaded' => false,
             '_personIds' => false,
+            '_perks' => false,
+            '_perksCount' => false,
+            '_perksLoaded' => false,
+            '_perkIds' => false,
         );
     }
     
@@ -115,6 +119,27 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 'midTableName' => '#__people_tags',
                 'fieldLinks2' => array (
                     'idOfPerson' => 'personId',
+                ),
+            ),
+            '_perks' => array (
+                'srcMapperClass' => 'Sample_Tag_Mapper',
+                'destMapperClass' => 'Sample_Perk_Mapper',
+                'srcVarName' => '_perks',
+                'srcNNIdsVarName' => '_perkIds',
+                'srcCountVarName' => '_perksCount',
+                'srcLoadedVarName' => '_perksLoaded',
+                'destVarName' => '_tags',
+                'destCountVarName' => '_tagsCount',
+                'destLoadedVarName' => '_tagsLoaded',
+                'destNNIdsVarName' => '_tagIds',
+                'fieldLinks' => array (
+                    'tagId' => 'idOfTag',
+                ),
+                'srcIsUnique' => false,
+                'destIsUnique' => false,
+                'midTableName' => '#__tag_perks',
+                'fieldLinks2' => array (
+                    'idOfPerk' => 'perkId',
                 ),
             ),
         ));
@@ -200,6 +225,46 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
      */
      function loadPersonIdsFor($tags) {
         $rel = $this->getRelation('_people');
+        return $rel->loadDestNNIds($tags); 
+    }
+
+
+    /**
+     * Returns (but not loads!) one or more tags of given one or more perks 
+     * @param Sample_Tag|array $perks     
+     * @return Sample_Tag|array of Sample_Tag objects  
+     */
+    function getOfPerks($perks) {
+        $rel = $this->getRelation('_perks');
+        $res = $rel->getSrc($perks); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more tags of given one or more perks 
+     * @param Sample_Perk|array $perks of Sample_Tag objects
+     
+     */
+    function loadForPerks($perks) {
+        $rel = $this->getRelation('_perks');
+        return $rel->loadSrc($perks); 
+    }
+
+    /**
+     * Loads one or more perks of given one or more tags 
+     * @param Sample_Tag|array $tags     
+     */
+    function loadPerksFor($tags) {
+        $rel = $this->getRelation('_perks');
+        return $rel->loadDest($tags); 
+    }
+
+
+    /**
+     * @param Sample_Tag|array $tags 
+     */
+     function loadPerkIdsFor($tags) {
+        $rel = $this->getRelation('_perks');
         return $rel->loadDestNNIds($tags); 
     }
 

@@ -7,6 +7,9 @@ abstract class Sample_DomainBase extends Ac_Application {
             'Sample_Person_Mapper' => array (
                 'class' => 'Sample_Person_Mapper',
             ),
+            'Sample_Perk_Mapper' => array (
+                'class' => 'Sample_Perk_Mapper',
+            ),
             'Sample_Person_Album_Mapper' => array (
                 'class' => 'Sample_Person_Album_Mapper',
             ),
@@ -45,6 +48,13 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function getSamplePersonMapper() {
         return $this->getMapper('Sample_Person_Mapper');
+    }
+    
+    /**
+     * @return Sample_Perk_Mapper 
+     */
+    function getSamplePerkMapper() {
+        return $this->getMapper('Sample_Perk_Mapper');
     }
     
     /**
@@ -130,6 +140,21 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function createSamplePerson () {
         return $this->getMapper('Sample_Person_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Perk 
+     */
+    static function Sample_Perk ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Perk 
+     */
+    function createSamplePerk () {
+        return $this->getMapper('Sample_Perk_Mapper')->createRecord();
     }
     
  
