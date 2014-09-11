@@ -23,6 +23,8 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
     protected $defaultJoinType = 'LEFT JOIN';
     
     protected $ignoreMidWhere = false;
+    
+    var $mapperAlias = false;
 
     function setDefaultJoinType($defaultJoinType) {
         $this->defaultJoinType = $defaultJoinType;
@@ -117,7 +119,8 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 			}
 			else {
 				$sqs = $this->getSqlSelect(true);
-				$joinsAlias = $sqs->getEffectivePrimaryAlias();
+				$joinsAlias = $this->mapperAlias !== false? $this->mapperAlias 
+                    : $sqs->getEffectivePrimaryAlias();
 				$prevMapper = $this->getMapper(true);
 			}
 			$rel = $prevMapper->getRelation($p['relationId']);

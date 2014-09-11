@@ -7,6 +7,10 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     public $_peopleCount = false;
     public $_peopleLoaded = false;
     public $_personIds = false;
+    public $_perks = false;
+    public $_perksCount = false;
+    public $_perksLoaded = false;
+    public $_perkIds = false;
     public $tagId = NULL;
     public $title = '';
     public $titleM = NULL;
@@ -34,18 +38,18 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'people', 1 => 'personIds', 2 => 'tagId', 3 => 'title', 4 => 'titleM', 5 => 'titleF', );
+        return array ( 0 => 'people', 1 => 'personIds', 2 => 'perks', 3 => 'perkIds', 4 => 'tagId', 5 => 'title', 6 => 'titleM', 7 => 'titleF', );
     }
  
     protected function listOwnLists() {
         
-        return array ( 'people' => 'people', );
+        return array ( 'people' => 'people', 'perks' => 'perks', );
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'people' => 'Sample_Person', );
+        return array ( 'people' => 'Sample_Person', 'perks' => 'Sample_Perk', );
     }
 
     protected function getOwnPropertiesInfo() {
@@ -66,6 +70,25 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
                 'values' => array (
                     'class' => 'Ac_Model_Values_Records',
                     'mapperClass' => 'Sample_Person_Mapper',
+                ),
+                'showInTable' => false,
+            ),
+            'perks' => array (
+                'className' => 'Sample_Perk',
+                'mapperClass' => 'Sample_Perk_Mapper',
+                'caption' => 'Perks',
+                'relationId' => '_perks',
+                'countVarName' => '_perksCount',
+                'nnIdsVarName' => '_perkIds',
+                'referenceVarName' => '_perks',
+            ),
+            'perkIds' => array (
+                'dataType' => 'int',
+                'arrayValue' => true,
+                'controlType' => 'selectList',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Records',
+                    'mapperClass' => 'Sample_Perk_Mapper',
                 ),
                 'showInTable' => false,
             ),
@@ -184,6 +207,90 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         $this->_people = array();
         $this->_personIds = false;
     }               
+
+    function countPerks() {
+        if (is_array($this->_perks)) return count($this->_perks);
+        if ($this->_perksCount === false) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocCountFor($this, '_perks');
+        }
+        return $this->_perksCount;
+    }
+
+    function listPerks() {
+        if (!$this->_perksLoaded) {
+            $mapper = $this->getMapper();
+            $mapper->listAssocFor($this, '_perks');
+        }
+        return array_keys($this->_perks);
+    }
+    
+    /**
+     * @return bool
+     */
+    function isPerksLoaded() {
+        return $this->_perksLoaded;
+    }
+    
+    /**
+     * @return Sample_Perk 
+     */
+    function getPerk($id) {
+        if (!$this->_perksLoaded) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_perks');
+        }
+        if (!isset($this->_perks[$id])) trigger_error ('No such Perk: \''.$id.'\'', E_USER_ERROR);
+        if ($this->_perks[$id] === false) {
+        }
+        return $this->_perks[$id];
+    }
+    
+    /**
+     * @param Sample_Perk $perk 
+     */
+    function addPerk($perk) {
+        if (!is_a($perk, 'Sample_Perk')) trigger_error('$perk must be an instance of Sample_Perk', E_USER_ERROR);
+        $this->listPerks();
+        $this->_perks[] = $perk;
+        
+        if (is_array($perk->_tags) && !Ac_Util::sameInArray($this, $perk->_tags)) {
+                $perk->_tags[] = $this;
+        }
+        
+    }
+    
+    /**
+     * @return Sample_Perk  
+     */
+    function createPerk($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Perk_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        if ($isReference) $res->_setIsReference(true);
+        $this->addPerk($res);
+        return $res;
+    }
+    
+
+    function getPerkIds() {
+        if ($this->_perkIds === false) {
+            $mapper = $this->getMapper();
+            $mapper->loadAssocNNIdsFor($this, '_perks');
+        }
+        return $this->_perkIds;
+    }
+    
+    function setPerkIds($perkIds) {
+        if (!is_array($perkIds)) trigger_error('$perkIds must be an array', E_USER_ERROR);
+        $this->_perkIds = $perkIds;
+        $this->_perks = false; 
+    }
+    
+    function clearPerks() {
+        $this->_perks = array();
+        $this->_perkIds = false;
+    }               
   
 
     function _storeNNRecords() {
@@ -193,6 +300,13 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         if (is_array($this->_people) || is_array($this->_personIds)) {
             $rel = $mapper->getRelation('_people');
             if (!$this->_autoStoreNNRecords($this->_people, $this->_personIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'people', $rel->midWhere)) 
+                $res = false;
+        }
+            
+        
+        if (is_array($this->_perks) || is_array($this->_perkIds)) {
+            $rel = $mapper->getRelation('_perks');
+            if (!$this->_autoStoreNNRecords($this->_perks, $this->_perkIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'perks', $rel->midWhere)) 
                 $res = false;
         }
             

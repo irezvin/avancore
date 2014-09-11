@@ -66,7 +66,7 @@ CREATE TABLE `ac_people` (
   KEY `FK_ac_person_photos_ac_people_protrait` (`personId`,`portraitId`),
   CONSTRAINT `FK_ac_person_photos_ac_people_protrait` FOREIGN KEY (`personId`, `portraitId`) REFERENCES `ac_person_photos` (`personId`, `photoId`),
   CONSTRAINT `FK_ac_person_religion` FOREIGN KEY (`religionId`) REFERENCES `ac_religion` (`religionId`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -104,6 +104,30 @@ LOCK TABLES `ac_people_tags` WRITE;
 /*!40000 ALTER TABLE `ac_people_tags` DISABLE KEYS */;
 INSERT INTO `ac_people_tags` VALUES (4,1),(6,1),(4,2),(7,2),(6,3);
 /*!40000 ALTER TABLE `ac_people_tags` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_perks`
+--
+
+DROP TABLE IF EXISTS `ac_perks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_perks` (
+  `perkId` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) CHARACTER SET utf8 DEFAULT '',
+  PRIMARY KEY (`perkId`),
+  KEY `uqName` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_perks`
+--
+
+LOCK TABLES `ac_perks` WRITE;
+/*!40000 ALTER TABLE `ac_perks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ac_perks` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -277,6 +301,33 @@ INSERT INTO `ac_religion` VALUES (4,'Agnostic'),(3,'Atheist'),(1,'Christian'),(2
 UNLOCK TABLES;
 
 --
+-- Table structure for table `ac_tag_perks`
+--
+
+DROP TABLE IF EXISTS `ac_tag_perks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_tag_perks` (
+  `idOfTag` int(10) unsigned NOT NULL,
+  `idOfPerk` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`idOfTag`,`idOfPerk`),
+  KEY `fkTagId_idx` (`idOfTag`),
+  KEY `fkPerkId_idx` (`idOfPerk`),
+  CONSTRAINT `fkTagId` FOREIGN KEY (`idOfTag`) REFERENCES `ac_tags` (`tagId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
+  CONSTRAINT `fkPerkId` FOREIGN KEY (`idOfPerk`) REFERENCES `ac_perks` (`perkId`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_tag_perks`
+--
+
+LOCK TABLES `ac_tag_perks` WRITE;
+/*!40000 ALTER TABLE `ac_tag_perks` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ac_tag_perks` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `ac_tags`
 --
 
@@ -290,7 +341,7 @@ CREATE TABLE `ac_tags` (
   `titleF` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`tagId`),
   UNIQUE KEY `Index_2` (`title`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -299,7 +350,7 @@ CREATE TABLE `ac_tags` (
 
 LOCK TABLES `ac_tags` WRITE;
 /*!40000 ALTER TABLE `ac_tags` DISABLE KEYS */;
-INSERT INTO `ac_tags` VALUES (1,'Ум','Умный','Умница'),(2,'Красота','Красивый','Красавица'),(3,'Хитрость','Хитрюга','Хитрюга');
+INSERT INTO `ac_tags` VALUES (1,'Ум','Умный','Умница'),(2,'Красота','Красивый','Красавица'),(3,'Хитрость','Хитрюга','Хитрюга'),(4,'Богатство','Богач','Богачка');
 /*!40000 ALTER TABLE `ac_tags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -440,4 +491,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-08-31 16:07:14
+-- Dump completed on 2014-09-12  0:42:00

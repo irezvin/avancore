@@ -1452,6 +1452,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
 			'tableProviders' => array(
 				'model' => array(
 					'class' => 'Ac_Model_Sql_TableProvider',
+                    'mapperAlias' => $primaryAlias,
 					'mapper' => $this,
 				),
 			),

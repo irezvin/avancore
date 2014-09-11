@@ -45,9 +45,17 @@
       - [X] better phpdoc comments
       - [X] internal relations maintainance
 *** DONE Ac_Model_Object::reset() fix [2014-07-25 Fri]	       :model:cg:bug:
+    Done on [2014-09-02 Tue]
+    - Ac_Model_Object::reset() now clears association fields too
     - Ac_Model_Mapper::EVENT_ON_GET_DEFAULTS, EVENT_ON_GET_INTERNAL_DEFAULTS
     - Ac_Model_Object::EVENT_ON_SET_DEFAULTS
     - Ac_Model_Object::reset() now accept parameter $revert to reset object to last loaded state
+*** DONE Ac_Sql_Select: don't join tables, which are specified in $this->tables[$this->primaryAlias]->joinsAlias [2013-08-27 Tue] :sql:bug:
+    DONE on [2014-09-12 Fri]
+    - [X] Optimize Ac_Select_Table::getSqlSelect(),
+    - [X] Ac_Select_Table::isPrimary()
+    - [X] Ac_Select_Table::getEffectiveJoinData() <- if table is not primary anymore, reverse back join direction
+    - +Test "rotating" sql select' schema (join former primary table to other tables)+ much work at the moment
 *** TODO after model changes, the $form->fetchPresentation(true) should return updated data :forms:redesign:bug:
     (at least when $form->updateFromModel() is called)
     - a - pull-based forms
@@ -59,30 +67,12 @@
 *** TODO Fix tree-related bugs (add tests) [2014-08-25 Mon]   :model:sql:bug:
     - in-memory tree creation, then saving
 ** Extensible model
-*** WORK Ability of mixables to add custom fields into mapper' hydration data :model:mixin:
+*** DONE Ability of mixables to add custom fields into mapper' hydration data :model:mixin:
   - Use loadFromRows() everywhere
-    - [-] Ac_Model_Relation
+    - [X] Ac_Model_Relation
       - [X] basic solution
-      - [-] tests
 	- [X] Ac_Model_Mapper::loadFromRows for 'non-unique' records -- should return same instances
 	- [X] Ac_Model_Mapper::loadFromRows with partially-loaded records in the collection
-	- [ ] Ac_Model_Relation: (oh, frack!)
-	  - [ ] single table:
-	    - [ ] unique, single key
-	    - [ ] unique, multi key
-	    - [ ] non-unique, single key (ensure non-repeating instances)
-	    - [ ] non-unique, multi key (ensure non-repeating instances)
-	  - [ ] mid table:
-	    - [ ] unique
-	      - [ ] unique, single key, single second key
-	      - [ ] unique, single key, multi second key
-	      - [ ] unique, multi key, single second key
-	      - [ ] unique, multi key, multi second key
-	    - [ ] non-unique -- ensure non-repeating instances
-	      - [ ] non-unique, single key, single second key
-	      - [ ] non-unique, single key, multi second key
-	      - [ ] non-unique, multi key, single second key
-	      - [ ] non-unique, multi key, multi second key
     - [X] Ac_Model_Collection
 *** TODO Support of sequential instantiation of mapper' records
     - [ ] should be supported by mixins that should be able to add their resources to the 'sequential' records source
@@ -233,6 +223,7 @@
 **** TODO Form tests
 **** TODO Table tests
 **** TODO SQL tests
+*** WORK Ability to "rotate" sql select by assigning different primary alias [2014-09-12 Fri] :sql:feature:
 ** Complete
 *** DONE Ac_Model_Relation::loadSrc/loadDest *DOES NOT WORK* for M-N relations (but should be quite useful) :model:bug:
     - As it turned out, only loadSrc didn't work properly, in contrast to loadDest
@@ -275,12 +266,16 @@
       - listLineItems($onlyLoaded = false) - if array is partially populated, it will be fully populated
       - relation must NOT overwrite objects that were already pre-loaded
 
+*** DONE fix Ac_Model_Relation::countSrc/Dest [2014-08-17 Sun]	  :model:bug:
+    Done on [2014-08-31 Sun]
 ** Not started
 *** TODO think about fields that are part of foreign key [2014-03-05 Wed]
     - Example A: userAvatar is referenced by both user->id and user->photoId. 
       $user->id must serve as a restriction of photo ValueList while photoId must behave normally.
       This behaviour must be enabled in case when second field is part of other foreign key or record unique index, 
       or is a non-NULL value.
+**** TODO If only one free field participates in relation, restrict records in Ac_Model_Values_Records by other non-free fields [2014-08-09 Sat] :model:
+     see [[freeFields]]
 *** TODO tests for Ac_Form [2013-11-23 Sat]
 *** TODO Forms and controls should not be descendants of Ac_Controller anymore :forms:redesign:
     Practice had shown that has no sense, burdens a class interface and confuses developer.
@@ -420,8 +415,5 @@
     - If $modelB is an aggregate of $modelA: $modelB->deleteOnStore()
 *** TODO Remove all references to the model by referencing records when it's deleted [2014-08-03 Sun] :model:
     
-*** TODO If only one free field participates in relation, restrict records in Ac_Model_Values_Records by other non-free fields [2014-08-09 Sat] :model:
-    see [[freeFields]]
 *** TODO reduce getNNIds() to free field only [2014-08-09 Sat] :model:
     see [[freeFields]]
-*** TODO fix Ac_Model_Relation::countSrc/Dest [2014-08-17 Sun] :model:bug:

@@ -9,7 +9,9 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     
     var $_usedAliases = array();
     
-    var $primaryAlias = false;
+    protected $primaryAlias = false;
+    
+    protected $effectivePrimaryAlias = false;
 
     var $distinct = false;
     var $columns = array();
@@ -206,9 +208,10 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
         $res = '';
         if ($this->otherJoins) $res .= implode("\n", $this->otherJoins);
         if (!$withFirstAlias) $skipAliases[] = $orderedAliases[0];
+        $first = true;
         foreach (array_diff($orderedAliases, $skipAliases) as $a) {
             $tbl = $this->getTable($a);
-            $jcp = $tbl->getJoinClausePart();
+            $jcp = $tbl->getJoinClausePart(false, $first);
             if (strlen($jcp)) {
             	if ($jcp{0} == ',') $res = $res.",\n".substr($jcp, 1);
             	else {
@@ -216,6 +219,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
             		$res .= $jcp;
             	}
             }
+            $first = false;
         }
         $res = trim($this->_db->indent($res));
         if ($withFromKeyword && strlen($res)) $res = 'FROM '.$res;
@@ -305,14 +309,16 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     }
     
     function _getOrderedAliases($usedAliases) {
-        $allRequiredAliases = array();
+        $allRequiredAliases = array($this->getEffectivePrimaryAlias());
         if (!count($usedAliases)) {
             $aliases = array_keys($this->_tables);
             $usedAliases = array($this->getEffectivePrimaryAlias());
         }
         foreach ($usedAliases as $alias) {
             $t = $this->getTable($alias);
-            if (is_object($t)) $allRequiredAliases = array_merge($allRequiredAliases, $t->getAllRequiredAliases());
+            if ($t->alias !== $this->getEffectivePrimaryAlias()) {
+                if (is_object($t)) $allRequiredAliases = array_merge($allRequiredAliases, $t->getAllRequiredAliases());
+            }
         }
         $allRequiredAliases = array_unique($allRequiredAliases);
         $deps = $this->_getDeps($allRequiredAliases);
@@ -352,13 +358,15 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     }
     
     function getEffectivePrimaryAlias() {
-        if ($this->primaryAlias !== false) $res = $this->primaryAlias;
-        else {
-            $l = $this->listTables();
-            $t = $this->getTable($l[0]);
-            $res = $t->getIdentifier(); 
+        if ($this->effectivePrimaryAlias === false) {
+            if ($this->primaryAlias !== false) $this->effectivePrimaryAlias = $this->primaryAlias;
+            else {
+                $l = $this->listTables();
+                $t = $this->getTable($l[0]);
+                $this->effectivePrimaryAlias = $t->getIdentifier(); 
+            }
         }
-        return $res;
+        return $this->effectivePrimaryAlias;
     }
     
     /**
@@ -481,6 +489,27 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
             }
         }
         $this->_allDeps = false;
+    }
+    
+    function __get($var) {
+        if (method_exists($this, $m = 'get'.$var)) return $this->$m();
+        else Ac_E_InvalidCall::noSuchProperty ($this, $var);
+    }
+
+    function __set($var, $value) {
+        if (method_exists($this, $m = 'set'.$var)) $this->$m($value);
+        else throw Ac_E_InvalidCall::noSuchProperty ($this, $var);
+    }
+    
+    function setPrimaryAlias($primaryAlias) {
+        if ($primaryAlias !== ($oldPrimaryAlias = $this->primaryAlias)) {
+            $this->primaryAlias = $primaryAlias;
+            $this->effectivePrimaryAlias = false;
+        }
+    }
+
+    function getPrimaryAlias() {
+        return $this->primaryAlias;
     }
     
 }
