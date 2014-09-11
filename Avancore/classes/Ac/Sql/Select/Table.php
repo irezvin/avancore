@@ -99,12 +99,13 @@ class Ac_Sql_Select_Table {
      * @param Ac_Sql_Select $sqlSelect
      */
     function getSqlSelect($required = false) {
-    	$res = $this->_tableProvider;
-    	while ($res && !is_a($res, 'Ac_Sql_Select')) {
-    		$res = $res->getParent();
-    	}
-    	if ($required && !$res) trigger_error("Cannot retrieve an instance of Ac_Sql_Select (it isn't in any of table' parents)", E_USER_ERROR);
-    	return $res;
+        if ($this->_sqlSelect === false) {
+            if ($this->_tableProvider) $this->_sqlSelect = $this->_tableProvider->getSqlSelect();
+        }
+        if ($required && !$this->_sqlSelect)
+            trigger_error("Cannot retrieve an instance of Ac_Sql_Select (it isn't in any of table' parents)", 
+                E_USER_ERROR);
+    	return $this->_sqlSelect;
     }
     
     function getDb($required = false) {
@@ -113,6 +114,10 @@ class Ac_Sql_Select_Table {
     	if ($s) $res = $s->getDb();
     	if ($required && !$res) trigger_error('Cannot retreive an instance of Ac_Sql_Db', E_USER_ERROR);
     	return $res;
+    }
+    
+    function notifyParentChanged() {
+        $this->_sqlSelect = false;
     }
     
     /**
@@ -124,6 +129,7 @@ class Ac_Sql_Select_Table {
     
     function setTableProvider(Ac_Sql_Select_TableProvider $tableProvider) {
     	$this->_tableProvider = $tableProvider;
+        $this->notifyParentChanged();
         $this->_allRequiredAliases = false;
     }
     
@@ -134,8 +140,45 @@ class Ac_Sql_Select_Table {
     	return $this->_tableProvider;
     }
     
+    /**
+     * @return Ac_Sql_Table
+     */
+    function isReverseJoin() {
+        $res = false;
+        /*if (!$this->joinsAlias && !$this->isPrimary()) {
+            $pa = $this->getSqlSelect()->getEffectivePrimaryAlias();
+            $pt = $this->getSqlSelect()->getTable($pa);
+            $aa = array_values($pt->getAllRequiredAliases(false));
+            if (count($aa) > 1 && $this->getIdentifier() == $aa[0]) {
+                $res = $this->getSqlSelect()->getTable($aa[1]);
+            }
+        }*/
+        return $res;
+    }
+    
+    function getEffectiveJoinsAlias($ignorePrimary = true) {
+        if ($ignorePrimary && ($t = $this->isReverseJoin())) {
+            return $t->getIdentifier();
+        } else {
+            return $this->joinsAlias;
+        }
+    }
+    
+    protected function getEffectiveJoinsOn() {
+        if ($t = $this->isReverseJoin()) {
+            $res = $t->getJoinsOn(false, true);
+        } else {
+            $res = $this->joinsOn;
+        }
+        return $res;
+    }
+    
     function getEffectiveJoinType() {
     	$res = $this->joinType;
+        if (($t = $this->isReverseJoin())) {
+            $res = $t->joinType;
+        }
+        if ($this->isPrimary()) return false;
     	if ($this->joinsAlias && preg_match('/^(inner|natural)\s+join\\b/i', $res)) { // this is INNER or NATURAL JOIN
     		$s = false;
 	    	switch ($this->autoLoosenJoinType) {
@@ -146,7 +189,7 @@ class Ac_Sql_Select_Table {
 	    	if ($loosen) {
 	    		if ($s === false) $s = $this->getSqlSelect();
 	    		if ($s) {
-	    			$joinTable = $s->getTable($this->joinsAlias);
+                    $joinTable = $s->getTable($this->getEffectiveJoinsAlias());
 	    			$otherJoin = $joinTable->getEffectiveJoinType();
 	    			if (preg_match('/^(left|right)\s+join$/i', trim($otherJoin), $matches)) {
 	    				if (!strncasecmp($matches[1], 'left', 1)) $res = 'LEFT JOIN';
@@ -171,11 +214,11 @@ class Ac_Sql_Select_Table {
     	return $res;
     }
     
-    function getJoinsOn($alias = false) {
+    function getJoinsOn($alias = false, $forceReturn = false) {
         if ($alias === false) $alias = $this->alias;
-        
         // get kind of join
-        if (is_array($this->joinsOn)) {
+        if ($this->isReverseJoin()) $joinsOn = $this->getEffectiveJoinsOn();
+        elseif (is_array($this->joinsOn)) {
         	$sqs = $this->getSqlSelect(true);
         	$db = $sqs->getDb();
     		// it's USING-type join
@@ -192,12 +235,17 @@ class Ac_Sql_Select_Table {
         				$c[] = $expr;
         			} else {
         				if (is_numeric($myColumn)) $myColumn = $otherColumn;
-                		$c[] = $db->nameQuote(array($this->joinsAlias, $otherColumn)).' = '.$db->nameQuote(array($alias, $myColumn));
+                		$c[] = $db->nameQuote(array($this->joinsAlias, $otherColumn))
+                            .' = '.$db->nameQuote(array($alias, $myColumn));
         			}
             	}
             	$joinsOn = implode(' AND ', $c);
         	}
         } else $joinsOn = (string) $this->joinsOn;
+        if ($this->isPrimary() && !$forceReturn) {
+            $joinsOn = '';
+            $tj = '';
+        }
         if (strlen($joinsOn)) $joinsOn = ' '.trim($joinsOn);
         if (strlen($tj = trim($joinsOn)) && strncmp($tj, ',', 1) && strncasecmp($tj, 'on', 2) && strncasecmp($tj, 'using', 2)) $joinsOn = ' ON '.$joinsOn;
         return $joinsOn;
@@ -205,9 +253,10 @@ class Ac_Sql_Select_Table {
 
     function hasUsingKeyword() {
     	$res = false;
-    	if (!$this->_empty($this->joinsOn)) {
-    		if (is_array($this->joinsOn)) $res = is_numeric(implode('', array_keys($this->joinsOn)));
-    		else $res = preg_match('/^USING\\b/i', trim($this->joinsOn));
+        $joinsOn = $this->getEffectiveJoinsOn();
+    	if (!$this->_empty($joinsOn)) {
+    		if (is_array($joinsOn)) $res = is_numeric(implode('', array_keys($joinsOn)));
+    		else $res = preg_match('/^USING\\b/i', trim($joinsOn));
     	}
     	return $res;
     }
@@ -228,25 +277,37 @@ class Ac_Sql_Select_Table {
         return $res;
     }
     
-    function getJoinClausePart($alias = false) {
+    function getJoinClausePart($alias = false, $isFirst = false) {
+        $sqlSelect = $this->getSqlSelect();
         if ($this->omitInFromClause) $res = '';
+        elseif ($this->isPrimary()) {
+            $res = $this->getSqlSrc();
+            $alias = $this->alias;
+            if (strlen($alias)) $res .= ' AS '.$sqlSelect->n($alias);
+        }
         else {
             
             if ($alias === false) $alias = $this->alias;
             
             $sqlSelect = $this->getSqlSelect(true);
 
-            if (strlen($this->joinsAlias)) {
+            $joinsAlias = $this->getEffectiveJoinsAlias();
+            if (strlen($joinsAlias)) {
 
                 $joinType = $this->getEffectiveJoinType();
+                
+                if (!strlen($joinType) && $isFirst) $joinType = ", ";
 
                 $needsCondition = $this->_joinNeedsCondition($joinType);
+                
+                $joinsOn = $this->getEffectiveJoinsOn();
+                
                 if ($needsCondition){
-                    if ($this->_empty($this->joinsOn)) {
+                    if ($this->_empty($joinsOn)) {
                         trigger_error ("\$joinsOn property not provided for '{$joinType}' type join (neither CROSS nor NATURAL)", E_USER_WARNING);
                     }
                 } else {
-                    if (!$this->_empty($this->joinsOn)) {
+                    if (!$this->_empty($joinsOn)) {
                         trigger_error ("'{$joinType}' type join don't needs \$joinsOn, but it's provided", E_USER_WARNING);
                     }
                 }
@@ -264,8 +325,9 @@ class Ac_Sql_Select_Table {
                 $res .= $this->getJoinsOn($alias);
 
             } else {
-
-                $res = $sqlSelect->n($this->name);
+                if ($isFirst) $res = "";
+                else $res = ", ";
+                $res .= $sqlSelect->n($this->name);
                 if (strlen($alias)) $res .= ' AS '.$sqlSelect->n($alias);
                 if ($this->useIndex !== false) {
                     $res .= ' USE INDEX('.(is_array($this->useIndex)? implode(", ", $this->useIndex) : $this->useIndex).')'; 
@@ -280,27 +342,33 @@ class Ac_Sql_Select_Table {
         return strlen($this->alias)? $this->alias : $this->name;
     }
     
-    function getDirectRequiredAliases() {
-        $ja = $this->joinsAlias? array($this->joinsAlias) : array();
+    function getDirectRequiredAliases($ignorePrimary = true) {
+        $sel = $this->getSqlSelect(true);
+        if ($this->isPrimary() && $ignorePrimary) return array();
+        $joinsAlias = $this->getEffectiveJoinsAlias($ignorePrimary);
+        $ja = strlen($joinsAlias)? array($joinsAlias) : array();
         $res = array_unique(array_merge(array($this->getIdentifier()), $this->otherRequiredAliases, $ja));
         return $res;
     }
     
-    function getAllRequiredAliases() {
+    function getAllRequiredAliases($ignorePrimary = true) {
+        $sqlSelect = $this->getSqlSelect(true);
+        if ($this->isPrimary() && $ignorePrimary) {
+            return array();
+        }
         if ($this->_allRequiredAliases === false) {
         	$sqlSelect = $this->getSqlSelect(true);
-            
             $aliasList = array();
             $deps = array();
             
-            $checkAliases = $this->getDirectRequiredAliases();
+            $checkAliases = $this->getDirectRequiredAliases($ignorePrimary);
             $checkedAliases = array();
             while (count($checkAliases)) {
                 $c = $checkAliases[0];
                 $checkedAliases[] = $c;
                 $checkAliases = array_slice($checkAliases, 1);
                 $t = $sqlSelect->getTable($c);
-                $aliasList = array_unique(array_merge($dra = $t->getDirectRequiredAliases(), $aliasList));
+                $aliasList = array_unique(array_merge($dra = $t->getDirectRequiredAliases($ignorePrimary), $aliasList));
                 $deps[$c] = $dra;
                 $checkAliases = array_merge($checkAliases, array_diff($dra, $checkedAliases));
             }
@@ -312,7 +380,10 @@ class Ac_Sql_Select_Table {
     }
     
     function __clone() {
-        
+    }
+    
+    function isPrimary() {
+        return $this->getSqlSelect(true)->getEffectivePrimaryAlias() == $this->getIdentifier();
     }
     
 }

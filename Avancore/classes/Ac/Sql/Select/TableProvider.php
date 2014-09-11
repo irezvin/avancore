@@ -9,6 +9,11 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
     var $_tableProviders = array();
     
     /**
+     * @var Ac_Sql_Select
+     */
+    var $_sqlSelect = false;
+    
+    /**
      * @var Ac_Sql_Select_TableProvider
      */
     var $_parent = false;
@@ -81,9 +86,33 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
      */
     function setParent($tableProvider) {
         //if ($this->_tableProvider) trigger_error ("Can set 'tableProvider' property only once", E_USER_ERROR);
-        if (!is_a($tableProvider, 'Ac_Sql_Select_TableProvider'))  trigger_error("\$tableProvider must be an instance of Ac_Sql_Select_TableProvider", E_USER_ERROR);
+        if (!is_a($tableProvider, 'Ac_Sql_Select_TableProvider'))
+            trigger_error("\$tableProvider must be an instance of Ac_Sql_Select_TableProvider", E_USER_ERROR);
         $this->_parent = $tableProvider;
+        $this->notifyParentChanged();
     }
+    
+    function notifyParentChanged() {
+        $this->_sqlSelect = false;
+        foreach ($this->_tables as $t) $t->notifyParentChanged();
+        foreach ($this->_tableProviders as $p) $p->notifyParentChanged();
+    }
+    
+    /**
+     * @return Ac_Sql_Select
+     */
+    function getSqlSelect() {
+        if ($this->_sqlSelect === false) {
+            $this->_sqlSelect = $this;
+            while ($this->_sqlSelect && !($this->_sqlSelect instanceof Ac_Sql_Select)) 
+                $this->_sqlSelect = $this->_sqlSelect->getParent();
+            if (!$this->_sqlSelect || !($this->_sqlSelect instanceof Ac_Sql_Select)) {
+                $this->_sqlSelect = null;
+            }
+        }
+        return $this->_sqlSelect;
+    }
+    
     
     /**
      * @return Ac_Sql_Select_TableProvider
@@ -92,6 +121,8 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
     	$res = $this->_parent;
     	return $res;
     }
+    
+    
     
     /**
      * Adds existing table or creates it by prototype.

@@ -4,6 +4,18 @@ require_once('testsStartup.php');
 require_once('simpletest/unit_tester.php');
 
 class Ac_Test_SqlSelect extends Ac_Test_Base {
+    
+    protected $bootSampleApp = true;
+    
+    function _testRevSelect() {
+        $sel2 = Sample::getInstance()->getSamplePersonMapper()->createSqlSelect();
+        $sel2->primaryAlias = 'tags[perks]';
+        $sel2->useAlias('religion', 'people');
+        var_dump(''.$sel2);
+        
+        $sel1 = Sample::getInstance()->getSamplePersonMapper()->createSqlSelect();
+        $sel1->useAlias('tags[perks]');
+    }
 	
 	/**
 	 * @return Ac_Sql_Select
@@ -204,6 +216,20 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
         $s2->getPart('mul')->bind(array('op' => 2));
         $this->assertNotEqual(''.$s2, $oldS2);
         $this->assertEqual(''.$s1, $lastS1);
+    }
+    
+    function testDontJoinPrimaryAlias() {
+        $sel = $this->createMySelect();
+        $sel->primaryAlias = 'relations';
+        $sel->useAlias('relationTypes');
+        $this->assertEqual(
+            $this->normalizeStatement(''.$sel),
+            $this->normalizeStatement('
+                SELECT *
+                FROM `#__relations` AS `relations`
+                INNER JOIN `#__relation_types` AS `relationTypes` USING(`relationTypeId`)
+            ')
+        );
     }
 	
 }
