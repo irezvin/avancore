@@ -1971,6 +1971,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $isUnique, $otherIsUnique, $qualifier, $otherQualifier, $mapMultiple = false, 
             $loadedVarName = false) {
         
+        if (!$varName && !$otherVarName && !$loadedVarName) return;
+        
         if (count($keys) === 1) {
             foreach ($map as $m) {
                 $dataKey = $m[1];

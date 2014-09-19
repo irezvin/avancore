@@ -32,6 +32,7 @@ class Ac_Model_Relation_Abstract extends Ac_Prototyped {
     }
     
     protected function setVal(& $dest, $varName, $val, $qualifier = false) {
+        if (!$varName) return;
         if ($qualifier !== false && $qualifier !== null && is_array($val)) {
             $val = Ac_Util::indexArray($val, $qualifier, true);
         }
@@ -52,6 +53,7 @@ class Ac_Model_Relation_Abstract extends Ac_Prototyped {
      * @param bool $linkedIsUnique - whether we should replace $linkTo->varName or add to it ($linkTo->varName[]) 
      */
     protected function linkBack(& $linkTo, & $linked, $varName, $toIsArray, $linkedIsUnique, $qualifier = false, $qKey = null) {
+        if (!$varName) return;
         if (is_null($qualifier)) $qualifier = false;
         elseif ($qualifier !== false) {
             if ($qKey === null) $qKey = Ac_Accessor::getObjectProperty ($linked, $qualifier, true);
@@ -211,6 +213,7 @@ class Ac_Model_Relation_Abstract extends Ac_Prototyped {
     }
     
     protected function isVarEmpty($srcItem, $var, & $value = false) {
+        if (!$var) return true;
         $res = true;
         $value = false;
         if (is_array($srcItem)) {

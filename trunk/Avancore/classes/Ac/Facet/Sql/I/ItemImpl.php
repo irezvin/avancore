@@ -9,5 +9,10 @@ interface Ac_Facet_Sql_I_ItemImpl {
     function setAlwaysApply($alwaysApply);
 
     function getAlwaysApply();
+    
+    /**
+     * @return Ac_Facet_Item
+     */
+    function getItem();
 
 }

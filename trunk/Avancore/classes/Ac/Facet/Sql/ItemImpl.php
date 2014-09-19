@@ -27,6 +27,11 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
      * @var Ac_Sql_Select
      */
     protected $selectForValues = false;
+    
+    /**
+     * @var array
+     */
+    protected $selectPrototypeForOtherValues = false;
 
     function setSelectForValues(Ac_Sql_Select $selectForValues) {
         $this->selectForValues = $selectForValues;
@@ -163,16 +168,21 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
         if ($this->selectExtra) {
             Ac_Util::ms($prototype, $this->selectExtra);
         }
+        $found = false;
         if ($this->selectPrototypesForValues) {
             $v = $this->getValue();
             if ($v !== false || is_array($v) && count($v)) {
                 $v = Ac_Util::toArray($v);
                 foreach ($v as $val) {
                     if (isset($this->selectPrototypesForValues[$val])) {
+                        $found = true;
                         Ac_Util::ms($prototype, $this->selectPrototypesForValues[$val]);
                     }
                 }
             }
+        }
+        if (!$found && $this->selectPrototypeForOtherValues) {
+            Ac_Util::ms($prototype, $this->selectPrototypeForOtherValues);
         }
     }
     
@@ -209,6 +219,17 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
      */
     function getSelectPrototypesForValues() {
         return $this->selectPrototypesForValues;
+    }    
+
+    function setSelectPrototypeForOtherValues(array $selectPrototypeForOtherValues) {
+        $this->selectPrototypeForOtherValues = $selectPrototypeForOtherValues;
+    }
+
+    /**
+     * @return array
+     */
+    function getSelectPrototypeForOtherValues() {
+        return $this->selectPrototypeForOtherValues;
     }    
     
 }
