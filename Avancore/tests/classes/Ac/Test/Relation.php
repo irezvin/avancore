@@ -4,6 +4,50 @@ class Ac_Test_Relation extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
 
+    function testLoadNoSrcVar() {
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        $person = $pm->loadByPersonId(3);
+        $rel = clone $pm->getRelation('_religion');
+        $rel->srcVarName = false;
+        $pp = array($person);
+        $r = $rel->loadDest($pp);
+        $this->assertTrue(is_array($r));
+        $person = $pm->loadByPersonId(3);
+        $rel = clone $pm->getRelation('_religion');
+        $rel->srcVarName = false;
+        $pp = array($person);
+        $r = $rel->loadDest($person);
+        $this->assertTrue(is_array($r));
+        
+        $person = $pm->loadByPersonId(3);
+        $rel = clone $pm->getRelation('_religion');
+        $rel->destVarName = false;
+        $pp = array($person);
+        $r = $rel->loadDest($pp);
+        $this->assertTrue(is_array($r));
+        $person = $pm->loadByPersonId(3);
+        $rel = clone $pm->getRelation('_religion');
+        $rel->srcVarName = false;
+        $pp = array($person);
+        $r = $rel->loadDest($person);
+        $this->assertTrue(is_array($r));
+        
+        $person = $pm->loadByPersonId(3);
+        $rel = clone $pm->getRelation('_religion');
+        $rel->destVarName = false;
+        $rel->srcVarName = false;
+        $pp = array($person);
+        $r = $rel->loadDest($pp);
+        $this->assertTrue(is_array($r));
+        $person = $pm->loadByPersonId(3);
+        $rel = clone $pm->getRelation('_religion');
+        $rel->srcVarName = false;
+        $pp = array($person);
+        $r = $rel->loadDest($person);
+        $this->assertTrue(is_array($r));
+        
+    }
+    
     function testPartialLoad() {
         $pm = Sample::getInstance()->getSamplePersonMapper();
         $rm = Sample::getInstance()->getSampleReligionMapper();

@@ -114,6 +114,8 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
                     $posParams = Ac_Accessor::mapFunctionArgs($cr, $params, $cr->isUserDefined());
                     $res = $class->newInstanceArgs(array_values($posParams));
                 } else {
+                    if (is_null($className) || !strlen($className)) 
+                        throw new Ac_E_InvalidPrototype("\'class' key is missing (or has null or empty value) in the prototype and default \$baseClass is not provided too ");
                     $res = new $className();
                 }
                 unset($p['__construct']);

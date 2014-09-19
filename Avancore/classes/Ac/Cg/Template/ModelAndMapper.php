@@ -106,7 +106,10 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
             $this->mapperVars['nullableSqlColumns'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->nullableSqlColumns, 0, false, true, true));
         foreach ($this->model->tableObject->listColumns() as $nm) {
             $col = $this->model->tableObject->getColumn($nm);
-            $this->mapperVars['defaults'][$nm] = $col->default;
+            
+            $default = $col->default; 
+            if (strpos(strtolower($col->type), 'text') !== false && is_null($col->default)) $default = '';
+            $this->mapperVars['defaults'][$nm] = $default;
         }
         $this->mapperVars['defaults'] = new Ac_Cg_Php_Expression($this->exportArray($this->mapperVars['defaults'], 8, true, false, true));
         
