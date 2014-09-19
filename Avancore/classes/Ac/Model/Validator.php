@@ -298,7 +298,7 @@ class Ac_Model_Validator {
         $res = true;
         if (!(isset($fieldInfo['skipValidation']) && $fieldInfo['skipValidation'])) {
             if (isset($fieldInfo['required']) && $fieldInfo['required']) {
-                $value = $this->convertValue($this->getFieldValue($fieldName, null, $fieldInfo), false, array());
+                $value = $this->convertValue($this->getFieldValue($fieldName, null, $fieldInfo), false, $fieldInfo);
                 if ($this->valueIsEmpty($value)) {
                     $res = false;
                     $this->errors[$fieldName]['required'] = $this->makeErrorMsg($this->msgs['required'], $fieldInfo);
