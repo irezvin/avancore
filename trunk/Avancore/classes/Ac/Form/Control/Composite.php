@@ -183,10 +183,6 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
         return $res;
     }
     
-    function getValue() {
-        return parent::getValue();
-    }
-    
     function _doGetValue() {
         if ($this->getDefaultFromModel) {
             if (!($this->readOnly === true) && isset($this->_rqData) && $this->_rqData) {
@@ -198,6 +194,19 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
         } else {
             return $this->getControlsValues();
         }
+    }
+    
+    function setValue($value) {
+        if (!is_array($value)) 
+            throw new Ac_E_InvalidCall("Ac_Form_Control_Composite::setValue(): \$value must be an array ");
+        foreach ($value as $k => $v) {
+            $this->getControl($k)->setValue($v);
+        }
+    }
+    
+    function deleteValue() {
+        foreach ($this->listControls() as $i)
+            $this->getControl($k)->deleteValue();
     }
     
     /**
@@ -252,6 +261,12 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
             $res = null;
         }
         return $res;
+    }
+    
+    function updateFromRequest() {
+        foreach ($this->listControls() as $c) {
+            $this->getControl($c)->updateFromRequest();
+        }
     }
     
     function updateFromModel() {

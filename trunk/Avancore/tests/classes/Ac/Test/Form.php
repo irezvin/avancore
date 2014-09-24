@@ -4,6 +4,46 @@ class Ac_Test_Form extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
     
+    function testFormReflectsModelChanges() {
+        $p = Sample::getInstance()->getSamplePersonMapper()->createRecord();
+        $p->name = 'Old name';
+        $tf = $this->createTestForm1(array('model' => $p));
+        $p->isSingle = true;
+        $ctx = $tf->getContext();
+        $ctx->setData(array(
+            'name' => 'Input name',
+        ));
+        $n = $tf->getControl('name');
+        $s = $tf->getControl('isSingle');
+        
+        $tf->setSubmitted(); // required for checkboxes 
+        
+        // initial values are from request (isSingle is default since it's not in the request)
+        $this->assertEqual($n->getValue(), 'Input name');
+        $this->assertEqual($s->getValue(), false);
+        
+        $tf->updateFromModel();
+        $this->assertEqual($n->getValue(), 'Old name');
+        $this->assertEqual($s->getValue(), true);
+        
+        $p->name = 'New name';
+        $p->isSingle = false;
+        
+        $this->assertEqual($n->getValue(), 'New name');
+        $this->assertEqual($s->getValue(), false);
+        
+        // round and round and round we go
+        $tf->updateFromRequest();
+        $this->assertEqual($n->getValue(), 'Input name');
+        $this->assertEqual($s->getValue(), false);
+
+        $n->setValue('Set name');
+        $s->setValue(true);
+        $this->assertEqual($n->getValue(), 'Set name');
+        $this->assertEqual($s->getValue(), true);
+
+    }
+    
     function testErrorList () {
         $person = Sample::getInstance()->getSamplePersonMapper()->createRecord();
         $f = new Ac_Form(null, array(
@@ -74,18 +114,6 @@ class Ac_Test_Form extends Ac_Test_Base {
         if ($invalid) var_dump($pres);
         
         $person->_checked = true;
-    }
-    
-    function testCreateForm() {
-        $p = Sample::getInstance()->getSamplePersonMapper()->createRecord();
-        $tf = $this->createTestForm1(array('model' => $p));
-        $ctx = $tf->getContext();
-        $ctx->updateData(array('name' => 'Name that user has entered'));
-        //var_dump($tf->getControl('name')->getValue());
-        $p->name = 'New name';
-        //var_dump($tf->getControl('name')->getValue());
-        $tf->updateFromModel();
-        //var_dump($tf->getControl('name')->getValue());
     }
     
     /**

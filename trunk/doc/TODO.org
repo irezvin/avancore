@@ -1,5 +1,5 @@
 * 0.3.2 Extensibility, step 1
-** Fix long-term bugs
+** Fix long-lasting bugs
 *** DONE convert nullable empty foreign keys to NULL before saving since it annoys a lot :model:bug:
     - Definitions:  <<freeFields>>
       - *free foreign field*: is not part of PK or other multi-field FK, or has meta-property isRestricted == false
@@ -55,15 +55,17 @@
     - [X] Optimize Ac_Select_Table::getSqlSelect(),
     - [X] Ac_Select_Table::isPrimary()
     - [X] Ac_Select_Table::getEffectiveJoinData() <- if table is not primary anymore, reverse back join direction
-    - +Test "rotating" sql select' schema (join former primary table to other tables)+ much work at the moment
-*** TODO after model changes, the $form->fetchPresentation(true) should return updated data :forms:redesign:bug:
+    - +Test "rotating" sql select' schema (join former primary table to other tables)+ much work at the moment*
+*** DONE after model changes, the $form->fetchPresentation(true) should return updated data :forms:redesign:bug:
     (at least when $form->updateFromModel() is called)
     - a - pull-based forms
     - b - make 'caching' more intelligent
-*** TODO Joomla output: don't add JS and CSS assets that were already added by the Joomla [2013-10-26 Sat]  :js:bug:
+    Done on [2014-09-25 Thu]
+*** TODO Joomla output: don't add JS and CSS assets that were already added by the Joomla [2013-10-26 Sat] :js:bug:
 *** TODO Ac_Sql_Db, Ac_Sql_Db_PDO: charset (at least default to utf-8) :sql:bug:minor:
 *** TODO Ac_Form_Control_Date cannot display "zero date" in required format :forms:bug:
 *** TODO Ac_Model_Values_Records & Ac_Model_Validator: don't load all records to check if value is Ok, use SELECT instead [2014-08-17 Sun] :model:bug:
+*
 *** TODO Fix tree-related bugs (add tests) [2014-08-25 Mon]   :model:sql:bug:
     - in-memory tree creation, then saving
 ** Extensible model
