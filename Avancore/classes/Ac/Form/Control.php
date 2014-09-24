@@ -319,7 +319,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     function getValue() {
         if (!$this->_gotValue) {
             $this->bindFromRequest();   
-            $this->_gotValue = true;
             if (!$this->isReadOnly()) {
                 $this->_value = $this->_doGetValue();
             } else {
@@ -329,9 +328,17 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         return $this->_value;
     }
     
-    function setData($value = array()) {
-        $this->_gotValue = true;
-        $this->_value = $value;
+    function setValue($value) {
+        $this->bindFromRequest();
+        $this->_rqData['value'] = $value;
+    }
+    
+    function deleteValue() {
+        unset($this->_rqData['value']);
+    }
+    
+    function setData($value) {
+        $this->setValue($value);
     }
     
     function setDefault($default = array()) {
@@ -967,10 +974,13 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         if (!$this->init) return false;
     }
 
+    function updateFromRequest() {
+        $this->_bound = false;
+    }
+    
     function updateFromModel() {
         if ($this->getModel()) {
-            $this->_value = $this->getDefault();
-            $this->_gotValue = true;
+            $this->deleteValue();
         }
     }
     
