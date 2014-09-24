@@ -54,12 +54,28 @@ class Ac_Form_Control_Toggle extends Ac_Form_Control {
         return $res;
     }
     
+    function updateFromModel() {
+        parent::updateFromModel();
+        $this->_submitted = false;
+    }
+    
+    function deleteValue() {
+        parent::deleteValue();
+        $this->_submitted = false;
+    }
+    
+    function updateFromRequest() {
+        parent::updateFromRequest();
+        $this->_submitted = null;
+    }
+    
     function _doGetValue() {
         if (!$this->isReadOnly()) {
             if (isset($this->_rqData['value'])) {
                 $val = (bool) $this->_rqData['value'];
                 $res = $val? $this->trueValue : $this->falseValue;
             } elseif ($this->type == 'checkbox' && $this->isSubmitted()) {
+                
                 $res = $this->falseValue; 
             } else {
                 $res = $this->getDefault();
