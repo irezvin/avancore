@@ -4,6 +4,50 @@ class Ac_Test_Form extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
     
+    function testZeroDate() {
+        
+        $p0 = new Ac_Form_Control_Date(null, array(
+            'externalFormat' => 'd-m-Y',
+            'internalFormat' => 'Y/m/d',
+        ), 'date1');
+        $p0->setValue('1982-12-23');
+        $this->assertEqual($p0->getDisplayValue(), '23-12-1982');
+        $this->assertEqual($p0->getValue(), '1982/12/23');
+        
+        $p01 = new Ac_Form_Control_Date(null, array(
+        ), 'date1');
+        $p01->setValue('0000-00-00');
+        // default external format is d.m.Y
+        $this->assertEqual($p01->getDisplayValue(), '00.00.0000');
+        $this->assertEqual($p01->getValue(), '0000-00-00');
+        
+        
+        $p1 = new Ac_Form_Control_Date(null, array(
+            'externalFormat' => 'd-m-Y',
+            'internalFormat' => 'Y/m/d',
+        ), 'date1');
+        $p1->setValue('0000-00-00');
+        $this->assertEqual($p1->getDisplayValue(), '00-00-0000');
+        $this->assertEqual($p1->getValue(), '0000/00/00');
+        
+        $p2 = new Ac_Form_Control_DateTime(null, array(
+            'externalFormat' => 'd-m-Y H:i:s',
+            'internalFormat' => 'G:i:s d/n/y',
+        ), 'date2');
+        $p2->setValue('0000-00-00 00:00:00');
+        $this->assertEqual($p2->getDisplayValue(), '00-00-0000 00:00:00');
+        $this->assertEqual($p2->getValue(), '0:00:00 00/0/00');
+        
+        $p3 = new Ac_Form_Control_DateTime(null, array(
+            'externalFormat' => 'Foobar',
+            'internalFormat' => 'Foobar',
+        ), 'date2');
+        $p3->setValue('0000-00-00 00:00:00');
+        $this->assertEqual($p3->getDisplayValue(), '0000-00-00 00:00:00');
+        $this->assertEqual($p3->getValue(), '0000-00-00 00:00:00');
+        
+    }
+    
     function testFormReflectsModelChanges() {
         $p = Sample::getInstance()->getSamplePersonMapper()->createRecord();
         $p->name = 'Old name';

@@ -6,6 +6,10 @@ class Ac_Form_Control_Date extends Ac_Form_Control {
     
     var $defaultInternalFormat = 'Y-m-d';
     
+    var $externalZeroDate = false;
+    
+    var $internalZeroDate = false;
+    
     var $externalFormat = false;
     
     var $internalFormat = false;
@@ -69,7 +73,11 @@ class Ac_Form_Control_Date extends Ac_Form_Control {
         $res = parent::getValue();
         if (($if = $this->getInternalFormat()) !== false) {
             $convertedValue = Ac_Util::date($res, $if, true, $wasZero);
-            if (!$wasZero && strlen($convertedValue)) $res = $convertedValue;
+            if ($wasZero) {
+                $zd = $this->convertZeroDate($if, $complete);
+                if ($complete) $res = $zd;
+                //echo "*{$res}*{$complete}*{$if}*";
+            } elseif (strlen($convertedValue)) $res = $convertedValue;
         }
         return $res;
     }
@@ -78,13 +86,17 @@ class Ac_Form_Control_Date extends Ac_Form_Control {
         $res = parent::getValue();
         if (($ef = $this->getExternalFormat()) !== false) {
             $convertedValue = Ac_Util::date($res, $ef, true, $wasZero);
-            if (!$wasZero && strlen($convertedValue)) $res = $convertedValue;
+            if ($wasZero) {
+                $zd = $this->convertZeroDate($ef, $complete);
+                if ($complete) $res = $zd;
+            }
+            elseif (strlen($convertedValue)) $res = $convertedValue;
         }
         return $res;
     }
     
     function convertToCalendarFormat($dateFormat) {
-        return strtr($dateFormat, array(
+        $res = strtr($dateFormat, array(
             'Y' => '%Y',
             'm' => '%m',
             'd' => '%d',
@@ -92,6 +104,25 @@ class Ac_Form_Control_Date extends Ac_Form_Control {
             'i' => '%M',
             's' => '%S',
         ));
+        return $res;
+    }
+    
+    function convertZeroDate($dateFormat, & $complete) {
+        $res = strtr($dateFormat, array(
+            'Y' => '0000',
+            'y' => '00',
+            'm' => '00',
+            'd' => '00',
+            'H' => '00',
+            'i' => '00',
+            's' => '00',
+            'j' => '0',
+            'n' => '0',
+            'g' => '0',
+            'G' => '0',
+        ));
+        $complete = !preg_match('/[a-zA-Z]/', $res);
+        return $res;
     }
     
     function getExtraJson() {
