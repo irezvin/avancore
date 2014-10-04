@@ -176,7 +176,6 @@ class Ac_Model_Validator {
         list($head, $tail) = Ac_Util::pathHeadTail($fieldName);        
         if (is_a($this->model, 'Ac_Model_Data')) {
             $res = $this->model->getField($fieldName);
-            //var_dump($fieldName, $res);
         }
         elseif (is_object($this->model) && $method = $this->_getMethod($this->model, 'get', $head)) {
             if (strlen($tail)) $res = $this->model->$method($tail); 
@@ -274,12 +273,16 @@ class Ac_Model_Validator {
         } else {
             $res = array();
         }
-        if(!isset($res['valueList']) && isset($res['values']) && is_array($res['values']) && is_object($this->model)) {
-            $vals = Ac_Model_Values::factoryIndependent($res['values']);
-            $vals->data = $this->model;
-            
-            $valueList = $vals->getValueList();
-            $res['valueList'] = $valueList;
+        if(!isset($res['valueList']) && isset($res['values']) && (
+            is_array($res['values']) 
+            || is_object($res['values']) && ($res['values'] instanceof Ac_Model_Values))
+        ) {
+            if (!is_object($res['values'])) {
+                $vals = Ac_Model_Values::factoryIndependent($res['values']);
+            }
+            else $vals = $res['values'];
+            if (is_object($this->model)) $vals->data = $this->model;
+            $res['values'] = $vals;
         }
         $this->_fieldsInfo[$fieldName] = $res;
         return $res;
@@ -389,9 +392,14 @@ class Ac_Model_Validator {
                 $intFi = $fieldInfo;
                 unset($intFi['plural']);
                 unset($intFi['arrayValue']);
-                if (isset($fieldInfo['restrictToListOnConvert']) && $fieldInfo['restrictToListOnConvert'] && isset($fieldInfo['valueList']) && is_array($fieldInfo['valueList'])) {
-                    foreach ($value as $key => $val) {
-                        if (!is_scalar($val) || !isset($fieldInfo['valueList'][$val])) unset($value[$key]);
+                if (isset($fieldInfo['restrictToListOnConvert']) && $fieldInfo['restrictToListOnConvert']) { 
+                    if (isset($fieldInfo['valueList']) && is_array($fieldInfo['valueList'])) {
+                        foreach ($value as $key => $val) {
+                            if (!is_scalar($val) || !isset($fieldInfo['valueList'][$val])) unset($value[$key]);
+                        }
+                    } elseif (isset($fieldInfo['values']) && is_object($fieldInfo['values']) 
+                        && $fieldInfo['values'] instanceof Ac_Model_Values) {
+                        $value = $fieldInfo['values']->filterValuesArray($value);
                     }
                 }
                 foreach ($value as $key => $val) {
@@ -539,16 +547,30 @@ class Ac_Model_Validator {
         $res = true;
         $valueList = null;
         if (isset($fieldInfo['valueList']) && is_array($fieldInfo['valueList'])) $valueList = $fieldInfo['valueList'];
-        if (is_array($valueList)) {
+        elseif (isset($fieldInfo['values']) && is_object($fieldInfo['values']) && $fieldInfo['values'] instanceof Ac_Model_Values) {
+            $valueList = $fieldInfo['values'];
+        }
+        if (is_array($valueList) || is_object($valueList)) {
             $fieldValue = $this->convertValue($this->getFieldValue($fieldName, false, $fieldInfo), false, $fieldInfo);
             if (!$this->valueIsEmpty($fieldValue)) {
-                if (!is_array($fieldValue)) $fieldValue = array($fieldValue);
-                foreach ($fieldValue as $fv) {
-                    if (!strlen($fv) || !isset($valueList[$fv])) {
-                        $this->errors[$fieldName]['valueList'] = $this->makeErrorMsg($this->msgs['valueList'], $fieldInfo);
-                        $res = false;
+                if (is_array($valueList)) {
+                    if (!is_array($fieldValue)) $fieldValue = array($fieldValue);
+                    foreach ($fieldValue as $fv) {
+                        if (!strlen($fv) || !isset($valueList[$fv])) {
+                            $res = false;
+                            break;
+                        }
+                    } 
+                } elseif ($valueList instanceof Ac_Model_Values) { // it's an Ac_Model_Values
+                    if (is_array($fieldValue)) {
+                        $res = count($fieldValue) == count($valueList->filterValuesArray($fieldValue));
+                    } else {
+                        $res = $valueList->check($fieldValue);
                     }
-                } 
+                }
+                if (!$res) {
+                    $this->errors[$fieldName]['valueList'] = $this->makeErrorMsg($this->msgs['valueList'], $fieldInfo);
+                }
             }
         } 
         return $res;

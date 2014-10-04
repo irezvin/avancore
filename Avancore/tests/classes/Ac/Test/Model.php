@@ -3,6 +3,58 @@
 class Ac_Test_Model extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
+
+    function testPartialValidateRelations() {
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        $rm = Sample::getInstance()->getSampleReligionMapper();
+        
+        $pers = $pm->createRecord();
+        $pers->religionId = '-1';
+        $pers->check();
+        $e = $pers->getErrors();
+        $this->assertTrue(is_string(Ac_Util::getArrayByPath($e, array('religionId', 'valueList'))));
+        $pers->religionId = '1';
+        $pers->check(true);
+        $e = $pers->getErrors();
+        $this->assertTrue(is_null(Ac_Util::getArrayByPath($e, array('religionId', 'valueList'))));
+       
+        $vList = Ac_Model_Values::factoryWithFormOptions($pers, 'religionId');
+        $this->assertTrue($vList instanceof Ac_Model_Values_Records);
+        
+        // order with best possible caching
+        if ($vList instanceof Ac_Model_Values_Records) {
+            $this->assertEqual(count($va = $vList->filterValuesArray(array(1, 2, 3, 999))), 3);
+            $this->assertEqual(count($vList->filterValuesArray(array(1, 2, 3))), 3);
+            $this->assertTrue($vList->check(1));
+            $this->assertFalse($vList->check(999));
+            $this->assertFalse(in_array(999, $va));
+        }
+        
+        // reverse order
+        $vList = Ac_Model_Values::factoryWithFormOptions($pers, 'religionId');
+        $this->assertTrue($vList instanceof Ac_Model_Values_Records);
+        if ($vList instanceof Ac_Model_Values_Records) {
+            $this->assertTrue($vList->check(1));
+            $this->assertEqual(count($vList->filterValuesArray(array(1, 2, 3))), 3);
+            $this->assertEqual(count($va = $vList->filterValuesArray(array(1, 2, 3, 999))), 3);
+            $this->assertFalse($vList->check(999));
+            $this->assertFalse(in_array(999, $va));
+        }
+        
+        // all in the cache
+        $vList = Ac_Model_Values::factoryWithFormOptions($pers, 'religionId');
+        $this->assertTrue($vList instanceof Ac_Model_Values_Records);
+        if ($vList instanceof Ac_Model_Values_Records) {
+            $rm->getAllRecords(); // will populate all records
+            $this->assertTrue($vList->check(1));
+            $this->assertEqual(count($vList->filterValuesArray(array(1, 2, 3))), 3);
+            $this->assertEqual(count($va = $vList->filterValuesArray(array(1, 2, 3, 999))), 3);
+            $this->assertFalse($vList->check(999));
+            $this->assertFalse(in_array(999, $va));
+        }
+       
+       
+   }
     
     function testReset() {
         
@@ -56,5 +108,6 @@ class Ac_Test_Model extends Ac_Test_Base {
         $pi = $pers->getPropertyInfo('tags[0][title]');
         $this->assertIsA($pi, 'Ac_Model_Property');
    }
+   
     
 }

@@ -489,5 +489,8 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
         ));
     }
     
+    function onReset() {
+        $this->rootNodeId = false;
+    }
 
 }

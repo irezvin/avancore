@@ -104,6 +104,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * function onGetInternalDefaults(array & $defaults)
      */
     const EVENT_ON_GET_INTERNAL_DEFAULTS = 'onGetInternalDefaults';
+    
+    /**
+     * function onReset()
+     */
+    const EVENT_ON_RESET = 'onReset';
 
     protected $id = false;
     
@@ -384,7 +389,10 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     }
 
     function listRecords() {
-        $res = $this->db->fetchColumn("SELECT ".$this->db->n($this->pk)."  FROM ".$this->db->n($this->tableName));
+        if ($this->allRecords) $res = array_keys($this->allRecords);
+        else {
+            $res = $this->db->fetchColumn("SELECT ".$this->db->n($this->pk)."  FROM ".$this->db->n($this->tableName));
+        }
         return $res;
     }
 
@@ -877,7 +885,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @return array (array($pk1, $title1), array($pk2, $title2), ...)
      */
     function getRecordTitles($where = false, $ordering = false, $extraJoins = false, $titleFieldName = false, $titleIsProperty = '?', $valueFieldName = false, $valueIsProperty = false) {
-        
         if ($titleFieldName === false) {
             if (!strlen($this->titleFieldExpression)) $titleFieldName = $this->getTitleFieldName();
             else $titleFieldName = $this->titleFieldExpression;
@@ -1442,6 +1449,10 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
+    function hasAllRecords() {
+        return is_array($this->allRecords);
+    }
+    
     protected function doGetSqlSelectPrototype($primaryAlias = 't') {
         $res = array(
 			'tables' => array(
@@ -1518,6 +1529,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         $this->newRecords = array();
         $this->allRecords = false;
         $this->fkFieldsData = false;
+        $this->triggerEvent(self::EVENT_ON_RESET);
     }
 
     /**

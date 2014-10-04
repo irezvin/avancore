@@ -12,7 +12,7 @@ class Ac_Model_Values {
      * 
      * @var Ac_Model_Data  
      */
-    var $data = false;
+    protected $data = false;
     
     /**
      * Name of data property that is described by this list (used to be second parameter to callbacks).
@@ -217,15 +217,26 @@ class Ac_Model_Values {
         }
         if (is_array($options)) {
             $this->_reset();
-            Ac_Util::simpleBind($options, $this);
+            Ac_Util::smartBind($options, $this);
         } else {
-            if (!is_object($this->data) || !is_object($data)) $this->_resetCache();
-            if (!Ac_Util::sameObject($this->data, $data)) {
-                if (get_class($this->data) !== get_class($data)) $this->_resetCache(); 
-            }
+            if ($this->resetCacheOnDataChange($this->data, $data)) $this->_resetCache();
         }
         $this->data = $data;
         $this->propName = $propName;
+    }
+    
+    protected function resetCacheOnDataChange($oldData, $newData) {
+        if ($oldData !== $newData) {
+            $res = true;
+        }
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Model_Data
+     */
+    function getData() {
+        return $this->data;
     }
     
     /**
@@ -374,7 +385,11 @@ class Ac_Model_Values {
      * @access protected
      */
     function _doDefaultCheck($value) {
-        return $this->getCaption($value) !== false;
+        $res = false;
+        if (is_scalar($value)) {
+            $res = array_key_exists($value, $this->getValueList());
+        }
+        return $res;
     }
     
     function _callGetter($cb) {
@@ -401,6 +416,30 @@ class Ac_Model_Values {
     
     static function isId($foo) {
         return preg_match("/^[a-zA-Z_][0-9a-zA-Z_]*$/", $foo);
+    }
+    
+    /**
+     * Removes all values not in the list. Default implementation filters out all non-scalar values
+     * @param array $values List of values to check
+     * @return array Array without improper values
+     */
+    function filterValuesArray(array $values) {
+        $res = array();
+        foreach ($values as $v) {
+            if (is_scalar(($v))) $res[] = $v;
+        }
+        $res = array_intersect($res, array_keys($this->getValueList()));
+        return $res;
+    }
+    
+    function __get($var) {
+        if (method_exists($this, $m = 'get'.$var)) return $this->$m();
+        else Ac_E_InvalidCall::noSuchProperty ($this, $var);
+    }
+
+    function __set($var, $value) {
+        if (method_exists($this, $m = 'set'.$var)) $this->$m($value);
+        else $this->$var = $value;
     }
     
 }

@@ -216,7 +216,6 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
      */
     function setParentNode(Ac_I_Tree_Node $parentNode = null) {
     	if (is_null($parentNode)) $this->setParentNodeId(null);
-        elseif (strlen($id = $parentNode->getNodeId())) $this->setParentNodeId($id);
         else {
             if ($this->tmpParent && ($this->tmpParent !== $parentNode)) 
                 $this->tmpParent->notifyChildNodeRemoved($this);
@@ -276,7 +275,7 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
                 unset($this->tmpChildren[$k]);
     }
     
-    function notifyChildNodeSaved(Ac_Model_Tree_NestedSetsImpl $childNode) {
+    function notifyChildNodeSaved(Ac_Model_Tree_AbstractImpl $childNode) {
         if (strlen($nsId = $childNode->getNodeId())) {
             $this->childNodeIds = false;
             foreach (array_keys($this->tmpChildren) as $k) 
@@ -672,6 +671,10 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
         $this->containerState = self::STATE_AFTER_DELETE;
         $this->doAfterContainerDelete();
         $this->containerState = false;
+    }
+    
+    protected function notifyChildrenThisSaved() {
+        foreach ($this->tmpChildren as $node) $node->notifyParentNodeSaved();
     }
     
     function afterContainerLoad() {

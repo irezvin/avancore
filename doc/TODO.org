@@ -63,9 +63,8 @@
     Done on [2014-09-25 Thu]
 *** DONE Ac_Form_Control_Date cannot display "zero date" in required format :forms:bug:
     Done on [2014-09-27 Sat]
-*** TODO Ac_Model_Values_Records & Ac_Model_Validator: don't load all records to check if value is Ok, use SELECT instead [2014-08-17 Sun] :model:bug:
-*
-*** TODO Fix tree-related bugs (add tests) [2014-08-25 Mon]   :model:sql:bug:
+*** DONE Ac_Model_Values_Records & Ac_Model_Validator: don't load all records to check if value is Ok, use SELECT instead [2014-08-17 Sun] :model:bug:
+*** DONE Fix tree-related bugs (add tests) [2014-08-25 Mon]   :model:sql:bug:
     - in-memory tree creation, then saving
 ** Extensible model
 *** DONE Ability of mixables to add custom fields into mapper' hydration data :model:mixin:
@@ -418,6 +417,7 @@
     
 *** TODO reduce getNNIds() to free field only [2014-08-09 Sat] :model:
     see [[freeFields]]
+*** TODO Cache Ac_Model_Values_Records instances where applicable (not so straightforward) [2014-09-27 Sat] :model:feature:cool:
 ** Questionable
 *** TODO Joomla output: don't add JS and CSS assets that were already added by the Joomla [2013-10-26 Sat] :js:bug:
 *** TODO Ac_Sql_Db, Ac_Sql_Db_PDO: charset (at least default to utf-8) :sql:bug:minor:

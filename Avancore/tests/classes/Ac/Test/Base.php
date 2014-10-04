@@ -139,6 +139,15 @@ class Ac_Test_Base extends UnitTestCase {
         $html = preg_replace("/\n+/", $stripBreaks? "" : "\n", $html);
         return $html;
     }
+    
+    // ugly hack to allow us to run only specific method
+    function getTests() {
+        $res = parent::getTests();
+        if (isset($_REQUEST['method']) && strlen($_REQUEST['method'])) {
+            $res = array_intersect(explode(",", $_REQUEST['method']), $res);
+        }
+        return $res;
+    }
 	
 	
 }

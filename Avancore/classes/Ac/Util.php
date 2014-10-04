@@ -414,8 +414,8 @@ abstract class Ac_Util {
     
     static function smartBind ($array, $obj) {
         foreach (array_keys($array) as $k) if ($k{0} !== '_') {
-            if (isset($obj->$k)) $obj->$k = $array[$k];
-            elseif (method_exists($obj, $setter = 'set'.$k)) $obj->$setter($array[$k]);
+            if (method_exists($obj, $setter = 'set'.$k)) $obj->$setter($array[$k]);
+            elseif (isset($obj->$k)) $obj->$k = $array[$k];
         }
     }
     
