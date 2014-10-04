@@ -381,7 +381,11 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     function doOnBind($src, $ignore = false) {
     }
     
-    function check() {
+    /**
+     * @param bool $again Whether check must be done again even if it was performed before
+     */
+    function check($again = false) {
+        if ($again) $this->mustRevalidate();
         if (!$this->_beingChecked && !$this->_checked) {
             $this->_beingChecked = true;
             $this->_errors = array();

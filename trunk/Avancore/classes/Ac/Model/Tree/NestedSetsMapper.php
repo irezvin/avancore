@@ -162,7 +162,7 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
         foreach ($nodes as $id => $node) {
             $objNode = new Ac_Model_Tree_NestedSetsImpl(array(
                 'nodeData' => $node,
-                'mapper' => $this->mixable, 
+                'mapper' => $this->mixin, 
             ));
             $res[$id] = $objNode;
         }
@@ -589,6 +589,10 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
         if (!$record->listMixables('Ac_Model_Tree_Object')) {
             $record->addMixable(new Ac_Model_Tree_Object);
         }
+    }
+    
+    function onReset() {
+        $this->rootNodeId = false;
     }
     
 }

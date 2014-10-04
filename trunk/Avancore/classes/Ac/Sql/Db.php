@@ -26,7 +26,7 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     }
     
     function quote($value, $asArray = false) {
-        return $this->q($value);        
+        return $this->q($value, $asArray);
     }
     
     function q($value, $asArray = false) {

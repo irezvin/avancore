@@ -152,8 +152,11 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     
     protected function updateContainer() {
         if ($c = $this->getContainer()) {
-            $this->container->{$this->orderingField} = $this->getOrdering();
-            $this->container->{$this->parentField} = $this->getParentNodeId();
+            if ($this->newOrdering !== false) $this->container->{$this->orderingField} = $this->newOrdering;
+                else $this->container->{$this->orderingField} = $this->getOrdering();
+            
+            if ($this->newParentId !== false) $this->container->{$this->parentField} = $this->newParentId;
+                else $this->container->{$this->parentField} = $this->getParentNodeId();
         }
     }
     
@@ -163,7 +166,7 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         $this->origParentId = $this->container->{$this->parentField};
         $this->parentId = false;
         $this->ordering = null;
-        $this->resetTreePositionChange();
+        if (!$this->lockStore) $this->resetTreePositionChange();
         $this->tmpParent = false;
     }
     
@@ -174,7 +177,8 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     }
 
     function hasToStoreParent() {
-        return $this->tmpParent && ($this->tmpParent->hasToStoreContainer() || $this->tmpParent->hasToStoreParent());
+        $res = $this->tmpParent && ($this->tmpParent->hasToStoreContainer() || $this->tmpParent->hasToStoreParent());
+        return $res;
     }
     
     protected function shouldReorder($parentIdIfChanged, $orderIfChanged) {
@@ -187,8 +191,9 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         $this->lockStore++;
         
         $res = $this->beginStore();
-        if ($res && $this->hasToStoreContainer()) 
+        if ($res && $this->hasToStoreContainer()) {
             if (!$this->container->store()) $res = false;
+        }
         $this->endStore($res);
         
         $this->lockStore--;
@@ -209,11 +214,11 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         
         if ($res == self::ORDER_LAST || $res > $maxO) $res = $maxO;
         if ($res < 1) $res = 1;
-
+        
         return $res;
     }
     
-    protected function checkAndEnqueueTreePositionChange() {
+    protected function checkAndEnqueueTreePositionChange($force = false) {
         
         $newParentId = $this->container->getField($this->parentField);
         $newOrdering = $this->container->getField($this->orderingField);
@@ -222,7 +227,7 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         
         $isParentIdChanged = $newParentId != $this->origParentId;
         
-        if (!$this->isPersistent()) {
+        if (!$this->isPersistent() || $force) {
             // always enqueue for non-persistent items
             $isParentIdChanged = true;
             $this->newParentId = $newParentId;
@@ -298,20 +303,37 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         
         $oldParentId = $this->origParentId;
         
+        $firstSave = false;
+        
         if ($this->hasToStoreParent() && !$this->tmpParent->store()) $res = false;
-        else {
-            if ($this->hasToStoreContainer()) 
-                if (!$this->container->store()) $res = false;
-        }
         
         if ($oldParentId != $this->origParentId) {
-            if ($oldParent = $this->getTreeProvider()->getNode()) 
+            if ($oldParent = $this->getTreeProvider()->getNode($oldParentId)) 
                 $oldParent->notifyChildNodeRemoved($this);
         }
+
+        if ($this->enqBeforeCntSave()) {
+            $this->resetTreePositionChange();
+            if ($res) {
+                $this->checkAndEnqueueTreePositionChange();
+            }
+        }
         
-        $this->resetTreePositionChange();
+        $force = false;
         
-        if ($res) $this->checkAndEnqueueTreePositionChange();
+        if ($res) {
+            if ($this->hasToStoreContainer()) {
+                $force = true;
+                if (!$this->container->store()) $res = false;
+            }
+        }
+
+        if (!$this->enqBeforeCntSave()) {
+            $this->resetTreePositionChange();
+            if ($res) {
+                $this->checkAndEnqueueTreePositionChange($force);
+            }
+        }
         
         return $res;
 
@@ -326,12 +348,17 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         
         $this->resetTreePositionChange();
         
+        $this->notifyChildrenThisSaved();
+        
+        $this->lockStore++;
         foreach ($this->listChildrenToStore() as $i) {
-            if (!$this->getChildNode($i)->store()) {
+            $n = $this->getChildNode($i);
+            if (!$n->store()) {
                 $res = false; 
                 break;
             }
         }
+        $this->lockStore--;
         
         if ($res && $this->tmpParent) $this->tmpParent->notifyChildNodeSaved($this);
         
@@ -340,8 +367,8 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
     }
         
     function notifyParentNodeSaved() {
-        if ($nsId = $this->tmpParent->getNodeId()) {
-            $this->parentId = $nsId;
+        if ($this->tmpParent && $nsId = $this->tmpParent->getNodeId()) {
+            $this->setParentNodeId($nsId);
         }
     }
     
@@ -431,6 +458,10 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
             $c->setField($this->orderingField, $ordering);
             $this->lockOrdering--;
         }
+    }
+    
+    protected function enqBeforeCntSave() {
+        return true;
     }
     
 }
