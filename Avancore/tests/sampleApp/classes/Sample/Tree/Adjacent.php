@@ -1,6 +1,10 @@
 <?php
 
 class Sample_Tree_Adjacent extends Sample_Tree_Adjacent_Base_Object {
+
+    function doBeforeSave() {
+        parent::doBeforeSave();
+    }
     
     /*
     protected function getOwnPropertiesInfo() {

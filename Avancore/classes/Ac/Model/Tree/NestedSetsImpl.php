@@ -67,7 +67,11 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     function setParentNode(Ac_I_Tree_Node $parentNode = null) {
         if ($parentNode && !($parentNode instanceof Ac_Model_Tree_NestedSetsImpl))
         	throw new Exception("\$parentNode can be only Ac_Model_Tree_NestedSetsImpl instance, '".get_class($parentNode)."' given");
-        parent::setParentNode($parentNode);
+        if ($parentNode && strlen($id = $parentNode->getNodeId())) {
+            $this->setParentNodeId($id);
+        } else {
+            parent::setParentNode($parentNode);
+        }
     }
     
     /**
@@ -105,6 +109,7 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
         Ac_Callbacks::call(self::debugCallback, self::debugBeginSelfStore, $this);
         
         $newParentId = $this->getParentIdIfChanged();
+        
         $newOrdering = $this->getOrderingIfChanged(!!$newParentId);
         if ($res && (($newParentId !== false) || !is_null($newOrdering))) {
             if (($tn = $this->getTreeNode())) {
@@ -126,6 +131,8 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
         }
         
         Ac_Callbacks::call(self::debugCallback, self::debugEndSelfStore, $this, $res);
+        
+        $this->notifyChildrenThisSaved();
         
         if ($res) {
             foreach ($this->listChildrenToStore() as $i) {
@@ -161,7 +168,8 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
             $this->treeProvider->loadNodes($l = $this->listChildNodes());
             $this->treeProvider->loadContainers($l);
             foreach ($l as $i) {
-                if (!$this->getChildNode($i)->delete()) {
+                $childNode = $this->getChildNode($i);
+                if ($childNode && !$this->getChildNode($i)->delete()) {
                     $res = false;
                     break;
                 }
@@ -201,7 +209,7 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     }
     
     function notifyParentNodeSaved() {
-        if (($nsId = $this->tmpParent->getNodeId())) {
+        if ($this->tmpParent && ($nsId = $this->tmpParent->getNodeId())) {
             if (($tn = $this->getTreeNode())) {
                 if ((string) $tn[$this->nestedSets->parentCol] !== (string) $nsId) {
                     $this->nestedSets->moveNode($tn[$this->nestedSets->idCol], $nsId);

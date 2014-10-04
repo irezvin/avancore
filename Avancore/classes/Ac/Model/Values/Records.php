@@ -42,6 +42,8 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
      */
     var $md5pk = true;
     
+    protected $cachedExistingValues = array();
+    
     function __construct ($data, $propName = false, $options = true, $isStatic = false, array $optionsOverride = array()) {
         parent::__construct($data, $propName, $options, $isStatic, $optionsOverride);
         if (!$this->mapperClass) trigger_error ('$mapperClass property must be provided', E_USER_ERROR);
@@ -113,11 +115,71 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
     }
     
     function getCaption($value) {
-        if (!$this->_cachedValueList) $this->_cachedValueList = $this->getValueList ();
+        $this->_cachedValueList = $this->getValueList ();
         return parent::getCaption($value);
     }
     
-    // TODO: make check() method
+    /**
+     * Removes all values not in the list. Default implementation filters out all non-scalar values
+     * @param array $values List of values to check
+     * @return array Array without improper values
+     */
+    function filterValuesArray(array $values) {
+        $res = array();
+        if ($this->cache && is_array($this->_cachedValueList)) return parent::filterValuesArray($values);
+        foreach ($values as $v) {
+            if (is_scalar(($v))) $res[] = $v;
+        }
+        $valuesToCheck = $res;
+        if ($this->cache && $this->cachedExistingValues) {
+            foreach ($valuesToCheck as $i => $v) {
+                if (isset($this->cachedExistingValues[$v])) {
+                    if (!$this->cachedExistingValues[$v]) unset($res[$i]);
+                    unset($valuesToCheck[$i]);
+                }
+            }
+        }
+        if ($valuesToCheck) {
+            $m = $this->_mapper;
+            if ($m->hasAllRecords()) {
+                $existing = $m->getAllRecords($valuesToCheck);
+            } else {
+                $db = $m->getDb();
+                $tmpWhere = $this->where;
+                $tmpList = $this->_cachedValueList;
+                $crit = $db->n(array('t', $m->pk), false).$db->eqCriterion($valuesToCheck);
+                if (strlen($this->where)) 
+                    $this->where = '('.$this->where.') AND '.$crit;
+                else 
+                    $this->where = $crit;
+                $existing = $this->_doDefaultGetValueList();
+                $this->where = $tmpWhere;
+                $this->_cachedValueList = $tmpList;
+            }
+            foreach ($valuesToCheck as $i => $v) {
+                $has = isset($existing[$v]);
+                $this->cachedExistingValues[$v] = $has;
+                if (!$has) {
+                    unset($res[$i]);
+                }
+            }
+        }
+        return $res;
+    }
+    
+    protected function resetCacheOnDataChange($oldData, $newData) {
+        if (($oldData !== $newData) && $this->whereMap) $this->_resetCache();
+    }
+    
+    function _doDefaultCheck($value) {
+        $res = count($this->filterValuesArray(array($value)));
+        return $res;
+    }
+    
+    function _resetCache() {
+        parent::_resetCache();
+        $this->cachedExistingValues = array();
+    }
     
 }
 

@@ -78,7 +78,7 @@ class Ac_Test_Tree_TextScanner implements Tr_I_ScannerImpl {
         $res = array();
         foreach ($this->getChildRows($adjData, $parentId) as $data) {
             $res[] = str_repeat(' ', $depth + 1).json_encode($data, JSON_UNESCAPED_UNICODE);
-            $res = array_merge($res, $this->makeAdjText($adjData, $depth + 1));
+            $res = array_merge($res, $this->makeAdjText($adjData, $data['id'], $depth + 1));
         }
         return $res;
     }

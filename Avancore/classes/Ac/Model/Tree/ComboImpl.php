@@ -88,6 +88,9 @@ class Ac_Model_Tree_ComboImpl extends Ac_Model_Tree_AdjacencyListImpl {
         $res = $this->container->isPersistent() && $this->getNodeId() === $this->mapper->getRootNodeId();
         return $res;
     }
- 
+    
+    protected function enqBeforeCntSave() {
+        return false;
+    }
     
 }
