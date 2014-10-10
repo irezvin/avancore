@@ -64,8 +64,10 @@
 *** DONE Ac_Form_Control_Date cannot display "zero date" in required format :forms:bug:
     Done on [2014-09-27 Sat]
 *** DONE Ac_Model_Values_Records & Ac_Model_Validator: don't load all records to check if value is Ok, use SELECT instead [2014-08-17 Sun] :model:bug:
+    Done on [2014-10-05 Sun]
 *** DONE Fix tree-related bugs (add tests) [2014-08-25 Mon]   :model:sql:bug:
     - in-memory tree creation, then saving
+    Done on [2014-10-05 Sun]
 ** Extensible model
 *** DONE Ability of mixables to add custom fields into mapper' hydration data :model:mixin:
   - Use loadFromRows() everywhere
@@ -74,9 +76,9 @@
 	- [X] Ac_Model_Mapper::loadFromRows for 'non-unique' records -- should return same instances
 	- [X] Ac_Model_Mapper::loadFromRows with partially-loaded records in the collection
     - [X] Ac_Model_Collection
-*** TODO Support of sequential instantiation of mapper' records
-    - [ ] should be supported by mixins that should be able to add their resources to the 'sequential' records source
-    - [ ] bring back sequential access to the collection
+*** TODO Multi-table models [2014-10-05 Sun] :model:feature:
+*** TODO Model subclassing (both "physical" and "virtual") [2014-10-05 Sun] :model:feature:
+*** TODO Cg: domain inheritance [2014-10-05 Sun]					 :cg:
 *** TODO Better integration of Ac_Accessor, Ac_Model_Object and Ac_Mixin [2014-07-25 Fri]  :core:
 *** TODO make Ac_Accessor Mixin-aware
 *** TODO currently Ac_Model_Object has its' __get. set, isset; they hide Mixin implementation
@@ -85,6 +87,9 @@
 *** TODO Cg is able to "mix in" mixables' docblocks into generated base mixins [2014-07-25 Fri] :cg:feature:
 *** TODO Mix-in properties [2014-08-25 Mon]
 *** TODO Mix-in associations [2014-08-25 Mon]
+*** TODO Support of sequential instantiation of mapper' records
+    - [ ] should be supported by mixins that should be able to add their resources to the 'sequential' records source
+    - [ ] bring back sequential access to the collection
 ** Extensible sql schema
 *** TODO Think out what does it mean [2014-07-25 Fri] :planning:
 ** Extensible controller
