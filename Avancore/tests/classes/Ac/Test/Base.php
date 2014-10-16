@@ -148,6 +148,21 @@ class Ac_Test_Base extends UnitTestCase {
         }
         return $res;
     }
-	
+    
+    function resetAi($tableName) {
+        // MySQL only!!!
+        $db = $this->getAeDb();
+        $cols = $db->fetchArray("SHOW COLUMNS FROM ".$db->n($tableName), 'Field');
+        $res = false;
+        foreach ($cols as $col => $data) {
+            if ($data['Extra'] == 'auto_increment') {
+                $max = $db->fetchValue("SELECT MAX(".$db->n($col).") FROM ".$db->n($tableName));
+                $res = intval($max) + 1;
+                $db->query('ALTER TABLE '.$db->n($tableName)." AUTO_INCREMENT=".($res));
+                break;
+            }
+        }
+        return $res;
+    }
 	
 }

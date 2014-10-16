@@ -21,7 +21,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
             'relationTypeId' => NULL,
             'relationBegin' => NULL,
             'relationEnd' => NULL,
-            'notes' => NULL,
+            'notes' => '',
         ); 
  
     

@@ -106,3 +106,12 @@
        (since with introduction of heterogeneous record sets there may be only partial
         support of concrete Relation by set items)
     
+* TODO Multi-table
+  - [ ] draft implementation
+    - [ ] without model mixin
+    - [ ] with model mixin
+      - [ ] Ac_Model_Data_Mixin
+	- can have properties and methods
+  - [ ] codegen support
+    - [ ] Ac_Cg_Model_Part
+    - [ ] Ac_Cg_Model_Shared extends Ac_Cg_Model_Part
