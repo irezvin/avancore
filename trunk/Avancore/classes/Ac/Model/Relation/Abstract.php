@@ -145,7 +145,7 @@ class Ac_Model_Relation_Abstract extends Ac_Prototyped {
     }
     
     protected function getFromAeData($src, $fieldName) {
-        return $src->getField($fieldName);
+        return $src->$fieldName;
     }
     
     /**
@@ -155,7 +155,7 @@ class Ac_Model_Relation_Abstract extends Ac_Prototyped {
     protected function getValue($src, $fieldName) {
         static $g = array();
         if (is_array($src)) {
-            if (!isset($src[$fieldName])) trigger_error('Cannot extract field \''.$fieldName.'\' from an array', E_USER_ERROR);
+            if (!array_key_exists($fieldName, $src)) trigger_error('Cannot extract field \''.$fieldName.'\' from an array', E_USER_ERROR);
             $res = $src[$fieldName];
         } else {
             $cls = get_class($src);

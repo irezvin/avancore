@@ -365,28 +365,28 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     /**
-     * @param mixed oid null, primary key or associative array with row 
+     * @param mixed $pkOrRow null, primary key or associative array with row 
      * @param bool $isRow Whether to treat first parameter as an associative row
      */
-    function load ($oid = null, $isRow = false) {
+    function load ($pkOrRow = null, $isRow = false) {
         
         if ($isRow) {
             $this->_otherValues = array();
-            $hyData = $this->mapper->peConvertForLoad($this, $oid);
+            $hyData = $this->mapper->peConvertForLoad($this, $pkOrRow);
             foreach ($this->listDataProperties() as $propName) {
                 if (array_key_exists($propName, $hyData)) {
-                    $this->$propName = $oid[$propName];
-                    unset($oid[$propName]);
+                    $this->$propName = $pkOrRow[$propName];
+                    unset($pkOrRow[$propName]);
                 }
             }
-            $row = $oid;
-            $this->_otherValues = $oid;
+            $row = $pkOrRow;
+            $this->_otherValues = $pkOrRow;
             $res = true;
         } else {
             if (!$this->isPersistent() && $this->isReference()) {
                 $res = $this->_loadReference();
             } else {
-                $res = $this->_legacyLoad($oid, $row);
+                $res = $this->_legacyLoad($pkOrRow, $row);
             }
         }
         if ($this->tracksPk()) {
@@ -406,35 +406,29 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
-    function _legacyLoad($oid, & $row) {
+    function _legacyLoad($primaryKey, & $row) {
         $k = $this->_pk;
 
-        if ($oid !== null) {
-            $this->$k = $oid;
+        if ($primaryKey !== null) {
+            $this->$k = $primaryKey;
         }
 
-        $oid = $this->$k;
+        $primaryKey = $this->$k;
         
-        if ($oid === null) {
+        if ($primaryKey === null) {
             return false;
         }
         
         $this->reset();
 
-        if ($oid !== null) {
-            $this->$k = $oid;
+        if ($primaryKey !== null) {
+            $this->$k = $primaryKey;
         }
         
         $props = $this->listDataProperties();
         
         if ($hyData = $this->mapper->peLoad($this, $this->getPrimaryKey())) {
-            $row = & $hyData;
-            $hyData = $this->mapper->peConvertForLoad($this, $hyData);
-            foreach ($props as $propName) {
-                if (array_key_exists($propName, $hyData)) {
-                    $this->$propName = $hyData[$propName];
-                }
-            }
+            $this->load($hyData, true);
             $res = true;
         } else {
             $res = false;
