@@ -35,6 +35,8 @@ $config = array(
         'autoTablesAll' => true,
 		'autoTablesIgnore' => array(
             '#__tree_nested_sets',
+            '#__shop_product_upc',
+            '#__shop_meta',            
         ),
         'defaultTitleColumn' => 'title',
         'dictionary' => array(
