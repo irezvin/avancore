@@ -251,7 +251,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
         				.$this->getDb()->n($this->nodeOrderField)." AS ordering, "
         				.$this->getDb()->n($this->mixin->pk)." AS childId 
         			  FROM ".$this->getDb()->n($this->mixin->tableName)." 
-        			  WHERE ".$this->getDb()->getIfnullFunction()."(".$this->getDb()->n($this->nodeParentField).", 0) <> 0) AS childIds
+        			  WHERE ".$this->getDb()->getIfnullFunction()."(".$this->getDb()->n($this->nodeParentField).", 0) <> 0)
                 "),
                 'fieldLinks' => array(
                     'nodeId' => 'id',
