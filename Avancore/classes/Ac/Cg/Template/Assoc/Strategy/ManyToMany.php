@@ -20,12 +20,14 @@ class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Stra
     function set<?php $this->d(ucfirst($this->prop->getIdsPropertyName())); ?>($<?php $this->d($this->prop->getIdsPropertyName()); ?>) {
         if (!is_array($<?php $this->d($this->prop->getIdsPropertyName()); ?>)) trigger_error('$<?php $this->d($this->prop->getIdsPropertyName()); ?> must be an array', E_USER_ERROR);
         $this-><?php $this->d($imn); ?> = $<?php $this->d($this->prop->getIdsPropertyName()); ?>;
+        <?php $this->d($this->loadedId); ?> = false;
         <?php $this->d($varId); ?> = false; 
     }
 <?php   } ?>
     
     function clear<?php $this->d($ucPlural); ?>() {
         <?php $this->d($varId); ?> = array();
+        <?php $this->d($this->loadedId); ?> = true;
 <?php   if (($imn = $this->prop->getIdsMemberName()) !== false) { ?>
         $this-><?php $this->d($imn) ?> = false;
 <?php   }?>

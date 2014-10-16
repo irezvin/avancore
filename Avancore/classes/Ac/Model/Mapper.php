@@ -15,13 +15,13 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     const EVENT_AFTER_HYDRATE_RECORD = 'onAfterHydrateRecord';
 
     /**
-     * function onBeforeStoreRecord($record, array & $hyData, array & $newData, & $exists, & $result, 
+     * function onBeforeStoreRecord($record, array & $hyData, & $newData, & $exists, & $result, 
      *                              & $error)
      */
     const EVENT_BEFORE_STORE_RECORD = 'onBeforeStoreRecord';
 
     /**
-     * function onAfterStoreRecord($record, array & $hyData, array & $newData, & $exists, & $result, & $error)
+     * function onAfterStoreRecord($record, array & $hyData, & $newData, & $exists, & $result, & $error)
      */
     const EVENT_AFTER_STORE_RECORD = 'onAfterStoreRecord';
 
@@ -94,6 +94,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * function onAfterLoadFromRows(array $rows, array & $records)
      */
     const EVENT_ON_AFTER_LOAD_FROM_ROWS = 'onAfterLoadFromRows';
+
+    /**
+     * function onPeLoad(& $data, $primaryKey, Ac_Model_Object $record, & $error)
+     */
+    const EVENT_ON_PE_LOAD = 'onPeLoad';
     
     /**
      * function onGetDefaults(array & $defaults)
@@ -143,7 +148,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @var array ('indexName' => array('fieldName1', 'fieldName2'), ...)
      */
     var $indexData = array();
-     
+
     protected $recordsCollection = array();
     
     /**
@@ -212,6 +217,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     protected $computedDefaults = false;
     
     function __construct(array $options = array()) {
+        // TODO: application & db are initialized last, id & tableName - first
         parent::__construct($options);
         if (!$this->tableName) trigger_error (__FILE__."::".__FUNCTION__." - tableName missing", E_USER_ERROR);
     }
@@ -586,7 +592,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
                 $res[$i] = $this->recordsCollection[$row[$this->pk]];
             } else {
                 $class = $recordClasses[$i];
-                $rec = new $class ($this);
+                if (is_object($class) && $class instanceof Ac_Model_Object) {
+                    $rec = $class;
+                } else {
+                    $rec = $this->createRecord($class);
+                }
                 $rec->load($row, true);
                 $res[$i] = $rec;
             }
@@ -1257,14 +1267,19 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      */
     function peLoad($record, $primaryKey, & $error = null) {
         $data = $this->db->fetchRow('SELECT * FROM '.$this->db->n($this->tableName).' WHERE '.$this->pk.' = '.$this->db->q($primaryKey));
+        $this->triggerEvent(self::EVENT_ON_PE_LOAD, array(& $data, $primaryKey, $record, & $error));
         return $data;
     }
 
     protected function corePeSave($record, & $hyData, & $exists = null, & $error = null, & $newData = array()) {
-        if (is_null($exists)) $exists = array_key_exists($this->pk, $hyData);
+        if (is_null($exists)) $exists = array_key_exists($this->pk, $dataToSave);
+        
+        // leave only existing columns
+        $dataToSave = array_intersect_key($hyData, array_flip($this->listSqlColumns()));
+        
         if ($exists) {
-            $query = $this->db->updateStatement($this->tableName, $hyData, $this->pk, false);
-            if ($this->db->query($query) !== false) $res = $hyData;
+            $query = $this->db->updateStatement($this->tableName, $dataToSave, $this->pk, false);
+            if ($this->db->query($query) !== false) $res = $dataToSave;
             else {
                 $descr = $this->db->getErrorDescr();
                 if (is_array($descr)) $descr = implode("; ", $descr);
@@ -1272,9 +1287,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
                 $res = false;
             }
         } else {
-            $query = $this->db->insertStatement($this->tableName, $hyData);
+            $query = $this->db->insertStatement($this->tableName, $dataToSave);
             if ($this->db->query($query)) {
-                if (strlen($ai = $this->getAutoincFieldName()) && !isset($hyData[$ai])) {
+                if (strlen($ai = $this->getAutoincFieldName()) && !isset($dataToSave[$ai])) {
                     $newData = array($ai => $this->getLastGeneratedId());
                 }
                 $res = true;
@@ -1317,7 +1332,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      */
     protected function corePeDelete($record, $hyData, & $error = null) {
         $key = $hyData[$this->pk];
-        $res = (bool) $this->db->query("DELETE FROM ".$this->db->n($this->tableName)." WHERE "
+        $res = (bool) $this->db->query($sql = "DELETE FROM ".$this->db->n($this->tableName)." WHERE "
             .$this->db->n($this->pk)." ".$this->db->eqCriterion($key));
         if ($res) $this->markUpdated();
         return $res;
@@ -1333,6 +1348,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         $this->triggerEvent(self::EVENT_BEFORE_DELETE_RECORD, array(
             $record, & $hyData, & $error, & $res
         ));
+        
         
         if (is_null($res)) 
             $res = $this->corePeDelete ($record, $hyData, $error);
@@ -1658,6 +1674,24 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
-    
+    static function mapRows(array $rows, array $origToTargetMap, $singleRow = false) {
+        if ($origToTargetMap) {
+            if ($singleRow) $rows = array($rows);
+            $res = array();
+            foreach ($rows as $idx => $row) {
+                foreach ($row as $key => $value) {
+                    if (isset($origToTargetMap[$key])) {
+                        $key = $origToTargetMap[$key];
+                        if ($key === false) continue;
+                    }
+                    $res[$idx][$key] = $value;
+                }
+            }
+            if ($singleRow) $res = $res[0];
+        } else {
+            $res = $rows;
+        }
+        return $res;
+    }
     
 }

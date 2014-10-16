@@ -126,41 +126,44 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
      */
     function filterValuesArray(array $values) {
         $res = array();
-        if ($this->cache && is_array($this->_cachedValueList)) return parent::filterValuesArray($values);
-        foreach ($values as $v) {
-            if (is_scalar(($v))) $res[] = $v;
-        }
-        $valuesToCheck = $res;
-        if ($this->cache && $this->cachedExistingValues) {
-            foreach ($valuesToCheck as $i => $v) {
-                if (isset($this->cachedExistingValues[$v])) {
-                    if (!$this->cachedExistingValues[$v]) unset($res[$i]);
-                    unset($valuesToCheck[$i]);
+        if ($this->cache && is_array($this->_cachedValueList)) {
+            $res = parent::filterValuesArray($values);
+        } else {
+            foreach ($values as $v) {
+                if (is_scalar(($v))) $res[] = $v;
+            }
+            $valuesToCheck = $res;
+            if ($this->cache && $this->cachedExistingValues) {
+                foreach ($valuesToCheck as $i => $v) {
+                    if (isset($this->cachedExistingValues[$v])) {
+                        if (!$this->cachedExistingValues[$v]) unset($res[$i]);
+                        unset($valuesToCheck[$i]);
+                    }
                 }
             }
-        }
-        if ($valuesToCheck) {
-            $m = $this->_mapper;
-            if ($m->hasAllRecords()) {
-                $existing = $m->getAllRecords($valuesToCheck);
-            } else {
-                $db = $m->getDb();
-                $tmpWhere = $this->where;
-                $tmpList = $this->_cachedValueList;
-                $crit = $db->n(array('t', $m->pk), false).$db->eqCriterion($valuesToCheck);
-                if (strlen($this->where)) 
-                    $this->where = '('.$this->where.') AND '.$crit;
-                else 
-                    $this->where = $crit;
-                $existing = $this->_doDefaultGetValueList();
-                $this->where = $tmpWhere;
-                $this->_cachedValueList = $tmpList;
-            }
-            foreach ($valuesToCheck as $i => $v) {
-                $has = isset($existing[$v]);
-                $this->cachedExistingValues[$v] = $has;
-                if (!$has) {
-                    unset($res[$i]);
+            if ($valuesToCheck) {
+                $m = $this->_mapper;
+                if ($m->hasAllRecords()) {
+                    $existing = $m->getAllRecords($valuesToCheck);
+                } else {
+                    $db = $m->getDb();
+                    $tmpWhere = $this->where;
+                    $tmpList = $this->_cachedValueList;
+                    $crit = $db->n(array('t', $m->pk), false).$db->eqCriterion($valuesToCheck);
+                    if (strlen($this->where)) 
+                        $this->where = '('.$this->where.') AND '.$crit;
+                    else 
+                        $this->where = $crit;
+                    $existing = $this->_doDefaultGetValueList();
+                    $this->where = $tmpWhere;
+                    $this->_cachedValueList = $tmpList;
+                }
+                foreach ($valuesToCheck as $i => $v) {
+                    $has = isset($existing[$v]);
+                    $this->cachedExistingValues[$v] = $has;
+                    if (!$has) {
+                        unset($res[$i]);
+                    }
                 }
             }
         }
