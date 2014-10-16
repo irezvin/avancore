@@ -19,7 +19,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
             'personId' => NULL,
             'photoId' => NULL,
             'title' => '',
-            'content' => NULL,
+            'content' => '',
         ); 
  
     

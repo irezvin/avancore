@@ -28,6 +28,12 @@ abstract class Sample_DomainBase extends Ac_Application {
             'Sample_Religion_Mapper' => array (
                 'class' => 'Sample_Religion_Mapper',
             ),
+            'Sample_Shop_Category_Mapper' => array (
+                'class' => 'Sample_Shop_Category_Mapper',
+            ),
+            'Sample_Shop_Product_Mapper' => array (
+                'class' => 'Sample_Shop_Product_Mapper',
+            ),
             'Sample_Tag_Mapper' => array (
                 'class' => 'Sample_Tag_Mapper',
             ),
@@ -97,6 +103,20 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function getSampleReligionMapper() {
         return $this->getMapper('Sample_Religion_Mapper');
+    }
+    
+    /**
+     * @return Sample_Shop_Category_Mapper 
+     */
+    function getSampleShopCategoryMapper() {
+        return $this->getMapper('Sample_Shop_Category_Mapper');
+    }
+    
+    /**
+     * @return Sample_Shop_Product_Mapper 
+     */
+    function getSampleShopProductMapper() {
+        return $this->getMapper('Sample_Shop_Product_Mapper');
     }
     
     /**
@@ -245,6 +265,36 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function createSampleReligion () {
         return $this->getMapper('Sample_Religion_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Shop_Category 
+     */
+    static function Sample_Shop_Category ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Shop_Category 
+     */
+    function createSampleShopCategory () {
+        return $this->getMapper('Sample_Shop_Category_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Shop_Product 
+     */
+    static function Sample_Shop_Product ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function createSampleShopProduct () {
+        return $this->getMapper('Sample_Shop_Product_Mapper')->createRecord();
     }
     
  
