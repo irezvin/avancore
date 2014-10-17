@@ -86,7 +86,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
         $res = array();
         $this->_aeDb->setQuery($this->intPreProcessQuery($query));
         $res = $this->_aeDb->loadObjectList();
-        if ($keyColumn !== false) $res = $this->indexRows($res, $keyColumn);
+        if ($keyColumn !== false) $res = $this->indexRows($res, is_array($keyColumn)? $keyColumn : array($keyColumn, true));
         return $res;
     }
     

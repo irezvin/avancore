@@ -392,7 +392,7 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
      * @return array sorted by keys (multi-dimensional if TRUE not provided)
      */
     function indexRows($rows, $keys, $valueToInsert = false) {
-        $tmpKeys = $keys;
+        $tmpKeys = Ac_Util::toArray($keys);
         $last = array_pop($tmpKeys);
         if (count($tmpKeys) && ($last === true || $last === false)) {
             $unique = $last;
