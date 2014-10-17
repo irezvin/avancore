@@ -1471,6 +1471,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     
     protected function doGetSqlSelectPrototype($primaryAlias = 't') {
         $res = array(
+            'class' => 'Ac_Sql_Select',
 			'tables' => array(
 				$primaryAlias => array(
 					'name' => $this->tableName, 

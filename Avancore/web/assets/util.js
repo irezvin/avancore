@@ -676,6 +676,7 @@ Ajs_Util.Uri = function(uri) {
         else this.parse(uri);
 }
 
+// A javascript replacement for Ac_Url
 Ajs_Util.Uri.prototype = {
     
     'Ajs_Util.Uri': true,

@@ -175,6 +175,15 @@ class Ac_Util_Csv extends Ac_Prototyped {
         }
         return $res;
     }
-
+    
+    function readFile($file) {
+        $this->reset();
+        if (is_string($file)) {
+            foreach (file($file) as $line) $this->pushLine ($line);
+        } else { 
+            while(false !== $line = fread($file)) $this->pushLine($line);
+        }
+        return $this->getResult(true);
+    }
     
 }

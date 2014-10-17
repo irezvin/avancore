@@ -144,7 +144,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
             foreach ($row as $k => $v) $o->$k = $v;
             $res[$key] = $o;
         }
-        if ($kc) $res = $this->indexRows($res, $keyColumn);
+        if ($kc) $res = $this->indexRows($res, is_array($keyColumn)? $keyColumn : array($keyColumn, true));
         return $res;
     }
 
