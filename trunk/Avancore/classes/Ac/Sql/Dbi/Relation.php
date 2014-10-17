@@ -42,7 +42,11 @@ class Ac_Sql_Dbi_Relation extends Ac_Sql_Dbi_Object {
      */
     function getForeignTable() {
         if ($this->_foreignTable === false) {
-            $this->_foreignTable = $this->ownTable->_database->getTable($this->table); 
+            if (in_array($this->table, $this->ownTable->_database->listTables()))
+                $this->_foreignTable = $this->ownTable->_database->getTable($this->table); 
+            else {
+                throw new Exception("WTF: relation {$this->name} of {$this->ownTable->name} points to non-existent table {$this->table}");
+            }
         }
         return $this->_foreignTable;
     }

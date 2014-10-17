@@ -512,5 +512,17 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
         return $this->primaryAlias;
     }
     
+    /**
+     * @return Ac_Sql_Select
+     */
+    function cloneWithAppliedParts() {
+        $res = clone $this;
+        $res->applyParts();
+        foreach ($res->listParts() as $partId) {
+            $res->getPart($partId)->applied = false;
+        }
+        return $res;
+    }
+    
 }
 
