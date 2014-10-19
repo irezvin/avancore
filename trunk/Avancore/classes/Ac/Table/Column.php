@@ -157,16 +157,23 @@ class Ac_Table_Column {
     }
 
     function determineGetter($record, $fn) {
-        if (is_a($record, 'Ac_Model_Data') && $this->useAeDataFacilities && $this->_staticMeta) return array('getWithGetField', null);
-        elseif (method_exists($record, $getterName = 'get'.$fn)) {
+        if (is_a($record, 'Ac_Model_Data') && $this->useAeDataFacilities && $this->_staticMeta) {
+            $res = array('getWithGetField', null);
+        } elseif (Ac_Accessor::methodExists($record, $getterName = 'get'.$fn)) {
             if ($fn == $this->fieldName && is_array($this->methodParams) && count($this->methodParams))
-            return array('getWithGetterParams', array($getterName, $this->methodParams));
-            else return array('getWithGetter', $getterName);
+            $res = array('getWithGetterParams', array($getterName, $this->methodParams));
+            else $res = array('getWithGetter', $getterName);
+        } elseif (method_exists($record, 'getProperty')) {
+            $res = array('getWithGetProperty', null);
+        } elseif (isset($record->$fn)) {
+            $res = array('getWithObjectVar', null);
+        } elseif (isset($record->_otherValues[$fn])) {
+            $res = array('getWithOtherValues', null);
         }
-        elseif (method_exists($record, 'getProperty')) return array('getWithGetProperty', null);
-        elseif (isset($record->$fn)) return array('getWithObjectVar', null);
-        elseif (isset($record->_otherValues[$fn])) return array('getWithOtherValues', null);
-        else return array('getWithNull', null);
+        else {
+            $res = array('getWithNull', null);
+        }
+        return $res;
     }
 
     function getWithGetField($record, $fn, $p) {

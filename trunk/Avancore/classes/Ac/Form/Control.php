@@ -871,7 +871,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
      * @access protected
      */
     function _doGetValue() {
-        if (!($this->readOnly === true) && isset($this->_rqData['value'])) {
+        if (($this->readOnly !== true) && isset($this->_rqData['value'])) {
             $res = $this->_rqData['value'];
         } else {
             $res = $this->getDefault();
