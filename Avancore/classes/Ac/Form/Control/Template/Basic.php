@@ -419,7 +419,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         <?php $this->_showCaption($control, true, "&nbsp;"); ?>
         <?php if ($control->isRequired($control)) $this->_showCoolRequiredAsterisk($control); else echo "&nbsp;"; ?>
     </th>
-    <td class='control <?echo $class; ?>'>
+    <td class='control <?php echo $class; ?>'>
 <?php echo $html; ?>
 <?php if ($errors) { ?>
 
@@ -571,13 +571,6 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
      * @param Ac_Form_Control_List $control
      */
     function showSelectList($control) {
-        /*
-        ?>
-            <div style="border: 1px solid red"><ul>
-                <li><?php echo implode("</li><li>", $control->getValueList()); ?></li>
-            </ul></div>
-        <?php
-        */
         $items = array();
         
         if ($control->type == 'chosen') {
