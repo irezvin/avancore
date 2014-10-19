@@ -440,7 +440,7 @@ class Ac_Accessor implements Ac_I_Accessor {
      * @return bool
      */
     static function methodExists($object, $methodName) {
-        if ($object instanceof Ac_I_Accessor_WithMethods) return $object->hasMethod($methodName);
+        if ($object instanceof Ac_I_WithMethods) return $object->hasMethod($methodName);
         else return method_exists($object, $methodName);
     }
     
