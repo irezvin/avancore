@@ -44,6 +44,7 @@
     - [X] Ac_Model_Relation::protected members, setters & getters
       - [X] better phpdoc comments
       - [X] internal relations maintainance
+
 *** DONE Ac_Model_Object::reset() fix [2014-07-25 Fri]	       :model:cg:bug:
     Done on [2014-09-02 Tue]
     - Ac_Model_Object::reset() now clears association fields too

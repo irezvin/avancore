@@ -654,11 +654,12 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     // ------------------------- methods to call from the template --------------------
     
-    function getId() {
+    function getId($forceAuto = false) {
         if ($this->id === false) {
             $this->id = '';
             $htmlAttribs = $this->getHtmlAttribs();
             if (isset($htmlAttribs['id']) && strlen($this->htmlAttribs['id'])) $this->id = $htmlAttribs['id'];
+            if ($forceAuto) $this->autoId = true;
             if (!strlen($this->id) && $this->autoId) $this->id = $this->_context->mapIdentifier('');
         }
         return $this->id;

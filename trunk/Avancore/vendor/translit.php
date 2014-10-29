@@ -1,4 +1,4 @@
-<?
+<?php
 // (c) YURiQUE (Yuriy Malchenko), 2005
 // jmalchenko@gmail.com
 //
