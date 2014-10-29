@@ -989,7 +989,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     // +----------------------------------- deleteAssoc ----------------------------------+
 
-    function deleteAssoc($propName, $key = false) {
+    function deleteAssoc($propName, $key = false, $internal = false) {
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
         if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         $assocClass = $this->_getAssocClass($head);
@@ -1015,7 +1015,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         } else {
             trigger_error ('deleteAssoc() called for non-association property '.get_class($this).'::'.$propName, E_USER_ERROR);
         }
-        $this->mustRevalidate();
+        if (!$internal) $this->mustRevalidate();
         return $res;
     }
     
@@ -1077,7 +1077,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     // +----------------------------------- setField -------------------------------------+
     
-    function setField($propName, $value, $key = false) {
+    function setField($propName, $value, $key = false, $internal = false) {
         list ($head, $tail) = Ac_Util::pathHeadTail($propName);
         if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         $assocClass = $this->_getAssocClass($head);
@@ -1105,7 +1105,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
                 $this->_setOwnSingleFieldItem($head, $value);
             }
         }
-        $this->mustRevalidate();
+        if (!$internal) $this->mustRevalidate();
     }
 
     /**
@@ -1250,7 +1250,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     // +----------------------------------- setAssoc -------------------------------------+
     
-    function setAssoc($propName, $assocObject, $key = false) {
+    function setAssoc($propName, $assocObject, $key = false, $internal = false) {
         if (is_array($assocObject)) {
             if (strlen($key)) trigger_error ('Key must not be specified when setting multiple associated items of '.get_class($this).'::'.$propName, E_USER_ERROR);
             return $this->setListAssoc($propName, $assocObject);
@@ -1281,7 +1281,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         } else {
             trigger_error ('setAssoc() called for non-association property '.get_class($this).'::'.$propName, E_USER_ERROR);
         }
-        $this->mustRevalidate();
+        if (!$internal) $this->mustRevalidate();
         return $res;
     }
     

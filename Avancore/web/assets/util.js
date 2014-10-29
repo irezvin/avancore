@@ -772,7 +772,7 @@ Ajs_Util.Uri.prototype = {
 }
 
 Ajs_Util.DelayedCall = function(func, id, contextObject, args, delay, immediate) {
-    if (id === undefined) id = Ajs_Util.DelatedCall.lastId++;
+    if (id === undefined) id = Ajs_Util.DelayedCall.lastId++;
         else Ajs_Util.DelayedCall.cancelCall(id);
     this.id = id;
     this.func = func;
