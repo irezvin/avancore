@@ -80,23 +80,6 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
 <?php   } ?>
 <?php  
     }
-
-    function _doShowStoreReferencingPart() {
-
-        if ($this->prop->isIncoming) {
-?>
-
-        if (is_array($this-><?php $this->d($this->var); ?>)) {
-            $rel = $mapper->getRelation(<?php $this->str($this->relationId); ?>);
-            if (!$this->_autoStoreReferencing($this-><?php $this->d($this->var); ?>, $rel->fieldLinks, <?php $this->str($this->plural); ?>)) $res = false;
-        }
-<?php   
-        return true;
-        
-        } else return false;
-        
-    }
-    
     
 }
 

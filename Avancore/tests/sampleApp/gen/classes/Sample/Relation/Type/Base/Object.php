@@ -151,17 +151,6 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
     
   
-
-    function _storeReferencingRecords() {
-        $res = parent::_storeReferencingRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_array($this->_relations)) {
-            $rel = $mapper->getRelation('_relations');
-            if (!$this->_autoStoreReferencing($this->_relations, $rel->fieldLinks, 'relations')) $res = false;
-        }
-        return $res; 
-    }
     
 }
 

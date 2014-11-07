@@ -139,6 +139,24 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+            
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'relationType' => array (
+                'relationId' => '_relationType',
+                'class' => 'Ac_Model_Association_Referenced',
+            ),
+            'otherPerson' => array (
+                'relationId' => '_otherPerson',
+                'class' => 'Ac_Model_Association_Referenced',
+            ),
+            'person' => array (
+                'relationId' => '_person',
+                'class' => 'Ac_Model_Association_Referenced',
+            ),
+        ));
+        
+    }
         
     protected function doGetInfoParams() {
         return Ac_Util::m( 

@@ -230,6 +230,44 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+            
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'protraitPersonPhoto' => array (
+                'relationId' => '_protraitPersonPhoto',
+                'class' => 'Ac_Model_Association_Referenced',
+            ),
+            'religion' => array (
+                'relationId' => '_religion',
+                'class' => 'Ac_Model_Association_Referenced',
+            ),
+            'tags' => array (
+                'relationId' => '_tags',
+                'class' => 'Ac_Model_Association_ManyToMany',
+            ),
+            'personAlbums' => array (
+                'relationId' => '_personAlbums',
+                'class' => 'Ac_Model_Association_Referencing',
+            ),
+            'personPhotos' => array (
+                'relationId' => '_personPhotos',
+                'class' => 'Ac_Model_Association_Referencing',
+            ),
+            'personPosts' => array (
+                'relationId' => '_personPosts',
+                'class' => 'Ac_Model_Association_Referencing',
+            ),
+            'incomingRelations' => array (
+                'relationId' => '_incomingRelations',
+                'class' => 'Ac_Model_Association_Referencing',
+            ),
+            'outgoingRelations' => array (
+                'relationId' => '_outgoingRelations',
+                'class' => 'Ac_Model_Association_Referencing',
+            ),
+        ));
+        
+    }
         
     protected function doGetInfoParams() {
         return Ac_Util::m( 

@@ -248,11 +248,13 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     function setPersonAlbumIds($personAlbumIds) {
         if (!is_array($personAlbumIds)) trigger_error('$personAlbumIds must be an array', E_USER_ERROR);
         $this->_personAlbumIds = $personAlbumIds;
+        $this->_personAlbumsLoaded = false;
         $this->_personAlbums = false; 
     }
     
     function clearPersonAlbums() {
         $this->_personAlbums = array();
+        $this->_personAlbumsLoaded = true;
         $this->_personAlbumIds = false;
     }               
         
@@ -362,42 +364,6 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     }
     
   
-
-    function _storeReferencedRecords() {
-        $res = parent::_storeReferencedRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_object($this->_person)) {
-            $rel = $mapper->getRelation('_person');
-            if (!$this->_autoStoreReferenced($this->_person, $rel->fieldLinks, 'person')) $res = false;
-        }
- 
-        return $res;
-    }
-
-    function _storeReferencingRecords() {
-        $res = parent::_storeReferencingRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_array($this->_personPosts)) {
-            $rel = $mapper->getRelation('_personPosts');
-            if (!$this->_autoStoreReferencing($this->_personPosts, $rel->fieldLinks, 'personPosts')) $res = false;
-        }
-        return $res; 
-    }
-
-    function _storeNNRecords() {
-        $res = parent::_storeNNRecords() !== false;
-        $mapper = $this->getMapper();
-        
-        if (is_array($this->_personAlbums) || is_array($this->_personAlbumIds)) {
-            $rel = $mapper->getRelation('_personAlbums');
-            if (!$this->_autoStoreNNRecords($this->_personAlbums, $this->_personAlbumIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'personAlbums', $rel->midWhere)) 
-                $res = false;
-        }
-            
-        return $res; 
-    }
     
 }
 

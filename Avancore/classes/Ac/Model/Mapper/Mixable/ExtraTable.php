@@ -47,7 +47,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * Class or prototype of model mixin
      * @var type 
      */
-    protected $modelMixin = false;
+    protected $modelMixable = false;
     
     /**
      * @var Ac_Model_Relation
@@ -124,12 +124,12 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         return $this->deleteWithOwner;
     }
 
-    function setModelMixin($modelMixin) {
-        $this->modelMixin = $modelMixin;
+    function setModelMixable($modelMixable) {
+        $this->modelMixable = $modelMixable;
     }
 
-    function getModelMixin() {
-        return $this->modelMixin;
+    function getModelMixable() {
+        return $this->modelMixable;
     }    
  
     function setMapperBaseClass($mapperBaseClass) {
@@ -301,11 +301,19 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         if ($result) {
             $extraRecord = $this->getExtraRecord($hyData);
             if ($extraRecord->hasFullPrimaryKey()) {
-                if (!$extraRecord->delete()) {
-                    $result = false;
-                    $error = $extraRecord->getError();
+                if (!$extraRecord->delete()) { // there may be the case when extra record does not exist
+                    if ($xError = $extraRecord->getError()) {
+                        $result = false;
+                        $error = $xError;
+                    }
                 }
             }
+        }
+    }
+    
+    function onAfterCreateRecord(Ac_Model_Object & $record) {
+        if ($this->modelMixable) {
+            $record->addMixable(Ac_Prototyped::factory($this->modelMixable, 'Ac_I_Mixable'));
         }
     }
    

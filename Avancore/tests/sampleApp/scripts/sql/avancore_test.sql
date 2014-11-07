@@ -66,7 +66,7 @@ CREATE TABLE `ac_people` (
   KEY `FK_ac_person_photos_ac_people_protrait` (`personId`,`portraitId`),
   CONSTRAINT `FK_ac_person_photos_ac_people_protrait` FOREIGN KEY (`personId`, `portraitId`) REFERENCES `ac_person_photos` (`personId`, `photoId`),
   CONSTRAINT `FK_ac_person_religion` FOREIGN KEY (`religionId`) REFERENCES `ac_religion` (`religionId`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=12 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -301,6 +301,142 @@ INSERT INTO `ac_religion` VALUES (4,'Agnostic'),(3,'Atheist'),(1,'Christian'),(2
 UNLOCK TABLES;
 
 --
+-- Table structure for table `ac_shop_categories`
+--
+
+DROP TABLE IF EXISTS `ac_shop_categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_shop_categories` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `leftCol` int(10) unsigned NOT NULL,
+  `rightCol` int(10) unsigned NOT NULL,
+  `ignore` int(10) unsigned NOT NULL,
+  `parentId` int(10) unsigned DEFAULT NULL,
+  `ordering` int(10) unsigned NOT NULL,
+  `depth` int(10) unsigned NOT NULL,
+  `metaId` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_shop_categories`
+--
+
+LOCK TABLES `ac_shop_categories` WRITE;
+/*!40000 ALTER TABLE `ac_shop_categories` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ac_shop_categories` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_shop_meta`
+--
+
+DROP TABLE IF EXISTS `ac_shop_meta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_shop_meta` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `pageTitle` varchar(255) DEFAULT NULL,
+  `metaDescription` varchar(255) DEFAULT NULL,
+  `metaKeywords` varchar(255) DEFAULT NULL,
+  `metaNoindex` int(1) unsigned NOT NULL DEFAULT '0',
+  `sharedObjectType` enum('product','category','other') NOT NULL DEFAULT 'other',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_shop_meta`
+--
+
+LOCK TABLES `ac_shop_meta` WRITE;
+/*!40000 ALTER TABLE `ac_shop_meta` DISABLE KEYS */;
+INSERT INTO `ac_shop_meta` VALUES (1,'Купить Товар 1 он-лайн','Страница товара 1','Товар 1, купить',0,'product');
+/*!40000 ALTER TABLE `ac_shop_meta` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_shop_product_extraCodes`
+--
+
+DROP TABLE IF EXISTS `ac_shop_product_extraCodes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_shop_product_extraCodes` (
+  `productId` int(10) unsigned NOT NULL,
+  `ean` varchar(255) NOT NULL DEFAULT '',
+  `asin` varchar(255) NOT NULL DEFAULT '',
+  `gtin` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`productId`),
+  CONSTRAINT `fk_ac_product_ean_1` FOREIGN KEY (`productId`) REFERENCES `ac_shop_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_shop_product_extraCodes`
+--
+
+LOCK TABLES `ac_shop_product_extraCodes` WRITE;
+/*!40000 ALTER TABLE `ac_shop_product_extraCodes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ac_shop_product_extraCodes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_shop_product_upc`
+--
+
+DROP TABLE IF EXISTS `ac_shop_product_upc`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_shop_product_upc` (
+  `productId` int(10) unsigned NOT NULL,
+  `upcCode` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`productId`),
+  CONSTRAINT `fk_ac_product_upc_1` FOREIGN KEY (`productId`) REFERENCES `ac_shop_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_shop_product_upc`
+--
+
+LOCK TABLES `ac_shop_product_upc` WRITE;
+/*!40000 ALTER TABLE `ac_shop_product_upc` DISABLE KEYS */;
+INSERT INTO `ac_shop_product_upc` VALUES (1,'1234');
+/*!40000 ALTER TABLE `ac_shop_product_upc` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_shop_products`
+--
+
+DROP TABLE IF EXISTS `ac_shop_products`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_shop_products` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `sku` varchar(255) NOT NULL DEFAULT '',
+  `title` varchar(255) NOT NULL DEFAULT '',
+  `metaId` int(10) unsigned DEFAULT NULL,
+  `published` int(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_shop_products`
+--
+
+LOCK TABLES `ac_shop_products` WRITE;
+/*!40000 ALTER TABLE `ac_shop_products` DISABLE KEYS */;
+INSERT INTO `ac_shop_products` VALUES (1,'PROD01','Товар 1',1,1),(2,'PROD02','Товар 2',NULL,1);
+/*!40000 ALTER TABLE `ac_shop_products` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `ac_tag_perks`
 --
 
@@ -313,8 +449,8 @@ CREATE TABLE `ac_tag_perks` (
   PRIMARY KEY (`idOfTag`,`idOfPerk`),
   KEY `fkTagId_idx` (`idOfTag`),
   KEY `fkPerkId_idx` (`idOfPerk`),
-  CONSTRAINT `fkTagId` FOREIGN KEY (`idOfTag`) REFERENCES `ac_tags` (`tagId`) ON DELETE NO ACTION ON UPDATE NO ACTION,
-  CONSTRAINT `fkPerkId` FOREIGN KEY (`idOfPerk`) REFERENCES `ac_perks` (`perkId`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fkPerkId` FOREIGN KEY (`idOfPerk`) REFERENCES `ac_perks` (`perkId`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fkTagId` FOREIGN KEY (`idOfTag`) REFERENCES `ac_tags` (`tagId`) ON DELETE NO ACTION ON UPDATE NO ACTION
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -370,7 +506,7 @@ CREATE TABLE `ac_tree_adjacent` (
   PRIMARY KEY (`id`),
   KEY `index_4` (`parentId`),
   KEY `index_5` (`ordering`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -379,7 +515,7 @@ CREATE TABLE `ac_tree_adjacent` (
 
 LOCK TABLES `ac_tree_adjacent` WRITE;
 /*!40000 ALTER TABLE `ac_tree_adjacent` DISABLE KEYS */;
-INSERT INTO `ac_tree_adjacent` VALUES (1,NULL,1,'child1',1),(2,NULL,3,'child2',2),(3,NULL,2,'child3',3);
+INSERT INTO `ac_tree_adjacent` VALUES (1,NULL,1,'-= top =-',NULL),(2,1,1,'A',NULL),(3,2,1,'A.1',NULL),(4,2,2,'A.2',NULL);
 /*!40000 ALTER TABLE `ac_tree_adjacent` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -406,7 +542,7 @@ CREATE TABLE `ac_tree_combos` (
   KEY `index_4` (`parentId`),
   KEY `index_5` (`ordering`),
   KEY `index_6` (`ignore`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -415,7 +551,7 @@ CREATE TABLE `ac_tree_combos` (
 
 LOCK TABLES `ac_tree_combos` WRITE;
 /*!40000 ALTER TABLE `ac_tree_combos` DISABLE KEYS */;
-INSERT INTO `ac_tree_combos` VALUES (1,0,3,NULL,1,'root',999,0,0),(2,1,2,1,1,'child1',1,0,1);
+INSERT INTO `ac_tree_combos` VALUES (1,0,17,NULL,1,'root',999,0,0),(2,1,12,1,1,'A',NULL,0,1),(3,2,7,2,1,'A.1',NULL,0,2),(4,10,11,2,3,'A.2',NULL,0,2);
 /*!40000 ALTER TABLE `ac_tree_combos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -453,7 +589,7 @@ CREATE TABLE `ac_tree_nested_sets` (
 
 LOCK TABLES `ac_tree_nested_sets` WRITE;
 /*!40000 ALTER TABLE `ac_tree_nested_sets` DISABLE KEYS */;
-INSERT INTO `ac_tree_nested_sets` VALUES (0,1,0,7,NULL,1,'Sample_Tree_Record_Mapper',0,0),(1,1,1,2,0,1,'',0,1),(2,1,5,6,0,3,'',0,1),(3,1,3,4,0,2,'',0,1);
+INSERT INTO `ac_tree_nested_sets` VALUES (0,1,0,9,NULL,1,'Sample_Tree_Record_Mapper',0,0),(1,1,1,8,0,1,'',0,1),(2,1,2,7,1,1,'',0,2),(3,1,3,4,2,1,'',0,3),(4,1,5,6,2,2,'',0,3);
 /*!40000 ALTER TABLE `ac_tree_nested_sets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -469,7 +605,7 @@ CREATE TABLE `ac_tree_records` (
   `title` varchar(255) NOT NULL DEFAULT '',
   `tag` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -478,7 +614,7 @@ CREATE TABLE `ac_tree_records` (
 
 LOCK TABLES `ac_tree_records` WRITE;
 /*!40000 ALTER TABLE `ac_tree_records` DISABLE KEYS */;
-INSERT INTO `ac_tree_records` VALUES (1,'child1',1),(2,'child2',2),(3,'child3',3);
+INSERT INTO `ac_tree_records` VALUES (1,'-= top =-',NULL),(2,'A',NULL),(3,'A.1',NULL),(4,'A.2',NULL);
 /*!40000 ALTER TABLE `ac_tree_records` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -491,4 +627,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-09-12  0:42:00
+-- Dump completed on 2014-11-02 22:07:22

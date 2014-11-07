@@ -140,17 +140,6 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     }
     
   
-
-    function _storeReferencingRecords() {
-        $res = parent::_storeReferencingRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_array($this->_people)) {
-            $rel = $mapper->getRelation('_people');
-            if (!$this->_autoStoreReferencing($this->_people, $rel->fieldLinks, 'people')) $res = false;
-        }
-        return $res; 
-    }
     
 }
 

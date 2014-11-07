@@ -132,6 +132,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     
     function getTargetModelName() {
         $res = $this->_other? $this->_other->name : false;
+        return $res;
     }
     
     function getDefaultClassName() {
@@ -430,6 +431,24 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
                 $res = $tmp[0];
             }
         }
+        return $res;
+    }
+    
+    function getAssociationPrototype() {
+        $prot = $this->getAeModelRelationPrototype();
+        $res = array(
+            'relationId' => $prot['srcVarName'],
+        );
+        if ($this->isList()) {
+            if ($this->isManyToMany()) {
+                $class = 'Ac_Model_Association_ManyToMany';
+            } else {
+                $class = 'Ac_Model_Association_Referencing';
+            }
+        } else {
+            $class = 'Ac_Model_Association_Referenced';
+        }
+        $res['class'] = $class;
         return $res;
     }
     

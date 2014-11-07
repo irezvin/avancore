@@ -52,9 +52,7 @@ class Ac_Test_Model extends Ac_Test_Base {
             $this->assertFalse($vList->check(999));
             $this->assertFalse(in_array(999, $va));
         }
-       
-       
-   }
+    }
     
     function testReset() {
         
@@ -107,7 +105,53 @@ class Ac_Test_Model extends Ac_Test_Base {
         
         $pi = $pers->getPropertyInfo('tags[0][title]');
         $this->assertIsA($pi, 'Ac_Model_Property');
-   }
+    }
    
+    function testPersistence() {
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        
+        $pm->useRecordsCollection = false;
+        $pm->reset();
+        
+        $personData = array('name' => 'testPerson', 'gender' => 'M', 'birthDate' => '2014-11-07');
+        $religionData = array('title' => 'Pastafarian');
+        $tagA = array('title' => 'The', 'titleM' => 'The Guy', 'titleF' => 'The Girl');
+        $tagB = array('title' => 'A', 'titleM' => 'A Guy', 'titleF' => 'A Girl');
+        
+        // Let's clean up the mess from prev. TC
+        $db = $this->getAeDb();
+        $db->args($tagA['title'])->query("DELETE FROM #__tags WHERE title = ?");
+        $db->args($tagB['title'])->query("DELETE FROM #__tags WHERE title = ?");
+        $db->args($religionData['title'])->query("DELETE FROM #__religion WHERE title = ?");
+        $db->args($personData['name'])->query("DELETE FROM #__people WHERE name = ?");
+        
+        $this->resetAi('#__people');
+        $this->resetAi('#__tags');
+        $this->resetAi('#__religion');
+        
+        $data = $personData;
+        //$data['religion'] = $religionData;
+        //$data['tags'] = array($tagA, $tagB);
+        
+        $person = $pm->createRecord();
+        
+        $person->bind($data);
+        $oReligion = $person->createReligion();
+        $oReligion->bind($religionData);
+        
+        $oTagA = $person->createTag();
+        $oTagA->bind($tagA);
+        
+        $oTagB = $person->createTag();
+        $oTagB->bind($tagB);
+        
+        $person->store();
+        
+        $this->assertTrue($oReligion->isPersistent());
+        $this->assertTrue($oTagA->isPersistent());
+        $this->assertTrue($oTagB->isPersistent());
+        $this->assertTrue(!array_diff(array($oTagA->tagId, $oTagB->tagId), $person->getTagIds()));
+        
+    }   
     
 }

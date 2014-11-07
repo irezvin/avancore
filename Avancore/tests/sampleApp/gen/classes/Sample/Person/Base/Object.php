@@ -400,11 +400,13 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function setTagIds($tagIds) {
         if (!is_array($tagIds)) trigger_error('$tagIds must be an array', E_USER_ERROR);
         $this->_tagIds = $tagIds;
+        $this->_tagsLoaded = false;
         $this->_tags = false; 
     }
     
     function clearTags() {
         $this->_tags = array();
+        $this->_tagsLoaded = true;
         $this->_tagIds = false;
     }               
 
@@ -723,67 +725,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
   
-
-    function _storeReferencedRecords() {
-        $res = parent::_storeReferencedRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_object($this->_protraitPersonPhoto)) {
-            $rel = $mapper->getRelation('_protraitPersonPhoto');
-            if (!$this->_autoStoreReferenced($this->_protraitPersonPhoto, $rel->fieldLinks, 'protraitPersonPhoto')) $res = false;
-        }
-
-        if (is_object($this->_religion)) {
-            $rel = $mapper->getRelation('_religion');
-            if (!$this->_autoStoreReferenced($this->_religion, $rel->fieldLinks, 'religion')) $res = false;
-        }
- 
-        return $res;
-    }
-
-    function _storeReferencingRecords() {
-        $res = parent::_storeReferencingRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_array($this->_personAlbums)) {
-            $rel = $mapper->getRelation('_personAlbums');
-            if (!$this->_autoStoreReferencing($this->_personAlbums, $rel->fieldLinks, 'personAlbums')) $res = false;
-        }
-
-        if (is_array($this->_personPhotos)) {
-            $rel = $mapper->getRelation('_personPhotos');
-            if (!$this->_autoStoreReferencing($this->_personPhotos, $rel->fieldLinks, 'personPhotos')) $res = false;
-        }
-
-        if (is_array($this->_personPosts)) {
-            $rel = $mapper->getRelation('_personPosts');
-            if (!$this->_autoStoreReferencing($this->_personPosts, $rel->fieldLinks, 'personPosts')) $res = false;
-        }
-
-        if (is_array($this->_incomingRelations)) {
-            $rel = $mapper->getRelation('_incomingRelations');
-            if (!$this->_autoStoreReferencing($this->_incomingRelations, $rel->fieldLinks, 'incomingRelations')) $res = false;
-        }
-
-        if (is_array($this->_outgoingRelations)) {
-            $rel = $mapper->getRelation('_outgoingRelations');
-            if (!$this->_autoStoreReferencing($this->_outgoingRelations, $rel->fieldLinks, 'outgoingRelations')) $res = false;
-        }
-        return $res; 
-    }
-
-    function _storeNNRecords() {
-        $res = parent::_storeNNRecords() !== false;
-        $mapper = $this->getMapper();
-        
-        if (is_array($this->_tags) || is_array($this->_tagIds)) {
-            $rel = $mapper->getRelation('_tags');
-            if (!$this->_autoStoreNNRecords($this->_tags, $this->_tagIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'tags', $rel->midWhere)) 
-                $res = false;
-        }
-            
-        return $res; 
-    }
     
 }
 

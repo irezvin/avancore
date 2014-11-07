@@ -200,11 +200,13 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     function setPersonIds($personIds) {
         if (!is_array($personIds)) trigger_error('$personIds must be an array', E_USER_ERROR);
         $this->_personIds = $personIds;
+        $this->_peopleLoaded = false;
         $this->_people = false; 
     }
     
     function clearPeople() {
         $this->_people = array();
+        $this->_peopleLoaded = true;
         $this->_personIds = false;
     }               
 
@@ -284,34 +286,16 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     function setPerkIds($perkIds) {
         if (!is_array($perkIds)) trigger_error('$perkIds must be an array', E_USER_ERROR);
         $this->_perkIds = $perkIds;
+        $this->_perksLoaded = false;
         $this->_perks = false; 
     }
     
     function clearPerks() {
         $this->_perks = array();
+        $this->_perksLoaded = true;
         $this->_perkIds = false;
     }               
   
-
-    function _storeNNRecords() {
-        $res = parent::_storeNNRecords() !== false;
-        $mapper = $this->getMapper();
-        
-        if (is_array($this->_people) || is_array($this->_personIds)) {
-            $rel = $mapper->getRelation('_people');
-            if (!$this->_autoStoreNNRecords($this->_people, $this->_personIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'people', $rel->midWhere)) 
-                $res = false;
-        }
-            
-        
-        if (is_array($this->_perks) || is_array($this->_perkIds)) {
-            $rel = $mapper->getRelation('_perks');
-            if (!$this->_autoStoreNNRecords($this->_perks, $this->_perkIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'perks', $rel->midWhere)) 
-                $res = false;
-        }
-            
-        return $res; 
-    }
     
 }
 
