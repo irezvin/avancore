@@ -110,6 +110,16 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
         return array_unique(array_merge($this->_usedAliases, $this->_getAliasesFromColumns()));
     }
     
+    /**
+     * Returns all aliases including ones used by the parts
+     */
+    function getAllUsedAliases() {
+        $this->beginCalc();
+        $res = $this->_getOrderedAliases($this->getUsedAliases());
+        $this->endCalc();
+        return $res;
+    }
+    
     function _getAliasesFromColumns() {
     	$cols = is_array($this->columns)? $this->columns : array($this->columns);
     	$res = array();
