@@ -69,5 +69,15 @@ class Ac_Sql_Dbi_Column extends Ac_Sql_Dbi_Object {
         return $res; 
     }
     
+    function isUnique() {
+        $res = false;
+        if ($this->isPk()) {
+            $res = true;
+        } else {
+            $res = (bool) $this->_table->findIndicesByColumns(array($this->name), Ac_Sql_Dbi_Table::INDEX_ACCEPT_SAME, true);
+        }
+        return $res;
+    }
+    
 }
 

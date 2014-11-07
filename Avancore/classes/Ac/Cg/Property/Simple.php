@@ -188,11 +188,18 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
         
         if (!$this->values) {
             if ($sfc = $this->_col->pointsToSingleForeignColumn()) {
-                if ($sfc->isPk()) {
+                if ($sfc->isUnique()) {
                     $foreignTbl = $sfc->_table;
                     if ($mod = $this->_model->_domain->searchModelByTable($foreignTbl->name)) {
                         if ($this->_col->nullable) $this->dummyCaption = new Ac_Cg_Php_Expression("''");
-                        $this->values = array('class' => 'Ac_Model_Values_Records', 'mapperClass' => $mod->getMapperClass());
+                        $this->values = array(
+                            'class' => 'Ac_Model_Values_Records', 
+                            'mapperClass' => $mod->getMapperClass()
+                        );
+                        // it's not a primary key so we have to specify what field do we reference
+                        if (!$sfc->isPk()) {
+                            $this->values['valueFieldName'] = $sfc->name;
+                        }
                         $controlType = 'selectList';
                     }
                 }
