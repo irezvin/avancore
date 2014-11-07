@@ -909,17 +909,16 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         foreach ($this->listPkFields() as $pkf) $qpkf[] = $this->db->n('t').'.'.$this->db->n($pkf);
         else {
             $vf = $valueFieldName;
-            if (!is_array($vf)) $vf = array($vf);
-            foreach ($vf as $pkf) $qpkf[] = $this->db->n('t').'.'.$this->db->n($pkf);
+            foreach (Ac_Util::toArray($vf) as $pkf) $qpkf[] = $this->db->n('t').'.'.$this->db->n($pkf);
         }
         $spk = count($qpkf) == 1;
         $qpkf = implode(", ", $qpkf);
+        $res = array();
         if (!$titleIsProperty && !$valueIsProperty) {
             $sql = "SELECT DISTINCT t.".$titleFieldName." AS _title_, ".$qpkf." FROM ".$this->db->n($this->tableName)." AS t";
             if ($extraJoins) $sql .= " ".$extraJoins;
             if ($where) $sql .= " WHERE ".$where;
             if ($ordering) $sql .= " ORDER BY ".$ordering;
-            $res = array();
             foreach ($this->db->fetchArray($sql) as $row) {
                 $title = $row['_title_'];
                 $pk = Ac_Util::array_values(array_slice($row, 1));
@@ -933,9 +932,13 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
             while ($rec = $coll->getNext()) {
                 if ($valueFieldName === false) $pk = $rec->getPrimaryKey();
                 else {
-                    $pk = array();
-                    if ($valueIsProperty) foreach ($vf as $f) $pk[] = $rec->getField($f);
-                    else foreach ($vf as $f) $pk[] = $rec->$f;
+                    if (is_array($valueFieldName)) {
+                        $pk = array();
+                        if ($valueIsProperty) foreach ($vf as $f) $pk[] = $rec->getField($f);
+                            else foreach ($vf as $f) $pk[] = $rec->$f;
+                    } else {
+                        $pk = $valueIsProperty? $rec->getField($valueFieldName) : $rec->{$valueFieldName};
+                    }
                 }
                 $title = $rec->getField($titleFieldName);
                 $res[] = array($pk, $title);
@@ -1444,8 +1447,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      */
     function getAllRecords($key = false) {
         if ($this->allRecords === false) {
-            if (strlen($t = $this->getTitleFieldName()) && !$this->isTitleAProperty()) $ord = $t.' ASC';
-            elseif (($o = $this->getDefaultOrdering()) !== false) $ord = $o;
+            
+            if (($o = $this->getDefaultOrdering()) !== false) $ord = $o;
+            elseif (strlen($t = $this->getTitleFieldName()) && !$this->isTitleAProperty()) $ord = $t.' ASC';
                 else $ord = '';
                 
             $this->allRecords = $this->loadRecordsByCriteria('', true, $ord);
