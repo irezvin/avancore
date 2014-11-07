@@ -739,4 +739,15 @@ class Ac_Cg_Model {
         return $res;
     }    
     
+    function getAssociationPrototypes() {
+        $res = array();
+        foreach ($this->listProperties() as $p) {
+            $prop = $this->getProperty($p);
+            if ($prop instanceof Ac_Cg_Property_Object && $prop->isEnabled()) {
+                $res[$prop->varName] = $prop->getAssociationPrototype();
+            }
+        }
+        return $res;
+    }
+    
 }

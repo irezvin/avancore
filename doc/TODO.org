@@ -382,7 +382,7 @@
     We need to be able to use one instance of Values for all appropriate records to reduce number of requsts to the DB.
 *** TODO Usable method do exclude/include all/some sub-mappers in Admin [2013-08-28 Wed] :admin:feature:minor:
 *** TODO Ac_Db_Mysqli, Ac_Db_Pg, Ac_Db_Ms [2013-09-08 Sun]	:sql:feature:
-*** TODO Ac_Sql_Select parameters (*including names of tables and databases*) [2013-09-08 Sun] :sql:feature:medium:
+*** TODO Ac_Sql_Select parameters (*including names of tables and databases*) [2013-09-08 Sun] :sql:feature:medium:tblParams:
     Если я делаю станадртную форму "параметров", то она должна экранироваться при помощи Ac_Sql_Db::q()
 **** TODO support of '#foo' => nameQuote in Ac_Sql_Db::preProcessQuery()
 *** TODO Do we need to make Ac_Sql_Filter_Multiple/Ac_Sql_Order_Multiple supporting $foo->getFilter|Order($sub)->bind()? [2013-11-12 Tue] :sql:design:
@@ -424,6 +424,44 @@
 *** TODO reduce getNNIds() to free field only [2014-08-09 Sat] :model:
     see [[freeFields]]
 *** TODO Cache Ac_Model_Values_Records instances where applicable (not so straightforward) [2014-09-27 Sat] :model:feature:cool:
+*** TODO Pseudo-singular relations with restrictions [2014-11-01 Sat] :model:
+    - [ ] Restrictions: are combined with the srcWhere / destWhere
+      - [ ] Ac_Model_Relation::srcRestrictions [field => value]
+      - [ ] Ac_Model_Relation::destRestrictions [field => value]
+    - [ ] Restrictions+fieldNames are used to detect cardinality of src/dest
+          records
+    - [ ] Support by Cg (ability to add restrictions to domain schema)
+    - [ ] Restrictions are applied to the other record when it is created
+    - [ ] Restriction values are added to joins' on clause by Ac_Model_Sql_TableProvider
+      - Example: $sefInfo = $post->createSefInfo(); $sefInfo->type === 'post'
+    - [ ] Example:
+      - Posts table: sefDataId => `Sef table`.Id (assumes `Sef table`.`type` = 'post')
+      - Products table: sefDataId => `Sef table`.Id (assumes `Sef table`.`type` = 'product')
+    - [ ] Must play nice with cascaded deletions
+*** TODO Ac_Model_Relation refactor level 1 [2014-11-01 Sat] 	      :model:
+    - [ ] Ac_Model_Relation_Impl: has only methods to load, count, list DESTINATION records
+      - [ ] computes derivative parameters and stores it in members
+      - [ ] is created by Ac_Model_Relation (two instances, one for src, one for dest), is re-created
+            when Ac_Model_Relation' parameters are changed
+      - [ ] subclasses
+	- [ ] Ac_Model_Relation_Impl_One
+	- [ ] Ac_Model_Relation_Impl_Many
+	- [ ] Ac_Model_Relation_Impl_ManyToMany
+*** TODO Ac_Model_Relation refactor level 2 [2014-11-01 Sat] :model:
+    Ac_Model_Relation_Impl has aggregates to perform per-record tasks: retrieve values from records,
+    create in-memory bindings. By default such aggregates are muti-purpose and able to work with
+    heterogeneous sets of records. But if we are aware about uniformness of src/dest set and its' 
+    properties, optimised concrete strategies can be used.
+*** TODO Re-mapping field names by Ac_Model_Mapper [2014-11-01 Sat]	    :model:difficult:
+    See also: feature tagged as :tblParams:
+**** TODO Ability to use "mapped" placeholders in Ac_Sql_Select i.e. {{foo:bar}} where
+     foo is mapped relation name and :bar is mapped property name
+     - [ ] proper support by Ac_Sql_Db::preProcessQuery()
+     - [ ] aliases' of referenced mappers' tables must be "used" automatically    
+**** TODO It must be decided (and implemented), whether we use mapped column names 
+     or "physical" field names in Ac_Model_Relation
+*** TODO bind for $nn=>array doesn't work with default-generated code [2014-11-07 Fri] :cg:model:bug:
+    where $nn is name of NN-related property (the error is 'Cannot set associated list item')
 ** Questionable
 *** TODO Joomla output: don't add JS and CSS assets that were already added by the Joomla [2013-10-26 Sat] :js:bug:
 *** TODO Ac_Sql_Db, Ac_Sql_Db_PDO: charset (at least default to utf-8) :sql:bug:minor:

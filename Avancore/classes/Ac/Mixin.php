@@ -186,6 +186,9 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
                     $tmp->unregisterMixin($this);
                 }
                 $this->mixables[$id] = $mix;
+                if (Ac_Accessor::methodExists($mix, 'setMixableId')) {
+                    $mix->setMixableId($id);
+                }
             }
             $mix->registerMixin($this);
         }

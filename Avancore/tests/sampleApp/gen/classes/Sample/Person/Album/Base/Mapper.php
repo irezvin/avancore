@@ -130,6 +130,20 @@ class Sample_Person_Album_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+            
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'person' => array (
+                'relationId' => '_person',
+                'class' => 'Ac_Model_Association_Referenced',
+            ),
+            'personPhotos' => array (
+                'relationId' => '_personPhotos',
+                'class' => 'Ac_Model_Association_ManyToMany',
+            ),
+        ));
+        
+    }
         
     protected function doGetInfoParams() {
         return Ac_Util::m( 

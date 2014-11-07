@@ -193,23 +193,6 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     }
     
   
-
-    function _storeReferencedRecords() {
-        $res = parent::_storeReferencedRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_object($this->_person)) {
-            $rel = $mapper->getRelation('_person');
-            if (!$this->_autoStoreReferenced($this->_person, $rel->fieldLinks, 'person')) $res = false;
-        }
-
-        if (is_object($this->_personPhoto)) {
-            $rel = $mapper->getRelation('_personPhoto');
-            if (!$this->_autoStoreReferenced($this->_personPhoto, $rel->fieldLinks, 'personPhoto')) $res = false;
-        }
- 
-        return $res;
-    }
     
 }
 
