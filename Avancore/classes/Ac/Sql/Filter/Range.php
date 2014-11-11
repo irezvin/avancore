@@ -19,6 +19,8 @@ class Ac_Sql_Filter_Range extends Ac_Sql_Filter {
     
     var $valueRx = false;
     
+    var $ignoreEmptyValue = true;
+    
     function _filterValue($item) {
         if ($this->valueRx !== false) {
             if (preg_match($this->valueRx, $item, $matches)) {
@@ -30,6 +32,7 @@ class Ac_Sql_Filter_Range extends Ac_Sql_Filter {
         } else {
             $res = true;
         }
+        if ($this->ignoreEmptyValue && empty($item)) $res = false;
         return $res;
     }
     
