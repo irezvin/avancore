@@ -102,6 +102,9 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
                 if (isset($pi->showInTable)) $showInTable = $pi->showInTable;
                     else $showInTable = !($pi->controlType == 'textArea');
                 if (!$showInTable) $s['disabled'] = true;
+                if (isset($pi->columnPrototype) && is_array($pi->columnPrototype)) {
+                    Ac_Util::ms($s, $pi->columnPrototype);
+                }
                 $res[$f] = $s;
             }
             $this->_columnSettings = $res;
