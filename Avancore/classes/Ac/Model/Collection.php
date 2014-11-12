@@ -153,8 +153,8 @@ class Ac_Model_Collection {
     
     function setKeys($keys = array(), $mapperClass = false, $pkName = false) {
         if (!strlen($mapperClass) && !$pkName) trigger_error ("Either \$mapperClass or \$pkName must be provided");
-        $this->_mapperClass = $mapperClass;
         $this->_mapper = false;
+        $this->useMapper($mapperClass);
         if (!$pkName) {
             $mapper = Ac_Model_Mapper::getMapper($mapperClass);
             $pkName = $mapper->listPkFields();

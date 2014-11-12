@@ -81,14 +81,18 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
             $manager->setApplication($this->getApplication());
             if ($this->separateToolbar) $manager->separateToolbar = true;
             $response = $manager->getResponse();
-            if ($this->separateToolbar) {
-                if (strlen($manager->toolbarContent)) {
-                    Ac_Legacy_Output_Joomla15::addHtmlToJoomlaToolbar($manager->toolbarContent);
+            if ($response->noWrap) {
+                $this->_response = $response;
+            } else {
+                if ($this->separateToolbar) {
+                    if (strlen($manager->toolbarContent)) {
+                        Ac_Legacy_Output_Joomla15::addHtmlToJoomlaToolbar($manager->toolbarContent);
+                    }
                 }
+                $this->_tplData['manager'] = $manager;
+                $this->_tplData['managerResponse'] = $response;
+                $this->_templatePart = 'manager';
             }
-            $this->_tplData['manager'] = $manager;
-            $this->_tplData['managerResponse'] = $response;
-            $this->_templatePart = 'manager';
 	    } else {
 	        $this->_response->redirectUrl = $this->getUrl(array($this->_methodParamName => 'start'));	        
 	    }

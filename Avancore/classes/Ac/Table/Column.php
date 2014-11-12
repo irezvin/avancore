@@ -152,7 +152,7 @@ class Ac_Table_Column {
         $g = $this->determineGetter($record, $fieldName);
         $res = $this->$g[0] ($record, $fieldName, $g[1]);
         
-        if ($this->decorator) $res = Ac_Decorator::decorate($this->decorator, $res, $this->decorator);
+        if ($this->decorator) $res = Ac_Decorator::decorate($this->decorator, $res, $this->decorator, $record);
         return $res;
     }
 

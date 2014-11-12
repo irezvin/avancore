@@ -298,25 +298,59 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     function executeProcessing() {
         $ok = false;
         
+        $proc = null;
+        $procResp = null;
+        $respMode = null;
+        
         if (isset($this->_rqData['processing']) && is_string($this->_rqData['processing']) 
-            && strlen($procName = $this->_rqData['processing'])) {
-                if (in_array($procName, $this->listProcessings())) {
-                    $proc = $this->getProcessing($procName);
-                    $resp = $proc->getResponse(); // TODO: merge processing response with current one and show processing dialog if needed
-                    if ($rep = $proc->getReport()) {
-                        if (!$this->_report) {
-                            $this->_report = new Ac_Admin_ReportEntry();
-                        }
-                        $this->_report->addChildEntry($rep);
-                        $ok = true;
+            && strlen($procName = $this->_rqData['processing'])) 
+        {
+            if (in_array($procName, $this->listProcessings())) {
+                $proc = $this->getProcessing($procName);
+                
+                $procResp = $proc->getResponse();
+                $respMode = $proc->managerResponseMode;
+
+                if ($rep = $proc->getReport()) {
+                    if (!$this->_report) {
+                        $this->_report = new Ac_Admin_ReportEntry();
                     }
+                    $this->_report->addChildEntry($rep);
+                    $ok = true;
                 }
             }
+        }
         
-        $this->_primaryKeys = array();
-        $this->_record = null;
-        $u = $this->getManagerUrl('list');
-        $this->_response->hasToRedirect = $u->toString();
+        $redir = true;
+        
+        if ($procResp) {
+            if ($respMode == Ac_Admin_Processing::RESPONSE_AUTO) {
+                if (strlen($procResp->content)) {
+                    $respMode = $procResp->noWrap? Ac_Admin_Processing::RESPONSE_REPLACE : Ac_Admin_Processing::RESPONSE_WRAP;
+                } else {
+                    $respMode = Ac_Admin_Processing::RESPONSE_IGNORE;
+                }
+            }
+            if ($respMode !== Ac_Admin_Processing::RESPONSE_IGNORE) {
+                $redir = false;
+                if ($respMode == Ac_Admin_Processing::RESPONSE_REPLACE) {
+                    $this->_response = $procResp;
+                } else {
+                    $this->_templatePart = 'processing';
+                    $this->_tplData['processing'] = $proc;
+                    $this->_tplData['processingResponse'] = $procResp;
+                }
+            }
+        }
+        
+        if ($redir && isset($this->_response->hasToRedirect)) $redir = false;
+
+        if ($redir) {
+            $this->_primaryKeys = array();
+            $this->_record = null;
+            $u = $this->getManagerUrl('list');
+            $this->_response->hasToRedirect = $u->toString();
+        }
         
             
     }
@@ -1262,6 +1296,13 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $this->_sqlSelect;
     }
     
+    /**
+     * @return Ac_Sql_Select
+     */
+    function getSqlSelect() {
+        return $this->_getSqlSelect();
+    }
+    
     function _preloadRelations() {
         if ($pr = $this->_getPreloadRelations()) {
             $myRecs = array();
@@ -1368,7 +1409,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         }
         return $this->configService;
     }    
-    
     
 }
 
