@@ -2,7 +2,7 @@
 
 interface Ac_I_Decorator_Model extends Ac_I_Decorator {
     
-    function setModel(Ac_Model_Data $model = null);
+    function setModel($model);
 
     /**
      * @return Ac_Model_Data
