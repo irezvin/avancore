@@ -1,12 +1,41 @@
 <?php
 
 class Ac_Admin_Processing extends Ac_Legacy_Controller {
+    
+    const DEFAULT_RECORDS_NONE = 0;
 
+    const DEFAULT_RECORDS_ALL = 1;
+    
+    const DEFAULT_RECORDS_BY_FILTERS = 2;
+    
+    /**
+     * How $this->manager should deal with $this->response
+     * Default behaviour: if there is response content, choose between RESPONSE_WRAP (if noWrap == false) or RESPONSE_REPLACE, otherwise RESPONSE_IGNORE
+     */
+    const RESPONSE_AUTO = 0;
+    
+    /**
+     * How $this->manager should deal with $this->response: ignore it and redirect to list (default action)
+     */
+    const RESPONSE_IGNORE = 1;
+    
+    /**
+     * How $this->manager should deal with $this->response: show it in a conventional wrapper
+     */
+    const RESPONSE_WRAP = 2;
+    
+    /**
+     * How $this->manager should deal with $this->response: show it instead of own response
+     */
+    const RESPONSE_REPLACE = 3;
+    
+    var $managerResponseMode = self::RESPONSE_AUTO;
+    
     var $title = 'Processing';
 
     var $header = '{title} started';
     
-    var $defaultToAllRecords = false;
+    var $defaultToAllRecords = Ac_Admin_Processing::DEFAULT_RECORDS_NONE;
     
     /**
      * @var Ac_Admin_ReportEntry
@@ -174,10 +203,14 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     function _doGetRecordsCollection() {
         if ($this->_recordsCollection === false) {
             if (!$this->_extRecords) $this->_recordKeys = $this->_getRecordKeysFromRequest();
-            if ($this->_noRecords || (!$this->defaultToAllRecords && is_array($this->_recordKeys) && !count($this->_recordKeys))) $this->_records = array();
+            if ($this->_noRecords || ($this->defaultToAllRecords == self::DEFAULT_RECORDS_NONE && is_array($this->_recordKeys) && !count($this->_recordKeys))) $this->_records = array();
             if (!$this->_recordsCollection) {
-                $this->_recordsCollection = new Ac_Model_Collection();
-                $this->_recordsCollection->setDatabase($this->application->getDb());
+                if ($this->defaultToAllRecords == self::DEFAULT_RECORDS_BY_FILTERS) {
+                    $this->_recordsCollection = $this->manager->getSqlSelect()->createCollection($this->manager->mapperClass);
+                } else {
+                    $this->_recordsCollection = new Ac_Model_Collection();
+                    $this->_recordsCollection->setDatabase($this->application->getDb());
+                }
                 // Most straightforward way
                 if (is_array($this->_records)) {
                     $this->_recordsCollection->setRecords($this->_records);
