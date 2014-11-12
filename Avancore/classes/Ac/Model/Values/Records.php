@@ -145,15 +145,20 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
                 $m = $this->_mapper;
                 if ($m->hasAllRecords()) {
                     $existing = $m->getAllRecords($valuesToCheck);
+                    if ($this->valueFieldName) $existing = Ac_Util::indexArray($existing, $this->valueFieldName, true);
                 } else {
                     $db = $m->getDb();
                     $tmpWhere = $this->where;
                     $tmpList = $this->_cachedValueList;
-                    $crit = $db->n(array('t', $m->pk), false).$db->eqCriterion($valuesToCheck);
-                    if (strlen($this->where)) 
-                        $this->where = '('.$this->where.') AND '.$crit;
-                    else 
-                        $this->where = $crit;
+                    if (!$this->valueIsProperty)  {
+                        if (!$this->valueFieldName) $k = $m->pk;
+                            else $k = $this->valueFieldName;
+                        $crit = $db->n(array('t', $k), false).$db->eqCriterion($valuesToCheck);
+                        if (strlen($this->where)) 
+                            $this->where = '('.$this->where.') AND '.$crit;
+                        else 
+                            $this->where = $crit;
+                    }
                     $existing = $this->_doDefaultGetValueList();
                     $this->where = $tmpWhere;
                     $this->_cachedValueList = $tmpList;
