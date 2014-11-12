@@ -34,6 +34,16 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
     var $url = false;
     
     /**
+     * @var Ac_Admin_Manager_Processing
+     */
+    var $processing = false;
+    
+    /**
+     * @var Ac_Legacy_Controller_Response
+     */
+    var $processingResponse = false;
+    
+    /**
      * Populates template vars using info from the manager and its context
      *
      * @param Ac_Admin_Manager $manager
@@ -342,5 +352,17 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
 <?php
         
     }
+    
+    function showProcessing() {
+        ob_start();
+        $this->htmlResponse->mergeWithResponse($this->processingResponse);
+?>
+        <div class="processing">
+            <?php echo $this->processingResponse->content; ?>
+        </div>
+<?php        
+        $this->showManagerWrapper(ob_get_clean());
+    }
+    
 }
 

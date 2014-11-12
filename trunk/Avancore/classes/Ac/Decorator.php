@@ -2,13 +2,15 @@
 
 class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
     
-    protected $model = null;
+    protected $model = false;
+    
+    protected static $modelStack = array();
     
     function hasPublicVars() {
         return true;
     }
 
-    function setModel(Ac_Model_Data $model = null) {
+    function setModel($model = null) {
         if ($model !== ($oldModel = $this->model)) {
             $this->model = $model;
             $this->doOnSetModel();
@@ -19,6 +21,7 @@ class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
     }
 
     function getModel() {
+        if ($this->model === false) return self::topModel();
         return $this->model;
     }
 
@@ -26,9 +29,30 @@ class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
         return $value;
     }
     
-    static final function decorate($decorator, $value, & $instance = null) {
+    static function pushModel($model) {
+        array_push(self::$modelStack, $model);
+    }
+    
+    static function topModel() {
+        $top = array_slice(self::$modelStack, -1);
+        if (count($top)) $res = $top[0];
+        else $res = null;
+        return $res;
+    }
+    
+    static function popModel() {
+        if (count(self::$modelStack)) $res = array_pop(self::$modelStack);
+        else {
+            throw new Ac_E_InvalidUsage("Call to Ac_Decorator::popModel() without corresponding Ac_Decorator::pushModel()");
+        }
+        return $res;
+    }
+    
+    static final function decorate($decorator, $value, & $instance = null, $model = false) {
+        if ($model !== false) $this->pushModel($model);
         $instance = self::instantiate($decorator);
         if ($instance) $value = $instance->apply($value);
+        if ($model !== false) $this->popModel();
         return $value;
     }
     

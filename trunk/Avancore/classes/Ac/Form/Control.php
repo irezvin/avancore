@@ -573,7 +573,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
     
     protected function postProcessPresentation(& $html) {
-        if ($this->presentationDecorator) $html = Ac_Decorator::decorate($this->presentationDecorator, $html, $this->presentationDecorator);
+        if ($this->presentationDecorator) $html = Ac_Decorator::decorate($this->presentationDecorator, $html, $this->presentationDecorator, $this->getModel());
         if ($this->_parent) $this->_parent->postProcessChildPresentation($html, $this);
     }
     
@@ -1096,7 +1096,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     function getDisplayValue() {
         $res = $this->getValue();
         if ($this->decorator) {
-            $res = Ac_Decorator::decorate ($this->decorator, $res, $this->decorator);            
+            $res = Ac_Decorator::decorate ($this->decorator, $res, $this->decorator, $this->getModel());
         }
         return $res;
     }
