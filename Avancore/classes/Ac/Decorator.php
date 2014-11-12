@@ -49,10 +49,10 @@ class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
     }
     
     static final function decorate($decorator, $value, & $instance = null, $model = false) {
-        if ($model !== false) $this->pushModel($model);
+        if ($model !== false) self::pushModel($model);
         $instance = self::instantiate($decorator);
         if ($instance) $value = $instance->apply($value);
-        if ($model !== false) $this->popModel();
+        if ($model !== false) self::popModel();
         return $value;
     }
     
