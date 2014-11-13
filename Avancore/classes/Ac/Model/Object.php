@@ -33,6 +33,16 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * function onCreate()
      */
     const EVENT_ON_CREATE = 'onCreate';
+    
+    /**
+     * function onListDataProperties(array & $dataProperties)
+     */
+    const EVENT_ON_LIST_DATA_PROPERTIES = 'onListDataProperties';
+
+    /**
+     * function onSetDefaults(array & $defaults, $full)
+     */
+    const EVENT_ON_SET_DEFAULTS = 'onSetDefaults';
 
     /**
      * function onAfterLoad()
@@ -60,9 +70,9 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_SAVE_FAILED = 'onSaveFailed';
 
     /**
-     * function onDeleteFailed()
+     * function onCanDelete(& $result)
      */
-    const EVENT_ON_DELETE_FAILED = 'onDeleteFailed';
+    const EVENT_ON_CAN_DELETE = 'onCanDelete';
 
     /**
      * function onBeforeDelete(& $result)
@@ -75,9 +85,9 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_AFTER_DELETE = 'onAfterDelete';
 
     /**
-     * function onCanDelete(& $result)
+     * function onDeleteFailed()
      */
-    const EVENT_ON_CAN_DELETE = 'onCanDelete';
+    const EVENT_ON_DELETE_FAILED = 'onDeleteFailed';
 
     /**
      * function onCopy(Ac_Model_Object $copy)
@@ -85,19 +95,14 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_COPY = 'onCopy';
 
     /**
-     * function onCompare(Ac_Model_Object $other, & $compareResult)
-     */
-    const EVENT_ON_COMPARE = 'onCompare';
-
-    /**
-     * function onListDefaultComparedAssociations(array & $associations)
-     */
-    const EVENT_ON_LIST_DEFAULT_COMPARED_ASSOCIATIONS = 'onListDefaultComparedAssociations';
-
-    /**
      * function onListNonCopiedFields(array & $fields)
      */
     const EVENT_ON_LIST_NON_COPIED_FIELDS = 'onListNonCopiedFields';
+
+    /**
+     * function onCompare(Ac_Model_Object $other, & $compareResult)
+     */
+    const EVENT_ON_COMPARE = 'onCompare';
 
     /**
      * function onListNonComparedFields(array & $fields)
@@ -105,24 +110,19 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_LIST_NON_COMPARED_FIELDS = 'onListNonComparedFields';
 
     /**
-     * function onSetDefaults(array & $defaults, $full)
+     * function onListDefaultComparedAssociations(array & $associations)
      */
-    const EVENT_ON_SET_DEFAULTS = 'onSetDefaults';
-    
-    /**
-     * function onCleanup()
-     */
-    const EVENT_ON_CLEANUP = 'onCleanup';
-    
-    /**
-     * function onListDataProperties(array & $dataProperties)
-     */
-    const EVENT_ON_LIST_DATA_PROPERTIES = 'onListDataProperties';
+    const EVENT_ON_LIST_DEFAULT_COMPARED_ASSOCIATIONS = 'onListDefaultComparedAssociations';
     
     /**
      * function onGetAssociations(array & $associations)
      */
     const EVENT_ON_GET_ASSOCIATIONS = 'onGetAssociations';
+    
+    /**
+     * function onCleanup()
+     */
+    const EVENT_ON_CLEANUP = 'onCleanup';
     
     /**
      * In-memory id
@@ -190,6 +190,15 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         return $this->getMapper()->getDb();
     }
     
+    // -------- template and to-be-overridden methods --------
+    
+    function doOnCreate() {
+    }
+    
+    protected function listOwnDataProperties() {
+        return $this->mapper->getColumnNames();
+    }
+    
     function doAfterLoad() {
     }
     
@@ -205,7 +214,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     function doOnSaveFailed() {
     }
     
-    function doOnDeleteFailed() {
+    function doOnCanDelete() {
     }
     
     function doBeforeDelete() {
@@ -214,32 +223,22 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     function doAfterDelete() {
     }
     
-    function doOnCanDelete() {
+    function doOnDeleteFailed() {
     }
     
-    function doOnCreate() {
+    /**
+     * @param Ac_Model_Object $copy
+     */
+    function doOnCopy($copy) {
+    }
+    
+    protected function doOnGetAssociations(array & $associations) {
     }
     
     function doListNonCopiedFields() {
         $m = $this->getMapper();
-        $res = $this->getMapper()->listPkFields();
+        $res = $m->listPkFields();
         return $res;
-    }
-    
-    function doListNonComparedFields() {
-        $m = $this->getMapper();
-        $res = $this->getMapper()->listPkFields();
-        return $res;
-    }
-    
-    /**
-     * Should return list of associations (names of properties) that should be compared by default, in order of comparison. 
-     * The list can be recursive, i.e. ('assoc1', 'assoc2', 'assoc3' => array('assoc3.1', 'assoc3.2', ...))
-     * 
-     * @return array
-     */
-    function doListDefaultComparedAssociations() {
-        return array();
     }
     
     /**
@@ -253,10 +252,23 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     function doOnExtraCompare ($otherObject) {
     }
     
+    function doListNonComparedFields() {
+        $m = $this->getMapper();
+        $res = $m->listPkFields();
+        return $res;
+    }
+    
     /**
-     * @param Ac_Model_Object $copy
+     * Should return list of associations (names of properties) that should be compared by default, in order of comparison. 
+     * The list can be recursive, i.e. ('assoc1', 'assoc2', 'assoc3' => array('assoc3.1', 'assoc3.2', ...))
+     * 
+     * @return array
      */
-    function doOnCopy($copy) {
+    function doListDefaultComparedAssociations() {
+        return array();
+    }
+    
+    protected function doOnCleanup() {
     }
     
     final function canDelete() {
@@ -264,12 +276,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         $this->triggerEvent(self::EVENT_ON_CAN_DELETE, array (& $result));
         $res  = $result !== false;
         return $res;
-    }
-    
-    function getExcludeList() {
-        $vars = array_keys(get_object_vars($this));
-        foreach ($vars as $i => $var) if ($var{0} == "_") unset($vars[$i]);
-        return $vars;
     }
     
     function _describeIndex($indexName, $indexFields = false) {
@@ -432,8 +438,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         if ($primaryKey !== null) {
             $this->$k = $primaryKey;
         }
-        
-        $props = $this->listDataProperties();
         
         if ($hyData = $this->mapper->peLoad($this, $this->getPrimaryKey())) {
             $this->load($hyData, true);
@@ -719,10 +723,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         
         if ($c) self::$metaCache[$mc][__FUNCTION__] = $res;
         return $res;
-    }
-    
-    protected function listOwnDataProperties() {
-        return $this->mapper->getColumnNames();
     }
     
     function getPrimaryKey() {
@@ -1110,6 +1110,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function cleanupMembers() {
+        $this->doOnCleanup();
         $this->triggerEvent(self::EVENT_ON_CLEANUP);
         $vars = get_class_vars(get_class($this));
         $m = $this->getMapper();
@@ -1229,9 +1230,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         }
     }
     
-    protected function doOnGetAssociations(array & $associations) {
-    }
-    
     final function getAssociations() {
         if ($this->associations === false) {
             $this->associations = $this->getMapper()->getAssociations();
@@ -1256,4 +1254,3 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
 }
-
