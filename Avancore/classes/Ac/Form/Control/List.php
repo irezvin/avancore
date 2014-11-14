@@ -177,11 +177,12 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
         return $res;
     }
     
-    function getId() {
+    function getId($forceAuto = false) {
         if ($this->id === false) {
             $this->id = '';
             $htmlAttribs = $this->getHtmlAttribs(true);
             if (isset($htmlAttribs['id']) && strlen($this->htmlAttribs['id'])) $this->id = $htmlAttribs['id'];
+            if ($forceAuto) $this->autoId = true;
             if (!strlen($this->id) && $this->autoId) $this->id = $this->_context->mapIdentifier('');
         }
         return $this->id;
