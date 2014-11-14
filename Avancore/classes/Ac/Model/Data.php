@@ -158,7 +158,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     function setMetaCacheMode($metaCacheMode) {
         if (!in_array($metaCacheMode, array(self::META_CACHE_NONE, self::META_CACHE_ALL, 
-            self::META_CACHE_STRUCTURE, self::META_CACHE_BY_STATE_C)))
+            self::META_CACHE_STRUCTURE, self::META_CACHE_BY_STATE)))
             throw Ac_E_InvalidCall::outOfConst ('metaCacheMode', $metaCacheMode, 'META_', __CLASS__);
         $this->metaCacheMode = $metaCacheMode;
     }
