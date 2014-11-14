@@ -396,6 +396,21 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
             $row = $pkOrRow;
             $this->_otherValues = $pkOrRow;
             $res = true;
+            
+            if ($this->tracksPk()) {
+                $this->_origPk = $res? $this->getPrimaryKey() : null;
+            }
+            $this->doAfterLoad();
+            $this->triggerEvent(self::EVENT_AFTER_LOAD);
+            if ($res) $this->doOnActual(self::ACTUAL_REASON_LOAD);
+            if ($this->isPersistent()) {
+                $m = $this->getMapper();
+                $m->notifyKeyAssigned($this);
+            }
+            if ($this->tracksChanges()) $this->_memorizeFields();
+
+            if ($res) $this->lastOperation = self::OPERATION_LOAD;
+            
         } else {
             if (!$this->isPersistent() && $this->isReference()) {
                 $res = $this->_loadReference();
@@ -403,19 +418,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
                 $res = $this->_legacyLoad($pkOrRow, $row);
             }
         }
-        if ($this->tracksPk()) {
-            $this->_origPk = $res? $this->getPrimaryKey() : null;
-        }
-        $this->doAfterLoad();
-        $this->triggerEvent(self::EVENT_AFTER_LOAD);
-        if ($res) $this->doOnActual(self::ACTUAL_REASON_LOAD);
-        if ($this->isPersistent()) {
-            $m = $this->getMapper();
-            $m->notifyKeyAssigned($this);
-        }
-        if ($this->tracksChanges()) $this->_memorizeFields();
-        
-        if ($res) $this->lastOperation = self::OPERATION_LOAD;
         
         return $res;
     }
