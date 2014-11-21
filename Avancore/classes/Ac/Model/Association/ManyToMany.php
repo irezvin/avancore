@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Model_Association_ManyToMany extends Ac_Model_Association_ModelObject {
+class Ac_Model_Association_ManyToMany extends Ac_Model_Association_Many {
  
     /**
      * @var array
@@ -18,25 +18,48 @@ class Ac_Model_Association_ManyToMany extends Ac_Model_Association_ModelObject {
     protected $midWhere = false;
     
     protected $idsField = false;
+    
+    /**
+     * @var string
+     */
+    protected $loadDestIdsMapperMethod = false;
+    
+    /**
+     * @var string
+     */
+    protected $getDestIdsMethod = false;
 
+    /**
+     * @var string
+     */
+    protected $setDestIdsMethod = false;
+
+    /**
+     * @var string
+     */
+    protected $clearDestObjectsMethod = false;
+    
     function setIdsField($idsField) {
         if ($idsField !== ($oldIdsField = $this->idsField)) {
-            if ($this->idsField !== false) throw Ac_E_InvalidCall::canRunMethodOnce($this, __METHOD__);
+            if ($this->immutable) throw self::immutableException($this, __METHOD__);
             $this->idsField = $idsField;
         }
     }
 
-    function getIdsField() {
+    function getIdsField($dontThrow = false) {
         if ($this->idsField === false) {
-            if ($rel = $this->getRelation(false)) 
+            if ($rel = $this->getRelation($dontThrow)) 
                 $this->idsField = $rel->getSrcNNIdsVarName();
+            if (!$this->idsField && !$dontThrow) {
+                throw new Ac_E_InvalidCall("Cannot ".__METHOD__." without proper getRelation()::srcNNIdsVarName()");
+            }
         }
         return $this->idsField;
     }
     
     function setFieldLinks2(array $fieldLinks2) {
         if ($fieldLinks2 !== ($oldFieldLinks2 = $this->fieldLinks2)) {
-            if ($this->fieldLinks2 !== false) throw Ac_E_InvalidCall::canRunMethodOnce($this, __METHOD__);
+            if ($this->immutable) throw self::immutableException($this, __METHOD__);
             $this->fieldLinks2 = $fieldLinks2;
         }
     }
@@ -57,7 +80,7 @@ class Ac_Model_Association_ManyToMany extends Ac_Model_Association_ModelObject {
      */
     function setMidTableName($midTableName) {
         if ($midTableName !== ($oldMidTableName = $this->midTableName)) {
-            if ($this->midTableName !== false) throw Ac_E_InvalidCall::canRunMethodOnce($this, __METHOD__);
+            if ($this->immutable) throw self::immutableException($this, __METHOD__);
             $this->midTableName = $midTableName;
         }
     }
@@ -78,7 +101,7 @@ class Ac_Model_Association_ManyToMany extends Ac_Model_Association_ModelObject {
      */
     function setMidWhere($midWhere) {
         if ($midWhere !== ($oldMidWhere = $this->midWhere)) {
-            if ($this->midWhere !== false) throw Ac_E_InvalidCall::canRunMethodOnce ($this, __METHOD__);
+            if ($this->immutable) throw self::immutableException($this, __METHOD__);
             $this->midWhere = $midWhere;
         }
     }
@@ -106,7 +129,7 @@ class Ac_Model_Association_ManyToMany extends Ac_Model_Association_ModelObject {
         $val = false;
         if (strlen($f)) $val = $object->$f;
         
-        $l = $this->getIdsField();
+        $l = $this->getIdsField(true);
         $ids = false;
         if (strlen($l)) $ids = $object->$l;
         
@@ -181,8 +204,151 @@ class Ac_Model_Association_ManyToMany extends Ac_Model_Association_ModelObject {
             }
         }
         return $res;
-        
-        
+    }
+    
+    function checkIdsLoaded($object) {
+        $ids = $this->getIdsField(true);
+        if ($ids !== false) $res = $object->{$ids} !== false;
+            else $res = null;
+        return $res;
+    }
+ 
+    /**
+     * @param string $loadDestIdsMapperMethod
+     */
+    function setLoadDestIdsMapperMethod($loadDestIdsMapperMethod) {
+        if ($loadDestIdsMapperMethod !== ($oldloadDestIdsMapperMethod = $this->loadDestIdsMapperMethod)) {
+            if ($this->immutable) throw self::immutableException($this, __METHOD__);
+            $this->loadDestIdsMapperMethod = $loadDestIdsMapperMethod;
+        }
+    }
+
+    /**
+     * @param string $getDestIdsMethod
+     */
+    function setGetDestIdsMethod($getDestIdsMethod) {
+        if ($getDestIdsMethod !== ($oldGetDestIdsMethod = $this->getDestIdsMethod)) {
+            $this->getDestIdsMethod = $getDestIdsMethod;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    function getGetDestIdsMethod() {
+        if ($this->getDestIdsMethod === false) {
+            $this->guessMethods();
+        }
+        return $this->getDestIdsMethod;
+    }
+
+    /**
+     * @param string $setDestIdsMethod
+     */
+    function setSetDestIdsMethod($setDestIdsMethod) {
+        if ($setDestIdsMethod !== ($oldSetDestIdsMethod = $this->setDestIdsMethod)) {
+            $this->setDestIdsMethod = $setDestIdsMethod;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    function getSetDestIdsMethod() {
+        if ($this->setDestIdsMethod === false) {
+            $this->guessMethods();
+        }
+        return $this->setDestIdsMethod;
+    }
+
+    /**
+     * @param string $clearDestObjectsMethod
+     */
+    function setClearDestObjectsMethod($clearDestObjectsMethod) {
+        if ($clearDestObjectsMethod !== ($oldClearDestObjectsMethod = $this->clearDestObjectsMethod)) {
+            $this->clearDestObjectsMethod = $clearDestObjectsMethod;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    function getClearDestObjectsMethod() {
+        if ($this->clearDestObjectsMethod === false) {
+            $this->guessMethods();
+        }
+        return $this->clearDestObjectsMethod;
+    }    
+    
+    
+
+    /**
+     * @return string
+     */
+    function getloadDestIdsMapperMethod() {
+        if ($this->loadDestIdsMapperMethod === false) {
+            $this->guessMethods();
+        }
+        return $this->loadDestIdsMapperMethod;
+    }
+   
+    function loadDestIds($srcObjects) {
+        if ($this->useMapperMethods && ($m = $this->loadDestIdsMapperMethod)) {
+            $res = $this->getMapper()->$m($srcObjects);
+        } else {
+            $rel = $this->getRelation();
+            $res = $rel->loadDestNNIds($srcObjects); 
+        }
+        return $res;
+    }
+    
+    function getDestIds($object) {
+        if ($this->useModelMethods && ($m = $this->getDestIdsMethod)) {
+            $res = $object->$m();
+        } else {
+            $if = $this->getIdsField();
+            if ($object->$if === false) {
+                $this->loadDestIds($object);
+            }
+            $res = $object->$if;
+        }
+        return $res;
+    }
+    
+    function setDestIds($object, array $ids) {
+        if ($this->useModelMethods && ($m = $this->setDestIdsMethod)) {
+            $res = $object->$m($ids);
+        } else {
+            $if = $this->getIdsField();
+            $l = $this->getLoadedField();
+            $f = $this->getInMemoryField();
+            if (strlen($l)) $object->$l = false;
+            if (strlen($f)) $object->$f = false;
+            $object->$if = $ids;
+        }
+        return $res;
+    }
+   
+    function clearDestObjects($object) {
+        if ($this->useModelMethods && ($m = $this->clearDestObjectsMethod)) {
+            $res = $object->$m($ids);
+        } else {
+            $if = $this->getIdsField(true);
+            $l = $this->getLoadedField();
+            $f = $this->getInMemoryField();
+            if (strlen($f)) $object->$f = array();
+            if (strlen($if)) $object->$if = false;
+            if (strlen($l)) $object->$l = true;
+        }
+        return $res;
+    }
+   
+    protected function getGuessMap() {
+        return array_merge(parent::getGuessMap(), array(
+            'loadDestIdsMapperMethod' => 'load{Single}IdsFor',
+            'getDestIdsMethod' => 'get{Single}Ids',
+            'setDestIdsMethod' => 'set{Single}Ids',
+        ));
     }
     
 }

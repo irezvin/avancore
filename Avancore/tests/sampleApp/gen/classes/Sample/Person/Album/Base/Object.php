@@ -115,8 +115,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
      */
     function getPerson() {
         if ($this->_person === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_person');
+            $this->mapper->loadPeopleFor($this);
         }
         return $this->_person;
     }
@@ -155,16 +154,14 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
     function countPersonPhotos() {
         if (is_array($this->_personPhotos)) return count($this->_personPhotos);
         if ($this->_personPhotosCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_personPhotos');
+            $this->mapper->loadAssocCountFor($this, '_personPhotos');
         }
         return $this->_personPhotosCount;
     }
 
     function listPersonPhotos() {
         if (!$this->_personPhotosLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_personPhotos');
+            $this->mapper->loadPersonPhotosFor($this);
         }
         return array_keys($this->_personPhotos);
     }
@@ -181,12 +178,9 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
      */
     function getPersonPhoto($id) {
         if (!$this->_personPhotosLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_personPhotos');
+            $this->mapper->loadPersonPhotosFor($this);
         }
         if (!isset($this->_personPhotos[$id])) trigger_error ('No such Person photo: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_personPhotos[$id] === false) {
-        }
         return $this->_personPhotos[$id];
     }
     
@@ -219,8 +213,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
 
     function getPersonPhotoIds() {
         if ($this->_personPhotoIds === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocNNIdsFor($this, '_personPhotos');
+            $this->mapper->loadPersonPhotoIdsFor($this);
         }
         return $this->_personPhotoIds;
     }

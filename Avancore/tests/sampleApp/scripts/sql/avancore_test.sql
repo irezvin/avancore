@@ -64,9 +64,9 @@ CREATE TABLE `ac_people` (
   PRIMARY KEY (`personId`),
   KEY `FK_ac_people_1` (`religionId`),
   KEY `FK_ac_person_photos_ac_people_protrait` (`personId`,`portraitId`),
-  CONSTRAINT `FK_ac_person_photos_ac_people_protrait` FOREIGN KEY (`personId`, `portraitId`) REFERENCES `ac_person_photos` (`personId`, `photoId`),
+  CONSTRAINT `FK_ac_person_photos_ac_people_portrait` FOREIGN KEY (`personId`, `portraitId`) REFERENCES `ac_person_photos` (`personId`, `photoId`),
   CONSTRAINT `FK_ac_person_religion` FOREIGN KEY (`religionId`) REFERENCES `ac_religion` (`religionId`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,7 +75,7 @@ CREATE TABLE `ac_people` (
 
 LOCK TABLES `ac_people` WRITE;
 /*!40000 ALTER TABLE `ac_people` DISABLE KEYS */;
-INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2014-08-10 19:24:57',4,1),(4,'Таня','F',0,'1981-12-23',NULL,'2014-08-10 19:25:10',1,3),(6,'Ян','M',1,'1981-09-21',NULL,'2014-08-31 13:03:07',4,NULL),(7,'Оля','F',1,'1981-09-08',NULL,'2014-08-31 13:04:00',1,NULL);
+INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2014-08-10 19:24:57',4,1),(4,'Таня','F',0,'1981-12-23',NULL,'2014-08-10 19:25:10',1,3),(6,'Ян','M',1,'1981-09-21',NULL,'2014-08-31 13:03:07',4,NULL),(7,'Оля','F',1,'1981-09-08',NULL,'2014-08-31 13:04:00',1,NULL),(8,'testPerson','M',0,'2014-11-07',NULL,'0000-00-00 00:00:00',5,NULL);
 /*!40000 ALTER TABLE `ac_people` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,7 +102,7 @@ CREATE TABLE `ac_people_tags` (
 
 LOCK TABLES `ac_people_tags` WRITE;
 /*!40000 ALTER TABLE `ac_people_tags` DISABLE KEYS */;
-INSERT INTO `ac_people_tags` VALUES (4,1),(6,1),(4,2),(7,2),(6,3);
+INSERT INTO `ac_people_tags` VALUES (4,1),(6,1),(4,2),(7,2),(6,3),(8,5),(8,6);
 /*!40000 ALTER TABLE `ac_people_tags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -287,7 +287,7 @@ CREATE TABLE `ac_religion` (
   `title` varchar(45) NOT NULL,
   PRIMARY KEY (`religionId`),
   UNIQUE KEY `Index_2` (`title`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -296,7 +296,7 @@ CREATE TABLE `ac_religion` (
 
 LOCK TABLES `ac_religion` WRITE;
 /*!40000 ALTER TABLE `ac_religion` DISABLE KEYS */;
-INSERT INTO `ac_religion` VALUES (4,'Agnostic'),(3,'Atheist'),(1,'Christian'),(2,'Muslim');
+INSERT INTO `ac_religion` VALUES (4,'Agnostic'),(3,'Atheist'),(1,'Christian'),(2,'Muslim'),(5,'Pastafarian');
 /*!40000 ALTER TABLE `ac_religion` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -345,7 +345,7 @@ CREATE TABLE `ac_shop_meta` (
   `metaNoindex` int(1) unsigned NOT NULL DEFAULT '0',
   `sharedObjectType` enum('product','category','other') NOT NULL DEFAULT 'other',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -423,7 +423,7 @@ CREATE TABLE `ac_shop_products` (
   `metaId` int(10) unsigned DEFAULT NULL,
   `published` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -477,7 +477,7 @@ CREATE TABLE `ac_tags` (
   `titleF` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`tagId`),
   UNIQUE KEY `Index_2` (`title`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -486,7 +486,7 @@ CREATE TABLE `ac_tags` (
 
 LOCK TABLES `ac_tags` WRITE;
 /*!40000 ALTER TABLE `ac_tags` DISABLE KEYS */;
-INSERT INTO `ac_tags` VALUES (1,'Ум','Умный','Умница'),(2,'Красота','Красивый','Красавица'),(3,'Хитрость','Хитрюга','Хитрюга'),(4,'Богатство','Богач','Богачка');
+INSERT INTO `ac_tags` VALUES (1,'Ум','Умный','Умница'),(2,'Красота','Красивый','Красавица'),(3,'Хитрость','Хитрюга','Хитрюга'),(4,'Богатство','Богач','Богачка'),(5,'The','The Guy','The Girl'),(6,'A','A Guy','A Girl');
 /*!40000 ALTER TABLE `ac_tags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -627,4 +627,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-11-02 22:07:22
+-- Dump completed on 2014-11-20 23:38:40

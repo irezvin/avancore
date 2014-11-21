@@ -6,11 +6,11 @@ class Sample_Plugin implements Ac_I_Mixable {
     public function getMixableId() {
     }
 
-    public function listMixinMethods() {
+    public function listMixinMethods(Ac_I_Mixin $mixin) {
         return array();
     }
 
-    public function listMixinProperties() {
+    public function listMixinProperties(Ac_I_Mixin $mixin) {
         return array();
     }
 

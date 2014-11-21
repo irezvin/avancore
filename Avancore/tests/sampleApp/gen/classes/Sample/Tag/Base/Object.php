@@ -127,16 +127,14 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     function countPeople() {
         if (is_array($this->_people)) return count($this->_people);
         if ($this->_peopleCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_people');
+            $this->mapper->loadAssocCountFor($this, '_people');
         }
         return $this->_peopleCount;
     }
 
     function listPeople() {
         if (!$this->_peopleLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_people');
+            $this->mapper->loadPeopleFor($this);
         }
         return array_keys($this->_people);
     }
@@ -153,12 +151,9 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
      */
     function getPerson($id) {
         if (!$this->_peopleLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_people');
+            $this->mapper->loadPeopleFor($this);
         }
         if (!isset($this->_people[$id])) trigger_error ('No such People: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_people[$id] === false) {
-        }
         return $this->_people[$id];
     }
     
@@ -191,8 +186,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
 
     function getPersonIds() {
         if ($this->_personIds === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocNNIdsFor($this, '_people');
+            $this->mapper->loadPersonIdsFor($this);
         }
         return $this->_personIds;
     }
@@ -213,16 +207,14 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     function countPerks() {
         if (is_array($this->_perks)) return count($this->_perks);
         if ($this->_perksCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_perks');
+            $this->mapper->loadAssocCountFor($this, '_perks');
         }
         return $this->_perksCount;
     }
 
     function listPerks() {
         if (!$this->_perksLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_perks');
+            $this->mapper->loadPerksFor($this);
         }
         return array_keys($this->_perks);
     }
@@ -239,12 +231,9 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
      */
     function getPerk($id) {
         if (!$this->_perksLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_perks');
+            $this->mapper->loadPerksFor($this);
         }
         if (!isset($this->_perks[$id])) trigger_error ('No such Perk: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_perks[$id] === false) {
-        }
         return $this->_perks[$id];
     }
     
@@ -277,8 +266,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
 
     function getPerkIds() {
         if ($this->_perkIds === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocNNIdsFor($this, '_perks');
+            $this->mapper->loadPerkIdsFor($this);
         }
         return $this->_perkIds;
     }

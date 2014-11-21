@@ -64,6 +64,30 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
         Ac_Util::simpleBindAll($options, $this);
     }
     
+    function getGuessMap() {
+        return array(
+            'loadDestObjectsMapperMethod' => 'load{Plural}For',
+            'loadSrcObjectsMapperMethod' => 'loadFor{Plural}',
+            'getSrcObjectsMapperMethod' => 'getOf{Plural}',
+            'createDestObjectMethod' => 'create{Single}',
+        );
+    }
+    
+    function getMethodNames() {
+        $this->init();
+        $res = array();
+        $tr = array(
+            '{single}' => $this->single,
+            '{Single}' => $this->ucSingle,
+            '{plural}' => $this->plural,
+            '{Plural}' => $this->ucPlural,
+        );
+        foreach ($this->getGuessMap() as $k => $v) {
+            $res[$k] = strtr($v, $tr);
+        }
+        return $res;
+    }
+    
     function init() {
 
         $this->var = $this->prop->getClassMemberName();

@@ -187,7 +187,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function getDb() {
-        return $this->getMapper()->getDb();
+        return $this->mapper->getDb();
     }
     
     // -------- template and to-be-overridden methods --------
@@ -236,7 +236,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function doListNonCopiedFields() {
-        $m = $this->getMapper();
+        $m = $this->mapper;
         $res = $m->listPkFields();
         return $res;
     }
@@ -253,7 +253,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function doListNonComparedFields() {
-        $m = $this->getMapper();
+        $m = $this->mapper;
         $res = $m->listPkFields();
         return $res;
     }
@@ -280,7 +280,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     function _describeIndex($indexName, $indexFields = false) {
         if ($indexFields === false) {
-            $m = $this->getMapper();
+            $m = $this->mapper;
             $indexFields = $m->listUniqueIndexFields($indexName);
         }
         $r = array();
@@ -296,7 +296,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         parent::_checkOwnFields();
         $dbp = $this->checkDatabasePresence(true);
         if ($dbp) {
-            $m = $this->getMapper();
+            $m = $this->mapper;
             foreach ($dbp as $indexName => $pks) {
                 $ff = $m->listUniqueIndexFields($indexName);
                 $fn = current($ff);
@@ -309,7 +309,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     // Models that have same properties use common validator (stored in the mapper). This preserves memory and time required for initial metadata retrieval. 
     function _createValidator() {
         if ($this->hasUniformPropertiesInfo()) {
-            $m = $this->getMapper();
+            $m = $this->mapper;
             $res = $m->getCommonValidator();
             $res->model = $this;
         } else {
@@ -404,7 +404,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
             $this->triggerEvent(self::EVENT_AFTER_LOAD);
             if ($res) $this->doOnActual(self::ACTUAL_REASON_LOAD);
             if ($this->isPersistent()) {
-                $m = $this->getMapper();
+                $m = $this->mapper;
                 $m->notifyKeyAssigned($this);
             }
             if ($this->tracksChanges()) $this->_memorizeFields();
@@ -461,7 +461,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     function _legacyStore() {
         $k = $this->_pk;
-        $mapper = $this->getMapper();
+        $mapper = $this->mapper;
         $tpk = $this->tracksPk();
         $hyData = $this->getHyData();
         $error = false;
@@ -509,7 +509,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function forget() {
-        $m = $this->getMapper();
+        $m = $this->mapper;
         $m->forget($this);
     }
     
@@ -778,7 +778,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * @see Ac_Model_Mapper::checkRecordUniqueness
      */    
     function checkDatabasePresence($dontReturnOwnKey = false, $checkNewRecords = false) {
-       $mapper = $this->getMapper();
+       $mapper = $this->mapper;
        return $mapper->checkRecordPresence($this, $dontReturnOwnKey, array(), array(), $checkNewRecords); 
     }
     
@@ -803,7 +803,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         foreach ($iData as $idx => $f) $where = array_merge($where, $f);
         
         if (count($where)) {
-            $m = $this->getMapper();
+            $m = $this->mapper;
             $s = $getSqlDb();
             $r = $m->loadRecordsByCriteria($c = $s->valueCriterion($where));
             if (count($r) == 1) {
@@ -840,7 +840,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function _getCompleteUniqueIndices() {
-        $m = $this->getMapper();
+        $m = $this->mapper;
         $res = array();
         foreach ($m->listUniqueIndices() as $idx) {
             $d = array();
@@ -966,7 +966,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * @return Ac_Model_Object
      */
     function copy($asReference = null, $withPk = false) {
-        $m = $this->getMapper();
+        $m = $this->mapper;
         $copy = $m->createRecord();
         $flds = array_diff($this->listDataProperties(), $this->doListNonCopiedFields());
         if (!$asReference && !$withPk) $flds = array_diff($flds, $m->listPkFields());
@@ -1115,7 +1115,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         $this->doOnCleanup();
         $this->triggerEvent(self::EVENT_ON_CLEANUP);
         $vars = get_class_vars(get_class($this));
-        $m = $this->getMapper();
+        $m = $this->mapper;
         $m->forget($this);
         foreach (get_class_vars(get_class($this)) as $k => $v) if (isset($this->$k)) {
             if (is_array($this->$k)) {
@@ -1196,7 +1196,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     protected function intResetReferences() {
-        $fkData = $this->getMapper()->getFkFieldsData();
+        $fkData = $this->mapper->getFkFieldsData();
         foreach ($fkData as $fieldName => $details) {
             $null = false;
             if (is_null($fieldName)) {
@@ -1234,11 +1234,31 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     final function getAssociations() {
         if ($this->associations === false) {
-            $this->associations = $this->getMapper()->getAssociations();
+            $this->associations = $this->mapper->getAssociations();
             $this->doOnGetAssociations($this->associations);
             $this->triggerEvent(self::EVENT_ON_GET_ASSOCIATIONS, array(& $this->associations));
         }
         return $this->associations;
+    }
+    
+    /**
+     * @return array
+     */
+    final function listAssociationObjects() {
+        if ($this->associations === false) $this->getAssociations();
+        return array_keys($this->associations);
+    }
+
+    /**
+     * @return Ac_Model_Association_Abstract
+     */
+    final function getAssociationObject($id, $dontThrow = false) {
+        $res = null;
+        if ($this->associations === false) $this->getAssociations();
+        if (isset($this->associations[$id])) $res = $this->associations[$id];
+        if (!$res && !$dontThrow) 
+            throw Ac_E_InvalidCall::noSuchItem ('association', $id, 'listAssociationsObjects');
+        return $res;
     }
     
     function addAssociations($associations) {
@@ -1251,7 +1271,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         }
         $instances = Ac_Prototyped::factoryCollection($associations, 'Ac_I_ModelAssociation', array(), 'id', true);
         foreach ($instances as $i) if ($i instanceof Ac_Model_Association_ModelObject) 
-            $i->setMapper($this->getMapper());
+            $i->setMapper($this->mapper);
         Ac_Util::ms($this->associations, $instances);
     }
     
