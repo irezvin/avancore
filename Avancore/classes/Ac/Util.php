@@ -345,11 +345,8 @@ abstract class Ac_Util {
         return $res;
     }
     
-    static function getObjectProperty($object, $property, $default = false) {
-        if (is_callable($getter = array(& $object, 'get'.ucFirst($property)))) $res = call_user_func($getter);
-            elseif (isset($object->$property)) $res = $object->$property;
-                else $res = $default;
-        return $res;
+    static function getObjectProperty($item, $propertyName, $defaultValue = null, $treatArraysAsObjects = false) {
+        return Ac_Accessor::getObjectProperty($item, $propertyName, $defaultValue, $treatArraysAsObjects);
     }
 
     static function stripSlashes($value ) {

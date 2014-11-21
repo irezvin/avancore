@@ -899,7 +899,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
             if (!strlen($this->titleFieldExpression)) $titleFieldName = $this->getTitleFieldName();
             else $titleFieldName = $this->titleFieldExpression;
         }
-        if ($titleIsProperty == '?') $titleIsProperty = $this->isTitleAProperty();
+        if ($titleIsProperty === '?') $titleIsProperty = $this->isTitleAProperty();
         if (!$titleFieldName) {
             $pkf = $this->listPkFields();
             $titleFieldName = $pkf[0];

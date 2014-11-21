@@ -48,7 +48,9 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
         parent::__construct($data, $propName, $options, $isStatic, $optionsOverride);
         if (!$this->mapperClass) trigger_error ('$mapperClass property must be provided', E_USER_ERROR);
         $this->_mapper = Ac_Model_Mapper::getMapper($this->mapperClass);
-        if ($this->titleIsProperty == '?') $this->titleIsProperty = $this->_mapper->isTitleAProperty();
+        if ($this->titleIsProperty === '?') {
+            $this->titleIsProperty = $this->_mapper->isTitleAProperty();
+        }
         if ($this->ordering === '?') {
             $this->ordering = $this->_mapper->getDefaultOrdering();
             if ($this->ordering === false && $this->_mapper->getTitleFieldName() && !$this->titleIsProperty) {
@@ -80,8 +82,6 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
             }
         }
         $ttls = $this->_mapper->getRecordTitles($where, $this->ordering, $this->extraJoins, $this->titleFieldName, $this->titleIsProperty, $this->valueFieldName, $this->valueIsProperty);
-        //    if ($this->tableName === '#__element_versions')
-        
         $res = array();
         if (is_array($ttls)) {
             if ($this->_cpk) {
