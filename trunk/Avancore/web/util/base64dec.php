@@ -3,15 +3,18 @@
     $dec = '';
     $uns = '';
     if (strlen($base64)) {
-	$dec = @base64_decode($base64);
-	if (strlen($dec)) $uns = @unserialize($dec);
+        $dec = @base64_decode($base64);
     }
+	if (strlen($dec)) {
+        $uns = @unserialize($dec);
+    }
+    if (!$uns) $uns = @unserialize($base64);
 ?>
 <html>
 <head><meta http-equiv="content-type" value="text/html; charset=utf-8" />
 <body>
 <h2>Base 64:</h2>
-<form>
+<form method="post">
     <textarea name="base64" cols="80" rows="10"><?php if (strlen($base64)) echo htmlspecialchars($base64); ?></textarea>
     <br />
     <input type="submit" />
