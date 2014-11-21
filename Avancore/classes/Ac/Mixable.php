@@ -39,7 +39,7 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
         return $this->mixableId;
     }
     
-    public function listMixinMethods() {
+    public function listMixinMethods(Ac_I_Mixin $mixin) {
         $c = get_class($this);
         if (!isset(self::$introducedPublicMethods[$c])) {
             self::$introducedPublicMethods[$c] = array_diff(
@@ -70,7 +70,7 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
         return self::$eventHandlerMethods[$c];
     }
 
-    public function listMixinProperties() {
+    public function listMixinProperties(Ac_I_Mixin $mixin) {
         $c = get_class($this);
         if (!isset(self::$introducedPublicVars[$c])) {
             self::$introducedPublicVars[$c] = array_diff(

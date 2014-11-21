@@ -80,16 +80,14 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     function countPeople() {
         if (is_array($this->_people)) return count($this->_people);
         if ($this->_peopleCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_people');
+            $this->mapper->loadAssocCountFor($this, '_people');
         }
         return $this->_peopleCount;
     }
 
     function listPeople() {
         if (!$this->_peopleLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_people');
+            $this->mapper->loadPeopleFor($this);
         }
         return array_keys($this->_people);
     }
@@ -106,12 +104,9 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
      */
     function getPerson($id) {
         if (!$this->_peopleLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_people');
+            $this->mapper->loadPeopleFor($this);
         }
         if (!isset($this->_people[$id])) trigger_error ('No such People: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_people[$id] === false) {
-        }
         return $this->_people[$id];
     }
     

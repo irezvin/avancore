@@ -184,4 +184,47 @@ class Ac_Test_Model extends Ac_Test_Base {
         $this->assertEqual($mix->events, array('doAfterLoad', 'doBeforeSave', 'doOnCanDelete'));
     }
     
+    function testAssoc() {
+        $m = Sample::getInstance()->getSamplePersonMapper();
+        $o = $m->getPrototype();
+        $aa = $m->getAssociations();
+        $nonMatching = array();
+        foreach ($aa as $id => $assoc) {
+            $mn = $assoc->getMethodNames();
+            $mmk = preg_grep('/MapperMethod/', array_keys($mn));
+            $omk = array_diff(array_keys($mn), $mmk);
+            $mmn = array();
+            $omn = array();
+            foreach($mmk as $key) $mmn[] = $mn[$key];
+            foreach($omk as $key) $omn[] = $mn[$key];
+            foreach ($mmn as $method) 
+                if (!method_exists($m, $method)) $nonMatching[$id][] = $method;
+            foreach ($omn as $method) 
+                if (!method_exists($o, $method)) $nonMatching[$id][] = $method;
+        }
+        if (!$this->assertTrue(!count($nonMatching), 'All mapper & model methods must be correctly set in Association')) {
+            var_dump($nonMatching);
+        }
+        $m->useRecordsCollection = false;
+        $m->reset();
+        $a = $m->loadByPersonId(3);
+        $assoc = $a->getAssociationObject('religion');
+        $assoc2 = clone $assoc;
+        $this->assertTrue($assoc->getImmutable());
+        $this->assertFalse($assoc2->getImmutable());
+        if ($assoc instanceof Ac_Model_Association_One) {
+            $do = $assoc->getDestObject($a);
+            $this->assertSame($do, $a->getReligion());
+        }
+        
+        $assoc2->setUseMapperMethods(false);
+        $assoc2->setUseModelMethods(false);
+        $do2 = $assoc2->getDestObject($a);
+        $this->assertSame($do2, $a->getReligion());
+        
+        $a2 = $m->loadByPersonId(3);
+        $do3 = $assoc2->getDestObject($a2);
+        $this->assertEqual($do3->getDataFields(), $do->getDataFields());
+    }
+    
 }

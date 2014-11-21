@@ -10,7 +10,7 @@ class Dimensions implements Ac_I_Mixable {
         return '';
     }
 
-    public function listMixinMethods() {
+    public function listMixinMethods(Ac_I_Mixin $mixin) {
         return array('getVolume');
     }
     
@@ -18,7 +18,7 @@ class Dimensions implements Ac_I_Mixable {
         return $this->length * $this->width * $this->height;
     }
     
-    public function listMixinProperties() {
+    public function listMixinProperties(Ac_I_Mixin $mixin) {
         return array('length', 'width', 'height');
     }
 
@@ -40,11 +40,11 @@ class Weight implements Ac_I_Mixable {
         return '';
     }
 
-    public function listMixinMethods() {
+    public function listMixinMethods(Ac_I_Mixin $mixin) {
         return array();
     }
     
-    public function listMixinProperties() {
+    public function listMixinProperties(Ac_I_Mixin $mixin) {
         return array('weight');
     }
 
@@ -88,7 +88,7 @@ class ModelProp implements Ac_I_Mixable {
         return '';
     }
 
-    public function listMixinMethods() {
+    public function listMixinMethods(Ac_I_Mixin $mixin) {
         return array('getExtraProp', 'setExtraProp');
     }
     
@@ -105,7 +105,7 @@ class ModelProp implements Ac_I_Mixable {
         $properties[] = 'extraPublicProp';
     }
     
-    public function listMixinProperties() {
+    public function listMixinProperties(Ac_I_Mixin $mixin) {
         return array('extraPublicProp');
     }
 

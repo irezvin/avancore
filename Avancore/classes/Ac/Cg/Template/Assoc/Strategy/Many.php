@@ -2,6 +2,16 @@
 
 class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
     
+    function getGuessMap() {
+        return array_merge(parent::getGuessMap(), array(
+            'listDestObjectsMethod' => 'list{Plural}',
+            'countDestObjectsMethod' => 'count{Plural}',
+            'getDestObjectMethod' => 'get{Single}',
+            'addDestObjectMethod' => 'add{Single}',
+            'isDestLoadedMethod' => 'is{Plural}Loaded',
+        ));
+    }
+    
     function _doShowGenModelMethods() {
         extract(get_object_vars($this));
         
@@ -11,8 +21,7 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
     function count<?php $this->d($ucPlural); ?>() {
         if (is_array(<?php $this->d($varId); ?>)) return count(<?php $this->d($varId); ?>);
         if (<?php $this->d($countId); ?> === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, <?php $this->str($relationId); ?>);
+            $this->mapper->loadAssocCountFor($this, <?php $this->str($relationId); ?>);
         }
         return <?php $this->d($countId); ?>;
     }
@@ -20,8 +29,7 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
 
     function list<?php $this->d($ucPlural); ?>() {
         if (!<?php $this->d($this->loadedId); ?>) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, <?php $this->str($relationId); ?>);
+            $this->mapper->load<?php echo $this->ucOtherPlural; ?>For($this);
         }
         return array_keys(<?php $this->d($varId); ?>);
     }
@@ -38,12 +46,9 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
      */
     function get<?php $this->d($ucSingle); ?>($id) {
         if (!<?php $this->d($this->loadedId); ?>) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, <?php $this->str($relationId); ?>);
+            $this->mapper->load<?php echo $this->ucOtherPlural; ?>For($this);
         }
         if (!isset(<?php $this->d($varId); ?>[$id])) trigger_error ('No such <?php echo addcslashes($otherModel->singleCaption, '\''); ?>: \''.$id.'\'', E_USER_ERROR);
-        if (<?php $this->d($varId); ?>[$id] === false) {
-        }
         return <?php $this->d($varId); ?>[$id];
     }
     

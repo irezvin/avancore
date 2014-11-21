@@ -83,6 +83,11 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     var $_checked = false;
     
     var $_errors = array();
+
+    /**
+     * @var array Collection of values for random purposes (used by mixables etc)
+     */
+    protected $extraData = array();
     
     // +------ TEMPLATE METHODS - most should be overridden by developer of concrete class -----+  
 
@@ -1305,7 +1310,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         }
         //$target = $this->getAssoc($head, $subKey);
         $target = $this->_getOwnAssoc($head, $subKey, $plural);
-        $value = $target->setAssoc($tail, $assocObject, $key);
+        $target->setAssoc($tail, $assocObject, $key);
     }
     
     /**
@@ -1511,6 +1516,45 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     }
     
     function doOnWakeup() {
+    }
+    
+    // ----------- extra data support ----------
+    
+    function getExtraData($key = false, $default = null, & $found = false) {
+        if (is_array($key)) $res = Ac_Util::getArrayByPath ($arr, $key, $default, $found);
+        elseif ($key === false) {
+                $res = $this->extraData;
+                $found = false;
+        } elseif (array_key_exists($key, $this->extraData)) {
+                $res = $this->extraData[$key];
+                $found = true;
+        } else {
+                $res = $default;
+                $found = false;
+        }
+        return $res;
+    }
+    
+    function setExtraData($value, $key = false) {
+        if (is_array($key)) Ac_Util::setArrayByPath ($this->extraData, $key, $value);
+        elseif ($key === false) {
+            if (is_array($value)) {
+                $this->extraData = $value;
+            } else {
+                throw Ac_E_InvalidCall::wrongType('value', $value, 'array');
+            }
+        } else {
+            $this->extraData[$key] = $value;
+        }
+    }
+    
+    function unsetExtraData($key = false) {
+        if (is_array($key)) Ac_Util::unsetArrayByPath($this->extraData, $key);
+        elseif ($key === false) {
+            $this->extraData = array();
+        } else {
+            unset($this->extraData[$key]);
+        }
     }
     
 }

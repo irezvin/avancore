@@ -345,10 +345,8 @@ abstract class Ac_Util {
         return $res;
     }
     
-    static function getObjectProperty($object, $property, $default = false) {
-        if (is_callable($getter = array(& $object, 'get'.ucFirst($property)))) $res = call_user_func($getter);
-            elseif (isset($object->$property)) $res = $object->$property;
-                else $res = $default;
+    static function getObjectProperty($object, $property, $defaultValue = false, $treatArraysAsObjects = false) {
+        $res = Ac_Accessor::getObjectProperty($item, $propertyName, $defaultValue, $treatArraysAsObjects);
         return $res;
     }
 
@@ -1084,6 +1082,11 @@ abstract class Ac_Util {
             }
         }
         return $res;
+    }
+    
+    static function lcFirst($string) {
+        if (strlen($string)) $string{0} = strtolower($string{0});
+        return $string;
     }
     
 }
