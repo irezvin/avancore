@@ -171,7 +171,7 @@ class Ac_Accessor implements Ac_I_Accessor {
         } elseif (is_array($propertyName)) {
             $res = array();
             foreach ($propertyName as $k) {
-                $res[$k] = self::getObjectProperty($item, $k, $defaultValue);
+                $res[$k] = self::getObjectProperty($item, $k, $defaultValue, $treatArraysAsObjects);
             }
             return $res;
         } elseif ($propertyName instanceof Ac_I_Getter) {
@@ -205,8 +205,8 @@ class Ac_Accessor implements Ac_I_Accessor {
                 $res = $defaultValue;
             }
         } else {
-            throw Ac_E_InvalidCall("Unsupported \$item type: ".get_type($item)."; probably you "
-                ."didn't pass \$treatArraysAsObjects = true when trying to retrieve values from array");
+            throw new Ac_E_InvalidCall("Unsupported \$item type: ".gettype($item)."; you may have forgotten "
+                ."to pass \$treatArraysAsObjects = true when trying to retrieve values from array");
         }
         return $res;
     }
