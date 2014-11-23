@@ -7,6 +7,7 @@ class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Stra
             'loadDestIdsMapperMethod' => 'load{Single}IdsFor',
             'getDestIdsMethod' => 'get{Single}Ids',
             'setDestIdsMethod' => 'set{Single}Ids',
+            'clearDestObjectsMethod' => 'clear{Plural}',
         ));
     }
     

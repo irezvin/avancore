@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac_I_ModelAssociation {
+abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac_I_ModelAssociation, Ac_I_Mixable_Shared {
     
     protected $relationId = false;
 
@@ -90,7 +90,23 @@ abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac
     protected $plural = false;
     
     protected $immutable = false;
-
+    
+    protected $methodsGuessed = false;
+    
+    // ---- mixable support ----
+    
+    protected $methodMap = false;
+    
+    protected $propMap = false;
+    
+    protected $modelMeta = false;
+    
+    protected $mapperMeta = false;
+    
+    protected $mixableInit = false;
+    
+    protected $mapperData = array();
+        
     function __construct(array $prototype = array()) {
         $im = false;
         if (isset($prototype['immutable'])) {
@@ -104,6 +120,10 @@ abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac
     
     protected static function immutableException($instance, $method) {
         return new Ac_E_InvalidUsage("Cannot {$method} on immutable Association");
+    }
+    
+    protected static function wmc($mixin) {
+        return Ac_E_InvalidCall::wrongClass('mixin', $mixin, array('Ac_Model_Object', 'Ac_Model_Mapper'));
     }
     
     function setId($id) {
@@ -537,12 +557,12 @@ abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac
         return $res;
     }
 
-    function loadDestObjects($destObjects) {
+    function loadDestObjects($srcObjects) {
         if ($this->useMapperMethods && ($m = $this->loadSrcObjectsMapperMethod)) {
             $res = $this->getMapper()->$m($srcObjects);
         } else {
             $rel = $this->getRelation();
-            $res = $rel->loadSrc($srcObjects);
+            $res = $rel->loadDest($srcObjects);
         }
         return $res;
     }
@@ -643,7 +663,68 @@ abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac
         );
     }
     
+    protected function getMethodImplMap() {
+        return array(
+            'getSrcObjectsMapperMethod' => 'getSrcObjects',
+            'loadSrcObjectsMapperMethod' => 'loadDestObjects',
+            'loadDestObjectsMapperMethod' => 'loadSrcObjects',
+            'createDestObjectMethod' => 'createDestObject',
+        );
+    }
+    
+    protected function genMethodMap() {
+        if (!$this->methodsGuessed) $this->guessMethods();
+        $this->methodMap = array(
+            'mapper' => array(),
+            'model' => array(),
+        );
+        foreach (($imap = $this->getMethodImplMap()) as $myProp => $myImplMethod) {
+            $methodName = strtolower($this->$myProp);
+            if (strlen($methodName)) {
+                if (strpos($myProp, 'Mapper') !== false) {
+                    $this->methodMap['mapper'][$methodName] = $myImplMethod;
+                } else {
+                    $this->methodMap['model'][$methodName] = $myImplMethod;
+                }
+            }
+        }
+    }
+    
+    protected function genPropMap() {
+        $this->propMap = array(
+            'model' => array(
+                $this->getInMemoryField() => "_assoc_{$this->id}_inMemoryField",
+            ),
+            'mapper' => array(
+                
+            ),
+        );
+    }
+    
+    function getObjectPropertyName() {
+        return $this->getSingle();
+    }
+    
+    protected function genModelMeta() {
+        $dc = $this->getDestClass();
+        $im = $this->getInMemoryField();
+        $s = $this->getObjectPropertyName();
+        $this->modelMeta = array(
+            'onListAssociations' => array($s => $dc),
+            'onListProperties' => array($s),
+            'onGetPropertiesInfo' => array(
+                $s => array(
+                    'className' => $dc,
+                    'mapperClass' => $this->getDestMapper()->getId(),
+                    'relationId' => $im,
+                    'referenceVarName' => $im,
+                ),
+            ),
+        );
+    }
+    
     protected function guessMethods() {
+        $this->methodsGuessed = true;
         $tr = array(
             '{single}' => Ac_Util::lcFirst($s = $this->getSingle()),
             '{Single}' => ucfirst($s),
@@ -673,5 +754,192 @@ abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac
     function __clone() {
         $this->immutable = false;
     }
-
+    
+    function getMixableId() {
+        return $this->id;
+    }
+    
+    function listMixinProperties(Ac_I_Mixin $mixin) {
+        if ($this->propMap === false) $this->genPropMap();
+        if ($mixin instanceof Ac_Model_Object) {
+            $res = array_keys($this->propMap['model']);
+        } elseif ($mixin instanceof Ac_Model_Mapper) {
+            $res = array_keys($this->propMap['mapper']);
+        } else {
+            $res = array();
+        }
+        return $res;
+    }
+    
+    function listMixinMethods(Ac_I_Mixin $mixin) {
+        if ($this->methodMap === false) $this->genMethodMap();
+        if ($mixin instanceof Ac_Model_Object) {
+            $res = array_keys($this->methodMap['model']);
+        } elseif ($mixin instanceof Ac_Model_Mapper) {
+            $res = array_keys($this->methodMap['mapper']);
+        } else {
+            $res = array();
+        }
+        return $res;
+    }
+    
+    protected function initMixable() {
+        if (!$this->methodMap) $this->genMethodMap();
+        if (!$this->propMap) $this->genPropMap();
+        if (!$this->modelMeta) $this->genModelMeta();
+    }
+    
+    function registerMixin(Ac_I_Mixin $mixin) {
+        if ($mixin instanceof Ac_Model_Object) {
+            if (!$this->mixableInit) $this->initMixable();
+            foreach ($this->propMap['model'] as $varName) $mixin->setExtraData(false, $varName);
+        } elseif ($mixin instanceof Ac_Model_Mapper) {
+            if (!$this->mapper) $this->setMapper ($mixin);
+            elseif ($this->mapper !== $mixin) {
+                throw new Ac_E_InvalidUsage("get_class($this): can mix with only one mapper (\$this->getMapper()) at a time");
+            }
+            
+            // Add my relation
+            $mixin->addRelation($this->getInMemoryField(), $this->getRelation());
+            // Add my association
+            $mixin->addAssociations(array($this));
+            
+            if (!$this->mixableInit) $this->initMixable();
+            $this->mapperData = array();
+            foreach ($this->propMap['mapper'] as $varName) {
+                $this->mapperData[$varName] = false;
+            }
+        } else {
+            throw self::wmc($mixin);            
+        }
+        $this->observeMixin($mixin);
+    }
+    
+    function unregisterMixin(Ac_I_Mixin $mixin) {
+        $this->unobserveMixin($mixin);
+    }
+    
+    function callMixinMethod(Ac_I_Mixin $mixin, $method, array $arguments = array()) {
+        $c = false;
+        $method = strtolower($method);
+        if ($mixin instanceof Ac_Model_Object) {
+            $mm = $this->methodMap['model'];
+            if (isset($mm[$method])) $c = array($this, $mm[$method]);
+            array_unshift($arguments, $mixin);
+        } elseif ($mixin instanceof Ac_Model_Mapper) {
+            $mm = $this->methodMap['mapper'];
+            if (isset($mm[$method])) $c = array($this, $mm[$method]);
+        } else {
+            throw self::wmc($mixin);
+        }
+        if ($c) $res = call_user_func_array($c, $arguments);
+            else throw new Ac_E_InvalidCall("No implementation for ".get_class($mixin)."::{$method}() in ".get_class($this)."#'{$this->id}'");
+        return $res;
+    }
+    
+    function & getMixinProperty(Ac_I_Mixin $mixin, $property) {
+        $res = null;
+        if ($mixin instanceof Ac_Model_Object) {
+            $mm = $this->propMap['model'];
+            if (array_key_exists($property, $mm)) {
+                $res = & $mixin->getExtraData($mm[$property]);
+            } else {
+                throw Ac_E_InvalidCall::noSuchProperty($mixin, $property);
+            }
+        } elseif ($mixin instanceof Ac_Model_Mapper) {
+            $mm = $this->propMap['mapper'];
+            if (array_key_exists($property, $mm)) $res = $this->mapperData[$mm];
+                else throw Ac_E_InvalidCall::noSuchProperty($mixin, $property);
+        } else {
+            throw self::wmc($mixin);
+        }
+        return $res;
+    }
+    
+    function setMixinProperty(Ac_I_Mixin $mixin, $property, $value) {
+        if ($mixin instanceof Ac_Model_Object) {
+            $mm = $this->propMap['model'];
+            if (array_key_exists($property, $mm)) {
+                $mixin->setExtraData($value, $mm[$property]);
+            } else {
+                throw Ac_E_InvalidCall::noSuchProperty($mixin, $property);
+            }
+        } elseif ($mixin instanceof Ac_Model_Mapper) {
+            $mm = $this->propMap['mapper'];
+            if (array_key_exists($property, $mm)) 
+                $this->mapperData[$mm[$property]] = $value;
+            else throw Ac_E_InvalidCall::noSuchProperty($mixin, $property);
+        } else {
+            throw self::wmc($mixin);
+        }
+    }
+    
+    function issetMixinProperty(Ac_I_Mixin $mixin, $property) {
+        $res = false;
+        if ($mixin instanceof Ac_Model_Object) {
+            $mm = $this->propMap['model'];
+            if (array_key_exists($property, $mm)) {
+                $res = $mixin->getExtraData($mm[$property]) !== null;
+            }
+        } elseif ($mixin instanceof Ac_Model_Mapper) {
+            $mm = $this->propMap['mapper'];
+            if (array_key_exists($property, $mm)) {
+                $res = isset($this->mapperData[$mm[$property]]);
+            }
+        } else {
+            throw self::wmc($mixin);
+        }
+        return $res;
+    }
+    
+    function unsetMixinProperty(Ac_I_Mixin $mixin, $property) {
+        if ($mixin instanceof Ac_Model_Object) {
+            $mm = $this->propMap['model'];
+            if (array_key_exists($property, $mm)) {
+                $mixin->setExtraData(null, $mm[$property]);
+            }
+        } elseif ($mixin instanceof Ac_Model_Mapper) {
+            $mm = $this->propMap['mapper'];
+            if (array_key_exists($property, $mm)) {
+                $this->mapperData[$mm[$property]] = null;
+            }
+        } else {
+            throw self::wmc($mixin);
+        }
+    }
+    
+    protected function observeMixin(Ac_I_Mixin $mixin) {
+        if ($mixin instanceof Ac_Model_Object) {
+            $prefix = 'model_';
+        } elseif ($mixin instanceof Ac_Model_Mapper) {
+            $prefix = 'mapper_';
+        } else {
+            throw self::wmc($mixin);
+        }
+        $handlers = Ac_Event::listEventHandlers(get_class($this), $prefix, true);
+        foreach ($handlers as $event => $method) {
+            $mixin->addEventListener(array($this, $method), $event);
+        }
+    }
+    
+    protected function unobserveMixin(Ac_I_Mixin $mixin) {
+        $mixin->deleteEventListener($this);
+    }
+    
+    function mapper_onAfterCreateRecord($record) {
+        $record->addMixable($this, 'assoc_'.$this->id);
+    }
+    
+    function model_onListAssociations(& $meta) {
+        $meta = array_merge($meta, $this->modelMeta['onListAssociations']);
+    }
+    
+    function model_onListProperties(& $meta) {
+        $meta = array_merge($meta, $this->modelMeta['onListProperties']);
+    }
+    
+    function model_onGetPropertiesInfo(& $meta) {
+        Ac_Util::ms($meta, $this->modelMeta['onGetPropertiesInfo']);
+    }
+    
 }

@@ -19,8 +19,6 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
     
     protected static $introducedPublicVars = array();
     
-    protected static $eventHandlerMethods = array();
-    
     protected function listNonMixedMethods() {
         return array();
     }
@@ -54,20 +52,16 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
     }
     
     function listEventHandlerMethods() {
-        $c = get_class($this);
-        if (!isset(self::$eventHandlerMethods[$c])) {
-            self::$eventHandlerMethods[$c] = array();
-            if ($l = strlen($this->autoEventPrefix)) {
-                foreach (Ac_Util::getPublicMethods($c) as $m)
-                    if (!strncasecmp($m, $this->autoEventPrefix, $l)) {
-                        if ($this->stripAutoEventPrefix)
-                            self::$eventHandlerMethods[$c][substr($m, $l)] = $m;
-                        else 
-                            self::$eventHandlerMethods[$c][$m] = $m;
-                    }
-            }
+        if (strlen($this->autoEventPrefix)) {
+            $res = Ac_Event::listEventHandlers(
+                get_class($this), 
+                $this->autoEventPrefix, 
+                $this->stripAutoEventPrefix
+            );
+        } else {
+            $res = array();
         }
-        return self::$eventHandlerMethods[$c];
+        return $res;
     }
 
     public function listMixinProperties(Ac_I_Mixin $mixin) {

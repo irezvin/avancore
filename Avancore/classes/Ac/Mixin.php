@@ -226,14 +226,14 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
         return $res;
     }
     
-    public function __get($property) {
+    public function & __get($property) {
         if ($this->mixPropertyMap === false) $this->fillMixMaps();
         if (isset($this->mixPropertyMap[$property])) {
             $id = $this->mixPropertyMap[$property];
             if (isset($this->sharedMixableIds[$id])) {
-                $res = $this->mixables[$id]->getMixinProperty($this, $property);
+                $res = & $this->mixables[$id]->getMixinProperty($this, $property);
             } else {
-                $res = $this->mixables[$id]->$property;
+                $res = & $this->mixables[$id]->$property;
             }
         } else {
             $res = $this->doAccessMissingProperty($property, self::ACCESS_GET);
