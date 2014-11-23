@@ -1160,35 +1160,26 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function __isset($name) {
-        $res = in_array($name, $this->listFields());
+        if (in_array($name, $this->listFields())) $res = true; // TODO: check if this is right (in PHP isset(NULL) is FALSE)
+        elseif (strpos($name, '[') !== false) {
+            $res = $this->hasProperty($name);
+        } else $res = parent::__isset($name);
         return $res;
     }
     
-    function __get($name) {
-        if (in_array($name, $this->listFields())) return $this->getField($name);
-        elseif (!in_array($name, array_diff(array_keys(Ac_Util::getPublicVars($this)), array_keys(get_object_vars($this))))) {
-            return $this->$name;
+    function & __get($name) {
+        if (in_array($name, $this->listFields()) || strpos($name, '[') !== false) {
+            $res = & $this->getField($name);
         } else {
-            $rc = new ReflectionClass(get_class($this));
-            $p = $rc->getProperty($name);
-            if ($p->isPrivate()) $m = 'private';
-            elseif ($p->isProtected()) $m = 'protected';
-            else throw new Exception("Assertion: something is wrong in ".__METHOD__);
-            throw new Ac_E_InvalidCall("Cannot access {$m} property '$name' in class ".get_class($this));
+            $res = & parent::__get($name);
         }
+        return $res;
     }
     
     function __set($name, $value) {
-        if (in_array($name, $this->listFields())) $res = $this->setField($name, $value);
-        elseif (!in_array($name, array_diff(array_keys(Ac_Util::getPublicVars($this)), array_keys(get_object_vars($this))))) {
-            $this->$name = $value;
-        } else {
-            $rc = new ReflectionClass(get_class($this));
-            $p = $rc->getProperty($name);
-            if ($p->isPrivate()) $m = 'private';
-            elseif ($p->isProtected()) $m = 'protected';
-            else throw new Exception("Assertion: something is wrong in ".__METHOD__);
-            throw new Ac_E_InvalidCall("Cannot access {$m} property '$name' in class ".get_class($this));
+        if (in_array($name, $this->listFields()) || strpos($name, '[') !== false) $this->setField($name, $value);
+        else {
+            parent::__set($name, $value);
         }
     }
     

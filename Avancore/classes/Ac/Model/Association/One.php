@@ -117,10 +117,19 @@ class Ac_Model_Association_One extends Ac_Model_Association_Abstract {
     }
     
     protected function getGuessMap() {
-        return array_merge(parent::getGuessMap(), array(
+        $res = array_merge(parent::getGuessMap(), array(
             'getDestObjectMethod' => 'get{Single}',
             'setDestObjectMethod' => 'set{Single}',
             'clearDestObjectMethod' => 'clear{Single}',
+        ));
+        return $res;
+    }
+    
+    protected function getMethodImplMap() {
+        return array_merge(parent::getMethodImplMap(), array(
+            'getDestObjectMethod' => 'getDestObject',
+            'setDestObjectMethod' => 'setDestObject',
+            'clearDestObjectMethod' => 'clearDestObject',
         ));
     }
     

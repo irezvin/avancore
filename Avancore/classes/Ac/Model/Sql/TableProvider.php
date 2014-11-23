@@ -47,7 +47,7 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 	}
 	
 	function getMapperClass() {
-		if ($this->_mapper) $res = Ac_Util::fixClassName(get_class($this->_mapper));
+		if ($this->_mapper) $res = $this->_mapper->getId();
 			else $res = $this->_mapperClass;
 		return $res;
 	} 

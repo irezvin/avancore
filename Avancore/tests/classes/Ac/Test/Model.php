@@ -184,11 +184,11 @@ class Ac_Test_Model extends Ac_Test_Base {
         $this->assertEqual($mix->events, array('doAfterLoad', 'doBeforeSave', 'doOnCanDelete'));
     }
     
-    function testAssoc() {
-        $m = Sample::getInstance()->getSamplePersonMapper();
-        $o = $m->getPrototype();
-        $aa = $m->getAssociations();
+    function checkMapperModelMethods($mapper, $ignoreMixins = false) {
+        $o = $mapper->getPrototype();
+        $aa = $mapper->getAssociations();
         $nonMatching = array();
+        $c = $ignoreMixins? 'method_exists' : array('Ac_Accessor', 'methodExists');
         foreach ($aa as $id => $assoc) {
             $mn = $assoc->getMethodNames();
             $mmk = preg_grep('/MapperMethod/', array_keys($mn));
@@ -198,13 +198,18 @@ class Ac_Test_Model extends Ac_Test_Base {
             foreach($mmk as $key) $mmn[] = $mn[$key];
             foreach($omk as $key) $omn[] = $mn[$key];
             foreach ($mmn as $method) 
-                if (!method_exists($m, $method)) $nonMatching[$id][] = $method;
+                if (!$c($mapper, $method)) $nonMatching[$id]['mapper'][] = $method;
             foreach ($omn as $method) 
-                if (!method_exists($o, $method)) $nonMatching[$id][] = $method;
+                if (!$c($o, $method)) $nonMatching[$id]['model'][] = $method;
         }
         if (!$this->assertTrue(!count($nonMatching), 'All mapper & model methods must be correctly set in Association')) {
             var_dump($nonMatching);
         }
+    }
+    
+    function testAssoc() {
+        $m = Sample::getInstance()->getSamplePersonMapper();
+        $this->checkMapperModelMethods($m, true);
         $m->useRecordsCollection = false;
         $m->reset();
         $a = $m->loadByPersonId(3);
@@ -225,6 +230,171 @@ class Ac_Test_Model extends Ac_Test_Base {
         $a2 = $m->loadByPersonId(3);
         $do3 = $assoc2->getDestObject($a2);
         $this->assertEqual($do3->getDataFields(), $do->getDataFields());
+    }
+    
+    function testMixinAssoc() {
+        $sam = Sample::getInstance();
+        
+        $people = new Ac_Model_Mapper(array(
+            'id' => 'People', 
+            'tableName' => '#__people'
+        ));
+        $religion = new Ac_Model_Mapper(array(
+            'id' => 'Religion',
+            'tableName' => '#__religion'
+        ));
+        $sam->addMapper($people);
+        $sam->addMapper($religion);
+        
+        $peopleReligion = new Ac_Model_Association_One(array(
+            'id' => 'religion',
+            'plural' => 'religion',
+            'relation' => new Ac_Model_Relation(array(
+                'srcMapper' => $people,
+                'destMapper' => $religion,
+                'fieldLinks' => array('religionId' => 'religionId'),
+                'srcVarName' => '_religion',
+                'destVarName' => '_people',
+                'destLoadedVarName' => '_peopleLoaded',
+                'destCountVarName' => '_peopleCount',
+            )),
+        ));
+        
+        $religionPeople = new Ac_Model_Association_Many(array(
+            'id' => 'people',
+            'single' => 'person',
+            'relation' => new Ac_Model_Relation(array(
+                'srcMapper' => $religion,
+                'destMapper' => $people,
+                'fieldLinks' => array('religionId' => 'religionId'),
+                'srcVarName' => '_people',
+                'srcLoadedVarName' => '_peopleLoaded',
+                'srcCountVarName' => '_peopleCount',
+                'destVarName' => '_religion',
+            )),
+        ));
+        
+        $people->addMixable($peopleReligion);
+        $religion->addMixable($religionPeople);
+        
+        $this->checkMapperModelMethods($people);
+        $this->checkMapperModelMethods($religion);
+        
+        $pers = $people->createRecord();
+        $rel = $religion->createRecord(); 
+        
+        $this->assertSame($pers->_religion, false);
+        $this->assertSame($rel->_people, false);
+        $this->assertSame($rel->_peopleLoaded, false);
+        $this->assertSame($rel->_peopleCount, false);
+        
+        $p3 = $people->loadRecord(3);
+        $r = $p3->getReligion();
+        if ($this->assertIsA($r, 'Ac_Model_Object')) {
+            $this->assertSame($r->getMapper(), $religion);
+        }
+        $list = $r->listPeople();
+        $this->assertTrue(is_array($list));
+        $this->assertTrue(count($list) > 1);
+        $this->assertTrue($r->isPeopleLoaded());
+        $this->assertSame($r->getPerson(0), $p3);
+        
+        $tags = new Ac_Model_Mapper(array(
+            'id' => 'Tags',
+            'tableName' => '#__tags'
+        ));
+        $sam->addMapper($tags);
+        
+        $peopleTags = new Ac_Model_Association_ManyToMany(array(
+            'id' => 'tags',
+            'relation' => new Ac_Model_Relation(array(
+                'srcMapper' => $people,
+                'destMapper' => $tags,
+                'midTableName' => '#__people_tags',
+                'fieldLinks' => array(
+                    'personId' => 'idOfPerson'
+                ),
+                'fieldLinks2' => array(
+                    'idOfTag' => 'tagId',
+                ),
+                'srcVarName' => '_tags',
+                'srcNNIdsVarName' => '_tagIds',
+                'srcCountVarName' => '_tagsCount',
+                'srcLoadedVarName' => '_tagsLoaded',
+                
+                'destVarName' => '_people',
+                'destNNIdsVarName' => '_personIds',
+                'destCountVarName' => '_peopleCount',
+                'destLoadedVarName' => '_peopleLoaded',
+            )),
+        ));
+        
+        $tagsPeople = new Ac_Model_Association_ManyToMany(array(
+            'id' => 'people',
+            'single' => 'person',
+            'relation' => new Ac_Model_Relation(array(
+                'destMapper' => $people,
+                'srcMapper' => $tags,
+                'midTableName' => '#__people_tags',
+                'fieldLinks' => array(
+                    'tagId' => 'idOfTag',
+                ),
+                'fieldLinks2' => array(
+                    'idOfPerson' => 'personId',
+                ),
+                'destVarName' => '_tags',
+                'destNNIdsVarName' => '_tagIds',
+                'destCountVarName' => '_tagsCount',
+                'destLoadedVarName' => '_tagsLoaded',
+                
+                'srcVarName' => '_people',
+                'srcNNIdsVarName' => '_personIds',
+                'srcCountVarName' => '_peopleCount',
+                'srcLoadedVarName' => '_peopleLoaded',
+            )),
+        ));
+        
+        $people->addMixable($peopleTags);
+        $tags->addMixable($tagsPeople);
+        
+        $this->checkMapperModelMethods($people);
+        $this->checkMapperModelMethods($tags);
+        
+        $p4 = $people->loadRecord(4);
+        $this->assertTrue(is_array($ids = $p4->getTagIds()));
+        $this->assertTrue(is_array($tagsList = $p4->listTags()));
+        $this->assertEqual(count($ids), count($tagsList));
+        if (count($tags)) {
+            $found = false;
+            $first = $p4->getTag(0);
+            foreach ($first->listPeople() as $i) {
+                if ($first->getPerson($i) === $p4) {
+                    $found = true;
+                    break;
+                }
+            }
+            $this->assertTrue($found);
+        }
+        
+        $this->assertTrue($p4->hasProperty('religion'));
+        $this->assertTrue($p4->hasProperty('religion[title]'));
+        
+        // TODO: fix WTFy inconsistency: Cg creates plural name of property (tags, tags[0][title]) that
+        //  causes errors, Assoc creates singular (but unconvenient) name (tag, tag[0][title])
+        $this->assertTrue($p4->hasProperty('tag'));
+        $this->assertTrue($p4->hasProperty('tag[0][titleF]'));
+        
+        $s = $tags->createSqlSelect();
+        $s->useAlias('person[religion]');
+        $s->distinct = true;
+        $s->columns = '`person[religion]`.title';
+        $stmt = $s->getStatement();
+        $this->assertTrue(strpos($stmt, '#__people_tags') !== false);
+        $this->assertTrue(strpos($stmt, '#__people') !== false);
+        $this->assertTrue(strpos($stmt, '#__religion') !== false);
+        
+        // TODO: check un-binding of associations
+        
     }
     
 }
