@@ -18,6 +18,8 @@ class Ac_Form_Control_ErrorList extends Ac_Form_Control {
     
     var $showErrorsInMainArea = true;
     
+    var $errorSourcePath = false;
+    
     protected $returnErrors = false;
     
     /**
@@ -25,14 +27,17 @@ class Ac_Form_Control_ErrorList extends Ac_Form_Control {
      */
     protected function getErrorsSource() {
         $root = false;
-        if (!($root = $this->_getRootControl('Ac_Form'))) $root = $this->_getRootControl('Ac_Form_Control_Composite');
+        if ($this->errorSourcePath !== false) $root = $this->searchControlByPath($this->errorSourcePath);
+        else {
+            if (!($root = $this->_getRootControl('Ac_Form'))) $root = $this->_getRootControl('Ac_Form_Control_Composite');
+        }
         return $root;
     }
     
     protected function collectErrorsShownByOtherControls() {
         $res = array();
         if ($src = $this->getErrorsSource()) {
-            $allControls = $src->findControlsRecursive();
+            $allControls = $src->findControlsRecursive(true);
             foreach ($allControls as $c) if ($c !== $this) {
                 $e = $c->getErrors();
                 if (is_array($e) && $e) Ac_Util::ms($res, $e);

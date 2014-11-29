@@ -135,6 +135,17 @@ class ExtraPropCatcher extends Ac_Mixable implements Ac_I_Mixable_WithInit {
     
 }
 
+class IncompleteBody extends Ac_Mixin {
+
+    protected $protVar = false;
+    
+    protected function doGetCoreMixables() {
+        return array(new Dimensions());
+    }
+    
+}
+
+
 /*class ModelAggregate implements Ac_I_Mixable {
     
     
