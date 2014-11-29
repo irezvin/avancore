@@ -759,8 +759,17 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         if (!is_null($model) && ($model !== false) && !is_a($model, 'Ac_Model_Data')) 
             trigger_error ("\$model should be null, false or the instance of Ac_Model_Data", E_USER_ERROR);
         $this->_model = $model;
+        if ($this->modelPropertyName === '' && $this->autoModelProperty) 
+            $this->modelPropertyName = false;        
         if ($this->_model) $this->_hasOwnModel = true;
             else $this->_hasOwnModel = false;
+    }
+    
+    protected function notifyParentModelChanged($model) {
+        if (!$this->_hasOwnModel) {
+            $this->_model = false;
+            if ($this->modelPropertyName === '' && $this->autoModelProperty) $this->modelPropertyName = false;
+        }
     }
     
     function getPropertyName() {
@@ -793,7 +802,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
                 $this->modelGetterName = 'get'.ucFirst($this->name);
                 if (strlen($this->modelGetterName)) {
                     $m = $this->getModel();
-                    if (!$m || !method_exists($m, $this->modelGetterName)) $this->modelGetterName = '';
+                    if (!$m || !Ac_Accessor::methodExists($m, $this->modelGetterName)) $this->modelGetterName = '';
                 } 
             }
         }
@@ -1043,7 +1052,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         foreach ($this->getJsPropMap() as $k => $v) {
             if (is_numeric($k)) $k = $v;
             if (is_string($v)) {
-                if (method_exists('', $m = 'getJs'.$v)) {
+                if (Ac_Accessor::methodExists('', $m = 'getJs'.$v)) {
                     $val = $this->$m();
                 } else {
                     $val = Ac_Accessor::getObjectProperty($this, $k);

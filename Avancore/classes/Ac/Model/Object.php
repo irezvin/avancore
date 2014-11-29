@@ -333,15 +333,15 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         
         if (!$mapper) throw new Exception("Cannot determine \$mapper for ".get_class($this));
         
-        $this->mapper = $mapper;
-        $this->mapper->registerRecord($this);
-        
         if (!strlen($this->_mapperClass)) $this->_mapperClass = $mapper->getId();
         
+        $this->mapper = $mapper;
         $this->_pk = $mapper->pk;
         $this->_tableName = $mapper->tableName;
      
         parent::__construct($prototype);
+        
+        $mapper->registerRecord($this);
         
         if (!$this->_hasDefaults) {
             foreach ($mapper->getDefaults() as $k => $v) $this->$k = $v;
@@ -1142,7 +1142,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function __get($name) {
-        if (in_array($name, $this->listFields())) $res = $this->getField($name);
+        if (in_array($name, $this->listFields())) return $this->getField($name);
         elseif (!in_array($name, array_diff(array_keys(Ac_Util::getPublicVars($this)), array_keys(get_object_vars($this))))) {
             return $this->$name;
         } else {

@@ -392,7 +392,6 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
             
             $this->doOnCheck();
             $this->triggerEvent(self::EVENT_ON_CHECK, array(& $this->_errors));
-            
             $this->_checkOwnFields();
             $this->_checkOwnAssociations();
             // $this->_checkOverrideProperties(); // This function is not implemented yet 
@@ -407,6 +406,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     }
     
     function mustRevalidate() {
+        if ($this->_beingChecked) return;
         $this->_bound = true;
         $this->_errors = array();
         $this->_checked = false;

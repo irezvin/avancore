@@ -42,6 +42,8 @@ class Ac_Form_Control_Repeater extends Ac_Form_Control_Composite {
     
     var $defaultNumChildren = 0;
     
+    var $addChildrenToModel = false;
+    
     protected $controlsInit = false;
     
     function getNumChildren() {

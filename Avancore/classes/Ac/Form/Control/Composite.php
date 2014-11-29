@@ -101,8 +101,12 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
         return $res;
     }
     
-    function listControls() {
-        $res = array_keys($this->_controls);
+    function listControls($existingOnly = false) {
+        if ($existingOnly) {
+            $res = array_keys(array_filter($this->_controls, 'is_object'));
+        } else {
+            $res = array_keys($this->_controls);
+        }
         return $res;
     }
     
@@ -204,6 +208,25 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
         }
     }
     
+    function setModel($model) {
+        $oldModel = $this->_model;
+        if ($this->_model !== $model) {
+            parent::setModel($model);
+            foreach ($this->listControls(true) as $i) {
+                $ctl = $this->getControl($i);
+                $ctl->notifyParentModelChanged($model);
+            }
+        }
+    }
+    
+    protected function notifyParentModelChanged($model) {
+        $this->_model = false;
+        foreach ($this->listControls(true) as $i) {
+            $ctl = $this->getControl($i);
+            $ctl->notifyParentModelChanged($model);
+        }
+    }
+    
     function deleteValue() {
         foreach ($this->listControls() as $i)
             $this->getControl($k)->deleteValue();
@@ -297,8 +320,9 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
      * Recursively traverses ALL sub-controls and returns a numerical array with all children
      * @return array
      */
-    function findControlsRecursive() {
+    function findControlsRecursive($withThis = false) {
         $res = array();
+        if ($withThis) $res[] = $this;
         foreach($this->listControls() as $i) {
             $c = $this->getControl($i);
             if ($c instanceof Ac_Form_Control_Composite) $res = array_merge($res, $c->findControlsRecursive());

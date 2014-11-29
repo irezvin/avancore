@@ -419,7 +419,13 @@ class Ac_Model_Validator {
             $res = $errValue;
             if ($type === false && isset($fieldInfo['dataType'])) $type = $fieldInfo['dataType'];
             
-            if (isset($fieldInfo['isNullable']) && $fieldInfo['isNullable'] && is_null($value)) $res = null;
+            $canBeNull = isset($fieldInfo['isNullable']) && $fieldInfo['isNullable'] ;
+            
+            // we still allow nulls for value-restricted fields
+            // TODO: allow them only if they have respecitve satisfied to-one associations
+            $canBeNull = $canBeNull || isset($fieldInfo['values']) || isset($fieldInfo['valueList']);
+            
+            if (is_null($value) && $canBeNull) $value = null;
             else {
                 switch ($type) {
                     case 'int':
@@ -552,6 +558,7 @@ class Ac_Model_Validator {
         }
         if (is_array($valueList) || is_object($valueList)) {
             $fieldValue = $this->convertValue($this->getFieldValue($fieldName, false, $fieldInfo), false, $fieldInfo);
+            if (!$fieldValue) $fieldValue = null;
             if (!$this->valueIsEmpty($fieldValue)) {
                 if (is_array($valueList)) {
                     if (!is_array($fieldValue)) $fieldValue = array($fieldValue);
@@ -582,15 +589,6 @@ class Ac_Model_Validator {
     function check($modifyModel = false) {
         $this->resetErrors();
         
-        // The SLOW way - 4 x count($fields) x getFieldInfo() - it can be too consuming if we have some advanced calls from getFieldInfo() code... 
-        /* 
-        $this->checkForRequiredFields();
-        $this->checkForDataTypes($modifyModel);   
-        $this->checkForBounds();
-        $this->checkForLists();
-        */
-
-        // The optimized way...
         foreach ($this->listFields() as $fieldName) {
             $fieldInfo = $this->getFieldInfo($fieldName);
             if (!isset($fieldInfo['value'])) {
