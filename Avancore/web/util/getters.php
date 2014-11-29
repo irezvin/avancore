@@ -23,7 +23,7 @@
 <?php   if (isset($_REQUEST['submit'])) { $vars = array(); $sg = array();
     
     foreach (explode("\n", $_REQUEST['getters']) as $line) {    
-        if (preg_match ('#(\w+)(\s*:\s*\w+)?(\s*\w+)?#', trim($line), $matches)) {
+        if (preg_match ('#(\w+)(\s*:\s*[\\\\\w]+)?(\s*\w+)?#', trim($line), $matches)) {
             $varName = $matches[1];
             $setterName = "set".ucfirst($varName);
             $getterName = "get".ucfirst($varName);

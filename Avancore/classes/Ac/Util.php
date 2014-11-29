@@ -51,8 +51,9 @@ abstract class Ac_Util {
     
     static function loadClass($className) {        
         if (!class_exists($className, false)) { // New behavior - use relative path to classDir
-            $fileName = str_replace('_', '/', $className).'.php';
-            $classDir = dirname(__FILE__).'/../';
+            $fileName = str_replace('\\', DIRECTORY_SEPARATOR, $className);
+            $fileName = str_replace('_', DIRECTORY_SEPARATOR, $fileName).'.php';
+            $classDir = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
             $f = $classDir.$fileName;
             $fileLoaded = false;
             if (is_file($f)) {
@@ -60,7 +61,7 @@ abstract class Ac_Util {
                 $fileLoaded = true;
             } else {
                 $p = self::getSafeIncludePath();
-                foreach ($p as $dir) if (is_file($f = $dir.'/'.$fileName)) {
+                foreach ($p as $dir) if (is_file($f = $dir.DIRECTORY_SEPARATOR.$fileName)) {
                     require($f);
                     $fileLoaded = true;
                     break;
