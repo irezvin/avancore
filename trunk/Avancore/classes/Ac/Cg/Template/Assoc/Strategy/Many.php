@@ -48,6 +48,13 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
     }
     
     /**
+     * @return <?php $this->d($prop->className); ?> 
+     */
+    function get<?php $this->d($ucPlural); ?>Item($id) {
+        return $this->get<?php $this->d($ucSingle); ?>($id);
+    }
+    
+    /**
      * @param <?php $this->d($prop->className); ?> $<?php $this->d($single); ?> 
      */
     function add<?php $this->d($ucSingle); ?>($<?php $this->d($single); ?>) {

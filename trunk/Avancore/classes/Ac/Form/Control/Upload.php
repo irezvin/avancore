@@ -24,7 +24,9 @@ class Ac_Form_Control_Upload extends Ac_Form_Control {
         while ($p && (!$p instanceof Ac_Form)) {
             $p = $p->_parent;
         }
-        if ($p) $p->htmlAttribs['enctype'] = 'multipart/form-data';
+        if ($p) {
+            $p->formTagAttribs['enctype'] = 'multipart/form-data';
+        }
         $res = parent::fetchPresentation($refresh, $withWrapper);
         return $res;
     }

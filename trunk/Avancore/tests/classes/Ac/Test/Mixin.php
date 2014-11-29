@@ -67,4 +67,10 @@ class Ac_Test_Mixin extends Ac_Test_Base {
         $this->assertEqual($mx->extraProps, array('foo' => 1, 'bar' => 2));
     }
     
+    function addMixinToObjectWithCoreMixin() {
+        $b = new IncompleteBody();
+        $b->addMixable(new Weight());
+        $this->assertEqual(count($b->listMixables()), 2);
+    }
+    
 }
