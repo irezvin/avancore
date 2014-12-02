@@ -75,4 +75,88 @@ class Ac_Test_Util extends Ac_Test_Base {
         }
     }
     
+    var $report = array();
+    
+    /**
+     * @param type $string
+     * 
+     *  +dir/sub/file
+     *     file2
+     *  dir/sub2/file3
+     *     file4
+     * + file5
+     *  
+     * "+" denotes files that should be older than $ttl seconds
+     * " " between start of line or "+" and filename/dirname means file 
+     *     should have same path as prev.file
+     * 
+     *      
+     * @param type $base
+     * @param type $ttl
+     */
+    function mkStuff($string, $base, $ttl = 3600) {
+        $items = preg_split('/\s*\n\s*+/', $string, -1, PREG_SPLIT_NO_EMPTY);
+        $dir = $base;
+        foreach ($items as $filename) {
+            $old = false;
+            if ($filename{0} == '+') {
+                $old = true;
+                $filename = substr($filename, 1);
+            }
+            if ($filename{0} == ' ') {
+            } else {
+                $dir = $base;
+            }
+            $filename = trim($filename);
+            $filename = trim($filename, '/\\');
+            $dn = dirname($filename);
+            $dir = $dir.'/'.$dn;
+            if (!is_dir($dir)) mkdir($dir, 0775, true);
+            $t = time();
+            if ($old) $t -= $ttl + 1;
+            touch($dir.'/'.basename($filename), $t);
+        }
+    }
+    
+    function deleteCb(SplFileInfo $f) {
+        $this->report[$f->getPathname()] = $f->getBasename();
+        return true;
+    }
+    
+    function testDeleteOldFiles() {
+        $this->report = array();
+        $sa = $this->getSampleApp();
+        $varDir = $sa->getAdapter()->getVarCachePath();
+        $stuff = implode("\n", array(
+            'foo/new1',
+            ' new2',
+            '+ old1',
+            ' bar/new3',
+            '+ old2',
+            '+baz/old3',
+            '+ old4',
+            '+baz/old5',
+            '+ quux/old6',
+            '+ old7'
+        ));
+        $dof = new Ac_Util_DeleteOldFiles();
+        $dof->setDirName($varDir);
+        $dof->setDeleteEmptyDirs(true);
+        $dof->setCallback(array($this, 'deleteCb'));
+        $this->mkStuff($stuff, $varDir, $dof->getLifetime());
+        
+        $this->report = array();
+        $dof->run();
+        $this->assertTrue(!count(array_diff($this->report, array(
+            'old1', 'old2', 'old3', 'old4', 'old5', 'old6', 'old7', 'baz', 'quux'
+        ))), 'old files and directories with them should be deleted...');
+        $notDeleted = array();
+        clearstatcache();
+        foreach ($this->report as $k => $v) {
+            if (is_file($k)) $notDeleted[$k] = $v;
+        }
+        if (!$this->assertTrue(!count($notDeleted), 'All items intended for deletion '
+            . 'were really deleted')) var_dump($notDeleted);
+    }
+    
 }
