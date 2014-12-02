@@ -47,7 +47,6 @@ class Ac_Util_DeleteOldFiles extends Ac_Prototyped {
 
     protected function delete(Iterator $iter) {
         $fileinfo = $iter->current();
-        $this->foundFiles++;
         if ($this->callback) {
             $m = $this->callback;
             $res = $m($fileinfo);
@@ -60,6 +59,7 @@ class Ac_Util_DeleteOldFiles extends Ac_Prototyped {
     }
 
     function filter(SplFileInfo $fileinfo) {
+        $this->foundFiles++;
         if ($this->time === false)
             $t = time();
         else
