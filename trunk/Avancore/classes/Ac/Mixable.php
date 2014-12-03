@@ -30,8 +30,10 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
     }
     
     function setMixableId($mixableId) {
-        if ($this->mixableId !== false && $mixableId !== $this->mixableId)
+        if ($this->mixableId !== false && $mixableId !== $this->mixableId) {
+            Ac_Debug::dd($this->mixableId, $mixableId, ''.(new Exception));
             throw Ac_E_InvalidCall::canRunMethodOnce($this, __FUNCTION__);
+        }
         $this->mixableId = $mixableId;
     }
     

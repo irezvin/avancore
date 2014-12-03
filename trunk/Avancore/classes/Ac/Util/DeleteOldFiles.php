@@ -22,20 +22,30 @@ class Ac_Util_DeleteOldFiles extends Ac_Prototyped {
         $t = $this->time;
         if ($t === false)
             $this->time = time();
-        if ($this->deleteEmptyDirs && $this->realDir === false) 
-            $this->realDir = realpath($this->dirName);
-        $dir = new RecursiveDirectoryIterator($this->dirName, 
-            RecursiveDirectoryIterator::SKIP_DOTS | RecursiveDirectoryIterator::CURRENT_AS_FILEINFO
-        );
-        $iter = new RecursiveIteratorIterator(
-            $dir, 
-            $this->deleteEmptyDirs? 
-                RecursiveIteratorIterator::CHILD_FIRST : 
-                RecursiveIteratorIterator::LEAVES_ONLY
-        );
-        $cb = new CallbackFilterIterator($iter, array($this, 'filter'));
         $this->foundFiles = $this->deletedFiles = $this->deletedDirs = 0;
-        iterator_apply($cb, array($this, 'delete'), array($cb));
+        $dn = Ac_Util::toArray($this->dirName);
+        foreach ($dn as $n) {
+            $dirName = $n;
+            if ($this->deleteEmptyDirs && $this->realDir === false) 
+                $this->realDir = realpath($dirName);
+            
+            $directoryIterator = new RecursiveDirectoryIterator($dirName, 
+                RecursiveDirectoryIterator::SKIP_DOTS | RecursiveDirectoryIterator::CURRENT_AS_FILEINFO
+            );
+            
+            $recursiveIterator = new RecursiveIteratorIterator(
+                $directoryIterator, 
+                $this->deleteEmptyDirs? 
+                    RecursiveIteratorIterator::CHILD_FIRST : 
+                    RecursiveIteratorIterator::LEAVES_ONLY
+            );
+            
+            $filterIterator = new CallbackFilterIterator($recursiveIterator, array($this, 'filter'));
+            
+            $this->foundFiles = $this->deletedFiles = $this->deletedDirs = 0;
+            iterator_apply($filterIterator, array($this, 'delete'), array($filterIterator));
+            
+        }
         $this->time = $t;
         $res = array(
             'foundFiles' => $this->foundFiles,
