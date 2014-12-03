@@ -159,4 +159,59 @@ class Ac_Test_Util extends Ac_Test_Base {
             . 'were really deleted')) var_dump($notDeleted);
     }
     
+    function getSampleFlagsDir() {
+        return dirname(__FILE__).'/../../../sampleApp/var/flags';
+    }
+    
+    function testLock() {
+        $dir = $this->getSampleFlagsDir();
+        $foo = new Ac_Util_Lock(array('dirName' => $dir, 'fileName' => 'test_lock'));
+        $bar = new Ac_Util_Lock(array('dirName' => $dir, 'fileName' => 'test_lock'));
+        $path = $foo->getPath();
+        if (is_file($path)) unlink($path);
+        $dp = realpath($dir);
+        $fp = realpath(dirname($path));
+        $this->assertEqual($dp, $fp);
+        $this->assertEqual($foo->getPath(), $bar->getPath());
+        $this->assertTrue($foo->acquire());
+        $this->assertTrue(file_exists($foo->getPath()));
+        $this->assertFalse($bar->acquire());
+        $this->assertTrue($foo->release());
+        $this->assertTrue($bar->acquire());
+        $this->assertTrue($bar->release());
+    }
+    
+    var $periodicRan = false;
+    
+    function runCallback() {
+        $this->periodicRan++;
+    }
+    
+    function testPeriodic() {
+        $a = new Ac_Util_Periodic(array(
+            'id' => 'foo',
+            'intervalSeconds' => 2,
+            'flags' => new Ac_Flags(array('dir' => $this->getSampleFlagsDir())),
+        ));
+        $this->assertTrue($a->run());
+        $this->assertFalse($a->run());
+        sleep(2);
+        $this->assertTrue($a->run());
+        
+        // Test with lock & callback
+        $lock = new Ac_Util_Lock(array('dirName' => $this->getSampleFlagsDir(), 'fileName' => $a->getFlagName()));
+        $a->setLock($lock);
+        $lock->acquire();
+        $a->setCallback(array($this, 'runCallback'));
+        $this->periodicRan = 0;
+        $this->assertFalse($a->run());
+        $this->assertEqual($this->periodicRan, 0);
+        $a->setIntervalSeconds(1);
+        $lock->release();
+        sleep(1);
+        $this->assertTrue($a->run());
+        $this->assertEqual($this->periodicRan, 1);
+        $this->assertFalse($lock->has());
+    }
+    
 }
