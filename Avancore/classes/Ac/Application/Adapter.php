@@ -455,7 +455,8 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     
     protected function doGetDefaultMailSenderPrototype() {
         $res = array(
-            'class' => 'Ac_Mail_PHPMailer_Mail'
+            'class' => 'Ac_Mail_PHPMailer_Mail',
+            'defaultCharset' => $this->getCharset(),
         );
         return $res;
     }
