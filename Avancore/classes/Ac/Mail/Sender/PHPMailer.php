@@ -34,6 +34,11 @@ abstract class Ac_Mail_Sender_PHPMailer extends Ac_Prototyped implements Ac_I_Ma
     protected $phpMailerExceptions = true;
 
     /**
+     * @var string
+     */
+    protected $defaultCharset = false;
+
+    /**
      * @param bool $phpMailerExceptions
      */
     function setPhpMailerExceptions($phpMailerExceptions) {
@@ -126,7 +131,9 @@ abstract class Ac_Mail_Sender_PHPMailer extends Ac_Prototyped implements Ac_I_Ma
                     $mailer->addCustomHeader($k, $v);
                 }
             }
+            
             if (strlen($cs = $mail->getMailCharset())) $mailer->CharSet = $cs;
+            elseif (strlen($dcs = $this->getDefaultCharset())) $mailer->CharSet = $dcs;
         }
     }
     
@@ -290,6 +297,27 @@ abstract class Ac_Mail_Sender_PHPMailer extends Ac_Prototyped implements Ac_I_Ma
     
     function getLastDumpFilePrefix() {
         return $this->lastDumpFilePrefix;
+    }
+
+    /**
+     * @param string $defaultCharset
+     */
+    function setDefaultCharset($defaultCharset) {
+        $this->defaultCharset = $defaultCharset;
+    }
+
+    /**
+     * @return string
+     */
+    function getDefaultCharset($guess = false) {
+        $res = $this->defaultCharset;
+        if ($guess && $res === false) {
+            if (class_exists('Ac_Application', false)) {
+                $def = Ac_Application::getDefaultInstance();
+                if ($def) $res = $def->getAdapter()->getCharset();
+            }
+        }
+        return $res;
     }
     
 }

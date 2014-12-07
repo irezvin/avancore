@@ -112,7 +112,7 @@ class Ac_Mail_Message extends Ac_Prototyped implements Ac_I_Mail_ExtendedMessage
     }
 
     function setMailCcRecipients($mailCcRecipients) {
-        $this->mailCcRecipients = $this->ensureItems($mailRecipients, 'mailCcRecipients');
+        $this->mailCcRecipients = $this->ensureItems($mailCcRecipients, 'mailCcRecipients');
     }
 
     function getMailCcRecipients() {
@@ -120,7 +120,7 @@ class Ac_Mail_Message extends Ac_Prototyped implements Ac_I_Mail_ExtendedMessage
     }
 
     function setMailBccRecipients($mailBccRecipients) {
-        $this->mailBccRecipients = $this->ensureItems($mailRecipients, 'mailBccRecipients');
+        $this->mailBccRecipients = $this->ensureItems($mailBccRecipients, 'mailBccRecipients');
     }
 
     function getMailBccRecipients() {
@@ -128,7 +128,7 @@ class Ac_Mail_Message extends Ac_Prototyped implements Ac_I_Mail_ExtendedMessage
     }
 
     function setMailReplyTo($mailReplyTo) {
-        $this->mailReplyTo = $this->ensureItems($mailRecipients, 'mailReplyTo', true);
+        $this->mailReplyTo = $this->ensureItems($mailReplyTo, 'mailReplyTo', true);
     }
 
     function getMailReplyTo() {

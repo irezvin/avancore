@@ -18,12 +18,12 @@ class Ac_Mail_Address extends Ac_Prototyped implements Ac_I_Mail_Address {
             }
         }
         if (!is_null($mailTitle)) {
-            $this->mailtitle = $mailTitle;
+            $this->mailTitle = $mailTitle;
         }
     }
 
     function setMailAddress($mailAddress) {
-        $this->mailaddress = $mailAddress;
+        $this->mailAddress = $mailAddress;
     }
 
     function getMailAddress() {
