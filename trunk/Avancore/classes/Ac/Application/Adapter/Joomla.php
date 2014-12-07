@@ -98,4 +98,38 @@ class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
         return $res;
     }
     
+    function getJConifg($asArray = false) {
+        $res = JFactory::getConfig();
+        if ($asArray) $res = $res->toArray();
+        return $res;
+    }
+    
+    protected function doGetDefaultMailSenderPrototype() {
+        $res = parent::doGetDefaultMailSenderPrototype();
+        $config = $this->getJConifg(true);
+        if ($config['mailer'] === 'smtp') {
+            $res['class'] = 'Ac_Mail_PHPMailer_Smtp';
+            $res['smtpHost'] = $config['smtphost'];
+            $res['smtpPort'] = $config['smtpport'];
+            $res['smtpPassword'] = $config['smtppass'];
+            $res['smtpUser'] = $config['smtpuser'];
+            $sec = $config['smtpsecure'];
+            if ($sec === 'none') $sec = '';
+            $res['smtpSecure'] = $sec;
+            $res['smtpAuth'] = (bool) $config['smtpauth'];
+        } elseif ($config['mailer'] === 'sendmail') {
+            $res['class'] = 'Ac_Mail_PHPMailer_SendMail';
+        }
+        return $res;
+    }
+
+    /**
+     * @return Ac_Mail_Address
+     */
+    function getJoomlaMailFrom() {
+        $config = $this->getJConifg(true);
+        $res = new Ac_Mail_Address($config['mailfrom'], $config['fromname']);
+        return $res;
+    }
+    
 }
