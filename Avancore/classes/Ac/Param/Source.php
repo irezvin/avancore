@@ -5,12 +5,6 @@
  * 
  * Each source is like an associative array. 
  * It can contain any number of "keys"; each "key" can contain a value (scalar) or another source.
- * 
- * @abstract
- * @author Ilya Rezvin
- * @package Avancore
- * @subpackage Params
- * @example param/source.php Ac_Param_Source usage example.
  */
 abstract class Ac_Param_Source {
     

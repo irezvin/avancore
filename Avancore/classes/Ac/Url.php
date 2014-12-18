@@ -2,10 +2,6 @@
 
 /**
  * Class for URL handling (parsing, modifying and generating)
- * 
- * @package Avancore Lite
- * @copyright Copyright &copy; 2007, Ilya Rezvin, Avansite (I.Rezvin@avansite.com)
- * @license http://www.gnu.org/licenses/lgpl.html GNU/LGPL, see LICENSE.php
  */
  
 class Ac_Url implements Ac_I_RedirectTarget {
@@ -161,7 +157,7 @@ class Ac_Url implements Ac_I_RedirectTarget {
      * Converts array representation of the query string to array
      * This function can be called statically
      * 
-     * @copyright  roberlamerma at gmail dot com, linus at flowingcreativity dot net, i dot rezvin at avansite dot com ;-))
+     * @copyright  roberlamerma at gmail dot com, linus at flowingcreativity dot net and me
      */ 
     function array2queryString($arr_request, $var_name = '', $separator='&') {
         $ret = "";
