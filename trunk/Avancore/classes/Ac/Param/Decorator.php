@@ -1,10 +1,6 @@
 <?php
 
 /**
- * @author Nivzer
- */
-
-/**
  * Applies Ac_I_Decorator to filtered value
  */
 class Ac_Param_Decorator extends Ac_Param_Filter {

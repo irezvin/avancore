@@ -211,27 +211,32 @@ Ajs_Util = {
         return modifiedObject;
     },
     
-    makeQuery: function(data, paramName, stripLeadingAmpersand) {
+    makeQuery: function(data, paramName, stripLeadingAmpersand, assoc) {
         var res = '', i;
+        if (assoc) res = typeof assoc === 'object'? assoc : {};
         if (data === undefined) return '';
         if (data instanceof Array) {
         	if (data.length) {
 	            for (i = 0; i < data.length; i++) {
-	                res = res + Ajs_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i);
+                    if (assoc) Ajs_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i, false, res);
+	                else res = res + Ajs_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i);
 	            }
         	} else {
-        		res = '&' + paramName + '=';
+        		if (assoc) res[paramName] = '';
+                    else res = '&' + paramName + '=';
         	}
         } else {
             if ((typeof data) == 'object') {
                 for (i in data) if (Ajs_Util.hasOwnProperty(data, i)) {
-                    res = res + Ajs_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i);
+                    if (assoc) Ajs_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i, false, res);
+                    else res = res + Ajs_Util.makeQuery(data[i], paramName? paramName + '[' + i + ']' : i);
                 }
             } else {
-                res = '&' + paramName + '=' + encodeURIComponent(data);
+                if (assoc) res[paramName] = '' + data;
+                else res = '&' + paramName + '=' + encodeURIComponent(data);
             }
         }
-        if (stripLeadingAmpersand && res.length) res = res.slice(1);
+        if (!assoc && stripLeadingAmpersand && res.length) res = res.slice(1);
         return res;
     },
 	
@@ -457,11 +462,32 @@ Ajs_Util = {
 			(function(d){eval(d);}).call(context, data);
 		}
 	},
+    
+    getElementsBy: function(method, tag, root, firstOnly) {
+        tag = tag || '*';
+        root = root || document;
+
+            var ret = (firstOnly) ? null : [],
+                elements;
+
+        if (root) {
+            elements = root.getElementsByTagName(tag);
+            for (var i = 0, len = elements.length; i < len; ++i) {
+                if ( method(elements[i]) ) {
+                    if (firstOnly) {
+                        ret = elements[i]; 
+                        break;
+                    } else {
+                        ret[ret.length] = elements[i];
+                    }
+                }
+            }
+        }
+        return ret;
+    },
 
 
     getData: function (oForm, submitButton) {
-
-        var Dom = YAHOO.util.Dom;
 
         var
         	aElements,

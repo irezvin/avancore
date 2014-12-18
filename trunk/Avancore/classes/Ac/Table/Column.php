@@ -5,10 +5,6 @@
  * Ac_Table class. 
  * 
  * By default this column renders same-named property of the record
- *  
- * @package Avancore Lite
- * @copyright Copyright &copy; 2007, Ilya Rezvin, Avansite (I.Rezvin@avansite.com)
- * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
  */
 
 class Ac_Table_Column {

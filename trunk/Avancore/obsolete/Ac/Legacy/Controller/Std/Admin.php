@@ -11,6 +11,8 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
 	var $_defaultMethodName = 'default';
     
     var $_defaultMapper = false;
+    
+    var $extraAssets = array();
 	
     function doListMapperClasses() {
         return array();

@@ -1,6 +1,17 @@
 AvanControllers = {
 		
     instances: {},
+    
+    findManager: function(element) {
+        var res = null;
+        for(var curr = element; curr && !res; curr = curr.parentNode) {
+            if (curr.hasAttribute('data-managerid')) {
+                var id = curr.getAttribute('data-managerid');
+                res = window.AvanControllers.instances[id];
+            }
+        }
+        return res;
+    },
 
     getElement: function(element) {
 		if (element) {
@@ -9,6 +20,27 @@ AvanControllers = {
 		}
 		return element;
 	},
+    
+    findInputs: function(parent, prefix, assoc) {
+
+        var res;
+        var l = prefix.length;
+        var items = Ajs_Util.getElementsBy(function(elem) {
+            var sTag = elem.tagName.toUpperCase();
+            return (sTag == "INPUT" || sTag == "TEXTAREA" ||
+                    sTag == "SELECT") && (('' + elem.getAttribute('name')).slice(0, l) == prefix);
+        }, '*', parent);
+
+        if (assoc) {
+            res = {};
+            for (var i = 0; i < items.length; i++) {
+                res[items[i].getAttribute('name')] = items[i];
+            }
+        } else {
+            res = items;
+        }
+        return res;
+    },
 	
     stopEvent: function(event) {
         if (event.stopPropagation) {
@@ -160,6 +192,7 @@ AvanControllers = {
         	}
         	this.observers = [];
         }
+        
     }
 };
 
@@ -852,6 +885,8 @@ AvanControllers.ManagerController.prototype = {
     formElement: false,
     managerActionElement: false,
     managerProcessingElement: false,
+    processingParamsPrefix: false,
+    containerElementId: false,
     
     submitForm: function() {
         if (this.parentManager) this.parentManager.submitFormByChildManager(this); 
@@ -859,6 +894,11 @@ AvanControllers.ManagerController.prototype = {
             var formElement = AvanControllers.getElement(this.formElement);
             if (formElement) formElement.submit(); else throw 'No Form Element';
         }
+    },
+    
+    getFormElement: function() {
+        if (this.parentManager) return this.parentManager.getFormElement();
+            else return AvanControllers.getElement(this.formElement);
     },
     
     /**
@@ -885,14 +925,49 @@ AvanControllers.ManagerController.prototype = {
      * @param {String} processingName Name of manager processing (is passed to PHP backend)
      * @param recordsOrKeys Optional array of records of their keys to select before the form will be submitted 
      */
-    executeProcessing: function(processingName, recordsOrKeys) {
+    executeProcessing: function(processingName, recordsOrKeys, params, override) {
         var managerProcessingElement = AvanControllers.getElement(this.managerProcessingElement);
         if (managerProcessingElement) managerProcessingElement.value = processingName;
+        
+        if (params && typeof params === 'object') {
+            var f = this.getFormElement();
+            if (!f) throw 'No form element';
+            var queryArgs = Ajs_Util.makeQuery(params, this.processingParamsPrefix, false, true);
+            var bogusItems = [];
+            var items = window.AvanControllers.findInputs(f, this.processingParamsPrefix);
+            
+            // set existing element' values
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i], name = item.getAttribute('name') + '';
+                if (queryArgs[name] !== undefined) {
+                    item.value = queryArgs[name];
+                    delete queryArgs[name];
+                } else {
+                    bogusItems.push(item);
+                }
+            }
+            
+            // create missing parameters
+            for (var n in queryArgs) if (queryArgs.hasOwnProperty(n)) {
+                var elem = document.createElement('input');
+                elem.setAttribute('type', 'hidden');
+                elem.setAttribute('name', n);
+                elem.setAttribute('value', queryArgs[n]);
+                f.appendChild(elem);
+            }
+            
+            if (override) {
+                for (var i = 0; i < bogusItems.length; i++) {
+                    bogusItems[i].parentNode.removeChild(bogusItems[i]);
+                }
+            }
+        }
+            
         this.executeManagerAction('processing', recordsOrKeys);
     },
     
     submitFormByChildManager: function(manager) {
-        submitForm.call(this);
+        this.submitForm.call(this);
     },
     
     invokeAction: function(action) {

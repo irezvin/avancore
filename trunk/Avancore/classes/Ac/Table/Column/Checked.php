@@ -2,10 +2,6 @@
 
 /**
  * This class shows checkbox to select record for some action and "checkAll" checkbox in the header
- * 
- * @package Avancore Lite
- * @copyright Copyright &copy; 2007, Ilya Rezvin, Avansite (I.Rezvin@avansite.com)
- * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
  */
 
 class Ac_Table_Column_Checked extends Ac_Table_Column {

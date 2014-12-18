@@ -105,14 +105,15 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
 ?>
 
     <input type="hidden" name="<?php $this->d($ctx->mapParam($this->manager->_methodParamName)); ?>" id="<?php $this->d($aId = $ctx->mapIdentifier($this->manager->_methodParamName)); ?>" value="<?php if (isset($sd['action'])) $this->d($sd['action']); ?>" />
-    <input type="hidden" name="<?php $this->d($ctx->mapParam($this->manager->_processingParamName)); ?>" id="<?php $this->d($pId = $ctx->mapIdentifier($this->manager->_processingParamName)); ?>" />
+    <input type="hidden" name="<?php $this->d($ctx->mapParam($this->manager->getProcessingParamName())); ?>" id="<?php $this->d($pId = $this->manager->getProcessingParamName()); ?>" value="<?php if (isset($sd['processing'])) $this->d($sd['processing']); ?>" />
     <script type="text/javascript"><!--
     
-        var _m = <?php echo $mgrCon ?> = new AvanControllers.ManagerController({
+        <?php echo $mgrCon ?> = new AvanControllers.ManagerController({
             managerActionElement: <?php $this->d($h->jsQuote($aId), true) ?>,
-            managerProcessingElement: <?php $this->d($h->jsQuote($pId), true) ?> 
+            managerProcessingElement: <?php $this->d($h->jsQuote($pId), true) ?>,
+            processingParamsPrefix: <?php $this->d($h->jsQuote($this->manager->getProcessingParamsParamName()), true); ?>, 
+            containerElementId: <?php $this->d($h->jsQuote($this->manager->getContext()->mapIdentifier('_container')), true); ?>
         });
-        delete _m;
     // -->
     </script>
 <?php
@@ -277,7 +278,7 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
             echo $foo = Ac_Url::queryToHidden($stateData, /*Ac_Util::arrayToPath($adp)*/ $adp );
         } ?>
 
-    <div class='manager'>
+    <div class='manager' data-managerid='<?php $this->d($this->manager->getJsManagerControllerRef(true)); ?>' id='<?php $this->d($this->manager->getContext()->mapIdentifier('_container')); ?>'>
 <?php if ($this->manager->separateToolbar) ob_start(); ?>    
 <?php   $this->manager->toolbarHeader = $this->manager->isForm()? $this->manager->getFormTitle() : $this->manager->getPluralCaption(); ?>
 <?php   $this->showToolbar(); ?>

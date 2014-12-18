@@ -2,10 +2,6 @@
 
 /**
  * This class shows record's published status icon along with the link to change record's publishing 
- *  
- * @package Avancore Lite
- * @copyright Copyright &copy; 2007, Ilya Rezvin, Avansite (I.Rezvin@avansite.com)
- * @license http://www.gnu.org/copyleft/gpl.html GNU/GPL, see LICENSE.php
  */
 
 class Ac_Table_Column_Published extends Ac_Table_Column {
