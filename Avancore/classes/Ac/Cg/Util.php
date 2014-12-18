@@ -124,13 +124,16 @@ abstract class Ac_Cg_Util {
                 foreach ($strings as $string) {
                     $s1 = substr($string, 0, strlen($res) + 1);
                     if ($s === false) $s = $s1;
+                    elseif ($string === $res) {
+                        $match = false;
+                        $res = '';
+                    }
                     elseif ($s != $s1) {
                         $match = false;
-                        break;
                     }
                 }
                 if ($match) $res = $s;
-            } while ($match);
+            } while ($match && strlen($res));
         }
         return $res;
     }

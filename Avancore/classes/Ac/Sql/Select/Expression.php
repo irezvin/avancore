@@ -1,10 +1,6 @@
 <?php
 
 /**
- * @author Nivzer
- */
-
-/**
  * Expression that contains info about aliases mentioned in it
  */
 class Ac_Sql_Select_Expression extends Ac_Sql_Expression {

@@ -1,10 +1,4 @@
 <?php
-/**
- * @package
- * @copyright    (c) 2008 Ilya Rezvin
- * @author         Ilya Rezvin <ilya@rezvin.com>
- * @version        $Id$
- */
 
 class Ac_Sql_Order extends Ac_Sql_Part {
 

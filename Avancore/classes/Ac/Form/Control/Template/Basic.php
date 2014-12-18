@@ -23,7 +23,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
      * @param Ac_Form_Control $control
      */
     function showPlainList($control) {
-        $this->utlShowSimpleControlsList($control->getOrderedDisplayChildren());     
+        $this->utlShowSimpleControlsList($control->getOrderedDisplayChildren());
     }
     
     /**
@@ -46,6 +46,25 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
     function showHTable($control) {
         $this->utlShowControlsTableHorizontal($control->getOrderedDisplayChildren(), true, $control->getHtmlAttribs());
     }
+
+    function showTableRow($control) {
+        $trAttribs = $control->getHtmlAttribs();
+?>
+        <tr <?php echo Ac_Util::mkAttribs($control->getHtmlAttribs()); ?>>
+<?php       $this->utlShowControlsTableHorizontal($control->getOrderedDisplayChildren(), false); ?>
+        </tr>
+<?php 
+    }
+    
+    function showTableWithoutTags($control) {
+        $tableAttribs = $control->getHtmlAttribs();
+?>
+        <table <?php echo Ac_Util::mkAttribs($control->getHtmlAttribs()); ?>>
+<?php       $this->utlShowSimpleControlsList($control->getOrderedDisplayChildren()); ?>
+        </table>
+<?php
+    }
+    
     
     function showTableWithoutOuterTag($control, $extraParams = false) {
         $this->utlShowControlsTable($control->getOrderedDisplayChildren(), false, $control->getHtmlAttribs(), $extraParams);
@@ -131,7 +150,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         foreach (array_keys($controls) as $k) { 
             $cl = $controls[$k];
             if ($cl->showWrapper) {
-                if (strlen($cl->wrapperTemplatePart) && strlen($cl->wrapperTemplateClass)) {
+                if (strlen($cl->wrapperTemplatePart)) {
                     echo $cl->fetchWithWrapper();
                 } else {
                     if (!is_array($trWrapperMethod)) {

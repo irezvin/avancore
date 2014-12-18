@@ -24,6 +24,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     var $toolbarHeader = false;
     
+    var $_stayOnProcessing = false;
+    
     /**
      * @var Ac_Sql_Filter
      */
@@ -107,20 +109,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      */
     var $_pagination = false;
     
-    /**
-     * Javascript thar returns reference to the controller object
-     *
-     * @var string
-     */
-    var $_jsListControllerRef = false;
-    var $_jsActionsControllerRef = false;
-    var $_jsPaginationControllerRef = false;
-    var $_jsFormControllerRef = false;
-    var $_jsManagerControllerRef = false;
-    
     var $_managerFormName = false;
-    
-    var $_processingParamName = 'processing';
     
     var $_actions = false;
     
@@ -247,6 +236,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     function executeList() {
         $this->_isList = true;
+        $this->_stayOnProcessing = false;
         $template = $this->getTemplate();
         if ($this->_caching && $c = $this->_loadFromCache()) {
             $this->_response = unserialize($c);
@@ -258,6 +248,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     function executeDetails() {
         $this->_isForm = true;
+        $this->_stayOnProcessing = false;
         $template = $this->getTemplate();
         $this->_processSubManagers();
         
@@ -274,6 +265,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     function executeRefreshDetails() {
         $this->_isForm = true;
+        $this->_stayOnProcessing = false;
         
         $form = $this->getForm();
         $data = $form->getValue();
@@ -301,6 +293,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $proc = null;
         $procResp = null;
         $respMode = null;
+        $this->_stayOnProcessing = false;
         
         if (isset($this->_rqData['processing']) && is_string($this->_rqData['processing']) 
             && strlen($procName = $this->_rqData['processing'])) 
@@ -317,6 +310,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                     }
                     $this->_report->addChildEntry($rep);
                     $ok = true;
+                }
+                if ($proc->stayOn) {
+                    $this->_stayOnProcessing = $this->_rqData['processing'];
                 }
             }
         }
@@ -358,6 +354,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     function executeNew() {
         $this->_isForm = true;
         $this->_isNewRecord = true;
+        $this->_stayOnProcessing = false;        
         
         $template = $this->getTemplate();
         $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
@@ -365,6 +362,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     function executeSave($withAdd = false) {
         $this->_isForm = true;
+        $this->_stayOnProcessing = false;        
         
         $form = $this->getForm();
         $form->setSubmitted(true);
@@ -397,6 +395,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     function executeApply() {
         $this->_isForm = true;
+        $this->_stayOnProcessing = false;
         
         $form = $this->getForm();
         $form->setSubmitted(true);
@@ -417,6 +416,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     function executeCancel() {
         $this->_record = null;
+        $this->_stayOnProcessing = false;
+        
         $u = $this->getManagerUrl('list');
         $this->_response->hasToRedirect = $u->toString();
     }
@@ -510,13 +511,14 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $pkl = $this->getPrimaryKeyLength();
                 foreach ($this->_rqData['keys'] as $key) {
                     if (is_string($key)) {
-                        if ($pkl === 1) $res[] = $key;
+                        if ($pkl === 1) $res[$key] = $key;
                         else {
                             $u = @unserialize($key);
-                            if (($u !== false) && is_array($u) && (count($u) === $pkl)) $res[] = $u;
+                            if (($u !== false) && is_array($u) && (count($u) === $pkl)) $res[$key] = $u;
                         }
                     }
                 }
+                $res = array_values($res);
             }
             $this->_primaryKeys = $res;
         } 
@@ -570,8 +572,16 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     function getStateData() {
         $res = array();
-        $res['action'] = $this->isForm()? 'details' : 'list';
+        if ($this->_stayOnProcessing) {
+            $res['action'] = 'processing';
+            $res['processing'] = $this->_stayOnProcessing;
+        } else {
+            $res['action'] = $this->isForm()? 'details' : 'list';
+        }
         if ($this->isNewRecord()) $res['new'] = 1;
+        elseif (($res['action'] !== 'form') && $keys = $this->getPrimaryKeys()) {
+            $res['keys'] = $keys; 
+        }
         elseif ($rec = $this->getRecord()) {
             $res['keys'][] = $this->getStrPk($rec); 
         }
@@ -597,52 +607,55 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         //$this->_response->content = $template->fetch('manager');
     }
     
-    function getJsListControllerRef() {
-        if ($this->_jsListControllerRef === false) {
-            $id = $this->_context->mapIdentifier($this->_instanceId.'_listController');
-            $this->_jsListControllerRef = "window.AvanControllers.instances['".$id."']"; 
-        }
-        return $this->_jsListControllerRef;
+    function getProcessingParamName($mapped = false) {
+        $res = 'processing';
+        if ($mapped) $res = $this->_context->mapParam($res);
+        return $res;
     }
     
-    function getJsActionsControllerRef() {
-        if ($this->_jsActionsControllerRef === false) {
-            $id = $this->_context->mapIdentifier($this->_instanceId.'_actionsController');
-            $this->_jsActionsControllerRef = "window.AvanControllers.instances['".$id."']"; 
-        }
-        return $this->_jsActionsControllerRef;
+    function getProcessingParamsParamName() {
+        return $this->_context->mapParam('processingParams');
     }
     
-    function getJsPaginationControllerRef() {
-        if ($this->_jsPaginationControllerRef === false) {
-            $id = $this->_context->mapIdentifier($this->_instanceId.'_paginationController');
-            $this->_jsPaginationControllerRef = "window.AvanControllers.instances['".$id."']"; 
-        }
-        return $this->_jsPaginationControllerRef;
+    function getJsListControllerRef($onlyId = false) {
+        $id = $this->_context->mapIdentifier($this->_instanceId.'_listController');
+        if ($onlyId) return $id;
+        $res = "window.AvanControllers.instances['".$id."']"; 
+        return $res;
     }
     
-    function getJsFormControllerRef() {
-        if ($this->_jsFormControllerRef === false) {
-            $id = $this->_context->mapIdentifier($this->_instanceId.'_formController');
-            $this->_jsFormControllerRef = "window.AvanControllers.instances['".$id."']"; 
-        }
-        return $this->_jsFormControllerRef;
+    function getJsActionsControllerRef($onlyId = false) {
+        $id = $this->_context->mapIdentifier($this->_instanceId.'_actionsController');
+        if ($onlyId) return $id;
+        $res = "window.AvanControllers.instances['".$id."']"; 
+        return $res;
     }
     
-    function getJsManagerControllerRef() {
-        if ($this->_jsManagerControllerRef === false) {
-            $id = $this->_context->mapIdentifier($this->_instanceId.'_managerController');
-            $this->_jsManagerControllerRef = "window.AvanControllers.instances['".$id."']"; 
-        }
-        return $this->_jsManagerControllerRef;
+    function getJsPaginationControllerRef($onlyId = false) {
+        $id = $this->_context->mapIdentifier($this->_instanceId.'_paginationController');
+        if ($onlyId) return $id;
+        $res = "window.AvanControllers.instances['".$id."']"; 
+        return $res;
+    }
+    
+    function getJsFormControllerRef($onlyId = false) {
+        $id = $this->_context->mapIdentifier($this->_instanceId.'_formController');
+        if ($onlyId) return $id;
+        $res = "window.AvanControllers.instances['".$id."']"; 
+        return $res;
+    }
+    
+    function getJsManagerControllerRef($onlyId = false) {
+        $id = $this->_context->mapIdentifier($this->_instanceId.'_managerController');
+        if ($onlyId) return $id;
+        $res = "window.AvanControllers.instances['".$id."']"; 
+        return $res;
     }
     
     function getManagerFormName() {
-        if ($this->_managerFormName === false) {
-            if ($this->_context->isInForm) $this->_managerFormName = $this->_context->isInForm;
-            else $this->_managerFormName = $this->_context->mapIdentifier('managerForm');
-        }
-        return $this->_managerFormName;
+        if ($this->_context->isInForm) $res = $this->_context->isInForm;
+            else $res = $this->_context->mapIdentifier('managerForm');
+        return $res;
     }
     
     

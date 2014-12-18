@@ -67,7 +67,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
         $numeric = false;
         $default = false;
         
-        /*if (!is_null($this->_col->default))*/ $default = $this->_col->default;
+        $default = $this->_col->default;
         
         switch (strtoupper($this->_col->type)) {
             case 'VARCHAR':
@@ -152,7 +152,6 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
             case 'DOUBLE':
             case 'DECIMAL':    
                 $dataType = 'float';
-                $controlType = 'dateInput';
                 $numeric = true;
                 if (strlen($default)) $default = floatval($default);
                 if (!$this->_col->nullable && is_null($this->_col->default) && !in_array($this->_col->name, $this->_model->tableObject->listPkFields()))

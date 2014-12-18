@@ -1,10 +1,6 @@
 <?php
 
 /**
- * @author nivzer
- */
-
-/**
  * Used to implement search-by-autocomplete and format tree nodes in Ac_Legacy_Controller_Std_Tree
  */
 interface Ac_I_Tree_SearchTool {

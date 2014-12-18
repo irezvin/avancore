@@ -310,7 +310,7 @@ class Ac_Util_Lock extends Ac_Prototyped {
     
     function release($force = false) {
         $this->check(true);
-        if (($force || $this->lockStatus !== self::STATUS_OTHER) && $this->lockStatus !== self::STATUS_NONE) {
+        if (($force || $this->lockStatus !== self::STATUS_OTHER) && $this->lockStatus !== self::STATUS_NONE && $this->lockStatus !== self::STATUS_DELETED) {
             unlink($this->getPath());
         }
         return true;

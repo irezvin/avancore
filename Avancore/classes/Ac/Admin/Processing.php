@@ -38,6 +38,12 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     var $defaultToAllRecords = Ac_Admin_Processing::DEFAULT_RECORDS_NONE;
     
     /**
+     * @var bool
+     * Whether manager should reference to this processing during the next request
+     */
+    var $stayOn = false;
+    
+    /**
      * @var Ac_Admin_ReportEntry
      */
     var $_report = false;
