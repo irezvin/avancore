@@ -105,7 +105,7 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
 ?>
 
     <input type="hidden" name="<?php $this->d($ctx->mapParam($this->manager->_methodParamName)); ?>" id="<?php $this->d($aId = $ctx->mapIdentifier($this->manager->_methodParamName)); ?>" value="<?php if (isset($sd['action'])) $this->d($sd['action']); ?>" />
-    <input type="hidden" name="<?php $this->d($ctx->mapParam($this->manager->getProcessingParamName())); ?>" id="<?php $this->d($pId = $this->manager->getProcessingParamName()); ?>" value="<?php if (isset($sd['processing'])) $this->d($sd['processing']); ?>" />
+    <input type="hidden" name="<?php $this->d($ctx->mapParam($this->manager->getProcessingParamName())); ?>" id="<?php $this->d($pId = $this->manager->getProcessingParamName(true)); ?>" value="<?php if (isset($sd['processing'])) $this->d($sd['processing']); ?>" />
     <script type="text/javascript"><!--
     
         <?php echo $mgrCon ?> = new AvanControllers.ManagerController({
