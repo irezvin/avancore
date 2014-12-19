@@ -591,8 +591,17 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             unset($res['keys']);
         }
         
+        if (isset($this->_rqData['filterForm'])) {
+            $ff = $this->_rqData['filterForm'];
+            if (is_array($ff)) {
+                foreach ($ff as $k => $v) {
+                    if (is_array($v) && !$v || !strlen($v)) unset($ff[$k]);
+                }
+            }
+            $res['filterForm'] = $ff;
+        }
+        
         //if (isset($this->_rqData['pagination'])) $res['pagination'] = $this->_rqData['pagination'];
-        //if (isset($this->_rqData['filter'])) $res['filter'] = $this->_rqData['filter'];
         //if (isset($this->_rqData['order'])) $res['order'] = $this->_rqData['order'];
         return $res;
     }
