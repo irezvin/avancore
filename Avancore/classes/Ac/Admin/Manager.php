@@ -417,7 +417,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     function executeCancel() {
         $this->_record = null;
         $this->_stayOnProcessing = false;
-        
         $u = $this->getManagerUrl('list');
         $this->_response->hasToRedirect = $u->toString();
     }
@@ -583,10 +582,13 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $res['keys'] = $keys; 
         }
         elseif ($rec = $this->getRecord()) {
-            $res['keys'][] = $this->getStrPk($rec); 
+            $res['keys'] = array($this->getStrPk($rec)); 
         }
         if ($this->_isForm && isset($this->_rqData['form']) && !$this->_recordStored) {
             $res['form'] = $this->_rqData['form'];
+        }
+        if ($res['action'] === 'list') {
+            unset($res['keys']);
         }
         
         //if (isset($this->_rqData['pagination'])) $res['pagination'] = $this->_rqData['pagination'];
