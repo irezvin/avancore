@@ -27,6 +27,10 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     var $accessors = array();
     var $nullableSqlColumns = array();
     var $associationPrototypes = array();
+    var $hasUniformPropertiesInfo = false;
+    var $tracksChanges = false;
+    var $modelCoreMixables = array();
+    var $mapperCoreMixables = array();
     
     function _generateFilesList() {
         return array(
@@ -55,7 +59,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     
     function doInit() {
         $this->modelClass = $this->model->className;
-        $this->genModelClass = $this->model->className.'_Base_Object';
+        $this->genModelClass = $this->model->getGenModelClass();
         $this->parentClass = $this->model->parentClassName;
         
         $this->mapperClass = $this->model->getMapperClass();
@@ -81,6 +85,10 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->ownPropInfo = $pps['ownPropertiesInfo'];  
         $this->tableName = $this->model->tableObject->name;
         $this->associationPrototypes = $this->model->getAssociationPrototypes();
+        $this->hasUniformPropertiesInfo = $this->model->hasUniformPropertiesInfo;
+        $this->tracksChanges = $this->model->tracksChanges;
+        $this->modelCoreMixables = $this->model->modelCoreMixables;
+        $this->mapperCoreMixables = $this->model->mapperCoreMixables;
         
         foreach ($this->model->tableObject->listColumns() as $cn) {
             $col = $this->model->tableObject->getColumn($cn);
@@ -99,7 +107,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         }
         
         $this->mapperVars['pk'] = new Ac_Cg_Php_Expression($this->pkStr);
-        $this->mapperVars['recordClass'] = $this->modelClass;
+        $this->mapperVars['recordClass'] = $this->model->getMapperRecordClass();
         $this->mapperVars['tableName'] = $this->tableName;
         $this->mapperVars['id'] = $this->mapperClass;
         $this->mapperVars['columnNames'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->tableObject->listColumns(), 0, false, true, true));
@@ -243,17 +251,23 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
+<?php if ($this->modelCoreMixables) { ?>
+
+    protected function doGetCoreMixables() { 
+        return Ac_Util::m(parent::doGetCoreMixables(), <?php $this->exportArray($this->modelCoreMixables, 8, true); ?>);
+    }
+<?php } ?> 
     
     protected function listOwnProperties() {
-<?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
-    return array_merge(parent::listOwnProperties(), <?php $this->exportArray($this->ownProperties, 0, false, true); ?>);
+<?php if ($this->parentClass !== $this->model->getDefaultParentClassName()) { ?>
+        return array_merge(parent::listOwnProperties(), <?php $this->exportArray($this->ownProperties, 0, false, true); ?>);
 <?php } else { ?>
         return <?php $this->exportArray($this->ownProperties, 0, false, true); ?>;
 <?php }?>
     }
 <?php if ($this->ownLists) { ?> 
     protected function listOwnLists() {
-<?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
+<?php if ($this->parentClass !== $this->model->getDefaultParentClassName()) { ?>
     return array_merge(parent::listOwnLists(), <?php $this->exportArray($this->ownLists, 0, false, true); ?>);
 <?php } else { ?>        
         return <?php $this->exportArray($this->ownLists, 0, false, true); ?>;
@@ -263,8 +277,8 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 <?php } ?>    
 <?php if ($this->ownAssociations) { ?> 
     protected function listOwnAssociations() {
-<?php if ($this->parentClass !== 'Ac_Model_Object') { ?>
-    return array_merge(parent::listOwnLists(), <?php $this->exportArray($this->ownAssociations, 0, false, true); ?>);
+<?php if ($this->parentClass !== $this->model->getDefaultParentClassName()) { ?>
+        return array_merge(parent::listOwnLists(), <?php $this->exportArray($this->ownAssociations, 0, false, true); ?>);
 <?php } else { ?>
         return <?php $this->exportArray($this->ownAssociations, 0, false, true); ?>;
 <?php }?>
@@ -273,17 +287,17 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 <?php } ?>
     protected function getOwnPropertiesInfo() {
     	<?php if ($this->generator->php5) echo 'static $pi = false; if ($pi === false) '; ?>$pi = <?php $this->exportArray($this->ownPropInfo, 8, true); ?>;
-<?php   if ($this->parentClass === 'Ac_Model_Object') { ?>    
+<?php   if ($this->parentClass === $this->model->getDefaultParentClassName()) { ?>    
         return $pi;
 <?php   } else { ?>
         return Ac_Util::m($pi, parent::getOwnPropertiesInfo());
 <?php   } ?>                
     }
-<?php if ($this->model->hasUniformPropertiesInfo) { ?>
+<?php if ($this->hasUniformPropertiesInfo) { ?>
 
     function hasUniformPropertiesInfo() { return true; }
 <?php } ?>
-<?php if ($this->model->tracksChanges) { ?>
+<?php if ($this->tracksChanges) { ?>
 
     function tracksChanges() { return true; }
 <?php } ?>
@@ -362,6 +376,12 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     protected $askRelationsForDefaults = false;
     
 <?php } ?>
+<?php if ($this->mapperCoreMixables) { ?>
+    protected function doGetCoreMixables() { 
+        return Ac_Util::m(parent::doGetCoreMixables(), <?php $this->exportArray($this->mapperCoreMixables, 8, true); ?>);
+    }
+    
+<?php } ?> 
     function listSqlColumns() {
         return $this->columnNames;
     }
@@ -435,7 +455,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     <?php if ($this->relationPrototypes) { ?>
     
     protected function doGetRelationPrototypes() {
-<?php   if (!in_array($this->genMapperClass, array('Ac_Model_Mapper', 'Ac_Model_CpkMapper'))) { ?>
+<?php   if (!in_array($this->genMapperClass, array($this->model->getDefaultParentMapperClassName(), 'Ac_Model_CpkMapper'))) { ?>
         return Ac_Util::m(parent::doGetRelationPrototypes(), <?php $this->exportArray($this->relationPrototypes, 8); ?>);
 <?php   } else { ?>
         return <?php $this->exportArray($this->relationPrototypes, 8); ?>;
@@ -445,7 +465,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     <?php if ($this->associationPrototypes) { ?>
     
     protected function doGetAssociationPrototypes() {
-<?php   if (!in_array($this->genMapperClass, array('Ac_Model_Mapper', 'Ac_Model_CpkMapper'))) { ?>
+<?php   if (!in_array($this->genMapperClass, array($this->model->getDefaultParentMapperClassName(), 'Ac_Model_CpkMapper'))) { ?>
         return Ac_Util::m(parent::doGetAssociationPrototypes(), <?php $this->exportArray($this->associationPrototypes, 8); ?>);
 <?php   } else { ?>
         return <?php $this->exportArray($this->associationPrototypes, 8); ?>;
@@ -454,7 +474,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     <?php } ?>
     
     protected function doGetInfoParams() {
-<?php   if (!in_array($this->genMapperClass, array('Ac_Model_Mapper', 'Ac_Model_CpkMapper'))) { ?>
+<?php   if (!in_array($this->genMapperClass, array($this->model->getDefaultParentMapperClassName(), 'Ac_Model_CpkMapper'))) { ?>
         return Ac_Util::m( 
             <?php $this->exportArray($this->model->getMapperInfoParams(), 12); ?>,
             parent::doGetInfoParams()

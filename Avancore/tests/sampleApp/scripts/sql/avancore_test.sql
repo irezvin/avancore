@@ -197,9 +197,12 @@ CREATE TABLE `ac_person_posts` (
   `photoId` int(10) unsigned DEFAULT NULL,
   `title` varchar(255) DEFAULT '',
   `content` longtext,
+  `pubId` int(10) unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `idxPubId` (`pubId`),
   KEY `personId` (`personId`),
   KEY `FK__ac_post_photo` (`personId`,`photoId`),
+  CONSTRAINT `fkPostPublish` FOREIGN KEY (`pubId`) REFERENCES `ac_publish` (`id`),
   CONSTRAINT `FK__ac_post_person` FOREIGN KEY (`personId`) REFERENCES `ac_people` (`personId`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `FK__ac_post_photo` FOREIGN KEY (`personId`, `photoId`) REFERENCES `ac_person_photos` (`personId`, `photoId`) ON DELETE SET NULL ON UPDATE SET NULL
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
@@ -211,8 +214,47 @@ CREATE TABLE `ac_person_posts` (
 
 LOCK TABLES `ac_person_posts` WRITE;
 /*!40000 ALTER TABLE `ac_person_posts` DISABLE KEYS */;
-INSERT INTO `ac_person_posts` VALUES (1,3,1,'Post 1 by Ilya','The text 1'),(2,3,NULL,'Post 2 by Ilya (no photo)','No photo this time'),(3,4,3,'Post by Tanya','Hello, world!');
+INSERT INTO `ac_person_posts` VALUES (1,3,1,'Post 1 by Ilya','The text 1',NULL),(2,3,NULL,'Post 2 by Ilya (no photo)','No photo this time',NULL),(3,4,3,'Post by Tanya','Hello, world!',NULL);
 /*!40000 ALTER TABLE `ac_person_posts` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_publish`
+--
+
+DROP TABLE IF EXISTS `ac_publish`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_publish` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `sharedObjectType` varchar(50) NOT NULL,
+  `published` int(1) unsigned DEFAULT '1',
+  `deleted` int(1) unsigned DEFAULT '0',
+  `publishUp` datetime DEFAULT '0000-00-00 00:00:00',
+  `publishDown` datetime DEFAULT '0000-00-00 00:00:00',
+  `authorId` int(10) unsigned DEFAULT NULL,
+  `editorId` int(10) unsigned DEFAULT NULL,
+  `pubChannelId` varchar(255) DEFAULT NULL,
+  `dateCreated` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `dateModified` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  `dateDeleted` datetime NOT NULL DEFAULT '0000-00-00 00:00:00',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idxPubChannelId` (`pubChannelId`),
+  KEY `sharedObjectType` (`sharedObjectType`),
+  KEY `fkPubAuthor` (`authorId`),
+  KEY `fkPubEditor` (`editorId`),
+  CONSTRAINT `fkPubAuthor` FOREIGN KEY (`authorId`) REFERENCES `ac_people` (`personId`) ON DELETE SET NULL ON UPDATE SET NULL,
+  CONSTRAINT `fkPubEditor` FOREIGN KEY (`editorId`) REFERENCES `ac_people` (`personId`) ON DELETE SET NULL ON UPDATE SET NULL
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_publish`
+--
+
+LOCK TABLES `ac_publish` WRITE;
+/*!40000 ALTER TABLE `ac_publish` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ac_publish` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -317,7 +359,10 @@ CREATE TABLE `ac_shop_categories` (
   `ordering` int(10) unsigned NOT NULL,
   `depth` int(10) unsigned NOT NULL,
   `metaId` int(10) unsigned DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `pubId` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idxPubId` (`pubId`),
+  CONSTRAINT `fkCategoryPublish` FOREIGN KEY (`pubId`) REFERENCES `ac_publish` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -345,7 +390,7 @@ CREATE TABLE `ac_shop_meta` (
   `metaNoindex` int(1) unsigned NOT NULL DEFAULT '0',
   `sharedObjectType` enum('product','category','other') NOT NULL DEFAULT 'other',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -421,9 +466,11 @@ CREATE TABLE `ac_shop_products` (
   `sku` varchar(255) NOT NULL DEFAULT '',
   `title` varchar(255) NOT NULL DEFAULT '',
   `metaId` int(10) unsigned DEFAULT NULL,
-  `published` int(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8;
+  `pubId` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idxPubId` (`pubId`),
+  CONSTRAINT `fkPersonPublish` FOREIGN KEY (`pubId`) REFERENCES `ac_publish` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -432,7 +479,7 @@ CREATE TABLE `ac_shop_products` (
 
 LOCK TABLES `ac_shop_products` WRITE;
 /*!40000 ALTER TABLE `ac_shop_products` DISABLE KEYS */;
-INSERT INTO `ac_shop_products` VALUES (1,'PROD01','Товар 1',1,1),(2,'PROD02','Товар 2',NULL,1);
+INSERT INTO `ac_shop_products` VALUES (1,'PROD01','Товар 1',1,NULL),(2,'PROD02','Товар 2',NULL,NULL);
 /*!40000 ALTER TABLE `ac_shop_products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -627,4 +674,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2014-11-20 23:38:40
+-- Dump completed on 2014-12-19  2:04:45

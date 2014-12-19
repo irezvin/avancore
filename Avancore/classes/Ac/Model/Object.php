@@ -1114,10 +1114,10 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     function cleanupMembers() {
         $this->doOnCleanup();
         $this->triggerEvent(self::EVENT_ON_CLEANUP);
-        $vars = get_class_vars(get_class($this));
+        $vars = array_intersect_key(get_class_vars(get_class($this)), get_object_vars($this));
         $m = $this->mapper;
         $m->forget($this);
-        foreach (get_class_vars(get_class($this)) as $k => $v) if (isset($this->$k)) {
+        foreach ($vars as $k => $v) if (isset($this->$k)) {
             if (is_array($this->$k)) {
                 $tmp = $this->$k;
                 foreach (array_keys($tmp) as $kk) {
@@ -1169,7 +1169,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     function & __get($name) {
         if (in_array($name, $this->listFields()) || strpos($name, '[') !== false) {
-            $res = & $this->getField($name);
+            $res = $this->getField($name);
         } else {
             $res = & parent::__get($name);
         }

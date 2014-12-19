@@ -22,6 +22,7 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
     
     protected $askRelationsForDefaults = false;
     
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }

@@ -9,6 +9,19 @@ class Ac_Model_Mixable_Object extends Ac_Model_Mixable_Data {
     
     protected $mixinClass = 'Ac_Model_Object';
     
+    /**
+     * @retrun Ac_Application
+     */
+    function getApplication() {
+        if ($this->mixin) $res = $this->mixin->getApplication();
+            else $res = null;
+        return $res;
+    }
+    
+    function listNonMixedMethods() {
+        return array_merge(parent::listNonMixedMethods(), array('getApplication'));
+    }
+    
     protected function doOnCreate() {
     }
         

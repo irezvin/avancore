@@ -19,6 +19,9 @@ abstract class Sample_DomainBase extends Ac_Application {
             'Sample_Person_Post_Mapper' => array (
                 'class' => 'Sample_Person_Post_Mapper',
             ),
+            'Sample_Publish_ImplMapper' => array (
+                'class' => 'Sample_Publish_ImplMapper',
+            ),
             'Sample_Relation_Type_Mapper' => array (
                 'class' => 'Sample_Relation_Type_Mapper',
             ),
@@ -82,6 +85,13 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function getSamplePersonPostMapper() {
         return $this->getMapper('Sample_Person_Post_Mapper');
+    }
+    
+    /**
+     * @return Sample_Publish_ImplMapper 
+     */
+    function getSamplePublishImplMapper() {
+        return $this->getMapper('Sample_Publish_ImplMapper');
     }
     
     /**
@@ -220,6 +230,21 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function createSamplePersonPost () {
         return $this->getMapper('Sample_Person_Post_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Publish 
+     */
+    static function Sample_Publish ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Publish 
+     */
+    function createSamplePublish () {
+        return $this->getMapper('Sample_Publish_ImplMapper')->createRecord();
     }
     
  
