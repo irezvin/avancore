@@ -389,7 +389,7 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
     }
     
     function hasToStoreContainer() {
-        $res = ($this->containerState === false) && $this->container && !$this->container->_isBeingStored && !$this->container->isPersistent() || $this->container->getChanges();
+        $res = ($this->containerState === false) && $this->container && !$this->container->_isBeingStored && (!$this->container->isPersistent() || $this->container->getChanges());
         return $res;
     }
     
