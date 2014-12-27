@@ -6,6 +6,14 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
     const debugBeforeQuery = 'beforeQuery';
     const debugAfterQuery = 'afterQuery';
     
+    const FREAK_OUT_NONE = 0;
+    const FREAK_OUT_WHEN_ERRORS = 1;
+    const FREAK_OUT_ALWAYS = 2;
+    
+    var $freakOut = self::FREAK_OUT_NONE;
+    var $freakExtraColumns = '';
+    var $freakExtraJoins = '';
+    
     /**
      * @var Ac_Sql_Db
      */
@@ -360,66 +368,236 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
     // TODO: optimize the implementation; 
     // I'm more than sure that we can use at most one UPDATE with proper SWITCH
     function moveNode($id, $parentId, $order = false, $dontCheckForParent = false, 
-        & $actualOrder = null) {
+        & $actualOrder = null, $oldParent = false) {
         
         $res = false;
         if ($this->ensureTransaction() && ($node = $this->getInternalFields($this->getNode($id)))) {
             $parent = $this->getInternalFields($this->getNode($parentId));
-            if ($parent && !(($parent['left'] >  $node['left']) && ($parent['right'] < $node['right']))) {
-                if ($parent['id'] == $node['parent'] && $order == $node['ordering']) {
+            if ($parent && !(($parent['left'] > $node['left']) && ($parent['right'] < $node['right']))) {
+                
+                // Find out target node
+                
+                if ($order === 0) $order = 1; // we count from 1
+
+                if ($parent['right'] == $parent['left'] + 1) { // we don't have target node
+                    $hasTargetNode = false;
+                    $order = 0;
+                } elseif ($parent['right'] == $parent['left'] + 3) { // we have node inside the parent
+                    if ($order == 1) {
+                        $hasTargetNode = true;
+                        $targetNodeLeft = $parent['left'] + 1;
+                        $targetNodeRight = $parent['right'] - 1;
+                    } else {
+                        $hasTargetNode = false;
+                    }
+                } else {
                     
-                    //nothing to do
-                    $res = true; 
+                    // let's find target node
+                    
+                    $nodes = $this->_db->fetchArray($this->_db->applyLimits($this->_stmt('
+                        SELECT [[leftCol]] AS lft, [[rightCol]] AS rgt 
+                        FROM [[tableName]] 
+                        WHERE [[parentCol]] = {{parentId}} [[tc]] ORDER BY [[leftCol]]
+                    ', array('parentId' => $parent['id'])), $order));
+                    if (count($nodes) >= $order) {
+                        $lastNode = $nodes[$order - 1];
+                        $hasTargetNode = true;
+                        $targetNodeLeft = $lastNode['lft'];
+                        $targetNodeRight = $lastNode['rgt'];
+                    } else {
+                        $hasTargetNode = false;
+                    }
+                    
+                    
+                }
+                    
+                if ($oldParent === false) $oldParent = $node['parent'];
+
+                $sameParent = $node['parent'] == $parentId;
+
+                // make computations
+                
+                /**
+                 * The idea is...
+                 * 
+                 * There are two groups of rows:
+                 * - our node row group is moved by $nDelta (both left and right columns)
+                 * - two other sequences of LEFT (between oLeftMin and oLeftMax) and RIGHT (between oRightMin and oRightMax) 
+                 *   values are moved towards node group by ~$oDelta
+                 */
+
+                $width = $node['right'] - $node['left'];
+                
+                // targetLeft
+                if ($hasTargetNode) {
+                    if ($node['left'] < $targetNodeLeft) {
+                        if ($sameParent) { // swap with node to the right
+                            $targetLeft = $targetNodeRight - $width;
+                        } else {
+                            $targetLeft = $targetNodeLeft - 1 - $width;
+                        }
+                    } else {
+                        $targetLeft = $targetNodeLeft;
+                    }
+                } else {
+                    if ($node['left'] < $parent['right']) {
+                        $targetLeft = $parent['right'] - 1 - $width;
+                    } else {
+                        $targetLeft = $parent['right'];
+                    }
+                }
+                
+                if ($targetLeft == $node['left']) {
+                    // nothing to do
                     $actualOrder = $order;
                     
                 } else {
                     
-                    $left = $parent['left'] + 1;
+                    $nDelta = $targetLeft - $node['left'];
                     
-                    $this->query($this->_stmt('
-                        UPDATE [[tableName]] 
-                        SET [[ignoreCol]] = 1 
-                        WHERE [[leftCol]] >= {{nodeLeft}} AND [[rightCol]] <= {{nodeRight}} [[tc]] 
-                    ', array('nodeLeft' => $node['left'], 'nodeRight' => $node['right'])));
-                    
-                    $maxTargetOrder = $this->_db->fetchValue($this->_stmt('
-                    	SELECT MAX([[orderingCol]]) FROM [[tableName]] WHERE [[parentCol]] = {{parentId}} [[tc]]
-                    ', array('parentId' => $parentId)), 0, 0) + 1;
-                                        
-                    if ($order === false) {
-                        $order = $maxTargetOrder;
-                    } else {
-                        $order = min($maxTargetOrder, $order);
+                    if ($nDelta > 0) { // move to the right
+                        
+                        $oLeftMin = $oRightMin = $node['right'] + 1;
+                        
+                        if ($hasTargetNode) {
+                            if ($sameParent) {
+                                $oLeftMax = $targetNodeRight;
+                                $oRightMax = $targetNodeRight;
+                            } else {
+                                $oLeftMax = $tagetNodeLeft - 1;
+                                $oRightMax = $targetLeft - 1;
+                            }
+                        } else {
+                            $oLeftMax = $oRightMax = $parent['right'] - 1;
+                        }
+                        
+                        $oDelta = - $width - 1;
+                        
+                    } else { // move to the left
+                        
+                        $oLeftMax = $oRightMax = $node['left'] - 1;
+                        
+                        if ($hasTargetNode) {
+                            $oLeftMin = $oRightMin = $targetNodeLeft;
+                        } else {
+                            $oLeftMin = $parent['right'] + 1;
+                            $oRightMin = $parent['right'];
+                        }
+                        $oDelta = $width + 1;
+                        
                     }
                     
-                    if ($node['parent'] != $parentId) {
-                        
-                        // move with parent change...
-                        
-                        $this->query($this->_stmt('
-                                UPDATE [[tableName]] 
-                                SET [[orderingCol]] = [[orderingCol]] + 1
-                                WHERE [[parentCol]] = {{newParentId}} AND [[orderingCol]] >= {{newOrder}} [[tc]]
-                            ', array('newParentId' => $parentId, 'newOrder' => $order)
-                        ));
-                        
-                        $this->query($this->_stmt('
-                                UPDATE [[tableName]] 
-                                SET [[orderingCol]] = [[orderingCol]] - 1
-                                WHERE [[parentCol]] = {{oldParentId}} AND [[orderingCol]] >= {{oldOrder}} [[tc]]
-                            ', array('oldParentId' => $node['parent'], 'oldOrder' => $node['ordering'])
-                        ));
+                    $params = compact('nDelta', 'oDelta', 'oLeftMin', 'oLeftMax', 'oRightMin', 'oRightMax');
+                    $params['nodeLeft'] = $node['left'];
+                    $params['nodeRight'] = $node['right'];
                     
-                        if (($leftSibling = $this->getInternalFields($this->_db->fetchRow(
-                            $this->_stmt('
-                                SELECT * FROM [[tableName]]
-                                WHERE [[parentCol]] = {{parentId}} AND [[orderingCol]] < {{order}} [[tc]]
-                                ORDER BY [[orderingCol]] DESC
-                                LIMIT 1
-                            ', array('parentId' => $parentId, 'order' => $order))
-                        )))) $left = $leftSibling['right'] + 1;
+                    if ($this->freakOut) {
+                        
+                        $freakExtraColumns = $this->freakExtraColumns;
+                        $freakExtraJoins = $this->freakExtraJoins;
+                        if (strlen($freakExtraColumns)) $freakExtraColumns .= ', ';
+                        
+                        $extra = compact ('parent', 'node', 'order', 'width', 'sameParent', 'hasTargetNode', 'targetLeft', 'targetRight');
+                        $ds = $this->_stmt("
+                            SELECT {$freakExtraColumns} [[idCol]], [[orderingCol]], [[parentCol]], [[leftCol]] AS `oL`, [[rightCol]] AS `oR`,
+
+                                CASE 
+                                    WHEN [[leftCol]] BETWEEN {{nodeLeft}} AND {{nodeRight}} THEN CONCAT('N ', {{nDelta}})
+                                    WHEN [[leftCol]] BETWEEN {{oLeftMin}} AND {{oLeftMax}} THEN CONCAT('L ', {{oDelta}})
+                                    ELSE ''
+                                END AS lClass,
+
+                                CASE 
+                                    WHEN [[rightCol]] BETWEEN {{nodeLeft}} AND {{nodeRight}} THEN CONCAT('N ', {{nDelta}})
+                                    WHEN [[rightCol]] BETWEEN {{oRightMin}} AND {{oRightMax}} THEN CONCAT('R ', {{oDelta}})
+                                    ELSE ''
+                                END AS rClass,
+
+                                [[leftCol]] + CASE 
+                                    WHEN [[leftCol]] BETWEEN {{nodeLeft}} AND {{nodeRight}} THEN {{nDelta}} 
+                                    WHEN [[leftCol]] BETWEEN {{oLeftMin}} AND {{oLeftMax}} THEN {{oDelta}} 
+                                    ELSE '' 
+                                END AS `nL`,
+                                
+                                [[rightCol]] + CASE 
+                                    WHEN [[rightCol]] BETWEEN {{nodeLeft}} AND {{nodeRight}} THEN {{nDelta}} 
+                                    WHEN [[rightCol]] BETWEEN {{oRightMin}} AND {{oRightMax}} THEN {{oDelta}} 
+                                    ELSE 0
+                                END AS `nR`
+
+                            FROM [[tableName]] WHERE 1 [[tc]]
+                            ORDER BY [[leftCol]]
+                            ", $params
+                        );
+                        $rows = $this->_db->fetchArray($ds);
+
+                        $counts = array('oL' => array(), 'oR' => array(), 'nL' => array(), 'nR' => array());
+                        foreach ($rows as $row) {
+                            foreach (array_keys($counts) as $item) {
+                                if (!isset($counts[$item][$row[$item]])) $counts[$item][$row[$item]] = 1;
+                                else $counts[$item][$row[$item]]++;
+                            }
+                        }
+                        $hasBugs = false;
+                        foreach ($rows as $k => $row) {
+                            foreach (array_keys($counts) as $item) {
+                                if ($counts[$item][$row[$item]] > 1) {
+                                    $rows[$k][$item] .= ' !! '.$counts[$item][$row[$item]];
+                                    $hasBugs = true;
+                                }
+                            }
+                        }
+                        
+                        if ($this->freakOut == self::FREAK_OUT_ALWAYS || $hasBugs) {
                     
-                    } else {
+                            while(ob_get_level()) ob_end_clean();
+                    
+?>
+                            <style type="text/css">
+                                .tDebug td {
+                                    vertical-align: top;
+                                    border: 1px solid black;
+                                    padding: 5px;
+                                }
+                            </style>
+<?php
+                        
+                            echo "<table class='tDebug'><tr><td>"; var_dump($params); echo "</td><td>"; var_dump($extra); echo "</td><td>";
+                            Ac_Util::showCoolTable($rows, array_combine(array_keys($rows[0]), array_keys($rows[0])), array());
+                            echo "</td></tr></table>";
+
+                            die();
+                        }
+                    }
+                    
+                    // let's DO it
+                    $this->query($this->_stmt('
+                        UPDATE [[tableName]] 
+                        SET 
+                            [[leftCol]] = [[leftCol]] + CASE 
+                                WHEN [[leftCol]] BETWEEN {{nodeLeft}} AND {{nodeRight}} THEN {{nDelta}} 
+                                WHEN [[leftCol]] BETWEEN {{oLeftMin}} AND {{oLeftMax}} THEN {{oDelta}} 
+                                ELSE 0 
+                            END, 
+                            
+                            [[rightCol]] = [[rightCol]] + CASE 
+                                WHEN [[rightCol]] BETWEEN {{nodeLeft}} AND {{nodeRight}} THEN {{nDelta}} 
+                                WHEN [[rightCol]] BETWEEN {{oRightMin}} AND {{oRightMax}} THEN {{oDelta}} 
+                                ELSE 0 END 
+                                
+                        WHERE 
+                            (
+                                [[leftCol]] BETWEEN {{nodeLeft}} AND {{nodeRight}}
+                                OR [[leftCol]] BETWEEN {{oLeftMin}} AND {{oLeftMax}} 
+                                OR [[rightCol]] BETWEEN {{oRightMin}} AND {{oRightMax}}
+                            ) [[tc]]
+                            
+                        ', $params
+                    ));
+                    
+                    // Change ordering values
+
+                    if ($sameParent) {
                         
                         if ($order > $node['ordering']) {
                             $rightOrder = $order;
@@ -438,121 +616,27 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
                             ', array('parentId' => $parentId, 'leftOrder' => $leftOrder, 'rightOrder' => $rightOrder, 'newOrder' => $order, 'id' => $id, 'delta' => new Ac_Sql_Expression($delta))
                         ));
                         
-                        $leftSibling = $this->getInternalFields($this->_db->fetchRow(
-                            $this->_stmt('
-                                SELECT * FROM [[tableName]]
-                                WHERE [[parentCol]] = {{parentId}} AND [[orderingCol]] < {{order}} [[tc]]
-                                ORDER BY [[orderingCol]] DESC
-                                LIMIT 1
-                            ', array('parentId' => $parentId, 'order' => $order))
-                        ));
-                        if ($leftSibling) {
-                            $left = $leftSibling['right'] + 1;
-                        }
-                        
-                    }
-                     
-                    $childOffset = $node['right'] - $node['left'] + 1;
-                    
-                    if ($left < $node['left']) {
-                        
-                        $this->query($this->_stmt('
-                            UPDATE [[tableName]] SET 
-                                [[leftCol]] = [[leftCol]] + {{childOffset}}
-                            WHERE
-                                [[leftCol]] >= {{left}}
-                                AND [[leftCol]] <= {{nodeLeft}}
-                                AND [[ignoreCol]] = 0
-                                [[tc]]
-                        ', array('childOffset' => $childOffset, 'left' => $left, 'nodeLeft' => $node['left'])
-                        ));
-                        
-                        $this->query($this->_stmt('
-                            UPDATE [[tableName]] SET 
-                                [[rightCol]] = [[rightCol]] + {{childOffset}}
-                            WHERE
-                                [[rightCol]] >= {{left}}
-                                AND [[rightCol]] <= {{nodeRight}}
-                                AND [[ignoreCol]] = 0
-                                [[tc]]
-                        ', array('childOffset' => $childOffset, 'left' => $left, 'nodeRight' => $node['right'])
-                        ));
-                        
-                        
                     } else {
                         
                         $this->query($this->_stmt('
-                            UPDATE [[tableName]] SET 
-                                [[leftCol]] = [[leftCol]] - {{childOffset}}
-                            WHERE
-                                [[leftCol]] <= {{left}}
-                                AND [[leftCol]] >= {{nodeLeft}}
-                                AND [[ignoreCol]] = 0
-                                [[tc]]
-                        ', array('childOffset' => $childOffset, 'left' => $left, 'nodeLeft' => $node['left'])
+                                UPDATE [[tableName]] 
+                                SET [[orderingCol]] = [[orderingCol]] + 1
+                                WHERE [[parentCol]] = {{newParentId}} AND [[orderingCol]] >= {{newOrder}} [[tc]]
+                            ', array('newParentId' => $parentId, 'newOrder' => $order)
                         ));
                         
                         $this->query($this->_stmt('
-                            UPDATE [[tableName]] SET 
-                                [[rightCol]] = [[rightCol]] - {{childOffset}}
-                            WHERE
-                                [[rightCol]] < {{left}}
-                                AND [[rightCol]] >= {{nodeRight}}
-                                AND [[ignoreCol]] = 0
-                                [[tc]]
-                        ', array('childOffset' => $childOffset, 'left' => $left, 'nodeRight' => $node['right'])
+                                UPDATE [[tableName]] 
+                                SET [[orderingCol]] = [[orderingCol]] - 1
+                                WHERE [[parentCol]] = {{oldParentId}} AND [[orderingCol]] >= {{oldOrder}} [[tc]]
+                            ', array('oldParentId' => $node['parent'], 'oldOrder' => $node['ordering'])
                         ));
                     }
-                    
-                    $levelDiff = $parent['level'] - $node['level'] + 1;
-                    $newOffset = $node['left'] - $left;
-                    if ($left > $node['left']) $newOffset += $childOffset;
-                    
-                    $this->query($this->_stmt('
-                        UPDATE [[tableName]] SET 
-                            [[leftCol]] = [[leftCol]] - {{newOffset}},
-                            [[rightCol]] = [[rightCol]] - {{newOffset}},
-                            [[levelCol]] = [[levelCol]] + {{levelDiff}}
-                        WHERE
-                            [[leftCol]] >= {{nodeLeft}}
-                            AND [[rightCol]] <= {{nodeRight}}
-                            AND [[ignoreCol]] = 1
-                            [[tc]]
-                        ', array(
-                            'newOffset' => $newOffset, 
-                            'levelDiff' => $levelDiff, 
-                            'nodeLeft' => $node['left'],
-                            'nodeRight' => $node['right'],
-                        )
-                    ));
-                    
-                    $this->query($this->_stmt('
-                        UPDATE [[tableName]] SET
-                            [[ignoreCol]] = 0
-                        WHERE
-                            [[leftCol]] >= {{newLeft}}
-                            AND [[rightCol]] <= {{newRight}}
-                            AND [[ignoreCol]] = 1
-                            [[tc]]
-                        ', array(
-                            'newLeft' => $node['left'] - $newOffset,
-                            'newRight' => $node['right'] - $newOffset,
-                        )
-                    ));
-                    
-                    $this->query($this->_stmt('
-                        UPDATE [[tableName]] SET 
-                            [[parentCol]] = {{parentId}},
-                            [[orderingCol]] = {{order}}
-                        WHERE
-                            [[idCol]] = {{id}} 
-                        ', array('parentId' => $parentId, 'order' => $order, 'id' => $id)
-                    ));
-                    
-                    $res = true;
-                    $actualOrder = $order;
-                    
+                     
                 }
+
+                $res = true;
+                $actualOrder = $order;
                 
             }
                 
