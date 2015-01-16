@@ -17,6 +17,8 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
     
     var $rootNodePrototype = array();
     
+    var $nestedSetsExtra = array();
+    
     protected $isCreatingRootNode = false;
     
     protected $allChildrenCountRelation = false;
@@ -28,7 +30,7 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
      */
     function getNestedSets() {
         if ($this->nestedSets === false) {
-            $this->nestedSets = new Ac_Sql_NestedSets(array(
+            $this->nestedSets = new Ac_Sql_NestedSets(Ac_Util::m(array(
                 'tableName' => $this->mixin->tableName,
                 'leftCol' => $this->leftCol,
                 'rightCol' => $this->rightCol,
@@ -41,7 +43,7 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
                 'db' => $this->mixin->getDb(),
                 'blocker' => new Ac_Sql_Blocker(),
                 'idIsAutoInc' => $this->mixin->getAutoincFieldName() == $this->mixin->pk,
-            ));
+            ), $this->nestedSetsExtra));
         }
         return $this->nestedSets;
     }
