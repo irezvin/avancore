@@ -673,6 +673,13 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     // -------------------------------------- associations related methods -------------------------------------------- 
 
     /**
+     * @return Ac_Model_Datalink
+     */
+    function getDataLink() {
+        return $this->_datalink;
+    }
+    
+    /**
      * @param Ac_Model_Datalink $datalink
      */
     function setDatalink($datalink) {
