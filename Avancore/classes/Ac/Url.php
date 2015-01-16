@@ -276,12 +276,17 @@ class Ac_Url implements Ac_I_RedirectTarget {
      * @return Ac_Url
      */
     static function guess($withPathInfo = false) {
-        if (!isset($_SERVER['SERVER_PROTOCOL'])) {
+        if (!isset($_SERVER)) {
             // TODO: fix me
             return new Ac_Url("http://localhost/");
         }
-        $protocol = explode('/', strtolower($_SERVER['SERVER_PROTOCOL']));
-        $res = new Ac_Url($protocol[0].'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+        $scheme = 'http';
+        if (isset($_SERVER['REQUEST_SCHEME']) && strlen($_SERVER['REQUEST_SCHEME'])) {
+            $scheme = $_SERVER['REQUEST_SCHEME'];
+        } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+            $scheme = 'https';
+        }
+        $res = new Ac_Url($scheme.'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
         if ($withPathInfo) {
             if (isset($_SERVER['PATH_INFO'])) {
                 $myPathInfo = $_SERVER['PATH_INFO'];
