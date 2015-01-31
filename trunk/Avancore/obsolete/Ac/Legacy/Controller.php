@@ -262,6 +262,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped {
      */
     function getMethodParamValue() {
         if ($this->_methodParamValue === false) {
+            $this->bindFromRequest();
             $this->_methodParamValue = null;
             $mp = $this->_methodParamName;
             if (isset($this->_rqData[$mp])) {

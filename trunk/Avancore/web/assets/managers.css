@@ -89,7 +89,8 @@ td.w20, th.w20 {width: 20px}
 .pagination a.selected {font-weight: bold}
 
 span.captionWithDesc {border-bottom: 1px dashed silver; cursor: help}
-span.captionWithDesc:hover {border-bottom: 1px solid silver;]}
+
+span.captionWithDesc:hover {border-bottom: 1px solid silver;}
 
 body.admin .btn-toolbar .actions {
     font-size: 14px;
@@ -227,3 +228,6 @@ table.actions td, .avanadmin .details table.actions td {
 }
 
 
+.avanadmin ul.shadetabs > li.withErrors a {
+    color: red
+}

@@ -159,6 +159,10 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     var $dontCount = false;
     
+    var $lastRecordErrors = array();
+    
+    var $_returnUrl = false;
+    
     /**
      * @var Ac_Admin_ManagerConfigService
      */
@@ -246,11 +250,18 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         }
     }
     
-    function executeDetails() {
+    function executeDetails($refresh = false) {
         $this->_isForm = true;
         $this->_stayOnProcessing = false;
+        
+        if ($refresh) {
+            $form = $this->getForm();
+            $record = $this->getRecord();
+            $form->updateModel();
+        }
+
         $template = $this->getTemplate();
-        $this->_processSubManagers();
+        if (!$this->_processSubManagers()) return true;
         
         $rqd = isset($this->_rqWithState['form'])? $this->_rqWithState['form'] : false;
         if ($this->_caching && $c = $this->_loadFromCache('form', $rqd)) {
@@ -260,31 +271,12 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             if ($this->_caching) $this->_saveToCache(serialize($this->_formResponse), 'form', $rqd);
         }
         
-        if (!(isset($this->_response->hasToRedirect) && $this->_response->hasToRedirect)) $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
+        if (!(isset($this->_response->hasToRedirect) && $this->_response->hasToRedirect)) 
+            $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
     }
     
     function executeRefreshDetails() {
-        $this->_isForm = true;
-        $this->_stayOnProcessing = false;
-        
-        $form = $this->getForm();
-        $data = $form->getValue();
-        $record = $this->getRecord();
-        $record->bind($data);
-        
-        $this->_processSubManagers();
-        $template = $this->getTemplate();
-        
-        $rqd = isset($this->_rqWithState['form'])? $this->_rqWithState['form'] : false;
-        if ($this->_caching && $c = $this->_loadFromCache('form', $rqd)) {
-            $this->_formResponse = unserialize($c);
-        } else {
-            $this->_formResponse = $this->_getFormResponse();
-            if ($this->_caching) $this->_saveToCache(serialize($this->_formResponse), 'form', $rqd);
-        }
-        
-        
-        if (!(isset($this->_response->hasToRedirect) && $this->_response->hasToRedirect)) $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
+        return $this->executeDetails(true);
     }
     
     function executeProcessing() {
@@ -360,29 +352,39 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
     }
     
-    function executeSave($withAdd = false) {
+    function executeSave($withAdd = false, $stayOnDetails = false) {
         $this->_isForm = true;
         $this->_stayOnProcessing = false;        
         
         $form = $this->getForm();
         $form->setSubmitted(true);
-        $data = $form->getValue();
         $record = $this->getRecord();
-        $record->bind($data);
+        $form->updateModel();
         $this->callFeatures('onBind', $record);
-        if ($record->check() && $record->store()) {
+        $this->lastRecordErrors = array();
+        $subOk = $this->_processSubManagers(true);
+        if ($subOk && $record->check() && $record->store()) {
             $this->_recordStored = true;
             $this->_record = null;
+            $u = $this->getReturnUrl();
             if ($withAdd) {
-                $u = $this->getManagerUrl('new',array(
-                ));
+                $params = array();
+                if (strlen($u)) 
+                    $params['returnUrl64'] = base64_encode($u);
+                $u = $this->getManagerUrl('new', $params)->toString();
+            } elseif (strlen($u)) {
+                $this->_response->redirectUrl = $u;
+                $u = false;
+            } elseif ($stayOnDetails) {
+                $u = $this->getManagerUrl('details')->toString();
             } else {
-                $u = $this->getManagerUrl('list');
+                $u = $this->getManagerUrl('list')->toString();
             }
-            $this->_response->hasToRedirect = $u->toString();
+            $this->_response->hasToRedirect = $u;
             
         } else {
         
+            $this->lastRecordErrors = $this->_record->getErrors();
             $template = $this->getTemplate();
             $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
             
@@ -394,24 +396,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
     
     function executeApply() {
-        $this->_isForm = true;
-        $this->_stayOnProcessing = false;
-        
-        $form = $this->getForm();
-        $form->setSubmitted(true);
-        $data = $form->getValue();
-        
-        $record = $this->getRecord();
-        $record->bind($data);
-        if ($record->check() && $record->store()) {
-            $this->_recordStored = true;
-            $u = $this->getManagerUrl('details');
-            $this->_response->hasToRedirect = $u->toString();
-        }
-        else {
-            $template = $this->getTemplate();
-            $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
-        }
+        return $this->executeSave(false, true);
     }
     
     function executeCancel() {
@@ -589,6 +574,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         }
         if ($res['action'] === 'list') {
             unset($res['keys']);
+        }
+        if (($u = $this->getReturnUrl()) !== null) {
+            $res['returnUrl64'] = base64_encode($u);
         }
         
         if (isset($this->_rqData['filterForm'])) {
@@ -928,6 +916,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $this->_subManagers = array();
             if ($this->allowSubManagers && $this->getRecord() && $this->getRecord()->isPersistent()) {
                 foreach ($this->listFeatures() as $f) {
+
                     $feat = $this->getFeature($f);
                     $smc = $feat->getSubManagersConfig();
                     if (is_array($this->allowSubManagers)) {
@@ -1143,14 +1132,35 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     // ---------------------------------------------------- protected supplementary methods --------------------------------------------
     
-    function _processSubManagers() {
+    function _processSubManagers($forceSave = false) {
         $subRedirect = false;
         $allState = array();
+        $res = true;
         foreach ($this->listSubManagers() as $i) {
             $s = $this->getSubManager($i);
-            $r = $s->getResponse();
+            if ($forceSave && $s->getMethodParamValue() == 'details') {
+                $methodName = 'executeApply';
+            } else {
+                $methodName = false;
+            }
+            $r = $s->getResponse($methodName);
+            if ($forceSave && $methodName !== false) {
+                if ($s->lastRecordErrors) {
+                    $this->_tplData['activeSubManagerId'] = $i;
+                    $res = false;
+                } else {
+                    $s->_response = false;
+                    $r = $s->getResponse('executeDetails');
+                }
+            }
             $this->_response->mergeWithResponse($r);
-            if (isset($r->hasToRedirect) && $r->hasToRedirect) $subRedirect = $r->hasToRedirect;
+            if (!$forceSave && isset($r->hasToRedirect) && $r->hasToRedirect) {
+                $subRedirect = $r->hasToRedirect;
+            }
+            elseif ($r->noHtml || $r->noWrap) {
+                $subRedirect = false;
+                break;
+            }
             $allState['sm_'.$i] = $s->getStateData();
         }
         if ($subRedirect) {
@@ -1159,6 +1169,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $mu->query = Ac_Util::m($mu->query, $u->query, true);
             $this->_response->hasToRedirect = $mu->toString();
         }
+        return $res;
     }
     
     /**
@@ -1343,11 +1354,18 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $this->getMapper()->preloadRelations($myRecs, $pr);
         }
     }
-        
+    
     /**
      * @return Ac_Model_Collection
      */
     function _getRecordsCollection() {
+        return $this->getRecordsCollection();
+    }
+    
+    /**
+     * @return Ac_Model_Collection
+     */
+    function getRecordsCollection() {
         if ($this->_recordsCollection === false) {
             if ($this->_collectionCanBeUsed()) {
                 $this->_recordsCollection = new Ac_Model_Collection($this->mapperClass, false, $this->_getWhere(), $this->_getOrder(), $this->_getJoins(), $this->_getExtraColumns());
@@ -1440,6 +1458,18 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         }
         return $this->configService;
     }    
+    
+    function getReturnUrl() {
+        if ($this->_returnUrl === false) {
+            $this->_returnUrl = $this->getContext()->getData('returnUrl', null);
+            if (is_null($this->_returnUrl)) {
+                $tmp = $this->getContext()->getData('returnUrl64', null);
+                if (strlen($tmp) && strlen($tmp = base64_decode($tmp))) 
+                    $this->_returnUrl = $tmp;
+            }
+        }
+        return $this->_returnUrl;
+    }
     
 }
 
