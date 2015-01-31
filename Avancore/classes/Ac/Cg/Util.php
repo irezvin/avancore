@@ -121,24 +121,16 @@ abstract class Ac_Cg_Util {
             do {
                 $match = true;
                 $s = false;
-                $same = 0;
                 foreach ($strings as $string) {
                     $s1 = substr($string, 0, strlen($res) + 1);
                     if ($s === false) $s = $s1;
-                    elseif ($string === $res) {
-                        $same++;
-                    }
                     elseif ($s != $s1) {
                         $match = false;
+                        break;
                     }
                 }
-                if ($same && $same == count($strings)) { // all the strings are same
-                    $match = false;
-                    $res = '';
-                    break;
-                }
                 if ($match) $res = $s;
-            } while ($match && strlen($res));
+            } while ($match);
         }
         return $res;
     }
