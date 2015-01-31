@@ -212,7 +212,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
             if ($this->_noRecords || ($this->defaultToAllRecords == self::DEFAULT_RECORDS_NONE && is_array($this->_recordKeys) && !count($this->_recordKeys))) $this->_records = array();
             if (!$this->_recordsCollection) {
                 if ($this->defaultToAllRecords == self::DEFAULT_RECORDS_BY_FILTERS) {
-                    $this->_recordsCollection = $this->manager->getSqlSelect()->createCollection($this->manager->mapperClass);
+                    $this->_recordsCollection = clone $this->manager->getRecordsCollection ($this->manager->mapperClass);
                 } else {
                     $this->_recordsCollection = new Ac_Model_Collection();
                     $this->_recordsCollection->setDatabase($this->application->getDb());

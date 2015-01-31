@@ -5,6 +5,8 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
      * @var Ac_Admin_Manager
      */
     var $manager = false;
+    var $activeSubManagerId = false;
+    
     /**
      * @var Ac_Legacy_Controller_Context_Http
      */
@@ -303,19 +305,24 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
         $tcId = $ctx->mapIdentifier('smTabs');
         $tcVar = $tcId.'_o';
         $h = $this->getHtmlHelper();
+        $currTab = $ctx->getData('tab');
         
 ?>
 
         <div class='subManagers'>
-
         <ul id="<?php $this->d($tcId); ?>" class="shadetabs">
 <?php foreach ($this->manager->listSubManagers() as $id) { 
         $smId = $ctx->mapIdentifier('smTab_'.$id); 
         $sm = $this->manager->getSubManager($id);
         $resp = $sm->getResponse();
+        $cls = '';
+        if ($sm->lastRecordErrors) {
+            if (!$currTab) $currTab = $id;
+            $cls = ' class="withErrors"';
+        }
 ?>
     
-        <li><a href="#" rel="<?php $this->d($smId); ?>"><?php $this->d($sm->getPluralCaption()); ?></a></li>
+        <li<?php echo $cls; ?>><a href="#" rel="<?php $this->d($smId); ?>"><?php $this->d($sm->getPluralCaption()); ?></a></li>
 <?php } ?>
         </ul>
 
@@ -344,7 +351,7 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
             <?php echo $tcVar; ?>.setpersist(true);
             <?php echo $tcVar; ?>.setselectedClassTarget("link");
             <?php echo $tcVar; ?>.init();
-<?php       if (strlen($currTab = $ctx->getData('tab'))) { ?> 
+<?php       if (strlen($currTab)) { ?> 
             <?php echo "{$tcVar}.expandtab({$tcVar}.tabs[{$currTab}]);" ?>
 <?php       } ?>
                 

@@ -274,6 +274,18 @@
 
 *** DONE fix Ac_Model_Relation::countSrc/Dest [2014-08-17 Sun]	  :model:bug:
     Done on [2014-08-31 Sun]
+*** DONE Ac_Admin_Manager returnUrl on save()/cancel() [2013-11-11 Mon] :admin:feature:
+         Done on [2015-01-31 Sat]
+       	 +Also $returnToReferer  would be nice.+
+*** DONE Ac_Admin_Manager: 'datalink' restrictions are not always applied to sub-manager processing [2014-12-09] :admin:bug:minor:
+    How to reproduce: invoke a processing in sub-manager that has 
+    $defaultToAllRecords === Ac_Admin_Processing::DEFAULT_RECORDS_BY_FILTERS
+    It will run through ALL detail records, not all details of currently open parent record.
+    Done on [2015-01-17 Sat]
+*** DONE Ac_Admin_Manager: when action returns "raw" (non-wrapped, no-html output), output is still wrapped in outer manager's details [2014-12-09] :admin:bug:minor:
+    Done on [2015-01-24 Sat]
+*** DONE Ac_Admin_Manager must save open referencing records when top referenced record is saved [2013-12-06 Fri] 
+    Done on [2015-01-24 Sat]
 ** Not started
 *** TODO think about fields that are part of foreign key [2014-03-05 Wed]
     - Example A: userAvatar is referenced by both user->id and user->photoId. 
@@ -310,8 +322,6 @@
 **** TODO ability to specify own sort expressions
 *** TODO Get rid of Ac_Model_Collection::getStatementTail(), since not all DBMS have limit clause [2013-11-11 Mon]  
 **** Make E_DEPRECATED, that's all
-*** TODO Ac_Admin_Manager returnUrl on save()/cancel() [2013-11-11 Mon] 	      :admin:feature:
-       	 Also $returnToReferer  would be nice.
 *** TODO decorators' access to the model		      :model:feature:
 *** TODO Ac_Widget_Menu [2014-03-12 Wed]		     :widget:feature:
 *** TODO Add "libraries" class to add common JS and CSS frameworks [2013-10-26 Sat] :js:feature:
@@ -386,7 +396,6 @@
     Если я делаю станадртную форму "параметров", то она должна экранироваться при помощи Ac_Sql_Db::q()
 **** TODO support of '#foo' => nameQuote in Ac_Sql_Db::preProcessQuery()
 *** TODO Do we need to make Ac_Sql_Filter_Multiple/Ac_Sql_Order_Multiple supporting $foo->getFilter|Order($sub)->bind()? [2013-11-12 Tue] :sql:design:
-*** TODO Ac_Admin_Manager must save open referencing records when top referenced record is saved [2013-12-06 Fri] 
 *** TODO Ac_Model_Mapper: ability to remap property<->column (?how to deal with SQL? special form of NameQuote, probably?) [2013-12-06 Fri]
 **** Nice idea to add $defaultQualifier in Mapper to allow other related object know what qualifier to use.
 **** Usually it's a PK field.
@@ -440,11 +449,6 @@
     I should allow it to create and delate detail records, since
     it's almost ununsable in it's current state (See how it's done
     in different solutions)
-*** TODO Ac_Admin_Manager: 'datalink' restrictions are not always applied to sub-manager processing [2014-12-09] :admin:bug:minor:
-    How to reproduce: invoke a processing in sub-manager that has 
-    $defaultToAllRecords === Ac_Admin_Processing::DEFAULT_RECORDS_BY_FILTERS
-    It will run through ALL detail records, not all details of currently open parent record.
-*** TODO Ac_Admin_Manager: when action returns "raw" (non-wrapped, no-html output), output is still wrapped in outer manager's details [2014-12-09] :admin:bug:minor:
 *** TODO Ac_Cg_Model::findRelationSuffixes() produces wrong result when two one FK is 'common prefix' of other FK :cg:bug:minor:important: [2015-01-17]
     Example:
     I have table1 (class Foo)
@@ -455,6 +459,7 @@
     suffix of reference2 is Blah. When there is common prefix, but empty ref. suffix,
     default property & accessor names should be used.
     
+*** TODO Ac_Admin_Feature, Ac_Admin_Datalink: should be Mixins of Ac_Admin_Manager [2015-01-31 Sat] :admin:refactor:
 ** Questionable
 *** TODO Joomla output: don't add JS and CSS assets that were already added by the Joomla [2013-10-26 Sat] :js:bug:
 *** TODO Ac_Sql_Db, Ac_Sql_Db_PDO: charset (at least default to utf-8) :sql:bug:minor:

@@ -46,11 +46,15 @@ class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Legacy_Template_Html {
         $bu = $this->controller->getUrl();
         $ctx = $this->manager->getContext();
         $allState[$this->manager->getInstanceId()] = $this->manager->getStateData();
+        if ($this->managerResponse && strlen($this->managerResponse->redirectUrl)) {
+            $this->htmlResponse->redirectUrl = $this->managerResponse->redirectUrl;
+            $this->htmlResponse->redirectType = $this->managerResponse->redirectType;
+            return;
+        }
         if ($this->managerResponse && isset($this->managerResponse->hasToRedirect) && ($redir = $this->managerResponse->hasToRedirect)) {
             $bu = $ctx->getUrl();
             $u = new Ac_Url($redir);
             $bu->query = Ac_Util::m($allState, $u->query, true);
-            //Ac_Debug::ddd(strlen(''.$bu), ''.$bu);
             $this->htmlResponse->redirectUrl = $bu;
         } else {
             $bu = $this->controller->getUrl(array($this->controller->_methodParamName => 'manager', 'mapper' => $this->context->getData('mapper')));
