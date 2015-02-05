@@ -131,6 +131,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_people');
         }
         return $this->_peopleCount;
+        
     }
 
     function listPeople() {
@@ -154,8 +155,16 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         if (!$this->_peopleLoaded) {
             $this->mapper->loadPeopleFor($this);
         }
+        
         if (!isset($this->_people[$id])) trigger_error ('No such People: \''.$id.'\'', E_USER_ERROR);
         return $this->_people[$id];
+    }
+    
+    /**
+     * @return Sample_Person 
+     */
+    function getPeopleItem($id) {
+        return $this->getPerson($id);
     }
     
     /**
@@ -171,7 +180,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         }
         
     }
-    
+
     /**
      * @return Sample_Person  
      */
@@ -211,6 +220,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_perks');
         }
         return $this->_perksCount;
+        
     }
 
     function listPerks() {
@@ -234,8 +244,16 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         if (!$this->_perksLoaded) {
             $this->mapper->loadPerksFor($this);
         }
+        
         if (!isset($this->_perks[$id])) trigger_error ('No such Perk: \''.$id.'\'', E_USER_ERROR);
         return $this->_perks[$id];
+    }
+    
+    /**
+     * @return Sample_Perk 
+     */
+    function getPerksItem($id) {
+        return $this->getPerk($id);
     }
     
     /**
@@ -251,7 +269,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         }
         
     }
-    
+
     /**
      * @return Sample_Perk  
      */

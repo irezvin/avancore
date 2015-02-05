@@ -36,7 +36,6 @@ $config = array(
 		'autoTablesIgnore' => array(
             '#__tree_nested_sets',
             '#__shop_product_upc',
-            '#__shop_product_extraCodes',            
             '#__shop_meta',            
         ),
         'defaultTitleColumn' => 'title',
@@ -93,6 +92,12 @@ $config = array(
                 ),
                 'skipMapperMixables' => array(
                     'fkPostPublish',
+                ),
+            ),
+            'shopProductExtraCodes' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'masterFkIds' => array(
+                    'fkExtraCodeProduct',
                 ),
             ),
         ),

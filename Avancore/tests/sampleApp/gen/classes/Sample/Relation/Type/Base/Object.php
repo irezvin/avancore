@@ -95,6 +95,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_relations');
         }
         return $this->_relationsCount;
+        
     }
 
     function listRelations() {
@@ -118,8 +119,16 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
         if (!$this->_relationsLoaded) {
             $this->mapper->loadRelationsFor($this);
         }
+        
         if (!isset($this->_relations[$id])) trigger_error ('No such Relation: \''.$id.'\'', E_USER_ERROR);
         return $this->_relations[$id];
+    }
+    
+    /**
+     * @return Sample_Relation 
+     */
+    function getRelationsItem($id) {
+        return $this->getRelation($id);
     }
     
     /**
@@ -133,7 +142,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
         $relation->_relationType = $this;
         
     }
-    
+
     /**
      * @return Sample_Relation  
      */

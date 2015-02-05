@@ -137,6 +137,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     function getPublish() {
         if ($this->_publish === false) {
             $this->mapper->loadPublishFor($this);
+            
         }
         return $this->_publish;
     }
@@ -158,7 +159,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     function clearPublish() {
         $this->publish = null;
     }
-    
+
     /**
      * @return Sample_Publish  
      */
@@ -170,6 +171,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
         $this->setPublish($res);
         return $res;
     }
+
     
         
     
@@ -179,6 +181,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     function getPerson() {
         if ($this->_person === false) {
             $this->mapper->loadPeopleFor($this);
+            
         }
         return $this->_person;
     }
@@ -200,7 +203,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     function clearPerson() {
         $this->person = null;
     }
-    
+
     /**
      * @return Sample_Person  
      */
@@ -212,6 +215,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
         $this->setPerson($res);
         return $res;
     }
+
     
         
     
@@ -221,6 +225,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     function getPersonPhoto() {
         if ($this->_personPhoto === false) {
             $this->mapper->loadPersonPhotosFor($this);
+            
         }
         return $this->_personPhoto;
     }
@@ -242,7 +247,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     function clearPersonPhoto() {
         $this->personPhoto = null;
     }
-    
+
     /**
      * @return Sample_Person_Photo  
      */
@@ -254,6 +259,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
         $this->setPersonPhoto($res);
         return $res;
     }
+
     
   
     

@@ -15,6 +15,20 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
 
     protected $mixinClass = false;
     
+    /**
+     * Class which descendants introduce mixin properties and
+     * methods
+     * 
+     * By default all methods and props introduced after Ac_Mixable 
+     * are exposes by listMixinMethods() / listMixinProperties().
+     * 
+     * But it may be changed to simplify creation of descendants,
+     * 'transparent' to mixins.
+     * 
+     * @var strings
+     */
+    protected $myBaseClass = 'Ac_Mixable';
+    
     protected static $introducedPublicMethods = array();
     
     protected static $introducedPublicVars = array();
@@ -44,7 +58,7 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
         if (!isset(self::$introducedPublicMethods[$c])) {
             self::$introducedPublicMethods[$c] = array_diff(
                 Ac_Util::getPublicMethods($c), 
-                Ac_Util::getPublicMethods('Ac_Mixable')
+                Ac_Util::getPublicMethods($this->myBaseClass)
             ); 
             if (strlen($this->autoEventPrefix)) 
                 self::$introducedPublicMethods[$c] = array_diff(self::$introducedPublicMethods[$c], 
@@ -71,7 +85,7 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
         if (!isset(self::$introducedPublicVars[$c])) {
             self::$introducedPublicVars[$c] = array_diff(
                 array_keys(Ac_Util::getPublicVars($c)), 
-                array_keys(Ac_Util::getPublicVars('Ac_Mixable'))
+                array_keys(Ac_Util::getPublicVars($this->myBaseClass))
             );
         }
         return array_diff(self::$introducedPublicVars[$c], $this->listNonMixedProperties());

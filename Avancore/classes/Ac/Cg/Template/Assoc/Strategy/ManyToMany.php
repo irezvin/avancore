@@ -3,12 +3,14 @@
 class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Strategy_Many {
     
     function getGuessMap() {
-        return array_merge(parent::getGuessMap(), array(
+        $res = array_merge(parent::getGuessMap(), array(
             'loadDestIdsMapperMethod' => 'load{Single}IdsFor',
             'getDestIdsMethod' => 'get{Single}Ids',
             'setDestIdsMethod' => 'set{Single}Ids',
             'clearDestObjectsMethod' => 'clear{Plural}',
         ));
+        if (!$this->canLoadDest) $res['loadDestIdsMapperMethod'] = null;
+        return $res;
     }
     
     function _doShowGenModelMethods() {
@@ -20,7 +22,11 @@ class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Stra
 
     function get<?php $this->d(ucfirst($this->prop->getIdsPropertyName())); ?>() {
         if ($this-><?php $this->d($imn) ?> === false) {
-            $this->mapper->load<?php $this->d(ucfirst($this->prop->getIdsPropertyName())); ?>For($this);
+<?php       if ($this->canLoadDest) { ?>
+            $this->mapper->load<?php $this->d(ucfirst($this->prop->getIdsPropertyName())); ?>For(<?php echo $this->relationTargetExpression; ?>);
+<?php       } else { ?>            
+            return array();
+<?php       } ?>
         }
         return $this-><?php $this->d($imn) ?>;
     }
@@ -46,8 +52,8 @@ class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Stra
     function _showLinkBackCode() {
 ?>        
 <?php   if (strlen($this->mirrorVar)) { ?>
-        if (is_array($<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>) && !Ac_Util::sameInArray($this, $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>)) {
-                $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>[] = $this;
+        if (is_array($<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>) && !Ac_Util::sameInArray(<?php echo $this->relationTargetExpression; ?>, $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>)) {
+                $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>[] = <?php echo $this->relationTargetExpression; ?>;
         }
 <?php   } ?>
 <?php  
@@ -57,6 +63,7 @@ class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Stra
         parent::_doShowGenMapperMethods();
         extract(get_object_vars($this));
 ?>
+<?php if ($this->canLoadDest) { ?>
 
     /**
      * @param <?php $this->d($thisClass); ?>|array <?php $this->d($idThisPlural); ?> 
@@ -65,7 +72,8 @@ class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Stra
         $rel = $this->getRelation(<?php $this->str($relationId); ?>);
         return $rel->loadDestNNIds(<?php $this->d($idThisPlural); ?>); 
     }
-
+    
+<?php } ?>
 <?php
 
     }

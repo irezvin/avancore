@@ -2,6 +2,8 @@
 
 class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
 
+    protected $myBaseClass = 'Ac_Model_Mapper_Mixable_ExtraTable';
+    
     /**
      * @var Ac_Model_Mapper
      */
@@ -65,6 +67,11 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * @var array SQL column => value
      */
     protected $restrictions = array();
+    
+    /**
+     * @var bool
+     */
+    protected $overwriteModelFields = false;
 
     function setTableName($tableName) {
         $this->tableName = $tableName;
@@ -209,7 +216,11 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
             } else {
                 $extra = $this->getDefaults();
             }
-            $rows[$k] = array_merge($rows[$k], $extra);
+            if ($this->overwriteModelFields) 
+                $rows[$k] = array_merge($rows[$k], $extra);
+            else {
+                $rows[$k] = array_merge($rows[$k], array_diff_key($extra, $rows[$k]));
+            }
         }
     }
     
@@ -305,5 +316,44 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
             $record->addMixable($mix);
         }
     }
- 
+
+    /**
+     * @param bool $overwriteModelFields
+     */
+    function setOverwriteModelFields($overwriteModelFields) {
+        $this->overwriteModelFields = $overwriteModelFields;
+    }
+
+    /**
+     * @return bool
+     */
+    function getOverwriteModelFields() {
+        return $this->overwriteModelFields;
+    }
+    
+    protected function doGetRelationPrototypes() {
+        return array();
+    }
+    
+    protected function doGetAssociationPrototypes() {
+        return array();
+    }
+    
+    function onGetRelationPrototypes(& $relationPrototypes) {
+        if ($p = $this->doGetRelationPrototypes()) 
+            Ac_Util::ms($relationPrototypes, $p);
+    }
+    
+    function onGetAssociationPrototypes(& $associationPrototypes) {
+        if ($p = $this->doGetAssociationPrototypes()) 
+            Ac_Util::ms($associationPrototypes, $p);
+    }
+    
+    /**
+     * @return Ac_Model_Relation
+     */
+    protected function getRelation($relId) {
+        return $this->mixin->getRelation($relId);
+    }
+        
 }

@@ -89,6 +89,25 @@ abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac
      */
     protected $plural = false;
     
+    
+    /**
+     * whether Association allows to load destination object(s)
+     * @var bool
+     */
+    protected $canLoadDestObjects = true;
+
+    /**
+     * whether Association allows to load source objects
+     * @var bool
+     */
+    protected $canLoadSrcObjects = true;
+
+    /**
+     * whether Association allows to create destination objects
+     * @var bool
+     */
+    protected $canCreateDestObject = true;
+    
     protected $immutable = false;
     
     protected $methodsGuessed = false;
@@ -348,6 +367,63 @@ abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac
         }
         return $this->relation;
     }
+
+    /**
+     * Sets whether Association allows to load destination object(s)
+     * @param bool $canLoadDestObjects
+     */
+    function setCanLoadDestObjects($canLoadDestObjects) {
+        if ($canLoadDestObjects !== ($oldCanLoadDestObjects = $this->canLoadDestObjects)) {
+            if ($this->immutable) throw self::immutableException($this, __METHOD__);
+            $this->canLoadDestObjects = $canLoadDestObjects;
+        }
+    }
+
+    /**
+     * Returns whether Association allows to load destination object(s)
+     * @return bool
+     */
+    function getCanLoadDestObjects() {
+        return $this->canLoadDestObjects;
+    }
+
+    /**
+     * Sets whether Association allows to load source objects
+     * @param bool $canLoadSrcObjects
+     */
+    function setCanLoadSrcObjects($canLoadSrcObjects) {
+        if ($canLoadSrcObjects !== ($oldCanLoadSrcObjects = $this->canLoadSrcObjects)) {
+            if ($this->immutable) throw self::immutableException($this, __METHOD__);
+            $this->canLoadSrcObjects = $canLoadSrcObjects;
+        }
+    }
+
+    /**
+     * Returns whether Association allows to load source objects
+     * @return bool
+     */
+    function getCanLoadSrcObjects() {
+        return $this->canLoadSrcObjects;
+    }
+
+    /**
+     * Sets whether Association allows to create destination objects
+     * @param bool $canCreateDestObject
+     */
+    function setCanCreateDestObject($canCreateDestObject) {
+        if ($canCreateDestObject !== ($oldCanCreateDestObject = $this->canCreateDestObject)) {
+            if ($this->immutable) throw self::immutableException($this, __METHOD__);
+            $this->canCreateDestObject = $canCreateDestObject;
+        }
+    }
+
+    /**
+     * Returns whether Association allows to create destination objects
+     * @return bool
+     */
+    function getCanCreateDestObject() {
+        return $this->canCreateDestObject;
+    }    
     
     protected function storeReferencing(Ac_Model_Object $object, $recordOrRecords, & $errors) {
         $res = true;
@@ -548,36 +624,50 @@ abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac
     }    
     
     function getSrcObjects($destObjects) {
-        if ($this->useMapperMethods && ($m = $this->getSrcObjectsMapperMethod)) {
-            $res = $this->getMapper()->$m($destObjects);
+        if ($this->canLoadSrcObjects) {
+            if ($this->useMapperMethods && ($m = $this->getSrcObjectsMapperMethod)) {
+                $res = $this->getMapper()->$m($destObjects);
+            } else {
+                $rel = $this->getRelation();
+                $res = $rel->getSrc($destObjects);
+            }
         } else {
-            $rel = $this->getRelation();
-            $res = $rel->getSrc($destObjects);
+            $res = array();
         }
         return $res;
     }
 
     function loadDestObjects($srcObjects) {
-        if ($this->useMapperMethods && ($m = $this->loadSrcObjectsMapperMethod)) {
-            $res = $this->getMapper()->$m($srcObjects);
+        if ($this->canLoadDestObjects) {
+            if ($this->useMapperMethods && ($m = $this->loadSrcObjectsMapperMethod)) {
+                $res = $this->getMapper()->$m($srcObjects);
+            } else {
+                $rel = $this->getRelation();
+                $res = $rel->loadDest($srcObjects);
+            }
         } else {
-            $rel = $this->getRelation();
-            $res = $rel->loadDest($srcObjects);
+            $res = array();
         }
         return $res;
     }
     
     function loadSrcObjects($srcObjects) {
-        if ($this->useMapperMethods && ($m = $this->loadDestObjectsMapperMethod)) {
-            $res = $this->getMapper()->$m($srcObjects);
+        if ($this->canLoadSrcObjects) {
+            if ($this->useMapperMethods && ($m = $this->loadDestObjectsMapperMethod)) {
+                $res = $this->getMapper()->$m($srcObjects);
+            } else {
+                $rel = $this->getRelation();
+                $res = $rel->loadDest($srcObjects);
+            }
         } else {
-            $rel = $this->getRelation();
-            $res = $rel->loadDest($srcObjects);
+            $res = array();
         }
         return $res;
     }
     
     function createDestObject($object, $values = array(), $isReference = false) {
+        if (!$this->canCreateDestObject) 
+            throw new Ac_E_InvalidCall("Cannot createDestObject when \$canCreateDestObject === FALSE");
         if ($this->useModelMethods && ($m = $this->createDestObjectMethod)) {
             $res = $object->$m($values, $isReference);
         } else {
@@ -655,12 +745,16 @@ abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac
      * methodTemplate may contain placeholder like '{single}', '{plural}', '{Single}', '{Plural}'
      */
     protected function getGuessMap() {
-        return array(
+        $res = array(
             'loadDestObjectsMapperMethod' => 'load{Plural}For',
             'loadSrcObjectsMapperMethod' => 'loadFor{Plural}',
             'getSrcObjectsMapperMethod' => 'getOf{Plural}',
             'createDestObjectMethod' => 'create{Single}',
         );
+        if (!$this->canLoadDestObjects) $res['loadDestObjectsMapperMethod'] = null;
+        if (!$this->canLoadSrcObjects) $res['loadSrcObjectsMapperMethod'] = null;
+        if (!$this->canCreateDestObject) $res['createDestObjectsMethod'] = null;
+        return $res;
     }
     
     protected function getMethodImplMap() {
@@ -732,7 +826,7 @@ abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac
             '{Plural}' => ucfirst($p),
         );
         foreach ($this->getGuessMap() as $k => $v) {
-            if ($this->$k === false) $this->$k = strtr($v, $tr);
+            if ($this->$k === false) $this->$k = is_null($v)? null : strtr($v, $tr);
         }
     }
     

@@ -580,7 +580,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         
         foreach ($loaded as $pk => $record) 
             $objects[$pk] = $record;
-        
+
         if ($this->useRecordsCollection) {
             foreach ($loaded as $pk => $record) {
                 $this->recordsCollection[$record->getPrimaryKey()] = $record;

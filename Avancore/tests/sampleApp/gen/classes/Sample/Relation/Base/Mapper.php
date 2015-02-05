@@ -235,14 +235,13 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads several relations of given one or more relationTypes 
-     * @param Sample_Relation_Type|array $relationTypes of Sample_Relation objects
-     
+     * @param Sample_Relation_Type|array $relationTypes of Sample_Relation objects      
      */
     function loadForRelationTypes($relationTypes) {
         $rel = $this->getRelation('_relationType');
         return $rel->loadSrc($relationTypes); 
     }
-
+    
     /**
      * Loads several relationTypes of given one or more relations 
      * @param Sample_Relation|array $relations     
@@ -266,14 +265,13 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads several relations of given one or more people 
-     * @param Sample_Person|array $otherPeople of Sample_Relation objects
-     
+     * @param Sample_Person|array $otherPeople of Sample_Relation objects      
      */
     function loadForOtherPeople($otherPeople) {
         $rel = $this->getRelation('_otherPerson');
         return $rel->loadSrc($otherPeople); 
     }
-
+    
     /**
      * Loads several people of given one or more relations 
      * @param Sample_Relation|array $relations     
@@ -297,14 +295,13 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads several relations of given one or more people 
-     * @param Sample_Person|array $people of Sample_Relation objects
-     
+     * @param Sample_Person|array $people of Sample_Relation objects      
      */
     function loadForPeople($people) {
         $rel = $this->getRelation('_person');
         return $rel->loadSrc($people); 
     }
-
+    
     /**
      * Loads several people of given one or more relations 
      * @param Sample_Relation|array $relations     

@@ -26,6 +26,15 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     
     var $parentExtraTableIsAbstract = false;
     
+    var $extraRelationPrototypes = array();
+    
+    var $extraAssociationPrototypes = array();
+    
+    /**
+     * @var Ac_Cg_Model
+     */
+    var $masterModel = false;
+    
     function getDefaultParentClassName() {
         return 'Ac_Model_Mixable_ExtraTable';
     }
@@ -34,6 +43,8 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
         $res = parent::onShow();
         Ac_Util::ms($res, array(
             'masterFkIds' => $this->masterFkIds,
+            'masterModelName' => $this->masterModel? $this->masterModel->name : false,
+            'isReferenced' => $this->isReferenced,
         ));
         return $res;
     }
@@ -99,7 +110,7 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
                 
                 $this->masterProperties[$fkId] = $prop->name;
                 if ($prop->isIncoming) $incomingFks[] = $fkId;
-                else $outgoingFks[] = $fkId;
+                    else $outgoingFks[] = $fkId;
             }
         }
         $sInc = implode(", ", $incomingFks);
@@ -117,10 +128,45 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
         
         $this->isReferenced = !count($outgoingFks);
         
+        if (count($outgoingFks) === 1) {
+            $mp = $this->masterProperties[$outgoingFks[0]];
+            $this->masterModel = $this->getProperty($mp)->getOtherModel();
+        }
+        
+    }
+    
+    protected function adjustObjectProperty(Ac_Cg_Property_Object $prop) {
+        
+        $other = $prop->getMirrorProperty();
+
+        // incoming associations are disabled at the moment
+        $other->enabled = false;
+        $prop->canLoadSrc = false;
+        
+        // still leave association (no loadDest at the moment) for referencing extra table
+        // doesn't work at the moment (class of ExtraTable still ends up in gen'd code)
+        
+        if (!$this->isReferenced && $this->masterModel) {
+            $other->setOtherModel($this->masterModel, true);
+            $other->enabled = true;
+            $other->canLoadDest = false;
+            $other->className = $this->masterModel->className;
+            $other->mapperClass = $this->masterModel->getMapperClass();
+        }
     }
     
     function beforeGenerate() {
         parent::beforeGenerate();
+        // adjust relations
+        foreach ($this->listProperties() as $i) {
+            $prop = $this->getProperty($i);
+            if ($prop instanceof Ac_Cg_Property_Object) {
+                // We deal only with regular associations
+                if (!in_array($prop->name, $this->masterProperties)) {
+                    $this->adjustObjectProperty($prop);
+                }
+            }
+        }
         if ($this->skipMapperMixables !== true) {
             $skip = Ac_Util::toArray($this->skipMapperMixables);
             foreach ($this->masterProperties as $fkId => $propName) {
@@ -132,6 +178,8 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
                 }
             }
         }
+        $this->extraRelationPrototypes = $this->getRelationPrototypes();
+        $this->extraAssociationPrototypes = $this->getAssociationPrototypes();
     }
     
     function getMapperCoreMixablePrototype(Ac_Cg_Property_Object $prop) {

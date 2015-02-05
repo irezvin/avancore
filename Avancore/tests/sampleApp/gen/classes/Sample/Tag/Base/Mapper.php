@@ -251,14 +251,13 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more tags of given one or more people 
-     * @param Sample_Person|array $people of Sample_Tag objects
-     
+     * @param Sample_Person|array $people of Sample_Tag objects      
      */
     function loadForPeople($people) {
         $rel = $this->getRelation('_people');
         return $rel->loadSrc($people); 
     }
-
+    
     /**
      * Loads one or more people of given one or more tags 
      * @param Sample_Tag|array $tags     
@@ -276,7 +275,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_people');
         return $rel->loadDestNNIds($tags); 
     }
-
+    
 
     /**
      * Returns (but not loads!) one or more tags of given one or more perks 
@@ -291,14 +290,13 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more tags of given one or more perks 
-     * @param Sample_Perk|array $perks of Sample_Tag objects
-     
+     * @param Sample_Perk|array $perks of Sample_Tag objects      
      */
     function loadForPerks($perks) {
         $rel = $this->getRelation('_perks');
         return $rel->loadSrc($perks); 
     }
-
+    
     /**
      * Loads one or more perks of given one or more tags 
      * @param Sample_Tag|array $tags     
@@ -316,7 +314,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_perks');
         return $rel->loadDestNNIds($tags); 
     }
-
+    
     
 }
 

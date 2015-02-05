@@ -35,6 +35,12 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                     'id' => 'pubId',
                 ),
             ),
+            'Sample_Shop_Product_Extra_Code_MapperMixable' => array (
+                'class' => 'Sample_Shop_Product_Extra_Code_MapperMixable',
+                'colMap' => array (
+                    'productId' => 'id',
+                ),
+            ),
         ));
     }
     

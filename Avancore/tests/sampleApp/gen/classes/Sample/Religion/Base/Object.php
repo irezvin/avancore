@@ -84,6 +84,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_people');
         }
         return $this->_peopleCount;
+        
     }
 
     function listPeople() {
@@ -107,8 +108,16 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
         if (!$this->_peopleLoaded) {
             $this->mapper->loadPeopleFor($this);
         }
+        
         if (!isset($this->_people[$id])) trigger_error ('No such People: \''.$id.'\'', E_USER_ERROR);
         return $this->_people[$id];
+    }
+    
+    /**
+     * @return Sample_Person 
+     */
+    function getPeopleItem($id) {
+        return $this->getPerson($id);
     }
     
     /**
@@ -122,7 +131,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
         $person->_religion = $this;
         
     }
-    
+
     /**
      * @return Sample_Person  
      */

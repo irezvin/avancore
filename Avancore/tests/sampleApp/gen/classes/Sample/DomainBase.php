@@ -34,6 +34,9 @@ abstract class Sample_DomainBase extends Ac_Application {
             'Sample_Shop_Category_Mapper' => array (
                 'class' => 'Sample_Shop_Category_Mapper',
             ),
+            'Sample_Shop_Product_Extra_Code_ImplMapper' => array (
+                'class' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
+            ),
             'Sample_Shop_Product_Mapper' => array (
                 'class' => 'Sample_Shop_Product_Mapper',
             ),
@@ -120,6 +123,13 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function getSampleShopCategoryMapper() {
         return $this->getMapper('Sample_Shop_Category_Mapper');
+    }
+    
+    /**
+     * @return Sample_Shop_Product_Extra_Code_ImplMapper 
+     */
+    function getSampleShopProductExtraCodeImplMapper() {
+        return $this->getMapper('Sample_Shop_Product_Extra_Code_ImplMapper');
     }
     
     /**
@@ -305,6 +315,21 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function createSampleShopCategory () {
         return $this->getMapper('Sample_Shop_Category_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Shop_Product_Extra_Code 
+     */
+    static function Sample_Shop_Product_Extra_Code ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Shop_Product_Extra_Code 
+     */
+    function createSampleShopProductExtraCode () {
+        return $this->getMapper('Sample_Shop_Product_Extra_Code_ImplMapper')->createRecord();
     }
     
  
