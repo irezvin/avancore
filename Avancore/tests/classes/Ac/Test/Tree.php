@@ -605,7 +605,7 @@ class Ac_Test_Tree extends Ac_Test_Base {
                 ');
 
                 $this->assertTreeMatch($txtNs, $proper);
-
+                
                 $b->delete();
 
                 $txtNs = $this->getTreeFromNs();
@@ -689,7 +689,7 @@ class Ac_Test_Tree extends Ac_Test_Base {
 
             $b->delete();
 
-            $txtNs = $this->getTreeFromNs();
+            $txtNs = $this->getTreeFromAdjacency();
 
             $proper = trim('
         root

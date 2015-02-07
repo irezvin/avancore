@@ -116,6 +116,13 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return Sample_Person 
+     */
+    function getPeopleItem($id) {
+        return $this->getPerson($id);
+    }
+    
+    /**
      * @param Sample_Person $person 
      */
     function addPerson($person) {

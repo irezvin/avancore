@@ -414,6 +414,12 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
                 if ($oldParent === false) $oldParent = $node['parent'];
 
                 $sameParent = $node['parent'] == $parentId;
+                
+                $dLevel = 0;
+
+                if (strlen($this->levelCol)) {
+                    $dLevel = ($parent['level'] + 1) - $node['level'];
+                }
 
                 // make computations
                 
@@ -570,10 +576,30 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
                         }
                     }
                     
+                    if ($dLevel) {
+                        $params['dLevel'] = $dLevel;
+                        $depthChange = "[[levelCol]] = IF("
+                            . "[[leftCol]] BETWEEN {{nodeLeft}} AND {{nodeRight}}, "
+                            . "[[levelCol]] + {{dLevel}}, [[levelCol]]),";
+                    } else {
+                        $depthChange = "";
+                    }
+                    
+                    if (!$sameParent) {
+                        $params['newParent'] = $parent['id'];
+                        $params['nodeId'] = $id;
+                        $parentChange = "[[parentCol]] = IF("
+                            . "[[idCol]] = {{nodeId}}, {{newParent}}, [[idCol]]),";
+                    } else {
+                        $parentChange = "";
+                    }
+                    
                     // let's DO it
-                    $this->query($this->_stmt('
+                    $this->query($s = $this->_stmt("
                         UPDATE [[tableName]] 
                         SET 
+                            $depthChange
+                            $parentChange
                             [[leftCol]] = [[leftCol]] + CASE 
                                 WHEN [[leftCol]] BETWEEN {{nodeLeft}} AND {{nodeRight}} THEN {{nDelta}} 
                                 WHEN [[leftCol]] BETWEEN {{oLeftMin}} AND {{oLeftMax}} THEN {{oDelta}} 
@@ -592,7 +618,7 @@ class Ac_Sql_NestedSets extends Ac_Prototyped {
                                 OR [[rightCol]] BETWEEN {{oRightMin}} AND {{oRightMax}}
                             ) [[tc]]
                             
-                        ', $params
+                        ", $params
                     ));
                     
                     // Change ordering values

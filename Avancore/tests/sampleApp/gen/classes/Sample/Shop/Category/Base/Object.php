@@ -12,6 +12,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
     public $ordering = 0;
     public $depth = 0;
     public $metaId = NULL;
+    public $pubId = NULL;
     
     var $_mapperClass = 'Sample_Shop_Category_Mapper';
     
@@ -35,7 +36,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'id', 1 => 'title', 2 => 'leftCol', 3 => 'rightCol', 4 => 'ignore', 5 => 'parentId', 6 => 'ordering', 7 => 'depth', 8 => 'metaId', );
+        return array ( 0 => 'id', 1 => 'title', 2 => 'leftCol', 3 => 'rightCol', 4 => 'ignore', 5 => 'parentId', 6 => 'ordering', 7 => 'depth', 8 => 'metaId', 9 => 'pubId', );
     }
     
     protected function getOwnPropertiesInfo() {
@@ -110,6 +111,15 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 ),
                 'isNullable' => true,
                 'caption' => 'Meta Id',
+            ),
+            'pubId' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
+                ),
+                'isNullable' => true,
+                'caption' => 'Pub Id',
             ),
         );
     
