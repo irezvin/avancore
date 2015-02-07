@@ -129,6 +129,13 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return Sample_Tag 
+     */
+    function getTagsItem($id) {
+        return $this->getTag($id);
+    }
+    
+    /**
      * @param Sample_Tag $tag 
      */
     function addTag($tag) {
@@ -166,11 +173,13 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
     function setTagIds($tagIds) {
         if (!is_array($tagIds)) trigger_error('$tagIds must be an array', E_USER_ERROR);
         $this->_tagIds = $tagIds;
+        $this->_tagsLoaded = false;
         $this->_tags = false; 
     }
     
     function clearTags() {
         $this->_tags = array();
+        $this->_tagsLoaded = true;
         $this->_tagIds = false;
     }               
   

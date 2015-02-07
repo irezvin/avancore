@@ -7,7 +7,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     public $sku = '';
     public $title = '';
     public $metaId = NULL;
-    public $published = 0;
+    public $pubId = NULL;
     
     var $_mapperClass = 'Sample_Shop_Product_Mapper';
     
@@ -31,7 +31,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'id', 1 => 'sku', 2 => 'title', 3 => 'metaId', 4 => 'published', );
+        return array ( 0 => 'id', 1 => 'sku', 2 => 'title', 3 => 'metaId', 4 => 'pubId', );
     }
     
     protected function getOwnPropertiesInfo() {
@@ -61,15 +61,14 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 'isNullable' => true,
                 'caption' => 'Meta Id',
             ),
-            'published' => array (
-                'dataType' => 'bool',
-                'controlType' => 'selectList',
-                'maxLength' => '1',
-                'valueList' => array (
-                    0 => 'No',
-                    1 => 'Yes',
+            'pubId' => array (
+                'dataType' => 'int',
+                'maxLength' => '10',
+                'attribs' => array (
+                    'size' => '6',
                 ),
-                'caption' => 'Published',
+                'isNullable' => true,
+                'caption' => 'Pub Id',
             ),
         );
     

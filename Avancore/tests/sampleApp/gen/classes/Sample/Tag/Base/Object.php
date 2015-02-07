@@ -163,6 +163,13 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return Sample_Person 
+     */
+    function getPeopleItem($id) {
+        return $this->getPerson($id);
+    }
+    
+    /**
      * @param Sample_Person $person 
      */
     function addPerson($person) {
@@ -200,11 +207,13 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     function setPersonIds($personIds) {
         if (!is_array($personIds)) trigger_error('$personIds must be an array', E_USER_ERROR);
         $this->_personIds = $personIds;
+        $this->_peopleLoaded = false;
         $this->_people = false; 
     }
     
     function clearPeople() {
         $this->_people = array();
+        $this->_peopleLoaded = true;
         $this->_personIds = false;
     }               
 
@@ -247,6 +256,13 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return Sample_Perk 
+     */
+    function getPerksItem($id) {
+        return $this->getPerk($id);
+    }
+    
+    /**
      * @param Sample_Perk $perk 
      */
     function addPerk($perk) {
@@ -284,11 +300,13 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     function setPerkIds($perkIds) {
         if (!is_array($perkIds)) trigger_error('$perkIds must be an array', E_USER_ERROR);
         $this->_perkIds = $perkIds;
+        $this->_perksLoaded = false;
         $this->_perks = false; 
     }
     
     function clearPerks() {
         $this->_perks = array();
+        $this->_perksLoaded = true;
         $this->_perkIds = false;
     }               
   

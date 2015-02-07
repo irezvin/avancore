@@ -10,16 +10,16 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Product_Mapper'; 
 
-    var $columnNames = array ( 0 => 'id', 1 => 'sku', 2 => 'title', 3 => 'metaId', 4 => 'published', ); 
+    var $columnNames = array ( 0 => 'id', 1 => 'sku', 2 => 'title', 3 => 'metaId', 4 => 'pubId', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'metaId', ); 
+    var $nullableSqlColumns = array ( 0 => 'metaId', 1 => 'pubId', ); 
 
     var $defaults = array (
             'id' => NULL,
             'sku' => '',
             'title' => '',
             'metaId' => NULL,
-            'published' => '0',
+            'pubId' => NULL,
         ); 
  
     
@@ -108,6 +108,9 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
             'PRIMARY' => array (
                 0 => 'id',
             ),
+            'idxPubId' => array (
+                0 => 'pubId',
+            ),
         );
     }
         
@@ -116,6 +119,16 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
      */
     function loadById ($id) {
         $recs = $this->loadRecordsByCriteria(''.$this->getDb()->n('id').' = '.$this->getDb()->q($id).'');
+        if (count($recs)) $res = $recs[0];
+            else $res = null;
+        return $res;
+    }
+
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function loadByPubId ($pubId) {
+        $recs = $this->loadRecordsByCriteria(''.$this->getDb()->n('pubId').' = '.$this->getDb()->q($pubId).'');
         if (count($recs)) $res = $recs[0];
             else $res = null;
         return $res;

@@ -211,6 +211,13 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return Sample_Person_Album 
+     */
+    function getPersonAlbumsItem($id) {
+        return $this->getPersonAlbum($id);
+    }
+    
+    /**
      * @param Sample_Person_Album $personAlbum 
      */
     function addPersonAlbum($personAlbum) {
@@ -248,11 +255,13 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     function setPersonAlbumIds($personAlbumIds) {
         if (!is_array($personAlbumIds)) trigger_error('$personAlbumIds must be an array', E_USER_ERROR);
         $this->_personAlbumIds = $personAlbumIds;
+        $this->_personAlbumsLoaded = false;
         $this->_personAlbums = false; 
     }
     
     function clearPersonAlbums() {
         $this->_personAlbums = array();
+        $this->_personAlbumsLoaded = true;
         $this->_personAlbumIds = false;
     }               
         
@@ -335,6 +344,13 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         if ($this->_personPosts[$id] === false) {
         }
         return $this->_personPosts[$id];
+    }
+    
+    /**
+     * @return Sample_Person_Post 
+     */
+    function getPersonPostsItem($id) {
+        return $this->getPersonPost($id);
     }
     
     /**

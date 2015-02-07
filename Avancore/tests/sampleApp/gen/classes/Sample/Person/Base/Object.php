@@ -363,6 +363,13 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return Sample_Tag 
+     */
+    function getTagsItem($id) {
+        return $this->getTag($id);
+    }
+    
+    /**
      * @param Sample_Tag $tag 
      */
     function addTag($tag) {
@@ -400,11 +407,13 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function setTagIds($tagIds) {
         if (!is_array($tagIds)) trigger_error('$tagIds must be an array', E_USER_ERROR);
         $this->_tagIds = $tagIds;
+        $this->_tagsLoaded = false;
         $this->_tags = false; 
     }
     
     function clearTags() {
         $this->_tags = array();
+        $this->_tagsLoaded = true;
         $this->_tagIds = false;
     }               
 
@@ -444,6 +453,13 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         if ($this->_personAlbums[$id] === false) {
         }
         return $this->_personAlbums[$id];
+    }
+    
+    /**
+     * @return Sample_Person_Album 
+     */
+    function getPersonAlbumsItem($id) {
+        return $this->getPersonAlbum($id);
     }
     
     /**
@@ -510,6 +526,13 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return Sample_Person_Photo 
+     */
+    function getPersonPhotosItem($id) {
+        return $this->getPersonPhoto($id);
+    }
+    
+    /**
      * @param Sample_Person_Photo $personPhoto 
      */
     function addPersonPhoto($personPhoto) {
@@ -570,6 +593,13 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         if ($this->_personPosts[$id] === false) {
         }
         return $this->_personPosts[$id];
+    }
+    
+    /**
+     * @return Sample_Person_Post 
+     */
+    function getPersonPostsItem($id) {
+        return $this->getPersonPost($id);
     }
     
     /**
@@ -636,6 +666,13 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return Sample_Relation 
+     */
+    function getIncomingRelationsItem($id) {
+        return $this->getIncomingRelation($id);
+    }
+    
+    /**
      * @param Sample_Relation $incomingRelation 
      */
     function addIncomingRelation($incomingRelation) {
@@ -696,6 +733,13 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         if ($this->_outgoingRelations[$id] === false) {
         }
         return $this->_outgoingRelations[$id];
+    }
+    
+    /**
+     * @return Sample_Relation 
+     */
+    function getOutgoingRelationsItem($id) {
+        return $this->getOutgoingRelation($id);
     }
     
     /**
