@@ -127,6 +127,13 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return Sample_Relation 
+     */
+    function getRelationsItem($id) {
+        return $this->getRelation($id);
+    }
+    
+    /**
      * @param Sample_Relation $relation 
      */
     function addRelation($relation) {

@@ -191,6 +191,13 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
     }
     
     /**
+     * @return Sample_Person_Photo 
+     */
+    function getPersonPhotosItem($id) {
+        return $this->getPersonPhoto($id);
+    }
+    
+    /**
      * @param Sample_Person_Photo $personPhoto 
      */
     function addPersonPhoto($personPhoto) {
@@ -228,11 +235,13 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
     function setPersonPhotoIds($personPhotoIds) {
         if (!is_array($personPhotoIds)) trigger_error('$personPhotoIds must be an array', E_USER_ERROR);
         $this->_personPhotoIds = $personPhotoIds;
+        $this->_personPhotosLoaded = false;
         $this->_personPhotos = false; 
     }
     
     function clearPersonPhotos() {
         $this->_personPhotos = array();
+        $this->_personPhotosLoaded = true;
         $this->_personPhotoIds = false;
     }               
   
