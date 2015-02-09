@@ -30,6 +30,8 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     
     var $extraAssociationPrototypes = array();
     
+    var $mixableId = array();
+    
     /**
      * @var Ac_Cg_Model
      */
@@ -174,7 +176,11 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
                 $prop = $this->getProperty($propName);
                 if ($prop instanceof Ac_Cg_Property_Object) {
                     $otherModel = $prop->getOtherModel();
-                    $otherModel->mapperCoreMixables[$this->getExtraTableClass()] = $this->getMapperCoreMixablePrototype($prop);
+                    $mirror = $prop->getMirrorProperty();
+                    if ($this->mixableId) $mixName = $this->mixableId;
+                    if ($mirror) $mixName = $mirror->getDefaultVarName();
+                        else $mixName = $this->single;
+                    $otherModel->mapperCoreMixables[$mixName] = $this->getMapperCoreMixablePrototype($prop);
                 }
             }
         }

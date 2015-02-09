@@ -119,6 +119,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * function onReset()
      */
     const EVENT_ON_RESET = 'onReset';
+    
+    /**
+     * function onGetSqlTable($alias, $prevAlias, Ac_Sql_Select_TableProvider $tableProvider, & $result)
+     */
+    const EVENT_ON_GET_SQL_TABLE  = 'onGetSqlTable';
 
     protected $id = false;
     
@@ -1778,5 +1783,32 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     function resetPrototype() {
         $this->prototype = false;
     }
+    
+    /**
+     * Locates joined SQL table for Ac_Sql_Select and returns its' prototype or an instance
+     * (can return Ac_Sql_Table instance too)
+     * 
+     * Is called by Ac_Model_Sql_TableProvider when it has resolved the mapper but not found
+     * any satisfying property
+     *  
+     * @param string $alias Alias of currently saught table
+     * @param string $prevAlias Alias of the table that result (probably) have to be joined to
+     * @param Ac_Sql_Select_TableProvider $provider TableProvider that made the request
+     */
+    final function getSqlTable ($alias, $prevAlias, Ac_Sql_Select_TableProvider $provider) {
+        $result = $this->doOnGetSqlTable($alias, $prevAlias, $provider);
+        if (!$result) {
+            $this->triggerEvent(self::EVENT_ON_GET_SQL_TABLE, array($alias, $prevAlias, $provider, & $result));
+        }
+        return $result;
+    }
+ 
+    /**
+     * @see Ac_Model_Mapper::getSqlTable
+     */
+    protected function doOnGetSqlTable($alias, $prevAlias, Ac_Sql_Select_TableProvider $provider) {
+    }
+    
+    
     
 }

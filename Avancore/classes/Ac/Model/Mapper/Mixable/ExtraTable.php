@@ -355,5 +355,22 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     protected function getRelation($relId) {
         return $this->mixin->getRelation($relId);
     }
+    
+    function onGetSqlTable($alias, $prevAlias, Ac_Sql_Select_TableProvider $tableProvider, & $result) {
+        if (!$result && $this->mixin) {
+            $sel = $tableProvider->getSqlSelect();
+            if ($sel && $sel->hasTable($prevAlias) && $sel->getTable($prevAlias)->name === $this->mixin->tableName) {
+                if (strlen($this->mixableId) && $alias === 'extra__'.$this->mixableId && !$result) {
+                    $result = array(
+                        'class' => 'Ac_Sql_Select_Table',
+                        'name' => $this->tableName,
+                        'joinsAlias' => $prevAlias,
+                        'joinsOn' => $this->colMap,
+                        'joinType' => 'LEFT JOIN',
+                    );
+                }
+            }
+        }
+    }
         
 }

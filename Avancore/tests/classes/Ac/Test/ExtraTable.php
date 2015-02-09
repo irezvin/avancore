@@ -199,4 +199,19 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         $this->assertEqual($prodRow, array_merge($d, $c));
     }
     
+    function testExtraTableMixable() {
+        $prodMap = $this->getSampleApp()->getSampleShopProductMapper();
+        $catMap = $this->getSampleApp()->getSampleShopCategoryMapper();
+        $sql = $catMap->createSqlSelect();
+        $this->assertTrue($sql->hasTable($alias = 'shopProducts[extra__upc]'));
+        $sql->useAlias($alias);
+        $stmt = ''.$sql;
+        
+        $prodSql = $prodMap->createSqlSelect();
+        if ($this->assertTrue($prodSql->hasTable($alias = 'extra__publish'))) 
+            $prodSql->useAlias($alias);
+        $stmt = ''.$prodSql;
+        //var_dump($stmt);
+    }
+    
 }
