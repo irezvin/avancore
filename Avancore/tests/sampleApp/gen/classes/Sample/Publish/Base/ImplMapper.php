@@ -125,44 +125,6 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
         
     }
             
-    protected function doGetAssociationPrototypes() {
-        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
-            'authorPerson' => array (
-                'relationId' => '_authorPerson',
-                'useMapperMethods' => true,
-                'useModelMethods' => true,
-                'single' => 'authorPerson',
-                'plural' => 'authorPeople',
-                'canLoadSrcObjects' => false,
-                'class' => 'Ac_Model_Association_One',
-                'loadDestObjectsMapperMethod' => 'loadAuthorPeopleFor',
-                'loadSrcObjectsMapperMethod' => NULL,
-                'getSrcObjectsMapperMethod' => 'getOfAuthorPeople',
-                'createDestObjectMethod' => 'createAuthorPerson',
-                'getDestObjectMethod' => 'getAuthorPerson',
-                'setDestObjectMethod' => 'setAuthorPerson',
-                'clearDestObjectMethod' => 'clearAuthorPerson',
-            ),
-            'editorPerson' => array (
-                'relationId' => '_editorPerson',
-                'useMapperMethods' => true,
-                'useModelMethods' => true,
-                'single' => 'editorPerson',
-                'plural' => 'editorPeople',
-                'canLoadSrcObjects' => false,
-                'class' => 'Ac_Model_Association_One',
-                'loadDestObjectsMapperMethod' => 'loadEditorPeopleFor',
-                'loadSrcObjectsMapperMethod' => NULL,
-                'getSrcObjectsMapperMethod' => 'getOfEditorPeople',
-                'createDestObjectMethod' => 'createEditorPerson',
-                'getDestObjectMethod' => 'getEditorPerson',
-                'setDestObjectMethod' => 'setEditorPerson',
-                'clearDestObjectMethod' => 'clearEditorPerson',
-            ),
-        ));
-        
-    }
-        
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -205,30 +167,6 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-    
-    
-    
-    /**
-     * Loads several people of given one or more publish 
-     * @param Sample_Publish|array $publish     
-     */
-    function loadAuthorPeopleFor($publish) {
-        $rel = $this->getRelation('_authorPerson');
-        return $rel->loadDest($publish); 
-    }
-
-
-    
-    
-    /**
-     * Loads several people of given one or more publish 
-     * @param Sample_Publish|array $publish     
-     */
-    function loadEditorPeopleFor($publish) {
-        $rel = $this->getRelation('_editorPerson');
-        return $rel->loadDest($publish); 
-    }
-
-    
+        
 }
 

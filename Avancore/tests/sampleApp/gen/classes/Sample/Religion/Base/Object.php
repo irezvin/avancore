@@ -32,7 +32,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'people', 1 => 'religionId', 2 => 'title', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'people', )));
     }
  
     protected function listOwnLists() {
@@ -129,6 +129,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
         $this->_people[] = $person;
         
         $person->_religion = $this;
+        
         
     }
 

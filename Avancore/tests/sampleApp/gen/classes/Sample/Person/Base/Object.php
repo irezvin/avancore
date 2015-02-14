@@ -24,9 +24,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     public $_outgoingRelations = false;
     public $_outgoingRelationsCount = false;
     public $_outgoingRelationsLoaded = false;
-    public $_shopProducts = false;
+    public $_extraCodeShopProducts = false;
     public $_shopProductsCount = false;
     public $_shopProductsLoaded = false;
+    public $_noteShopProducts = false;
     public $personId = NULL;
     public $name = '';
     public $gender = 'F';
@@ -60,18 +61,18 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'portraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'personPosts', 7 => 'incomingRelations', 8 => 'outgoingRelations', 9 => 'shopProducts', 10 => 'personId', 11 => 'name', 12 => 'gender', 13 => 'isSingle', 14 => 'birthDate', 15 => 'lastUpdatedDatetime', 16 => 'createdTs', 17 => 'religionId', 18 => 'portraitId', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'portraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'personPosts', 7 => 'incomingRelations', 8 => 'outgoingRelations', 9 => 'extraCodeShopProducts', 10 => 'noteShopProducts', )));
     }
  
     protected function listOwnLists() {
         
-        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', 'shopProducts' => 'shopProducts', );
+        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', 'extraCodeShopProducts' => 'shopProducts', 'noteShopProducts' => 'shopProducts', );
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'portraitPersonPhoto' => 'Sample_Person_Photo', 'religion' => 'Sample_Religion', 'tags' => 'Sample_Tag', 'personAlbums' => 'Sample_Person_Album', 'personPhotos' => 'Sample_Person_Photo', 'personPosts' => 'Sample_Person_Post', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', 'shopProducts' => 'Sample_Shop_Product', );
+        return array ( 'portraitPersonPhoto' => 'Sample_Person_Photo', 'religion' => 'Sample_Religion', 'tags' => 'Sample_Tag', 'personAlbums' => 'Sample_Person_Album', 'personPhotos' => 'Sample_Person_Photo', 'personPosts' => 'Sample_Person_Post', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', 'extraCodeShopProducts' => 'Sample_Shop_Product', 'noteShopProducts' => 'Sample_Shop_Product', );
     }
 
     protected function getOwnPropertiesInfo() {
@@ -154,13 +155,23 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'countVarName' => '_outgoingRelationsCount',
                 'referenceVarName' => '_outgoingRelations',
             ),
-            'shopProducts' => array (
+            'extraCodeShopProducts' => array (
                 'className' => 'Sample_Shop_Product',
                 'mapperClass' => 'Sample_Shop_Product_Mapper',
+                'otherModelIdInMethodsPrefix' => 'extraCode',
                 'caption' => 'Shop products',
-                'relationId' => '_shopProducts',
+                'relationId' => '_extraCodeShopProducts',
                 'countVarName' => '_shopProductsCount',
-                'referenceVarName' => '_shopProducts',
+                'referenceVarName' => '_extraCodeShopProducts',
+            ),
+            'noteShopProducts' => array (
+                'className' => 'Sample_Shop_Product',
+                'mapperClass' => 'Sample_Shop_Product_Mapper',
+                'otherModelIdInMethodsPrefix' => 'note',
+                'caption' => 'Shop products',
+                'relationId' => '_noteShopProducts',
+                'countVarName' => '_shopProductsCount',
+                'referenceVarName' => '_noteShopProducts',
             ),
             'personId' => array (
                 'dataType' => 'int',
@@ -479,6 +490,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         
         $personAlbum->_person = $this;
         
+        
     }
 
     /**
@@ -545,6 +557,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $this->_personPhotos[] = $personPhoto;
         
         $personPhoto->_person = $this;
+        
         
     }
 
@@ -613,6 +626,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         
         $personPost->_person = $this;
         
+        
     }
 
     /**
@@ -679,6 +693,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $this->_incomingRelations[] = $incomingRelation;
         
         $incomingRelation->_otherPerson = $this;
+        
         
     }
 
@@ -747,6 +762,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         
         $outgoingRelation->_person = $this;
         
+        
     }
 
     /**
@@ -762,47 +778,48 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
 
-    function countShopProducts() {
-        if (is_array($this->_shopProducts)) return count($this->_shopProducts);
+    function countExtraCodeShopProducts() {
+        if (is_array($this->_extraCodeShopProducts)) return count($this->_extraCodeShopProducts);
         return 0;
         
     }
 
-    function listShopProducts() {
-        if (!is_array($this->_shopProducts)) $this->_shopProducts = array();
-        return array_keys($this->_shopProducts);
+    function listExtraCodeShopProducts() {
+        if (!is_array($this->_extraCodeShopProducts)) $this->_extraCodeShopProducts = array();
+        return array_keys($this->_extraCodeShopProducts);
     }
     
     /**
      * @return bool
      */
-    function isShopProductsLoaded() {
+    function isExtraCodeShopProductsLoaded() {
         return $this->_shopProductsLoaded;
     }
     
     /**
      * @return Sample_Shop_Product 
      */
-    function getShopProduct($id) {
+    function getExtraCodeShopProduct($id) {
         
-        if (!isset($this->_shopProducts[$id])) trigger_error ('No such Shop product: \''.$id.'\'', E_USER_ERROR);
-        return $this->_shopProducts[$id];
+        if (!isset($this->_extraCodeShopProducts[$id])) trigger_error ('No such Shop product: \''.$id.'\'', E_USER_ERROR);
+        return $this->_extraCodeShopProducts[$id];
     }
     
     /**
      * @return Sample_Shop_Product 
      */
-    function getShopProductsItem($id) {
-        return $this->getShopProduct($id);
+    function getExtraCodeShopProductsItem($id) {
+        return $this->getExtraCodeShopProduct($id);
     }
     
     /**
-     * @param Sample_Shop_Product $shopProduct 
+     * @param Sample_Shop_Product $extraCodeShopProduct 
      */
-    function addShopProduct($shopProduct) {
-        if (!is_a($shopProduct, 'Sample_Shop_Product')) trigger_error('$shopProduct must be an instance of Sample_Shop_Product', E_USER_ERROR);
-        $this->listShopProducts();
-        $this->_shopProducts[] = $shopProduct;
+    function addExtraCodeShopProduct($extraCodeShopProduct) {
+        if (!is_a($extraCodeShopProduct, 'Sample_Shop_Product')) trigger_error('$extraCodeShopProduct must be an instance of Sample_Shop_Product', E_USER_ERROR);
+        $this->listExtraCodeShopProducts();
+        $this->_extraCodeShopProducts[] = $extraCodeShopProduct;
+        
         
         
     }
@@ -810,12 +827,72 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Shop_Product  
      */
-    function createShopProduct($values = array(), $isReference = false) {
+    function createExtraCodeShopProduct($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Shop_Product_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
-        $this->addShopProduct($res);
+        $this->addExtraCodeShopProduct($res);
+        return $res;
+    }
+    
+
+    function countNoteShopProducts() {
+        if (is_array($this->_noteShopProducts)) return count($this->_noteShopProducts);
+        return 0;
+        
+    }
+
+    function listNoteShopProducts() {
+        if (!is_array($this->_noteShopProducts)) $this->_noteShopProducts = array();
+        return array_keys($this->_noteShopProducts);
+    }
+    
+    /**
+     * @return bool
+     */
+    function isNoteShopProductsLoaded() {
+        return $this->_shopProductsLoaded;
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getNoteShopProduct($id) {
+        
+        if (!isset($this->_noteShopProducts[$id])) trigger_error ('No such Shop product: \''.$id.'\'', E_USER_ERROR);
+        return $this->_noteShopProducts[$id];
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getNoteShopProductsItem($id) {
+        return $this->getNoteShopProduct($id);
+    }
+    
+    /**
+     * @param Sample_Shop_Product $noteShopProduct 
+     */
+    function addNoteShopProduct($noteShopProduct) {
+        if (!is_a($noteShopProduct, 'Sample_Shop_Product')) trigger_error('$noteShopProduct must be an instance of Sample_Shop_Product', E_USER_ERROR);
+        $this->listNoteShopProducts();
+        $this->_noteShopProducts[] = $noteShopProduct;
+        
+        $noteShopProduct->_notePerson = $this;
+        
+        
+    }
+
+    /**
+     * @return Sample_Shop_Product  
+     */
+    function createNoteShopProduct($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Shop_Product_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        if ($isReference) $res->_setIsReference(true);
+        $this->addNoteShopProduct($res);
         return $res;
     }
     

@@ -3,7 +3,6 @@
 class Sample_Person_Post_Base_Object extends Ac_Model_Object {
 
     public $_hasDefaults = true;
-    public $_publish = false;
     public $_person = false;
     public $_personPhoto = false;
     public $id = NULL;
@@ -36,23 +35,16 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'publish', 1 => 'person', 2 => 'personPhoto', 3 => 'id', 4 => 'personId', 5 => 'photoId', 6 => 'title', 7 => 'content', 8 => 'pubId', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'person', 1 => 'personPhoto', )));
     }
     
  
     protected function listOwnAssociations() {
-        return array ( 'publish' => 'Sample_Publish', 'person' => 'Sample_Person', 'personPhoto' => 'Sample_Person_Photo', );
+        return array ( 'person' => 'Sample_Person', 'personPhoto' => 'Sample_Person_Photo', );
     }
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
-            'publish' => array (
-                'className' => 'Sample_Publish',
-                'mapperClass' => 'Sample_Publish_ImplMapper',
-                'caption' => 'Publish',
-                'relationId' => '_publish',
-                'referenceVarName' => '_publish',
-            ),
             'person' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
@@ -129,50 +121,6 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     function hasUniformPropertiesInfo() { return true; }
 
     function tracksChanges() { return true; }
-        
-    
-    /**
-     * @return Sample_Publish 
-     */
-    function getPublish() {
-        if ($this->_publish === false) {
-            $this->mapper->loadPublishFor($this);
-            
-        }
-        return $this->_publish;
-    }
-    
-    /**
-     * @param Sample_Publish $publish 
-     */
-    function setPublish($publish) {
-        if ($publish === false) $this->_publish = false;
-        elseif ($publish === null) $this->_publish = null;
-        else {
-            if (!is_a($publish, 'Sample_Publish')) trigger_error('$publish must be an instance of Sample_Publish', E_USER_ERROR);
-            if (!is_object($this->_publish) && !Ac_Util::sameObject($this->_publish, $publish)) { 
-                $this->_publish = $publish;
-            }
-        }
-    }
-    
-    function clearPublish() {
-        $this->publish = null;
-    }
-
-    /**
-     * @return Sample_Publish  
-     */
-    function createPublish($values = array(), $isReference = false) {
-        $m = $this->getMapper('Sample_Publish_ImplMapper');
-        $res = $m->createRecord();
-        if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
-        $this->setPublish($res);
-        return $res;
-    }
-
-    
         
     
     /**

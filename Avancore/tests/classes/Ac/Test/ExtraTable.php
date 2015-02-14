@@ -118,15 +118,17 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         $persons->useRecordsCollection = true;
         
         $p3 = $persons->loadByPersonId(3);
-        $this->assertEqual($p3->_shopProducts, false);
-        $p3->listShopProducts();
-        $this->assertEqual($p3->_shopProducts, array());
+        $this->assertEqual($p3->_extraCodeShopProducts, false);
+        $p3->listExtraCodeShopProducts();
+        $this->assertEqual($p3->_extraCodeShopProducts, array());
         
         $prod = $prods->loadById(2);
-        $prodPerson = $prod->getPerson();
-        $this->assertSame($prodPerson, $p3);
-        if ($this->assertEqual(count($prodPerson->listShopProducts()), 1)) {
-            $this->assertSame($prodPerson->getShopProduct(0), $prod);
+        $prodPerson = $prod->getExtraCodePerson();
+        if ($this->assertTrue(is_object($prodPerson))) {
+            $this->assertSame($prodPerson, $p3);
+            if ($this->assertEqual(count($prodPerson->listExtraCodeShopProducts()), 1)) {
+                $this->assertSame($prodPerson->getExtraCodeShopProduct(0), $prod);
+            }
         }
             
         $persons->useRecordsCollection = false;
@@ -152,7 +154,8 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             'asin' => 'B',
             'gtin' => 'C',
         ));
-        $author = $newProd->createPerson();
+
+        $author = $newProd->createExtraCodePerson();
         $author->bind($b = array(
             'name' => 'test prod author',
             'gender' => 'M', 
@@ -179,7 +182,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             'gender' => 'F',
             'birthDate' => '2015-02-05',
         ));
-        $prod2 = $girl->createShopProduct($d = array(
+        $prod2 = $girl->createExtraCodeShopProduct($d = array(
             'sku' => 'f01',
             'title' => 'test prod 3',
             'ean' => 'A1',
@@ -199,7 +202,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         $this->assertEqual($prodRow, array_merge($d, $c));
     }
     
-    function testExtraTableMixable() {
+    function testExtraTableSqlSelect() {
         $prodMap = $this->getSampleApp()->getSampleShopProductMapper();
         $catMap = $this->getSampleApp()->getSampleShopCategoryMapper();
         $sql = $catMap->createSqlSelect();
@@ -212,6 +215,38 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             $prodSql->useAlias($alias);
         $stmt = ''.$prodSql;
         //var_dump($stmt);
+    }
+    
+    function testInlineGenExtraTable() {
+        $prodMap = $this->getSampleApp()->getSampleShopProductMapper();
+        $db = $this->getAeDb();
+        $db->query("DELETE FROM #__shop_products WHERE sku = 'PROD_NOTE'");
+        $db->query("DELETE FROM #__people WHERE name = 'Author of a note'");
+        $prod = $prodMap->createRecord();
+        $prod->bind($a = array(
+            'sku' => 'PROD_NOTE',
+            'title' => 'product with a note',
+            'note' => 'foobar',
+        ));
+        $author = $prod->createNotePerson();
+        $author->bind($b = array(
+            'name' => 'Author of a note', 
+            'gender' => 'M',
+            'birthDate' => '2014-02-14',
+        ));
+        $prod->store();
+        $this->assertTrue($prod->isPersistent());
+        $this->assertTrue($author->isPersistent());
+        $prodRow = $db->args($a['title'])->fetchRow(
+            $pQuery = 'SELECT p.sku, p.title, n.note, n.noteAuthorId, u.name, u.gender, u.birthDate '
+            . 'FROM #__shop_products p INNER JOIN #__shop_product_notes n ON n.productId = p.id '
+            . 'INNER JOIN #__people u ON u.personId = n.noteAuthorId '
+            . 'WHERE p.title = ?');
+        $a['noteAuthorId'] = $prod->noteAuthorId;
+        $this->assertEqual($prodRow, array_merge($a, $b));
+//        if ($this->assertTrue(in_array(0, $author->listNoteShopProducts())))
+//            $this->assertSame($author->getNoteShopProduct(0), $prod);
+//       
     }
     
 }

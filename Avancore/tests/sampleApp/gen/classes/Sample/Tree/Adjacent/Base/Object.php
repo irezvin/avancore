@@ -32,7 +32,7 @@ class Sample_Tree_Adjacent_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'id', 1 => 'parentId', 2 => 'ordering', 3 => 'title', 4 => 'tag', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( )));
     }
     
     protected function getOwnPropertiesInfo() {

@@ -100,6 +100,13 @@ $config = array(
                     'fkExtraCodeProduct',
                 ),
             ),
+            'shopProductNotes' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'inline' => true,
+                'masterFkIds' => array(
+                    'fkProductNoteProduct',
+                ),
+            ),
         ),
     ),
 );

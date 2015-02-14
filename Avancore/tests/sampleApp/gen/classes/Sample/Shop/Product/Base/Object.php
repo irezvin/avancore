@@ -12,6 +12,12 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     public $title = '';
     public $metaId = NULL;
     public $pubId = NULL;
+    public $_notePerson = false;
+    public $_noteShopProductsCount = false;
+    public $_noteShopProductsLoaded = false;
+    public $productId = NULL;
+    public $note = '';
+    public $noteAuthorId = NULL;
     
     var $_mapperClass = 'Sample_Shop_Product_Mapper';
     
@@ -36,18 +42,18 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'shopCategories', 1 => 'shopCategoryIds', 2 => 'id', 3 => 'sku', 4 => 'title', 5 => 'metaId', 6 => 'pubId', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopCategories', 1 => 'shopCategoryIds', 7 => 'notePerson', 8 => 'productId', 9 => 'note', 10 => 'noteAuthorId', )));
     }
  
     protected function listOwnLists() {
         
-        return array ( 'shopCategories' => 'shopCategories', );
+        return array ( 'shopCategories' => 'shopCategories', 'notePerson' => 'noteShopProducts', );
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'shopCategories' => 'Sample_Shop_Category', );
+        return array ( 'shopCategories' => 'Sample_Shop_Category', 'notePerson' => 'Sample_Person', );
     }
 
     protected function getOwnPropertiesInfo() {
@@ -107,6 +113,42 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 ),
                 'isNullable' => true,
                 'caption' => 'Pub Id',
+            ),
+            'notePerson' => array (
+                'className' => 'Sample_Person',
+                'mapperClass' => 'Sample_Person_Mapper',
+                'otherModelIdInMethodsPrefix' => 'note',
+                'caption' => 'People',
+                'relationId' => '_notePerson',
+                'countVarName' => '_noteShopProductsCount',
+                'referenceVarName' => '_notePerson',
+            ),
+            'productId' => array (
+                'dataType' => 'int',
+                'controlType' => 'selectList',
+                'maxLength' => '11',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Records',
+                    'mapperClass' => 'Sample_Shop_Product_Mapper',
+                ),
+                'caption' => 'Product Id',
+            ),
+            'note' => array (
+                'controlType' => 'textArea',
+                'caption' => 'Note',
+            ),
+            'noteAuthorId' => array (
+                'dataType' => 'int',
+                'controlType' => 'selectList',
+                'maxLength' => '10',
+                'dummyCaption' => '',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Records',
+                    'mapperClass' => 'Sample_Person_Mapper',
+                ),
+                'objectPropertyName' => 'person',
+                'isNullable' => true,
+                'caption' => 'Note Author Id',
             ),
         );
     
@@ -206,6 +248,50 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
         $this->_shopCategoriesLoaded = true;
         $this->_shopCategoryIds = false;
     }               
+        
+    
+    /**
+     * @return Sample_Person 
+     */
+    function getNotePerson() {
+        if ($this->_notePerson === false) {
+            $this->mapper->loadNotePeopleFor($this);
+            
+        }
+        return $this->_notePerson;
+    }
+    
+    /**
+     * @param Sample_Person $notePerson 
+     */
+    function setNotePerson($notePerson) {
+        if ($notePerson === false) $this->_notePerson = false;
+        elseif ($notePerson === null) $this->_notePerson = null;
+        else {
+            if (!is_a($notePerson, 'Sample_Person')) trigger_error('$notePerson must be an instance of Sample_Person', E_USER_ERROR);
+            if (!is_object($this->_notePerson) && !Ac_Util::sameObject($this->_notePerson, $notePerson)) { 
+                $this->_notePerson = $notePerson;
+            }
+        }
+    }
+    
+    function clearNotePerson() {
+        $this->notePerson = null;
+    }
+
+    /**
+     * @return Sample_Person  
+     */
+    function createNotePerson($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Person_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        if ($isReference) $res->_setIsReference(true);
+        $this->setNotePerson($res);
+        return $res;
+    }
+
+    
   
     
 }

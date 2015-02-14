@@ -230,6 +230,7 @@ class Ac_Cg_Frontend {
         } else {
             $extra = array();
         }
+        Ac_Util::ms($vars, $extra);
         foreach ($vars as $k => $v) {
             if ($k == 'password') $v = str_repeat('*', strlen($v));
             if (array_key_exists($k, $extra) || ($k{0} != '_' && !is_object($v) && !is_array($v))) {

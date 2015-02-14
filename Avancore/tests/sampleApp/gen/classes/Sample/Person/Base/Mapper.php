@@ -59,9 +59,10 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
             '_outgoingRelations' => false,
             '_outgoingRelationsCount' => false,
             '_outgoingRelationsLoaded' => false,
-            '_shopProducts' => false,
+            '_extraCodeShopProducts' => false,
             '_shopProductsCount' => false,
             '_shopProductsLoaded' => false,
+            '_noteShopProducts' => false,
         );
     }
     
@@ -231,14 +232,29 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
             ),
-            '_shopProducts' => array (
+            '_extraCodeShopProducts' => array (
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Shop_Product_Mapper',
-                'srcVarName' => '_shopProducts',
+                'srcVarName' => '_extraCodeShopProducts',
                 'srcCountVarName' => '_shopProductsCount',
                 'srcLoadedVarName' => '_shopProductsLoaded',
                 'fieldLinks' => array (
                     'personId' => 'responsiblePersonId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+            ),
+            '_noteShopProducts' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Shop_Product_Mapper',
+                'srcVarName' => '_noteShopProducts',
+                'srcCountVarName' => '_shopProductsCount',
+                'srcLoadedVarName' => '_shopProductsLoaded',
+                'destVarName' => '_notePerson',
+                'destCountVarName' => '_noteShopProductsCount',
+                'destLoadedVarName' => '_noteShopProductsLoaded',
+                'fieldLinks' => array (
+                    'personId' => 'noteAuthorId',
                 ),
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
@@ -385,23 +401,41 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'addDestObjectMethod' => 'addOutgoingRelation',
                 'isDestLoadedMethod' => 'isOutgoingRelationsLoaded',
             ),
-            'shopProducts' => array (
-                'relationId' => '_shopProducts',
+            'extraCodeShopProducts' => array (
+                'relationId' => '_extraCodeShopProducts',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
-                'single' => 'shopProduct',
-                'plural' => 'shopProducts',
+                'single' => 'extraCodeShopProduct',
+                'plural' => 'extraCodeShopProducts',
                 'canLoadDestObjects' => false,
                 'class' => 'Ac_Model_Association_Many',
                 'loadDestObjectsMapperMethod' => NULL,
-                'loadSrcObjectsMapperMethod' => 'loadForShopProducts',
-                'getSrcObjectsMapperMethod' => 'getOfShopProducts',
-                'createDestObjectMethod' => 'createShopProduct',
-                'listDestObjectsMethod' => 'listShopProducts',
-                'countDestObjectsMethod' => 'countShopProducts',
-                'getDestObjectMethod' => 'getShopProduct',
-                'addDestObjectMethod' => 'addShopProduct',
-                'isDestLoadedMethod' => 'isShopProductsLoaded',
+                'loadSrcObjectsMapperMethod' => 'loadForExtraCodeShopProducts',
+                'getSrcObjectsMapperMethod' => 'getOfExtraCodeShopProducts',
+                'createDestObjectMethod' => 'createExtraCodeShopProduct',
+                'listDestObjectsMethod' => 'listExtraCodeShopProducts',
+                'countDestObjectsMethod' => 'countExtraCodeShopProducts',
+                'getDestObjectMethod' => 'getExtraCodeShopProduct',
+                'addDestObjectMethod' => 'addExtraCodeShopProduct',
+                'isDestLoadedMethod' => 'isExtraCodeShopProductsLoaded',
+            ),
+            'noteShopProducts' => array (
+                'relationId' => '_noteShopProducts',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'noteShopProduct',
+                'plural' => 'noteShopProducts',
+                'canLoadDestObjects' => false,
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => NULL,
+                'loadSrcObjectsMapperMethod' => 'loadForNoteShopProducts',
+                'getSrcObjectsMapperMethod' => 'getOfNoteShopProducts',
+                'createDestObjectMethod' => 'createNoteShopProduct',
+                'listDestObjectsMethod' => 'listNoteShopProducts',
+                'countDestObjectsMethod' => 'countNoteShopProducts',
+                'getDestObjectMethod' => 'getNoteShopProduct',
+                'addDestObjectMethod' => 'addNoteShopProduct',
+                'isDestLoadedMethod' => 'isNoteShopProductsLoaded',
             ),
         ));
         
@@ -688,22 +722,44 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
 
     /**
      * Returns (but not loads!) one or more people of given one or more shopProducts 
-     * @param Sample_Person|array $shopProducts     
+     * @param Sample_Person|array $extraCodeShopProducts     
      * @return array of Sample_Person objects  
      */
-    function getOfShopProducts($shopProducts) {
-        $rel = $this->getRelation('_shopProducts');
-        $res = $rel->getSrc($shopProducts); 
+    function getOfExtraCodeShopProducts($extraCodeShopProducts) {
+        $rel = $this->getRelation('_extraCodeShopProducts');
+        $res = $rel->getSrc($extraCodeShopProducts); 
         return $res;
     }
     
     /**
      * Loads one or more people of given one or more shopProducts 
-     * @param Sample_Shop_Product|array $shopProducts of Sample_Person objects      
+     * @param Sample_Shop_Product|array $extraCodeShopProducts of Sample_Person objects      
      */
-    function loadForShopProducts($shopProducts) {
-        $rel = $this->getRelation('_shopProducts');
-        return $rel->loadSrc($shopProducts); 
+    function loadForExtraCodeShopProducts($extraCodeShopProducts) {
+        $rel = $this->getRelation('_extraCodeShopProducts');
+        return $rel->loadSrc($extraCodeShopProducts); 
+    }
+    
+
+
+    /**
+     * Returns (but not loads!) one or more people of given one or more shopProducts 
+     * @param Sample_Person|array $noteShopProducts     
+     * @return array of Sample_Person objects  
+     */
+    function getOfNoteShopProducts($noteShopProducts) {
+        $rel = $this->getRelation('_noteShopProducts');
+        $res = $rel->getSrc($noteShopProducts); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more people of given one or more shopProducts 
+     * @param Sample_Shop_Product|array $noteShopProducts of Sample_Person objects      
+     */
+    function loadForNoteShopProducts($noteShopProducts) {
+        $rel = $this->getRelation('_noteShopProducts');
+        return $rel->loadSrc($noteShopProducts); 
     }
     
 

@@ -48,6 +48,10 @@ class Ac_Model_Mixable_ExtraTable extends Ac_Model_Mixable_Object {
         );
     }
     
+    protected function listOwnProperties() {
+        return $this->listOwnDataProperties();
+    }
+    
     function listOwnDataProperties() {
         $extra = $this->getMapperExtraTable(true);
         $res = array_keys($extra->getDefaults());

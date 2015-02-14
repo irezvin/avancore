@@ -35,8 +35,14 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                     'id' => 'pubId',
                 ),
             ),
-            'shopProductExtraCode' => array (
+            'extraCode' => array (
                 'class' => 'Sample_Shop_Product_Extra_Code_MapperMixable',
+                'colMap' => array (
+                    'productId' => 'id',
+                ),
+            ),
+            'note' => array (
+                'class' => 'Sample_Shop_Product_Note_MapperMixable',
                 'colMap' => array (
                     'productId' => 'id',
                 ),
@@ -55,6 +61,9 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
             '_shopCategoriesCount' => false,
             '_shopCategoriesLoaded' => false,
             '_shopCategoryIds' => false,
+            '_notePerson' => false,
+            '_noteShopProductsCount' => false,
+            '_noteShopProductsLoaded' => false,
         );
     }
     
@@ -248,6 +257,18 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
         return $rel->loadDestNNIds($shopProducts); 
     }
     
+
+    
+    
+    /**
+     * Loads several people of given one or more shopProducts 
+     * @param Sample_Shop_Product|array $shopProducts     
+     */
+    function loadNotePeopleFor($shopProducts) {
+        $rel = $this->getRelation('_notePerson');
+        return $rel->loadDest($shopProducts); 
+    }
+
     
 }
 

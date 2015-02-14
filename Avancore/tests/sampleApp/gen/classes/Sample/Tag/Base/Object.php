@@ -39,7 +39,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'people', 1 => 'personIds', 2 => 'perks', 3 => 'perkIds', 4 => 'tagId', 5 => 'title', 6 => 'titleM', 7 => 'titleF', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'people', 1 => 'personIds', 2 => 'perks', 3 => 'perkIds', )));
     }
  
     protected function listOwnLists() {

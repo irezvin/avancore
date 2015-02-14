@@ -74,16 +74,23 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     protected $overwriteModelFields = false;
 
     function setTableName($tableName) {
-        $this->tableName = $tableName;
+        if ($tableName !== $this->tableName) {
+            $this->tableName = $tableName;
+            if ($this->implMapper) {
+                if ($this->tableName && $this->implMapper->tableName !== $this->tableName) {
+                    throw new Ac_E_InvalidUsage("\$tableName, if set, must not be different from \$implMapper->tableName");
+                }
+            }
+        }
     }
 
     function getTableName() {
+        if ($this->implMapper) return $this->implMapper->tableName;
         return $this->tableName;
     }
 
     function setFieldNames(array $fieldNames) {
         $this->fieldNames = $fieldNames;
-        $this->dataFieldNames = false;
     }
 
     /**
@@ -164,6 +171,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      */
     protected function getImplRelation() {
         if ($this->implRelation === false) {
+            $this->getImplMapper();
             $this->implRelation = new Ac_Model_Relation(array(
                 'fieldLinks' => $this->colMap,
                 'srcTableName' => $this->tableName,
@@ -176,10 +184,30 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     }
     
     /**
+     * Sets class, prototype or instance of Ac_Model_Mapper that interacts with extra table
+     */
+    function setImplMapper($implMapper) {
+        if (!$this->implMapper || $this->implMapper !== $implMapper) {
+            if ($this->implMapper) throw Ac_E_InvalidCall::canRunMethodOnce($this, __METHOD__);
+            $this->implMapper = $implMapper;
+        }
+    }
+    
+    /**
      * @return Ac_Model_Mapper
      */
     protected function getImplMapper() {
-        if ($this->implMapper === false && $this->mixin) {
+        if ($this->implMapper !== false && !is_object($this->implMapper) && $this->mixin) {
+            $def = array();
+            if ($this->mixin) 
+                $def['application'] = $this->mixin->getApplication();
+            $this->implMapper = Ac_Prototyped::factory($this->implMapper, 'Ac_Model_Mapper', $def);
+            if ($this->tableName && $this->implMapper->tableName !== $this->tableName) {
+                throw new Ac_E_InvalidUsage("\$tableName, if set, must not be different from \$implMapper->tableName");
+            }
+            $this->tableName = $this->implMapper->tableName;
+        }
+        if ($this->implMapper === false && $this->mixin && strlen($this->tableName)) {
             $this->implMapper = new Ac_Model_Mapper(array(
                 'id' => 'extraTable_'.$this->mixin->getId().$this->tableName,
                 'tableName' => $this->tableName,
@@ -359,6 +387,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     function onGetSqlTable($alias, $prevAlias, Ac_Sql_Select_TableProvider $tableProvider, & $result) {
         if (!$result && $this->mixin) {
             $sel = $tableProvider->getSqlSelect();
+            $this->getImplMapper();
             if ($sel && $sel->hasTable($prevAlias) && $sel->getTable($prevAlias)->name === $this->mixin->tableName) {
                 if (strlen($this->mixableId) && $alias === 'extra__'.$this->mixableId && !$result) {
                     $result = array(
@@ -372,5 +401,11 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
             }
         }
     }
-        
+    
+    function onListDataProperties(array & $dataProperties) {
+        if (!$this->modelMixable) {
+            $dataProperties = array_unique(array_merge($dataProperties, array_keys($this->getDefaults())));
+        }
+    }
+    
 }

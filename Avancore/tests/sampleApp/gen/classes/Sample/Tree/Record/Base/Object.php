@@ -30,7 +30,7 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'id', 1 => 'title', 2 => 'tag', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( )));
     }
     
     protected function getOwnPropertiesInfo() {

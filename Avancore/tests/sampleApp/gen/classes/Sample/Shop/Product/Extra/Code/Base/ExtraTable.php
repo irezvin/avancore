@@ -2,22 +2,24 @@
 
 class Sample_Shop_Product_Extra_Code_Base_ExtraTable extends Ac_Model_Mapper_Mixable_ExtraTable {
 
-    protected $tableName = '#__shop_product_extraCodes';
-    
     protected $extraIsReferenced = false;
     
     protected $modelMixable = 'Sample_Shop_Product_Extra_Code';
+    
+    protected $implMapper = 'Sample_Shop_Product_Extra_Code_ImplMapper';
     
     
 
     
     protected function doGetRelationPrototypes() {
         return array (
-            '_person' => array (
+            '_extraCodePerson' => array (
                 'srcMapperClass' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
-                'srcVarName' => '_person',
-                'destVarName' => '_shopProducts',
+                'srcVarName' => '_extraCodePerson',
+                'srcCountVarName' => '_extraCodeShopProductsCount',
+                'srcLoadedVarName' => '_extraCodeShopProductsLoaded',
+                'destVarName' => '_extraCodeShopProducts',
                 'destCountVarName' => '_shopProductsCount',
                 'destLoadedVarName' => '_shopProductsLoaded',
                 'fieldLinks' => array (
@@ -33,21 +35,21 @@ class Sample_Shop_Product_Extra_Code_Base_ExtraTable extends Ac_Model_Mapper_Mix
     
     protected function doGetAssociationPrototypes() {
         return array (
-            'person' => array (
-                'relationId' => '_person',
+            'extraCodePerson' => array (
+                'relationId' => '_extraCodePerson',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
-                'single' => 'person',
-                'plural' => 'people',
+                'single' => 'extraCodePerson',
+                'plural' => 'extraCodePeople',
                 'canLoadSrcObjects' => false,
                 'class' => 'Ac_Model_Association_One',
-                'loadDestObjectsMapperMethod' => 'loadPeopleFor',
+                'loadDestObjectsMapperMethod' => 'loadExtraCodePeopleFor',
                 'loadSrcObjectsMapperMethod' => NULL,
-                'getSrcObjectsMapperMethod' => 'getOfPeople',
-                'createDestObjectMethod' => 'createPerson',
-                'getDestObjectMethod' => 'getPerson',
-                'setDestObjectMethod' => 'setPerson',
-                'clearDestObjectMethod' => 'clearPerson',
+                'getSrcObjectsMapperMethod' => 'getOfExtraCodePeople',
+                'createDestObjectMethod' => 'createExtraCodePerson',
+                'getDestObjectMethod' => 'getExtraCodePerson',
+                'setDestObjectMethod' => 'setExtraCodePerson',
+                'clearDestObjectMethod' => 'clearExtraCodePerson',
             ),
         );
     }
@@ -58,8 +60,8 @@ class Sample_Shop_Product_Extra_Code_Base_ExtraTable extends Ac_Model_Mapper_Mix
      * Loads several people of given one or more shopProductExtraCodes 
      * @param Sample_Shop_Product_Extra_Code|array $shopProductExtraCodes     
      */
-    function loadPeopleFor($shopProductExtraCodes) {
-        $rel = $this->getRelation('_person');
+    function loadExtraCodePeopleFor($shopProductExtraCodes) {
+        $rel = $this->getRelation('_extraCodePerson');
         return $rel->loadDest($shopProductExtraCodes); 
     }
 

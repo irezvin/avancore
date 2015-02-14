@@ -3,7 +3,9 @@
 class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
 
     public $_hasDefaults = true;
-    public $_person = false;
+    public $_extraCodePerson = false;
+    public $_extraCodeShopProductsCount = false;
+    public $_extraCodeShopProductsLoaded = false;
     public $productId = NULL;
     public $ean = '';
     public $asin = '';
@@ -23,22 +25,30 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'person', 1 => 'productId', 2 => 'ean', 3 => 'asin', 4 => 'gtin', 5 => 'responsiblePersonId', );
+        return array_merge(parent::listOwnProperties(), array ( 0 => 'extraCodePerson', ));
     }
+ 
+    protected function listOwnLists() {
+        
+        return array ( 'extraCodePerson' => 'extraCodeShopProducts', );
+    }
+
     
  
     protected function listOwnAssociations() {
-        return array ( 'person' => 'Sample_Person', );
+        return array ( 'extraCodePerson' => 'Sample_Person', );
     }
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; if ($pi === false) $pi = array (
-            'person' => array (
+            'extraCodePerson' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
+                'otherModelIdInMethodsPrefix' => 'extraCode',
                 'caption' => 'People',
-                'relationId' => '_person',
-                'referenceVarName' => '_person',
+                'relationId' => '_extraCodePerson',
+                'countVarName' => '_extraCodeShopProductsCount',
+                'referenceVarName' => '_extraCodePerson',
             ),
             'productId' => array (
                 'dataType' => 'int',
@@ -86,41 +96,41 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
     /**
      * @return Sample_Person 
      */
-    function getPerson() {
-        if ($this->_person === false) {
-            $this->mapper->loadPeopleFor($this->mixin);
+    function getExtraCodePerson() {
+        if ($this->_extraCodePerson === false) {
+            $this->mapper->loadExtraCodePeopleFor($this->mixin);
             
         }
-        return $this->_person;
+        return $this->_extraCodePerson;
     }
     
     /**
-     * @param Sample_Person $person 
+     * @param Sample_Person $extraCodePerson 
      */
-    function setPerson($person) {
-        if ($person === false) $this->_person = false;
-        elseif ($person === null) $this->_person = null;
+    function setExtraCodePerson($extraCodePerson) {
+        if ($extraCodePerson === false) $this->_extraCodePerson = false;
+        elseif ($extraCodePerson === null) $this->_extraCodePerson = null;
         else {
-            if (!is_a($person, 'Sample_Person')) trigger_error('$person must be an instance of Sample_Person', E_USER_ERROR);
-            if (!is_object($this->_person) && !Ac_Util::sameObject($this->_person, $person)) { 
-                $this->_person = $person;
+            if (!is_a($extraCodePerson, 'Sample_Person')) trigger_error('$extraCodePerson must be an instance of Sample_Person', E_USER_ERROR);
+            if (!is_object($this->_extraCodePerson) && !Ac_Util::sameObject($this->_extraCodePerson, $extraCodePerson)) { 
+                $this->_extraCodePerson = $extraCodePerson;
             }
         }
     }
     
-    function clearPerson() {
-        $this->person = null;
+    function clearExtraCodePerson() {
+        $this->extraCodePerson = null;
     }
 
     /**
      * @return Sample_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
+    function createExtraCodePerson($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
-        $this->setPerson($res);
+        $this->setExtraCodePerson($res);
         return $res;
     }
 

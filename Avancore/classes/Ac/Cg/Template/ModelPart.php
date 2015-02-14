@@ -16,6 +16,8 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
     
     var $extraAssociationPrototypes = array();
     
+    var $inline = false;
+    
     /**
      * @var Ac_Cg_Model_Part
      */
@@ -35,6 +37,10 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
                 'templatePart' => 'genExtraTable',
             ),
         ));
+        if ($this->inline) {
+            unset($res['modelObject']);
+            unset($res['genModelObject']);
+        }
         return $res;
     }
     
@@ -51,6 +57,7 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
         $this->extraTableVars = $this->model->getExtraTableVars();
         $this->extraRelationPrototypes = $this->model->extraRelationPrototypes;
         $this->extraAssociationPrototypes = $this->model->extraAssociationPrototypes;
+        $this->inline = $this->model->inline;
     }
     
     function getAssocStrategy($relationId, $prop) {
@@ -143,11 +150,7 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
     }
     
     protected function listOwnProperties() {
-<?php if ($this->parentClass !== $this->model->getDefaultParentClassName()) { ?>
         return array_merge(parent::listOwnProperties(), <?php $this->exportArray($this->ownProperties, 0, false, true); ?>);
-<?php } else { ?>
-        return <?php $this->exportArray($this->ownProperties, 0, false, true); ?>;
-<?php }?>
     }
 <?php if ($this->ownLists) { ?> 
     protected function listOwnLists() {
@@ -186,6 +189,11 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
 <?php        
     }
     
-    
+    function showGenMapper() {
+        $tmp = array($this->associationPrototypes, $this->assocProperties);
+        $this->associationPrototypes = $this->assocProperties = array();
+        parent::showGenMapper();
+        list($this->associationPrototypes, $this->assocProperties) = $tmp;
+    }    
     
 }

@@ -33,7 +33,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'relations', 1 => 'relationTypeId', 2 => 'title', 3 => 'isSymmetrical', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'relations', )));
     }
  
     protected function listOwnLists() {
@@ -140,6 +140,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
         $this->_relations[] = $relation;
         
         $relation->_relationType = $this;
+        
         
     }
 

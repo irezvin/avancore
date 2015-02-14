@@ -35,7 +35,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'person', 1 => 'personPhotos', 2 => 'personPhotoIds', 3 => 'albumId', 4 => 'personId', 5 => 'albumName', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'person', 1 => 'personPhotos', 2 => 'personPhotoIds', )));
     }
  
     protected function listOwnLists() {

@@ -30,12 +30,39 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     
     var $extraAssociationPrototypes = array();
     
-    var $mixableId = array();
+    var $mixableId = false;
+    
+    var $objectPropertiesPrefix = false;
     
     /**
      * @var Ac_Cg_Model
      */
     var $masterModel = false;
+    
+    var $inline = false;
+    
+    function getMixableId() {
+        if ($this->mixableId === false) {
+            $res = $this->single;
+            if (!$this->isReferenced && $this->masterModel) {
+                $entity = $this->masterModel->single;
+                if (!strncmp($this->single, $entity, strlen($entity))) {
+                    $shorter = substr($this->single, strlen($entity));
+                    if (strlen($shorter)) {
+                        $res = $shorter;
+                        $res{0} = strtolower($res{0});
+                    }
+                }
+            }
+        } else $res = $this->mixableId;
+        return $res;
+    }
+    
+    function getObjectPropertiesPrefix() {
+        if ($this->objectPropertiesPrefix === false) $res = $this->getMixableId();
+            else $res = $this->objectPropertiesPrefix;
+        return $res;
+    }
     
     function getDefaultParentClassName() {
         return 'Ac_Model_Mixable_ExtraTable';
@@ -140,17 +167,29 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     protected function adjustObjectProperty(Ac_Cg_Property_Object $prop) {
         
         $other = $prop->getMirrorProperty();
+        
+        if ($prop->otherModelIdInMethodsPrefix === false) {
+            $prop->otherModelIdInMethodsPrefix = $this->getObjectPropertiesPrefix();
+            $prop->varName = $prop->getDefaultVarName();
+            $prop->pluralForList = $prop->getDefaultPluralForList();
+        }
 
         // incoming associations are disabled at the moment
-        $other->enabled = false;
+        if ($other) $other->enabled = false;
         $prop->canLoadSrc = false;
         
         // still leave association (no loadDest at the moment) for referencing extra table
         // doesn't work at the moment (class of ExtraTable still ends up in gen'd code)
         
-        if (!$this->isReferenced && $this->masterModel) {
+        if (!$this->isReferenced && $this->masterModel && $other) {
             $other->setOtherModel($this->masterModel, true);
             $other->enabled = true;
+            if ($other->otherModelIdInMethodsPrefix === false) {
+                $other->otherModelIdInMethodsPrefix = $this->getObjectPropertiesPrefix();
+                $other->varName = $other->getDefaultVarName();
+                $prop->pluralForList = $other->getDefaultPluralForList();
+            }
+            
             $other->canLoadDest = false;
             $other->className = $this->masterModel->className;
             $other->mapperClass = $this->masterModel->getMapperClass();
@@ -172,20 +211,45 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
         if ($this->skipMapperMixables !== true) {
             $skip = Ac_Util::toArray($this->skipMapperMixables);
             foreach ($this->masterProperties as $fkId => $propName) {
-                if (in_array($fkId, $skip)) continue;
+                $shouldSkip = in_array($fkId, $skip);
                 $prop = $this->getProperty($propName);
                 if ($prop instanceof Ac_Cg_Property_Object) {
                     $otherModel = $prop->getOtherModel();
-                    $mirror = $prop->getMirrorProperty();
-                    if ($this->mixableId) $mixName = $this->mixableId;
-                    if ($mirror) $mixName = $mirror->getDefaultVarName();
-                        else $mixName = $this->single;
-                    $otherModel->mapperCoreMixables[$mixName] = $this->getMapperCoreMixablePrototype($prop);
+                    $this->prepareOtherModel($otherModel, $prop, $shouldSkip);
                 }
             }
         }
         $this->extraRelationPrototypes = $this->getRelationPrototypes();
         $this->extraAssociationPrototypes = $this->getAssociationPrototypes();
+    }
+    
+    function prepareOtherModel(Ac_Cg_Model $otherModel, Ac_Cg_Property_Object $masterProperty, $shouldSkip) {
+        $mirror = $masterProperty->getMirrorProperty();
+        if ($shouldSkip) {
+            $masterProperty->enabled = false;
+            if ($mirror) $mirror->enabled = false;
+        } else {
+            $mixName = $this->getMixableId();
+            $otherModel->mapperCoreMixables[$mixName] = $this->getMapperCoreMixablePrototype($masterProperty);
+            if ($this->inline) {
+                foreach (array_diff($this->listProperties(), $this->masterProperties) as $propName) {
+                    // don't overwrite existing properties of other model
+                    //while(ob_get_level()) ob_end_clean ();
+                    if (!in_array($propName, $otherModel->listProperties())) { 
+                        $myProp = $this->getProperty($propName);
+                        $prop = clone $myProp;
+                        $prop->_model = $otherModel;
+                        if ($prop instanceof Ac_Cg_Property_Object && $prop->modelRelation) {
+                            $prop->modelRelation = clone $myProp->modelRelation;
+                            $prop->modelRelation->createAssociationObject = false;
+                            $prop->modelRelation->createRelationObject = false;
+                            $otherModel->addRelationInfo($prop->modelRelation);
+                        }
+                        $otherModel->addProperty($prop);
+                    }
+                }
+            }
+        }
     }
     
     function getMapperCoreMixablePrototype(Ac_Cg_Property_Object $prop) {
@@ -198,11 +262,17 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     }
     
     function getExtraTableVars() {
-        return array(
+        $res = array(
             'tableName' => $this->table,
             'extraIsReferenced' => $this->isReferenced,
             'modelMixable' => $this->className,
         );
+        if ($this->inline) unset($res['modelMixable']);
+        if ($mc = $this->getMapperClass()) {
+            $res['implMapper'] = $this->getMapperClass();
+            unset($res['tableName']);
+        }
+        return $res;
     }
     
     function getMapperRecordClass() {

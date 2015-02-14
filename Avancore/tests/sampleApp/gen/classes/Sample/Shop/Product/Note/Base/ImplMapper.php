@@ -1,25 +1,23 @@
 <?php
 
-class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
+class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $pk = 'productId'; 
 
     var $recordClass = 'Ac_Model_Record'; 
 
-    var $tableName = '#__shop_product_extraCodes'; 
+    var $tableName = '#__shop_product_notes'; 
 
-    var $id = 'Sample_Shop_Product_Extra_Code_ImplMapper'; 
+    var $id = 'Sample_Shop_Product_Note_ImplMapper'; 
 
-    var $columnNames = array ( 0 => 'productId', 1 => 'ean', 2 => 'asin', 3 => 'gtin', 4 => 'responsiblePersonId', ); 
+    var $columnNames = array ( 0 => 'productId', 1 => 'note', 2 => 'noteAuthorId', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'responsiblePersonId', ); 
+    var $nullableSqlColumns = array ( 0 => 'noteAuthorId', ); 
 
     var $defaults = array (
             'productId' => NULL,
-            'ean' => '',
-            'asin' => '',
-            'gtin' => '',
-            'responsiblePersonId' => NULL,
+            'note' => '',
+            'noteAuthorId' => NULL,
         ); 
  
  
@@ -29,25 +27,25 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     
     function doGetInternalDefaults() {
         return array (
-            '_extraCodePerson' => false,
-            '_extraCodeShopProductsCount' => false,
-            '_extraCodeShopProductsLoaded' => false,
+            '_notePerson' => false,
+            '_noteShopProductsCount' => false,
+            '_noteShopProductsLoaded' => false,
         );
     }
     
     /**
-     * @return Sample_Shop_Product_Extra_Code 
+     * @return Sample_Shop_Product_Note 
      */ 
     static function factory ($className = false,
         $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
-        $res = Ac_Model_Mapper::getMapper('Sample_Shop_Product_Extra_Code_ImplMapper')->createRecord($className);
+        $res = Ac_Model_Mapper::getMapper('Sample_Shop_Product_Note_ImplMapper')->createRecord($className);
         return $res;
     }
     
     /**
-     * @return Sample_Shop_Product_Extra_Code 
+     * @return Sample_Shop_Product_Note 
      */ 
     function createRecord ($className = false) {
         $res = parent::createRecord($className);
@@ -55,14 +53,14 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     }
     
     /**
-     * @return Sample_Shop_Product_Extra_Code 
+     * @return Sample_Shop_Product_Note 
      */ 
     function reference ($values = array()) {
         return parent::reference($values);
     }
     
     /**
-     * @return Sample_Shop_Product_Extra_Code 
+     * @return Sample_Shop_Product_Note 
      */ 
     function loadRecord ($id) {
         return parent::loadRecord($id);
@@ -70,7 +68,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     
     /**
      * Returns first record in the resultset (returns NULL if there are no records)
-     * @return Sample_Shop_Product_Extra_Code 
+     * @return Sample_Shop_Product_Note 
      */ 
     function loadFirstRecord($where = '', $order = '', $joins = '', $limitOffset = false, $tableAlias = false) {
         return parent::loadFirstRecord($where, $order, $joins, $limitOffset, $tableAlias);
@@ -79,7 +77,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * Returns single record in the resultset if it contains only one record
      * (returns NULL if there are no records or there is more than one record)
-     * @return Sample_Shop_Product_Extra_Code 
+     * @return Sample_Shop_Product_Note 
      */ 
     function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
@@ -88,17 +86,17 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
                 
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_extraCodePerson' => array (
-                'srcMapperClass' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
+            '_notePerson' => array (
+                'srcMapperClass' => 'Sample_Shop_Product_Note_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
-                'srcVarName' => '_extraCodePerson',
-                'srcCountVarName' => '_extraCodeShopProductsCount',
-                'srcLoadedVarName' => '_extraCodeShopProductsLoaded',
-                'destVarName' => '_extraCodeShopProducts',
+                'srcVarName' => '_notePerson',
+                'srcCountVarName' => '_noteShopProductsCount',
+                'srcLoadedVarName' => '_noteShopProductsLoaded',
+                'destVarName' => '_noteShopProducts',
                 'destCountVarName' => '_shopProductsCount',
                 'destLoadedVarName' => '_shopProductsLoaded',
                 'fieldLinks' => array (
-                    'responsiblePersonId' => 'personId',
+                    'noteAuthorId' => 'personId',
                 ),
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
@@ -111,8 +109,8 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Shop product extra code',
-                'pluralCaption' => 'Shop product extra codes',
+                'singleCaption' => 'Shop product note',
+                'pluralCaption' => 'Shop product notes',
             ),
             parent::doGetInfoParams()
         );
@@ -129,7 +127,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     }
         
     /**
-     * @return Sample_Shop_Product_Extra_Code 
+     * @return Sample_Shop_Product_Note 
      */
     function loadByProductId ($productId) {
         $recs = $this->loadRecordsByCriteria(''.$this->getDb()->n('productId').' = '.$this->getDb()->q($productId).'');

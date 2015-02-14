@@ -31,7 +31,7 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'authorPerson', 1 => 'editorPerson', 2 => 'id', 3 => 'sharedObjectType', 4 => 'published', 5 => 'deleted', 6 => 'publishUp', 7 => 'publishDown', 8 => 'authorId', 9 => 'editorId', 10 => 'pubChannelId', 11 => 'dateCreated', 12 => 'dateModified', 13 => 'dateDeleted', );
+        return array_merge(parent::listOwnProperties(), array ( 0 => 'authorPerson', 1 => 'editorPerson', ));
     }
     
  

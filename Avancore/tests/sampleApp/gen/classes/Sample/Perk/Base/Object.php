@@ -33,7 +33,7 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'tags', 1 => 'tagIds', 2 => 'perkId', 3 => 'name', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'tags', 1 => 'tagIds', )));
     }
  
     protected function listOwnLists() {

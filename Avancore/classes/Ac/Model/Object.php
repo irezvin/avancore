@@ -199,8 +199,12 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     function doOnCreate() {
     }
     
+    protected function listOwnProperties() {
+        return $this->listOwnDataProperties();
+    }
+    
     protected function listOwnDataProperties() {
-        return $this->mapper->getColumnNames();
+        return $this->mapper->listDataProperties();
     }
     
     function doAfterLoad() {

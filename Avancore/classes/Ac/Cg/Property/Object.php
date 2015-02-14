@@ -49,6 +49,11 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     var $associationOverrides = array();
     
     /**
+     * @var Ac_Cg_Model_Relation
+     */
+    var $modelRelation = false;
+    
+    /**
      * @var Ac_Sql_Dbi_Relation
      */
     var $_rel = false;
@@ -412,9 +417,9 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             $many = false;
             $res = parent::getAeModelPropertyInfo();
         }
-        $relId = $this->_model->searchRelationIdByProperty($this);
-        if ($relId !== false) {
-            $prot = $this->_model->getAeModelRelationPrototype($relId);
+        $relation = $this->modelRelation;
+        if ($relation) {
+            $prot = $this->_model->getAeModelRelationPrototype($relation);
             if (isset($prot['srcVarName'])) {
                 if ($many) {
                     $res[$this->varName]['relationId'] = $prot['srcVarName'];
@@ -525,6 +530,10 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         
         if ($this->_other) $this->mapperClass = $this->_other->getMapperClass();
         
+    }
+    
+    function __clone() {
+        $this->_assocStrategy = false;
     }
     
 }

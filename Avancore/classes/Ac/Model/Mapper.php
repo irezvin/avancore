@@ -124,6 +124,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * function onGetSqlTable($alias, $prevAlias, Ac_Sql_Select_TableProvider $tableProvider, & $result)
      */
     const EVENT_ON_GET_SQL_TABLE  = 'onGetSqlTable';
+    
+    /**
+     * function onListDataProperties(array & $dataProperties)
+     */
+    const EVENT_ON_LIST_DATA_PROPERTIES  = 'onListDataProperties';
 
     protected $id = false;
     
@@ -219,6 +224,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     protected $defaultQualifier = false;
     
     protected $columnNames = false;
+    
+    protected $dataProperties = false;
     
     protected $defaults = false;
     
@@ -343,7 +350,19 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         }
         return $this->columnNames;
     }
-
+    
+    final function listDataProperties() {
+        if ($this->dataProperties === false) {
+            $this->dataProperties = $this->getColumnNames();
+            $this->doOnListDataProperties($this->dataProperties);
+            $this->triggerEvent(self::EVENT_ON_LIST_DATA_PROPERTIES, array(& $this->dataProperties));
+        }
+        return $this->dataProperties;
+    }
+    
+    protected function doOnListDataProperties(array & $dataProperties) {
+    }
+    
     protected function coreCreateRecord($className = false) {
         if ($className === false) $className = $this->recordClass;
         if ($this->useProto) {
@@ -695,7 +714,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
 
     function listModelProperties() {
         $proto = $this->getPrototype();
-        return $proto->listPublicProperties();
+        return $proto->listDataProperties();
     }
 
     /**
@@ -1777,6 +1796,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     function addMixable(Ac_I_Mixable $mixable, $id = false, $canReplace = false) {
         parent::addMixable($mixable, $id, $canReplace);
         Ac_Model_Data::clearMetaCache($this->getId());
+        $this->dataProperties = false;
         $this->resetPrototype();
     }
     

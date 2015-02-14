@@ -13,6 +13,7 @@ class Sample_Shop_Product extends Sample_Shop_Product_Base_Object {
             parent::listOwnProperties(), 
             array_keys($this->getMapper()->getMixable('meta')->getDefaults()),
             array_keys($this->getMapper()->getMixable('upc')->getDefaults())
+            //,array_keys($this->getMapper()->getMixable('shopProductNote')->getDefaults())
         );
     }
     
@@ -21,6 +22,7 @@ class Sample_Shop_Product extends Sample_Shop_Product_Base_Object {
             parent::listOwnDataProperties(), 
             array_keys($this->getMapper()->getMixable('meta')->getDefaults()),
             array_keys($this->getMapper()->getMixable('upc')->getDefaults())
+            //,array_keys($this->getMapper()->getMixable('shopProductNote')->getDefaults())
         );
     }
     

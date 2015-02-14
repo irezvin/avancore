@@ -39,7 +39,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'person', 1 => 'personAlbums', 2 => 'personAlbumIds', 3 => 'portraitPerson', 4 => 'personPosts', 5 => 'photoId', 6 => 'personId', 7 => 'filename', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'person', 1 => 'personAlbums', 2 => 'personAlbumIds', 3 => 'portraitPerson', 4 => 'personPosts', )));
     }
  
     protected function listOwnLists() {
@@ -358,6 +358,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         $this->_personPosts[] = $personPost;
         
         $personPost->_personPhoto = $this;
+        
         
     }
 

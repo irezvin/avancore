@@ -111,6 +111,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->mapperVars['tableName'] = $this->tableName;
         $this->mapperVars['id'] = $this->mapperClass;
         $this->mapperVars['columnNames'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->tableObject->listColumns(), 0, false, true, true));
+        $this->ownProperties = array_diff($this->ownProperties, $this->model->tableObject->listColumns());
         if ($this->uniqueIndexData) $this->mapperVars['indexData'] = $this->indexData;
         if ($this->model->nullableSqlColumns) 
             $this->mapperVars['nullableSqlColumns'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->nullableSqlColumns, 0, false, true, true));
@@ -249,11 +250,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 <?php } ?> 
     
     protected function listOwnProperties() {
-<?php if ($this->parentClass !== $this->model->getDefaultParentClassName()) { ?>
-        return array_merge(parent::listOwnProperties(), <?php $this->exportArray($this->ownProperties, 0, false, true); ?>);
-<?php } else { ?>
-        return <?php $this->exportArray($this->ownProperties, 0, false, true); ?>;
-<?php }?>
+        return array_unique(array_merge(parent::listOwnProperties(), <?php $this->exportArray($this->ownProperties, 0, false, true); ?>));
     }
 <?php if ($this->ownLists) { ?> 
     protected function listOwnLists() {

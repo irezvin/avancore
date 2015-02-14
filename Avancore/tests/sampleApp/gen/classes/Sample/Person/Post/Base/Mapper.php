@@ -35,7 +35,6 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     
     function doGetInternalDefaults() {
         return array (
-            '_publish' => false,
             '_person' => false,
             '_personPhoto' => false,
         );
@@ -98,17 +97,6 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
                 
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_publish' => array (
-                'srcMapperClass' => 'Sample_Person_Post_Mapper',
-                'destMapperClass' => 'Sample_Publish_ImplMapper',
-                'srcVarName' => '_publish',
-                'fieldLinks' => array (
-                    'pubId' => 'id',
-                ),
-                'srcIsUnique' => true,
-                'destIsUnique' => true,
-                'srcOutgoing' => true,
-            ),
             '_person' => array (
                 'srcMapperClass' => 'Sample_Person_Post_Mapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
@@ -144,21 +132,6 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
             
     protected function doGetAssociationPrototypes() {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
-            'publish' => array (
-                'relationId' => '_publish',
-                'useMapperMethods' => true,
-                'useModelMethods' => true,
-                'single' => 'publish',
-                'plural' => 'publish',
-                'class' => 'Ac_Model_Association_One',
-                'loadDestObjectsMapperMethod' => 'loadPublishFor',
-                'loadSrcObjectsMapperMethod' => 'loadForPublish',
-                'getSrcObjectsMapperMethod' => 'getOfPublish',
-                'createDestObjectMethod' => 'createPublish',
-                'getDestObjectMethod' => 'getPublish',
-                'setDestObjectMethod' => 'setPublish',
-                'clearDestObjectMethod' => 'clearPublish',
-            ),
             'person' => array (
                 'relationId' => '_person',
                 'useMapperMethods' => true,
@@ -236,36 +209,6 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
         return $res;
     }
     
-    /**
-     * Returns (but not loads!) one or more personPosts of given one or more publish 
-     * @param Sample_Person_Post|array $publish     
-     * @return Sample_Person_Post|array of Sample_Person_Post objects  
-     */
-    function getOfPublish($publish) {
-        $rel = $this->getRelation('_publish');
-        $res = $rel->getSrc($publish); 
-        return $res;
-    }
-    
-    /**
-     * Loads one or more personPosts of given one or more publish 
-     * @param Sample_Publish|array $publish of Sample_Person_Post objects      
-     */
-    function loadForPublish($publish) {
-        $rel = $this->getRelation('_publish');
-        return $rel->loadSrc($publish); 
-    }
-    
-    /**
-     * Loads one or more publish of given one or more personPosts 
-     * @param Sample_Person_Post|array $personPosts     
-     */
-    function loadPublishFor($personPosts) {
-        $rel = $this->getRelation('_publish');
-        return $rel->loadDest($personPosts); 
-    }
-
-
     /**
      * Returns (but not loads!) several personPosts of given one or more people 
      * @param Sample_Person_Post|array $people     

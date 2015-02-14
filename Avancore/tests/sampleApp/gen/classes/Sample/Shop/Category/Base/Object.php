@@ -41,7 +41,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'shopProducts', 1 => 'shopProductIds', 2 => 'id', 3 => 'title', 4 => 'leftCol', 5 => 'rightCol', 6 => 'ignore', 7 => 'parentId', 8 => 'ordering', 9 => 'depth', 10 => 'metaId', 11 => 'pubId', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopProducts', 1 => 'shopProductIds', )));
     }
  
     protected function listOwnLists() {
