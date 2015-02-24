@@ -163,7 +163,9 @@ class Ac_Model_Collection {
         if (!$this->_db) {
             throw new Exception("Database not provided, call setDatabase() first");
         }
-        $this->setWhere($pkName.' '.$this->_db->eqCriterion($keys));
+        $al = $pkName;
+        if (strlen($this->_alias)) $al = array($this->_alias, $pkName);
+        $this->setWhere($this->_db->nameQuote($al).' '.$this->_db->eqCriterion($keys));
     }
     
     /**
