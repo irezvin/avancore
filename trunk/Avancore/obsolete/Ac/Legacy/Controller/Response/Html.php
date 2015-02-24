@@ -35,25 +35,25 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
     }
     
     function addJsLib($jsLib, $isLocal = false, $atBeginning = false) {
+        $k = $jsLib.'-'.$isLocal;
         if (is_array($jsLib)) {
             foreach ($atBeginning? array_reverse($jsLib) : $jsLib as $lib) {
                 $this->addJsLib($lib, $isLocal, $atBeginning);
             }
         } else {
-            if ($atBeginning) $this->jsLibs = array_merge(array(array($jsLib, $isLocal)), $this->jsLibs);
-            else $this->jsLibs[] = array($jsLib, $isLocal);
-            $this->jsLibs = Ac_Util::array_unique($this->jsLibs);
+            if ($atBeginning) $this->jsLibs = array_merge(array($k => array($jsLib, $isLocal)), $this->jsLibs);
+            else $this->jsLibs[$k] = array($jsLib, $isLocal);
         }
     }
     
     function addCssLib($cssLib, $isLocal = false, $atBeginning = false) {
+        $k = $cssLib.'-'.$isLocal;
         if (is_array($cssLib)) {
             foreach ($atBeginning? array_reverse($cssLib) : $cssLib as $lib) 
                 $this->addCssLib($lib, $isLocal, $atBeginning);
         } else {
-            if ($atBeginning) array_unshift ($this->cssLibs, array($cssLib, $isLocal));
-            else $this->cssLibs[] = array($cssLib, $isLocal);
-            $this->cssLibs = Ac_Util::array_unique($this->cssLibs);
+            if ($atBeginning) $this->cssLibs = array_merge(array($k => array($cssLib, $isLocal)), $this->cssLibs);
+            else $this->cssLibs[$k] = array($cssLib, $isLocal);
         }
     }
     
@@ -142,8 +142,12 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
             $this->pathway = array_merge($this->pathway, $subResponse->pathway);
         }
         $this->metas = array_merge($this->metas, $subResponse->metas);
-        $this->jsLibs = Ac_Util::array_unique(array_merge($this->jsLibs, $subResponse->jsLibs));
-        $this->cssLibs = Ac_Util::array_unique(array_merge($this->cssLibs, $subResponse->cssLibs));
+        foreach ($subResponse->jsLibs as $k => $l) {
+            $this->jsLibs[$k] = $l;
+        }
+        foreach ($subResponse->cssLibs as $k => $l) {
+            $this->cssLibs[$k] = $l;
+        }
         Ac_Util::ms($this->data, $subResponse->data);
         $this->extraHeaders = Ac_Util::array_unique(array_merge($this->extraHeaders, $subResponse->extraHeaders));
         $this->bodyAttribs = Ac_Util::m($this->bodyAttribs, $subResponse->bodyAttribs);

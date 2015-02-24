@@ -76,6 +76,8 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
      */
     protected $metaClassId = false;
     
+    protected $updateLevel = 0;
+    
     var $_bound = false;
     
     var $_beingChecked = false;
@@ -171,9 +173,11 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     protected function intAssignMetaCaching() {
         if ($this->metaClassId === false)
             $this->metaClassId = get_class($this);
-        if ($this->metaClassId === 'Ac_Model_Data') $this->metaCacheMode = self::META_CACHE_NONE;
-            else $this->metaCacheMode = 
-                $this->hasUniformPropertiesInfo ()? self::META_CACHE_ALL : self::META_CACHE_STRUCTURE;
+        if ($this->metaCacheMode === false) {
+            if ($this->metaClassId === 'Ac_Model_Data') $this->metaCacheMode = self::META_CACHE_NONE;
+                else $this->metaCacheMode = 
+                    $this->hasUniformPropertiesInfo ()? self::META_CACHE_ALL : self::META_CACHE_STRUCTURE;
+        }
     }
     
     // +---- metadata-supplying public functions -----+
@@ -406,7 +410,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     }
     
     function mustRevalidate() {
-        if ($this->_beingChecked) return;
+        if ($this->_beingChecked || $this->updateLevel) return;
         $this->_bound = true;
         $this->_errors = array();
         $this->_checked = false;
@@ -1511,6 +1515,19 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     }
     
     function doOnWakeup() {
+    }
+    
+    function beginUpdate() {
+        $this->updateLevel++;
+    }
+    
+    function endUpdate() {
+        if ($this->updateLevel > 0) {
+            $this->updateLevel--;
+            if (!$this->updateLevel) $this->mustRevalidate();
+        } else {
+            throw new Ac_E_InvalidUsage("Call to endUpdate() without corresponding beginUpdate()");
+        }
     }
     
 }

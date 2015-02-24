@@ -818,8 +818,10 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         if ($this->_property === false) {
             $this->_property = null;
             if (strlen($p = $this->getPropertyName()) && ($m = $this->getModel())) {
-                if ($m->hasProperty($p))
-                    $this->_property = $m->getPropertyInfo($p, !($this->forceDynamicPropInfo || $m->isBound()));
+                if ($m->hasProperty($p)) {
+                    $onlyStatic = !($this->forceDynamicPropInfo || $m->isBound());
+                    $this->_property = $m->getPropertyInfo($p, $onlyStatic);
+                }
                 else
                     $this->_property = null;
             }

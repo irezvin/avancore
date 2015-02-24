@@ -25,6 +25,8 @@ class Ac_Admin_Feature_ShowColumnsByFilter extends Ac_Admin_Feature {
      */
     var $decorators = array();
     
+    var $sqlSelectSettings = array();
+    
     function getFilterValues() {
         $values = $this->manager->getFilterForm()->getValue();
         foreach ($this->decorators as $path => $decorator) {
@@ -61,6 +63,12 @@ class Ac_Admin_Feature_ShowColumnsByFilter extends Ac_Admin_Feature {
                 $res[$colName] = array('hidden' => $hidden);
             }
         }
+        return $res;
+    }
+    
+    function getSqlSelectSettings() {
+        $res = parent::getSqlSelectSettings();
+        if ($this->shouldHide? !$this->checkFiltersMatch() : $this->checkFiltersMatch()) Ac_Util::ms($res, $this->sqlSelectSettings);
         return $res;
     }
     
