@@ -40,7 +40,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_AFTER_LOAD = 'onAfterLoad';
     
     /**
-     * function onActual($reason = self::ACTUAL_REASON_LOAD)
+     * function onActual($reason = Ac_Model_Object::ACTUAL_REASON_LOAD)
      */
     const EVENT_ON_ACTUAL = 'onActual';
 

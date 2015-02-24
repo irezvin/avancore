@@ -301,9 +301,16 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     
     function updateModel() {
         $this->modelUpdated = true;
+        $m = $this->getModel();
+        if ($m && $m instanceof Ac_Model_Data) 
+            $m->beginUpdate();
+        
         foreach ($this->listControls() as $c) {
             $this->getControl($c)->updateModel();
         }
+        
+        if ($m && $m instanceof Ac_Model_Data) 
+            $m->endUpdate();
     }
     
     function executeXhr() {
