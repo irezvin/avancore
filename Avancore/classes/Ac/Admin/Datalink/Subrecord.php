@@ -84,9 +84,14 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     function setRecordDefaults($record) {
         if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {
-                foreach ($rel->fieldLinks as $srcField => $destField) {
+/*                foreach ($rel->fieldLinks as $srcField => $destField) {
                     $record->$destField = $rec->$srcField;
+                }*/
+                $def = array();
+                foreach ($rel->fieldLinks as $srcField => $destField) {
+                    $def[$destField] = $rec->$srcField;
                 }
+                $record->bind($def);
             } else {
                 // We would have some difficulties with mid-tables... 
             }

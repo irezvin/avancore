@@ -599,7 +599,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         if (is_array($ignore)) $ignore = array_merge($ignore, $this->getBindIgnore());
             else $ignore .= $this->getBindIgnore();
         parent::bind($array, $ignore);
-        $this->doOnBind($array, $ignore);
     }
     
     /**

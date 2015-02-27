@@ -79,8 +79,10 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
                 $vc = $select->getDb()->n(array($va, $vc));
             }
         }
-        $select->columns = array('title' => $tc, 'value' => $vc);
-        $select->orderBy = 'title ASC';
+        $columns = array('title' => $tc, 'value' => $vc);
+        if (is_array($select->columns) && $select->columns) $columns = array_merge($columns, $select->columns);
+        $select->columns = $columns;
+        if (!$select->orderBy) $select->orderBy = 'title ASC';
         if ($this->getWithCounts()) {
             $select->columns['count'] = $this->getSetImpl()->getCountColName();
             $select->groupBy = array($vc);
