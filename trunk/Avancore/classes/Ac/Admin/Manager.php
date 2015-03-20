@@ -1369,6 +1369,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if ($this->_recordsCollection === false) {
             if ($this->_collectionCanBeUsed()) {
                 $this->_recordsCollection = new Ac_Model_Collection($this->mapperClass, false, $this->_getWhere(), $this->_getOrder(), $this->_getJoins(), $this->_getExtraColumns());
+                    if (strlen($h = $this->_getHaving())) $this->_recordsCollection->setHaving ($h);
                 $this->_recordsCollection->setDistinct();
                 $this->_recordsCollection->setGroupBy($this->_getGroupBy());
                 foreach ($this->listFeatures() as $i) $this->getFeature($i)->onCollectionCreated ($this->_recordsCollection);
@@ -1408,6 +1409,16 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     function _getOrder() {
         $s = $this->_getSqlSelect();
         if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getOrderByClause(false)))) {
+            $res = $w;
+        } else {
+            $res = false;
+        }
+        return $res;
+    }
+    
+    function _getHaving() {
+        $s = $this->_getSqlSelect();
+        if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getHavingClause(false)))) {
             $res = $w;
         } else {
             $res = false;
