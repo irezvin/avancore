@@ -114,9 +114,10 @@ class Ac_Cg_Strategy {
      */
     function processTemplate($templateName, $modelName = false) {
         $tpl = $this->_createTemplate($templateName, $modelName);
+        $writer = $this->_gen->getWriter();
         foreach ($tpl->listFiles() as $n) {
             $skip = false;
-            $p = $tpl->getFilePath($n, $this->outputDir);
+            $p = $tpl->getFilePath($n);
             if ($tpl->fileIsUserEditable($n)) {
                 
                 if (!$this->genEditable) $skip = true;
@@ -129,8 +130,9 @@ class Ac_Cg_Strategy {
             }
             if (!$skip) {
                 $this->_gen->log($p.": writing file ");
-                $tpl->outputFile($n, $this->outputDir);
-                if ($this->_gen->lintify) $this->_gen->runLint($p);
+                $tpl->outputFile($n, $writer);
+                if (strlen($this->_gen->outputDir)) $p = rtrim($this->_gen->outputDir, '/\\').'/'.$p;
+                if ($this->_gen->lintify && is_file($p)) $this->_gen->runLint($p);
             }
         }
     }

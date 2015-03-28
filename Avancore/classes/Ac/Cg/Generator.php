@@ -85,6 +85,11 @@ class Ac_Cg_Generator {
     var $_logFile = false;
     
     /**
+     * Ac_Cg_Writer_Abstract instance or its' prototype
+     */
+    var $writer = false;
+    
+    /**
      * Names of entities (domains and models) to proceess (by default, generator processes all domains, all models). Can be in following forms:
      * - string 'domain1, domain2.model1, domain2.model2, ...
      * - array ('domain1', 'domain2.model1', 'domain3' => array(), 'domain4' => array('model4', 'model5'))
@@ -333,9 +338,9 @@ class Ac_Cg_Generator {
         }
         
         $this->log('Generator started ----------------');
-        
-        $this->_outputBytes = 0;
-        $this->_outputFiles = 0;
+
+        $writer = $this->getWriter();
+        $writer->begin();
         
         if ($this->clearOutputDir && $this->outputDir) Ac_Cg_Util::cleanDir($this->outputDir);
         
@@ -347,6 +352,9 @@ class Ac_Cg_Generator {
             $strat->generateCommonCode();
         }
         
+        $this->_outputBytes = $writer->getTotalSize();
+        $this->_outputFiles = $writer->getFileCount();
+        
         $this->log('Generator finished: '.$this->getOutputBytes().' bytes in '.$this->getOutputFiles().' files ----------------');
         
         foreach ($oldSettings as $s => $v) {
@@ -357,11 +365,6 @@ class Ac_Cg_Generator {
                 else ini_set($s, $v); 
         }
         
-    }
-    
-    function addOutputStats($files = 0, $bytes = 0) {
-        $this->_outputBytes += $bytes;
-        $this->_outputFiles += $files;
     }
     
     function getOutputBytes() {
@@ -418,6 +421,15 @@ class Ac_Cg_Generator {
         $dom->unserializeFromArray($json);
         $this->_domains[$name] = $dom;
         return $dom;
+    }
+
+    /**
+     * @return Ac_Cg_Writer_Abstract
+     */
+    function getWriter() {
+        if (!$this->writer) $this->writer = new Ac_Cg_Writer_File(array('basePath' => $this->outputDir));
+        elseif (!is_object($this->writer)) $this->writer = Ac_Prototyped::factory ($this->writer, 'Ac_Cg_Writer_Abstract');
+        return $this->writer;
     }
     
     

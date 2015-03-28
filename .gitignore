@@ -1,6 +1,6 @@
 Avancore/deploy/app.config.php
 Avancore/tests/app.config.php
-Avancore/tests/codegen/generator*
+Avancore/tests/codegen/*log*
 Avancore/tests/codegen/output
 Avancore/tests/codegen/output2
 Avancore/tests/codegen/output3
