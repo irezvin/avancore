@@ -31,6 +31,11 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     var $tracksChanges = false;
     var $modelCoreMixables = array();
     var $mapperCoreMixables = array();
+    var $internalDefaults = false;
+    
+    var $ignoreVars = array();
+    var $ignoreMethods = array();
+    var $inheritedIndice = array();
     
     function _generateFilesList() {
         return array(
@@ -70,33 +75,36 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         foreach ($this->model->listProperties() as $name) {
             $prop = $this->model->getProperty($name);
             if (!$prop->isEnabled()) continue;
-            if ($this->createAccessors && $prop instanceof Ac_Cg_Property_Simple) {
+            if ($this->createAccessors && $prop instanceof Ac_Cg_Property_Simple && !$prop->inherited) {
                 $this->accessors[$prop->getClassMemberName()] = $prop->getClassMemberName();
             }
-            $this->vars['_hasDefaults'] = true;
-            //foreach ($gacm = $prop->getAllClassMembers() as $cm) if (!$cm) var_dump($prop->name, $gacm);
-            $this->vars = array_merge($this->vars, $prop->getAllClassMembers());
         }
         
+        $this->vars = $this->getModelClassMembers($this->model);
+        
         $pps = $this->model->getAeDataPropLists();
+        $parentModel = $this->model->getParentModel();
+        if ($parentModel) {
+            $parentProps = $parentModel->getAeDataPropLists();
+            foreach (array_keys($pps) as $i) {
+                $pps[$i] = Ac_Cg_Util::arrayDiffWithKeys($pps[$i], $parentProps[$i]);
+            }
+        }
+        
+        
         $this->ownProperties = $pps['ownProperties'];
         $this->ownAssociations = $pps['ownAssociations'];
         $this->ownLists = $pps['ownLists'];
         $this->ownPropInfo = $pps['ownPropertiesInfo'];  
+        
         $this->tableName = $this->model->tableObject->name;
         $this->associationPrototypes = $this->model->getAssociationPrototypes();
         $this->hasUniformPropertiesInfo = $this->model->hasUniformPropertiesInfo;
         $this->tracksChanges = $this->model->tracksChanges;
         $this->modelCoreMixables = $this->model->modelCoreMixables;
         $this->mapperCoreMixables = $this->model->mapperCoreMixables;
-        
-        foreach ($this->model->tableObject->listColumns() as $cn) {
-            $col = $this->model->tableObject->getColumn($cn);
-            if ($col->autoInc) {
-                $this->autoincFieldName = $cn;
-                break;
-            }
-        }
+        $this->autoincFieldName = $this->calcAi($this->model);
+        $this->internalDefaults = $this->model->getInternalDefaults();
         
         $pk = $this->model->tableObject->listPkFields();
         if (!count($pk)) $this->pkStr = 'null';
@@ -110,24 +118,116 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->mapperVars['recordClass'] = $this->model->getMapperRecordClass();
         $this->mapperVars['tableName'] = $this->tableName;
         $this->mapperVars['id'] = $this->mapperClass;
-        $this->mapperVars['columnNames'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->tableObject->listColumns(), 0, false, true, true));
-        $this->ownProperties = array_diff($this->ownProperties, $this->model->tableObject->listColumns());
-        if ($this->uniqueIndexData) $this->mapperVars['indexData'] = $this->indexData;
+        $this->mapperVars['columnNames'] = new Ac_Cg_Php_Expression($this->exportArray(array_keys($this->getDefaults($this->model)), 0, false, true, true));
+        
+        $this->ownProperties = array_diff($this->ownProperties, $this->model->listUsedColumns());
         if ($this->model->nullableSqlColumns) 
             $this->mapperVars['nullableSqlColumns'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->nullableSqlColumns, 0, false, true, true));
-        foreach ($this->model->tableObject->listColumns() as $nm) {
-            $col = $this->model->tableObject->getColumn($nm);
-            
-            $default = $col->default; 
-            if (strpos(strtolower($col->type), 'text') !== false && is_null($col->default)) $default = '';
-            $this->mapperVars['defaults'][$nm] = $default;
-        }
+        $this->mapperVars['defaults'] = $this->getDefaults($this->model);
         $this->mapperVars['defaults'] = new Ac_Cg_Php_Expression($this->exportArray($this->mapperVars['defaults'], 8, true, false, true));
         
         $this->relationPrototypes = $this->model->getRelationPrototypes();
         $this->assocProperties = $this->model->getAssocProperties();
         
         $this->uniqueIndexData = $this->model->tableObject->getUniqueIndexData();
+        
+        $this->calcInheritance();
+    }
+    
+    function getModelClassMembers(Ac_Cg_Model $model) {
+        $res = array('_hasDefaults' => true);
+        foreach ($model->listProperties() as $name) {
+            $prop = $model->getProperty($name);
+            if (!$prop->isEnabled()) continue;
+            $res = array_merge($res, $prop->getAllClassMembers());
+        }
+        return $res;
+    }
+    
+    function calcAi(Ac_Cg_Model $model) {
+        
+        $res = false;
+        foreach ($model->listUsedColumns() as $cn) {
+            $col = $model->tableObject->getColumn($cn);
+            if ($col->autoInc) {
+                $res = $cn;
+                break;
+            }
+        }
+        return $res;
+        
+    }
+    
+    function getDefaults(Ac_Cg_Model $model) {
+        $res = array();
+        $tc = $model->tableObject->listColumns();
+        foreach (array_intersect($model->listUsedColumns(), $tc) as $nm) {
+            $col = $model->tableObject->getColumn($nm);
+            $default = $col->default; 
+            if (strpos(strtolower($col->type), 'text') !== false && is_null($col->default)) $default = '';
+            $res[$nm] = $default;
+        }
+        return $res;
+    }
+    
+    protected function calcInheritance() {
+        $parentModel = $this->model->getParentModel();
+        if (!$parentModel) return;
+
+        $vars = $this->getModelClassMembers($parentModel);
+        $this->vars = Ac_Cg_Util::arrayDiffWithKeys($this->vars, $vars);
+        
+        if ($parentModel->tableObject->listPkFields() == $this->model->tableObject->listPkFields()) {
+            unset($this->mapperVars['pk']);
+        }
+        
+        if ($parentModel->tableObject->name == $this->model->tableObject->name) {
+            unset($this->mapperVars['tableName']);
+        }
+        
+        if ($parentModel->listUsedColumns() == $this->model->listUsedColumns()) {
+            unset($this->mapperVars['columnNames']);
+        }
+        
+        if ($this->getDefaults($this->model) == $this->getDefaults($parentModel)) {
+            unset($this->mapperVars['defaults']);
+        }
+        
+        if ($this->model->nullableSqlColumns == $parentModel->nullableSqlColumns) {
+            unset($this->mapperVars['nullableSqlColumns']);
+        }
+        
+        if ($this->calcAi($parentModel) == $this->autoincFieldName) {
+            $this->ignoreMethods['autoincFieldName'] = true;
+        }
+        
+        $this->ignoreMethods['askRelationsForDefaults'] = true;
+        
+        $this->associationPrototypes = Ac_Cg_Util::arrayDiffWithKeys($this->associationPrototypes, $parentModel->getAssociationPrototypes());
+        
+        $this->relationPrototypes = Ac_Cg_Util::arrayDiffWithKeys($this->relationPrototypes, $parentModel->getRelationPrototypes());
+
+        $this->internalDefaults = Ac_Cg_Util::arrayDiffWithKeys($this->internalDefaults, $parentModel->getInternalDefaults());
+        
+        $this->mapperCoreMixables = Ac_Cg_Util::arrayDiffWithKeys($this->mapperCoreMixables, $parentModel->mapperCoreMixables);
+        
+        $this->modelCoreMixables = Ac_Cg_Util::arrayDiffWithKeys($this->modelCoreMixables, $parentModel->modelCoreMixables);
+        
+        $parentIndexData = $parentModel->tableObject->getUniqueIndexData();
+        
+        foreach ($this->uniqueIndexData as $idxName => $idxFields) {
+            if (isset($parentIndexData[$idxName]) && $parentIndexData[$idxName] == $idxFields) {
+                $this->inheritedIndice[] = $idxName;
+            }
+        }
+        
+        if ($parentModel->hasUniformPropertiesInfo == $this->model->hasUniformPropertiesInfo) {
+            $this->ignoreMethods['hasUniformPropertiesInfo'] = true;
+        }
+        
+        if ($parentModel->tracksChanges == $this->model->tracksChanges) {
+            $this->ignoreMethods['tracksChanges'] = true;
+        }
         
     }
 
@@ -174,6 +274,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
      */
     function _showMapperLoaderMethods() {
         foreach ($this->uniqueIndexData as $idxName => $idxFields) {
+            $inherited = in_array($idxName, $this->inheritedIndice);
             if ($this->model->useIndexNamesInMapper) $funcSfx = $idxName; 
                 else $funcSfx = str_replace(" ", "", ucwords(implode(" ", $idxFields)));
             $funcSfx = ucfirst($funcSfx);
@@ -189,9 +290,13 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
      * @return <?php $this->d($this->modelClass); ?> 
      */
     function loadBy<?php $this->d($funcSfx); ?> (<?php $this->d($params); ?>) {
+<?php   if ($inherited) { ?>
+        $res = parent::loadBy<?php $this->d($funcSfx); ?>(<?php $this->d($params); ?>);
+<?php   } else { ?>
         $recs = $this->loadRecordsByCriteria('<?php $this->d($sqlCrit); ?>');
         if (count($recs)) $res = $recs[0];
             else $res = null;
+<?php   } ?>
         return $res;
     }
 <?php            
@@ -242,16 +347,17 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
-<?php if ($this->modelCoreMixables) { ?>
+<?php if ($this->modelCoreMixables) { ?> 
 
     protected function doGetCoreMixables() { 
         return Ac_Util::m(parent::doGetCoreMixables(), <?php $this->exportArray($this->modelCoreMixables, 8, true); ?>);
     }
-<?php } ?> 
-    
+<?php } ?>
+<?php   if ($this->ownProperties) { ?>    
     protected function listOwnProperties() {
         return array_unique(array_merge(parent::listOwnProperties(), <?php $this->exportArray($this->ownProperties, 0, false, true); ?>));
     }
+<?php } ?>    
 <?php if ($this->ownLists) { ?> 
     protected function listOwnLists() {
 <?php if ($this->parentClass !== $this->model->getDefaultParentClassName()) { ?>
@@ -272,19 +378,22 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     }
 
 <?php } ?>
+<?php if ($this->ownPropInfo) { ?>
     protected function getOwnPropertiesInfo() {
-    	<?php if ($this->generator->php5) echo 'static $pi = false; if ($pi === false) '; ?>$pi = <?php $this->exportArray($this->ownPropInfo, 8, true); ?>;
+    	static $pi = false; 
+        if ($pi === false) $pi = <?php $this->exportArray($this->ownPropInfo, 8, true); ?>;
 <?php   if ($this->parentClass === $this->model->getDefaultParentClassName()) { ?>    
         return $pi;
 <?php   } else { ?>
         return Ac_Util::m($pi, parent::getOwnPropertiesInfo());
 <?php   } ?>                
     }
-<?php if ($this->hasUniformPropertiesInfo) { ?>
+<?php } ?>    
+<?php if ($this->hasUniformPropertiesInfo && !isset($this->ignoreMethods['hasUniformPropertiesInfo'])) { ?>
 
     function hasUniformPropertiesInfo() { return true; }
 <?php } ?>
-<?php if ($this->tracksChanges) { ?>
+<?php if ($this->tracksChanges && !isset($this->ignoreMethods['tracksChanges'])) { ?>
 
     function tracksChanges() { return true; }
 <?php } ?>
@@ -356,27 +465,34 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 
     var $<?php echo $var; ?> = <?php $this->export($default); ?>; 
 <?php } ?> 
-<?php if ($this->autoincFieldName) { ?>
-    
+<?php if ($this->autoincFieldName && !isset($this->ignoreMethods['autoincFieldName'])) { ?>
+   
     protected $autoincFieldName = <?php $this->str($this->autoincFieldName) ?>;
-    
-    protected $askRelationsForDefaults = false;
-    
 <?php } ?>
+<?php if (!isset($this->ignoreMethods['askRelationsForDefaults'])) { ?>
+    protected $askRelationsForDefaults = false;
+<?php   } ?> 
 <?php if ($this->mapperCoreMixables) { ?>
     protected function doGetCoreMixables() { 
         return Ac_Util::m(parent::doGetCoreMixables(), <?php $this->exportArray($this->mapperCoreMixables, 8, true); ?>);
     }
     
 <?php } ?> 
+<?php if (!$this->model->getParentModel()) { ?>
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+<?php } ?> 
+<?php if ($this->internalDefaults) { ?>
     function doGetInternalDefaults() {
-        return <?php $this->exportArray($this->model->getInternalDefaults(), 8); ?>;
+<?php   if (!in_array($this->genMapperClass, array($this->model->getDefaultParentMapperClassName(), 'Ac_Model_CpkMapper'))) { ?>
+        return Ac_Util::m(parent::doGetInternalDefaults(), <?php $this->exportArray($this->internalDefaults, 8); ?>);
+<?php   } else { ?>
+        return <?php $this->exportArray($this->internalDefaults, 8); ?>;
+<?php   } ?>
     }
     
+<?php } ?>
     /**
      * @return <?php $this->d($this->modelClass); ?> 
      */ 
@@ -427,19 +543,19 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-    <?php if ($this->model->titleProp) { ?>
+<?php if ($this->model->titleProp) { ?>
     
     function getTitleFieldName() {
         return <?php $this->str($this->model->titleProp); ?>;   
     }
-    <?php } ?>
-    <?php if ($this->model->orderingProp) { $ord = $this->model->orderingProp; if ($this->model->orderGroupProp) $ord = $this->model->orderGroupProp.', '.$ord;  ?>
+<?php } ?>
+<?php if ($this->model->orderingProp) { $ord = $this->model->orderingProp; if ($this->model->orderGroupProp) $ord = $this->model->orderGroupProp.', '.$ord;  ?>
     
     function getDefaultOrdering() {
         return <?php $this->str($ord); ?>;
     }
-    <?php } ?>
-    <?php if ($this->relationPrototypes) { ?>
+<?php } ?>
+<?php if ($this->relationPrototypes) { ?>
     
     protected function doGetRelationPrototypes() {
 <?php   if (!in_array($this->genMapperClass, array($this->model->getDefaultParentMapperClassName(), 'Ac_Model_CpkMapper'))) { ?>
@@ -448,8 +564,8 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
         return <?php $this->exportArray($this->relationPrototypes, 8); ?>;
 <?php   } ?>        
     }
-    <?php } ?>
-    <?php if ($this->associationPrototypes) { ?>
+<?php } ?>
+<?php if ($this->associationPrototypes) { ?>
     
     protected function doGetAssociationPrototypes() {
 <?php   if (!in_array($this->genMapperClass, array($this->model->getDefaultParentMapperClassName(), 'Ac_Model_CpkMapper'))) { ?>
@@ -458,7 +574,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
         return <?php $this->exportArray($this->associationPrototypes, 8); ?>;
 <?php   } ?>        
     }
-    <?php } ?>
+<?php } ?>
     
     protected function doGetInfoParams() {
 <?php   if (!in_array($this->genMapperClass, array($this->model->getDefaultParentMapperClassName(), 'Ac_Model_CpkMapper'))) { ?>
@@ -473,14 +589,14 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 <?php   } ?>        
     }
     
-    <?php if ($this->uniqueIndexData) { ?>
+<?php if ($this->uniqueIndexData && array_diff(array_keys($this->uniqueIndexData), $this->inheritedIndice)) { ?>
     
     protected function doGetUniqueIndexData() {
-        return <?php $this->exportArray($this->uniqueIndexData, 8); ?>;
+    return <?php $this->exportArray(array_diff_key($this->uniqueIndexData, array_flip($this->inheritedIndice)), 8); ?>;
     }
-    <?php } ?>
-    <?php $this->_showMapperLoaderMethods(); ?>
-    <?php foreach (array_keys($this->assocProperties) as $relId) { $this->_showMapperMethodsForAssociation($relId, $this->assocProperties[$relId]); } ?>
+<?php } ?>
+<?php   $this->_showMapperLoaderMethods(); ?>
+<?php   foreach (array_keys($this->assocProperties) as $relId) { $this->_showMapperMethodsForAssociation($relId, $this->assocProperties[$relId]); } ?>
     
 }
 

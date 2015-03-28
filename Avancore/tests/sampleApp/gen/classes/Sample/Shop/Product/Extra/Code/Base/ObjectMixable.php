@@ -40,7 +40,8 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
             'extraCodePerson' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
@@ -81,7 +82,7 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
                     'class' => 'Ac_Model_Values_Records',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
-                'objectPropertyName' => 'person',
+                'objectPropertyName' => 'extraCodePerson',
                 'isNullable' => true,
                 'caption' => 'Responsible Person Id',
             ),

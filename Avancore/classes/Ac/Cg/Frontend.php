@@ -101,6 +101,8 @@ class Ac_Cg_Frontend {
         $this->init();
             
         $gen = new Ac_Cg_Generator($this->configPath);
+        
+        $gen->prepare();
     
         $form = new Ac_Form(null, array(
             'htmlAttribs' => array(

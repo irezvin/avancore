@@ -18,18 +18,17 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
             'filename' => '',
         ); 
  
-    
+   
     protected $autoincFieldName = 'photoId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
  
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_person' => false,
             '_personAlbums' => false,
             '_personAlbumsCount' => false,
@@ -39,7 +38,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
             '_personPosts' => false,
             '_personPostsCount' => false,
             '_personPostsLoaded' => false,
-        );
+        ));
     }
     
     /**
@@ -92,7 +91,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_person' => array (
@@ -161,7 +160,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-            
+    
     protected function doGetAssociationPrototypes() {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
             'person' => array (
@@ -236,7 +235,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-        
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -248,15 +247,15 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'photoId',
             ),
         );
     }
-        
+
     /**
      * @return Sample_Person_Photo 
      */
@@ -266,7 +265,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-    
+
     /**
      * Returns (but not loads!) several personPhotos of given one or more people 
      * @param Sample_Person_Photo|array $people     

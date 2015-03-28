@@ -109,6 +109,14 @@ $config = array(
             ),
         ),
     ),
+    
+    'domains.Child' => array(
+        'parentDomainName' => 'Sample',
+        
+        'appName' => 'Child',
+        'caption' => 'Avancore_Child',
+        'josComId' => 'child',
+    ),
 );
 
 ?>

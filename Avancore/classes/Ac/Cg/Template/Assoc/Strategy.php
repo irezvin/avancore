@@ -66,6 +66,9 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
     
     var $relationTargetExpression = '$this';
     
+    var $inherited = false;
+    var $parentProp = false;
+    
     function Ac_Cg_Template_Assoc_Strategy ($options) {
         Ac_Util::simpleBindAll($options, $this);
     }
@@ -106,7 +109,7 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
     }
     
     function init() {
-
+        
         $this->var = $this->prop->getClassMemberName();
         $this->varId = '$this->'.$this->var;
         $this->otherModel = $this->prop->getOtherModel();
@@ -196,20 +199,33 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
             if ($this->mirrorProp->isPrivateVar && strlen($this->mirrorVar)) $this->mirrorVar = '_'.$this->mirrorVar;
         }
         
+        $this->inherited = $this->prop->inherited;
+        if ($this->inherited) {
+            $this->parentProp = $this->model->getParentModel()->getProperty($this->prop->name);
+        }
+        
     }
     
     function showGenModelMethods() {
         $this->init();
-        $this->_doShowGenModelMethods();
+        if ($this->inherited) $this->_doShowInheritedGenModelMethods();
+            else $this->_doShowGenModelMethods();
     }
     
     function showGenMapperMethods() {
         $this->init();
-        $this->_doShowGenMapperMethods();
+        if ($this->inherited) $this->_doShowInheritedGenMapperMethods();
+            else $this->_doShowGenMapperMethods();
     }
     
     function _doShowGenModelMethods() {
         trigger_error("Call to abstract method", E_USER_ERROR);
+    }
+    
+    function _doShowInheritedGenModelMethods() {
+    }
+    
+    function _doShowInheritedGenMapperMethods() {
     }
     
     function _doShowGenMapperMethods() {

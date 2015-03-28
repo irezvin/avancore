@@ -39,11 +39,11 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopCategories', 1 => 'shopCategoryIds', 7 => 'notePerson', 8 => 'productId', 9 => 'note', 10 => 'noteAuthorId', )));
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopCategories', 1 => 'shopCategoryIds', 7 => 'notePerson', )));
     }
+    
  
     protected function listOwnLists() {
         
@@ -57,7 +57,8 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
             'shopCategories' => array (
                 'className' => 'Sample_Shop_Category',
                 'mapperClass' => 'Sample_Shop_Category_Mapper',
@@ -146,7 +147,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Records',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
-                'objectPropertyName' => 'person',
+                'objectPropertyName' => 'notePerson',
                 'isNullable' => true,
                 'caption' => 'Note Author Id',
             ),
@@ -155,6 +156,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
         return $pi;
                 
     }
+    
 
     function hasUniformPropertiesInfo() { return true; }
 

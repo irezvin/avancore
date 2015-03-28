@@ -30,11 +30,11 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
     protected function listOwnProperties() {
         return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'relations', )));
     }
+    
  
     protected function listOwnLists() {
         
@@ -48,7 +48,8 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
             'relations' => array (
                 'className' => 'Sample_Relation',
                 'mapperClass' => 'Sample_Relation_Mapper',
@@ -84,6 +85,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
         return $pi;
                 
     }
+    
 
     function hasUniformPropertiesInfo() { return true; }
 
@@ -140,7 +142,6 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
         $this->_relations[] = $relation;
         
         $relation->_relationType = $this;
-        
         
     }
 

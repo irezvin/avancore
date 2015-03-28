@@ -18,22 +18,21 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
             'isSymmetrical' => '0',
         ); 
  
-    
+   
     protected $autoincFieldName = 'relationTypeId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
  
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_relations' => false,
             '_relationsCount' => false,
             '_relationsLoaded' => false,
-        );
+        ));
     }
     
     /**
@@ -86,11 +85,11 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-        
+    
     function getTitleFieldName() {
         return 'title';   
     }
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_relations' => array (
@@ -109,7 +108,7 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-            
+    
     protected function doGetAssociationPrototypes() {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
             'relations' => array (
@@ -132,7 +131,7 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-        
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -144,15 +143,15 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'relationTypeId',
             ),
         );
     }
-        
+
     /**
      * @return Sample_Relation_Type 
      */
@@ -162,7 +161,7 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-    
+
     /**
      * Returns (but not loads!) one or more relationTypes of given one or more relations 
      * @param Sample_Relation_Type|array $relations     

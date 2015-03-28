@@ -36,11 +36,11 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
     protected function listOwnProperties() {
         return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'person', 1 => 'personAlbums', 2 => 'personAlbumIds', 3 => 'portraitPerson', 4 => 'personPosts', )));
     }
+    
  
     protected function listOwnLists() {
         
@@ -54,7 +54,8 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
             'person' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
@@ -125,6 +126,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         return $pi;
                 
     }
+    
 
     function hasUniformPropertiesInfo() { return true; }
 
@@ -358,7 +360,6 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         $this->_personPosts[] = $personPost;
         
         $personPost->_personPhoto = $this;
-        
         
     }
 

@@ -19,23 +19,22 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
             'name' => '',
         ); 
  
-    
+   
     protected $autoincFieldName = 'perkId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
  
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_tags' => false,
             '_tagsCount' => false,
             '_tagsLoaded' => false,
             '_tagIds' => false,
-        );
+        ));
     }
     
     /**
@@ -88,7 +87,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_tags' => array (
@@ -115,7 +114,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-            
+    
     protected function doGetAssociationPrototypes() {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
             'tags' => array (
@@ -142,7 +141,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-        
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -154,15 +153,15 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'perkId',
             ),
         );
     }
-        
+
     /**
      * @return Sample_Perk 
      */
@@ -172,7 +171,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-    
+
     /**
      * Returns (but not loads!) one or more perks of given one or more tags 
      * @param Sample_Perk|array $tags     

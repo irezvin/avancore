@@ -12,7 +12,6 @@ class Ac_Cg_Template_Assoc_Strategy_One extends Ac_Cg_Template_Assoc_Strategy {
     
     function _doShowGenModelMethods() {
         extract(get_object_vars($this));
-        
 ?>        
     
     /**
@@ -58,6 +57,39 @@ class Ac_Cg_Template_Assoc_Strategy_One extends Ac_Cg_Template_Assoc_Strategy {
         if ($isReference) $res->_setIsReference(true);
         $this->set<?php $this->d($ucSingle); ?>($res);
         return $res;
+    }
+
+<?php   } ?>    
+<?php        
+    }
+    
+    function _doShowInheritedGenModelMethods() {
+        extract(get_object_vars($this));
+        
+?>        
+    
+    /**
+     * @return <?php $this->d($prop->className); ?> 
+     */
+    function get<?php $this->d($ucSingle); ?>() {
+        return parent::get<?php $this->d($ucSingle); ?>();
+    }
+    
+    /**
+     * @param <?php $this->d($prop->className); ?> $<?php $this->d($this->single); ?> 
+     */
+    function set<?php $this->d($ucSingle); ?>($<?php $this->d($this->single); ?>) {
+        if ($<?php $this->d($this->single); ?> && !is_a($<?php $this->d($this->single); ?>, <?php $this->str($prop->className); ?>)) 
+            trigger_error('$<?php $this->d($this->single); ?> must be an instance of <?php $this->d($prop->className); ?>', E_USER_ERROR);
+        return parent::set<?php $this->d($ucSingle); ?>($<?php $this->d($this->single); ?>);
+    }
+    
+<?php   if ($this->canCreateDest) { ?>
+    /**
+     * @return <?php $this->d($prop->className); ?>  
+     */
+    function create<?php $this->d($ucSingle); ?>($values = array(), $isReference = false) {
+        return parent::create<?php $this->d($ucSingle); ?>($values, $isReference);
     }
 
 <?php   } ?>    

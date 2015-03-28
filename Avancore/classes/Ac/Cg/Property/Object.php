@@ -71,6 +71,8 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     
     var $_assocStrategy = false;
     
+    protected $refsToFix = false;
+    
     function listPassthroughVars() {
         return array_merge(array(
             'className', 
@@ -81,7 +83,11 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         ), parent::listPassthroughVars());
     }
     
-    function _init() {
+    function init() {
+        if (is_array($this->refsToFix)) {
+            $this->finishUnserialization ();
+            return;
+        }
         if ($this->relation) {
             if ($this->isIncoming)
                 $this->_rel = $this->_model->tableObject->getIncomingRelation($this->relation);
@@ -95,6 +101,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
                     else $this->_otherRel = $tbl->getRelation($this->otherRelation);
             }
             
+        } else {
         }
         
         if ($this->_rel) {
@@ -419,6 +426,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         }
         $relation = $this->modelRelation;
         if ($relation) {
+            //var_dump($relation);
             $prot = $this->_model->getAeModelRelationPrototype($relation);
             if (isset($prot['srcVarName'])) {
                 if ($many) {
@@ -534,6 +542,36 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     
     function __clone() {
         $this->_assocStrategy = false;
+    }
+    
+    function getSerializationMap() {
+        $res = array(
+            'modelRelation' => array('modelRelation', 'Ac_Cg_Model_Relation', array())
+        );
+        return $res;
+    }
+    
+    function serializeToArray() {
+        $res = parent::serializeToArray();
+        if ($this->_other) $res['_other'] = $this->refModel($this->_other);
+        if ($this->_rel) $res['_rel'] = $this->refRelation($this->_rel);
+        if ($this->_otherRel) $res['_otherRel'] = $this->refRelation($this->_otherRel);
+        return $res;
+    }
+    
+    function unserializeFromArray($array) {
+        parent::unserializeFromArray($array);
+        $this->refsToFix = array();
+        foreach (array('_other', '_rel', '_otherRel') as $k) if (isset($array[$k])) $this->refsToFix[$k] = $array[$k];
+    }
+    
+    protected function finishUnserialization() {
+        $array = $this->refsToFix;
+        if (isset($array['_other'])) $this->_other = $this->unrefModel($array['_other']);
+        if (isset($array['_rel'])) {
+            $this->_rel = $this->unrefRelation($array['_rel']);
+        }
+        if (isset($array['_otherRel'])) $this->_otherRel = $this->unrefRelation($array['_otherRel']);
     }
     
 }

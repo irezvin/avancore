@@ -135,5 +135,40 @@ abstract class Ac_Cg_Util {
         return $res;
     }
     
+    /**
+     * Compares key => value pairs of two arrays
+     * Leaves only keys & values of $array1 which are missing or different from ones in $array2
+     * Items with numeric keys are considered matching if value is in both arrays and with numeric keys
+     * in both arrays
+     */
+    static function arrayDiffWithKeys(array $array1, array $array2) {
+        $res = array();
+        foreach ($array1 as $k => $v) {
+            $diff = true;
+            if (is_numeric($k) && in_array($v, $array2)) {
+                foreach ($array2 as $k2 => $v2) {
+                    if ($v == $v2) {
+                        if (is_numeric($k2)) $diff = false;
+                        break;
+                    }
+                }
+            } else {
+                if (array_key_exists($k, $array2)) {
+                    if (is_array($array2[$k]) && is_array($v)) {
+                        if (!$v && !$array2[$k]) $diff = false;
+                        else {
+                            $v = self::arrayDiffWithKeys($v, $array2[$k]);
+                            if (!$v) $diff = false;
+                        }
+                    } else {
+                        $diff = $array2[$k] !== $array1[$k];
+                    }
+                }
+            }
+            if ($diff) $res[$k] = $v;
+        }
+        return $res;
+    }
+    
 }
 

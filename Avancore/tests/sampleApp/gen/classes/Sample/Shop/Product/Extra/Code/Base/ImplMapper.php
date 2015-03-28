@@ -22,17 +22,19 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
             'responsiblePersonId' => NULL,
         ); 
  
+    protected $askRelationsForDefaults = false;
+ 
  
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_extraCodePerson' => false,
             '_extraCodeShopProductsCount' => false,
             '_extraCodeShopProductsLoaded' => false,
-        );
+        ));
     }
     
     /**
@@ -85,7 +87,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_extraCodePerson' => array (
@@ -107,7 +109,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
         ));
         
     }
-            
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -119,15 +121,15 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'productId',
             ),
         );
     }
-        
+
     /**
      * @return Sample_Shop_Product_Extra_Code 
      */
@@ -137,6 +139,6 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-        
+    
 }
 

@@ -58,11 +58,11 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
     protected function listOwnProperties() {
         return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'portraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'personPosts', 7 => 'incomingRelations', 8 => 'outgoingRelations', 9 => 'extraCodeShopProducts', 10 => 'noteShopProducts', )));
     }
+    
  
     protected function listOwnLists() {
         
@@ -76,7 +76,8 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
             'portraitPersonPhoto' => array (
                 'className' => 'Sample_Person_Photo',
                 'mapperClass' => 'Sample_Person_Photo_Mapper',
@@ -256,6 +257,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         return $pi;
                 
     }
+    
 
     function hasUniformPropertiesInfo() { return true; }
 
@@ -490,7 +492,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         
         $personAlbum->_person = $this;
         
-        
     }
 
     /**
@@ -557,7 +558,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $this->_personPhotos[] = $personPhoto;
         
         $personPhoto->_person = $this;
-        
         
     }
 
@@ -626,7 +626,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         
         $personPost->_person = $this;
         
-        
     }
 
     /**
@@ -693,7 +692,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $this->_incomingRelations[] = $incomingRelation;
         
         $incomingRelation->_otherPerson = $this;
-        
         
     }
 
@@ -762,7 +760,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         
         $outgoingRelation->_person = $this;
         
-        
     }
 
     /**
@@ -819,7 +816,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         if (!is_a($extraCodeShopProduct, 'Sample_Shop_Product')) trigger_error('$extraCodeShopProduct must be an instance of Sample_Shop_Product', E_USER_ERROR);
         $this->listExtraCodeShopProducts();
         $this->_extraCodeShopProducts[] = $extraCodeShopProduct;
-        
         
         
     }
@@ -880,7 +876,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $this->_noteShopProducts[] = $noteShopProduct;
         
         $noteShopProduct->_notePerson = $this;
-        
         
     }
 

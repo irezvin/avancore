@@ -347,7 +347,7 @@ abstract class Ac_Util {
     }
     
     static function getObjectProperty($object, $property, $defaultValue = false, $treatArraysAsObjects = false) {
-        $res = Ac_Accessor::getObjectProperty($item, $propertyName, $defaultValue, $treatArraysAsObjects);
+        $res = Ac_Accessor::getObjectProperty($object, $property, $defaultValue, $treatArraysAsObjects);
         return $res;
     }
 

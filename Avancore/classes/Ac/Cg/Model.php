@@ -4,7 +4,7 @@
  * Model metamodel for Code Generator
  */
         
-class Ac_Cg_Model {
+class Ac_Cg_Model extends Ac_Cg_Base {
 
     /**
      * Model name
@@ -13,7 +13,7 @@ class Ac_Cg_Model {
     var $name = false;
     
     /**
-     * Table name (defaults dto model name)
+     * Table name (defaults to model name)
      * @var string
      */
     var $table = false;
@@ -82,39 +82,6 @@ class Ac_Cg_Model {
      * @var bool
      */
     var $tracksChanges = false;
-    
-    // --------------------- tree-like structures support -----------------
-    
-    /**
-     * Make model hierarchycally enabled either by using Pmt_Tree_NestedSetsImpl or by using Pmt_Tree_AdjacencyListImpl   
-     */    
-    var $hierarchy = false;
-    
-    /**
-     * Name of table with nested sets. If $nestedSetsTable isn't set, adjacency list model will be assumed.
-     * @var false|string
-     */
-    var $nestedSetsTable = false;
-    
-    /**
-     * Name of column with node id for hierarchy based on adjacency list.
-     * By default primary key will be assumed.
-     * 
-     * @var false|string
-     */
-    var $nodeIdCol = false;
-    
-    /**
-     * Name of column with parent id for hierarchy based on adjacency list.
-     * @var false|string
-     */
-    var $parentIdCol = false;
-        
-    /**
-     * Name of column with ordering for hierarchy based on adjacency list.
-     * @var false|string
-     */
-    var $orderingCol = false;
     
     var $fixMapperMethodNames = false;
     
@@ -220,18 +187,59 @@ class Ac_Cg_Model {
     
     var $mapperCoreMixables = array();
     
+    var $noUi = true;
+    
+    /**
+     * Null or empty string - force NO parent model
+     * FALSE - default behaviour (no parent model if there is no parent domain; otherwise, parent model
+     * if parent domain has the same or matching table
+     * @see Ac_Cg_Domain::autoParentModels
+     * @see Ac_Cg_Domain::parentTableMap
+     * @var type 
+     */
+    var $parentModelName = false;
+
+    /**
+     * If array is provided, only columns specified in this list will be used for the properties
+     * @var bool|array
+     */
+    var $onlyColumns = false;
+    
+    /**
+     * Ignore table columns specified in the list
+     */
+    var $ignoreColumns = array();
+
+    /**
+     * If array is provided, only relations specified in this list will be used to create associations
+     * Identifier format: _rel_{ForeignKeyId}
+     * @var bool|array
+     */
+    var $onlyRelations = false;
+    
+    /**
+     * Ignore relations specified in the list
+     * Identifier format: _rel_{foreignKeyId}
+     * @var array
+     */
+    var $ignoreRelations = array();
+    
     var $errors = array();
     
     var $warnings = array();
     
-    function Ac_Cg_Model($domain, $name, $config = array()) {
+    /**
+     * @var Ac_Cg_Model
+     */
+    protected $parentModel = false;
+    
+    function __construct($domain, $name, $config = array()) {
         $this->_domain = $domain;
         $this->name = $name;
         Ac_Util::simpleBindAll($config, $this);
     }
     
     function listProperties() {
-        $this->init();        
         if ($this->_properties === false) {
             $this->_properties = array();
             $this->_determineUsableRelations();
@@ -262,6 +270,7 @@ class Ac_Cg_Model {
             $conf = $this->_properties[$name];
             if (isset($conf['metaPropertyClass']) && $conf['metaPropertyClass']) $cls = $conf['metaPropertyClass'];
             else $cls = 'Ac_Cg_Property_Simple';
+            $this->_properties[$name]['_init'] = true;
             $this->_properties[$name] = new $cls ($this, $name, $this->_properties[$name]);
         }
         
@@ -273,6 +282,7 @@ class Ac_Cg_Model {
     function getProperty($name) {
         if (!in_array($name, $this->listProperties())) trigger_error ('No such property: \''.$name.'\'', E_USER_ERROR);
         if (is_array($this->_properties[$name])) {
+            ini_set('html_errors', 1);
             $this->_initAllProperties();
         }
         return $this->_properties[$name];
@@ -313,8 +323,12 @@ class Ac_Cg_Model {
     }
     
     function getDefaultParentClassName() {
-        if (count($this->tableObject->listPkFields()) == 1) $res = 'Ac_Model_Object';
-            else $res = 'Ac_Model_CpkObject'; 
+        if (($pm = $this->getParentModel())) {
+            $res = $pm->className;
+        } else {
+            if (count($this->tableObject->listPkFields()) == 1) $res = 'Ac_Model_Object';
+                else $res = 'Ac_Model_CpkObject'; 
+        }
         return $res;
     }
     
@@ -330,10 +344,12 @@ class Ac_Cg_Model {
         foreach ($this->listProperties() as $name) {
             $prop = $this->getProperty($name);
             if (!$prop->isEnabled()) continue;
-            if (is_a($prop, 'Ac_Cg_Property_Object')) {
-                $ownAssociations[$prop->varName] = $prop->className;
+            if (!$this->isPropertyInherited($name)) {
+                if (is_a($prop, 'Ac_Cg_Property_Object')) {
+                    $ownAssociations[$prop->varName] = $prop->className;
+                }
+                if ($prop->pluralForList) $ownLists[$prop->varName] = $prop->pluralForList;
             }
-            if ($prop->pluralForList) $ownLists[$prop->varName] = $prop->pluralForList;
             if ($prop->hasSeveralProperties()) {
                 $pi = $prop->getAeModelPropertyInfo();
                 if ($pi) $ownPropertiesInfo = array_merge($ownPropertiesInfo, $pi);
@@ -352,6 +368,15 @@ class Ac_Cg_Model {
         );
     }
     
+    function listInheritedModelMembers() {
+        return array(
+            'single', 'plural', 'singleCaption', 'pluralCaption', 
+            'fixMapperMethodNames', 
+            'useLangStrings', 'langStringPrefix', 'tableLangStringPrefix',
+            'createAccessors'
+        );
+    }
+    
     /**
      * Inititalizes default values
      */
@@ -365,6 +390,13 @@ class Ac_Cg_Model {
         $this->table = $infoOfTable['tableNameWithPrefix'];
         
         $info = $this->_domain->analyzeTableName($this->name);
+        
+        if ($parent = $this->getParentModel()) {
+            $defs = get_class_vars(get_class($this));
+            foreach ($this->listInheritedModelMembers() as $v) {
+                if ($this->$v === $defs[$v]) $this->$v = $parent->$v;
+            }
+        }
         
         if (!strlen($this->plural)) {
             $this->plural = Ac_Cg_Inflector::camelize($info['pluralEntity']);
@@ -385,7 +417,7 @@ class Ac_Cg_Model {
         
         if ($this->nullableSqlColumns === false) {
             $this->nullableSqlColumns = array();
-            foreach ($this->tableObject->listColumns() as $i) {
+            foreach ($this->listUsedColumns() as $i) {
                 $col = $this->tableObject->getColumn($i);
                 if ($col->nullable) $this->nullableSqlColumns[] = $i;
             }
@@ -480,7 +512,13 @@ class Ac_Cg_Model {
      * Adds automatic property config base on column $colName to $this->_properties array (if needed)
      */
     function _addSimplePropertyConfig($colName) {
-        $this->_properties[$colName] = array('column' => $colName, 'metaPropertyClass' => 'Ac_Cg_Property_Simple');
+        $this->_properties[$colName] = array(
+            'column' => $colName, 
+            'metaPropertyClass' => 'Ac_Cg_Property_Simple',
+            'inherited' => $this->isPropertyInherited($colName, $ignore),
+            'ignoreInDescendants' => $ignore,
+            'enabled' => !$ignore && $this->isPropertyEnabled($colName, false),
+        );
     }
     
     /**
@@ -514,10 +552,40 @@ class Ac_Cg_Model {
                 'otherRelation' => $modelRelation->otherRelationName, 
                 'isOtherIncoming' => $modelRelation->isOtherRelationIncoming,
                 'modelRelation' => $modelRelation,
+                'inherited' => $this->isPropertyInherited($nm, $ignore),
+                'ignoreInDescendants' => $ignore,
+                'enabled' => !$ignore && $this->isPropertyEnabled($nm, true),
             );
             //if (isset($this->properties[$nm]) && is_array($this->properties[$nm])) Ac_Util::ms($xp, $this->properties[$nm]);
             $this->_properties[$nm] = $xp;
         }
+    }
+    
+    function isPropertyInherited($name, & $ignoreInDescendants = null) {
+        $res = false;
+        $ignoreInDescendants = false;
+        if ($pm = $this->getParentModel()) {
+            if (in_array($name, $pm->listProperties())) {
+                $parentProp = $pm->getProperty($name);
+                if ($parentProp->enabled || $parentProp->inherited && $parentProp->ignoreInDescendants) {
+                    $res = true;
+                }
+                if ($parentProp->ignoreInDescendants) $ignoreInDescendants = true;
+            }
+        }
+        return $res;
+    }
+    
+    protected function isPropertyEnabled($name, $isRelation) {
+        $res = true;
+        if ($isRelation) {
+            if (is_array($this->onlyRelations) && !in_array($name, $this->onlyRelations)) $res = false;
+            elseif (in_array($name, $this->ignoreRelations)) $res = false;
+        } else {
+            if (is_array($this->onlyColumns) && !in_array($name, $this->onlyColumns)) $res = false;
+            elseif (in_array($name, $this->ignoreColumns)) $res = false;
+        }
+        return $res;
     }
     
     /**
@@ -525,7 +593,6 @@ class Ac_Cg_Model {
      * @return Ac_Cg_Model_Relation[]
      */
     function getParticipatingModelRelations() {
-        $this->init();
         $res = array();
         foreach ($this->listProperties() as $p) {
             $prop = $this->getProperty($p);
@@ -563,7 +630,6 @@ class Ac_Cg_Model {
      * @return array|false
      */
     function getAeModelRelationPrototype(Ac_Cg_Model_Relation $relation) {
-        $this->init();
         $res = false;
         if ($relation->hasModel) {
             if ($prop = $this->searchPropertyByRelation($relation)) {
@@ -581,7 +647,6 @@ class Ac_Cg_Model {
      * @return Ac_Cg_Property
      */
     function searchPropertyByRelation(Ac_Cg_Model_Relation $relation) {
-        $this->init();
         foreach ($this->listProperties() as $name) {
             $prop = $this->getProperty($name);
             if ($prop instanceof Ac_Cg_Property_Object && $prop->modelRelation === $relation) {
@@ -611,12 +676,10 @@ class Ac_Cg_Model {
     }
     
     function getGenMapperClass() {
-        $this->init();
         return $this->className.'_Base_Mapper';
     }
     
     function getMapperClass() {
-        $this->init();
         return $this->className.'_Mapper';
     }
     
@@ -639,9 +702,13 @@ class Ac_Cg_Model {
     }
     
     function getDefaultParentMapperClassName() {
-        $this->init();
-        if (count($this->tableObject->listPkFields()) == 1) $res = 'Ac_Model_Mapper';
-            else $res = 'Ac_Model_CpkMapper'; 
+        if ($pm = $this->getParentModel()) {
+            $res = $pm->getMapperClass();
+        } elseif (count($this->tableObject->listPkFields()) == 1) {
+            $res = 'Ac_Model_Mapper';
+        } else {
+            $res = 'Ac_Model_CpkMapper'; 
+        }
         return $res;
     }
     
@@ -650,7 +717,6 @@ class Ac_Cg_Model {
      * @return array
      */
     function getNonModelRelationPrototype($relName, $isIncoming, $otherRel) {
-        $this->init();
         $res = array();
         $res['srcRecordClass'] = $this->className;
         $res['srcMapperClass'] = $this->getMapperClass();
@@ -849,5 +915,61 @@ class Ac_Cg_Model {
         }
         return $res;
     }
+    
+    /**
+     * @return Ac_Cg_Model
+     */
+    function getParentModel() {
+        if ($this->parentModel === false) {
+            $this->parentModel = null;
+            $parentDomain = $this->_domain->getParentDomain();
+            if ($parentDomain) {
+                if ($this->parentModelName === false && $this->_domain->autoParentModels) {
+                    $searchTable = $this->table;
+                    if (is_array($this->_domain->parentTableMap) && isset($this->_domain->parentTableMap[$searchTable])) {
+                        $searchTable = $this->_domain->parentTableMap[$searchTable];
+                    }
+                    $this->parentModel = $parentDomain->searchModelByTable($searchTable);
+                }
+            }
+        }
+        return $this->parentModel;
+    }
+    
+    function listUsedColumns() {
+        $res = array();
+        foreach ($this->listProperties() as $i) {
+            $prop = $this->getProperty($i);
+            if ($prop instanceof Ac_Cg_Property_Simple && $prop->enabled) $res[] = $i;
+        }
+        return $res;
+    }
+    
+    /**
+     * @return array (myProperty => array(arrayKey, defaultClass, crArgs))
+     * crArgs => array(keyA, keyB, keyC) <- constructor args map
+     * crArgs = false -- just copy $this->$myProperty to/from $array[$arrayKey]
+     */
+    function getSerializationMap() {
+        $res = array(
+            '_properties' => array('_properties', 'Ac_Cg_Property', array('__parent', 'name')),
+            '_relations' => array('_relations', 'Ac_Cg_Model_Relation', array()),
+        );
+        return $res;
+    }
+    
+    protected function beforeSerialize(& $vars) {
+        unset($vars['tableObject']);
+    }
+    
+    function initProperties() {
+        foreach ($this->_properties as $p) $p->init();        
+    }
+    
+    function unserializeFromArray($array) {
+        parent::unserializeFromArray($array);
+        $this->tableObject = $this->_domain->getDatabase()->getTable($this->table);
+        $this->_init = true;
+    }    
     
 }

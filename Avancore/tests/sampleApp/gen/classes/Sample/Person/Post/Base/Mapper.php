@@ -23,21 +23,20 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
             'pubId' => NULL,
         ); 
  
-    
+   
     protected $autoincFieldName = 'id';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
  
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_person' => false,
             '_personPhoto' => false,
-        );
+        ));
     }
     
     /**
@@ -90,11 +89,11 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-        
+    
     function getTitleFieldName() {
         return 'title';   
     }
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_person' => array (
@@ -129,7 +128,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-            
+    
     protected function doGetAssociationPrototypes() {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
             'person' => array (
@@ -165,7 +164,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-        
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -177,9 +176,9 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'id',
             ),
@@ -188,7 +187,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
             ),
         );
     }
-        
+
     /**
      * @return Sample_Person_Post 
      */
@@ -208,7 +207,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-    
+
     /**
      * Returns (but not loads!) several personPosts of given one or more people 
      * @param Sample_Person_Post|array $people     

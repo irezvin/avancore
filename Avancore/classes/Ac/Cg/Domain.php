@@ -4,7 +4,7 @@
  * Domain metamodel for Code Generator. Models between different domains are not linked
  **/
 
-class Ac_Cg_Domain {
+class Ac_Cg_Domain extends Ac_Cg_Base {
 
     /**
      * @var string Name of the domain
@@ -153,7 +153,7 @@ class Ac_Cg_Domain {
      */
     var $defaultPublishedPropName = false;
     
-    /**
+    /**or
      * Default name for model special properties auto-detection
      * @see Ac_Cg_Model::detectSpecialProperties  
      */
@@ -203,39 +203,128 @@ class Ac_Cg_Domain {
     
     var $overrideTypesUsingDocBlocks = true;
     
+    /**
+     * Name of the domain that current domain inherits
+     * Must be returned by Ac_Cg_Generator::getDomain()
+     * @var string
+     */
+    var $parentDomainName = false;
+
+    /**
+     * If $autoParentModels === true and $parentDomainName !== false,
+     * models will have parent models assigned using matching table names
+     * ($parentModelName will still override this value)
+     * @var bool
+     */
+    var $autoParentModels = true;
+    
+    /**
+     * Map for automatic parent model assignment
+     * array ($myTableName => $parentTableName) // both with prefixes replaced to #__
+     * @var array 
+     */
+    var $parentTableMap = array();
+    
+    /**
+     * If parent domain is set, list of the properties that shouldn't
+     * be inherited from it
+     */
+    var $dontInheritProperties = array();
+    
+    protected $parentDomain = false;
+    
     protected $langStrings = array();
+    
+    /**
+     * @var Ac_Sql_Dbi_Inspector
+     */
+    protected $inspector = false;
     
     /**
      * @param Ac_Cg_Generator $generator 
      */
-    function Ac_Cg_Domain($generator, $name, $config = array()) {
-         $this->_gen = $generator;
-         $this->$name = $name;
-         Ac_Util::simpleBind($config, $this);
-         if (!$this->dbName) $this->dbName = $name;
-         if (!$this->appName) $this->appName = $name;
-         if (!$this->caption) $this->caption = $this->appName;
-         if (!$this->josComId) $this->josComId = $this->appName;
-         
-         if (isset($config['dictionary']) && is_array($config['dictionary'])) {
-             $dicConf = $config['dictionary'];
-         } else {
-             $dicConf = array();
-         }
-         if (!isset($dicConf['constantPrefix'])) $dicConf['constantPrefix'] = $this->appName; 
-         $this->dictionary = new Ac_Cg_Dictionary($dicConf);
+    function __construct($generator, $name, $config = array()) {
+        $this->_gen = $generator;
+        $this->name = $name;
+        foreach (array('parentDomainName', 'dontInheritProperties') as $k) {
+            if (isset($config[$k])) {
+                $this->$k = $config[$k];
+                unset($config->$k);
+            }
+        }
+        $this->inheritDefaults($config);
+        Ac_Util::simpleBind($config, $this);
+        if (!$this->dbName) $this->dbName = $name;
+        if (!$this->appName) $this->appName = $name;
+        if (!$this->caption) $this->caption = $this->appName;
+        if (!$this->josComId) $this->josComId = $this->appName;
+        
+        if (isset($config['dictionary']) && is_array($config['dictionary'])) {
+            $dicConf = $config['dictionary'];
+        } else {
+            $dicConf = array();
+        }
+        if (!isset($dicConf['constantPrefix'])) $dicConf['constantPrefix'] = $this->appName; 
+        $this->dictionary = new Ac_Cg_Dictionary($dicConf);
+    }
+    
+    protected function inheritDefaults(& $config) {
+        if ($this->parentDomainName) {
+            $pd = $this->getParentDomain();
+            foreach (array_diff(array(
+                'dbName',
+                'tablePrefix',
+                'stripTablePrefixFromIds',
+                'extraStripFromIds',
+                'autoTables',
+                'autoTablesAll',
+                'autoTablesIgnore',
+                'replaceTablePrefixWith',
+                'dontLinkSubsystems',
+                'defaultTitlePropName',
+                'defaultPublishedPropName',
+                'defaultOrderingPropName',
+                'modelDefaults',
+                'ignoredColumnsInJunctionTables',
+                'extraConfigByTables',
+                'langStringPrefix',
+                'tableLangStringPrefix',
+                'addSubsystemsToMapperMethods',
+                'overrideTypesUsingDocBlocks',
+                'subsystemPrefixes',
+                'subsystemPrefixAppearsOnlyOnce',
+                'schemaExtras',
+                'dictionary'
+            ), $this->dontInheritProperties) as $propName) {
+                if ($propName === 'dictionary') {
+                    $parentVal = $pd->dictionary->getConfig();
+                    unset($parentVal['constantPrefix']);
+                } else {
+                    $parentVal = $pd->$propName;
+                }
+                $this->$propName = $parentVal;
+                if (!in_array($propName, array('autoTablesIgnore'))) {
+                    if (isset($config[$propName]) && is_array($config[$propName]) && is_array($this->$propName)) {
+                        Ac_Util::ms($this->$propName, $config[$propName]);
+                        if (in_array($propName, 'subsystemPrefixes')) {
+                            $this->$propName = array_unique($this->$propName);
+                        }
+                        unset($config[$propName]);
+                    }
+                }
+            }
+        }
     }
     
     function listModels() {
-        $l = '_models';
-        if ($this->$l === false) {
-            $this->$l = array();
+        if ($this->_models === false) {
+            $this->_models = array();
             foreach ($this->_calculateModelsConfig() as $name => $config) {
-                 $this->{$l}[$name] = $config; 
+                $this->_models[$name] = $config; 
             }
             $this->resolveConflicts();
         }
-        return array_keys($this->$l);
+        return array_keys($this->_models);
     }
     
     protected function resolveConflicts() {
@@ -264,7 +353,11 @@ class Ac_Cg_Domain {
      * @return Ac_Sql_Dbi_Inspector
      */
     function getInspector() {
-        $res = $this->_gen->getInspector();
+        if ($this->inspector === false) {
+            $res = $this->_gen->getInspector();
+        } else {
+            $res = $this->inspector;
+        }
         return $res;
     }
     
@@ -332,15 +425,37 @@ class Ac_Cg_Domain {
         
         $conf['table'] = $tableName;
         
+        $name = Ac_Cg_Util::makeIdentifier($coolName);
+        
+        $overConf = array();
+        
         if ($this->extraConfigByTables) {
             foreach ($this->extraConfigByTables as $k => $extraConfig) {
                 if (is_array($extraConfig) && ($k === $tableName || ($k{0} == '/' && preg_match($k, $tableName)))) {
-                    Ac_Util::ms($conf, $extraConfig);
+                    Ac_Util::ms($overConf, $extraConfig);
                 }
             }
         }
         
-        $name = Ac_Cg_Util::makeIdentifier($coolName);
+        // let's determine default class from parent domain
+        if ($parentDomain = $this->getParentDomain()) {
+            if (isset($this->models[$name]) && is_array($this->models[$name])) {
+                $extraConf = $this->models[$name];
+            } else {
+                $extraConf = array();
+            }
+            $extraConf = Ac_Util::m($overConf, $conf);
+            $parentModelName = false;
+            if (isset($extraConf['parentModelName']))
+                $parentModelName = $extraConf['parentModelName'];
+            elseif ($this->autoParentModels) $parentModelName = $name;
+            if (strlen($parentModelName) && in_array($parentModelName, $parentDomain->listModels())) {
+                $class = get_class($parentDomain->getModel($parentModelName));
+                $conf['class'] = $class;
+            }
+        }
+        
+        if ($overConf) Ac_Util::ms($conf, $overConf);
         
         return array($name, $conf);
     }
@@ -516,6 +631,85 @@ class Ac_Cg_Domain {
             $this->getModel($i)->beforeGenerate();
         }
     }
+    
+    /**
+     * @return Ac_Cg_Domain
+     */
+    function getParentDomain() {
+        if ($this->parentDomain === false) {
+            if (strlen($this->parentDomainName)) {
+                $res = $this->_gen->getDomain($this->parentDomainName);
+                if ($res) $this->parentDomain = $res;
+            }
+        }
+        if ($this->parentDomain) $res = $this->parentDomain;
+            else $res = null;
+        return $res;
+    }
+    
+    function getParentAppClass() {
+        if (($pd = $this->getParentDomain())) {
+            $res = $pd->getAppClass();
+        } else {
+            $res = $this->appBaseClass;
+        }
+        return $res;
+    }
+    
+    function getMapperAliases() {
+        $res = array();
+        if ($parent = $this->getParentDomain()) {
+            foreach ($this->listModels() as $m) {
+                $mod = $this->getModel($m);
+                if ($pm = $mod->getParentModel()) {
+                    $res[$pm->getMapperClass()] = $mod->getMapperClass();
+                }
+            }
+        }
+        return $res;
+    }
+    
+    /**
+     * @return array (myProperty => array(arrayKey, defaultClass, crArgs))
+     * crArgs => array(keyA, keyB, keyC) <- constructor args map
+     * crArgs = false -- just copy $this->$myProperty to/from $array[$arrayKey]
+     */
+    function getSerializationMap() {
+        $res = array(
+            'dictionary' => array('dictionary', 'Ac_Cg_Dictionary', array()),
+            '_models' => array('_models', 'Ac_Cg_Model', array('__parent', 'name')),
+        );
+        return $res;
+    }
+    
+    protected function beforeSerialize(& $vars) {
+        $can = new Ac_Sql_Dbi_Inspector_Canned();
+        $can->defaultDatabaseName = $this->dbName;
+        $can->import($this->getInspector());
+        $vars['inspector'] = $can;
+        parent::beforeSerialize($vars);
+    }
+    
+    public function unserializeFromArray($array) {
+        if (isset($array['inspector']) && is_array($array['inspector'])) {
+            $this->inspector = new Ac_Sql_Dbi_Inspector_Canned;
+            $this->inspector->unserializeFromArray($array['inspector']);
+        }
+        parent::unserializeFromArray($array);
+        if (!$this->_models) $this->_models = array();
+        foreach ($this->_models as $mod) $mod->initProperties();
+    }
+    
+    public function serializeToArray() {
+        $res = parent::serializeToArray();
+        if (isset($res['models'])) {
+            $models = $res['models'];
+            unset($res['models']);
+            $res['models'] = $models;
+        }
+        return $res;
+    }
+
     
 }
 

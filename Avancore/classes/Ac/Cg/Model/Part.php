@@ -41,6 +41,8 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     
     var $inline = false;
     
+    protected $masterModelName = false;
+    
     function getMixableId() {
         if ($this->mixableId === false) {
             $res = $this->single;
@@ -110,15 +112,47 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
         return $this->className.'_MapperMixable';
     }
     
+    function listInheritedModelMembers() {
+        return array_merge(parent::listInheritedModelMembers(), array(
+            'inline'
+        ));
+    }
+    
     function init() {
         if ($this->_init) return;
         parent::init();
         $this->initMasterRelations();
     }
     
+    protected function calcPartInheritance() {
+
+        $parentModel = $this->getParentModel();
+        
+        if ($parentModel && $parentModel instanceof Ac_Cg_Model_Part) {
+            foreach ($parentModel->masterFkIds as $fkId) {
+                if (!in_array($fkId, $this->masterFkIds)) {
+                    $this->masterFkIds[] = $fkId;
+                }
+            }
+            foreach ($parentModel->skipMapperMixables as $sm) {
+                if (!in_array($sm, $this->skipMapperMixables))
+                    $this->skipMapperMixables[] = $sm;
+            }
+            
+            if ($this->parentExtraTableClass === 'Ac_Model_Mapper_Mixable_ExtraTable') {
+                $this->parentExtraTableClass = $parentModel->getExtraTableClass();
+            }
+            
+        }
+        
+    }
+    
     protected function initMasterRelations() {
         $incomingFks = array();
         $outgoingFks = array();
+        
+        $this->calcPartInheritance();
+        
         foreach ($this->masterFkIds as $i => $fkId) {
             $prop = $this->findPropertyByForeignKeyId($fkId);
             if (!$prop) {
@@ -126,6 +160,7 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
             } else {
                 // disable the property
                 $prop->enabled = false;
+                $prop->ignoreInDescendants = true;
                 if (!$prop->thisIsUnique) {
                     $this->warnings["masterFkIds"][$i]['thisNotUnique'] = "ExtraTable record is not unique";
                 }
@@ -135,6 +170,7 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
                 if ($mirror = $prop->getMirrorProperty()) {
                     // disable the mirror property
                     $mirror->enabled = false;
+                    $mirror->ignoreInDescendants = true;
                 }
                 
                 $this->masterProperties[$fkId] = $prop->name;
@@ -175,7 +211,10 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
         }
 
         // incoming associations are disabled at the moment
-        if ($other) $other->enabled = false;
+        if ($other) {
+            $other->enabled = false;
+            $other->ignoreInDescendants = true;
+        }
         $prop->canLoadSrc = false;
         
         // still leave association (no loadDest at the moment) for referencing extra table
@@ -278,5 +317,26 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     function getMapperRecordClass() {
         return 'Ac_Model_Record';
     }
+
+    protected function beforeSerialize(&$vars) {
+        unset($vars['masterModel']);
+        $vars['masterModelName'] = $this->masterModel? $this->masterModel->name : '';
+        parent::beforeSerialize($vars);
+    }
     
+    public function unserializeFromArray($array) {
+        if (isset($array['masterModelName'])) {
+            $this->masterModelName = $array['masterModelName'];
+        }
+        parent::unserializeFromArray($array);
+    }
+     
+    function initProperties() {
+        if ($this->masterModelName) {
+            $this->masterModel = $this->_domain->getModel($this->masterModelName);
+            $this->masterModelName = false;
+        }
+        foreach ($this->_properties as $p) $p->init();
+    }
+   
 }

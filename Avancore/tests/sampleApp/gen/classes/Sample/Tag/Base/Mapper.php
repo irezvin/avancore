@@ -21,18 +21,17 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
             'titleF' => NULL,
         ); 
  
-    
+   
     protected $autoincFieldName = 'tagId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
  
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_people' => false,
             '_peopleCount' => false,
             '_peopleLoaded' => false,
@@ -41,7 +40,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
             '_perksCount' => false,
             '_perksLoaded' => false,
             '_perkIds' => false,
-        );
+        ));
     }
     
     /**
@@ -94,11 +93,11 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-        
+    
     function getTitleFieldName() {
         return 'title';   
     }
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_people' => array (
@@ -146,7 +145,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-            
+    
     protected function doGetAssociationPrototypes() {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
             'people' => array (
@@ -194,7 +193,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-        
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -206,9 +205,9 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'tagId',
             ),
@@ -217,7 +216,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
             ),
         );
     }
-        
+
     /**
      * @return Sample_Tag 
      */
@@ -237,7 +236,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-    
+
     /**
      * Returns (but not loads!) one or more tags of given one or more people 
      * @param Sample_Tag|array $people     

@@ -33,14 +33,11 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
-    protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( )));
-    }
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
             'id' => array (
                 'dataType' => 'int',
                 'maxLength' => '10',
@@ -118,6 +115,7 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
         return $pi;
                 
     }
+    
 
     function hasUniformPropertiesInfo() { return true; }
 

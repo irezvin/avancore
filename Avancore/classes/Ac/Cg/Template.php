@@ -161,5 +161,24 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
            else echo $out;
     }
     
+    function showDenyHtaccess() {
+?>
+    <IfModule mod_version.c>
+        <IfVersion < 2.4>
+            Order Deny,Allow
+            Deny from All
+        </IfVersion>
+
+        <IfVersion >= 2.4>
+            Access all denied
+        </IfVersion>
+    </IfModule>
+    <IfModule !mod_version.c>
+        Order Deny,Allow
+        Deny from All
+    </IfModule>
+<?php
+    }
+    
 }
 

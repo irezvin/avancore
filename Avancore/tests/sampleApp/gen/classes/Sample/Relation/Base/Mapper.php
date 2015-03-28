@@ -24,22 +24,21 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
             'notes' => '',
         ); 
  
-    
+   
     protected $autoincFieldName = 'relationId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
  
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_relationType' => false,
             '_otherPerson' => false,
             '_person' => false,
-        );
+        ));
     }
     
     /**
@@ -92,7 +91,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_relationType' => array (
@@ -140,7 +139,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-            
+    
     protected function doGetAssociationPrototypes() {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
             'relationType' => array (
@@ -191,7 +190,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-        
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -203,15 +202,15 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'relationId',
             ),
         );
     }
-        
+
     /**
      * @return Sample_Relation 
      */
@@ -221,7 +220,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-    
+
     /**
      * Returns (but not loads!) several relations of given one or more relationTypes 
      * @param Sample_Relation|array $relationTypes     

@@ -17,22 +17,21 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
             'title' => NULL,
         ); 
  
-    
+   
     protected $autoincFieldName = 'religionId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
  
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_people' => false,
             '_peopleCount' => false,
             '_peopleLoaded' => false,
-        );
+        ));
     }
     
     /**
@@ -85,11 +84,11 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-        
+    
     function getTitleFieldName() {
         return 'title';   
     }
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_people' => array (
@@ -108,7 +107,7 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-            
+    
     protected function doGetAssociationPrototypes() {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
             'people' => array (
@@ -131,7 +130,7 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-        
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -143,9 +142,9 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'religionId',
             ),
@@ -154,7 +153,7 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
             ),
         );
     }
-        
+
     /**
      * @return Sample_Religion 
      */
@@ -174,7 +173,7 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-    
+
     /**
      * Returns (but not loads!) one or more religion of given one or more people 
      * @param Sample_Religion|array $people     

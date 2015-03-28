@@ -45,7 +45,6 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
     }
     
     function doInit() {
-        parent::doInit();
         
         $this->hasUniformPropertiesInfo = false;
         $this->tracksChanges = false;
@@ -58,6 +57,19 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
         $this->extraRelationPrototypes = $this->model->extraRelationPrototypes;
         $this->extraAssociationPrototypes = $this->model->extraAssociationPrototypes;
         $this->inline = $this->model->inline;
+        
+        parent::doInit();
+    }
+    
+    protected function calcInheritance() {
+        parent::calcInheritance();
+        $parentModel = $this->model->getParentModel();
+        if (!$parentModel) return;
+        
+        $this->extraTableVars = Ac_Cg_Util::arrayDiffWithKeys($this->extraTableVars, $parentModel->getExtraTableVars());
+        $this->extraRelationPrototypes = Ac_Cg_Util::arrayDiffWithKeys($this->extraRelationPrototypes, $parentModel->extraRelationPrototypes);
+        $this->extraAssociationPrototypes = Ac_Cg_Util::arrayDiffWithKeys($this->extraAssociationPrototypes, $parentModel->extraAssociationPrototypes);
+        
     }
     
     function getAssocStrategy($relationId, $prop) {
@@ -173,7 +185,8 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
 
 <?php } ?>
     protected function getOwnPropertiesInfo() {
-    	<?php if ($this->generator->php5) echo 'static $pi = false; if ($pi === false) '; ?>$pi = <?php $this->exportArray($this->ownPropInfo, 8, true); ?>;
+    	static $pi = false; 
+        if ($pi === false) $pi = <?php $this->exportArray($this->ownPropInfo, 8, true); ?>;
 <?php   if ($this->parentClass === $this->model->getDefaultParentClassName()) { ?>    
         return $pi;
 <?php   } else { ?>

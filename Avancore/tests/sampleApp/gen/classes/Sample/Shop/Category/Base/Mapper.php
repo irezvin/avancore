@@ -27,11 +27,10 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
             'pubId' => NULL,
         ); 
  
-    
+   
     protected $autoincFieldName = 'id';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
     protected function doGetCoreMixables() { 
         return Ac_Util::m(parent::doGetCoreMixables(), array (
             'publish' => array (
@@ -47,14 +46,14 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_shopProducts' => false,
             '_shopProductsCount' => false,
             '_shopProductsLoaded' => false,
             '_shopProductIds' => false,
-        );
+        ));
     }
     
     /**
@@ -107,15 +106,15 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-        
+    
     function getTitleFieldName() {
         return 'title';   
     }
-            
+    
     function getDefaultOrdering() {
         return 'ordering';
     }
-            
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_shopProducts' => array (
@@ -142,7 +141,7 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-            
+    
     protected function doGetAssociationPrototypes() {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
             'shopProducts' => array (
@@ -169,7 +168,7 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
-        
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -181,9 +180,9 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'id',
             ),
@@ -192,7 +191,7 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
             ),
         );
     }
-        
+
     /**
      * @return Sample_Shop_Category 
      */
@@ -212,7 +211,7 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-    
+
     /**
      * Returns (but not loads!) one or more shopCategories of given one or more shopProducts 
      * @param Sample_Shop_Category|array $shopProducts     

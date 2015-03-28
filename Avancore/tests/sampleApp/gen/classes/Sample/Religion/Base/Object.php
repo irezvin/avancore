@@ -29,11 +29,11 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
     protected function listOwnProperties() {
         return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'people', )));
     }
+    
  
     protected function listOwnLists() {
         
@@ -47,7 +47,8 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
             'people' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
@@ -73,6 +74,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
         return $pi;
                 
     }
+    
 
     function hasUniformPropertiesInfo() { return true; }
 
@@ -129,7 +131,6 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
         $this->_people[] = $person;
         
         $person->_religion = $this;
-        
         
     }
 

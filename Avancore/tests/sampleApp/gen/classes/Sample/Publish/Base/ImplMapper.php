@@ -29,21 +29,20 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
             'dateDeleted' => '0000-00-00 00:00:00',
         ); 
  
-    
+   
     protected $autoincFieldName = 'id';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
  
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_authorPerson' => false,
             '_editorPerson' => false,
-        );
+        ));
     }
     
     /**
@@ -96,7 +95,7 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_authorPerson' => array (
@@ -124,7 +123,7 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
         ));
         
     }
-            
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -136,9 +135,9 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'id',
             ),
@@ -147,7 +146,7 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
             ),
         );
     }
-        
+
     /**
      * @return Sample_Publish 
      */
@@ -167,6 +166,6 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-        
+    
 }
 

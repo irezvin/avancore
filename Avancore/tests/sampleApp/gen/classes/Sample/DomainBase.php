@@ -2,6 +2,11 @@
 
 abstract class Sample_DomainBase extends Ac_Application {
 
+    protected function doOnInitialize() {
+        parent::doOnInitialize();
+    }
+
+
     protected function doGetMapperPrototypes() {
         return array (
             'Sample_Person_Mapper' => array (

@@ -109,12 +109,6 @@ class Ac_Cg_Generator {
     var $clearOutputDir = false;
     
     /**
-     * Add static keywords and type hinting in appropriate places.
-     * @var bool
-     */
-    var $php5 = true;
-    
-    /**
      * Number of bytes that were written during last run
      */
     var $_outputBytes = false;
@@ -129,11 +123,14 @@ class Ac_Cg_Generator {
     var $lintCommand = "php -l %s 2>&1";
     
     /**
-     * @param string $configFileName name of file with static configuration of project
+     * @param string $configOrFileName name of file with static configuration of project
      */
-    function Ac_Cg_Generator($configFileName, $runtimeOptions = array()) {
-        $this->_configFileName = $configFileName;
-        $this->_loadStaticConfig();
+    function Ac_Cg_Generator($configOrFileName, $runtimeOptions = array()) {
+        if (is_array($configOrFileName)) $this->staticConfig = $configOrFileName;
+        else {
+            $this->_configFileName = $configOrFileName;
+            $this->_loadStaticConfig();
+        }
         if (isset($this->staticConfig['generator']) && is_array($this->staticConfig['generator'])) {
             if (isset($this->staticConfig['generator']['staticConfig'])) unset($this->staticConfig['generator']['staticConfig']);
             Ac_Util::simpleBind($this->staticConfig['generator'], $this); 
@@ -308,7 +305,13 @@ class Ac_Cg_Generator {
         }
     }
     
-    
+    function prepare() {
+        
+        foreach ($this->listDomains() as $domain) {
+            $domainObject = $this->getDomain($domain);
+            $domainObject->beforeGenerate();
+        }
+    }
     
     function run() {
         
@@ -319,8 +322,8 @@ class Ac_Cg_Generator {
             fclose(fopen($errLog, "w"));
         } else {
             if (is_file($errLog)) {
-                fopen($errLog, "w");
-                fputs($errLog, "\n\n----------------------------------\n\n");
+                $f = fopen($errLog, "w");
+                fputs($f, "\n\n----------------------------------\n\n");
             }
         }
         
@@ -335,11 +338,10 @@ class Ac_Cg_Generator {
         $this->_outputFiles = 0;
         
         if ($this->clearOutputDir && $this->outputDir) Ac_Cg_Util::cleanDir($this->outputDir);
+        
         $todo = $this->parseGenEntities();
         
         foreach ($todo as $domain => $models) {
-            $domainObject = $this->getDomain($domain);
-            $domainObject->beforeGenerate();
             $strat = $this->createStrategyForDomain($domain);
             $strat->generateCodeForModels($models);
             $strat->generateCommonCode();
@@ -382,6 +384,40 @@ class Ac_Cg_Generator {
                 $this->log(implode("\n", $out)."\n", true);
             }
         }
+    }
+    
+    /**
+     * 
+     * @param string|array $json
+     * @param type $isFile
+     * @param type $newName
+     * @throws Ac_E_InvalidCall
+     * @throws Exception
+     * @throws type
+     */
+    function importDomain($json, $isFile = false, $newName = false) {
+        if (is_array($json) && $isFile) 
+            throw new Ac_E_InvalidCall ("WTF: is \$isFile is TRUE, \$json must be a filename, not an array");
+        if ($isFile) {
+            if (!is_file($json)) throw new Exception("\$json points to non-existent file: '$json'");
+            $jsonData = file_get_contents($json);
+            $json = json_decode($jsonData, true);
+        } else {
+            if (is_string($json)) $json = json_decode ($json, true);
+        }
+        if (!is_array($json)) throw new Ac_E_InvalidCall("\$json not an array");
+        if (!isset($json['__class']) || $json['__class'] !== 'Ac_Cg_Domain') {
+            throw new Exception ("'__class' => 'Ac_Cg_Domain' missing in \$json data");
+        }
+        if ($newName !== false) $json['name'] = $newName;
+        $name = $json['name'];
+        if (isset($this->_domains[$name])) {
+            throw Ac_E_InvalidCall::alreadySuchItem("domain", $name);
+        }
+        $dom = new Ac_Cg_Domain($this, $name);
+        $dom->unserializeFromArray($json);
+        $this->_domains[$name] = $dom;
+        return $dom;
     }
     
     
