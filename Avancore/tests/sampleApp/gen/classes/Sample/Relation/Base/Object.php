@@ -34,6 +34,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
+ 
     
     protected function listOwnProperties() {
         return array ( 0 => 'relationType', 1 => 'otherPerson', 2 => 'person', 3 => 'relationId', 4 => 'personId', 5 => 'otherPersonId', 6 => 'relationTypeId', 7 => 'relationBegin', 8 => 'relationEnd', 9 => 'notes', );

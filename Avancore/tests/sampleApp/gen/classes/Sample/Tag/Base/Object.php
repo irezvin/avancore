@@ -36,6 +36,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
+ 
     
     protected function listOwnProperties() {
         return array ( 0 => 'people', 1 => 'personIds', 2 => 'perks', 3 => 'perkIds', 4 => 'tagId', 5 => 'title', 6 => 'titleM', 7 => 'titleF', );

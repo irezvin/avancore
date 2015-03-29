@@ -151,7 +151,7 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
         $this->idOtherPlural = '$'.$this->otherPlural;      
         $this->ucThisPlural = ucfirst($this->thisPlural);
         $this->ucOtherPlural = ucfirst($this->otherPlural);
-        $this->thisClass = $this->template->modelClass;
+        $this->thisClass = $this->model->className;
         $this->otherClass = $this->otherModel->className;
         if (($this->mirrorProp = $this->prop->getMirrorProperty()) && $this->mirrorProp->isEnabled()) {
        
