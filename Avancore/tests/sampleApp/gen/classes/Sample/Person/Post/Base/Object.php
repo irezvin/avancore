@@ -113,8 +113,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
      */
     function getPerson() {
         if ($this->_person === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_person');
+            $this->mapper->loadPeopleFor($this);
         }
         return $this->_person;
     }
@@ -156,8 +155,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
      */
     function getPersonPhoto() {
         if ($this->_personPhoto === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_personPhoto');
+            $this->mapper->loadPersonPhotosFor($this);
         }
         return $this->_personPhoto;
     }

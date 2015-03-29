@@ -2,7 +2,13 @@
 
 class Ac_Cg_Template_Assoc_Strategy_One extends Ac_Cg_Template_Assoc_Strategy {
     
-    
+    function getGuessMap() {
+        return array_merge(parent::getGuessMap(), array(
+            'getDestObjectMethod' => 'get{Single}',
+            'setDestObjectMethod' => 'set{Single}',
+            'clearDestObjectMethod' => 'clear{Single}',
+        ));
+    }
     
     function _doShowGenModelMethods() {
         extract(get_object_vars($this));
@@ -14,8 +20,7 @@ class Ac_Cg_Template_Assoc_Strategy_One extends Ac_Cg_Template_Assoc_Strategy {
      */
     function get<?php $this->d($ucSingle); ?>() {
         if (<?php $this->d($varId); ?> === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, <?php $this->str($relationId); ?>);
+            $this->mapper->load<?php echo $this->ucOtherPlural; ?>For($this);
         }
         return <?php $this->d($varId); ?>;
     }
