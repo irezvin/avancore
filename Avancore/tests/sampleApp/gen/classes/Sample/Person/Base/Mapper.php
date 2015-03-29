@@ -282,6 +282,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'loadDestIdsMapperMethod' => 'loadTagIdsFor',
                 'getDestIdsMethod' => 'getTagIds',
                 'setDestIdsMethod' => 'setTagIds',
+                'clearDestObjectsMethod' => 'clearTags',
             ),
             'personAlbums' => array (
                 'relationId' => '_personAlbums',
