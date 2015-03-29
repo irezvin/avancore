@@ -131,8 +131,8 @@
 	- [X] test
 	  - [X] test smart event assignment
 	  - [X] test simple variant
-      - [ ] Ac_Model_Mixable_Object
-	- [ ] can have referenced, referencing, NN records
+      - [X] Ac_Model_Mixable_Object
+	- [X] can have referenced, referencing, NN records
       - [ ] Usable mixable associations that declare list/get/create methods
   - [ ] codegen support
     - [ ] Ac_Cg_Model_Part
