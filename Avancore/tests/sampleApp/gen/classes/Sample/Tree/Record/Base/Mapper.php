@@ -25,7 +25,6 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
     
     protected $askRelationsForDefaults = false;
     
- 
     function listSqlColumns() {
         return $this->columnNames;
     }
@@ -89,7 +88,7 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
     function getTitleFieldName() {
         return 'title';   
     }
-                    
+                
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (

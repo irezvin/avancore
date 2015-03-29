@@ -19,9 +19,6 @@ abstract class Sample_DomainBase extends Ac_Application {
             'Sample_Person_Post_Mapper' => array (
                 'class' => 'Sample_Person_Post_Mapper',
             ),
-            'Sample_Publish_ImplMapper' => array (
-                'class' => 'Sample_Publish_ImplMapper',
-            ),
             'Sample_Relation_Type_Mapper' => array (
                 'class' => 'Sample_Relation_Type_Mapper',
             ),
@@ -33,9 +30,6 @@ abstract class Sample_DomainBase extends Ac_Application {
             ),
             'Sample_Shop_Category_Mapper' => array (
                 'class' => 'Sample_Shop_Category_Mapper',
-            ),
-            'Sample_Shop_Product_Extra_Code_ImplMapper' => array (
-                'class' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
             ),
             'Sample_Shop_Product_Mapper' => array (
                 'class' => 'Sample_Shop_Product_Mapper',
@@ -91,13 +85,6 @@ abstract class Sample_DomainBase extends Ac_Application {
     }
     
     /**
-     * @return Sample_Publish_ImplMapper 
-     */
-    function getSamplePublishImplMapper() {
-        return $this->getMapper('Sample_Publish_ImplMapper');
-    }
-    
-    /**
      * @return Sample_Relation_Type_Mapper 
      */
     function getSampleRelationTypeMapper() {
@@ -123,13 +110,6 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function getSampleShopCategoryMapper() {
         return $this->getMapper('Sample_Shop_Category_Mapper');
-    }
-    
-    /**
-     * @return Sample_Shop_Product_Extra_Code_ImplMapper 
-     */
-    function getSampleShopProductExtraCodeImplMapper() {
-        return $this->getMapper('Sample_Shop_Product_Extra_Code_ImplMapper');
     }
     
     /**
@@ -244,21 +224,6 @@ abstract class Sample_DomainBase extends Ac_Application {
     
  
     /**
-     * @return Sample_Publish 
-     */
-    static function Sample_Publish ($object = null) {
-        return $object;
-    }
-    
-    /**
-     * @return Sample_Publish 
-     */
-    function createSamplePublish () {
-        return $this->getMapper('Sample_Publish_ImplMapper')->createRecord();
-    }
-    
- 
-    /**
      * @return Sample_Relation_Type 
      */
     static function Sample_Relation_Type ($object = null) {
@@ -315,21 +280,6 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function createSampleShopCategory () {
         return $this->getMapper('Sample_Shop_Category_Mapper')->createRecord();
-    }
-    
- 
-    /**
-     * @return Sample_Shop_Product_Extra_Code 
-     */
-    static function Sample_Shop_Product_Extra_Code ($object = null) {
-        return $object;
-    }
-    
-    /**
-     * @return Sample_Shop_Product_Extra_Code 
-     */
-    function createSampleShopProductExtraCode () {
-        return $this->getMapper('Sample_Shop_Product_Extra_Code_ImplMapper')->createRecord();
     }
     
  

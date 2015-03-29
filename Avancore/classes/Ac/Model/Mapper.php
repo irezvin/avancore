@@ -68,13 +68,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     /**
      * function onGetRelationPrototypes(& $relationPrototypes)
      */
-    const EVENT_ON_GET_RELATION_PROTOTYPES = 'onGetRelationPrototypes';
+    const EVENT_ON_GET_RELATION_PROTOTYPES = 'onGetRelationPrototype';
 
-    /**
-     * function onGetAssociationPrototypes(& $associationPrototypes)
-     */
-    const EVENT_ON_GET_ASSOCIATION_PROTOTYPES = 'onGetAssociationPrototypes';
-    
     /**
      * function onGetManagerConfig(& $managerConfig)
      */
@@ -171,12 +166,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * @var array of Ac_Model_Relation
      */
     protected $relations = false;
-    
-    /**
-     * Ac_Model_Association instances (common for all records)
-     * @var array
-     */
-    protected $associations = false;
     
     /**
      * List of 'intrinsic' relations that cannot be deleted
@@ -359,7 +348,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     
     final function registerRecord(Ac_Model_Object $record) {
         $this->coreRegisterRecord($record);
-        $this->triggerEvent(self::EVENT_AFTER_CREATE_RECORD, array(& $record));
+        $this->triggerEvent(self::EVENT_AFTER_CREATE_RECORD, array(
+            $record
+        ));
     }
     
     protected function coreRegisterRecord(Ac_Model_Object $record) {
@@ -580,7 +571,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         
         foreach ($loaded as $pk => $record) 
             $objects[$pk] = $record;
-
+        
         if ($this->useRecordsCollection) {
             foreach ($loaded as $pk => $record) {
                 $this->recordsCollection[$record->getPrimaryKey()] = $record;
@@ -1072,7 +1063,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     function listRelations() {
         if ($this->relations === false) {
             $this->relations = $this->getRelationPrototypes();
-            foreach ($this->relations as $rel) {
+            foreach ($this->relations as $k => $rel) {
                 if (is_object($rel)) {
                     $rel->setImmutable(true);
                 }
@@ -1095,51 +1086,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
 
-    /**
-     * @return array
-     */
-    function getAssociations() {
-        if ($this->associations === false) {
-            $this->associations = array();
-            $proto = $this->getAssociationPrototypes();
-            $this->addAssociations($proto);
-        }
-        return $this->associations;
-    }
-    
-    /**
-     * @return array
-     */
-    function listAssociations() {
-        if ($this->associations === false) $this->getAssociations();
-        return array_keys($this->associations);
-    }
-    
-    /**
-     * @return Ac_Model_Association_Abstract
-     */
-    function getAssociation($id, $dontThrow = false) {
-        $res = null;
-        if ($this->associations === false) $this->getAssociations();
-        if (isset($this->associations[$id])) $res = $this->associations[$id];
-        if (!$res && !$dontThrow) 
-            throw Ac_E_InvalidCall::noSuchItem ('association', $id, 'listAssociations');
-        return $res;
-    }
-    
-    function addAssociations(array $associations) {
-        $objects = Ac_Prototyped::factoryCollection($associations, 'Ac_I_ModelAssociation', 
-            array('mapper' => $this, 'immutable' => true), 'id', true, true);
-        
-        foreach ($objects as $k => $a) {
-            if (isset($this->associations[$k]) && $this->associations[$k] !== $a) {
-                throw Ac_E_InvalidCall::alreadySuchItem('association', $k);
-            }
-            $this->associations[$k] = $a;
-        }
-        return $objects;
-    }
-    
     /**
      * @return Ac_Model_Relation
      */
@@ -1226,22 +1172,10 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     protected function doGetRelationPrototypes() {
         return array();
     }
-    
-    protected function doGetAssociationPrototypes() {
-        return array();
-    }
 
     final function getRelationPrototypes() {
         $res = $this->doGetRelationPrototypes();
         $this->triggerEvent(self::EVENT_ON_GET_RELATION_PROTOTYPES, array(
-            & $res
-        ));
-        return $res;
-    }
-
-    protected final function getAssociationPrototypes() {
-        $res = $this->doGetAssociationPrototypes();
-        $this->triggerEvent(self::EVENT_ON_GET_ASSOCIATION_PROTOTYPES, array(
             & $res
         ));
         return $res;
@@ -1730,12 +1664,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     }
     
     protected function getRelationDefaults() {
-        if ($this->askRelationsForDefaults) {
-            $this->listRelations();
-            $kk = array_keys($this->relations);
-        } else {
-            $kk = $this->additionalRelations;
-        }
+        if ($this->askRelationsForDefaults) $kk = array_keys($this->relations);
+            else $kk = $this->additionalRelations;
         $res = array();
         foreach ($kk as $k) {
             $rel = $this->getRelation($k);
@@ -1767,16 +1697,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
             $res = $rows;
         }
         return $res;
-    }
-    
-    function addMixable(Ac_I_Mixable $mixable, $id = false, $canReplace = false) {
-        parent::addMixable($mixable, $id, $canReplace);
-        Ac_Model_Data::clearMetaCache($this->getId());
-        $this->resetPrototype();
-    }
-    
-    function resetPrototype() {
-        $this->prototype = false;
     }
     
 }

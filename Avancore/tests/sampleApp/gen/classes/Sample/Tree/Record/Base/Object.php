@@ -27,7 +27,6 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
     protected function listOwnProperties() {
         return array ( 0 => 'id', 1 => 'title', 2 => 'tag', );

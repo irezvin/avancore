@@ -22,13 +22,13 @@ interface Ac_I_Mixable {
      * Returns list of properties that are exposed to the mixin
      * @return array Array of strings - property names
      */
-    function listMixinProperties(Ac_I_Mixin $mixin);
+    function listMixinProperties();
     
     /**
      * Returns list of methods that are exposed to the mixin
      * @return array Array of strings - method names
      */
-    function listMixinMethods(Ac_I_Mixin $mixin);
+    function listMixinMethods();
     
     /**
      * Is called when $this mixable is added to the mixin $mixin

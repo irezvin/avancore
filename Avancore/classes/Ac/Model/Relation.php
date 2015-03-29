@@ -120,12 +120,12 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * Describes cardinality of source table (true if source fields point to unique record)
      * @var bool 
      */
-    protected $srcIsUnique = null;
+    protected $srcIsUnique = false;
     
     /**
      * Describes cardinality of destination table (true if destination fields point to unique record)
      */
-    protected $destIsUnique = null;
+    protected $destIsUnique = false;
     
     /**
      * Name of variable in source object that contains reference to destination object (if $destUnique is false, it has to be an array with references) 
@@ -260,6 +260,14 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if (($this->destTableName === false) && strlen($this->destMapperClass)) {
             $this->setDestMapper(Ac_Model_Mapper::getMapper($this->destMapperClass, $this->application? $this->application : null));
         }
+        
+        /*if (!$this->fieldLinks) trigger_error('fieldLinks must be specified', E_USER_ERROR);
+            else $this->fieldLinksRev = array_flip($this->fieldLinks);
+        
+        if (strlen($this->midTableName)) {
+            if (!$this->fieldLinks2) trigger_error('fieldLinks2 must be specified with midTableName', E_USER_ERROR);
+                else $this->fieldLinksRev2 = array_flip($this->fieldLinks2);
+        }*/
         
         if ($imm) $this->immutable = true;            
         
@@ -591,15 +599,6 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @return bool
      */
     function getSrcIsUnique() {
-        if ($this->srcIsUnique === null) {
-            $this->srcIsUnique = false;
-            if ($m = $this->getSrcMapper()) {
-                if (!$this->fieldLinks) 
-                    throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() before setFieldLinks()");
-                if ($m) $this->srcIsUnique = 
-                    !$this->midTableName && $m->identifiesRecordBy(array_keys($this->fieldLinks));
-            }
-        }
         return $this->srcIsUnique;
     }
 
@@ -627,16 +626,6 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * @return bool
      */
     function getDestIsUnique() {
-        if ($this->destIsUnique === null) {
-            $this->destIsUnique = false;
-            if ($m = $this->getDestMapper()) {
-                if (!$this->fieldLinks) 
-                    throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() before setFieldLinks()");
-                if ($m) $this->destIsUnique = !$this->midTableName && $m->identifiesRecordBy (
-                    array_values($this->fieldLinks)
-                );
-            }
-        }
         return $this->destIsUnique;
     }
 
@@ -1218,7 +1207,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $hasDef, 
             $this->fieldLinks, 
             $this->fieldLinks2, 
-            $this->getDestIsUnique(), 
+            $this->destIsUnique, 
             $this->destTableName, 
             'instantiateDest', 
             $this->destOrdering, 
@@ -1247,7 +1236,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             $hasDef, 
             $this->fieldLinksRev, 
             $this->fieldLinksRev2, 
-            $this->getSrcIsUnique(), 
+            $this->srcIsUnique, 
             $this->srcTableName, 
             'instantiateSrc', 
             $this->srcOrdering, 
@@ -1263,13 +1252,13 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function countDest ($srcData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         return $this->countSrcOrDest($srcData, $separate, $matchMode, $this->fieldLinks, $this->fieldLinks2, 
-            $this->getDestIsUnique(), $this->destTableName, $this->srcNNIdsVarName);
+            $this->destIsUnique, $this->destTableName, $this->srcNNIdsVarName);
     }
     
     function countSrc ($destData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         return $this->countSrcOrDest($destData, $separate, $matchMode, $this->fieldLinksRev, 
-            $this->fieldLinksRev2, $this->getSrcIsUnique(), $this->srcTableName, $this->destNNIdsVarName);
+            $this->fieldLinksRev2, $this->srcIsUnique, $this->srcTableName, $this->destNNIdsVarName);
     }
     
     function deleteDest (& $srcData) {
@@ -1285,7 +1274,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function loadDest (& $srcData, $dontOverwriteLoaded = true, $biDirectional = true, $returnAll = true) {
         if (!$this->destTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent destination!');
         //if (!$this->srcVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $srcVarName is not set');
-        $defaultValue = $this->getDestIsUnique()? null : array();
+        $defaultValue = $this->destIsUnique? null : array();
         $biDirectional = $biDirectional && strlen($this->destVarName);
 
         $lvn = $this->srcLoadedVarName;
@@ -1296,8 +1285,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         }
         
         $res = $this->loadSrcOrDest ($srcData, $defaultValue, $this->srcVarName, $this->destVarName, 
-            $dontOverwriteLoaded, $biDirectional, $this->fieldLinks, $this->fieldLinks2, $this->getDestIsUnique(), 
-                $this->getSrcIsUnique(), $this->destTableName, 'instantiateDest', $this->destOrdering, 
+            $dontOverwriteLoaded, $biDirectional, $this->fieldLinks, $this->fieldLinks2, $this->destIsUnique, 
+                $this->srcIsUnique, $this->destTableName, 'instantiateDest', $this->destOrdering, 
                 $this->destExtraJoins, $this->destWhere, $this->destQualifier, $this->srcQualifier, 
                 $this->srcNNIdsVarName, $returnAll, $lvn);
         return $res;
@@ -1306,7 +1295,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function loadSrc (& $destData, $dontOverwriteLoaded = true, $biDirectional = true, $returnAll = true) {
         if (!$this->srcTableName) trigger_error ('Can\'t '.__FUNCTION__.'() with non-persistent source!');
         if (!$this->destVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $destVarName is not set');
-        $defaultValue = $this->getSrcIsUnique()? null : array();
+        $defaultValue = $this->srcIsUnique? null : array();
         $biDirectional = $biDirectional && strlen($this->srcVarName);
         
         if (strlen($this->midTableName)) {
@@ -1325,7 +1314,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         }
         
         return $this->loadSrcOrDest ($destData, $defaultValue, $this->destVarName, $this->srcVarName, 
-            $dontOverwriteLoaded, $biDirectional, $fl1, $fl2, $this->getSrcIsUnique(), $this->getDestIsUnique(), 
+            $dontOverwriteLoaded, $biDirectional, $fl1, $fl2, $this->srcIsUnique, $this->destIsUnique, 
             $this->srcTableName, 'instantiateSrc', $this->srcOrdering, $this->srcExtraJoins, 
             $this->srcWhere, $this->srcQualifier, $this->destQualifier, $this->destNNIdsVarName, $returnAll,
             $lvn);
@@ -1351,7 +1340,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'destWhere' => $this->getStrMidWhere(),
                 'fieldLinks' => $this->fieldLinks,
 
-                'srcIsUnique' => $this->getSrcIsUnique(),
+                'srcIsUnique' => $this->srcIsUnique,
                 'destIsUnique' => false,
             );
             $this->destNNIdsRelation = new Ac_Model_Relation($relConfig);
@@ -1375,7 +1364,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'fieldLinks' => $this->fieldLinks2,
 
                 'srcIsUnique' => false,
-                'destIsUnique' => $this->getSrcIsUnique(),
+                'destIsUnique' => $this->srcIsUnique,
             );
             $this->srcNNIdsRelation = new Ac_Model_Relation($relConfig);
         }
@@ -1633,7 +1622,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             }
             if ($rows) $res = $rows;
                 else {
-                    if (!$hasDefaultValue) $defaultValue = $this->getDestIsUnique()? null : array();
+                    if (!$hasDefaultValue) $defaultValue = $this->destIsUnique? null : array();
                     $res = $defaultValue;
                 }
         } else {
@@ -1947,7 +1936,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 }
             }
         } else {
-            trigger_error ('$srcData/$destData must be an array, a collection or an object, '.Ac_Util::typeClass($data).' provided', E_USER_ERROR);
+            trigger_error ('$srcData/$destData must be an array, a collection or an object', E_USER_ERROR);
         }
         return $res;
     }

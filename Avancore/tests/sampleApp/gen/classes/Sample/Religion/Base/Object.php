@@ -29,7 +29,6 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
     protected function listOwnProperties() {
         return array ( 0 => 'people', 1 => 'religionId', 2 => 'title', );
@@ -81,15 +80,16 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     function countPeople() {
         if (is_array($this->_people)) return count($this->_people);
         if ($this->_peopleCount === false) {
-            $this->mapper->loadAssocCountFor($this, '_people');
+            $mapper = $this->getMapper();
+            $mapper->loadAssocCountFor($this, '_people');
         }
         return $this->_peopleCount;
-        
     }
 
     function listPeople() {
         if (!$this->_peopleLoaded) {
-            $this->mapper->loadPeopleFor($this);
+            $mapper = $this->getMapper();
+            $mapper->listAssocFor($this, '_people');
         }
         return array_keys($this->_people);
     }
@@ -106,10 +106,12 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
      */
     function getPerson($id) {
         if (!$this->_peopleLoaded) {
-            $this->mapper->loadPeopleFor($this);
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_people');
         }
-        
         if (!isset($this->_people[$id])) trigger_error ('No such People: \''.$id.'\'', E_USER_ERROR);
+        if ($this->_people[$id] === false) {
+        }
         return $this->_people[$id];
     }
     
@@ -131,7 +133,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
         $person->_religion = $this;
         
     }
-
+    
     /**
      * @return Sample_Person  
      */
@@ -145,6 +147,17 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     }
     
   
+
+    function _storeReferencingRecords() {
+        $res = parent::_storeReferencingRecords() !== false;
+        $mapper = $this->getMapper();
+
+        if (is_array($this->_people)) {
+            $rel = $mapper->getRelation('_people');
+            if (!$this->_autoStoreReferencing($this->_people, $rel->fieldLinks, 'people')) $res = false;
+        }
+        return $res; 
+    }
     
 }
 

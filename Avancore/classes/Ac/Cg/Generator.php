@@ -336,10 +336,7 @@ class Ac_Cg_Generator {
         
         if ($this->clearOutputDir && $this->outputDir) Ac_Cg_Util::cleanDir($this->outputDir);
         $todo = $this->parseGenEntities();
-        
         foreach ($todo as $domain => $models) {
-            $domainObject = $this->getDomain($domain);
-            $domainObject->beforeGenerate();
             $strat = $this->createStrategyForDomain($domain);
             $strat->generateCodeForModels($models);
             $strat->generateCommonCode();

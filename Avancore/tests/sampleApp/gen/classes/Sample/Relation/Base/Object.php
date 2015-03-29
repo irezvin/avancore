@@ -34,7 +34,6 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
     protected function listOwnProperties() {
         return array ( 0 => 'relationType', 1 => 'otherPerson', 2 => 'person', 3 => 'relationId', 4 => 'personId', 5 => 'otherPersonId', 6 => 'relationTypeId', 7 => 'relationBegin', 8 => 'relationEnd', 9 => 'notes', );
@@ -149,8 +148,8 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
      */
     function getRelationType() {
         if ($this->_relationType === false) {
-            $this->mapper->loadRelationTypesFor($this);
-            
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_relationType');
         }
         return $this->_relationType;
     }
@@ -172,7 +171,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     function clearRelationType() {
         $this->relationType = null;
     }
-
+    
     /**
      * @return Sample_Relation_Type  
      */
@@ -184,7 +183,6 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
         $this->setRelationType($res);
         return $res;
     }
-
     
         
     
@@ -193,8 +191,8 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
      */
     function getOtherPerson() {
         if ($this->_otherPerson === false) {
-            $this->mapper->loadOtherPeopleFor($this);
-            
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_otherPerson');
         }
         return $this->_otherPerson;
     }
@@ -216,7 +214,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     function clearOtherPerson() {
         $this->otherPerson = null;
     }
-
+    
     /**
      * @return Sample_Person  
      */
@@ -228,7 +226,6 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
         $this->setOtherPerson($res);
         return $res;
     }
-
     
         
     
@@ -237,8 +234,8 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
      */
     function getPerson() {
         if ($this->_person === false) {
-            $this->mapper->loadPeopleFor($this);
-            
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_person');
         }
         return $this->_person;
     }
@@ -260,7 +257,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     function clearPerson() {
         $this->person = null;
     }
-
+    
     /**
      * @return Sample_Person  
      */
@@ -272,9 +269,30 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
         $this->setPerson($res);
         return $res;
     }
-
     
   
+
+    function _storeReferencedRecords() {
+        $res = parent::_storeReferencedRecords() !== false;
+        $mapper = $this->getMapper();
+
+        if (is_object($this->_relationType)) {
+            $rel = $mapper->getRelation('_relationType');
+            if (!$this->_autoStoreReferenced($this->_relationType, $rel->fieldLinks, 'relationType')) $res = false;
+        }
+
+        if (is_object($this->_otherPerson)) {
+            $rel = $mapper->getRelation('_otherPerson');
+            if (!$this->_autoStoreReferenced($this->_otherPerson, $rel->fieldLinks, 'otherPerson')) $res = false;
+        }
+
+        if (is_object($this->_person)) {
+            $rel = $mapper->getRelation('_person');
+            if (!$this->_autoStoreReferenced($this->_person, $rel->fieldLinks, 'person')) $res = false;
+        }
+ 
+        return $res;
+    }
     
 }
 

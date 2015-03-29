@@ -230,6 +230,7 @@ class Ac_Cg_Frontend {
         } else {
             $extra = array();
         }
+        Ac_Util::ms($vars, $extra);
         foreach ($vars as $k => $v) {
             if ($k == 'password') $v = str_repeat('*', strlen($v));
             if (array_key_exists($k, $extra) || ($k{0} != '_' && !is_object($v) && !is_array($v))) {
@@ -237,7 +238,6 @@ class Ac_Cg_Frontend {
                 if ($v === false) $v = '<i>false</i>';
                 elseif ($v === true) $v = '<i>true</i>';
                 elseif (is_array($v)) $v = $v? '<pre>'.htmlspecialchars(print_r($v, 1)).'</pre>' : "Array()";
-                elseif (is_object($v)) $v = Ac_Util::typeClass ($v);
                 else $v = "'".htmlspecialchars($v)."'";
                 $r[] = "<li> <strong>$k</strong>: $v</li>";
             }
