@@ -30,6 +30,7 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
+ 
     
     protected function listOwnProperties() {
         return array ( 0 => 'tags', 1 => 'tagIds', 2 => 'perkId', 3 => 'name', );

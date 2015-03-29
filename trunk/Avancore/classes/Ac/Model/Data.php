@@ -571,7 +571,9 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         //elseif ($g = $this->_getMethod('get', $head)) return $this->$g();
         
         if ($g = $this->_getMethod('get', $head)) return $this->$g();
-        elseif (isset($this->$head) || $this->_hasVar($head)) return $this->$head;
+        if ($this->mixPropertyMap === false) $this->fillMixMaps ();
+        if (isset($this->mixPropertyMap[$head])) return Ac_Mixin::__get($head);
+        if (isset($this->$head) || $this->_hasVar($head)) return $this->$head;
         
         trigger_error ('Cannot retrieve field '.get_class($this).'::'.$head.' - consider implementing get<Prop>() method', E_USER_ERROR);
     }

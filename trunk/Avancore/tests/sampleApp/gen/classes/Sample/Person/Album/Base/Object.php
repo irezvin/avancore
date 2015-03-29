@@ -32,6 +32,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
+ 
     
     protected function listOwnProperties() {
         return array ( 0 => 'person', 1 => 'personPhotos', 2 => 'personPhotoIds', 3 => 'albumId', 4 => 'personId', 5 => 'albumName', );

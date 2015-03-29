@@ -14,12 +14,6 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     protected $tableName = false;
 
     /**
-     * Relation ID, relation prototype or a relation object
-     * @var mixed
-     */
-    protected $ownerRelation = false;
-
-    /**
      * Mapping of tableColName => slaveFieldNames
      * @var array
      */
@@ -32,7 +26,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     protected $colMap = array();
 
     /**
-     * If slave records should be deleted when owner is deleted
+     * If slave records should be deleted when owners are deleted
      * @var bool
      */
     protected $deleteWithOwner = true;
@@ -71,7 +65,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * @var array SQL column => value
      */
     protected $restrictions = array();
-    
+
     function setTableName($tableName) {
         $this->tableName = $tableName;
     }
@@ -80,16 +74,9 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         return $this->tableName;
     }
 
-    function setOwnerRelation($ownerRelation) {
-        $this->ownerRelation = $ownerRelation;
-    }
-
-    function getOwnerRelation() {
-        return $this->ownerRelation;
-    }
-
     function setFieldNames(array $fieldNames) {
         $this->fieldNames = $fieldNames;
+        $this->dataFieldNames = false;
     }
 
     /**
@@ -313,8 +300,10 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     
     function onAfterCreateRecord(Ac_Model_Object & $record) {
         if ($this->modelMixable) {
-            $record->addMixable(Ac_Prototyped::factory($this->modelMixable, 'Ac_I_Mixable'));
+            $mix = Ac_Prototyped::factory($this->modelMixable, 'Ac_I_Mixable');
+            if ($mix instanceof Ac_Model_Mixable_ExtraTable) $mix->setMapperExtraTable($this);
+            $record->addMixable($mix);
         }
     }
-   
+ 
 }

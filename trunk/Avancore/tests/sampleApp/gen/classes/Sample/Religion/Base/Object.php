@@ -29,6 +29,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
+ 
     
     protected function listOwnProperties() {
         return array ( 0 => 'people', 1 => 'religionId', 2 => 'title', );

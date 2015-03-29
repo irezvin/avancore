@@ -23,6 +23,7 @@ class Sample_Person_Album_Base_Mapper extends Ac_Model_Mapper {
     
     protected $askRelationsForDefaults = false;
     
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }

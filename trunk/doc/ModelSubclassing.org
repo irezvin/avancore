@@ -119,12 +119,14 @@
 	  - [ ] must be reflected in Ac_Sql_Select prototoype when it's based on mapper
 	  - [ ] ??how does it play with Ac_Sql_Select_TableProvider??
       - [ ] Cg support
-	- [ ] option A: add extra fields into model object
+	- [ ] option A: add extra fields into model object <- at the moment won't be implemented 
+             (but might be useful in the future with direct inheritance)
 	- [ ] option B: create mixable base class and register it as mixable
-	- [ ] option C: don't create additional mixable base class, but register
-	      it as a part of model' mapper (using Ac_Model_Mapper_Mixable_ExtraTable)
+	- [ ] +option C: don't create additional mixable base class, but register ++
+	      +it as a part of model' mapper (using Ac_Model_Mapper_Mixable_ExtraTable)+
+	      won't work since we need model mixable class
     - [X] without model mixable
-    - [-] with model mixable
+    - [X] with model mixable
       - [X] Ac_Model_Mixable_Data
 	- [X] can have properties and methods
 	- [X] check, bind
@@ -133,7 +135,21 @@
 	  - [X] test simple variant
       - [X] Ac_Model_Mixable_Object
 	- [X] can have referenced, referencing, NN records
-      - [ ] Usable mixable associations that declare list/get/create methods
-  - [ ] codegen support
-    - [ ] Ac_Cg_Model_Part
-    - [ ] Ac_Cg_Model_Shared extends Ac_Cg_Model_Part
+      - [X] Usable mixable associations that declare list/get/create methods
+    - [ ] Ac_Model_Relation $fieldMapping
+    - [ ] Ac_Model_Mapper $fieldMapping (modelFieldName => array(alias, field name or Sql expression)
+    - [ ] Ac_Model_Mixable_ExtraTable should extend host 
+          mapper's unique indices and nullable columns
+    - [ ] Ac_Model_Mixable_ExtraTable should create its' own Ac_Sql_Select_TableProvider
+          with additional table
+  - [-] codegen support
+    - [-] Ac_Cg_Model_Part extends Ac_Cg_Model
+      - [-] masterRelations: IDs of relations to "masters"
+	- [X] master relations must be 1-1
+	- [X] either all-incoming or one-outgoing model, mixing not possible
+	- [X] Base model class is Ac_Model_Mixable_Object
+	- [ ] Ac_Model_Mixable_ExtraTable is created
+	- [ ] ImplMapper is created too
+	- [ ] Ac_Model_Mixable_ExtraTable must provide relations from ImplMapper 
+              with corresponding $srcExtraJoins / $destExtraJoins 
+              and $fieldMapping, $fieldMapping2

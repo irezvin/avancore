@@ -31,6 +31,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     protected $askRelationsForDefaults = false;
     
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }
@@ -52,6 +53,12 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
             '_personPosts' => false,
             '_personPostsCount' => false,
             '_personPostsLoaded' => false,
+            '_authorPublish' => false,
+            '_authorPublishCount' => false,
+            '_authorPublishLoaded' => false,
+            '_editorPublish' => false,
+            '_editorPublishCount' => false,
+            '_editorPublishLoaded' => false,
             '_incomingRelations' => false,
             '_incomingRelationsCount' => false,
             '_incomingRelationsLoaded' => false,
@@ -201,6 +208,32 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
             ),
+            '_authorPublish' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Publish_ImplMapper',
+                'srcVarName' => '_authorPublish',
+                'srcCountVarName' => '_authorPublishCount',
+                'srcLoadedVarName' => '_authorPublishLoaded',
+                'destVarName' => '_authorPerson',
+                'fieldLinks' => array (
+                    'personId' => 'authorId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+            ),
+            '_editorPublish' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Publish_ImplMapper',
+                'srcVarName' => '_editorPublish',
+                'srcCountVarName' => '_editorPublishCount',
+                'srcLoadedVarName' => '_editorPublishLoaded',
+                'destVarName' => '_editorPerson',
+                'fieldLinks' => array (
+                    'personId' => 'editorId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+            ),
             '_incomingRelations' => array (
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Relation_Mapper',
@@ -334,6 +367,40 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'getDestObjectMethod' => 'getPersonPost',
                 'addDestObjectMethod' => 'addPersonPost',
                 'isDestLoadedMethod' => 'isPersonPostsLoaded',
+            ),
+            'authorPublish' => array (
+                'relationId' => '_authorPublish',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'authorPublish',
+                'plural' => 'authorPublish',
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => 'loadAuthorPublishFor',
+                'loadSrcObjectsMapperMethod' => 'loadForAuthorPublish',
+                'getSrcObjectsMapperMethod' => 'getOfAuthorPublish',
+                'createDestObjectMethod' => 'createAuthorPublish',
+                'listDestObjectsMethod' => 'listAuthorPublish',
+                'countDestObjectsMethod' => 'countAuthorPublish',
+                'getDestObjectMethod' => 'getAuthorPublish',
+                'addDestObjectMethod' => 'addAuthorPublish',
+                'isDestLoadedMethod' => 'isAuthorPublishLoaded',
+            ),
+            'editorPublish' => array (
+                'relationId' => '_editorPublish',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'editorPublish',
+                'plural' => 'editorPublish',
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => 'loadEditorPublishFor',
+                'loadSrcObjectsMapperMethod' => 'loadForEditorPublish',
+                'getSrcObjectsMapperMethod' => 'getOfEditorPublish',
+                'createDestObjectMethod' => 'createEditorPublish',
+                'listDestObjectsMethod' => 'listEditorPublish',
+                'countDestObjectsMethod' => 'countEditorPublish',
+                'getDestObjectMethod' => 'getEditorPublish',
+                'addDestObjectMethod' => 'addEditorPublish',
+                'isDestLoadedMethod' => 'isEditorPublishLoaded',
             ),
             'incomingRelations' => array (
                 'relationId' => '_incomingRelations',
@@ -594,6 +661,68 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      */
     function loadPersonPostsFor($people) {
         $rel = $this->getRelation('_personPosts');
+        return $rel->loadDest($people); 
+    }
+
+
+    /**
+     * Returns (but not loads!) one or more people of given one or more publish 
+     * @param Sample_Person|array $authorPublish     
+     * @return array of Sample_Person objects  
+     */
+    function getOfAuthorPublish($authorPublish) {
+        $rel = $this->getRelation('_authorPublish');
+        $res = $rel->getSrc($authorPublish); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more people of given one or more publish 
+     * @param Sample_Publish|array $authorPublish of Sample_Person objects
+     
+     */
+    function loadForAuthorPublish($authorPublish) {
+        $rel = $this->getRelation('_authorPublish');
+        return $rel->loadSrc($authorPublish); 
+    }
+
+    /**
+     * Loads one or more publish of given one or more people 
+     * @param Sample_Person|array $people     
+     */
+    function loadAuthorPublishFor($people) {
+        $rel = $this->getRelation('_authorPublish');
+        return $rel->loadDest($people); 
+    }
+
+
+    /**
+     * Returns (but not loads!) one or more people of given one or more publish 
+     * @param Sample_Person|array $editorPublish     
+     * @return array of Sample_Person objects  
+     */
+    function getOfEditorPublish($editorPublish) {
+        $rel = $this->getRelation('_editorPublish');
+        $res = $rel->getSrc($editorPublish); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more people of given one or more publish 
+     * @param Sample_Publish|array $editorPublish of Sample_Person objects
+     
+     */
+    function loadForEditorPublish($editorPublish) {
+        $rel = $this->getRelation('_editorPublish');
+        return $rel->loadSrc($editorPublish); 
+    }
+
+    /**
+     * Loads one or more publish of given one or more people 
+     * @param Sample_Person|array $people     
+     */
+    function loadEditorPublishFor($people) {
+        $rel = $this->getRelation('_editorPublish');
         return $rel->loadDest($people); 
     }
 
