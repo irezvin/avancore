@@ -30,7 +30,6 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
     protected function listOwnProperties() {
         return array ( 0 => 'tags', 1 => 'tagIds', 2 => 'perkId', 3 => 'name', );
@@ -94,15 +93,16 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
     function countTags() {
         if (is_array($this->_tags)) return count($this->_tags);
         if ($this->_tagsCount === false) {
-            $this->mapper->loadAssocCountFor($this, '_tags');
+            $mapper = $this->getMapper();
+            $mapper->loadAssocCountFor($this, '_tags');
         }
         return $this->_tagsCount;
-        
     }
 
     function listTags() {
         if (!$this->_tagsLoaded) {
-            $this->mapper->loadTagsFor($this);
+            $mapper = $this->getMapper();
+            $mapper->listAssocFor($this, '_tags');
         }
         return array_keys($this->_tags);
     }
@@ -119,10 +119,12 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
      */
     function getTag($id) {
         if (!$this->_tagsLoaded) {
-            $this->mapper->loadTagsFor($this);
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_tags');
         }
-        
         if (!isset($this->_tags[$id])) trigger_error ('No such Tag: \''.$id.'\'', E_USER_ERROR);
+        if ($this->_tags[$id] === false) {
+        }
         return $this->_tags[$id];
     }
     
@@ -146,7 +148,7 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
         }
         
     }
-
+    
     /**
      * @return Sample_Tag  
      */
@@ -162,7 +164,8 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
 
     function getTagIds() {
         if ($this->_tagIds === false) {
-            $this->mapper->loadTagIdsFor($this);
+            $mapper = $this->getMapper();
+            $mapper->loadAssocNNIdsFor($this, '_tags');
         }
         return $this->_tagIds;
     }
@@ -180,6 +183,19 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
         $this->_tagIds = false;
     }               
   
+
+    function _storeNNRecords() {
+        $res = parent::_storeNNRecords() !== false;
+        $mapper = $this->getMapper();
+        
+        if (is_array($this->_tags) || is_array($this->_tagIds)) {
+            $rel = $mapper->getRelation('_tags');
+            if (!$this->_autoStoreNNRecords($this->_tags, $this->_tagIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'tags', $rel->midWhere)) 
+                $res = false;
+        }
+            
+        return $res; 
+    }
     
 }
 

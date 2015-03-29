@@ -31,7 +31,6 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
     
     protected $askRelationsForDefaults = false;
     
- 
     function listSqlColumns() {
         return $this->columnNames;
     }
@@ -99,7 +98,7 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
     function getDefaultOrdering() {
         return 'ordering';
     }
-                
+            
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (

@@ -6,22 +6,19 @@ class Sample_Shop_Product extends Sample_Shop_Product_Base_Object {
     var $metaDescription = '';
     var $metaKeywords = '';
     var $metaNoindex = '';
-    var $upcCode = '';
 
     protected function listOwnProperties() {
-        return array_merge(
-            parent::listOwnProperties(), 
-            array_keys($this->getMapper()->getMixable('meta')->getDefaults()),
-            array_keys($this->getMapper()->getMixable('upc')->getDefaults())
+        return array_merge(parent::listOwnProperties(), 
+            array_keys(
+                $this->getMapper()->getMixable('meta')->getDefaults()
+            )
         );
     }
     
     protected function listOwnDataProperties() {
-        return array_merge(
-            parent::listOwnDataProperties(), 
-            array_keys($this->getMapper()->getMixable('meta')->getDefaults()),
-            array_keys($this->getMapper()->getMixable('upc')->getDefaults())
-        );
+        return array_merge(parent::listOwnDataProperties(), array_keys(
+            $this->getMapper()->getMixable('meta')->getDefaults()
+        ));
     }
     
     function tracksPk() {

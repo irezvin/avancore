@@ -101,12 +101,12 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         $sam = Sample::getInstance();
         $m = $sam->getSamplePersonMapper();
         $p = $m->loadByPersonId(3);
-        $port = $p->getPortraitPersonPhoto();
+        $port = $p->getProtraitPersonPhoto();
         $this->assertTrue($port);
         $p->religionId = '';
         $p->portraitId = '';
         $p->intResetReferences();
-        $port = $p->getPortraitPersonPhoto();
+        $port = $p->getProtraitPersonPhoto();
         $this->assertTrue(!$port, 'Ensure association object is cleared after '
             . 'I have changed the FK field value (multi-field FK)');
         $this->assertEqual($p->personId, 3, 'Field that participates in PK or other FK must not be touched'

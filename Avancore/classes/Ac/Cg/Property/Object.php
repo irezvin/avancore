@@ -39,14 +39,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     var $otherModelIdInMethodsPlural = false;
     var $otherModelIdInMethodsPrefix = false;
     
-    var $canLoadSrc = true;
-    var $canLoadDest = true;
-    var $canCreateDest = true;
-    
     var $mapperClass = false;
-    
-    var $relationOverrides = array();
-    var $associationOverrides = array();
     
     /**
      * @var Ac_Sql_Dbi_Relation
@@ -63,8 +56,6 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
      * @var Ac_Cg_Model
      */
     var $_other = false;
-    
-    var $_assocStrategy = false;
     
     function listPassthroughVars() {
         return array_merge(array(
@@ -141,7 +132,6 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     
     function getTargetModelName() {
         $res = $this->_other? $this->_other->name : false;
-        return $res;
     }
     
     function getDefaultClassName() {
@@ -305,9 +295,6 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
                 $res['destIsUnique'] = false;
             }
         }
-        
-        if (is_array($this->relationOverrides))
-            Ac_Util::ms($res, $this->relationOverrides);
          
         return $res;
     }
@@ -444,87 +431,6 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             }
         }
         return $res;
-    }
-    
-    function getAssociationPrototype() {
-        $prot = $this->getAeModelRelationPrototype();
-        $strat = $this->getAssocStrategy();
-        $mm = $strat->getMethodNames();
-        $res = array(
-            'relationId' => $prot['srcVarName'],
-            'useMapperMethods' => true,
-            'useModelMethods' => true,
-            'single' => $strat->single,
-            'plural' => $strat->plural,
-        );
-        foreach (array(
-            'canLoadDest' => 'canLoadDestObjects', 
-            'canLoadSrc' => 'canLoadSrcObjects', 
-            'canCreateDest' => 'canCreateDestObject'
-        ) as $p => $op) {
-            if (!$this->$p) $res[$op] = false;
-        }
-        if ($this->isList()) {
-            if ($this->isManyToMany()) {
-                $class = 'Ac_Model_Association_ManyToMany';
-            } else {
-                $class = 'Ac_Model_Association_Many';
-                if (!$this->isIncoming) 
-                    $res['isReferenced'] = true;
-            }
-        } else {
-            $class = 'Ac_Model_Association_One';
-            if ($this->isIncoming) 
-                $res['isReferenced'] = false;
-        }
-        $res['class'] = $class;
-        Ac_Util::ms($res, $mm);
-        
-        if (is_array($this->associationOverrides))
-            Ac_Util::ms($res, $this->associationOverrides);
-        
-        return $res;
-    }
-    
-    function getAssocStrategy() {
-        if ($this->_assocStrategy === false) {
-            $prot = $this->getAeModelRelationPrototype();
-            $relationId = $prot['srcVarName'];
-            if ($this->isList() && $this->isManyToMany()) $class = 'Ac_Cg_Template_Assoc_Strategy_ManyToMany';
-            elseif ($this->isList()) $class = 'Ac_Cg_Template_Assoc_Strategy_Many';
-            else $class = 'Ac_Cg_Template_Assoc_Strategy_One';
-
-            //$class = 'Ac_Cg_Template_Assoc_Strategy';
-            $this->_assocStrategy = new $class (array(
-                'relationId' => $relationId, 
-                'prop' => $this, 
-                'model' => $this->_model,
-                'domain' => $this->_model->_domain
-            ));
-        }
-        return $this->_assocStrategy;
-    }
-    
-    function setOtherModel(Ac_Cg_Model $otherModel = null, $resetProps = false) {
-        $this->_other = $otherModel;
-        
-        if ($resetProps) {
-            $this->className = false;
-            $this->varName = false;
-            $this->pluralForList = false;
-            $this->caption = false;
-        }
-        
-        if (!$this->className) $this->className = $this->getDefaultClassName();
-        
-        if (!$this->varName) $this->varName = $this->getDefaultVarName();
-        
-        if (!$this->pluralForList) $this->pluralForList = $this->getDefaultPluralForList();
-        
-        if (!$this->caption) $this->caption = $this->getDefaultCaption();
-        
-        if ($this->_other) $this->mapperClass = $this->_other->getMapperClass();
-        
     }
     
 }

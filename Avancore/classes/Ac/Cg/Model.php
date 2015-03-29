@@ -13,7 +13,7 @@ class Ac_Cg_Model {
     var $name = false;
     
     /**
-     * Table name (defaults dto model name)
+     * Table name (defaults to model name)
      * @var string
      */
     var $table = false;
@@ -134,10 +134,6 @@ class Ac_Cg_Model {
     var $createAccessors = false;
     
     var $nullableSqlColumns = false;
-    
-    protected $relationPrototypes = false;
-    
-    protected $assocProperties = false;
 
     // ---------------------------------------------------------------------
     
@@ -215,14 +211,6 @@ class Ac_Cg_Model {
     var $hasUniformPropertiesInfo = false;
     
     var $altDomainPrefix = false;
-    
-    var $modelCoreMixables = array();
-    
-    var $mapperCoreMixables = array();
-    
-    var $errors = array();
-    
-    var $warnings = array();
     
     function Ac_Cg_Model($domain, $name, $config = array()) {
         $this->_domain = $domain;
@@ -384,9 +372,6 @@ class Ac_Cg_Model {
         
         $this->detectSpecialProperties();
     }
-    
-    function beforeGenerate() {
-    }
 
     /**
      * Checks whether other table of given relation is bi-junctional and returns relation from the junction table to third table or other model 
@@ -497,29 +482,6 @@ class Ac_Cg_Model {
         return $res;
     }
     
-    function getRelationPrototypes() {
-        if ($this->relationPrototypes === false) {
-            $this->relationPrototypes = array();
-            $this->assocProperties = array();
-            foreach ($this->listAeModelRelations() as $r) {
-                $prot = $this->getAeModelRelationPrototype($r);
-                $key = isset($prot['srcVarName'])? $prot['srcVarName'] : count($this->relationPrototypes);
-                if ($prop = $this->searchPropertyByRelation($r)) {
-                    $this->assocProperties[$prop->getClassMemberName()] = $prop;
-                } else {
-                    var_dump("Prop by relation not found:", $r);
-                }
-                $this->relationPrototypes[$key] = $prot;
-            }
-        }
-        return $this->relationPrototypes;
-    }
-    
-    function getAssocProperties() {
-        if ($this->assocProperties === false) $this->getRelationPrototypes ();
-        return $this->assocProperties;
-    }
-    
     /**
      * @return array|false
      */
@@ -581,10 +543,6 @@ class Ac_Cg_Model {
         return $res;
     }
     
-    function getGenModelClass() {
-        return $this->className.'_Base_Object';
-    }
-    
     function getGenMapperClass() {
         $this->init();
         return $this->className.'_Base_Mapper';
@@ -593,10 +551,6 @@ class Ac_Cg_Model {
     function getMapperClass() {
         $this->init();
         return $this->className.'_Mapper';
-    }
-    
-    function getMapperRecordClass() {
-        return $this->className;
     }
     
     function getMapperInfoParams() {
@@ -771,13 +725,7 @@ class Ac_Cg_Model {
     }
     
     function onShow() {
-        $res = array(
-            'getReferenceFieldsData()' => $this->getReferenceFieldsData(),
-            'class' => get_class($this),
-        );
-        if ($this->errors) $res['errors'] = $this->errors;
-        if ($this->warnings) $res['warnings'] = $this->warnings;
-        return $res;
+        return array('getReferenceFieldsData()' => $this->getReferenceFieldsData());
     }
     
     function getInternalDefaults() {
@@ -790,36 +738,5 @@ class Ac_Cg_Model {
         }
         return $res;
     }    
-    
-    function getAssociationPrototypes() {
-        $res = array();
-        foreach ($this->listProperties() as $p) {
-            $prop = $this->getProperty($p);
-            if ($prop instanceof Ac_Cg_Property_Object && $prop->isEnabled()) {
-                $res[$prop->varName] = $prop->getAssociationPrototype();
-            }
-        }
-        return $res;
-    }
-    
-    function getTemplates() {
-        return array('Ac_Cg_Template_ModelAndMapper');
-    }
-    
-    /**
-     * @return Ac_Cg_Property_Object
-     */
-    function findPropertyByForeignKeyId($id) {
-        $res = null;
-        foreach ($this->listProperties() as $i) {
-            $prop = $this->getProperty($i);
-            if ($prop instanceof Ac_Cg_Property_Object) {
-                if ($prop->getRelation()->name == $id) {
-                    $res = $prop;
-                }
-            }
-        }
-        return $res;
-    }
     
 }

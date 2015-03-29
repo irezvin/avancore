@@ -186,9 +186,6 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
                     $tmp->unregisterMixin($this);
                 }
                 $this->mixables[$id] = $mix;
-                if (Ac_Accessor::methodExists($mix, 'setMixableId')) {
-                    $mix->setMixableId($id);
-                }
             }
             $mix->registerMixin($this);
         }
@@ -211,11 +208,11 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
             if ($mix instanceof Ac_I_Mixable_Shared)
                 $this->sharedMixableIds[$id] = $id;
             
-            $nm = array_diff($mix->listMixinMethods($this), $mm);
+            $nm = array_diff($mix->listMixinMethods(), $mm);
             foreach ($nm as $m) $this->mixMethodMap[strtolower($m)] = $id;
             $mm = array_merge($mm, $nm);
             
-            $np = array_diff($mix->listMixinProperties($this), $mp);
+            $np = array_diff($mix->listMixinProperties(), $mp);
             foreach ($np as $p) $this->mixPropertyMap[$p] = $id;
         }
     }
@@ -226,14 +223,14 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
         return $res;
     }
     
-    public function & __get($property) {
+    public function __get($property) {
         if ($this->mixPropertyMap === false) $this->fillMixMaps();
         if (isset($this->mixPropertyMap[$property])) {
             $id = $this->mixPropertyMap[$property];
             if (isset($this->sharedMixableIds[$id])) {
-                $res = & $this->mixables[$id]->getMixinProperty($this, $property);
+                $res = $this->mixables[$id]->getMixinProperty($this, $property);
             } else {
-                $res = & $this->mixables[$id]->$property;
+                $res = $this->mixables[$id]->$property;
             }
         } else {
             $res = $this->doAccessMissingProperty($property, self::ACCESS_GET);
