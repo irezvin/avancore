@@ -125,9 +125,9 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_CLEANUP = 'onCleanup';
     
     /**
-     * function onGetAssociations(array & $associations)
+     * function onCleanup()
      */
-    const EVENT_ON_GET_ASSOCIATIONS = 'onGetAssociations';
+    const EVENT_ON_CLEANUP = 'onCleanup';
     
     /**
      * In-memory id
@@ -204,6 +204,15 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         return $this->mapper->getColumnNames();
     }
     
+    // -------- template and to-be-overridden methods --------
+    
+    function doOnCreate() {
+    }
+    
+    protected function listOwnDataProperties() {
+        return $this->mapper->getColumnNames();
+    }
+    
     function doAfterLoad() {
     }
     
@@ -241,7 +250,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function doListNonCopiedFields() {
-        $m = $this->mapper;
+        $m = $this->getMapper();
         $res = $m->listPkFields();
         return $res;
     }
@@ -258,7 +267,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function doListNonComparedFields() {
-        $m = $this->mapper;
+        $m = $this->getMapper();
         $res = $m->listPkFields();
         return $res;
     }
