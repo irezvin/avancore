@@ -35,6 +35,8 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
     
     var $_objectPropertyName = false;
     
+    protected $skipInit = false;
+    
     function listPassthroughVars() {
         return array_merge(
             array(
@@ -45,14 +47,15 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
         );
     }
     
-    function _init() {
+    function init() {
+        if ($this->skipInit) return;
+        
         if (!$this->colName) $this->colName = $this->name;
         $this->_col = $this->_model->tableObject->getColumn($this->colName);
         if (!$this->varName) $this->varName = $this->getDefaultVarName();
         $this->processType();
         //if (!$this->maxLength) $this->maxLength = $this->getDefaultMaxLength();
         if (!$this->caption) $this->caption = $this->getDefaultCaption();
-        
     }
     
     function _useMaxLength() {
@@ -251,6 +254,17 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
         return $this->_objectPropertyName;
     }
     
+    function serializeToArray() {
+        $res = parent::serializeToArray();
+        if ($this->_col) $res['_col'] = $this->refColumn($this->_col);
+        return $res;
+    }
+    
+    function unserializeFromArray($array) {
+        parent::unserializeFromArray($array);
+        if (isset($array['_col'])) $this->_col = $this->unrefColumn($array['_col']);
+        $this->skipInit = true;
+    }
     
 }
 

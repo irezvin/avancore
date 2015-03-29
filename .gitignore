@@ -2,6 +2,8 @@ Avancore/deploy/app.config.php
 Avancore/tests/app.config.php
 Avancore/tests/codegen/*log*
 Avancore/tests/codegen/output
+Avancore/tests/codegen/output2
+Avancore/tests/codegen/output3
 Avancore/tests/pdo.config.php
 Avancore/tests/sampleApp/deploy/app.config.php
 Avancore/tests/sampleApp/var/

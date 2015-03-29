@@ -101,6 +101,8 @@ class Ac_Cg_Frontend {
         $this->init();
             
         $gen = new Ac_Cg_Generator($this->configPath);
+        
+        $gen->prepare();
     
         $form = new Ac_Form(null, array(
             'htmlAttribs' => array(
@@ -238,6 +240,7 @@ class Ac_Cg_Frontend {
                 if ($v === false) $v = '<i>false</i>';
                 elseif ($v === true) $v = '<i>true</i>';
                 elseif (is_array($v)) $v = $v? '<pre>'.htmlspecialchars(print_r($v, 1)).'</pre>' : "Array()";
+                elseif (is_object($v)) $v = Ac_Util::typeClass ($v);
                 else $v = "'".htmlspecialchars($v)."'";
                 $r[] = "<li> <strong>$k</strong>: $v</li>";
             }

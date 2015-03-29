@@ -19,22 +19,22 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
             'name' => '',
         ); 
  
-    
+   
     protected $autoincFieldName = 'perkId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_tags' => false,
             '_tagsCount' => false,
             '_tagsLoaded' => false,
             '_tagIds' => false,
-        );
+        ));
     }
     
     /**
@@ -87,7 +87,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_tags' => array (
@@ -114,7 +114,34 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+    
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'tags' => array (
+                'relationId' => '_tags',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'tag',
+                'plural' => 'tags',
+                'class' => 'Ac_Model_Association_ManyToMany',
+                'loadDestObjectsMapperMethod' => 'loadTagsFor',
+                'loadSrcObjectsMapperMethod' => 'loadForTags',
+                'getSrcObjectsMapperMethod' => 'getOfTags',
+                'createDestObjectMethod' => 'createTag',
+                'listDestObjectsMethod' => 'listTags',
+                'countDestObjectsMethod' => 'countTags',
+                'getDestObjectMethod' => 'getTag',
+                'addDestObjectMethod' => 'addTag',
+                'isDestLoadedMethod' => 'isTagsLoaded',
+                'loadDestIdsMapperMethod' => 'loadTagIdsFor',
+                'getDestIdsMethod' => 'getTagIds',
+                'setDestIdsMethod' => 'setTagIds',
+                'clearDestObjectsMethod' => 'clearTags',
+            ),
+        ));
         
+    }
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -126,15 +153,15 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'perkId',
             ),
         );
     }
-        
+
     /**
      * @return Sample_Perk 
      */
@@ -158,14 +185,13 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more perks of given one or more tags 
-     * @param Sample_Tag|array $tags of Sample_Perk objects
-     
+     * @param Sample_Tag|array $tags of Sample_Perk objects      
      */
     function loadForTags($tags) {
         $rel = $this->getRelation('_tags');
         return $rel->loadSrc($tags); 
     }
-
+    
     /**
      * Loads one or more tags of given one or more perks 
      * @param Sample_Perk|array $perks     
@@ -183,7 +209,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_tags');
         return $rel->loadDestNNIds($perks); 
     }
-
+    
     
 }
 

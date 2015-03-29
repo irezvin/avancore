@@ -1,10 +1,10 @@
 <?php
 
-class Ac_Cg_Php_Expression {
+class Ac_Cg_Php_Expression extends Ac_Cg_Base {
     
     var $expression = false;
     
-    function Ac_Cg_Php_Expression($expression) {
+    function __construct ($expression = '') {
         $this->expression = $expression;
     }
     

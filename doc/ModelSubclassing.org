@@ -111,7 +111,7 @@
       - [X] extra is referenced => false
       - [X] loading of many records
 
-      - [ ] create Ac_Model_Sql_TableProvider to access the fields of extra table
+      - [X] create Ac_Model_Sql_TableProvider to access the fields of extra table
       - [X] ability to re-map field names +(also add default re-mapping suffix)+
 	- +requires support of fields re-mapping by Ac_Model_Mapper+
       - [ ] ability to load-by-join
@@ -140,8 +140,10 @@
     - [ ] ??? Ac_Model_Mapper $fieldMapping (modelFieldName => array(alias, field name or Sql expression)
     - [ ] ??? Ac_Model_Mixable_ExtraTable should modify host mapper's unique indices and nullable columns
           by adding unique indices and nullable columns of additional SQL table
-    - [ ] Ac_Model_Mixable_ExtraTable should create its' own Ac_Sql_Select_TableProvider
+    - [X] Ac_Model_Mixable_ExtraTable should create its' own Ac_Sql_Select_TableProvider
           with additional table (see above)
+	  Example:
+	  prop[prop][extra__<mixableId>]
   - [-] codegen support
     - [-] Ac_Cg_Model_Part extends Ac_Cg_Model
       - [-] masterRelations: IDs of relations to "masters"

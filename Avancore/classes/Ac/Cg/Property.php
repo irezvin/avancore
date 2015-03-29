@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Cg_Property {
+class Ac_Cg_Property extends Ac_Cg_Base {
     
     var $enabled = '?';
     
@@ -24,17 +24,26 @@ class Ac_Cg_Property {
     
     var $extraPropertyInfo = array();
     
-    function Ac_Cg_Property ($model, $name, $config = array()) {
+    /**
+     * This property is inherited by the owner model from the parent model
+     * @var bool
+     */
+    var $inherited = false;
+    
+    var $ignoreInDescendants = false;
+    
+    function __construct ($model, $name, $config = array()) {
         $this->_model = $model;
         $this->name = $name;
+        $init = isset($config['_init']) && $config['_init'];
         Ac_Util::simpleBindAll($config, $this);
-        $this->_init();
+        if ($init) $this->init();
     }
     
     /**
      * Computes unfilled meta-property members
      */
-    function _init() {
+    function init() {
     }
     
     function resolveConflicts() {
@@ -95,6 +104,11 @@ class Ac_Cg_Property {
         } else {
             $res = $this->caption;
         }
+        return $res;
+    }
+    
+    function getIsInherited() {
+        $res = $this->inherited || $this->_model->isPropertyInherited($this->name);
         return $res;
     }
     

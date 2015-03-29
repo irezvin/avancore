@@ -31,8 +31,9 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'people', 1 => 'religionId', 2 => 'title', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'people', )));
     }
+    
  
     protected function listOwnLists() {
         
@@ -46,7 +47,8 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
             'people' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
@@ -72,6 +74,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
         return $pi;
                 
     }
+    
 
     function hasUniformPropertiesInfo() { return true; }
 
@@ -80,16 +83,15 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     function countPeople() {
         if (is_array($this->_people)) return count($this->_people);
         if ($this->_peopleCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_people');
+            $this->mapper->loadAssocCountFor($this, '_people');
         }
         return $this->_peopleCount;
+        
     }
 
     function listPeople() {
         if (!$this->_peopleLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_people');
+            $this->mapper->loadPeopleFor($this);
         }
         return array_keys($this->_people);
     }
@@ -106,12 +108,10 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
      */
     function getPerson($id) {
         if (!$this->_peopleLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_people');
+            $this->mapper->loadPeopleFor($this);
         }
+        
         if (!isset($this->_people[$id])) trigger_error ('No such People: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_people[$id] === false) {
-        }
         return $this->_people[$id];
     }
     
@@ -133,7 +133,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
         $person->_religion = $this;
         
     }
-    
+
     /**
      * @return Sample_Person  
      */
@@ -147,17 +147,6 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     }
     
   
-
-    function _storeReferencingRecords() {
-        $res = parent::_storeReferencingRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_array($this->_people)) {
-            $rel = $mapper->getRelation('_people');
-            if (!$this->_autoStoreReferencing($this->_people, $rel->fieldLinks, 'people')) $res = false;
-        }
-        return $res; 
-    }
     
 }
 

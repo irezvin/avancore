@@ -6,18 +6,22 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
     var $domainGenClass = false;
     var $domainBaseClass = false;
     var $mappers = array();
+    var $mappersOverride = array();
     var $mapperPrototypes = array();
     var $modelClasses = array();
     var $modelMethodSuffixes = array();
     var $optName = false;
     var $adminMenu = array();
+    var $mapperAliases = array();
     
     function doInit() {
         
         $this->domainClass = $this->domain->getAppClass();
         $this->domainGenClass = $this->domain->appName.'_DomainBase';
-        $this->domainBaseClass = $this->domain->appBaseClass;
+        $this->domainBaseClass = $this->domain->getParentAppClass();
         $this->mappers = array();
+        $this->mapperAliases = $this->domain->getMapperAliases();
+        
         foreach ($this->domain->listModels() as $m) {
             $mod = $this->domain->getModel($m);
             $modName = $mod->getModelBaseName();
@@ -26,9 +30,15 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
             }
             $mapperClass = $mod->getMapperClass();
             $mapperMethodSuffix = str_replace ("_", "", $mapperClass);
-            //$mapperMethodSuffix{0} = strtolower($mapperMethodSuffix{0});
             $this->mapperPrototypes[$mod->getMapperClass()] = array('class' => $mod->getMapperClass());
             $this->mappers[$mapperMethodSuffix] = $mod->getMapperClass();
+            if ($pm = $mod->getParentModel()) {
+                $parentMapperMethodSuffix = str_replace("_", "", $pm->getMapperClass());
+                $this->mappersOverride[$parentMapperMethodSuffix] = array(
+                    'method' => 'get'.$mapperMethodSuffix, 
+                    'class' => $mod->getMapperClass()
+                );
+            }
             $this->modelClasses[$mod->getMapperClass()] = $mod->className;  
             $this->modelMethodSuffixes[$mod->getMapperClass()] = str_replace("_", "", $mod->className);
         }
@@ -36,6 +46,7 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
     }
     
     function _generateFilesList() {
+        $domDat = trim(str_replace('\\', '_', $this->domainClass), '_').'.json';
         $res = array();
         $res['domainFile'] = array(
             'relPath' => Ac_Cg_Util::className2fileName($this->domainClass),
@@ -46,6 +57,16 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
             'relPath' => 'gen/'.Ac_Cg_Util::className2fileName($this->domainGenClass),
             'isEditable' => false,
             'templatePart' => 'domainGenFile',
+        );
+        $res['domainDumpFile'] = array(
+            'relPath' => 'gen/data/'.$domDat,
+            'isEditable' => false,
+            'templatePart' => 'domainDump',
+        );
+        $res['domainDumpHtaccess'] = array(
+            'relPath' => 'gen/data/.htaccess',
+            'isEditable' => false,
+            'templatePart' => 'denyHtaccess',
         );
         return $res;
     }
@@ -78,6 +99,14 @@ class <?php $this->d($this->domainClass); ?> extends <?php $this->d($this->domai
 ?><?php $this->phpOpen(); ?> 
 
 abstract class <?php $this->d($this->domainGenClass); ?> extends <?php $this->d($this->domainBaseClass); ?> {
+
+    protected function doOnInitialize() {
+        parent::doOnInitialize();
+<?php   if ($this->mapperAliases) { ?> 
+        $this->setMapperAliases(<?php echo $this->export($this->mapperAliases, 8); ?>, true);
+<?php   } ?>
+    }
+
 <?php if (count($this->mappers)) { ?>
 
     protected function doGetMapperPrototypes() {
@@ -92,17 +121,23 @@ abstract class <?php $this->d($this->domainGenClass); ?> extends <?php $this->d(
         return $this->getMapper(<?php $this->export($class); ?>);
     }
 <?php   } ?>
+<?php   foreach ($this->mappersOverride as $method => $details) { ?>
+    
+    /**
+     * @return <?php echo $details['class'] ?> 
+     */
+    function get<?php echo $method; ?>() {
+        return $this-><?php echo $details['method']; ?>();
+    }
+<?php   } ?>
     
 <?php } ?>
 <?php if (count($this->modelClasses)) { ?>
 <?php foreach ($this->modelClasses as $mapperClass => $modelClass) { ?> 
     /**
      * @return <?php $this->d($modelClass); ?> 
-<?php if (!$this->generator->php5) { ?>
-     * @static
-<?php } ?>
      */
-    <?php if ($this->generator->php5) echo "static "; ?>function <?php $this->d($modelClass); ?> (<?php if (!$this->generator->php5) echo "& "; ?>$object = null) {
+    static function <?php $this->d($modelClass); ?> ($object = null) {
         return $object;
     }
     
@@ -118,5 +153,12 @@ abstract class <?php $this->d($this->domainGenClass); ?> extends <?php $this->d(
 <?php } ?>
 }
 <?php } 
+
+    function showDomainDump() {
+        $k = 0;
+        if (defined('JSON_PRETTY_PRINT')) $k |= JSON_PRETTY_PRINT;
+        if (defined('JSON_UNESCAPED_UNICODE')) $k |= JSON_UNESCAPED_UNICODE;
+        echo json_encode($this->domain->serializeToArray(), $k);
+    }
 
 }

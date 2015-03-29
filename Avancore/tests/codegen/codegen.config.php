@@ -83,7 +83,39 @@ $config = array(
         			),
         		),
         	),
+            'publish' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'masterFkIds' => array(
+                    'fkPersonPublish',
+                    'fkCategoryPublish',
+                    'fkPostPublish',
+                ),
+                'skipMapperMixables' => array(
+                    'fkPostPublish',
+                ),
+            ),
+            'shopProductExtraCodes' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'masterFkIds' => array(
+                    'fkExtraCodeProduct',
+                ),
+            ),
+            'shopProductNotes' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'inline' => true,
+                'masterFkIds' => array(
+                    'fkProductNoteProduct',
+                ),
+            ),
         ),
+    ),
+    
+    'domains.Child' => array(
+        'parentDomainName' => 'Sample',
+        
+        'appName' => 'Child',
+        'caption' => 'Avancore_Child',
+        'josComId' => 'child',
     ),
 );
 

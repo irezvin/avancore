@@ -80,6 +80,11 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
     
     protected $mappers = false;
     
+    /**
+     * @var array
+     */
+    protected $mapperAliases = array();
+    
     protected $services = array();
     
     /**
@@ -367,6 +372,18 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
         $this->triggerEvent(self::EVENT_ON_REGISTER_MAPPERS, array($id => $mapper));
     }
     
+    function setMapperAliases(array $mapperAliases, $add = false) {
+        if ($add) Ac_Util::ms($this->mapperAliases, $mapperAliases);
+            else $this->mapperAliases = $mapperAliases;
+    }
+
+    /**
+     * @return array
+     */
+    function getMapperAliases() {
+        return $this->mapperAliases;
+    }    
+    
     protected function doGetMapperPrototypes() {
         return array();
     }
@@ -375,7 +392,9 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
      * @return Ac_Model_Mapper
      */
     function getMapper($id, $dontThrow = false) {
-        if (in_array($id, $this->listMappers())) {
+        if (isset($this->mapperAliases[$id])) {
+            $res = $this->getMapper($this->mapperAliases[$id], $dontThrow);
+        } elseif (in_array($id, $this->listMappers())) {
             if (!is_object($this->mappers[$id])) {
                 $defaults = $this->mappers[$id];
                 if (!is_array($defaults)) $defaults = array('class' => $defaults);

@@ -57,32 +57,19 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
        return $res; 
     }
     
-    function getFilePath($id, $basePath = false) {
+    function getFilePath($id) {
        if (!in_array($id, $this->listFiles())) trigger_error ("No such file: '$id' in template ".get_class($this), E_USER_ERROR); 
        $res = $this->_filesList[$id]['relPath'];
-       if ($basePath) $res = Ac_Util::stripTrailingSlash($basePath, '/\\') . '/' . $res; 
        return $res; 
     }
     
-    function outputFile($id, $basePath) {
+    function outputFile($id, Ac_Cg_Writer_Abstract $writer) {
         if (!in_array($id, $this->listFiles())) trigger_error ("No such file: '$id' in template ".get_class($this), E_USER_ERROR);
         $partName = $this->_filesList[$id]['templatePart'];
-        $path = $this->getFilePath($id, $basePath);
-        Ac_Cg_Util::createDirPath(dirname($path));
+        $path = $this->getFilePath($id);
         if (method_exists($this, $mtdName = 'show'.$partName)) {
-             $f = fopen($path, "w");
-             if ($f === false) trigger_error ("Cannot open file '$path' for write", E_USER_ERROR);
-             if (($bytes = fputs($f, $this->fetch($partName))) === false) {
-                 trigger_error("Cannot write to file '$path''", E_USER_ERROR);
-                 @fclose($f);
-                 @unlink($path); 
-             }
-             if (fclose($f) === false) {
-                 trigger_error("Cannot close file '$path''", E_USER_ERROR);
-                 @unlink($path);
-             }
-             chmod($path, 0666);
-             $this->generator->addOutputStats(1, $bytes);
+            $content = $this->fetch($partName);
+            $writer->writeContent($path, $content);
         } else {
             trigger_error ("No template part '{$partName}' for file '".basename($path)."' is not defined in tempalte ".get_class($this), E_USER_ERROR);
         }
@@ -159,6 +146,25 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
            else $out = "'".addcslashes($str, "'")."'";
         if ($return) return $out;
            else echo $out;
+    }
+    
+    function showDenyHtaccess() {
+?>
+    <IfModule mod_version.c>
+        <IfVersion < 2.4>
+            Order Deny,Allow
+            Deny from All
+        </IfVersion>
+
+        <IfVersion >= 2.4>
+            Access all denied
+        </IfVersion>
+    </IfModule>
+    <IfModule !mod_version.c>
+        Order Deny,Allow
+        Deny from All
+    </IfModule>
+<?php
     }
     
 }

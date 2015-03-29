@@ -26,18 +26,18 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
             'portraitId' => NULL,
         ); 
  
-    
+   
     protected $autoincFieldName = 'personId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
-            '_protraitPersonPhoto' => false,
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+            '_portraitPersonPhoto' => false,
             '_religion' => false,
             '_tags' => false,
             '_tagsCount' => false,
@@ -58,7 +58,13 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
             '_outgoingRelations' => false,
             '_outgoingRelationsCount' => false,
             '_outgoingRelationsLoaded' => false,
-        );
+            '_extraCodeShopProducts' => false,
+            '_extraCodeShopProductsCount' => false,
+            '_extraCodeShopProductsLoaded' => false,
+            '_noteShopProducts' => false,
+            '_noteShopProductsCount' => false,
+            '_noteShopProductsLoaded' => false,
+        ));
     }
     
     /**
@@ -111,14 +117,14 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_protraitPersonPhoto' => array (
+            '_portraitPersonPhoto' => array (
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Person_Photo_Mapper',
-                'srcVarName' => '_protraitPersonPhoto',
-                'destVarName' => '_protraitPerson',
+                'srcVarName' => '_portraitPersonPhoto',
+                'destVarName' => '_portraitPerson',
                 'fieldLinks' => array (
                     'personId' => 'personId',
                     'portraitId' => 'photoId',
@@ -227,10 +233,215 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
             ),
+            '_extraCodeShopProducts' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Shop_Product_Mapper',
+                'srcVarName' => '_extraCodeShopProducts',
+                'srcCountVarName' => '_extraCodeShopProductsCount',
+                'srcLoadedVarName' => '_extraCodeShopProductsLoaded',
+                'fieldLinks' => array (
+                    'personId' => 'responsiblePersonId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+            ),
+            '_noteShopProducts' => array (
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Shop_Product_Mapper',
+                'srcVarName' => '_noteShopProducts',
+                'srcCountVarName' => '_noteShopProductsCount',
+                'srcLoadedVarName' => '_noteShopProductsLoaded',
+                'destVarName' => '_noteNotePerson',
+                'destCountVarName' => '_noteShopProductsCount',
+                'destLoadedVarName' => '_noteShopProductsLoaded',
+                'fieldLinks' => array (
+                    'personId' => 'noteAuthorId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => false,
+            ),
         ));
         
     }
+    
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'portraitPersonPhoto' => array (
+                'relationId' => '_portraitPersonPhoto',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'portraitPersonPhoto',
+                'plural' => 'portraitPersonPhotos',
+                'class' => 'Ac_Model_Association_One',
+                'loadDestObjectsMapperMethod' => 'loadPortraitPersonPhotosFor',
+                'loadSrcObjectsMapperMethod' => 'loadForPortraitPersonPhotos',
+                'getSrcObjectsMapperMethod' => 'getOfPortraitPersonPhotos',
+                'createDestObjectMethod' => 'createPortraitPersonPhoto',
+                'getDestObjectMethod' => 'getPortraitPersonPhoto',
+                'setDestObjectMethod' => 'setPortraitPersonPhoto',
+                'clearDestObjectMethod' => 'clearPortraitPersonPhoto',
+            ),
+            'religion' => array (
+                'relationId' => '_religion',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'religion',
+                'plural' => 'religion',
+                'class' => 'Ac_Model_Association_One',
+                'loadDestObjectsMapperMethod' => 'loadReligionFor',
+                'loadSrcObjectsMapperMethod' => 'loadForReligion',
+                'getSrcObjectsMapperMethod' => 'getOfReligion',
+                'createDestObjectMethod' => 'createReligion',
+                'getDestObjectMethod' => 'getReligion',
+                'setDestObjectMethod' => 'setReligion',
+                'clearDestObjectMethod' => 'clearReligion',
+            ),
+            'tags' => array (
+                'relationId' => '_tags',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'tag',
+                'plural' => 'tags',
+                'class' => 'Ac_Model_Association_ManyToMany',
+                'loadDestObjectsMapperMethod' => 'loadTagsFor',
+                'loadSrcObjectsMapperMethod' => 'loadForTags',
+                'getSrcObjectsMapperMethod' => 'getOfTags',
+                'createDestObjectMethod' => 'createTag',
+                'listDestObjectsMethod' => 'listTags',
+                'countDestObjectsMethod' => 'countTags',
+                'getDestObjectMethod' => 'getTag',
+                'addDestObjectMethod' => 'addTag',
+                'isDestLoadedMethod' => 'isTagsLoaded',
+                'loadDestIdsMapperMethod' => 'loadTagIdsFor',
+                'getDestIdsMethod' => 'getTagIds',
+                'setDestIdsMethod' => 'setTagIds',
+                'clearDestObjectsMethod' => 'clearTags',
+            ),
+            'personAlbums' => array (
+                'relationId' => '_personAlbums',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'personAlbum',
+                'plural' => 'personAlbums',
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => 'loadPersonAlbumsFor',
+                'loadSrcObjectsMapperMethod' => 'loadForPersonAlbums',
+                'getSrcObjectsMapperMethod' => 'getOfPersonAlbums',
+                'createDestObjectMethod' => 'createPersonAlbum',
+                'listDestObjectsMethod' => 'listPersonAlbums',
+                'countDestObjectsMethod' => 'countPersonAlbums',
+                'getDestObjectMethod' => 'getPersonAlbum',
+                'addDestObjectMethod' => 'addPersonAlbum',
+                'isDestLoadedMethod' => 'isPersonAlbumsLoaded',
+            ),
+            'personPhotos' => array (
+                'relationId' => '_personPhotos',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'personPhoto',
+                'plural' => 'personPhotos',
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => 'loadPersonPhotosFor',
+                'loadSrcObjectsMapperMethod' => 'loadForPersonPhotos',
+                'getSrcObjectsMapperMethod' => 'getOfPersonPhotos',
+                'createDestObjectMethod' => 'createPersonPhoto',
+                'listDestObjectsMethod' => 'listPersonPhotos',
+                'countDestObjectsMethod' => 'countPersonPhotos',
+                'getDestObjectMethod' => 'getPersonPhoto',
+                'addDestObjectMethod' => 'addPersonPhoto',
+                'isDestLoadedMethod' => 'isPersonPhotosLoaded',
+            ),
+            'personPosts' => array (
+                'relationId' => '_personPosts',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'personPost',
+                'plural' => 'personPosts',
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => 'loadPersonPostsFor',
+                'loadSrcObjectsMapperMethod' => 'loadForPersonPosts',
+                'getSrcObjectsMapperMethod' => 'getOfPersonPosts',
+                'createDestObjectMethod' => 'createPersonPost',
+                'listDestObjectsMethod' => 'listPersonPosts',
+                'countDestObjectsMethod' => 'countPersonPosts',
+                'getDestObjectMethod' => 'getPersonPost',
+                'addDestObjectMethod' => 'addPersonPost',
+                'isDestLoadedMethod' => 'isPersonPostsLoaded',
+            ),
+            'incomingRelations' => array (
+                'relationId' => '_incomingRelations',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'incomingRelation',
+                'plural' => 'incomingRelations',
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => 'loadIncomingRelationsFor',
+                'loadSrcObjectsMapperMethod' => 'loadForIncomingRelations',
+                'getSrcObjectsMapperMethod' => 'getOfIncomingRelations',
+                'createDestObjectMethod' => 'createIncomingRelation',
+                'listDestObjectsMethod' => 'listIncomingRelations',
+                'countDestObjectsMethod' => 'countIncomingRelations',
+                'getDestObjectMethod' => 'getIncomingRelation',
+                'addDestObjectMethod' => 'addIncomingRelation',
+                'isDestLoadedMethod' => 'isIncomingRelationsLoaded',
+            ),
+            'outgoingRelations' => array (
+                'relationId' => '_outgoingRelations',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'outgoingRelation',
+                'plural' => 'outgoingRelations',
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => 'loadOutgoingRelationsFor',
+                'loadSrcObjectsMapperMethod' => 'loadForOutgoingRelations',
+                'getSrcObjectsMapperMethod' => 'getOfOutgoingRelations',
+                'createDestObjectMethod' => 'createOutgoingRelation',
+                'listDestObjectsMethod' => 'listOutgoingRelations',
+                'countDestObjectsMethod' => 'countOutgoingRelations',
+                'getDestObjectMethod' => 'getOutgoingRelation',
+                'addDestObjectMethod' => 'addOutgoingRelation',
+                'isDestLoadedMethod' => 'isOutgoingRelationsLoaded',
+            ),
+            'extraCodeShopProducts' => array (
+                'relationId' => '_extraCodeShopProducts',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'extraCodeShopProduct',
+                'plural' => 'extraCodeShopProducts',
+                'canLoadDestObjects' => false,
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => NULL,
+                'loadSrcObjectsMapperMethod' => 'loadForExtraCodeShopProducts',
+                'getSrcObjectsMapperMethod' => 'getOfExtraCodeShopProducts',
+                'createDestObjectMethod' => 'createExtraCodeShopProduct',
+                'listDestObjectsMethod' => 'listExtraCodeShopProducts',
+                'countDestObjectsMethod' => 'countExtraCodeShopProducts',
+                'getDestObjectMethod' => 'getExtraCodeShopProduct',
+                'addDestObjectMethod' => 'addExtraCodeShopProduct',
+                'isDestLoadedMethod' => 'isExtraCodeShopProductsLoaded',
+            ),
+            'noteShopProducts' => array (
+                'relationId' => '_noteShopProducts',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'noteShopProduct',
+                'plural' => 'noteShopProducts',
+                'canLoadDestObjects' => false,
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => NULL,
+                'loadSrcObjectsMapperMethod' => 'loadForNoteShopProducts',
+                'getSrcObjectsMapperMethod' => 'getOfNoteShopProducts',
+                'createDestObjectMethod' => 'createNoteShopProduct',
+                'listDestObjectsMethod' => 'listNoteShopProducts',
+                'countDestObjectsMethod' => 'countNoteShopProducts',
+                'getDestObjectMethod' => 'getNoteShopProduct',
+                'addDestObjectMethod' => 'addNoteShopProduct',
+                'isDestLoadedMethod' => 'isNoteShopProductsLoaded',
+            ),
+        ));
         
+    }
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -242,15 +453,15 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'personId',
             ),
         );
     }
-        
+
     /**
      * @return Sample_Person 
      */
@@ -263,34 +474,32 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Returns (but not loads!) one or more people of given one or more personPhotos 
-     * @param Sample_Person|array $protraitPersonPhotos     
+     * @param Sample_Person|array $portraitPersonPhotos     
      * @return Sample_Person|array of Sample_Person objects  
      */
-    function getOfProtraitPersonPhotos($protraitPersonPhotos) {
-        $rel = $this->getRelation('_protraitPersonPhoto');
-        $res = $rel->getSrc($protraitPersonPhotos); 
+    function getOfPortraitPersonPhotos($portraitPersonPhotos) {
+        $rel = $this->getRelation('_portraitPersonPhoto');
+        $res = $rel->getSrc($portraitPersonPhotos); 
         return $res;
     }
     
     /**
      * Loads one or more people of given one or more personPhotos 
-     * @param Sample_Person_Photo|array $protraitPersonPhotos of Sample_Person objects
-     
+     * @param Sample_Person_Photo|array $portraitPersonPhotos of Sample_Person objects      
      */
-    function loadForProtraitPersonPhotos($protraitPersonPhotos) {
-        $rel = $this->getRelation('_protraitPersonPhoto');
-        return $rel->loadSrc($protraitPersonPhotos); 
+    function loadForPortraitPersonPhotos($portraitPersonPhotos) {
+        $rel = $this->getRelation('_portraitPersonPhoto');
+        return $rel->loadSrc($portraitPersonPhotos); 
     }
-
+    
     /**
      * Loads one or more personPhotos of given one or more people 
      * @param Sample_Person|array $people     
      */
-    function loadProtraitPersonPhotosFor($people) {
-        $rel = $this->getRelation('_protraitPersonPhoto');
+    function loadPortraitPersonPhotosFor($people) {
+        $rel = $this->getRelation('_portraitPersonPhoto');
         return $rel->loadDest($people); 
     }
-
 
     /**
      * Returns (but not loads!) several people of given one or more religion 
@@ -305,14 +514,13 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads several people of given one or more religion 
-     * @param Sample_Religion|array $religion of Sample_Person objects
-     
+     * @param Sample_Religion|array $religion of Sample_Person objects      
      */
     function loadForReligion($religion) {
         $rel = $this->getRelation('_religion');
         return $rel->loadSrc($religion); 
     }
-
+    
     /**
      * Loads several religion of given one or more people 
      * @param Sample_Person|array $people     
@@ -321,7 +529,6 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_religion');
         return $rel->loadDest($people); 
     }
-
 
     /**
      * Returns (but not loads!) one or more people of given one or more tags 
@@ -336,14 +543,13 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more people of given one or more tags 
-     * @param Sample_Tag|array $tags of Sample_Person objects
-     
+     * @param Sample_Tag|array $tags of Sample_Person objects      
      */
     function loadForTags($tags) {
         $rel = $this->getRelation('_tags');
         return $rel->loadSrc($tags); 
     }
-
+    
     /**
      * Loads one or more tags of given one or more people 
      * @param Sample_Person|array $people     
@@ -361,8 +567,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_tags');
         return $rel->loadDestNNIds($people); 
     }
-
-
+    
     /**
      * Returns (but not loads!) one or more people of given one or more personAlbums 
      * @param Sample_Person|array $personAlbums     
@@ -376,14 +581,13 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more people of given one or more personAlbums 
-     * @param Sample_Person_Album|array $personAlbums of Sample_Person objects
-     
+     * @param Sample_Person_Album|array $personAlbums of Sample_Person objects      
      */
     function loadForPersonAlbums($personAlbums) {
         $rel = $this->getRelation('_personAlbums');
         return $rel->loadSrc($personAlbums); 
     }
-
+    
     /**
      * Loads one or more personAlbums of given one or more people 
      * @param Sample_Person|array $people     
@@ -392,7 +596,6 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_personAlbums');
         return $rel->loadDest($people); 
     }
-
 
     /**
      * Returns (but not loads!) one or more people of given one or more personPhotos 
@@ -407,14 +610,13 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more people of given one or more personPhotos 
-     * @param Sample_Person_Photo|array $personPhotos of Sample_Person objects
-     
+     * @param Sample_Person_Photo|array $personPhotos of Sample_Person objects      
      */
     function loadForPersonPhotos($personPhotos) {
         $rel = $this->getRelation('_personPhotos');
         return $rel->loadSrc($personPhotos); 
     }
-
+    
     /**
      * Loads one or more personPhotos of given one or more people 
      * @param Sample_Person|array $people     
@@ -423,7 +625,6 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_personPhotos');
         return $rel->loadDest($people); 
     }
-
 
     /**
      * Returns (but not loads!) one or more people of given one or more personPosts 
@@ -438,14 +639,13 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more people of given one or more personPosts 
-     * @param Sample_Person_Post|array $personPosts of Sample_Person objects
-     
+     * @param Sample_Person_Post|array $personPosts of Sample_Person objects      
      */
     function loadForPersonPosts($personPosts) {
         $rel = $this->getRelation('_personPosts');
         return $rel->loadSrc($personPosts); 
     }
-
+    
     /**
      * Loads one or more personPosts of given one or more people 
      * @param Sample_Person|array $people     
@@ -454,7 +654,6 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_personPosts');
         return $rel->loadDest($people); 
     }
-
 
     /**
      * Returns (but not loads!) one or more people of given one or more relations 
@@ -469,14 +668,13 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more people of given one or more relations 
-     * @param Sample_Relation|array $incomingRelations of Sample_Person objects
-     
+     * @param Sample_Relation|array $incomingRelations of Sample_Person objects      
      */
     function loadForIncomingRelations($incomingRelations) {
         $rel = $this->getRelation('_incomingRelations');
         return $rel->loadSrc($incomingRelations); 
     }
-
+    
     /**
      * Loads one or more relations of given one or more people 
      * @param Sample_Person|array $people     
@@ -485,7 +683,6 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_incomingRelations');
         return $rel->loadDest($people); 
     }
-
 
     /**
      * Returns (but not loads!) one or more people of given one or more relations 
@@ -500,14 +697,13 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more people of given one or more relations 
-     * @param Sample_Relation|array $outgoingRelations of Sample_Person objects
-     
+     * @param Sample_Relation|array $outgoingRelations of Sample_Person objects      
      */
     function loadForOutgoingRelations($outgoingRelations) {
         $rel = $this->getRelation('_outgoingRelations');
         return $rel->loadSrc($outgoingRelations); 
     }
-
+    
     /**
      * Loads one or more relations of given one or more people 
      * @param Sample_Person|array $people     
@@ -516,6 +712,48 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_outgoingRelations');
         return $rel->loadDest($people); 
     }
+
+    /**
+     * Returns (but not loads!) one or more people of given one or more shopProducts 
+     * @param Sample_Person|array $extraCodeShopProducts     
+     * @return array of Sample_Person objects  
+     */
+    function getOfExtraCodeShopProducts($extraCodeShopProducts) {
+        $rel = $this->getRelation('_extraCodeShopProducts');
+        $res = $rel->getSrc($extraCodeShopProducts); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more people of given one or more shopProducts 
+     * @param Sample_Shop_Product|array $extraCodeShopProducts of Sample_Person objects      
+     */
+    function loadForExtraCodeShopProducts($extraCodeShopProducts) {
+        $rel = $this->getRelation('_extraCodeShopProducts');
+        return $rel->loadSrc($extraCodeShopProducts); 
+    }
+    
+
+    /**
+     * Returns (but not loads!) one or more people of given one or more shopProducts 
+     * @param Sample_Person|array $noteShopProducts     
+     * @return array of Sample_Person objects  
+     */
+    function getOfNoteShopProducts($noteShopProducts) {
+        $rel = $this->getRelation('_noteShopProducts');
+        $res = $rel->getSrc($noteShopProducts); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more people of given one or more shopProducts 
+     * @param Sample_Shop_Product|array $noteShopProducts of Sample_Person objects      
+     */
+    function loadForNoteShopProducts($noteShopProducts) {
+        $rel = $this->getRelation('_noteShopProducts');
+        return $rel->loadSrc($noteShopProducts); 
+    }
+    
 
     
 }

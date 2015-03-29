@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Cg_Dictionary {
+class Ac_Cg_Dictionary extends Ac_Cg_Base {
     
     var $translations = array();
     
@@ -20,11 +20,24 @@ class Ac_Cg_Dictionary {
     
     var $useInflector = true;
     
+    protected $configVars = array(
+        'alwaysUseConstants', 
+        'fallbackToConstants', 
+        'constantPrefix', 
+        'defaultLanguage', 
+        'useInflector'
+    );
+    
     function Ac_Cg_Dictionary ($config = array()) {
-        foreach (array('alwaysUseConstants', 'fallbackToConstants', 'constantPrefix', 'defaultLanguage', 'useInflector') as $p) 
+        foreach ($this->configVars as $p) 
             if (isset($config[$p])) 
                 $this->$p = $config[$p];
         if (isset($config['data'])) $this->addData($config['data']);
+    }
+    
+    function getConfig() {
+        $res = array_intersect_key(get_object_vars($this), array_flip($this->configVars));
+        return $res;
     }
     
     function addData($data) {
@@ -221,6 +234,6 @@ class Ac_Cg_Dictionary {
         }
         return $res; 
     }
-    
+
 }
 

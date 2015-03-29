@@ -65,7 +65,6 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
 
     protected function collectProperties(array $list, $forCache = false) {
         $res = array();
-        $cv = array_keys(get_class_vars(get_class($this)));
         foreach ($list as $propName) {
             if (is_array($propName)) {
                 $val = call_user_func_array(array($this, $propName[0]), array_slice($propName, 1));

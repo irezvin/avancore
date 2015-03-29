@@ -47,7 +47,7 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 	}
 	
 	function getMapperClass() {
-		if ($this->_mapper) $res = Ac_Util::fixClassName(get_class($this->_mapper));
+		if ($this->_mapper) $res = $this->_mapper->getId();
 			else $res = $this->_mapperClass;
 		return $res;
 	} 
@@ -71,14 +71,16 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 	 * @param $alias
 	 * @return array|false
 	 */
-	function _searchPath($alias) {
+	function _searchPath($alias, $fullAlias = false) {
+        if ($fullAlias === false) $fullAlias = $alias;
 		if (!isset($this->_aliasPaths[$alias])) {
 			$path = Ac_Util::pathToArray($alias);
 			$last = $path[count($path) - 1];
             list($last, $suffix) = array_merge(explode(':', $last, 2), array(''));
+            $baseAlias = false;
 			if (count($path) > 1) {
 				$baseAlias = Ac_Util::arrayToPath(array_slice($path, 0, count($path) - 1));
-				$baseInfo = $this->_searchPath($baseAlias);
+				$baseInfo = $this->_searchPath($baseAlias, $alias);
 			} else {
 				$baseInfo = array('mapperClass' => $this->getMapperClass());
 			}
@@ -86,19 +88,59 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 				$mapper = Ac_Model_Mapper::getMapper($baseInfo['mapperClass']);
                 if (!$mapper) throw new Exception("Mapper '{$baseInfo['mapperClass']}' not found");
 				$proto = $mapper->getPrototype();
-				$pi = $proto->getPropertyInfo($last, true);
-				if (isset($pi->mapperClass) && $pi->mapperClass && isset($pi->relationId) && ($pi->relationId)) {
-					$info = array('propName' => $last, 'mapperClass' => $pi->mapperClass, 'relationId' => $pi->relationId);
-					if (count($path) > 1) $info['prevAlias'] = $baseAlias;
-					$this->_aliasPaths[$alias] = $info; 
-				} else {
-					$this->_aliasPaths[$alias] = false;
-				}
+                $this->_aliasPaths[$alias] = false;
+                if ($proto->hasProperty($last)) {
+                    $pi = $proto->getPropertyInfo($last, true);
+                    if (isset($pi->mapperClass) && $pi->mapperClass && isset($pi->relationId) && ($pi->relationId)) {
+                        $info = array('propName' => $last, 'mapperClass' => $pi->mapperClass, 'relationId' => $pi->relationId);
+                        if (count($path) > 1) $info['prevAlias'] = $baseAlias;
+                        $this->_aliasPaths[$alias] = $info; 
+                    }
+                }
 			} else {
 				$this->_aliasPaths[$alias] = false;
 			}
+            if ($this->_aliasPaths[$alias] === false) {
+                if ($alias === $fullAlias) {
+                    $arrPath = Ac_Util::pathToArray($alias);
+                    $notFoundPath = array();
+                    while (null !== ($last = array_pop($arrPath))) {
+                        array_unshift($notFoundPath, $last);
+                        $checkPath = Ac_Util::arrayToPath($arrPath);
+                        if (isset($this->_aliasPaths[$checkPath]) && $this->_aliasPaths[$checkPath]) break;
+                    }
+                    $mapperClass = $this->getMapperClass();
+                    $prevAlias = false;
+                    $notFoundAlias = $fullAlias;
+                    if (strlen($checkPath)) {
+                        $info = $this->_aliasPaths[$checkPath];
+                        if ($info && isset($info['mapperClass'])) {
+                            $mapperClass = $info['mapperClass'];
+                            $prevAlias = $checkPath;
+                            $notFoundAlias = Ac_Util::arrayToPath($notFoundPath);
+                        }
+                    }
+                    if ($prevAlias === false) {
+                        $prevAlias = $this->getSqlSelect()->getEffectivePrimaryAlias();
+                    }
+                    $mapper = Ac_Model_Mapper::getMapper($mapperClass);
+                    $table = $mapper->getSqlTable($notFoundAlias, $prevAlias, $this);
+                    if ($table) {
+                        $table = $this->addTable($table, $notFoundAlias);
+                        $this->_aliasPaths[$alias] = array('table' => $table);
+                    } else {
+                        $this->_aliasPaths[$alias] = false;
+                    }
+                } else {
+                    // We don't want to remember non-full destination path
+                    // since last found mapper can respond with something useful
+                    // when receiving other path with same parts
+                    unset($this->_aliasPaths[$alias]);
+                }
+            }
 		}
-		return $this->_aliasPaths[$alias];
+		$res = isset($this->_aliasPaths[$alias])? $this->_aliasPaths[$alias] : false;
+        return $res;
 	}
 	
 	function _doHasTable($alias) {
@@ -110,7 +152,8 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
         $origAlias = $alias;
         if (!strncmp($alias, 'mid__', 5)) $alias = substr($alias, 5);
         $p = $this->_searchPath($alias);
-		if ($p) {
+		if ($p && isset($p['table'])) $res = $p['table'];
+        elseif ($p) {
 			$m = Ac_Model_Mapper::getMapper($p['mapperClass']);
 			if (isset($p['prevAlias'])) {
 				$prevPath = $this->_searchPath($p['prevAlias']);

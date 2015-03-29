@@ -265,6 +265,7 @@ class Ac_Table_Column {
      * Renders (echo's) column cell
      */
     function showCell($record, $rowNo) {
+        if ($this->hidden) return;
         if (!$this->staticAttribs) $this->updateAttribs();
         if (is_null($data = $this->getData($record, $rowNo, $this->fieldName))) $data = $this->nullText;
         if (!$this->hidden) echo '<td ', $this->_cellAttribs, '>', $data, '</td>';
