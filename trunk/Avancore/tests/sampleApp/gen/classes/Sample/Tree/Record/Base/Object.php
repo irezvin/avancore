@@ -28,12 +28,10 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
         return parent::getMapper($mapperClass);
     }
     
-    protected function listOwnProperties() {
-        return array ( 0 => 'id', 1 => 'title', 2 => 'tag', );
-    }
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
             'id' => array (
                 'dataType' => 'int',
                 'maxLength' => '10',
@@ -60,6 +58,7 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
         return $pi;
                 
     }
+    
 
     function hasUniformPropertiesInfo() { return true; }
 

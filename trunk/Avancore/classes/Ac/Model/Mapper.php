@@ -68,8 +68,13 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     /**
      * function onGetRelationPrototypes(& $relationPrototypes)
      */
-    const EVENT_ON_GET_RELATION_PROTOTYPES = 'onGetRelationPrototype';
+    const EVENT_ON_GET_RELATION_PROTOTYPES = 'onGetRelationPrototypes';
 
+    /**
+     * function onGetAssociationPrototypes(& $associationPrototypes)
+     */
+    const EVENT_ON_GET_ASSOCIATION_PROTOTYPES = 'onGetAssociationPrototypes';
+    
     /**
      * function onGetManagerConfig(& $managerConfig)
      */
@@ -114,6 +119,16 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
      * function onReset()
      */
     const EVENT_ON_RESET = 'onReset';
+    
+    /**
+     * function onGetSqlTable($alias, $prevAlias, Ac_Sql_Select_TableProvider $tableProvider, & $result)
+     */
+    const EVENT_ON_GET_SQL_TABLE  = 'onGetSqlTable';
+    
+    /**
+     * function onListDataProperties(array & $dataProperties)
+     */
+    const EVENT_ON_LIST_DATA_PROPERTIES  = 'onListDataProperties';
 
     protected $id = false;
     
@@ -168,6 +183,12 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     protected $relations = false;
     
     /**
+     * Ac_Model_Association instances (common for all records)
+     * @var array
+     */
+    protected $associations = false;
+    
+    /**
      * List of 'intrinsic' relations that cannot be deleted
      * @var array
      */
@@ -203,6 +224,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     protected $defaultQualifier = false;
     
     protected $columnNames = false;
+    
+    protected $dataProperties = false;
     
     protected $defaults = false;
     
@@ -327,7 +350,19 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         }
         return $this->columnNames;
     }
-
+    
+    final function listDataProperties() {
+        if ($this->dataProperties === false) {
+            $this->dataProperties = $this->getColumnNames();
+            $this->doOnListDataProperties($this->dataProperties);
+            $this->triggerEvent(self::EVENT_ON_LIST_DATA_PROPERTIES, array(& $this->dataProperties));
+        }
+        return $this->dataProperties;
+    }
+    
+    protected function doOnListDataProperties(array & $dataProperties) {
+    }
+    
     protected function coreCreateRecord($className = false) {
         if ($className === false) $className = $this->recordClass;
         if ($this->useProto) {
@@ -348,9 +383,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     
     final function registerRecord(Ac_Model_Object $record) {
         $this->coreRegisterRecord($record);
-        $this->triggerEvent(self::EVENT_AFTER_CREATE_RECORD, array(
-            $record
-        ));
+        $this->triggerEvent(self::EVENT_AFTER_CREATE_RECORD, array(& $record));
     }
     
     protected function coreRegisterRecord(Ac_Model_Object $record) {
@@ -571,7 +604,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         
         foreach ($loaded as $pk => $record) 
             $objects[$pk] = $record;
-        
+
         if ($this->useRecordsCollection) {
             foreach ($loaded as $pk => $record) {
                 $this->recordsCollection[$record->getPrimaryKey()] = $record;
@@ -681,7 +714,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
 
     function listModelProperties() {
         $proto = $this->getPrototype();
-        return $proto->listPublicProperties();
+        return $proto->listDataProperties();
     }
 
     /**
@@ -1063,7 +1096,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     function listRelations() {
         if ($this->relations === false) {
             $this->relations = $this->getRelationPrototypes();
-            foreach ($this->relations as $k => $rel) {
+            foreach ($this->relations as $rel) {
                 if (is_object($rel)) {
                     $rel->setImmutable(true);
                 }
@@ -1086,6 +1119,51 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
 
+    /**
+     * @return array
+     */
+    function getAssociations() {
+        if ($this->associations === false) {
+            $this->associations = array();
+            $proto = $this->getAssociationPrototypes();
+            $this->addAssociations($proto);
+        }
+        return $this->associations;
+    }
+    
+    /**
+     * @return array
+     */
+    function listAssociations() {
+        if ($this->associations === false) $this->getAssociations();
+        return array_keys($this->associations);
+    }
+    
+    /**
+     * @return Ac_Model_Association_Abstract
+     */
+    function getAssociation($id, $dontThrow = false) {
+        $res = null;
+        if ($this->associations === false) $this->getAssociations();
+        if (isset($this->associations[$id])) $res = $this->associations[$id];
+        if (!$res && !$dontThrow) 
+            throw Ac_E_InvalidCall::noSuchItem ('association', $id, 'listAssociations');
+        return $res;
+    }
+    
+    function addAssociations(array $associations) {
+        $objects = Ac_Prototyped::factoryCollection($associations, 'Ac_I_ModelAssociation', 
+            array('mapper' => $this, 'immutable' => true), 'id', true, true);
+        
+        foreach ($objects as $k => $a) {
+            if (isset($this->associations[$k]) && $this->associations[$k] !== $a) {
+                throw Ac_E_InvalidCall::alreadySuchItem('association', $k);
+            }
+            $this->associations[$k] = $a;
+        }
+        return $objects;
+    }
+    
     /**
      * @return Ac_Model_Relation
      */
@@ -1172,10 +1250,22 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     protected function doGetRelationPrototypes() {
         return array();
     }
+    
+    protected function doGetAssociationPrototypes() {
+        return array();
+    }
 
     final function getRelationPrototypes() {
         $res = $this->doGetRelationPrototypes();
         $this->triggerEvent(self::EVENT_ON_GET_RELATION_PROTOTYPES, array(
+            & $res
+        ));
+        return $res;
+    }
+
+    protected final function getAssociationPrototypes() {
+        $res = $this->doGetAssociationPrototypes();
+        $this->triggerEvent(self::EVENT_ON_GET_ASSOCIATION_PROTOTYPES, array(
             & $res
         ));
         return $res;
@@ -1664,8 +1754,12 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
     }
     
     protected function getRelationDefaults() {
-        if ($this->askRelationsForDefaults) $kk = array_keys($this->relations);
-            else $kk = $this->additionalRelations;
+        if ($this->askRelationsForDefaults) {
+            $this->listRelations();
+            $kk = array_keys($this->relations);
+        } else {
+            $kk = $this->additionalRelations;
+        }
         $res = array();
         foreach ($kk as $k) {
             $rel = $this->getRelation($k);
@@ -1698,5 +1792,43 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         }
         return $res;
     }
+    
+    function addMixable(Ac_I_Mixable $mixable, $id = false, $canReplace = false) {
+        parent::addMixable($mixable, $id, $canReplace);
+        Ac_Model_Data::clearMetaCache($this->getId());
+        $this->dataProperties = false;
+        $this->resetPrototype();
+    }
+    
+    function resetPrototype() {
+        $this->prototype = false;
+    }
+    
+    /**
+     * Locates joined SQL table for Ac_Sql_Select and returns its' prototype or an instance
+     * (can return Ac_Sql_Table instance too)
+     * 
+     * Is called by Ac_Model_Sql_TableProvider when it has resolved the mapper but not found
+     * any satisfying property
+     *  
+     * @param string $alias Alias of currently saught table
+     * @param string $prevAlias Alias of the table that result (probably) have to be joined to
+     * @param Ac_Sql_Select_TableProvider $provider TableProvider that made the request
+     */
+    final function getSqlTable ($alias, $prevAlias, Ac_Sql_Select_TableProvider $provider) {
+        $result = $this->doOnGetSqlTable($alias, $prevAlias, $provider);
+        if (!$result) {
+            $this->triggerEvent(self::EVENT_ON_GET_SQL_TABLE, array($alias, $prevAlias, $provider, & $result));
+        }
+        return $result;
+    }
+ 
+    /**
+     * @see Ac_Model_Mapper::getSqlTable
+     */
+    protected function doOnGetSqlTable($alias, $prevAlias, Ac_Sql_Select_TableProvider $provider) {
+    }
+    
+    
     
 }

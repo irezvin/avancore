@@ -37,16 +37,6 @@ class Ac_Cg_Strategy {
     var $genNonEditable = true;
     
     /**
-     * @var array Names of templates that apply to each model 
-     */
-    var $modelTemplates = array('Ac_Cg_Template_ModelAndMapper');
-    
-    /**
-     * @var array Names of templates that apply only to models with user interface 
-     */
-    var $uiTemplates = array('Ac_Cg_Template_Ui');
-    
-    /**
      * @var array Names of templates that are common for whole domain
      */
     var $domainTemplates = array('Ac_Cg_Template_Domain');
@@ -86,8 +76,7 @@ class Ac_Cg_Strategy {
     
     function listTemplatesForModel($name) {
         $mod = $this->_dom->getModel($name);
-        $res = $this->modelTemplates;
-        
+        $res = Ac_Util::toArray($mod->getTemplates());
         $res = array_unique($res);
         return $res;
     }
@@ -125,9 +114,10 @@ class Ac_Cg_Strategy {
      */
     function processTemplate($templateName, $modelName = false) {
         $tpl = $this->_createTemplate($templateName, $modelName);
+        $writer = $this->_gen->getWriter();
         foreach ($tpl->listFiles() as $n) {
             $skip = false;
-            $p = $tpl->getFilePath($n, $this->outputDir);
+            $p = $tpl->getFilePath($n);
             if ($tpl->fileIsUserEditable($n)) {
                 
                 if (!$this->genEditable) $skip = true;
@@ -140,8 +130,9 @@ class Ac_Cg_Strategy {
             }
             if (!$skip) {
                 $this->_gen->log($p.": writing file ");
-                $tpl->outputFile($n, $this->outputDir);
-                if ($this->_gen->lintify) $this->_gen->runLint($p);
+                $tpl->outputFile($n, $writer);
+                if (strlen($this->_gen->outputDir)) $p = rtrim($this->_gen->outputDir, '/\\').'/'.$p;
+                if ($this->_gen->lintify && is_file($p)) $this->_gen->runLint($p);
             }
         }
     }

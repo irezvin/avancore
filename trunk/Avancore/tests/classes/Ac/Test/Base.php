@@ -8,7 +8,7 @@ class Ac_Test_Base extends UnitTestCase {
     // Ugly but allows us to run test without legacy adapter
     static $config = array();
     
-	protected $aeDb = false;
+    protected $aeDb = false;
     
     protected $legacyDb = false;
     
@@ -149,7 +149,7 @@ class Ac_Test_Base extends UnitTestCase {
         return $res;
     }
     
-    function resetAi($tableName) {
+    function resetAi($tableName, $ai = false) {
         // MySQL only!!!
         $db = $this->getAeDb();
         $cols = $db->fetchArray("SHOW COLUMNS FROM ".$db->n($tableName), 'Field');
@@ -158,6 +158,10 @@ class Ac_Test_Base extends UnitTestCase {
             if ($data['Extra'] == 'auto_increment') {
                 $max = $db->fetchValue("SELECT MAX(".$db->n($col).") FROM ".$db->n($tableName));
                 $res = intval($max) + 1;
+                if (is_numeric($ai)) {
+                    if ($ai < $res) throw new Exception("Cannot set AI ($ai) to value < max ({$max})");
+                    $res = $ai;
+                }
                 $db->query('ALTER TABLE '.$db->n($tableName)." AUTO_INCREMENT=".($res));
                 break;
             }

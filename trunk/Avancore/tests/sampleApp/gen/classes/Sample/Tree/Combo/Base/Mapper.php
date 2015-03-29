@@ -26,20 +26,15 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
             'depth' => '0',
         ); 
  
-    
+   
     protected $autoincFieldName = 'id';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
-    function doGetInternalDefaults() {
-        return array (
-        );
-    }
-    
+ 
     /**
      * @return Sample_Tree_Combo 
      */ 
@@ -90,15 +85,15 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-        
+    
     function getTitleFieldName() {
         return 'title';   
     }
-            
+    
     function getDefaultOrdering() {
         return 'ordering';
     }
-            
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -110,15 +105,15 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'id',
             ),
         );
     }
-        
+
     /**
      * @return Sample_Tree_Combo 
      */
@@ -128,6 +123,7 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-        
+    
+    
 }
 

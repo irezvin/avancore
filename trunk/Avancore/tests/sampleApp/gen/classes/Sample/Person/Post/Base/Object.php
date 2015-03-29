@@ -10,6 +10,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     public $photoId = NULL;
     public $title = '';
     public $content = NULL;
+    public $pubId = NULL;
     
     var $_mapperClass = 'Sample_Person_Post_Mapper';
     
@@ -33,8 +34,9 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'person', 1 => 'personPhoto', 2 => 'id', 3 => 'personId', 4 => 'photoId', 5 => 'title', 6 => 'content', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'person', 1 => 'personPhoto', )));
     }
+    
     
  
     protected function listOwnAssociations() {
@@ -42,7 +44,8 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
             'person' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
@@ -97,11 +100,24 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                 'isNullable' => true,
                 'caption' => 'Content',
             ),
+            'pubId' => array (
+                'dataType' => 'int',
+                'controlType' => 'selectList',
+                'maxLength' => '10',
+                'dummyCaption' => '',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Records',
+                    'mapperClass' => 'Sample_Publish_ImplMapper',
+                ),
+                'isNullable' => true,
+                'caption' => 'Pub Id',
+            ),
         );
     
         return $pi;
                 
     }
+    
 
     function hasUniformPropertiesInfo() { return true; }
 
@@ -113,8 +129,8 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
      */
     function getPerson() {
         if ($this->_person === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_person');
+            $this->mapper->loadPeopleFor($this);
+            
         }
         return $this->_person;
     }
@@ -136,7 +152,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     function clearPerson() {
         $this->person = null;
     }
-    
+
     /**
      * @return Sample_Person  
      */
@@ -148,6 +164,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
         $this->setPerson($res);
         return $res;
     }
+
     
         
     
@@ -156,8 +173,8 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
      */
     function getPersonPhoto() {
         if ($this->_personPhoto === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_personPhoto');
+            $this->mapper->loadPersonPhotosFor($this);
+            
         }
         return $this->_personPhoto;
     }
@@ -179,7 +196,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     function clearPersonPhoto() {
         $this->personPhoto = null;
     }
-    
+
     /**
      * @return Sample_Person_Photo  
      */
@@ -191,25 +208,9 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
         $this->setPersonPhoto($res);
         return $res;
     }
+
     
   
-
-    function _storeReferencedRecords() {
-        $res = parent::_storeReferencedRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_object($this->_person)) {
-            $rel = $mapper->getRelation('_person');
-            if (!$this->_autoStoreReferenced($this->_person, $rel->fieldLinks, 'person')) $res = false;
-        }
-
-        if (is_object($this->_personPhoto)) {
-            $rel = $mapper->getRelation('_personPhoto');
-            if (!$this->_autoStoreReferenced($this->_personPhoto, $rel->fieldLinks, 'personPhoto')) $res = false;
-        }
- 
-        return $res;
-    }
     
 }
 

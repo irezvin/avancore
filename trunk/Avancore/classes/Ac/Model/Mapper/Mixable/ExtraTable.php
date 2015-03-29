@@ -2,6 +2,8 @@
 
 class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
 
+    protected $myBaseClass = 'Ac_Model_Mapper_Mixable_ExtraTable';
+    
     /**
      * @var Ac_Model_Mapper
      */
@@ -12,12 +14,6 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * @var string
      */
     protected $tableName = false;
-
-    /**
-     * Relation ID, relation prototype or a relation object
-     * @var mixed
-     */
-    protected $ownerRelation = false;
 
     /**
      * Mapping of tableColName => slaveFieldNames
@@ -32,7 +28,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     protected $colMap = array();
 
     /**
-     * If slave records should be deleted when owner is deleted
+     * If slave records should be deleted when owners are deleted
      * @var bool
      */
     protected $deleteWithOwner = true;
@@ -47,7 +43,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * Class or prototype of model mixin
      * @var type 
      */
-    protected $modelMixin = false;
+    protected $modelMixable = false;
     
     /**
      * @var Ac_Model_Relation
@@ -72,20 +68,25 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      */
     protected $restrictions = array();
     
+    /**
+     * @var bool
+     */
+    protected $overwriteModelFields = false;
+
     function setTableName($tableName) {
-        $this->tableName = $tableName;
+        if ($tableName !== $this->tableName) {
+            $this->tableName = $tableName;
+            if ($this->implMapper) {
+                if ($this->tableName && $this->implMapper->tableName !== $this->tableName) {
+                    throw new Ac_E_InvalidUsage("\$tableName, if set, must not be different from \$implMapper->tableName");
+                }
+            }
+        }
     }
 
     function getTableName() {
+        if ($this->implMapper) return $this->implMapper->tableName;
         return $this->tableName;
-    }
-
-    function setOwnerRelation($ownerRelation) {
-        $this->ownerRelation = $ownerRelation;
-    }
-
-    function getOwnerRelation() {
-        return $this->ownerRelation;
     }
 
     function setFieldNames(array $fieldNames) {
@@ -124,12 +125,12 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         return $this->deleteWithOwner;
     }
 
-    function setModelMixin($modelMixin) {
-        $this->modelMixin = $modelMixin;
+    function setModelMixable($modelMixable) {
+        $this->modelMixable = $modelMixable;
     }
 
-    function getModelMixin() {
-        return $this->modelMixin;
+    function getModelMixable() {
+        return $this->modelMixable;
     }    
  
     function setMapperBaseClass($mapperBaseClass) {
@@ -170,6 +171,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      */
     protected function getImplRelation() {
         if ($this->implRelation === false) {
+            $this->getImplMapper();
             $this->implRelation = new Ac_Model_Relation(array(
                 'fieldLinks' => $this->colMap,
                 'srcTableName' => $this->tableName,
@@ -182,10 +184,30 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     }
     
     /**
+     * Sets class, prototype or instance of Ac_Model_Mapper that interacts with extra table
+     */
+    function setImplMapper($implMapper) {
+        if (!$this->implMapper || $this->implMapper !== $implMapper) {
+            if ($this->implMapper) throw Ac_E_InvalidCall::canRunMethodOnce($this, __METHOD__);
+            $this->implMapper = $implMapper;
+        }
+    }
+    
+    /**
      * @return Ac_Model_Mapper
      */
     protected function getImplMapper() {
-        if ($this->implMapper === false && $this->mixin) {
+        if ($this->implMapper !== false && !is_object($this->implMapper) && $this->mixin) {
+            $def = array();
+            if ($this->mixin) 
+                $def['application'] = $this->mixin->getApplication();
+            $this->implMapper = Ac_Prototyped::factory($this->implMapper, 'Ac_Model_Mapper', $def);
+            if ($this->tableName && $this->implMapper->tableName !== $this->tableName) {
+                throw new Ac_E_InvalidUsage("\$tableName, if set, must not be different from \$implMapper->tableName");
+            }
+            $this->tableName = $this->implMapper->tableName;
+        }
+        if ($this->implMapper === false && $this->mixin && strlen($this->tableName)) {
             $this->implMapper = new Ac_Model_Mapper(array(
                 'id' => 'extraTable_'.$this->mixin->getId().$this->tableName,
                 'tableName' => $this->tableName,
@@ -222,7 +244,11 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
             } else {
                 $extra = $this->getDefaults();
             }
-            $rows[$k] = array_merge($rows[$k], $extra);
+            if ($this->overwriteModelFields) 
+                $rows[$k] = array_merge($rows[$k], $extra);
+            else {
+                $rows[$k] = array_merge($rows[$k], array_diff_key($extra, $rows[$k]));
+            }
         }
     }
     
@@ -301,12 +327,85 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         if ($result) {
             $extraRecord = $this->getExtraRecord($hyData);
             if ($extraRecord->hasFullPrimaryKey()) {
-                if (!$extraRecord->delete()) {
-                    $result = false;
-                    $error = $extraRecord->getError();
+                if (!$extraRecord->delete()) { // there may be the case when extra record does not exist
+                    if ($xError = $extraRecord->getError()) {
+                        $result = false;
+                        $error = $xError;
+                    }
                 }
             }
         }
     }
-   
+    
+    function onAfterCreateRecord(Ac_Model_Object & $record) {
+        if ($this->modelMixable) {
+            $mix = Ac_Prototyped::factory($this->modelMixable, 'Ac_I_Mixable');
+            if ($mix instanceof Ac_Model_Mixable_ExtraTable) $mix->setMapperExtraTable($this);
+            $record->addMixable($mix);
+        }
+    }
+
+    /**
+     * @param bool $overwriteModelFields
+     */
+    function setOverwriteModelFields($overwriteModelFields) {
+        $this->overwriteModelFields = $overwriteModelFields;
+    }
+
+    /**
+     * @return bool
+     */
+    function getOverwriteModelFields() {
+        return $this->overwriteModelFields;
+    }
+    
+    protected function doGetRelationPrototypes() {
+        return array();
+    }
+    
+    protected function doGetAssociationPrototypes() {
+        return array();
+    }
+    
+    function onGetRelationPrototypes(& $relationPrototypes) {
+        if ($p = $this->doGetRelationPrototypes()) 
+            Ac_Util::ms($relationPrototypes, $p);
+    }
+    
+    function onGetAssociationPrototypes(& $associationPrototypes) {
+        if ($p = $this->doGetAssociationPrototypes()) 
+            Ac_Util::ms($associationPrototypes, $p);
+    }
+    
+    /**
+     * @return Ac_Model_Relation
+     */
+    protected function getRelation($relId) {
+        return $this->mixin->getRelation($relId);
+    }
+    
+    function onGetSqlTable($alias, $prevAlias, Ac_Sql_Select_TableProvider $tableProvider, & $result) {
+        if (!$result && $this->mixin) {
+            $sel = $tableProvider->getSqlSelect();
+            $this->getImplMapper();
+            if ($sel && $sel->hasTable($prevAlias) && $sel->getTable($prevAlias)->name === $this->mixin->tableName) {
+                if (strlen($this->mixableId) && $alias === 'extra__'.$this->mixableId && !$result) {
+                    $result = array(
+                        'class' => 'Ac_Sql_Select_Table',
+                        'name' => $this->tableName,
+                        'joinsAlias' => $prevAlias,
+                        'joinsOn' => $this->colMap,
+                        'joinType' => 'LEFT JOIN',
+                    );
+                }
+            }
+        }
+    }
+    
+    function onListDataProperties(array & $dataProperties) {
+        if (!$this->modelMixable) {
+            $dataProperties = array_unique(array_merge($dataProperties, array_keys($this->getDefaults())));
+        }
+    }
+    
 }

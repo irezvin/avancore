@@ -29,7 +29,7 @@ class Ac_Test_PdoDb extends Ac_Test_Base {
         $this->assertTrue(!isset($a[0][0]));
         $this->assertTrue(isset($b[0][0]));
         
-        $a = $db->fetchArray("SELECT * FROM ac_people ORDER BY personId ASC", array('gender', 'name'));
+        $a = $db->fetchArray("SELECT * FROM ac_people WHERE personId IN (3, 4) ORDER BY personId ASC", array('gender', 'name'));
         $this->assertArraysMatch(array(
             'M' => array('Илья' => array(0 => array('name' => 'Илья', 'gender' => 'M', 'personId' => 3))),
             'F' => array('Таня' => array(0 => array('name' => 'Таня', 'gender' => 'F', 'personId' => 4)))
@@ -44,7 +44,7 @@ class Ac_Test_PdoDb extends Ac_Test_Base {
         //var_dump($b);
         
         $c = $db->fetchColumn(
-            "SELECT isSingle, gender, name FROM ac_people ORDER BY personId ASC", 
+            "SELECT isSingle, gender, name FROM ac_people WHERE personId IN (3, 4) ORDER BY personId ASC", 
             'name',
             array('isSingle', 'gender', true)
         );

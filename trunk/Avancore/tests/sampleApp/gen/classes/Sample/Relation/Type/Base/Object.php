@@ -32,8 +32,9 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'relations', 1 => 'relationTypeId', 2 => 'title', 3 => 'isSymmetrical', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'relations', )));
     }
+    
  
     protected function listOwnLists() {
         
@@ -47,7 +48,8 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
             'relations' => array (
                 'className' => 'Sample_Relation',
                 'mapperClass' => 'Sample_Relation_Mapper',
@@ -83,6 +85,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
         return $pi;
                 
     }
+    
 
     function hasUniformPropertiesInfo() { return true; }
 
@@ -91,16 +94,15 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     function countRelations() {
         if (is_array($this->_relations)) return count($this->_relations);
         if ($this->_relationsCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_relations');
+            $this->mapper->loadAssocCountFor($this, '_relations');
         }
         return $this->_relationsCount;
+        
     }
 
     function listRelations() {
         if (!$this->_relationsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_relations');
+            $this->mapper->loadRelationsFor($this);
         }
         return array_keys($this->_relations);
     }
@@ -117,12 +119,10 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
      */
     function getRelation($id) {
         if (!$this->_relationsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_relations');
+            $this->mapper->loadRelationsFor($this);
         }
+        
         if (!isset($this->_relations[$id])) trigger_error ('No such Relation: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_relations[$id] === false) {
-        }
         return $this->_relations[$id];
     }
     
@@ -144,7 +144,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
         $relation->_relationType = $this;
         
     }
-    
+
     /**
      * @return Sample_Relation  
      */
@@ -158,17 +158,6 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
     
   
-
-    function _storeReferencingRecords() {
-        $res = parent::_storeReferencingRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_array($this->_relations)) {
-            $rel = $mapper->getRelation('_relations');
-            if (!$this->_autoStoreReferencing($this->_relations, $rel->fieldLinks, 'relations')) $res = false;
-        }
-        return $res; 
-    }
     
 }
 
