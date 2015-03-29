@@ -632,8 +632,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             if ($m = $this->getDestMapper()) {
                 if (!$this->fieldLinks) 
                     throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() before setFieldLinks()");
-                if ($m) $this->destIsUnique = $m->identifiesRecordBy (
-                    $this->fieldLinks2? array_values($this->fieldLinks2): array_values($this->fieldLinks)
+                if ($m) $this->destIsUnique = !$this->midTableName && $m->identifiesRecordBy (
+                    array_values($this->fieldLinks)
                 );
             }
         }
