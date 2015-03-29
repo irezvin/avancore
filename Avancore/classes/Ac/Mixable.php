@@ -47,7 +47,7 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
             self::$introducedPublicMethods[$c] = array_diff(
                 Ac_Util::getPublicMethods($c), 
                 Ac_Util::getPublicMethods('Ac_Mixable')
-            );
+            ); 
             if (strlen($this->autoEventPrefix)) 
                 self::$introducedPublicMethods[$c] = array_diff(self::$introducedPublicMethods[$c], 
                     $this->listEventHandlerMethods());
