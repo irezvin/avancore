@@ -67,7 +67,7 @@ class Ac_Cg_Frontend {
     }
     
     function getTitle() {
-        $res = "Avancore CodeGen v. 0.0.5 &copy; 2008 &mdash; 2014 Ilya Rezvin";
+        $res = "Avancore CodeGen v. 0.0.6 &copy; 2008 &mdash; 2015 Ilya Rezvin";
         return $res;
     }
     
