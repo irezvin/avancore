@@ -211,11 +211,11 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
             if ($mix instanceof Ac_I_Mixable_Shared)
                 $this->sharedMixableIds[$id] = $id;
             
-            $nm = array_diff($mix->listMixinMethods(), $mm);
+            $nm = array_diff($mix->listMixinMethods($this), $mm);
             foreach ($nm as $m) $this->mixMethodMap[strtolower($m)] = $id;
             $mm = array_merge($mm, $nm);
             
-            $np = array_diff($mix->listMixinProperties(), $mp);
+            $np = array_diff($mix->listMixinProperties($this), $mp);
             foreach ($np as $p) $this->mixPropertyMap[$p] = $id;
         }
     }

@@ -90,7 +90,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
     function getTitleFieldName() {
         return 'title';   
     }
-                
+                    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (

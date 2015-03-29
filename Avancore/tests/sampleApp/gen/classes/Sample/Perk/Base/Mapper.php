@@ -119,7 +119,23 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
             'tags' => array (
                 'relationId' => '_tags',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'tag',
+                'plural' => 'tags',
                 'class' => 'Ac_Model_Association_ManyToMany',
+                'loadDestObjectsMapperMethod' => 'loadTagsFor',
+                'loadSrcObjectsMapperMethod' => 'loadForTags',
+                'getSrcObjectsMapperMethod' => 'getOfTags',
+                'createDestObjectMethod' => 'createTag',
+                'listDestObjectsMethod' => 'listTags',
+                'countDestObjectsMethod' => 'countTags',
+                'getDestObjectMethod' => 'getTag',
+                'addDestObjectMethod' => 'addTag',
+                'isDestLoadedMethod' => 'isTagsLoaded',
+                'loadDestIdsMapperMethod' => 'loadTagIdsFor',
+                'getDestIdsMethod' => 'getTagIds',
+                'setDestIdsMethod' => 'setTagIds',
             ),
         ));
         

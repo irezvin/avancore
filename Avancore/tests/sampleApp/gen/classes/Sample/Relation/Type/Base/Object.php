@@ -91,16 +91,14 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     function countRelations() {
         if (is_array($this->_relations)) return count($this->_relations);
         if ($this->_relationsCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_relations');
+            $this->mapper->loadAssocCountFor($this, '_relations');
         }
         return $this->_relationsCount;
     }
 
     function listRelations() {
         if (!$this->_relationsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_relations');
+            $this->mapper->loadRelationsFor($this);
         }
         return array_keys($this->_relations);
     }
@@ -117,12 +115,9 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
      */
     function getRelation($id) {
         if (!$this->_relationsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_relations');
+            $this->mapper->loadRelationsFor($this);
         }
         if (!isset($this->_relations[$id])) trigger_error ('No such Relation: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_relations[$id] === false) {
-        }
         return $this->_relations[$id];
     }
     
