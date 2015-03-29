@@ -280,14 +280,13 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads several personPhotos of given one or more people 
-     * @param Sample_Person|array $people of Sample_Person_Photo objects
-     
+     * @param Sample_Person|array $people of Sample_Person_Photo objects      
      */
     function loadForPeople($people) {
         $rel = $this->getRelation('_person');
         return $rel->loadSrc($people); 
     }
-
+    
     /**
      * Loads several people of given one or more personPhotos 
      * @param Sample_Person_Photo|array $personPhotos     
@@ -311,14 +310,13 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more personPhotos of given one or more personAlbums 
-     * @param Sample_Person_Album|array $personAlbums of Sample_Person_Photo objects
-     
+     * @param Sample_Person_Album|array $personAlbums of Sample_Person_Photo objects      
      */
     function loadForPersonAlbums($personAlbums) {
         $rel = $this->getRelation('_personAlbums');
         return $rel->loadSrc($personAlbums); 
     }
-
+    
     /**
      * Loads one or more personAlbums of given one or more personPhotos 
      * @param Sample_Person_Photo|array $personPhotos     
@@ -336,7 +334,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_personAlbums');
         return $rel->loadDestNNIds($personPhotos); 
     }
-
+    
 
     /**
      * Returns (but not loads!) one or more personPhotos of given one or more people 
@@ -351,14 +349,13 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more personPhotos of given one or more people 
-     * @param Sample_Person|array $portraitPeople of Sample_Person_Photo objects
-     
+     * @param Sample_Person|array $portraitPeople of Sample_Person_Photo objects      
      */
     function loadForPortraitPeople($portraitPeople) {
         $rel = $this->getRelation('_portraitPerson');
         return $rel->loadSrc($portraitPeople); 
     }
-
+    
     /**
      * Loads one or more people of given one or more personPhotos 
      * @param Sample_Person_Photo|array $personPhotos     
@@ -382,14 +379,13 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more personPhotos of given one or more personPosts 
-     * @param Sample_Person_Post|array $personPosts of Sample_Person_Photo objects
-     
+     * @param Sample_Person_Post|array $personPosts of Sample_Person_Photo objects      
      */
     function loadForPersonPosts($personPosts) {
         $rel = $this->getRelation('_personPosts');
         return $rel->loadSrc($personPosts); 
     }
-
+    
     /**
      * Loads one or more personPosts of given one or more personPhotos 
      * @param Sample_Person_Photo|array $personPhotos     

@@ -20,17 +20,25 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
 
     function count<?php $this->d($ucPlural); ?>() {
         if (is_array(<?php $this->d($varId); ?>)) return count(<?php $this->d($varId); ?>);
+<?php   if ($this->canLoadDest) { ?>
         if (<?php $this->d($countId); ?> === false) {
-            $this->mapper->loadAssocCountFor($this, <?php $this->str($relationId); ?>);
+            $this->mapper->loadAssocCountFor(<?php echo $this->relationTargetExpression; ?>, <?php $this->str($relationId); ?>);
         }
         return <?php $this->d($countId); ?>;
+<?php   } else { ?>
+        return 0;
+<?php   } ?>        
     }
 <?php } ?>
 
     function list<?php $this->d($ucPlural); ?>() {
+<?php   if ($this->canLoadDest) { ?>
         if (!<?php $this->d($this->loadedId); ?>) {
-            $this->mapper->load<?php echo $this->ucOtherPlural; ?>For($this);
+            $this->mapper->load<?php echo $this->ucOtherPlural; ?>For(<?php echo $this->relationTargetExpression; ?>);
         }
+<?php   } else { ?>
+        if (!is_array(<?php $this->d($varId); ?>)) <?php $this->d($varId); ?> = array();
+<?php   } ?>
         return array_keys(<?php $this->d($varId); ?>);
     }
     
@@ -45,9 +53,11 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
      * @return <?php $this->d($prop->className); ?> 
      */
     function get<?php $this->d($ucSingle); ?>($id) {
+<?php   if ($this->canLoadDest) { ?>
         if (!<?php $this->d($this->loadedId); ?>) {
-            $this->mapper->load<?php echo $this->ucOtherPlural; ?>For($this);
+            $this->mapper->load<?php echo $this->ucOtherPlural; ?>For(<?php echo $this->relationTargetExpression; ?>);
         }
+<?php   } ?>        
         if (!isset(<?php $this->d($varId); ?>[$id])) trigger_error ('No such <?php echo addcslashes($otherModel->singleCaption, '\''); ?>: \''.$id.'\'', E_USER_ERROR);
         return <?php $this->d($varId); ?>[$id];
     }
@@ -68,7 +78,8 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
         <?php $this->d($varId); ?>[] = $<?php $this->d($single); ?>;
 <?php   $this->_showLinkBackCode(); ?>        
     }
-    
+
+<?php   if ($this->canCreateDest) { ?>
     /**
      * @return <?php $this->d($prop->className); ?>  
      */
@@ -81,6 +92,7 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
         return $res;
     }
     
+<?php   } ?>
 <?php
 
     }
@@ -88,7 +100,7 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
     function _showLinkBackCode() {
 ?>        
 <?php   if (strlen($this->mirrorVar)) { ?>
-        $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?> = $this;
+        $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?> = <?php echo $this->relationTargetExpression; ?>;
 <?php   } ?>
 <?php  
     }

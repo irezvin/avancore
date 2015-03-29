@@ -1,8 +1,6 @@
 <?php
 
-class Sample_Publish extends Sample_Publish_Base_ObjectMixable {
-    
-    protected $mixableId = 'Sample_Publish';
+class Sample_Shop_Product_Extra_Code extends Sample_Shop_Product_Extra_Code_Base_ObjectMixable {
     
     /*
     protected function getOwnPropertiesInfo() {

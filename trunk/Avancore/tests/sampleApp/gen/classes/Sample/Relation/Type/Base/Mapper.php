@@ -176,14 +176,13 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more relationTypes of given one or more relations 
-     * @param Sample_Relation|array $relations of Sample_Relation_Type objects
-     
+     * @param Sample_Relation|array $relations of Sample_Relation_Type objects      
      */
     function loadForRelations($relations) {
         $rel = $this->getRelation('_relations');
         return $rel->loadSrc($relations); 
     }
-
+    
     /**
      * Loads one or more relations of given one or more relationTypes 
      * @param Sample_Relation_Type|array $relationTypes     

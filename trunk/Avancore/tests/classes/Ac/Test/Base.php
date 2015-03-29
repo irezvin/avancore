@@ -8,7 +8,7 @@ class Ac_Test_Base extends UnitTestCase {
     // Ugly but allows us to run test without legacy adapter
     static $config = array();
     
-	protected $aeDb = false;
+    protected $aeDb = false;
     
     protected $legacyDb = false;
     

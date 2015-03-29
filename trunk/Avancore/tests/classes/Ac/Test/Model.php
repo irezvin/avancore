@@ -156,9 +156,12 @@ class Ac_Test_Model extends Ac_Test_Base {
     
     function testDataMixable() {
         require_once(dirname(__FILE__).'/assets/DataWithMixable.php');
-        $data = new Ac_Model_Data();
+        $data = new DataMixin();
+        $data->bar = 'val';
         $dMix = new DataMixable();
+        $dMix->bar = 'mixableVal';
         $data->addMixable($dMix);
+        $this->assertTrue($data->getField('bar'), 'val');
         $validHandlers = array('onCheck', 'onListProperties', 'onGetPropertiesInfo');
         $currHandlers = $dMix->listEventHandlerMethods();
         $this->assertTrue(
@@ -176,8 +179,10 @@ class Ac_Test_Model extends Ac_Test_Base {
         require_once(dirname(__FILE__).'/assets/ObjectWithMixable.php');
         $pm = Sample::getInstance()->getSamplePersonMapper();
         $mix = new ObjectMixable();
+        $mix->personId = 'foobar';
         $rec = $pm->loadRecord(3);
         $rec->addMixable($mix);
+        $this->assertEqual($rec->getField('personId'), 3);
         $rec->load();
         $this->assertFalse($rec->store());
         $this->assertFalse($rec->canDelete());
@@ -198,9 +203,9 @@ class Ac_Test_Model extends Ac_Test_Base {
             foreach($mmk as $key) $mmn[] = $mn[$key];
             foreach($omk as $key) $omn[] = $mn[$key];
             foreach ($mmn as $method) 
-                if (!$c($mapper, $method)) $nonMatching[$id]['mapper'][] = $method;
+                if (strlen($method) && !$c($mapper, $method)) $nonMatching[$id]['mapper'][] = $method;
             foreach ($omn as $method) 
-                if (!$c($o, $method)) $nonMatching[$id]['model'][] = $method;
+                if (strlen($method) && !$c($o, $method)) $nonMatching[$id]['model'][] = $method;
         }
         if (!$this->assertTrue(!count($nonMatching), 'All mapper & model methods must be correctly set in Association')) {
             var_dump($nonMatching);
@@ -228,6 +233,7 @@ class Ac_Test_Model extends Ac_Test_Base {
         $this->assertSame($do2, $a->getReligion());
         
         $a2 = $m->loadByPersonId(3);
+        $this->assertTrue($assoc2->getCanLoadDestObjects());
         $do3 = $assoc2->getDestObject($a2);
         $this->assertEqual($do3->getDataFields(), $do->getDataFields());
     }
@@ -380,7 +386,8 @@ class Ac_Test_Model extends Ac_Test_Base {
         $this->assertTrue($p4->hasProperty('religion[title]'));
         
         // TODO: fix WTFy inconsistency: Cg creates plural name of property (tags, tags[0][title]) that
-        //  causes errors, Assoc creates singular (but unconvenient) name (tag, tag[0][title])
+        // causes errors, Assoc creates singular (but unconvenient) name (tag, tag[0][title])
+        
         $this->assertTrue($p4->hasProperty('tag'));
         $this->assertTrue($p4->hasProperty('tag[0][titleF]'));
         

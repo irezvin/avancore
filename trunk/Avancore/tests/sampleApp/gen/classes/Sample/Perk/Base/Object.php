@@ -97,6 +97,7 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_tags');
         }
         return $this->_tagsCount;
+        
     }
 
     function listTags() {
@@ -120,6 +121,7 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
         if (!$this->_tagsLoaded) {
             $this->mapper->loadTagsFor($this);
         }
+        
         if (!isset($this->_tags[$id])) trigger_error ('No such Tag: \''.$id.'\'', E_USER_ERROR);
         return $this->_tags[$id];
     }
@@ -144,7 +146,7 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
         }
         
     }
-    
+
     /**
      * @return Sample_Tag  
      */

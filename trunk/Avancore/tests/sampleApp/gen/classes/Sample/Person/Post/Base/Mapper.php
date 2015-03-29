@@ -249,14 +249,13 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more personPosts of given one or more publish 
-     * @param Sample_Publish|array $publish of Sample_Person_Post objects
-     
+     * @param Sample_Publish|array $publish of Sample_Person_Post objects      
      */
     function loadForPublish($publish) {
         $rel = $this->getRelation('_publish');
         return $rel->loadSrc($publish); 
     }
-
+    
     /**
      * Loads one or more publish of given one or more personPosts 
      * @param Sample_Person_Post|array $personPosts     
@@ -280,14 +279,13 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads several personPosts of given one or more people 
-     * @param Sample_Person|array $people of Sample_Person_Post objects
-     
+     * @param Sample_Person|array $people of Sample_Person_Post objects      
      */
     function loadForPeople($people) {
         $rel = $this->getRelation('_person');
         return $rel->loadSrc($people); 
     }
-
+    
     /**
      * Loads several people of given one or more personPosts 
      * @param Sample_Person_Post|array $personPosts     
@@ -311,14 +309,13 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads several personPosts of given one or more personPhotos 
-     * @param Sample_Person_Photo|array $personPhotos of Sample_Person_Post objects
-     
+     * @param Sample_Person_Photo|array $personPhotos of Sample_Person_Post objects      
      */
     function loadForPersonPhotos($personPhotos) {
         $rel = $this->getRelation('_personPhoto');
         return $rel->loadSrc($personPhotos); 
     }
-
+    
     /**
      * Loads several personPhotos of given one or more personPosts 
      * @param Sample_Person_Post|array $personPosts     
