@@ -137,12 +137,8 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
      * @return Ac_Cg_Template_Assoc_Strategy
      */
     function getAssocStrategy($relationId, $prop) {
-        if ($prop->isList() && $prop->isManyToMany()) $class = 'Ac_Cg_Template_Assoc_Strategy_ManyToMany';
-        elseif ($prop->isList()) $class = 'Ac_Cg_Template_Assoc_Strategy_Many';
-        else $class = 'Ac_Cg_Template_Assoc_Strategy_One';
-
-        //$class = 'Ac_Cg_Template_Assoc_Strategy';
-        $res = new $class (array('relationId' => $relationId, 'prop' => & $prop, 'model' => & $this->model, 'template' => & $this, 'domain' => $this->domain));
+        $res = $prop->getAssocStrategy();
+        $res->template = $this;
         return $res;
     }
     

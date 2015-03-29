@@ -93,16 +93,14 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
     function countTags() {
         if (is_array($this->_tags)) return count($this->_tags);
         if ($this->_tagsCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_tags');
+            $this->mapper->loadAssocCountFor($this, '_tags');
         }
         return $this->_tagsCount;
     }
 
     function listTags() {
         if (!$this->_tagsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_tags');
+            $this->mapper->loadTagsFor($this);
         }
         return array_keys($this->_tags);
     }
@@ -119,12 +117,9 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
      */
     function getTag($id) {
         if (!$this->_tagsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_tags');
+            $this->mapper->loadTagsFor($this);
         }
         if (!isset($this->_tags[$id])) trigger_error ('No such Tag: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_tags[$id] === false) {
-        }
         return $this->_tags[$id];
     }
     
@@ -164,8 +159,7 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
 
     function getTagIds() {
         if ($this->_tagIds === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocNNIdsFor($this, '_tags');
+            $this->mapper->loadTagIdsFor($this);
         }
         return $this->_tagIds;
     }

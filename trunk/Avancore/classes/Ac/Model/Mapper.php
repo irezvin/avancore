@@ -1107,9 +1107,29 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $this->associations;
     }
     
+    /**
+     * @return array
+     */
+    function listAssociations() {
+        if ($this->associations === false) $this->getAssociations();
+        return array_keys($this->associations);
+    }
+    
+    /**
+     * @return Ac_Model_Association_Abstract
+     */
+    function getAssociation($id, $dontThrow = false) {
+        $res = null;
+        if ($this->associations === false) $this->getAssociations();
+        if (isset($this->associations[$id])) $res = $this->associations[$id];
+        if (!$res && !$dontThrow) 
+            throw Ac_E_InvalidCall::noSuchItem ('association', $id, 'listAssociations');
+        return $res;
+    }
+    
     function addAssociations(array $associations) {
         $objects = Ac_Prototyped::factoryCollection($associations, 'Ac_I_ModelAssociation', 
-            array('mapper' => $this), 'id', true, true);
+            array('mapper' => $this, 'immutable' => true), 'id', true, true);
         
         foreach ($objects as $k => $a) {
             if (isset($this->associations[$k]) && $this->associations[$k] !== $a) {

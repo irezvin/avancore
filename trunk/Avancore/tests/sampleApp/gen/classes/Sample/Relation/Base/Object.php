@@ -148,8 +148,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
      */
     function getRelationType() {
         if ($this->_relationType === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_relationType');
+            $this->mapper->loadRelationTypesFor($this);
         }
         return $this->_relationType;
     }
@@ -191,8 +190,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
      */
     function getOtherPerson() {
         if ($this->_otherPerson === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_otherPerson');
+            $this->mapper->loadOtherPeopleFor($this);
         }
         return $this->_otherPerson;
     }
@@ -234,8 +232,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
      */
     function getPerson() {
         if ($this->_person === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_person');
+            $this->mapper->loadPeopleFor($this);
         }
         return $this->_person;
     }

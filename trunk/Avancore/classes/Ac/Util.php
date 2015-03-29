@@ -1084,6 +1084,11 @@ abstract class Ac_Util {
         return $res;
     }
     
+    static function lcFirst($string) {
+        if (strlen($string)) $string{0} = strtolower($string{0});
+        return $string;
+    }
+    
 }
 
 class _Ae_Util_ObjectVarGetter {

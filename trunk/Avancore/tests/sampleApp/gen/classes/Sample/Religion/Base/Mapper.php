@@ -112,7 +112,20 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
             'people' => array (
                 'relationId' => '_people',
-                'class' => 'Ac_Model_Association_Referencing',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'person',
+                'plural' => 'people',
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => 'loadPeopleFor',
+                'loadSrcObjectsMapperMethod' => 'loadForPeople',
+                'getSrcObjectsMapperMethod' => 'getOfPeople',
+                'createDestObjectMethod' => 'createPerson',
+                'listDestObjectsMethod' => 'listPeople',
+                'countDestObjectsMethod' => 'countPeople',
+                'getDestObjectMethod' => 'getPerson',
+                'addDestObjectMethod' => 'addPerson',
+                'isDestLoadedMethod' => 'isPeopleLoaded',
             ),
         ));
         

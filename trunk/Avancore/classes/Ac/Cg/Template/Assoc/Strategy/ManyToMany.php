@@ -2,6 +2,14 @@
 
 class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Strategy_Many {
     
+    function getGuessMap() {
+        return array_merge(parent::getGuessMap(), array(
+            'loadDestIdsMapperMethod' => 'load{Single}IdsFor',
+            'getDestIdsMethod' => 'get{Single}Ids',
+            'setDestIdsMethod' => 'set{Single}Ids',
+        ));
+    }
+    
     function _doShowGenModelMethods() {
         parent::_doShowGenModelMethods();
         extract(get_object_vars($this));
@@ -11,8 +19,7 @@ class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Stra
 
     function get<?php $this->d(ucfirst($this->prop->getIdsPropertyName())); ?>() {
         if ($this-><?php $this->d($imn) ?> === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocNNIdsFor($this, <?php $this->str($relationId); ?>);
+            $this->mapper->load<?php $this->d(ucfirst($this->prop->getIdsPropertyName())); ?>For($this);
         }
         return $this-><?php $this->d($imn) ?>;
     }

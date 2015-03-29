@@ -113,7 +113,20 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
             'relations' => array (
                 'relationId' => '_relations',
-                'class' => 'Ac_Model_Association_Referencing',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'relation',
+                'plural' => 'relations',
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => 'loadRelationsFor',
+                'loadSrcObjectsMapperMethod' => 'loadForRelations',
+                'getSrcObjectsMapperMethod' => 'getOfRelations',
+                'createDestObjectMethod' => 'createRelation',
+                'listDestObjectsMethod' => 'listRelations',
+                'countDestObjectsMethod' => 'countRelations',
+                'getDestObjectMethod' => 'getRelation',
+                'addDestObjectMethod' => 'addRelation',
+                'isDestLoadedMethod' => 'isRelationsLoaded',
             ),
         ));
         

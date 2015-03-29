@@ -57,6 +57,8 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
      */
     var $_other = false;
     
+    var $_assocStrategy = false;
+    
     function listPassthroughVars() {
         return array_merge(array(
             'className', 
@@ -436,20 +438,50 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     
     function getAssociationPrototype() {
         $prot = $this->getAeModelRelationPrototype();
+        $strat = $this->getAssocStrategy();
+        $mm = $strat->getMethodNames();
         $res = array(
             'relationId' => $prot['srcVarName'],
+            'useMapperMethods' => true,
+            'useModelMethods' => true,
+            'single' => $strat->single,
+            'plural' => $strat->plural,
         );
         if ($this->isList()) {
             if ($this->isManyToMany()) {
                 $class = 'Ac_Model_Association_ManyToMany';
             } else {
-                $class = 'Ac_Model_Association_Referencing';
+                $class = 'Ac_Model_Association_Many';
+                if (!$this->isIncoming) 
+                    $res['isReferenced'] = true;
             }
         } else {
-            $class = 'Ac_Model_Association_Referenced';
+            $class = 'Ac_Model_Association_One';
+            if ($this->isIncoming) 
+                $res['isReferenced'] = false;
         }
         $res['class'] = $class;
+        Ac_Util::ms($res, $mm);
         return $res;
+    }
+    
+    function getAssocStrategy() {
+        if ($this->_assocStrategy === false) {
+            $prot = $this->getAeModelRelationPrototype();
+            $relationId = $prot['srcVarName'];
+            if ($this->isList() && $this->isManyToMany()) $class = 'Ac_Cg_Template_Assoc_Strategy_ManyToMany';
+            elseif ($this->isList()) $class = 'Ac_Cg_Template_Assoc_Strategy_Many';
+            else $class = 'Ac_Cg_Template_Assoc_Strategy_One';
+
+            //$class = 'Ac_Cg_Template_Assoc_Strategy';
+            $this->_assocStrategy = new $class (array(
+                'relationId' => $relationId, 
+                'prop' => $this, 
+                'model' => $this->_model,
+                'domain' => $this->_model->_domain
+            ));
+        }
+        return $this->_assocStrategy;
     }
     
 }

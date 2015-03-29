@@ -99,7 +99,7 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
     function getDefaultOrdering() {
         return 'ordering';
     }
-            
+                
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
