@@ -9,6 +9,8 @@ abstract class Ac_Event {
     protected static $current = false;
 
     protected static $classEventCache = array();
+
+    protected static $eventHandlerCache = array();
     
     static function triggerEvent($issuer, $eventHandlers, $event, array $arguments = array()) {
         $a = isset($eventHandlers[Ac_Event::EVENT_ON_ALL_EVENTS]);
@@ -96,6 +98,24 @@ abstract class Ac_Event {
             } while(strlen($curr));
         }
         return self::$classEventCache[$class];
+    }
+    
+    static function listEventHandlers($classWithHandlers, $handlerPrefix, $stripAutoEventPrefix = true) {
+        $l = strlen($handlerPrefix);
+        $cacheId = $classWithHandlers.'-'.$handlerPrefix.'-'.$stripAutoEventPrefix;
+        if (!isset(self::$eventHandlerCache[$cacheId])) {
+            self::$eventHandlerCache[$cacheId] = array();
+            if ($l = strlen($handlerPrefix)) {
+                foreach (Ac_Util::getPublicMethods($classWithHandlers) as $m)
+                    if (!strncasecmp($m, $handlerPrefix, $l)) {
+                        if ($stripAutoEventPrefix)
+                            self::$eventHandlerCache[$cacheId][substr($m, $l)] = $m;
+                        else 
+                            self::$eventHandlerCache[$cacheId][$m] = $m;
+                    }
+            }
+        }
+        return self::$eventHandlerCache[$cacheId];
     }
     
 }

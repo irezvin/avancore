@@ -1769,6 +1769,14 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
         return $res;
     }
     
+    function addMixable(Ac_I_Mixable $mixable, $id = false, $canReplace = false) {
+        parent::addMixable($mixable, $id, $canReplace);
+        Ac_Model_Data::clearMetaCache($this->getId());
+        $this->resetPrototype();
+    }
     
+    function resetPrototype() {
+        $this->prototype = false;
+    }
     
 }

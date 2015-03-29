@@ -348,7 +348,36 @@ class Ac_Model_Association_ManyToMany extends Ac_Model_Association_Many {
             'loadDestIdsMapperMethod' => 'load{Single}IdsFor',
             'getDestIdsMethod' => 'get{Single}Ids',
             'setDestIdsMethod' => 'set{Single}Ids',
+            'clearDestObjectsMethod' => 'clear{Plural}',
         ));
+    }
+    
+    protected function genPropMap() {
+        parent::genPropMap();
+        $ids = $this->getIdsField();
+        if (strlen($ids)) $this->propMap['model'][$ids] = "_assoc_{$this->id}_ids";
+    }
+    
+    protected function getMethodImplMap() {
+        return array_merge(parent::getMethodImplMap(), array(
+            'loadDestIdsMapperMethod' => 'loadDestIds',
+            'getDestIdsMethod' => 'getDestIds',
+            'setDestIdsMethod' => 'setDestIds',
+            'clearDestObjectsMethod' => 'clearDestObjects',
+        ));
+    }
+    
+    protected function genModelMeta() {
+        parent::genModelMeta();
+        $s = $this->getSingle();
+        $ids = $this->getIdsField(true);
+        if (strlen($ids)) {
+            $this->modelMeta['onListProperties'][] = 'tagIds';
+            $this->modelMeta['onGetPropertiesInfo'][$s]['nnIdsVarName'] = $ids;
+            $this->modelMeta['onGetPropertiesInfo'][$ids] = array(
+                'arrayValue' => true,
+            );
+        }
     }
     
 }
