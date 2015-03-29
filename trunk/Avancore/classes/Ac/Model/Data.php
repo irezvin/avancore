@@ -1558,6 +1558,9 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
             $this->extraData = array();
         } else {
             unset($this->extraData[$key]);
+        }
+    }
+            
     function beginUpdate() {
         $this->updateLevel++;
     }

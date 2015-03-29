@@ -125,6 +125,11 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_CLEANUP = 'onCleanup';
     
     /**
+     * function onGetAssociations(array & $associations)
+     */
+    const EVENT_ON_GET_ASSOCIATIONS = 'onGetAssociations';
+    
+    /**
      * In-memory id
      * @var int
      */
