@@ -26,6 +26,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     var $createAccessors = false;
     var $accessors = array();
     var $nullableSqlColumns = array();
+    var $associationPrototypes = array();
     
     function _generateFilesList() {
         return array(
@@ -79,6 +80,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->ownLists = $pps['ownLists'];
         $this->ownPropInfo = $pps['ownPropertiesInfo'];  
         $this->tableName = $this->model->tableObject->name;
+        $this->associationPrototypes = $this->model->getAssociationPrototypes();
         
         foreach ($this->model->tableObject->listColumns() as $cn) {
             $col = $this->model->tableObject->getColumn($cn);
@@ -209,53 +211,6 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $strategy->showGenMapperMethods();
     }
     
-    function _showModelStorageMethods() {
-        $up = '';
-        $down = '';
-        $nn = '';
-        foreach (array_keys($this->assocProperties) as $relId) { 
-            $prop = $this->assocProperties[$relId];
-            $strat = $this->getAssocStrategy($relId, $prop);
-            ob_start(); $r = $strat->showStoreReferencedPart(); $part = ob_get_clean(); if ($r !== false) $up .= $part;
-            ob_start(); $r = $strat->showStoreReferencingPart(); $part = ob_get_clean(); if ($r !== false) $down .= $part;
-            ob_start(); $r = $strat->showStoreNNPart(); $part = ob_get_clean(); if ($r !== false) $nn .= $part;  
-        }
-        if (strlen($up)) {
-?>
-
-    function _storeReferencedRecords() {
-        $res = parent::_storeReferencedRecords() !== false;
-        $mapper = $this->getMapper();
-<?php   echo $up; ?> 
-        return $res;
-    }
-<?php           
-        }
-        if (strlen($down)) {
-?>
-
-    function _storeReferencingRecords() {
-        $res = parent::_storeReferencingRecords() !== false;
-        $mapper = $this->getMapper();
-<?php   echo $down; ?>
-        return $res; 
-    }
-<?php           
-        }
-        if (strlen($nn)) {
-?>
-
-    function _storeNNRecords() {
-        $res = parent::_storeNNRecords() !== false;
-        $mapper = $this->getMapper();
-<?php   echo $nn; ?>
-        return $res; 
-    }
-<?php           
-        }
-        
-    }
-    
     function showModelGenObject() {  
 
         $fieldVisibility = $this->createAccessors? 'protected' : 'public';
@@ -338,7 +293,6 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 <?php } ?>
 <?php if ($this->createAccessors) $this->_showModelAccessors(); ?>
 <?php foreach (array_keys($this->assocProperties) as $relId) { $this->_showModelMethodsForAssociation($relId, $this->assocProperties[$relId]); } ?>  
-<?php $this->_showModelStorageMethods(); ?>
     
 }
 
@@ -489,6 +443,16 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
         return Ac_Util::m(parent::doGetRelationPrototypes(), <?php $this->exportArray($this->relationPrototypes, 8); ?>);
 <?php   } else { ?>
         return <?php $this->exportArray($this->relationPrototypes, 8); ?>;
+<?php   } ?>        
+    }
+    <?php } ?>
+    <?php if ($this->associationPrototypes) { ?>
+    
+    protected function doGetAssociationPrototypes() {
+<?php   if (!in_array($this->genMapperClass, array('Ac_Model_Mapper', 'Ac_Model_CpkMapper'))) { ?>
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), <?php $this->exportArray($this->associationPrototypes, 8); ?>);
+<?php   } else { ?>
+        return <?php $this->exportArray($this->associationPrototypes, 8); ?>;
 <?php   } ?>        
     }
     <?php } ?>

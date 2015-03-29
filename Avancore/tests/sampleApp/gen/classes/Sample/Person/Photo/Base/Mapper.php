@@ -160,6 +160,28 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+            
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'person' => array (
+                'relationId' => '_person',
+                'class' => 'Ac_Model_Association_Referenced',
+            ),
+            'personAlbums' => array (
+                'relationId' => '_personAlbums',
+                'class' => 'Ac_Model_Association_ManyToMany',
+            ),
+            'protraitPerson' => array (
+                'relationId' => '_protraitPerson',
+                'class' => 'Ac_Model_Association_Referenced',
+            ),
+            'personPosts' => array (
+                'relationId' => '_personPosts',
+                'class' => 'Ac_Model_Association_Referencing',
+            ),
+        ));
+        
+    }
         
     protected function doGetInfoParams() {
         return Ac_Util::m( 
