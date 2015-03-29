@@ -45,36 +45,6 @@ class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Stra
 <?php  
     }
     
-    function _doShowStoreReferencingPart() {
-        return false;
-    }
-    
-    function _doShowStoreNNPart() {
-
-        if ($this->prop->isManyToMany()) {
-?>
-<?php       if (strlen($imn = $this->prop->getIdsMemberName())) { ?>
-        
-        if (is_array($this-><?php $this->d($this->var); ?>) || is_array($this-><?php $this->d($imn); ?>)) {
-            $rel = $mapper->getRelation(<?php $this->str($this->relationId); ?>);
-            if (!$this->_autoStoreNNRecords($this-><?php $this->d($this->var); ?>, $this-><?php $this->d($imn); ?>, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, <?php $this->str($this->plural); ?>, $rel->midWhere)) 
-                $res = false;
-        }
-<?php       } else { ?>
-        if (is_array($this-><?php $this->d($this->var); ?>)) {
-            $rel = $mapper->getRelation(<?php $this->str($this->relationId); ?>);
-            $ids = false;
-            if (!$this->_autoStoreNNRecords($this-><?php $this->d($this->var); ?>, $ids, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, <?php $this->str($this->plural); ?>)) 
-                $res = false;
-        }
-<?php       } ?>            
-<?php   
-        return true;
-        
-        } else return false;
-        
-    }
-    
     function _doShowGenMapperMethods() {
         parent::_doShowGenMapperMethods();
         extract(get_object_vars($this));

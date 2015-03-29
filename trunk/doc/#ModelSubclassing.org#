@@ -130,6 +130,7 @@
 	- [ ] check, bind
       - [ ] Ac_Model_Mixable_Object
 	- [ ] can have referenced, referencing, NN records
+	  - [ ] Ac_Model_Association
   - [ ] codegen support
     - [ ] Ac_Cg_Model_Part
     - [ ] Ac_Cg_Model_Shared extends Ac_Cg_Model_Part

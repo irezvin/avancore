@@ -120,6 +120,11 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_LIST_DATA_PROPERTIES = 'onListDataProperties';
     
     /**
+     * function onGetAssociations(array & $associations)
+     */
+    const EVENT_ON_GET_ASSOCIATIONS = 'onGetAssociations';
+    
+    /**
      * In-memory id
      * @var int
      */
@@ -158,6 +163,8 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     var $_origPk = null;
     
     protected $lastOperation = self::OPERATION_NONE;
+    
+    protected $associations = false;
     
     /**
      * @var Ac_Model_Mapper
@@ -369,8 +376,9 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * @param bool $isRow Whether to treat first parameter as an associative row
      */
     function load ($pkOrRow = null, $isRow = false) {
-        
+    
         if ($isRow) {
+            
             $this->_otherValues = array();
             $hyData = $this->mapper->peConvertForLoad($this, $pkOrRow);
             foreach ($this->listDataProperties() as $propName) {
@@ -510,11 +518,33 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
             $this->triggerEvent(self::EVENT_BEFORE_SAVE, array(& $beforeSaveResult));
             if ($beforeSaveResult !== false) {
                 $res = true;
-                $res = $res && ($this->_storeReferencedRecords() !== false);
+                
+                if (Ac_Accessor::methodExists($this, $m = '_storeReferencedRecords')) {
+                    trigger_error("Using $m() is deprecated; please re-generate the code", E_DEPRECATED);
+                    $res = $res && ($this->$m() !== false);
+                }
+                
+                foreach ($this->getAssociations() as $assoc) {
+                    if ($assoc->beforeSave($this, $this->_errors) === false) $res = false;
+                }
                 $res = $res && $this->_legacyStore();
                 if ($this->tracksPk()) $this->_origPk = $res? $this->getPrimaryKey() : null;
-                $res = $res && ($this->_storeReferencingRecords() !== false);
-                $res = $res && ($this->_storeNNRecords() !== false);
+                if ($res) {
+                    foreach ($this->getAssociations() as $assoc) {
+                        if ($assoc->afterSave($this, $this->_errors) === false) $res = false;
+                    }
+                }
+                
+                if (Ac_Accessor::methodExists($this, $m = '_storeReferencingRecords')) {
+                    trigger_error("Using $m() is deprecated; please re-generate the code", E_DEPRECATED);
+                    $res = $res && ($this->$m() !== false);
+                }
+                
+                if (Ac_Accessor::methodExists($this, $m = '_storeNNRecords')) {
+                    trigger_error("Using $m() is deprecated; please re-generate the code", E_DEPRECATED);
+                    $res = $res && ($this->$m() !== false);
+                }
+                
                 if ($res) {
             
                     $this->lastOperation = $isNew? self::OPERATION_CREATE : self::OPERATION_UPDATE;
@@ -618,7 +648,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * @return bool
      */
     function tracksPk() {
-    	return false;
+    	return true;
     }
     
     /**
@@ -820,22 +850,8 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     /**
-     * Saves records that are referenced by current record and are linked to it in-memory 
-     */
-    function _storeReferencedRecords() {
-    }
-    
-    /**
-     * Saves records that are referencing current record and are linked to it in-memory
-     */
-    function _storeReferencingRecords() {
-    }
-    
-    function _storeNNRecords() {
-    }
-    
-    /**
      * Stores referenced records and populates this record foreign keys.
+     * @deprecated
      */
     function _autoStoreReferenced($recordOrRecords, $fieldLinks, $errorKey) {
         $res = true;
@@ -858,6 +874,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     /**
      * Populates referencing records' foreign keys from this record keys and stores them
+     * @deprecated
      */
     function _autoStoreReferencing($recordOrRecords, $fieldLinks, $errorKey) {
         $res = true;
@@ -878,6 +895,9 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
+    /**
+     * @deprecated
+     */
     function _autoStoreNNRecords(& $recordOrRecords, $ids, $fieldLinks, $fieldLinks2, $midTableName, $errorKey, $midWhere = false) {
         $res = true;
         if ($recordOrRecords !== false && !is_null($recordOrRecords)) {
@@ -1206,6 +1226,32 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
                 }
             }
         }
+    }
+    
+    protected function doOnGetAssociations(array & $associations) {
+    }
+    
+    final function getAssociations() {
+        if ($this->associations === false) {
+            $this->associations = $this->getMapper()->getAssociations();
+            $this->doOnGetAssociations($this->associations);
+            $this->triggerEvent(self::EVENT_ON_GET_ASSOCIATIONS, array(& $this->associations));
+        }
+        return $this->associations;
+    }
+    
+    function addAssociations($associations) {
+        if ($this->associations === false) $this->getAssociations();
+        foreach ($associations as $k => $v) {
+            if (!$v) {
+                if (!is_numeric($k)) unset($this->associations[$k]);
+                unset($associations[$k]);
+            }
+        }
+        $instances = Ac_Prototyped::factoryCollection($associations, 'Ac_I_ModelAssociation', array(), 'id', true);
+        foreach ($instances as $i) if ($i instanceof Ac_Model_Association_ModelObject) 
+            $i->setMapper($this->getMapper());
+        Ac_Util::ms($this->associations, $instances);
     }
     
 }

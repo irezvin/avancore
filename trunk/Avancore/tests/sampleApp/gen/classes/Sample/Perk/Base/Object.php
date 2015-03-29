@@ -183,19 +183,6 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
         $this->_tagIds = false;
     }               
   
-
-    function _storeNNRecords() {
-        $res = parent::_storeNNRecords() !== false;
-        $mapper = $this->getMapper();
-        
-        if (is_array($this->_tags) || is_array($this->_tagIds)) {
-            $rel = $mapper->getRelation('_tags');
-            if (!$this->_autoStoreNNRecords($this->_tags, $this->_tagIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'tags', $rel->midWhere)) 
-                $res = false;
-        }
-            
-        return $res; 
-    }
     
 }
 

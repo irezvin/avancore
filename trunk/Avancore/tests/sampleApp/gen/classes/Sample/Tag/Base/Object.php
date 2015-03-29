@@ -310,26 +310,6 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         $this->_perkIds = false;
     }               
   
-
-    function _storeNNRecords() {
-        $res = parent::_storeNNRecords() !== false;
-        $mapper = $this->getMapper();
-        
-        if (is_array($this->_people) || is_array($this->_personIds)) {
-            $rel = $mapper->getRelation('_people');
-            if (!$this->_autoStoreNNRecords($this->_people, $this->_personIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'people', $rel->midWhere)) 
-                $res = false;
-        }
-            
-        
-        if (is_array($this->_perks) || is_array($this->_perkIds)) {
-            $rel = $mapper->getRelation('_perks');
-            if (!$this->_autoStoreNNRecords($this->_perks, $this->_perkIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'perks', $rel->midWhere)) 
-                $res = false;
-        }
-            
-        return $res; 
-    }
     
 }
 

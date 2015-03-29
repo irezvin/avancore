@@ -207,33 +207,5 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
 
     }
 
-    function showStoreReferencedPart() {
-        $this->init();
-        return $this->_doShowStoreReferencedPart(); 
-    }
-
-    function showStoreReferencingPart() {
-        $this->init();
-        return $this->_doShowStoreReferencingPart(); 
-    }
-
-    function showStoreNNPart() {
-        $this->init();
-        return $this->_doShowStoreNNPart(); 
-    }
-    
-    function _doShowStoreReferencedPart() {
-        return false;
-    }
-    
-    function _doShowStoreReferencingPart() {
-        return false;
-    }
-    
-    function _doShowStoreNNPart() {
-        return false;
-    }
-    
-    
 }
 

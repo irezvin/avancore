@@ -271,28 +271,6 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     }
     
   
-
-    function _storeReferencedRecords() {
-        $res = parent::_storeReferencedRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_object($this->_relationType)) {
-            $rel = $mapper->getRelation('_relationType');
-            if (!$this->_autoStoreReferenced($this->_relationType, $rel->fieldLinks, 'relationType')) $res = false;
-        }
-
-        if (is_object($this->_otherPerson)) {
-            $rel = $mapper->getRelation('_otherPerson');
-            if (!$this->_autoStoreReferenced($this->_otherPerson, $rel->fieldLinks, 'otherPerson')) $res = false;
-        }
-
-        if (is_object($this->_person)) {
-            $rel = $mapper->getRelation('_person');
-            if (!$this->_autoStoreReferenced($this->_person, $rel->fieldLinks, 'person')) $res = false;
-        }
- 
-        return $res;
-    }
     
 }
 

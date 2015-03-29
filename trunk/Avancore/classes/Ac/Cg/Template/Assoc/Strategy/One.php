@@ -53,22 +53,5 @@ class Ac_Cg_Template_Assoc_Strategy_One extends Ac_Cg_Template_Assoc_Strategy {
 <?php        
     }
 
-    function _doShowStoreReferencedPart() {
-
-        if (!$this->prop->isIncoming) {
-?>
-
-        if (is_object($this-><?php $this->d($this->var); ?>)) {
-            $rel = $mapper->getRelation(<?php $this->str($this->relationId); ?>);
-            if (!$this->_autoStoreReferenced($this-><?php $this->d($this->var); ?>, $rel->fieldLinks, <?php $this->str($this->single); ?>)) $res = false;
-        }
-<?php   
-        return true;
-        
-        } else return false;
-        
-    }
-    
-    
 }
 
