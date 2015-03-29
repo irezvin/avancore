@@ -1,0 +1,9 @@
+Avancore/deploy/app.config.php
+Avancore/tests/app.config.php
+Avancore/tests/codegen/generator*
+Avancore/tests/codegen/output
+Avancore/tests/pdo.config.php
+Avancore/tests/sampleApp/deploy/app.config.php
+Avancore/tests/sampleApp/var/
+nbproject
+*#*
