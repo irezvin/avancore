@@ -37,5 +37,35 @@ class Ac_Sql_Dbi_Object {
     	return $res;
     }
     
+    /**
+     * @return array(parentClass, parentMemberName)
+     */
+    protected function getSerializationParentInfo() {
+        return array(null, null);
+    }
+    
+    /**
+     * @return array (myProperty => array(arrayKey, defaultClass, crArgs))
+     * crArgs => array(keyA, keyB, keyC) <- constructor args map
+     * crArgs = false -- just copy $this->$myProperty to/from $array[$arrayKey]
+     */
+    protected function getSerializationMap() {
+        $res = array();
+        return $res;
+    }
+    
+    public function unserializeFromArray($array) {
+        $vars = Ac_Impl_ArraySerializer::getUnserializationVars($this, $array);
+        $allowed = array_unique(array_merge(array_keys(Ac_Util::getPublicVars($this)), array_keys($this->getSerializationMap())));
+        foreach (array_intersect_key($vars, array_flip($allowed)) as $k => $v) $this->$k = $v;
+    }
+    
+    public function serializeToArray() {
+        $allowed = array_unique(array_merge(array_keys(Ac_Util::getPublicVars($this)), array_keys($this->getSerializationMap())));
+        $pub = array_intersect_key(get_object_vars($this), $allowed);
+        $res = Ac_Impl_ArraySerializer::serializeToArray($this, $pub);
+        return $res;
+    }
+    
 }
 

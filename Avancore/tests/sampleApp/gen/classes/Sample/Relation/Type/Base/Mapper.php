@@ -18,21 +18,21 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
             'isSymmetrical' => '0',
         ); 
  
-    
+   
     protected $autoincFieldName = 'relationTypeId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_relations' => false,
             '_relationsCount' => false,
             '_relationsLoaded' => false,
-        );
+        ));
     }
     
     /**
@@ -85,11 +85,11 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-        
+    
     function getTitleFieldName() {
         return 'title';   
     }
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_relations' => array (
@@ -108,7 +108,30 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+    
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'relations' => array (
+                'relationId' => '_relations',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'relation',
+                'plural' => 'relations',
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => 'loadRelationsFor',
+                'loadSrcObjectsMapperMethod' => 'loadForRelations',
+                'getSrcObjectsMapperMethod' => 'getOfRelations',
+                'createDestObjectMethod' => 'createRelation',
+                'listDestObjectsMethod' => 'listRelations',
+                'countDestObjectsMethod' => 'countRelations',
+                'getDestObjectMethod' => 'getRelation',
+                'addDestObjectMethod' => 'addRelation',
+                'isDestLoadedMethod' => 'isRelationsLoaded',
+            ),
+        ));
         
+    }
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -120,15 +143,15 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'relationTypeId',
             ),
         );
     }
-        
+
     /**
      * @return Sample_Relation_Type 
      */
@@ -152,14 +175,13 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more relationTypes of given one or more relations 
-     * @param Sample_Relation|array $relations of Sample_Relation_Type objects
-     
+     * @param Sample_Relation|array $relations of Sample_Relation_Type objects      
      */
     function loadForRelations($relations) {
         $rel = $this->getRelation('_relations');
         return $rel->loadSrc($relations); 
     }
-
+    
     /**
      * Loads one or more relations of given one or more relationTypes 
      * @param Sample_Relation_Type|array $relationTypes     

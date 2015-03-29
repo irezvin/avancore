@@ -22,18 +22,48 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
             'pubId' => NULL,
         ); 
  
-    
+   
     protected $autoincFieldName = 'id';
-    
     protected $askRelationsForDefaults = false;
+ 
+    protected function doGetCoreMixables() { 
+        return Ac_Util::m(parent::doGetCoreMixables(), array (
+            'publish' => array (
+                'class' => 'Sample_Publish_MapperMixable',
+                'colMap' => array (
+                    'id' => 'pubId',
+                ),
+            ),
+            'extraCode' => array (
+                'class' => 'Sample_Shop_Product_Extra_Code_MapperMixable',
+                'colMap' => array (
+                    'productId' => 'id',
+                ),
+            ),
+            'note' => array (
+                'class' => 'Sample_Shop_Product_Note_MapperMixable',
+                'colMap' => array (
+                    'productId' => 'id',
+                ),
+            ),
+        ));
+    }
     
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
-        );
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+            '_shopCategories' => false,
+            '_shopCategoriesCount' => false,
+            '_shopCategoriesLoaded' => false,
+            '_shopCategoryIds' => false,
+            '_noteNotePerson' => false,
+            '_noteShopProductsCount' => false,
+            '_noteShopProductsLoaded' => false,
+        ));
     }
     
     /**
@@ -86,11 +116,65 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-        
+    
     function getTitleFieldName() {
         return 'title';   
     }
-                
+    
+    protected function doGetRelationPrototypes() {
+        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
+            '_shopCategories' => array (
+                'srcMapperClass' => 'Sample_Shop_Product_Mapper',
+                'destMapperClass' => 'Sample_Shop_Category_Mapper',
+                'srcVarName' => '_shopCategories',
+                'srcNNIdsVarName' => '_shopCategoryIds',
+                'srcCountVarName' => '_shopCategoriesCount',
+                'srcLoadedVarName' => '_shopCategoriesLoaded',
+                'destVarName' => '_shopProducts',
+                'destCountVarName' => '_shopProductsCount',
+                'destLoadedVarName' => '_shopProductsLoaded',
+                'destNNIdsVarName' => '_shopProductIds',
+                'fieldLinks' => array (
+                    'id' => 'productId',
+                ),
+                'srcIsUnique' => false,
+                'destIsUnique' => false,
+                'midTableName' => '#__shop_product_categories',
+                'fieldLinks2' => array (
+                    'categoryId' => 'id',
+                ),
+            ),
+        ));
+        
+    }
+    
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'shopCategories' => array (
+                'relationId' => '_shopCategories',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'shopCategory',
+                'plural' => 'shopCategories',
+                'class' => 'Ac_Model_Association_ManyToMany',
+                'loadDestObjectsMapperMethod' => 'loadShopCategoriesFor',
+                'loadSrcObjectsMapperMethod' => 'loadForShopCategories',
+                'getSrcObjectsMapperMethod' => 'getOfShopCategories',
+                'createDestObjectMethod' => 'createShopCategory',
+                'listDestObjectsMethod' => 'listShopCategories',
+                'countDestObjectsMethod' => 'countShopCategories',
+                'getDestObjectMethod' => 'getShopCategory',
+                'addDestObjectMethod' => 'addShopCategory',
+                'isDestLoadedMethod' => 'isShopCategoriesLoaded',
+                'loadDestIdsMapperMethod' => 'loadShopCategoryIdsFor',
+                'getDestIdsMethod' => 'getShopCategoryIds',
+                'setDestIdsMethod' => 'setShopCategoryIds',
+                'clearDestObjectsMethod' => 'clearShopCategories',
+            ),
+        ));
+        
+    }
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -102,9 +186,9 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'id',
             ),
@@ -113,7 +197,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
             ),
         );
     }
-        
+
     /**
      * @return Sample_Shop_Product 
      */
@@ -133,6 +217,56 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-        
+    
+    /**
+     * Returns (but not loads!) one or more shopProducts of given one or more shopCategories 
+     * @param Sample_Shop_Product|array $shopCategories     
+     * @return Sample_Shop_Product|array of Sample_Shop_Product objects  
+     */
+    function getOfShopCategories($shopCategories) {
+        $rel = $this->getRelation('_shopCategories');
+        $res = $rel->getSrc($shopCategories); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more shopProducts of given one or more shopCategories 
+     * @param Sample_Shop_Category|array $shopCategories of Sample_Shop_Product objects      
+     */
+    function loadForShopCategories($shopCategories) {
+        $rel = $this->getRelation('_shopCategories');
+        return $rel->loadSrc($shopCategories); 
+    }
+    
+    /**
+     * Loads one or more shopCategories of given one or more shopProducts 
+     * @param Sample_Shop_Product|array $shopProducts     
+     */
+    function loadShopCategoriesFor($shopProducts) {
+        $rel = $this->getRelation('_shopCategories');
+        return $rel->loadDest($shopProducts); 
+    }
+
+
+    /**
+     * @param Sample_Shop_Product|array $shopProducts 
+     */
+     function loadShopCategoryIdsFor($shopProducts) {
+        $rel = $this->getRelation('_shopCategories');
+        return $rel->loadDestNNIds($shopProducts); 
+    }
+    
+    
+    
+    /**
+     * Loads several people of given one or more shopProducts 
+     * @param Sample_Shop_Product|array $shopProducts     
+     */
+    function loadNotePeopleFor($shopProducts) {
+        $rel = $this->getRelation('_noteNotePerson');
+        return $rel->loadDest($shopProducts); 
+    }
+
+    
 }
 

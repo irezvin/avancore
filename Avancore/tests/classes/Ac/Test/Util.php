@@ -2,6 +2,10 @@
 
 class Ac_Test_Util extends Ac_Test_Base {
     
+    var $report = array();
+    
+    var $periodicRan = false;
+    
     function testUtil() {
         
         $a = array('foo' => array());
@@ -74,8 +78,6 @@ class Ac_Test_Util extends Ac_Test_Base {
             var_dump($f);
         }
     }
-    
-    var $report = array();
     
     /**
      * @param type $string
@@ -181,8 +183,6 @@ class Ac_Test_Util extends Ac_Test_Base {
         $this->assertTrue($bar->release());
     }
     
-    var $periodicRan = false;
-    
     function runCallback() {
         $this->periodicRan++;
     }
@@ -212,6 +212,24 @@ class Ac_Test_Util extends Ac_Test_Base {
         $this->assertTrue($a->run());
         $this->assertEqual($this->periodicRan, 1);
         $this->assertFalse($lock->has());
+    }
+    
+    function testOverriddenMethods() {
+        require_once(dirname(__FILE__).'/assets/classesWithOverrides.php');
+        $this->assertFalse(Ac_Util::isMethodOverridden('aBaseClass', 'aBaseClass', 'foo'));
+        $this->assertFalse(Ac_Util::isMethodOverridden('aBaseClass', 'aBaseClass', 'bar'));
+        $this->assertFalse(Ac_Util::isMethodOverridden('aBaseClass', 'aBaseClass', 'baz'));
+        $this->assertTrue(!Ac_Util::isMethodOverridden('aBaseClass', 'aBaseClass'));
+        
+        $this->assertTrue(Ac_Util::isMethodOverridden('aDescendantClass', 'aBaseClass', 'foo'));
+        $this->assertFalse(Ac_Util::isMethodOverridden('aDescendantClass', 'aBaseClass', 'bar'));
+        $this->assertFalse(Ac_Util::isMethodOverridden('aDescendantClass', 'aBaseClass', 'baz'));
+        $this->assertTrue(!array_diff($a = Ac_Util::isMethodOverridden('aDescendantClass', 'aBaseClass'), array('foo')));
+        
+        $this->assertTrue(Ac_Util::isMethodOverridden('aNotherDescendantClass', 'aBaseClass', 'foo'));
+        $this->assertTrue(Ac_Util::isMethodOverridden('aNotherDescendantClass', 'aBaseClass', 'bar'));
+        $this->assertFalse(Ac_Util::isMethodOverridden('aNotherDescendantClass', 'aBaseClass', 'baz'));
+        $this->assertTrue(!array_diff(Ac_Util::isMethodOverridden('aNotherDescendantClass', 'aBaseClass'), array('foo', 'bar')));
     }
     
 }

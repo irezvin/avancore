@@ -39,7 +39,19 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     var $otherModelIdInMethodsPlural = false;
     var $otherModelIdInMethodsPrefix = false;
     
+    var $canLoadSrc = true;
+    var $canLoadDest = true;
+    var $canCreateDest = true;
+    
     var $mapperClass = false;
+    
+    var $relationOverrides = array();
+    var $associationOverrides = array();
+    
+    /**
+     * @var Ac_Cg_Model_Relation
+     */
+    var $modelRelation = false;
     
     /**
      * @var Ac_Sql_Dbi_Relation
@@ -57,6 +69,10 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
      */
     var $_other = false;
     
+    var $_assocStrategy = false;
+    
+    protected $refsToFix = false;
+    
     function listPassthroughVars() {
         return array_merge(array(
             'className', 
@@ -67,7 +83,11 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         ), parent::listPassthroughVars());
     }
     
-    function _init() {
+    function init() {
+        if (is_array($this->refsToFix)) {
+            $this->finishUnserialization ();
+            return;
+        }
         if ($this->relation) {
             if ($this->isIncoming)
                 $this->_rel = $this->_model->tableObject->getIncomingRelation($this->relation);
@@ -81,6 +101,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
                     else $this->_otherRel = $tbl->getRelation($this->otherRelation);
             }
             
+        } else {
         }
         
         if ($this->_rel) {
@@ -132,6 +153,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     
     function getTargetModelName() {
         $res = $this->_other? $this->_other->name : false;
+        return $res;
     }
     
     function getDefaultClassName() {
@@ -190,6 +212,13 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         if (!strlen($res))
             $res = $this->getOtherEntityName(!$this->isList() || $forceSingle);
         if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
+        
+        if (strlen($this->otherModelIdInMethodsPrefix) && $this->_model instanceof Ac_Cg_Model_Part) {
+            //ini_set('html_errors', 1);
+            //var_dump('!'.$this->name.' '.$this->_model->name.' '.$this->otherModelIdInMethodsPrefix);
+            $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);        
+        }
+        
         return $res;
     }
     
@@ -295,6 +324,9 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
                 $res['destIsUnique'] = false;
             }
         }
+        
+        if (is_array($this->relationOverrides)) 
+            Ac_Util::ms($res, $this->relationOverrides);
          
         return $res;
     }
@@ -335,7 +367,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             if (strlen($this->otherModelIdInMethodsSingle)) 
                 $res = $this->otherModelIdInMethodsSingle.'Ids';
             else $res = $this->getOtherEntityName(true).'Ids';
-            if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);        
+            if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
         } else $res = false;
         return $res;
     }
@@ -399,9 +431,9 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             $many = false;
             $res = parent::getAeModelPropertyInfo();
         }
-        $relId = $this->_model->searchRelationIdByProperty($this);
-        if ($relId !== false) {
-            $prot = $this->_model->getAeModelRelationPrototype($relId);
+        $relation = $this->modelRelation;
+        if ($relation) {
+            $prot = $this->_model->getAeModelRelationPrototype($relation);
             if (isset($prot['srcVarName'])) {
                 if ($many) {
                     $res[$this->varName]['relationId'] = $prot['srcVarName'];
@@ -431,6 +463,121 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             }
         }
         return $res;
+    }
+    
+    function getAssociationPrototype() {
+        $prot = $this->getAeModelRelationPrototype();
+        $strat = $this->getAssocStrategy();
+        $mm = $strat->getMethodNames();
+        $res = array(
+            'relationId' => $prot['srcVarName'],
+            'useMapperMethods' => true,
+            'useModelMethods' => true,
+            'single' => $strat->single,
+            'plural' => $strat->plural,
+        );
+        foreach (array(
+            'canLoadDest' => 'canLoadDestObjects', 
+            'canLoadSrc' => 'canLoadSrcObjects', 
+            'canCreateDest' => 'canCreateDestObject'
+        ) as $p => $op) {
+            if (!$this->$p) $res[$op] = false;
+        }
+        if ($this->isList()) {
+            if ($this->isManyToMany()) {
+                $class = 'Ac_Model_Association_ManyToMany';
+            } else {
+                $class = 'Ac_Model_Association_Many';
+                if (!$this->isIncoming) 
+                    $res['isReferenced'] = true;
+            }
+        } else {
+            $class = 'Ac_Model_Association_One';
+            if ($this->isIncoming) 
+                $res['isReferenced'] = false;
+        }
+        $res['class'] = $class;
+        Ac_Util::ms($res, $mm);
+        
+        if (is_array($this->associationOverrides))
+            Ac_Util::ms($res, $this->associationOverrides);
+        
+        return $res;
+    }
+    
+    function getAssocStrategy() {
+        if ($this->_assocStrategy === false) {
+            $prot = $this->getAeModelRelationPrototype();
+            $relationId = $prot['srcVarName'];
+            if ($this->isList() && $this->isManyToMany()) $class = 'Ac_Cg_Template_Assoc_Strategy_ManyToMany';
+            elseif ($this->isList()) $class = 'Ac_Cg_Template_Assoc_Strategy_Many';
+            else $class = 'Ac_Cg_Template_Assoc_Strategy_One';
+
+            //$class = 'Ac_Cg_Template_Assoc_Strategy';
+            $this->_assocStrategy = new $class (array(
+                'relationId' => $relationId, 
+                'prop' => $this, 
+                'model' => $this->_model,
+                'domain' => $this->_model->_domain
+            ));
+        }
+        return $this->_assocStrategy;
+    }
+    
+    function setOtherModel(Ac_Cg_Model $otherModel = null, $resetProps = false) {
+        $this->_other = $otherModel;
+        
+        if ($resetProps) {
+            $this->className = false;
+            $this->varName = false;
+            $this->pluralForList = false;
+            $this->caption = false;
+        }
+        
+        if (!$this->className) $this->className = $this->getDefaultClassName();
+        
+        if (!$this->varName) $this->varName = $this->getDefaultVarName();
+        
+        if (!$this->pluralForList) $this->pluralForList = $this->getDefaultPluralForList();
+        
+        if (!$this->caption) $this->caption = $this->getDefaultCaption();
+        
+        if ($this->_other) $this->mapperClass = $this->_other->getMapperClass();
+        
+    }
+    
+    function __clone() {
+        $this->_assocStrategy = false;
+    }
+    
+    function getSerializationMap() {
+        $res = array(
+            'modelRelation' => array('modelRelation', 'Ac_Cg_Model_Relation', array())
+        );
+        return $res;
+    }
+    
+    function serializeToArray() {
+        $res = parent::serializeToArray();
+        if ($this->_other) $res['_other'] = $this->refModel($this->_other);
+        if ($this->_rel) $res['_rel'] = $this->refRelation($this->_rel);
+        if ($this->_otherRel) $res['_otherRel'] = $this->refRelation($this->_otherRel);
+        return $res;
+    }
+    
+    function unserializeFromArray($array) {
+        parent::unserializeFromArray($array);
+        $this->refsToFix = array();
+        foreach (array('_other', '_rel', '_otherRel') as $k) if (isset($array[$k])) $this->refsToFix[$k] = $array[$k];
+    }
+    
+    protected function finishUnserialization() {
+        $array = $this->refsToFix;
+        if (isset($array['_other'])) $this->_other = $this->unrefModel($array['_other']);
+        if (isset($array['_rel'])) {
+            $this->_rel = $this->unrefRelation($array['_rel']);
+        }
+        if (isset($array['_otherRel'])) $this->_otherRel = $this->unrefRelation($array['_otherRel']);
     }
     
 }

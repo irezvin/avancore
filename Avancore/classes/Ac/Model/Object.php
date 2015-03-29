@@ -33,6 +33,16 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * function onCreate()
      */
     const EVENT_ON_CREATE = 'onCreate';
+    
+    /**
+     * function onListDataProperties(array & $dataProperties)
+     */
+    const EVENT_ON_LIST_DATA_PROPERTIES = 'onListDataProperties';
+
+    /**
+     * function onSetDefaults(array & $defaults, $full)
+     */
+    const EVENT_ON_SET_DEFAULTS = 'onSetDefaults';
 
     /**
      * function onAfterLoad()
@@ -60,9 +70,9 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_SAVE_FAILED = 'onSaveFailed';
 
     /**
-     * function onDeleteFailed()
+     * function onCanDelete(& $result)
      */
-    const EVENT_ON_DELETE_FAILED = 'onDeleteFailed';
+    const EVENT_ON_CAN_DELETE = 'onCanDelete';
 
     /**
      * function onBeforeDelete(& $result)
@@ -75,9 +85,9 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_AFTER_DELETE = 'onAfterDelete';
 
     /**
-     * function onCanDelete(& $result)
+     * function onDeleteFailed()
      */
-    const EVENT_ON_CAN_DELETE = 'onCanDelete';
+    const EVENT_ON_DELETE_FAILED = 'onDeleteFailed';
 
     /**
      * function onCopy(Ac_Model_Object $copy)
@@ -85,19 +95,14 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_COPY = 'onCopy';
 
     /**
-     * function onCompare(Ac_Model_Object $other, & $compareResult)
-     */
-    const EVENT_ON_COMPARE = 'onCompare';
-
-    /**
-     * function onListDefaultComparedAssociations(array & $associations)
-     */
-    const EVENT_ON_LIST_DEFAULT_COMPARED_ASSOCIATIONS = 'onListDefaultComparedAssociations';
-
-    /**
      * function onListNonCopiedFields(array & $fields)
      */
     const EVENT_ON_LIST_NON_COPIED_FIELDS = 'onListNonCopiedFields';
+
+    /**
+     * function onCompare(Ac_Model_Object $other, & $compareResult)
+     */
+    const EVENT_ON_COMPARE = 'onCompare';
 
     /**
      * function onListNonComparedFields(array & $fields)
@@ -105,19 +110,19 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_ON_LIST_NON_COMPARED_FIELDS = 'onListNonComparedFields';
 
     /**
-     * function onSetDefaults(array & $defaults, $full)
+     * function onListDefaultComparedAssociations(array & $associations)
      */
-    const EVENT_ON_SET_DEFAULTS = 'onSetDefaults';
+    const EVENT_ON_LIST_DEFAULT_COMPARED_ASSOCIATIONS = 'onListDefaultComparedAssociations';
+    
+    /**
+     * function onGetAssociations(array & $associations)
+     */
+    const EVENT_ON_GET_ASSOCIATIONS = 'onGetAssociations';
     
     /**
      * function onCleanup()
      */
     const EVENT_ON_CLEANUP = 'onCleanup';
-    
-    /**
-     * function onListDataProperties(array & $dataProperties)
-     */
-    const EVENT_ON_LIST_DATA_PROPERTIES = 'onListDataProperties';
     
     /**
      * In-memory id
@@ -159,10 +164,16 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     protected $lastOperation = self::OPERATION_NONE;
     
+    protected $associations = false;
+    
     /**
      * @var Ac_Model_Mapper
      */
     protected $mapper = false;
+    
+    protected $_magicGetLock = false;
+    
+    protected $_magicSetLock = false;
     
     /**
      * @return Ac_Application
@@ -180,7 +191,20 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function getDb() {
-        return $this->getMapper()->getDb();
+        return $this->mapper->getDb();
+    }
+    
+    // -------- template and to-be-overridden methods --------
+    
+    function doOnCreate() {
+    }
+    
+    protected function listOwnProperties() {
+        return $this->listOwnDataProperties();
+    }
+    
+    protected function listOwnDataProperties() {
+        return $this->mapper->listDataProperties();
     }
     
     function doAfterLoad() {
@@ -198,7 +222,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     function doOnSaveFailed() {
     }
     
-    function doOnDeleteFailed() {
+    function doOnCanDelete() {
     }
     
     function doBeforeDelete() {
@@ -207,32 +231,22 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     function doAfterDelete() {
     }
     
-    function doOnCanDelete() {
-    }
-    
-    function doOnCreate() {
-    }
-    
-    function doListNonCopiedFields() {
-        $m = $this->getMapper();
-        $res = $this->getMapper()->listPkFields();
-        return $res;
-    }
-    
-    function doListNonComparedFields() {
-        $m = $this->getMapper();
-        $res = $this->getMapper()->listPkFields();
-        return $res;
+    function doOnDeleteFailed() {
     }
     
     /**
-     * Should return list of associations (names of properties) that should be compared by default, in order of comparison. 
-     * The list can be recursive, i.e. ('assoc1', 'assoc2', 'assoc3' => array('assoc3.1', 'assoc3.2', ...))
-     * 
-     * @return array
+     * @param Ac_Model_Object $copy
      */
-    function doListDefaultComparedAssociations() {
-        return array();
+    function doOnCopy($copy) {
+    }
+    
+    protected function doOnGetAssociations(array & $associations) {
+    }
+    
+    function doListNonCopiedFields() {
+        $m = $this->mapper;
+        $res = $m->listPkFields();
+        return $res;
     }
     
     /**
@@ -246,10 +260,23 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     function doOnExtraCompare ($otherObject) {
     }
     
+    function doListNonComparedFields() {
+        $m = $this->mapper;
+        $res = $m->listPkFields();
+        return $res;
+    }
+    
     /**
-     * @param Ac_Model_Object $copy
+     * Should return list of associations (names of properties) that should be compared by default, in order of comparison. 
+     * The list can be recursive, i.e. ('assoc1', 'assoc2', 'assoc3' => array('assoc3.1', 'assoc3.2', ...))
+     * 
+     * @return array
      */
-    function doOnCopy($copy) {
+    function doListDefaultComparedAssociations() {
+        return array();
+    }
+    
+    protected function doOnCleanup() {
     }
     
     final function canDelete() {
@@ -259,15 +286,9 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
-    function getExcludeList() {
-        $vars = array_keys(get_object_vars($this));
-        foreach ($vars as $i => $var) if ($var{0} == "_") unset($vars[$i]);
-        return $vars;
-    }
-    
     function _describeIndex($indexName, $indexFields = false) {
         if ($indexFields === false) {
-            $m = $this->getMapper();
+            $m = $this->mapper;
             $indexFields = $m->listUniqueIndexFields($indexName);
         }
         $r = array();
@@ -283,7 +304,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         parent::_checkOwnFields();
         $dbp = $this->checkDatabasePresence(true);
         if ($dbp) {
-            $m = $this->getMapper();
+            $m = $this->mapper;
             foreach ($dbp as $indexName => $pks) {
                 $ff = $m->listUniqueIndexFields($indexName);
                 $fn = current($ff);
@@ -296,7 +317,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     // Models that have same properties use common validator (stored in the mapper). This preserves memory and time required for initial metadata retrieval. 
     function _createValidator() {
         if ($this->hasUniformPropertiesInfo()) {
-            $m = $this->getMapper();
+            $m = $this->mapper;
             $res = $m->getCommonValidator();
             $res->model = $this;
         } else {
@@ -369,8 +390,9 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * @param bool $isRow Whether to treat first parameter as an associative row
      */
     function load ($pkOrRow = null, $isRow = false) {
-        
+    
         if ($isRow) {
+            
             $this->_otherValues = array();
             $hyData = $this->mapper->peConvertForLoad($this, $pkOrRow);
             foreach ($this->listDataProperties() as $propName) {
@@ -382,6 +404,21 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
             $row = $pkOrRow;
             $this->_otherValues = $pkOrRow;
             $res = true;
+            
+            if ($this->tracksPk()) {
+                $this->_origPk = $res? $this->getPrimaryKey() : null;
+            }
+            $this->doAfterLoad();
+            $this->triggerEvent(self::EVENT_AFTER_LOAD);
+            if ($res) $this->doOnActual(self::ACTUAL_REASON_LOAD);
+            if ($this->isPersistent()) {
+                $m = $this->mapper;
+                $m->notifyKeyAssigned($this);
+            }
+            if ($this->tracksChanges()) $this->_memorizeFields();
+
+            if ($res) $this->lastOperation = self::OPERATION_LOAD;
+            
         } else {
             if (!$this->isPersistent() && $this->isReference()) {
                 $res = $this->_loadReference();
@@ -389,19 +426,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
                 $res = $this->_legacyLoad($pkOrRow, $row);
             }
         }
-        if ($this->tracksPk()) {
-            $this->_origPk = $res? $this->getPrimaryKey() : null;
-        }
-        $this->doAfterLoad();
-        $this->triggerEvent(self::EVENT_AFTER_LOAD);
-        if ($res) $this->doOnActual(self::ACTUAL_REASON_LOAD);
-        if ($this->isPersistent()) {
-            $m = $this->getMapper();
-            $m->notifyKeyAssigned($this);
-        }
-        if ($this->tracksChanges()) $this->_memorizeFields();
-        
-        if ($res) $this->lastOperation = self::OPERATION_LOAD;
         
         return $res;
     }
@@ -425,8 +449,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
             $this->$k = $primaryKey;
         }
         
-        $props = $this->listDataProperties();
-        
         if ($hyData = $this->mapper->peLoad($this, $this->getPrimaryKey())) {
             $this->load($hyData, true);
             $res = true;
@@ -447,7 +469,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     function _legacyStore() {
         $k = $this->_pk;
-        $mapper = $this->getMapper();
+        $mapper = $this->mapper;
         $tpk = $this->tracksPk();
         $hyData = $this->getHyData();
         $error = false;
@@ -495,7 +517,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function forget() {
-        $m = $this->getMapper();
+        $m = $this->mapper;
         $m->forget($this);
     }
     
@@ -510,11 +532,33 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
             $this->triggerEvent(self::EVENT_BEFORE_SAVE, array(& $beforeSaveResult));
             if ($beforeSaveResult !== false) {
                 $res = true;
-                $res = $res && ($this->_storeReferencedRecords() !== false);
+                
+                if (Ac_Accessor::methodExists($this, $m = '_storeReferencedRecords')) {
+                    trigger_error("Using $m() is deprecated; please re-generate the code", E_USER_DEPRECATED);
+                    $res = $res && ($this->$m() !== false);
+                }
+                
+                foreach ($this->getAssociations() as $assoc) {
+                    if ($assoc->beforeSave($this, $this->_errors) === false) $res = false;
+                }
                 $res = $res && $this->_legacyStore();
                 if ($this->tracksPk()) $this->_origPk = $res? $this->getPrimaryKey() : null;
-                $res = $res && ($this->_storeReferencingRecords() !== false);
-                $res = $res && ($this->_storeNNRecords() !== false);
+                if ($res) {
+                    foreach ($this->getAssociations() as $assoc) {
+                        if ($assoc->afterSave($this, $this->_errors) === false) $res = false;
+                    }
+                }
+                
+                if (Ac_Accessor::methodExists($this, $m = '_storeReferencingRecords')) {
+                    trigger_error("Using $m() is deprecated; please re-generate the code", E_USER_DEPRECATED);
+                    $res = $res && ($this->$m() !== false);
+                }
+                
+                if (Ac_Accessor::methodExists($this, $m = '_storeNNRecords')) {
+                    trigger_error("Using $m() is deprecated; please re-generate the code", E_USER_DEPRECATED);
+                    $res = $res && ($this->$m() !== false);
+                }
+                
                 if ($res) {
             
                     $this->lastOperation = $isNew? self::OPERATION_CREATE : self::OPERATION_UPDATE;
@@ -618,7 +662,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * @return bool
      */
     function tracksPk() {
-    	return false;
+    	return true;
     }
     
     /**
@@ -690,10 +734,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
-    protected function listOwnDataProperties() {
-        return $this->mapper->getColumnNames();
-    }
-    
     function getPrimaryKey() {
         return $this->{$this->_pk};
     }
@@ -745,7 +785,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * @see Ac_Model_Mapper::checkRecordUniqueness
      */    
     function checkDatabasePresence($dontReturnOwnKey = false, $checkNewRecords = false) {
-       $mapper = $this->getMapper();
+       $mapper = $this->mapper;
        return $mapper->checkRecordPresence($this, $dontReturnOwnKey, array(), array(), $checkNewRecords); 
     }
     
@@ -770,7 +810,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         foreach ($iData as $idx => $f) $where = array_merge($where, $f);
         
         if (count($where)) {
-            $m = $this->getMapper();
+            $m = $this->mapper;
             $s = $getSqlDb();
             $r = $m->loadRecordsByCriteria($c = $s->valueCriterion($where));
             if (count($r) == 1) {
@@ -807,7 +847,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function _getCompleteUniqueIndices() {
-        $m = $this->getMapper();
+        $m = $this->mapper;
         $res = array();
         foreach ($m->listUniqueIndices() as $idx) {
             $d = array();
@@ -820,22 +860,8 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     /**
-     * Saves records that are referenced by current record and are linked to it in-memory 
-     */
-    function _storeReferencedRecords() {
-    }
-    
-    /**
-     * Saves records that are referencing current record and are linked to it in-memory
-     */
-    function _storeReferencingRecords() {
-    }
-    
-    function _storeNNRecords() {
-    }
-    
-    /**
      * Stores referenced records and populates this record foreign keys.
+     * @deprecated
      */
     function _autoStoreReferenced($recordOrRecords, $fieldLinks, $errorKey) {
         $res = true;
@@ -858,6 +884,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     /**
      * Populates referencing records' foreign keys from this record keys and stores them
+     * @deprecated
      */
     function _autoStoreReferencing($recordOrRecords, $fieldLinks, $errorKey) {
         $res = true;
@@ -878,6 +905,9 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
+    /**
+     * @deprecated
+     */
     function _autoStoreNNRecords(& $recordOrRecords, $ids, $fieldLinks, $fieldLinks2, $midTableName, $errorKey, $midWhere = false) {
         $res = true;
         if ($recordOrRecords !== false && !is_null($recordOrRecords)) {
@@ -943,7 +973,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * @return Ac_Model_Object
      */
     function copy($asReference = null, $withPk = false) {
-        $m = $this->getMapper();
+        $m = $this->mapper;
         $copy = $m->createRecord();
         $flds = array_diff($this->listDataProperties(), $this->doListNonCopiedFields());
         if (!$asReference && !$withPk) $flds = array_diff($flds, $m->listPkFields());
@@ -1089,11 +1119,12 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function cleanupMembers() {
+        $this->doOnCleanup();
         $this->triggerEvent(self::EVENT_ON_CLEANUP);
-        $vars = get_class_vars(get_class($this));
-        $m = $this->getMapper();
+        $vars = array_intersect_key(get_class_vars(get_class($this)), get_object_vars($this));
+        $m = $this->mapper;
         $m->forget($this);
-        foreach (get_class_vars(get_class($this)) as $k => $v) if (isset($this->$k)) {
+        foreach ($vars as $k => $v) if (isset($this->$k)) {
             if (is_array($this->$k)) {
                 $tmp = $this->$k;
                 foreach (array_keys($tmp) as $kk) {
@@ -1136,43 +1167,50 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function __isset($name) {
-        $res = in_array($name, $this->listFields());
+        if (in_array($name, $this->listFields())) $res = true; // TODO: check if this is right (in PHP isset(NULL) is FALSE)
+        elseif (strpos($name, '[') !== false) {
+            $res = $this->hasProperty($name);
+        } else $res = parent::__isset($name);
         return $res;
     }
     
-    function __get($name) {
-        if (in_array($name, $this->listFields())) return $this->getField($name);
-        elseif (!in_array($name, array_diff(array_keys(Ac_Util::getPublicVars($this)), array_keys(get_object_vars($this))))) {
-            return $this->$name;
+    function & __get($name) {
+        $tmp = $this->_magicGetLock;
+        $this->_magicGetLock = $name;
+        if (in_array($name, $this->listFields()) || strpos($name, '[') !== false) {
+            $res = $this->getField($name);
         } else {
-            $rc = new ReflectionClass(get_class($this));
-            $p = $rc->getProperty($name);
-            if ($p->isPrivate()) $m = 'private';
-            elseif ($p->isProtected()) $m = 'protected';
-            else throw new Exception("Assertion: something is wrong in ".__METHOD__);
-            throw new Ac_E_InvalidCall("Cannot access {$m} property '$name' in class ".get_class($this));
+            $res = & parent::__get($name);
         }
+        $this->_magicGetLock = $tmp;
+        return $res;
+    }
+    
+    function _getSingleFieldItem($head) {
+        if ($this->_magicGetLock === $head) return Ac_Mixin::__get($head);
+        return parent::_getSingleFieldItem($head);
+    }
+    
+    function _setOwnSingleFieldItem($head, $value) {
+        if ($this->_magicSetLock === $head) return Ac_Mixin::__set($head, $value);
+        return parent::_setOwnSingleFieldItem($head, $value);
     }
     
     function __set($name, $value) {
-        if (in_array($name, $this->listFields())) $res = $this->setField($name, $value);
-        elseif (!in_array($name, array_diff(array_keys(Ac_Util::getPublicVars($this)), array_keys(get_object_vars($this))))) {
-            $this->$name = $value;
-        } else {
-            $rc = new ReflectionClass(get_class($this));
-            $p = $rc->getProperty($name);
-            if ($p->isPrivate()) $m = 'private';
-            elseif ($p->isProtected()) $m = 'protected';
-            else throw new Exception("Assertion: something is wrong in ".__METHOD__);
-            throw new Ac_E_InvalidCall("Cannot access {$m} property '$name' in class ".get_class($this));
+        $tmp = $this->_magicGetLock;
+        $this->_magicSetLock = $name;
+        if (in_array($name, $this->listFields()) || strpos($name, '[') !== false) $this->setField($name, $value);
+        else {
+            parent::__set($name, $value);
         }
+        $this->_magicSetLock = $tmp;
     }
     
     protected function notifyFieldChanged($field) {
     }
     
     protected function intResetReferences() {
-        $fkData = $this->getMapper()->getFkFieldsData();
+        $fkData = $this->mapper->getFkFieldsData();
         foreach ($fkData as $fieldName => $details) {
             $null = false;
             if (is_null($fieldName)) {
@@ -1208,5 +1246,54 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         }
     }
     
-}
+    final function getAssociations() {
+        if ($this->associations === false) {
+            $this->associations = $this->mapper->getAssociations();
+            $this->doOnGetAssociations($this->associations);
+            $this->triggerEvent(self::EVENT_ON_GET_ASSOCIATIONS, array(& $this->associations));
+        }
+        return $this->associations;
+    }
+    
+    /**
+     * @return array
+     */
+    final function listAssociationObjects() {
+        if ($this->associations === false) $this->getAssociations();
+        return array_keys($this->associations);
+    }
 
+    /**
+     * @return Ac_Model_Association_Abstract
+     */
+    final function getAssociationObject($id, $dontThrow = false) {
+        $res = null;
+        if ($this->associations === false) $this->getAssociations();
+        if (isset($this->associations[$id])) $res = $this->associations[$id];
+        if (!$res && !$dontThrow) 
+            throw Ac_E_InvalidCall::noSuchItem ('association', $id, 'listAssociationsObjects');
+        return $res;
+    }
+    
+    function addAssociations($associations) {
+        if ($this->associations === false) $this->getAssociations();
+        foreach ($associations as $k => $v) {
+            if (!$v) {
+                if (!is_numeric($k)) unset($this->associations[$k]);
+                unset($associations[$k]);
+            }
+        }
+        $instances = Ac_Prototyped::factoryCollection($associations, 'Ac_I_ModelAssociation', array(), 'id', true);
+        foreach ($instances as $i) if ($i instanceof Ac_Model_Association_ModelObject) 
+            $i->setMapper($this->mapper);
+        Ac_Util::ms($this->associations, $instances);
+    }
+    
+    function __call($method, $arguments) {
+        if (!strncmp('_store', $method, 6)) {
+            return true;
+        }
+        return parent::__call($method, $arguments);
+    }
+    
+}

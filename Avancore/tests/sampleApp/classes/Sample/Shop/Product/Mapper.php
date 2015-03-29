@@ -17,6 +17,17 @@ class Sample_Shop_Product_Mapper extends Sample_Shop_Product_Base_Mapper {
                 'extraIsReferenced' => true,
                 'restrictions' => array('sharedObjectType' => 'product')
             ),
+            'upc' => array(
+                'class' => 'Ac_Model_Mapper_Mixable_ExtraTable',
+                'tableName' => '#__shop_product_upc',
+                'colMap' => array(
+                    'productId' => 'id',
+                ),
+                'fieldNames' => array(
+                    'productId' => false,
+                ),
+                'extraIsReferenced' => false
+            ),
         ));
     }
     

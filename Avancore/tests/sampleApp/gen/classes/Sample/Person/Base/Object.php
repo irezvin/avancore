@@ -3,7 +3,7 @@
 class Sample_Person_Base_Object extends Ac_Model_Object {
 
     public $_hasDefaults = true;
-    public $_protraitPersonPhoto = false;
+    public $_portraitPersonPhoto = false;
     public $_religion = false;
     public $_tags = false;
     public $_tagsCount = false;
@@ -24,6 +24,12 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     public $_outgoingRelations = false;
     public $_outgoingRelationsCount = false;
     public $_outgoingRelationsLoaded = false;
+    public $_extraCodeShopProducts = false;
+    public $_extraCodeShopProductsCount = false;
+    public $_extraCodeShopProductsLoaded = false;
+    public $_noteShopProducts = false;
+    public $_noteShopProductsCount = false;
+    public $_noteShopProductsLoaded = false;
     public $personId = NULL;
     public $name = '';
     public $gender = 'F';
@@ -56,29 +62,31 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array ( 0 => 'protraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'personPosts', 7 => 'incomingRelations', 8 => 'outgoingRelations', 9 => 'personId', 10 => 'name', 11 => 'gender', 12 => 'isSingle', 13 => 'birthDate', 14 => 'lastUpdatedDatetime', 15 => 'createdTs', 16 => 'religionId', 17 => 'portraitId', );
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'portraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'personPosts', 7 => 'incomingRelations', 8 => 'outgoingRelations', 9 => 'extraCodeShopProducts', 10 => 'noteShopProducts', )));
     }
+    
  
     protected function listOwnLists() {
         
-        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', );
+        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', 'extraCodeShopProducts' => 'extraCodeShopProducts', 'noteShopProducts' => 'noteShopProducts', );
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'protraitPersonPhoto' => 'Sample_Person_Photo', 'religion' => 'Sample_Religion', 'tags' => 'Sample_Tag', 'personAlbums' => 'Sample_Person_Album', 'personPhotos' => 'Sample_Person_Photo', 'personPosts' => 'Sample_Person_Post', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', );
+        return array ( 'portraitPersonPhoto' => 'Sample_Person_Photo', 'religion' => 'Sample_Religion', 'tags' => 'Sample_Tag', 'personAlbums' => 'Sample_Person_Album', 'personPhotos' => 'Sample_Person_Photo', 'personPosts' => 'Sample_Person_Post', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', 'extraCodeShopProducts' => 'Sample_Shop_Product', 'noteShopProducts' => 'Sample_Shop_Product', );
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; if ($pi === false) $pi = array (
-            'protraitPersonPhoto' => array (
+    	static $pi = false; 
+        if ($pi === false) $pi = array (
+            'portraitPersonPhoto' => array (
                 'className' => 'Sample_Person_Photo',
                 'mapperClass' => 'Sample_Person_Photo_Mapper',
-                'otherModelIdInMethodsPrefix' => 'protrait',
+                'otherModelIdInMethodsPrefix' => 'portrait',
                 'caption' => 'Person photo',
-                'relationId' => '_protraitPersonPhoto',
-                'referenceVarName' => '_protraitPersonPhoto',
+                'relationId' => '_portraitPersonPhoto',
+                'referenceVarName' => '_portraitPersonPhoto',
             ),
             'religion' => array (
                 'className' => 'Sample_Religion',
@@ -149,6 +157,24 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'relationId' => '_outgoingRelations',
                 'countVarName' => '_outgoingRelationsCount',
                 'referenceVarName' => '_outgoingRelations',
+            ),
+            'extraCodeShopProducts' => array (
+                'className' => 'Sample_Shop_Product',
+                'mapperClass' => 'Sample_Shop_Product_Mapper',
+                'otherModelIdInMethodsPrefix' => 'extraCode',
+                'caption' => 'Shop products',
+                'relationId' => '_extraCodeShopProducts',
+                'countVarName' => '_extraCodeShopProductsCount',
+                'referenceVarName' => '_extraCodeShopProducts',
+            ),
+            'noteShopProducts' => array (
+                'className' => 'Sample_Shop_Product',
+                'mapperClass' => 'Sample_Shop_Product_Mapper',
+                'otherModelIdInMethodsPrefix' => 'note',
+                'caption' => 'Shop products',
+                'relationId' => '_noteShopProducts',
+                'countVarName' => '_noteShopProductsCount',
+                'referenceVarName' => '_noteShopProducts',
             ),
             'personId' => array (
                 'dataType' => 'int',
@@ -224,7 +250,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Records',
                     'mapperClass' => 'Sample_Person_Photo_Mapper',
                 ),
-                'objectPropertyName' => 'protraitPersonPhoto',
+                'objectPropertyName' => 'portraitPersonPhoto',
                 'isNullable' => true,
                 'caption' => 'Portrait Id',
             ),
@@ -233,6 +259,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         return $pi;
                 
     }
+    
 
     function hasUniformPropertiesInfo() { return true; }
 
@@ -242,43 +269,44 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Photo 
      */
-    function getProtraitPersonPhoto() {
-        if ($this->_protraitPersonPhoto === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_protraitPersonPhoto');
+    function getPortraitPersonPhoto() {
+        if ($this->_portraitPersonPhoto === false) {
+            $this->mapper->loadPortraitPersonPhotosFor($this);
+            
         }
-        return $this->_protraitPersonPhoto;
+        return $this->_portraitPersonPhoto;
     }
     
     /**
-     * @param Sample_Person_Photo $protraitPersonPhoto 
+     * @param Sample_Person_Photo $portraitPersonPhoto 
      */
-    function setProtraitPersonPhoto($protraitPersonPhoto) {
-        if ($protraitPersonPhoto === false) $this->_protraitPersonPhoto = false;
-        elseif ($protraitPersonPhoto === null) $this->_protraitPersonPhoto = null;
+    function setPortraitPersonPhoto($portraitPersonPhoto) {
+        if ($portraitPersonPhoto === false) $this->_portraitPersonPhoto = false;
+        elseif ($portraitPersonPhoto === null) $this->_portraitPersonPhoto = null;
         else {
-            if (!is_a($protraitPersonPhoto, 'Sample_Person_Photo')) trigger_error('$protraitPersonPhoto must be an instance of Sample_Person_Photo', E_USER_ERROR);
-            if (!is_object($this->_protraitPersonPhoto) && !Ac_Util::sameObject($this->_protraitPersonPhoto, $protraitPersonPhoto)) { 
-                $this->_protraitPersonPhoto = $protraitPersonPhoto;
+            if (!is_a($portraitPersonPhoto, 'Sample_Person_Photo')) trigger_error('$portraitPersonPhoto must be an instance of Sample_Person_Photo', E_USER_ERROR);
+            if (!is_object($this->_portraitPersonPhoto) && !Ac_Util::sameObject($this->_portraitPersonPhoto, $portraitPersonPhoto)) { 
+                $this->_portraitPersonPhoto = $portraitPersonPhoto;
             }
         }
     }
     
-    function clearProtraitPersonPhoto() {
-        $this->protraitPersonPhoto = null;
+    function clearPortraitPersonPhoto() {
+        $this->portraitPersonPhoto = null;
     }
-    
+
     /**
      * @return Sample_Person_Photo  
      */
-    function createProtraitPersonPhoto($values = array(), $isReference = false) {
+    function createPortraitPersonPhoto($values = array(), $isReference = false) {
         $m = $this->getMapper('Sample_Person_Photo_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
-        $this->setProtraitPersonPhoto($res);
+        $this->setPortraitPersonPhoto($res);
         return $res;
     }
+
     
         
     
@@ -287,8 +315,8 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      */
     function getReligion() {
         if ($this->_religion === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_religion');
+            $this->mapper->loadReligionFor($this);
+            
         }
         return $this->_religion;
     }
@@ -310,7 +338,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function clearReligion() {
         $this->religion = null;
     }
-    
+
     /**
      * @return Sample_Religion  
      */
@@ -322,21 +350,21 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $this->setReligion($res);
         return $res;
     }
+
     
 
     function countTags() {
         if (is_array($this->_tags)) return count($this->_tags);
         if ($this->_tagsCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_tags');
+            $this->mapper->loadAssocCountFor($this, '_tags');
         }
         return $this->_tagsCount;
+        
     }
 
     function listTags() {
         if (!$this->_tagsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_tags');
+            $this->mapper->loadTagsFor($this);
         }
         return array_keys($this->_tags);
     }
@@ -353,12 +381,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      */
     function getTag($id) {
         if (!$this->_tagsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_tags');
+            $this->mapper->loadTagsFor($this);
         }
+        
         if (!isset($this->_tags[$id])) trigger_error ('No such Tag: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_tags[$id] === false) {
-        }
         return $this->_tags[$id];
     }
     
@@ -382,7 +408,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         }
         
     }
-    
+
     /**
      * @return Sample_Tag  
      */
@@ -398,8 +424,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
 
     function getTagIds() {
         if ($this->_tagIds === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocNNIdsFor($this, '_tags');
+            $this->mapper->loadTagIdsFor($this);
         }
         return $this->_tagIds;
     }
@@ -420,16 +445,15 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function countPersonAlbums() {
         if (is_array($this->_personAlbums)) return count($this->_personAlbums);
         if ($this->_personAlbumsCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_personAlbums');
+            $this->mapper->loadAssocCountFor($this, '_personAlbums');
         }
         return $this->_personAlbumsCount;
+        
     }
 
     function listPersonAlbums() {
         if (!$this->_personAlbumsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_personAlbums');
+            $this->mapper->loadPersonAlbumsFor($this);
         }
         return array_keys($this->_personAlbums);
     }
@@ -446,12 +470,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      */
     function getPersonAlbum($id) {
         if (!$this->_personAlbumsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_personAlbums');
+            $this->mapper->loadPersonAlbumsFor($this);
         }
+        
         if (!isset($this->_personAlbums[$id])) trigger_error ('No such Person album: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_personAlbums[$id] === false) {
-        }
         return $this->_personAlbums[$id];
     }
     
@@ -473,7 +495,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $personAlbum->_person = $this;
         
     }
-    
+
     /**
      * @return Sample_Person_Album  
      */
@@ -490,16 +512,15 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function countPersonPhotos() {
         if (is_array($this->_personPhotos)) return count($this->_personPhotos);
         if ($this->_personPhotosCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_personPhotos');
+            $this->mapper->loadAssocCountFor($this, '_personPhotos');
         }
         return $this->_personPhotosCount;
+        
     }
 
     function listPersonPhotos() {
         if (!$this->_personPhotosLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_personPhotos');
+            $this->mapper->loadPersonPhotosFor($this);
         }
         return array_keys($this->_personPhotos);
     }
@@ -516,12 +537,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      */
     function getPersonPhoto($id) {
         if (!$this->_personPhotosLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_personPhotos');
+            $this->mapper->loadPersonPhotosFor($this);
         }
+        
         if (!isset($this->_personPhotos[$id])) trigger_error ('No such Person photo: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_personPhotos[$id] === false) {
-        }
         return $this->_personPhotos[$id];
     }
     
@@ -543,7 +562,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $personPhoto->_person = $this;
         
     }
-    
+
     /**
      * @return Sample_Person_Photo  
      */
@@ -560,16 +579,15 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function countPersonPosts() {
         if (is_array($this->_personPosts)) return count($this->_personPosts);
         if ($this->_personPostsCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_personPosts');
+            $this->mapper->loadAssocCountFor($this, '_personPosts');
         }
         return $this->_personPostsCount;
+        
     }
 
     function listPersonPosts() {
         if (!$this->_personPostsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_personPosts');
+            $this->mapper->loadPersonPostsFor($this);
         }
         return array_keys($this->_personPosts);
     }
@@ -586,12 +604,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      */
     function getPersonPost($id) {
         if (!$this->_personPostsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_personPosts');
+            $this->mapper->loadPersonPostsFor($this);
         }
+        
         if (!isset($this->_personPosts[$id])) trigger_error ('No such Person post: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_personPosts[$id] === false) {
-        }
         return $this->_personPosts[$id];
     }
     
@@ -613,7 +629,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $personPost->_person = $this;
         
     }
-    
+
     /**
      * @return Sample_Person_Post  
      */
@@ -630,16 +646,15 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function countIncomingRelations() {
         if (is_array($this->_incomingRelations)) return count($this->_incomingRelations);
         if ($this->_incomingRelationsCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_incomingRelations');
+            $this->mapper->loadAssocCountFor($this, '_incomingRelations');
         }
         return $this->_incomingRelationsCount;
+        
     }
 
     function listIncomingRelations() {
         if (!$this->_incomingRelationsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_incomingRelations');
+            $this->mapper->loadIncomingRelationsFor($this);
         }
         return array_keys($this->_incomingRelations);
     }
@@ -656,12 +671,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      */
     function getIncomingRelation($id) {
         if (!$this->_incomingRelationsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_incomingRelations');
+            $this->mapper->loadIncomingRelationsFor($this);
         }
+        
         if (!isset($this->_incomingRelations[$id])) trigger_error ('No such Relation: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_incomingRelations[$id] === false) {
-        }
         return $this->_incomingRelations[$id];
     }
     
@@ -683,7 +696,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $incomingRelation->_otherPerson = $this;
         
     }
-    
+
     /**
      * @return Sample_Relation  
      */
@@ -700,16 +713,15 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function countOutgoingRelations() {
         if (is_array($this->_outgoingRelations)) return count($this->_outgoingRelations);
         if ($this->_outgoingRelationsCount === false) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocCountFor($this, '_outgoingRelations');
+            $this->mapper->loadAssocCountFor($this, '_outgoingRelations');
         }
         return $this->_outgoingRelationsCount;
+        
     }
 
     function listOutgoingRelations() {
         if (!$this->_outgoingRelationsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->listAssocFor($this, '_outgoingRelations');
+            $this->mapper->loadOutgoingRelationsFor($this);
         }
         return array_keys($this->_outgoingRelations);
     }
@@ -726,12 +738,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      */
     function getOutgoingRelation($id) {
         if (!$this->_outgoingRelationsLoaded) {
-            $mapper = $this->getMapper();
-            $mapper->loadAssocFor($this, '_outgoingRelations');
+            $this->mapper->loadOutgoingRelationsFor($this);
         }
+        
         if (!isset($this->_outgoingRelations[$id])) trigger_error ('No such Relation: \''.$id.'\'', E_USER_ERROR);
-        if ($this->_outgoingRelations[$id] === false) {
-        }
         return $this->_outgoingRelations[$id];
     }
     
@@ -753,7 +763,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $outgoingRelation->_person = $this;
         
     }
-    
+
     /**
      * @return Sample_Relation  
      */
@@ -766,68 +776,124 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         return $res;
     }
     
-  
 
-    function _storeReferencedRecords() {
-        $res = parent::_storeReferencedRecords() !== false;
-        $mapper = $this->getMapper();
+    function countExtraCodeShopProducts() {
+        if (is_array($this->_extraCodeShopProducts)) return count($this->_extraCodeShopProducts);
+        return 0;
+        
+    }
 
-        if (is_object($this->_protraitPersonPhoto)) {
-            $rel = $mapper->getRelation('_protraitPersonPhoto');
-            if (!$this->_autoStoreReferenced($this->_protraitPersonPhoto, $rel->fieldLinks, 'protraitPersonPhoto')) $res = false;
-        }
+    function listExtraCodeShopProducts() {
+        if (!is_array($this->_extraCodeShopProducts)) $this->_extraCodeShopProducts = array();
+        return array_keys($this->_extraCodeShopProducts);
+    }
+    
+    /**
+     * @return bool
+     */
+    function isExtraCodeShopProductsLoaded() {
+        return $this->_extraCodeShopProductsLoaded;
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getExtraCodeShopProduct($id) {
+        
+        if (!isset($this->_extraCodeShopProducts[$id])) trigger_error ('No such Shop product: \''.$id.'\'', E_USER_ERROR);
+        return $this->_extraCodeShopProducts[$id];
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getExtraCodeShopProductsItem($id) {
+        return $this->getExtraCodeShopProduct($id);
+    }
+    
+    /**
+     * @param Sample_Shop_Product $extraCodeShopProduct 
+     */
+    function addExtraCodeShopProduct($extraCodeShopProduct) {
+        if (!is_a($extraCodeShopProduct, 'Sample_Shop_Product')) trigger_error('$extraCodeShopProduct must be an instance of Sample_Shop_Product', E_USER_ERROR);
+        $this->listExtraCodeShopProducts();
+        $this->_extraCodeShopProducts[] = $extraCodeShopProduct;
+        
+        
+    }
 
-        if (is_object($this->_religion)) {
-            $rel = $mapper->getRelation('_religion');
-            if (!$this->_autoStoreReferenced($this->_religion, $rel->fieldLinks, 'religion')) $res = false;
-        }
- 
+    /**
+     * @return Sample_Shop_Product  
+     */
+    function createExtraCodeShopProduct($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Shop_Product_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        if ($isReference) $res->_setIsReference(true);
+        $this->addExtraCodeShopProduct($res);
         return $res;
     }
+    
 
-    function _storeReferencingRecords() {
-        $res = parent::_storeReferencingRecords() !== false;
-        $mapper = $this->getMapper();
-
-        if (is_array($this->_personAlbums)) {
-            $rel = $mapper->getRelation('_personAlbums');
-            if (!$this->_autoStoreReferencing($this->_personAlbums, $rel->fieldLinks, 'personAlbums')) $res = false;
-        }
-
-        if (is_array($this->_personPhotos)) {
-            $rel = $mapper->getRelation('_personPhotos');
-            if (!$this->_autoStoreReferencing($this->_personPhotos, $rel->fieldLinks, 'personPhotos')) $res = false;
-        }
-
-        if (is_array($this->_personPosts)) {
-            $rel = $mapper->getRelation('_personPosts');
-            if (!$this->_autoStoreReferencing($this->_personPosts, $rel->fieldLinks, 'personPosts')) $res = false;
-        }
-
-        if (is_array($this->_incomingRelations)) {
-            $rel = $mapper->getRelation('_incomingRelations');
-            if (!$this->_autoStoreReferencing($this->_incomingRelations, $rel->fieldLinks, 'incomingRelations')) $res = false;
-        }
-
-        if (is_array($this->_outgoingRelations)) {
-            $rel = $mapper->getRelation('_outgoingRelations');
-            if (!$this->_autoStoreReferencing($this->_outgoingRelations, $rel->fieldLinks, 'outgoingRelations')) $res = false;
-        }
-        return $res; 
-    }
-
-    function _storeNNRecords() {
-        $res = parent::_storeNNRecords() !== false;
-        $mapper = $this->getMapper();
+    function countNoteShopProducts() {
+        if (is_array($this->_noteShopProducts)) return count($this->_noteShopProducts);
+        return 0;
         
-        if (is_array($this->_tags) || is_array($this->_tagIds)) {
-            $rel = $mapper->getRelation('_tags');
-            if (!$this->_autoStoreNNRecords($this->_tags, $this->_tagIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'tags', $rel->midWhere)) 
-                $res = false;
-        }
-            
-        return $res; 
     }
+
+    function listNoteShopProducts() {
+        if (!is_array($this->_noteShopProducts)) $this->_noteShopProducts = array();
+        return array_keys($this->_noteShopProducts);
+    }
+    
+    /**
+     * @return bool
+     */
+    function isNoteShopProductsLoaded() {
+        return $this->_noteShopProductsLoaded;
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getNoteShopProduct($id) {
+        
+        if (!isset($this->_noteShopProducts[$id])) trigger_error ('No such Shop product: \''.$id.'\'', E_USER_ERROR);
+        return $this->_noteShopProducts[$id];
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getNoteShopProductsItem($id) {
+        return $this->getNoteShopProduct($id);
+    }
+    
+    /**
+     * @param Sample_Shop_Product $noteShopProduct 
+     */
+    function addNoteShopProduct($noteShopProduct) {
+        if (!is_a($noteShopProduct, 'Sample_Shop_Product')) trigger_error('$noteShopProduct must be an instance of Sample_Shop_Product', E_USER_ERROR);
+        $this->listNoteShopProducts();
+        $this->_noteShopProducts[] = $noteShopProduct;
+        
+        $noteShopProduct->_noteNotePerson = $this;
+        
+    }
+
+    /**
+     * @return Sample_Shop_Product  
+     */
+    function createNoteShopProduct($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Shop_Product_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        if ($isReference) $res->_setIsReference(true);
+        $this->addNoteShopProduct($res);
+        return $res;
+    }
+    
+  
     
 }
 

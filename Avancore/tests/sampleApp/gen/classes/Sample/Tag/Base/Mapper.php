@@ -21,17 +21,17 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
             'titleF' => NULL,
         ); 
  
-    
+   
     protected $autoincFieldName = 'tagId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_people' => false,
             '_peopleCount' => false,
             '_peopleLoaded' => false,
@@ -40,7 +40,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
             '_perksCount' => false,
             '_perksLoaded' => false,
             '_perkIds' => false,
-        );
+        ));
     }
     
     /**
@@ -93,11 +93,11 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-        
+    
     function getTitleFieldName() {
         return 'title';   
     }
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_people' => array (
@@ -145,7 +145,55 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+    
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'people' => array (
+                'relationId' => '_people',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'person',
+                'plural' => 'people',
+                'class' => 'Ac_Model_Association_ManyToMany',
+                'loadDestObjectsMapperMethod' => 'loadPeopleFor',
+                'loadSrcObjectsMapperMethod' => 'loadForPeople',
+                'getSrcObjectsMapperMethod' => 'getOfPeople',
+                'createDestObjectMethod' => 'createPerson',
+                'listDestObjectsMethod' => 'listPeople',
+                'countDestObjectsMethod' => 'countPeople',
+                'getDestObjectMethod' => 'getPerson',
+                'addDestObjectMethod' => 'addPerson',
+                'isDestLoadedMethod' => 'isPeopleLoaded',
+                'loadDestIdsMapperMethod' => 'loadPersonIdsFor',
+                'getDestIdsMethod' => 'getPersonIds',
+                'setDestIdsMethod' => 'setPersonIds',
+                'clearDestObjectsMethod' => 'clearPeople',
+            ),
+            'perks' => array (
+                'relationId' => '_perks',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'perk',
+                'plural' => 'perks',
+                'class' => 'Ac_Model_Association_ManyToMany',
+                'loadDestObjectsMapperMethod' => 'loadPerksFor',
+                'loadSrcObjectsMapperMethod' => 'loadForPerks',
+                'getSrcObjectsMapperMethod' => 'getOfPerks',
+                'createDestObjectMethod' => 'createPerk',
+                'listDestObjectsMethod' => 'listPerks',
+                'countDestObjectsMethod' => 'countPerks',
+                'getDestObjectMethod' => 'getPerk',
+                'addDestObjectMethod' => 'addPerk',
+                'isDestLoadedMethod' => 'isPerksLoaded',
+                'loadDestIdsMapperMethod' => 'loadPerkIdsFor',
+                'getDestIdsMethod' => 'getPerkIds',
+                'setDestIdsMethod' => 'setPerkIds',
+                'clearDestObjectsMethod' => 'clearPerks',
+            ),
+        ));
         
+    }
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -157,9 +205,9 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'tagId',
             ),
@@ -168,7 +216,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
             ),
         );
     }
-        
+
     /**
      * @return Sample_Tag 
      */
@@ -202,14 +250,13 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more tags of given one or more people 
-     * @param Sample_Person|array $people of Sample_Tag objects
-     
+     * @param Sample_Person|array $people of Sample_Tag objects      
      */
     function loadForPeople($people) {
         $rel = $this->getRelation('_people');
         return $rel->loadSrc($people); 
     }
-
+    
     /**
      * Loads one or more people of given one or more tags 
      * @param Sample_Tag|array $tags     
@@ -227,8 +274,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_people');
         return $rel->loadDestNNIds($tags); 
     }
-
-
+    
     /**
      * Returns (but not loads!) one or more tags of given one or more perks 
      * @param Sample_Tag|array $perks     
@@ -242,14 +288,13 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more tags of given one or more perks 
-     * @param Sample_Perk|array $perks of Sample_Tag objects
-     
+     * @param Sample_Perk|array $perks of Sample_Tag objects      
      */
     function loadForPerks($perks) {
         $rel = $this->getRelation('_perks');
         return $rel->loadSrc($perks); 
     }
-
+    
     /**
      * Loads one or more perks of given one or more tags 
      * @param Sample_Tag|array $tags     
@@ -267,7 +312,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_perks');
         return $rel->loadDestNNIds($tags); 
     }
-
+    
     
 }
 

@@ -17,21 +17,21 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
             'title' => NULL,
         ); 
  
-    
+   
     protected $autoincFieldName = 'religionId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_people' => false,
             '_peopleCount' => false,
             '_peopleLoaded' => false,
-        );
+        ));
     }
     
     /**
@@ -84,11 +84,11 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-        
+    
     function getTitleFieldName() {
         return 'title';   
     }
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_people' => array (
@@ -107,7 +107,30 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+    
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'people' => array (
+                'relationId' => '_people',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'person',
+                'plural' => 'people',
+                'class' => 'Ac_Model_Association_Many',
+                'loadDestObjectsMapperMethod' => 'loadPeopleFor',
+                'loadSrcObjectsMapperMethod' => 'loadForPeople',
+                'getSrcObjectsMapperMethod' => 'getOfPeople',
+                'createDestObjectMethod' => 'createPerson',
+                'listDestObjectsMethod' => 'listPeople',
+                'countDestObjectsMethod' => 'countPeople',
+                'getDestObjectMethod' => 'getPerson',
+                'addDestObjectMethod' => 'addPerson',
+                'isDestLoadedMethod' => 'isPeopleLoaded',
+            ),
+        ));
         
+    }
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -119,9 +142,9 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'religionId',
             ),
@@ -130,7 +153,7 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
             ),
         );
     }
-        
+
     /**
      * @return Sample_Religion 
      */
@@ -164,14 +187,13 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more religion of given one or more people 
-     * @param Sample_Person|array $people of Sample_Religion objects
-     
+     * @param Sample_Person|array $people of Sample_Religion objects      
      */
     function loadForPeople($people) {
         $rel = $this->getRelation('_people');
         return $rel->loadSrc($people); 
     }
-
+    
     /**
      * Loads one or more people of given one or more religion 
      * @param Sample_Religion|array $religion     

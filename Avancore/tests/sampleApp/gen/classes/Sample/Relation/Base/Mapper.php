@@ -24,21 +24,21 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
             'notes' => '',
         ); 
  
-    
+   
     protected $autoincFieldName = 'relationId';
-    
     protected $askRelationsForDefaults = false;
-    
+ 
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }
-    
+ 
     function doGetInternalDefaults() {
-        return array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_relationType' => false,
             '_otherPerson' => false,
             '_person' => false,
-        );
+        ));
     }
     
     /**
@@ -91,7 +91,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
 
-                
+    
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
             '_relationType' => array (
@@ -139,7 +139,58 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+    
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'relationType' => array (
+                'relationId' => '_relationType',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'relationType',
+                'plural' => 'relationTypes',
+                'class' => 'Ac_Model_Association_One',
+                'loadDestObjectsMapperMethod' => 'loadRelationTypesFor',
+                'loadSrcObjectsMapperMethod' => 'loadForRelationTypes',
+                'getSrcObjectsMapperMethod' => 'getOfRelationTypes',
+                'createDestObjectMethod' => 'createRelationType',
+                'getDestObjectMethod' => 'getRelationType',
+                'setDestObjectMethod' => 'setRelationType',
+                'clearDestObjectMethod' => 'clearRelationType',
+            ),
+            'otherPerson' => array (
+                'relationId' => '_otherPerson',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'otherPerson',
+                'plural' => 'otherPeople',
+                'class' => 'Ac_Model_Association_One',
+                'loadDestObjectsMapperMethod' => 'loadOtherPeopleFor',
+                'loadSrcObjectsMapperMethod' => 'loadForOtherPeople',
+                'getSrcObjectsMapperMethod' => 'getOfOtherPeople',
+                'createDestObjectMethod' => 'createOtherPerson',
+                'getDestObjectMethod' => 'getOtherPerson',
+                'setDestObjectMethod' => 'setOtherPerson',
+                'clearDestObjectMethod' => 'clearOtherPerson',
+            ),
+            'person' => array (
+                'relationId' => '_person',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'person',
+                'plural' => 'people',
+                'class' => 'Ac_Model_Association_One',
+                'loadDestObjectsMapperMethod' => 'loadPeopleFor',
+                'loadSrcObjectsMapperMethod' => 'loadForPeople',
+                'getSrcObjectsMapperMethod' => 'getOfPeople',
+                'createDestObjectMethod' => 'createPerson',
+                'getDestObjectMethod' => 'getPerson',
+                'setDestObjectMethod' => 'setPerson',
+                'clearDestObjectMethod' => 'clearPerson',
+            ),
+        ));
         
+    }
+    
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
@@ -151,15 +202,15 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         
     }
     
-        
+    
     protected function doGetUniqueIndexData() {
-        return array (
+    return array (
             'PRIMARY' => array (
                 0 => 'relationId',
             ),
         );
     }
-        
+
     /**
      * @return Sample_Relation 
      */
@@ -183,14 +234,13 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads several relations of given one or more relationTypes 
-     * @param Sample_Relation_Type|array $relationTypes of Sample_Relation objects
-     
+     * @param Sample_Relation_Type|array $relationTypes of Sample_Relation objects      
      */
     function loadForRelationTypes($relationTypes) {
         $rel = $this->getRelation('_relationType');
         return $rel->loadSrc($relationTypes); 
     }
-
+    
     /**
      * Loads several relationTypes of given one or more relations 
      * @param Sample_Relation|array $relations     
@@ -199,7 +249,6 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_relationType');
         return $rel->loadDest($relations); 
     }
-
 
     /**
      * Returns (but not loads!) several relations of given one or more people 
@@ -214,14 +263,13 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads several relations of given one or more people 
-     * @param Sample_Person|array $otherPeople of Sample_Relation objects
-     
+     * @param Sample_Person|array $otherPeople of Sample_Relation objects      
      */
     function loadForOtherPeople($otherPeople) {
         $rel = $this->getRelation('_otherPerson');
         return $rel->loadSrc($otherPeople); 
     }
-
+    
     /**
      * Loads several people of given one or more relations 
      * @param Sample_Relation|array $relations     
@@ -230,7 +278,6 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
         $rel = $this->getRelation('_otherPerson');
         return $rel->loadDest($relations); 
     }
-
 
     /**
      * Returns (but not loads!) several relations of given one or more people 
@@ -245,14 +292,13 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads several relations of given one or more people 
-     * @param Sample_Person|array $people of Sample_Relation objects
-     
+     * @param Sample_Person|array $people of Sample_Relation objects      
      */
     function loadForPeople($people) {
         $rel = $this->getRelation('_person');
         return $rel->loadSrc($people); 
     }
-
+    
     /**
      * Loads several people of given one or more relations 
      * @param Sample_Relation|array $relations     
