@@ -32,6 +32,18 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
     
     protected $askRelationsForDefaults = false;
     
+    protected function doGetCoreMixables() { 
+        return Ac_Util::m(parent::doGetCoreMixables(), array (
+            'Sample_Publish_MapperMixable' => array (
+                'class' => 'Sample_Publish_MapperMixable',
+                'colMap' => array (
+                    'id' => 'pubId',
+                ),
+            ),
+        ));
+    }
+    
+ 
     function listSqlColumns() {
         return $this->columnNames;
     }

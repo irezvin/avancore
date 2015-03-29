@@ -13,7 +13,7 @@ class Ac_Cg_Model {
     var $name = false;
     
     /**
-     * Table name (defaults to model name)
+     * Table name (defaults dto model name)
      * @var string
      */
     var $table = false;
@@ -212,6 +212,14 @@ class Ac_Cg_Model {
     
     var $altDomainPrefix = false;
     
+    var $modelCoreMixables = array();
+    
+    var $mapperCoreMixables = array();
+    
+    var $errors = array();
+    
+    var $warnings = array();
+    
     function Ac_Cg_Model($domain, $name, $config = array()) {
         $this->_domain = $domain;
         $this->name = $name;
@@ -371,6 +379,9 @@ class Ac_Cg_Model {
         }
         
         $this->detectSpecialProperties();
+    }
+    
+    function beforeGenerate() {
     }
 
     /**
@@ -543,6 +554,10 @@ class Ac_Cg_Model {
         return $res;
     }
     
+    function getGenModelClass() {
+        return $this->className.'_Base_Object';
+    }
+    
     function getGenMapperClass() {
         $this->init();
         return $this->className.'_Base_Mapper';
@@ -551,6 +566,10 @@ class Ac_Cg_Model {
     function getMapperClass() {
         $this->init();
         return $this->className.'_Mapper';
+    }
+    
+    function getMapperRecordClass() {
+        return $this->className;
     }
     
     function getMapperInfoParams() {
@@ -725,7 +744,13 @@ class Ac_Cg_Model {
     }
     
     function onShow() {
-        return array('getReferenceFieldsData()' => $this->getReferenceFieldsData());
+        $res = array(
+            'getReferenceFieldsData()' => $this->getReferenceFieldsData(),
+            'class' => get_class($this),
+        );
+        if ($this->errors) $res['errors'] = $this->errors;
+        if ($this->warnings) $res['warnings'] = $this->warnings;
+        return $res;
     }
     
     function getInternalDefaults() {
@@ -745,6 +770,26 @@ class Ac_Cg_Model {
             $prop = $this->getProperty($p);
             if ($prop instanceof Ac_Cg_Property_Object && $prop->isEnabled()) {
                 $res[$prop->varName] = $prop->getAssociationPrototype();
+            }
+        }
+        return $res;
+    }
+    
+    function getTemplates() {
+        return array('Ac_Cg_Template_ModelAndMapper');
+    }
+    
+    /**
+     * @return Ac_Cg_Property_Object
+     */
+    function findPropertyByForeignKeyId($id) {
+        $res = null;
+        foreach ($this->listProperties() as $i) {
+            $prop = $this->getProperty($i);
+            if ($prop instanceof Ac_Cg_Property_Object) {
+                if ($prop->getRelation()->name == $id) {
+                    $res = $prop;
+                }
             }
         }
         return $res;

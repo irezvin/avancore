@@ -84,6 +84,17 @@ $config = array(
         			),
         		),
         	),
+            'publish' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'masterFkIds' => array(
+                    'fkPersonPublish',
+                    'fkCategoryPublish',
+                    'fkPostPublish',
+                ),
+                'skipMapperMixables' => array(
+                    'fkPostPublish',
+                ),
+            ),
         ),
     ),
 );

@@ -18,6 +18,9 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         
         // Works when loading two objects (loadFromRows)
         $twoProds = $mapper->loadRecordsArray(array(1, 2), true);
+        
+        Ac_Debug::drr($twoProds);
+        
         $this->assertEqual($twoProds[1]->metaDescription, 'Страница товара 1');
         $this->assertEqual($twoProds[1]->upcCode, '1234');
         
