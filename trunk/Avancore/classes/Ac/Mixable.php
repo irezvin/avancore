@@ -15,23 +15,11 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
 
     protected $mixinClass = false;
     
-    /**
-     * Class which descendants introduce mixin properties and
-     * methods
-     * 
-     * By default all methods and props introduced after Ac_Mixable 
-     * are exposes by listMixinMethods() / listMixinProperties().
-     * 
-     * But it may be changed to simplify creation of descendants,
-     * 'transparent' to mixins.
-     * 
-     * @var strings
-     */
-    protected $myBaseClass = 'Ac_Mixable';
-    
     protected static $introducedPublicMethods = array();
     
     protected static $introducedPublicVars = array();
+    
+    protected static $eventHandlerMethods = array();
     
     protected function listNonMixedMethods() {
         return array();
@@ -53,13 +41,13 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
         return $this->mixableId;
     }
     
-    public function listMixinMethods(Ac_I_Mixin $mixin) {
+    public function listMixinMethods() {
         $c = get_class($this);
         if (!isset(self::$introducedPublicMethods[$c])) {
             self::$introducedPublicMethods[$c] = array_diff(
                 Ac_Util::getPublicMethods($c), 
-                Ac_Util::getPublicMethods($this->myBaseClass)
-            ); 
+                Ac_Util::getPublicMethods('Ac_Mixable')
+            );
             if (strlen($this->autoEventPrefix)) 
                 self::$introducedPublicMethods[$c] = array_diff(self::$introducedPublicMethods[$c], 
                     $this->listEventHandlerMethods());
@@ -68,24 +56,28 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
     }
     
     function listEventHandlerMethods() {
-        if (strlen($this->autoEventPrefix)) {
-            $res = Ac_Event::listEventHandlers(
-                get_class($this), 
-                $this->autoEventPrefix, 
-                $this->stripAutoEventPrefix
-            );
-        } else {
-            $res = array();
+        $c = get_class($this);
+        if (!isset(self::$eventHandlerMethods[$c])) {
+            self::$eventHandlerMethods[$c] = array();
+            if ($l = strlen($this->autoEventPrefix)) {
+                foreach (Ac_Util::getPublicMethods($c) as $m)
+                    if (!strncasecmp($m, $this->autoEventPrefix, $l)) {
+                        if ($this->stripAutoEventPrefix)
+                            self::$eventHandlerMethods[$c][substr($m, $l)] = $m;
+                        else 
+                            self::$eventHandlerMethods[$c][$m] = $m;
+                    }
+            }
         }
-        return $res;
+        return self::$eventHandlerMethods[$c];
     }
 
-    public function listMixinProperties(Ac_I_Mixin $mixin) {
+    public function listMixinProperties() {
         $c = get_class($this);
         if (!isset(self::$introducedPublicVars[$c])) {
             self::$introducedPublicVars[$c] = array_diff(
                 array_keys(Ac_Util::getPublicVars($c)), 
-                array_keys(Ac_Util::getPublicVars($this->myBaseClass))
+                array_keys(Ac_Util::getPublicVars('Ac_Mixable'))
             );
         }
         return array_diff(self::$introducedPublicVars[$c], $this->listNonMixedProperties());

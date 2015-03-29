@@ -29,7 +29,6 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
     protected function listOwnProperties() {
         return array ( 0 => 'id', 1 => 'sku', 2 => 'title', 3 => 'metaId', 4 => 'pubId', );
@@ -64,12 +63,9 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
             ),
             'pubId' => array (
                 'dataType' => 'int',
-                'controlType' => 'selectList',
                 'maxLength' => '10',
-                'dummyCaption' => '',
-                'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
-                    'mapperClass' => 'Sample_Publish_ImplMapper',
+                'attribs' => array (
+                    'size' => '6',
                 ),
                 'isNullable' => true,
                 'caption' => 'Pub Id',

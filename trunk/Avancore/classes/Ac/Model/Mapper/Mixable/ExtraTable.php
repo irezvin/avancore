@@ -2,8 +2,6 @@
 
 class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
 
-    protected $myBaseClass = 'Ac_Model_Mapper_Mixable_ExtraTable';
-    
     /**
      * @var Ac_Model_Mapper
      */
@@ -14,6 +12,12 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * @var string
      */
     protected $tableName = false;
+
+    /**
+     * Relation ID, relation prototype or a relation object
+     * @var mixed
+     */
+    protected $ownerRelation = false;
 
     /**
      * Mapping of tableColName => slaveFieldNames
@@ -28,7 +32,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     protected $colMap = array();
 
     /**
-     * If slave records should be deleted when owners are deleted
+     * If slave records should be deleted when owner is deleted
      * @var bool
      */
     protected $deleteWithOwner = true;
@@ -43,7 +47,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * Class or prototype of model mixin
      * @var type 
      */
-    protected $modelMixable = false;
+    protected $modelMixin = false;
     
     /**
      * @var Ac_Model_Relation
@@ -68,11 +72,6 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      */
     protected $restrictions = array();
     
-    /**
-     * @var bool
-     */
-    protected $overwriteModelFields = false;
-
     function setTableName($tableName) {
         $this->tableName = $tableName;
     }
@@ -81,9 +80,16 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         return $this->tableName;
     }
 
+    function setOwnerRelation($ownerRelation) {
+        $this->ownerRelation = $ownerRelation;
+    }
+
+    function getOwnerRelation() {
+        return $this->ownerRelation;
+    }
+
     function setFieldNames(array $fieldNames) {
         $this->fieldNames = $fieldNames;
-        $this->dataFieldNames = false;
     }
 
     /**
@@ -118,12 +124,12 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         return $this->deleteWithOwner;
     }
 
-    function setModelMixable($modelMixable) {
-        $this->modelMixable = $modelMixable;
+    function setModelMixin($modelMixin) {
+        $this->modelMixin = $modelMixin;
     }
 
-    function getModelMixable() {
-        return $this->modelMixable;
+    function getModelMixin() {
+        return $this->modelMixin;
     }    
  
     function setMapperBaseClass($mapperBaseClass) {
@@ -216,11 +222,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
             } else {
                 $extra = $this->getDefaults();
             }
-            if ($this->overwriteModelFields) 
-                $rows[$k] = array_merge($rows[$k], $extra);
-            else {
-                $rows[$k] = array_merge($rows[$k], array_diff_key($extra, $rows[$k]));
-            }
+            $rows[$k] = array_merge($rows[$k], $extra);
         }
     }
     
@@ -299,61 +301,12 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         if ($result) {
             $extraRecord = $this->getExtraRecord($hyData);
             if ($extraRecord->hasFullPrimaryKey()) {
-                if (!$extraRecord->delete()) { // there may be the case when extra record does not exist
-                    if ($xError = $extraRecord->getError()) {
-                        $result = false;
-                        $error = $xError;
-                    }
+                if (!$extraRecord->delete()) {
+                    $result = false;
+                    $error = $extraRecord->getError();
                 }
             }
         }
     }
-    
-    function onAfterCreateRecord(Ac_Model_Object & $record) {
-        if ($this->modelMixable) {
-            $mix = Ac_Prototyped::factory($this->modelMixable, 'Ac_I_Mixable');
-            if ($mix instanceof Ac_Model_Mixable_ExtraTable) $mix->setMapperExtraTable($this);
-            $record->addMixable($mix);
-        }
-    }
-
-    /**
-     * @param bool $overwriteModelFields
-     */
-    function setOverwriteModelFields($overwriteModelFields) {
-        $this->overwriteModelFields = $overwriteModelFields;
-    }
-
-    /**
-     * @return bool
-     */
-    function getOverwriteModelFields() {
-        return $this->overwriteModelFields;
-    }
-    
-    protected function doGetRelationPrototypes() {
-        return array();
-    }
-    
-    protected function doGetAssociationPrototypes() {
-        return array();
-    }
-    
-    function onGetRelationPrototypes(& $relationPrototypes) {
-        if ($p = $this->doGetRelationPrototypes()) 
-            Ac_Util::ms($relationPrototypes, $p);
-    }
-    
-    function onGetAssociationPrototypes(& $associationPrototypes) {
-        if ($p = $this->doGetAssociationPrototypes()) 
-            Ac_Util::ms($associationPrototypes, $p);
-    }
-    
-    /**
-     * @return Ac_Model_Relation
-     */
-    protected function getRelation($relId) {
-        return $this->mixin->getRelation($relId);
-    }
-        
+   
 }

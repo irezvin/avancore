@@ -60,49 +60,8 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
     var $mirrorRemoveMethod = false;
     var $mirrorVar = false;
     
-    var $canLoadSrc = true;
-    var $canLoadDest = true;
-    var $canCreateDest = true;
-    
-    var $relationTargetExpression = '$this';
-    
     function Ac_Cg_Template_Assoc_Strategy ($options) {
         Ac_Util::simpleBindAll($options, $this);
-    }
-    
-    function getGuessMap() {
-        $res = array(
-            'loadDestObjectsMapperMethod' => 'load{Plural}For',
-            'loadSrcObjectsMapperMethod' => 'loadFor{Plural}',
-            'getSrcObjectsMapperMethod' => 'getOf{Plural}',
-            'createDestObjectMethod' => 'create{Single}',
-        );
-        if (!$this->canLoadDest) {
-            $res['loadDestObjectsMapperMethod'] = null;
-        }
-        if (!$this->canLoadSrc) {
-            $res['loadSrcObjectsMapperMethod'] = null;
-        }
-        if (!$this->canCreateDest) {
-            $res['createDestObjectMethod'] = null;
-        }
-        return $res;
-    }
-    
-    function getMethodNames() {
-        $this->init();
-        $res = array();
-        $tr = array(
-            '{single}' => $this->single,
-            '{Single}' => $this->ucSingle,
-            '{plural}' => $this->plural,
-            '{Plural}' => $this->ucPlural,
-        );
-        foreach ($this->getGuessMap() as $k => $v) {
-            if (is_null($v)) $res[$k] = $v;
-                else $res[$k] = strtr($v, $tr);
-        }
-        return $res;
     }
     
     function init() {
@@ -121,10 +80,6 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
         $this->plural = $this->prop->getOtherEntityName(false);
         $this->ucPlural = ucfirst($this->plural);
         $this->singleId = '$this->'.$this->single;
-        
-        $this->canLoadDest = $this->prop->canLoadDest;
-        $this->canLoadSrc = $this->prop->canLoadSrc;
-        $this->canCreateDest = $this->prop->canCreateDest;
         
         if ($this->prop->otherModelIdInMethodsSingle) {
             $this->single = $this->prop->otherModelIdInMethodsSingle;
@@ -172,7 +127,7 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
         $this->idOtherPlural = '$'.$this->otherPlural;      
         $this->ucThisPlural = ucfirst($this->thisPlural);
         $this->ucOtherPlural = ucfirst($this->otherPlural);
-        $this->thisClass = $this->model->className;
+        $this->thisClass = $this->template->modelClass;
         $this->otherClass = $this->otherModel->className;
         if (($this->mirrorProp = $this->prop->getMirrorProperty()) && $this->mirrorProp->isEnabled()) {
        
@@ -216,7 +171,6 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
         extract(get_object_vars($this));
 ?>
 
-<?php if ($this->canLoadSrc) { ?>
     /**
      * Returns (but not loads!) <?php if ($prop->thisIsUnique) { ?>one or more<?php } else { ?>several<?php } ?> <?php $this->d($this->model->plural); ?> of given one or more <?php $this->d($otherModel->plural); ?> 
      * @param <?php $this->d($thisClass); ?>|array <?php $this->d($idOtherPlural); ?>
@@ -228,20 +182,17 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
         $res = $rel->getSrc(<?php $this->d($idOtherPlural); ?>); 
         return $res;
     }
-<?php } ?>
     
-<?php if ($this->canLoadSrc) { ?>
     /**
      * Loads <?php if ($prop->thisIsUnique) { ?>one or more<?php } else { ?>several<?php } ?> <?php $this->d($this->model->plural); ?> of given one or more <?php $this->d($otherModel->plural); ?> 
-     * @param <?php $this->d($otherClass); ?>|array <?php $this->d($idOtherPlural); ?> of <?php $this->d($thisClass); ?> objects      
+     * @param <?php $this->d($otherClass); ?>|array <?php $this->d($idOtherPlural); ?> of <?php $this->d($thisClass); ?> objects
+     
      */
     function loadFor<?php $this->d($ucOtherPlural); ?>(<?php $this->d($idOtherPlural); ?>) {
         $rel = $this->getRelation(<?php $this->str($relationId); ?>);
         return $rel->loadSrc(<?php $this->d($idOtherPlural); ?>); 
     }
-<?php } ?>
-    
-<?php if ($this->canLoadDest) { ?>
+
     /**
      * Loads <?php if ($prop->thisIsUnique) { ?>one or more<?php } else { ?>several<?php } ?> <?php $this->d($otherModel->plural); ?> of given one or more <?php $this->d($this->model->plural); ?> 
      * @param <?php $this->d($thisClass); ?>|array <?php $this->d($idThisPlural); ?>
@@ -251,11 +202,38 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
         $rel = $this->getRelation(<?php $this->str($relationId); ?>);
         return $rel->loadDest(<?php $this->d($idThisPlural); ?>); 
     }
-<?php } ?>
 
 <?php
 
     }
 
+    function showStoreReferencedPart() {
+        $this->init();
+        return $this->_doShowStoreReferencedPart(); 
+    }
+
+    function showStoreReferencingPart() {
+        $this->init();
+        return $this->_doShowStoreReferencingPart(); 
+    }
+
+    function showStoreNNPart() {
+        $this->init();
+        return $this->_doShowStoreNNPart(); 
+    }
+    
+    function _doShowStoreReferencedPart() {
+        return false;
+    }
+    
+    function _doShowStoreReferencingPart() {
+        return false;
+    }
+    
+    function _doShowStoreNNPart() {
+        return false;
+    }
+    
+    
 }
 

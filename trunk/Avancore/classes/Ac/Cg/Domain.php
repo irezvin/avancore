@@ -289,10 +289,8 @@ class Ac_Cg_Domain {
             $conf = $this->_models[$name];
             if (is_array($this->modelDefaults)) $conf = Ac_Util::m($this->modelDefaults, $conf);
             
-            if (isset($conf['class']) && $conf['class']) $cls = $conf['class'];
-            elseif (isset($conf['metaModelClass']) && $conf['metaModelClass']) $cls = $conf['metaModelClass'];
+            if (isset($conf['metaModelClass']) && $conf['metaModelClass']) $cls = $conf['metaModelClass'];
             else $cls = 'Ac_Cg_Model';  
-            
             $this->_models[$name] = new $cls($this, $name, $conf);
             $this->_models[$name]->init();
         }
@@ -511,11 +509,6 @@ class Ac_Cg_Domain {
         return $res;
     }
     
-    function beforeGenerate() {
-        foreach ($this->listModels() as $i) {
-            $this->getModel($i)->beforeGenerate();
-        }
-    }
     
 }
 

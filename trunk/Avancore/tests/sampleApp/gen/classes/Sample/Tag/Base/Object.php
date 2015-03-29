@@ -36,7 +36,6 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     function getMapper($mapperClass = false) {
         return parent::getMapper($mapperClass);
     }
- 
     
     protected function listOwnProperties() {
         return array ( 0 => 'people', 1 => 'personIds', 2 => 'perks', 3 => 'perkIds', 4 => 'tagId', 5 => 'title', 6 => 'titleM', 7 => 'titleF', );
@@ -128,15 +127,16 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     function countPeople() {
         if (is_array($this->_people)) return count($this->_people);
         if ($this->_peopleCount === false) {
-            $this->mapper->loadAssocCountFor($this, '_people');
+            $mapper = $this->getMapper();
+            $mapper->loadAssocCountFor($this, '_people');
         }
         return $this->_peopleCount;
-        
     }
 
     function listPeople() {
         if (!$this->_peopleLoaded) {
-            $this->mapper->loadPeopleFor($this);
+            $mapper = $this->getMapper();
+            $mapper->listAssocFor($this, '_people');
         }
         return array_keys($this->_people);
     }
@@ -153,10 +153,12 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
      */
     function getPerson($id) {
         if (!$this->_peopleLoaded) {
-            $this->mapper->loadPeopleFor($this);
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_people');
         }
-        
         if (!isset($this->_people[$id])) trigger_error ('No such People: \''.$id.'\'', E_USER_ERROR);
+        if ($this->_people[$id] === false) {
+        }
         return $this->_people[$id];
     }
     
@@ -180,7 +182,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         }
         
     }
-
+    
     /**
      * @return Sample_Person  
      */
@@ -196,7 +198,8 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
 
     function getPersonIds() {
         if ($this->_personIds === false) {
-            $this->mapper->loadPersonIdsFor($this);
+            $mapper = $this->getMapper();
+            $mapper->loadAssocNNIdsFor($this, '_people');
         }
         return $this->_personIds;
     }
@@ -217,15 +220,16 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     function countPerks() {
         if (is_array($this->_perks)) return count($this->_perks);
         if ($this->_perksCount === false) {
-            $this->mapper->loadAssocCountFor($this, '_perks');
+            $mapper = $this->getMapper();
+            $mapper->loadAssocCountFor($this, '_perks');
         }
         return $this->_perksCount;
-        
     }
 
     function listPerks() {
         if (!$this->_perksLoaded) {
-            $this->mapper->loadPerksFor($this);
+            $mapper = $this->getMapper();
+            $mapper->listAssocFor($this, '_perks');
         }
         return array_keys($this->_perks);
     }
@@ -242,10 +246,12 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
      */
     function getPerk($id) {
         if (!$this->_perksLoaded) {
-            $this->mapper->loadPerksFor($this);
+            $mapper = $this->getMapper();
+            $mapper->loadAssocFor($this, '_perks');
         }
-        
         if (!isset($this->_perks[$id])) trigger_error ('No such Perk: \''.$id.'\'', E_USER_ERROR);
+        if ($this->_perks[$id] === false) {
+        }
         return $this->_perks[$id];
     }
     
@@ -269,7 +275,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         }
         
     }
-
+    
     /**
      * @return Sample_Perk  
      */
@@ -285,7 +291,8 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
 
     function getPerkIds() {
         if ($this->_perkIds === false) {
-            $this->mapper->loadPerkIdsFor($this);
+            $mapper = $this->getMapper();
+            $mapper->loadAssocNNIdsFor($this, '_perks');
         }
         return $this->_perkIds;
     }
@@ -303,6 +310,26 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
         $this->_perkIds = false;
     }               
   
+
+    function _storeNNRecords() {
+        $res = parent::_storeNNRecords() !== false;
+        $mapper = $this->getMapper();
+        
+        if (is_array($this->_people) || is_array($this->_personIds)) {
+            $rel = $mapper->getRelation('_people');
+            if (!$this->_autoStoreNNRecords($this->_people, $this->_personIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'people', $rel->midWhere)) 
+                $res = false;
+        }
+            
+        
+        if (is_array($this->_perks) || is_array($this->_perkIds)) {
+            $rel = $mapper->getRelation('_perks');
+            if (!$this->_autoStoreNNRecords($this->_perks, $this->_perkIds, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, 'perks', $rel->midWhere)) 
+                $res = false;
+        }
+            
+        return $res; 
+    }
     
 }
 

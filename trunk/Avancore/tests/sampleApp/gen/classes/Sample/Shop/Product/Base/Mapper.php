@@ -27,24 +27,6 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
     
     protected $askRelationsForDefaults = false;
     
-    protected function doGetCoreMixables() { 
-        return Ac_Util::m(parent::doGetCoreMixables(), array (
-            'Sample_Publish_MapperMixable' => array (
-                'class' => 'Sample_Publish_MapperMixable',
-                'colMap' => array (
-                    'id' => 'pubId',
-                ),
-            ),
-            'Sample_Shop_Product_Extra_Code_MapperMixable' => array (
-                'class' => 'Sample_Shop_Product_Extra_Code_MapperMixable',
-                'colMap' => array (
-                    'productId' => 'id',
-                ),
-            ),
-        ));
-    }
-    
- 
     function listSqlColumns() {
         return $this->columnNames;
     }
@@ -108,7 +90,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
     function getTitleFieldName() {
         return 'title';   
     }
-                    
+                
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (

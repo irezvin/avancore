@@ -37,6 +37,16 @@ class Ac_Cg_Strategy {
     var $genNonEditable = true;
     
     /**
+     * @var array Names of templates that apply to each model 
+     */
+    var $modelTemplates = array('Ac_Cg_Template_ModelAndMapper');
+    
+    /**
+     * @var array Names of templates that apply only to models with user interface 
+     */
+    var $uiTemplates = array('Ac_Cg_Template_Ui');
+    
+    /**
      * @var array Names of templates that are common for whole domain
      */
     var $domainTemplates = array('Ac_Cg_Template_Domain');
@@ -76,7 +86,8 @@ class Ac_Cg_Strategy {
     
     function listTemplatesForModel($name) {
         $mod = $this->_dom->getModel($name);
-        $res = Ac_Util::toArray($mod->getTemplates());
+        $res = $this->modelTemplates;
+        
         $res = array_unique($res);
         return $res;
     }

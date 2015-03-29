@@ -2,17 +2,6 @@
 
 class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Strategy_Many {
     
-    function getGuessMap() {
-        $res = array_merge(parent::getGuessMap(), array(
-            'loadDestIdsMapperMethod' => 'load{Single}IdsFor',
-            'getDestIdsMethod' => 'get{Single}Ids',
-            'setDestIdsMethod' => 'set{Single}Ids',
-            'clearDestObjectsMethod' => 'clear{Plural}',
-        ));
-        if (!$this->canLoadDest) $res['loadDestIdsMapperMethod'] = null;
-        return $res;
-    }
-    
     function _doShowGenModelMethods() {
         parent::_doShowGenModelMethods();
         extract(get_object_vars($this));
@@ -22,11 +11,8 @@ class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Stra
 
     function get<?php $this->d(ucfirst($this->prop->getIdsPropertyName())); ?>() {
         if ($this-><?php $this->d($imn) ?> === false) {
-<?php       if ($this->canLoadDest) { ?>
-            $this->mapper->load<?php $this->d(ucfirst($this->prop->getIdsPropertyName())); ?>For(<?php echo $this->relationTargetExpression; ?>);
-<?php       } else { ?>            
-            return array();
-<?php       } ?>
+            $mapper = $this->getMapper();
+            $mapper->loadAssocNNIdsFor($this, <?php $this->str($relationId); ?>);
         }
         return $this-><?php $this->d($imn) ?>;
     }
@@ -52,18 +38,47 @@ class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Stra
     function _showLinkBackCode() {
 ?>        
 <?php   if (strlen($this->mirrorVar)) { ?>
-        if (is_array($<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>) && !Ac_Util::sameInArray(<?php echo $this->relationTargetExpression; ?>, $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>)) {
-                $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>[] = <?php echo $this->relationTargetExpression; ?>;
+        if (is_array($<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>) && !Ac_Util::sameInArray($this, $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>)) {
+                $<?php $this->d($this->single)?>-><?php $this->d($this->mirrorVar); ?>[] = $this;
         }
 <?php   } ?>
 <?php  
+    }
+    
+    function _doShowStoreReferencingPart() {
+        return false;
+    }
+    
+    function _doShowStoreNNPart() {
+
+        if ($this->prop->isManyToMany()) {
+?>
+<?php       if (strlen($imn = $this->prop->getIdsMemberName())) { ?>
+        
+        if (is_array($this-><?php $this->d($this->var); ?>) || is_array($this-><?php $this->d($imn); ?>)) {
+            $rel = $mapper->getRelation(<?php $this->str($this->relationId); ?>);
+            if (!$this->_autoStoreNNRecords($this-><?php $this->d($this->var); ?>, $this-><?php $this->d($imn); ?>, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, <?php $this->str($this->plural); ?>, $rel->midWhere)) 
+                $res = false;
+        }
+<?php       } else { ?>
+        if (is_array($this-><?php $this->d($this->var); ?>)) {
+            $rel = $mapper->getRelation(<?php $this->str($this->relationId); ?>);
+            $ids = false;
+            if (!$this->_autoStoreNNRecords($this-><?php $this->d($this->var); ?>, $ids, $rel->fieldLinks, $rel->fieldLinks2, $rel->midTableName, <?php $this->str($this->plural); ?>)) 
+                $res = false;
+        }
+<?php       } ?>            
+<?php   
+        return true;
+        
+        } else return false;
+        
     }
     
     function _doShowGenMapperMethods() {
         parent::_doShowGenMapperMethods();
         extract(get_object_vars($this));
 ?>
-<?php if ($this->canLoadDest) { ?>
 
     /**
      * @param <?php $this->d($thisClass); ?>|array <?php $this->d($idThisPlural); ?> 
@@ -72,8 +87,7 @@ class Ac_Cg_Template_Assoc_Strategy_ManyToMany extends Ac_Cg_Template_Assoc_Stra
         $rel = $this->getRelation(<?php $this->str($relationId); ?>);
         return $rel->loadDestNNIds(<?php $this->d($idThisPlural); ?>); 
     }
-    
-<?php } ?>
+
 <?php
 
     }
