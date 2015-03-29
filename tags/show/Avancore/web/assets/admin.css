@@ -1,8 +1,0 @@
-.importer div {border: 1px solid silver; padding: 0.5em; margin-bottom: 0.5em; margin-right: 0.5em; text-align: left}
-.importer table.physical {border-collapse: collapse}
-.importer table.physical td {border: 1px solid silver}
-.importer .file {float: left; width: 15em}
-.importer .content {overflow: scroll; height: 40em}
-.message {color: darkred; font-weight: bold}
-.unknownSections p {color: red} 
-.importer div.sections, .importer .sections div {margin: 0; padding: 0; border: none}
