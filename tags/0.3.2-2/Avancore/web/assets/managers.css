@@ -1,0 +1,233 @@
+.avantravel {text-align: left}
+
+.avanadmin .manager td.headingTd {vertical-align: middle}
+
+.avanadmin .toolbarTd {text-align: right}
+.avanadmin table.heading, .adminlist {width: 100%;}
+
+.avanadmin div, table {padding: 0; margin: 0}
+
+.avanadmin .details .tabContent {padding: 1em; display: none}
+
+.adminlist {border: 1px solid #eee; border-collapse: collapse}
+.adminlist td, .adminlist th { line-height: 1em;}
+.adminlist th {border-bottom: 2px solid darkred; background-color: #eee}
+.adminlist .row1 td {background-color: #f5f5f5}
+.adminlist tr:hover td {background-color: #eee}
+
+.adminlist tr.selected td {background-color: #A9E0EB!important;}
+.adminlist tr.selected.row1 td {background-color: #97CED9!important; /*border-bottom: 1px solid darkblue*/}
+
+/*.actions td, .headingTd, .afterHeading {background-color: #eee; }*/
+
+.avanadmin table.heading {border-collapse: collapse}
+.heading td.headingTd {font-weight: bold; color: darkred; width: 200px; padding-left: 3px; vertical-align: middle}
+/*.heading .afterHeading {background-image: url(images/corn2.png); background-repeat: no-repeat; background-position: top left; width: 80px}*/
+.heading td, .details .heading td {padding: 0}
+.heading .toolbarTd {background-color: white}
+
+.avanadmin table.actions {margin-left: auto; margin-bottom: 0; border-collapse: collapse}
+/*.actions .beforeActions {background-image: url(images/corn.png); background-repeat: no-repeat; background-position: top right}*/
+
+.actions div.actionButton {display: inline-block; height: 32px; width: 32px; background-position: 0 0; background-repeat: no-repeat}
+.actions .disabled div.disabled {background-position: 0 -32px}
+
+.actions img.enabled {cursor: pointer}
+.actions span.disabled, div.disabled, a.disabled {color: darkgray}
+.actions a img {border: none}
+.actions a.disabled {cursor: default; text-decoration: none}
+.actions td {width: 50px; text-align: center; font-size: 0.8em; padding: 2px}
+.actions a:hover, .actions td:hover a {color: red}
+
+.avanadmin .captionWithDesc {border-bottom: 1px dashed black}
+
+.avanadmin .details {border: 1px solid silver; padding: 1em; background-color: #eee}
+.avanadmin .details td {vertical-align: top; padding: 3px 0}
+.avanadmin .details .errors {color: darkred; font-weight: bold}
+.avanadmin .details .requiredAsterisk {color: #F57900}
+
+.avanadmin .menu a {text-decoration: none}
+.avanadmin .menu .active {font-weight: bold}
+
+.manager {font-size: 1em;}
+.manager .manager {font-size: 1em;}
+
+.subManagers {
+}
+
+.tabContainer {
+    border:1px solid darkgray; 
+    border-top: 2px solid darkred;
+    background-color: white; margin-bottom: 1em;
+}
+
+.menuTd, .managers {vertical-align: top}
+.subManagerTab {margin: 1em}
+
+.managers {background-color: white; padding: 0.5em}
+.menuTd {width: 150px; border-right: 1px solid darkgray}
+.clr {clear: both}
+.all {width: 100%}
+.topMgr {margin-bottom: 0.5em 0}
+.menu .active {background-color: silver}
+.menu div {padding: 0.125em 0}
+
+.avanadmin h2 {font-size: 1em}
+
+/*#hotelCommonInfoHeader, #hotelPublishingInfoHeader, #hotelDetailsInfoHeader {border-bottom: 1px solid darkred}*/
+#hotelCommonInfoHeader.selected, 
+#hotelPublishingInfoHeader.selected, 
+#hotelDetailsInfoHeader.selected {border-bottom: 1px solid #dfdfdf}
+#hotelCommonInfoHeader, #hotelPublishingInfoHeader, #hotelDetailsInfoHeader, .hotelCommonInfoSheet {background-color: #dfdfdf}
+
+td.ctr {text-align: center}
+td.rgt {text-align: right}
+td.w20, th.w20 {width: 20px}
+
+.pagination {text-align: center}
+
+.pagination a.selected {font-weight: bold}
+
+span.captionWithDesc {border-bottom: 1px dashed silver; cursor: help}
+
+span.captionWithDesc:hover {border-bottom: 1px solid silver;}
+
+body.admin .btn-toolbar .actions {
+    font-size: 14px;
+    line-height: 14px;
+}
+
+body.admin .pagination .position select {
+    width: 50px;
+}
+
+body.admin .pagination {
+    margin-top: 1em!important;
+}
+
+body.admin div.btn-group {
+    line-height: 0;
+}
+
+body.admin #toolbar {
+    margin-bottom: 0;
+}
+
+body.admin td.enabled {
+    cursor: pointer;
+}
+
+.adminlist th, .manager .details .adminlist th {
+    text-align: center;
+}
+
+.adminlist th, .adminlist td, .manager .details .adminlist th, .manager .details .adminlist td {
+    padding: 4px 2px;
+}
+
+
+.manager, .manager input {
+    font-family: Tahoma, Liberation Sans;
+}
+
+.manager .adminlist th, .manager .details .adminlist th {
+    border-right: 1px solid silver;
+    border-left: 1px solid silver;
+    border-top: 1px solid silver;
+    padding: 2px;
+}
+
+.manager .adminlist td,  .manager .details .adminlist td {
+    border-right: 1px solid #eee;
+    border-left: 1px solid #eee;
+}
+
+.manager .adminlist .row0 td, .manager .details .adminlist .row0 td {
+    border-right: 1px solid #eee;
+    border-left: 1px solid #eee;
+}
+
+.manager .pagesList {
+    display: inline-block;
+}
+
+/* Styles beginning with "section" are for Joomla 3.0 only! */
+
+section .manager .pagesList {
+    margin-bottom: 1em;
+}
+
+section .manager .pagesList span, section .manager .pagesList a {
+    display: inline-block;
+    float: none;
+    padding:0.75em;
+    height: auto;
+    line-height: 1em;
+}
+
+section .manager .pagesList span {
+    border: none;
+}
+
+
+section .manager .pagesList a {
+    border: 1px solid #ddd;
+    border-radius: 3px;
+}
+
+
+.tabContent table {
+    width: 100%;
+}
+
+.calendar table {
+    border-collapse: separate;
+    border-spacing: inherit;
+}
+
+.manager .details .adminlist td {
+    vertical-align: middle;
+}
+
+.manager .details .details {
+    margin: 1em;
+}
+
+.beforeActions.withHeader {
+    width: 100%;
+    text-align: left;
+    padding: 0;
+}
+
+.main .main {
+    margin: 1em 0;
+    padding: 0;
+}
+
+
+.avanadmin .details td.withHeader {
+    padding-left: 1em;
+    vertical-align: middle;
+}
+
+td.withHeader h1 {
+    color: darkred;
+    font-size: 1.5em;
+}
+
+.avanadmin .details .manager  {
+    margin: 0.5em;
+}
+
+table.actions td.withHeader, .avanadmin .details table.actions td.withHeader {
+    padding-left: 0;
+}
+
+table.actions td, .avanadmin .details table.actions td {
+    padding: 0 0.5em
+}
+
+
+.avanadmin ul.shadetabs > li.withErrors a {
+    color: red
+}

@@ -1,0 +1,6 @@
+# find . -name '*.php' | xargs ssed -Rf avancore31to32.ssed -i 
+s/(?<!protected )function (list|get)Own/protected function \1Own/g
+s/function\s+getSqlSelectPrototype/protected function doGetSqlSelectPrototype/
+s/function\s+getRelationPrototypes/function doGetRelationPrototypes/
+s/parent::getRelationPrototypes\b/parent::doGetRelationPrototypes/
+s/->(list|get)Own/->\1/g
