@@ -540,7 +540,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
                 $res = true;
                 
                 if (Ac_Accessor::methodExists($this, $m = '_storeReferencedRecords')) {
-                    trigger_error("Using $m() is deprecated; please re-generate the code", E_DEPRECATED);
+                    trigger_error("Using $m() is deprecated; please re-generate the code", E_USER_DEPRECATED);
                     $res = $res && ($this->$m() !== false);
                 }
                 
@@ -556,12 +556,12 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
                 }
                 
                 if (Ac_Accessor::methodExists($this, $m = '_storeReferencingRecords')) {
-                    trigger_error("Using $m() is deprecated; please re-generate the code", E_DEPRECATED);
+                    trigger_error("Using $m() is deprecated; please re-generate the code", E_USER_DEPRECATED);
                     $res = $res && ($this->$m() !== false);
                 }
                 
                 if (Ac_Accessor::methodExists($this, $m = '_storeNNRecords')) {
-                    trigger_error("Using $m() is deprecated; please re-generate the code", E_DEPRECATED);
+                    trigger_error("Using $m() is deprecated; please re-generate the code", E_USER_DEPRECATED);
                     $res = $res && ($this->$m() !== false);
                 }
                 
@@ -1277,6 +1277,13 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         foreach ($instances as $i) if ($i instanceof Ac_Model_Association_ModelObject) 
             $i->setMapper($this->mapper);
         Ac_Util::ms($this->associations, $instances);
+    }
+    
+    function __call($method, $arguments) {
+        if (!strncmp('_store', $method, 6)) {
+            return true;
+        }
+        return parent::__call($method, $arguments);
     }
     
 }
