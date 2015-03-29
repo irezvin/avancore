@@ -346,8 +346,9 @@ abstract class Ac_Util {
         return $res;
     }
     
-    static function getObjectProperty($item, $propertyName, $defaultValue = null, $treatArraysAsObjects = false) {
-        return Ac_Accessor::getObjectProperty($item, $propertyName, $defaultValue, $treatArraysAsObjects);
+    static function getObjectProperty($object, $property, $defaultValue = false, $treatArraysAsObjects = false) {
+        $res = Ac_Accessor::getObjectProperty($item, $propertyName, $defaultValue, $treatArraysAsObjects);
+        return $res;
     }
 
     static function stripSlashes($value ) {
