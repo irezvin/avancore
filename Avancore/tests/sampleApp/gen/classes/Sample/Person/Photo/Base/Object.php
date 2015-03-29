@@ -137,6 +137,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     function getPerson() {
         if ($this->_person === false) {
             $this->mapper->loadPeopleFor($this);
+            
         }
         return $this->_person;
     }
@@ -158,7 +159,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     function clearPerson() {
         $this->person = null;
     }
-    
+
     /**
      * @return Sample_Person  
      */
@@ -170,6 +171,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         $this->setPerson($res);
         return $res;
     }
+
     
 
     function countPersonAlbums() {
@@ -178,6 +180,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_personAlbums');
         }
         return $this->_personAlbumsCount;
+        
     }
 
     function listPersonAlbums() {
@@ -201,6 +204,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         if (!$this->_personAlbumsLoaded) {
             $this->mapper->loadPersonAlbumsFor($this);
         }
+        
         if (!isset($this->_personAlbums[$id])) trigger_error ('No such Person album: \''.$id.'\'', E_USER_ERROR);
         return $this->_personAlbums[$id];
     }
@@ -225,7 +229,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         }
         
     }
-    
+
     /**
      * @return Sample_Person_Album  
      */
@@ -266,6 +270,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     function getPortraitPerson() {
         if ($this->_portraitPerson === false) {
             $this->mapper->loadPortraitPeopleFor($this);
+            
         }
         return $this->_portraitPerson;
     }
@@ -287,7 +292,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     function clearPortraitPerson() {
         $this->portraitPerson = null;
     }
-    
+
     /**
      * @return Sample_Person  
      */
@@ -299,6 +304,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         $this->setPortraitPerson($res);
         return $res;
     }
+
     
 
     function countPersonPosts() {
@@ -307,6 +313,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_personPosts');
         }
         return $this->_personPostsCount;
+        
     }
 
     function listPersonPosts() {
@@ -330,6 +337,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         if (!$this->_personPostsLoaded) {
             $this->mapper->loadPersonPostsFor($this);
         }
+        
         if (!isset($this->_personPosts[$id])) trigger_error ('No such Person post: \''.$id.'\'', E_USER_ERROR);
         return $this->_personPosts[$id];
     }
@@ -352,7 +360,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
         $personPost->_personPhoto = $this;
         
     }
-    
+
     /**
      * @return Sample_Person_Post  
      */

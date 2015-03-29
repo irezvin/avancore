@@ -20,7 +20,11 @@ class Ac_Cg_Template_Assoc_Strategy_One extends Ac_Cg_Template_Assoc_Strategy {
      */
     function get<?php $this->d($ucSingle); ?>() {
         if (<?php $this->d($varId); ?> === false) {
-            $this->mapper->load<?php echo $this->ucOtherPlural; ?>For($this);
+<?php       if ($this->canLoadDest) { ?>
+            $this->mapper->load<?php echo $this->ucOtherPlural; ?>For(<?php echo $this->relationTargetExpression; ?>);
+<?php       } else { ?>
+            return null;
+<?php       } ?>            
         }
         return <?php $this->d($varId); ?>;
     }
@@ -42,7 +46,8 @@ class Ac_Cg_Template_Assoc_Strategy_One extends Ac_Cg_Template_Assoc_Strategy {
     function clear<?php $this->d($ucSingle); ?>() {
         $this-><?php $this->d($this->single); ?> = null;
     }
-    
+
+<?php   if ($this->canCreateDest) { ?>
     /**
      * @return <?php $this->d($prop->className); ?>  
      */
@@ -54,7 +59,8 @@ class Ac_Cg_Template_Assoc_Strategy_One extends Ac_Cg_Template_Assoc_Strategy {
         $this->set<?php $this->d($ucSingle); ?>($res);
         return $res;
     }
-    
+
+<?php   } ?>    
 <?php        
     }
 

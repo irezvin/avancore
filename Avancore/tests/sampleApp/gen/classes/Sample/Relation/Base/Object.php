@@ -150,6 +150,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     function getRelationType() {
         if ($this->_relationType === false) {
             $this->mapper->loadRelationTypesFor($this);
+            
         }
         return $this->_relationType;
     }
@@ -171,7 +172,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     function clearRelationType() {
         $this->relationType = null;
     }
-    
+
     /**
      * @return Sample_Relation_Type  
      */
@@ -183,6 +184,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
         $this->setRelationType($res);
         return $res;
     }
+
     
         
     
@@ -192,6 +194,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     function getOtherPerson() {
         if ($this->_otherPerson === false) {
             $this->mapper->loadOtherPeopleFor($this);
+            
         }
         return $this->_otherPerson;
     }
@@ -213,7 +216,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     function clearOtherPerson() {
         $this->otherPerson = null;
     }
-    
+
     /**
      * @return Sample_Person  
      */
@@ -225,6 +228,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
         $this->setOtherPerson($res);
         return $res;
     }
+
     
         
     
@@ -234,6 +238,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     function getPerson() {
         if ($this->_person === false) {
             $this->mapper->loadPeopleFor($this);
+            
         }
         return $this->_person;
     }
@@ -255,7 +260,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     function clearPerson() {
         $this->person = null;
     }
-    
+
     /**
      * @return Sample_Person  
      */
@@ -267,6 +272,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
         $this->setPerson($res);
         return $res;
     }
+
     
   
     

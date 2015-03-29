@@ -287,9 +287,10 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     // +------------------ SUPPLEMENTARY REFLECTION METHODS - are called by accessors ---------------+
     
-    function _hasVar($varName) {
-        if (isset($this->$varName)) return true;
+    function _hasVar($varName, $noMixins = false) {
+        if (!$noMixins && isset($this->$varName)) return true;
         elseif (array_key_exists($varName, get_object_vars($this))) return true;
+        elseif ($noMixins) return false;
         else {
             if ($this->mixPropertyMap === false) $this->fillMixMaps();
             return isset($this->mixPropertyMap[$varName]);
@@ -572,8 +573,8 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         
         if ($g = $this->_getMethod('get', $head)) return $this->$g();
         if ($this->mixPropertyMap === false) $this->fillMixMaps ();
+        if (isset($this->$head) || $this->_hasVar($head, true)) return $this->$head;
         if (isset($this->mixPropertyMap[$head])) return Ac_Mixin::__get($head);
-        if (isset($this->$head) || $this->_hasVar($head)) return $this->$head;
         
         trigger_error ('Cannot retrieve field '.get_class($this).'::'.$head.' - consider implementing get<Prop>() method', E_USER_ERROR);
     }

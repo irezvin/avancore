@@ -45,4 +45,8 @@ ALTER TABLE `ac_person_posts`
 ALTER TABLE `ac_publish`
     add unique index idxPubChannelId (pubChannelId);    
     
-        
+INSERT INTO `ac_publish` (`id`, `sharedObjectType`, `authorId`, `editorId`, `pubChannelId`, `dateCreated`, `dateModified`) VALUES (1, 'product', 3, 6, '123456', '2014-11-20 01:22:31', '2014-12-20 01:22:31');
+
+UPDATE `ac_shop_products` SET `pubId`=1 WHERE  `id`=1;
+
+

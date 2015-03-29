@@ -176,6 +176,10 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      */
     protected $mapper = false;
     
+    protected $_magicGetLock = false;
+    
+    protected $_magicSetLock = false;
+    
     /**
      * @return Ac_Application
      */
@@ -1181,19 +1185,35 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function & __get($name) {
+        $tmp = $this->_magicGetLock;
+        $this->_magicGetLock = $name;
         if (in_array($name, $this->listFields()) || strpos($name, '[') !== false) {
             $res = $this->getField($name);
         } else {
             $res = & parent::__get($name);
         }
+        $this->_magicGetLock = $tmp;
         return $res;
     }
     
+    function _getSingleFieldItem($head) {
+        if ($this->_magicGetLock === $head) return Ac_Mixin::__get($head);
+        return parent::_getSingleFieldItem($head);
+    }
+    
+    function _setOwnSingleFieldItem($head, $value) {
+        if ($this->_magicSetLock === $head) return Ac_Mixin::__set($head, $value);
+        return parent::_setOwnSingleFieldItem($head, $value);
+    }
+    
     function __set($name, $value) {
+        $tmp = $this->_magicGetLock;
+        $this->_magicSetLock = $name;
         if (in_array($name, $this->listFields()) || strpos($name, '[') !== false) $this->setField($name, $value);
         else {
             parent::__set($name, $value);
         }
+        $this->_magicSetLock = $tmp;
     }
     
     protected function notifyFieldChanged($field) {

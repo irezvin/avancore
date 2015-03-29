@@ -82,10 +82,15 @@ class Ac_Model_Association_One extends Ac_Model_Association_Abstract {
             $res = $object->$m();
         } else {
             $f = $this->getInMemoryField();
-            if ($object->$f === false) {
-                $this->getRelation()->loadDest($object);
+            if ($this->canLoadDestObjects) {
+                if ($object->$f === false) {
+                    $this->getRelation()->loadDest($object);
+                }
+                $res = $object->$f;
+            } else {
+                if ($object->$f === false) $res = null;
+                else $res = $object->$f;
             }
-            $res = $object->$f;
         }
         return $res;
     }

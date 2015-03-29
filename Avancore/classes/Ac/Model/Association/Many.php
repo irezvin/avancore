@@ -182,9 +182,15 @@ class Ac_Model_Association_Many extends Ac_Model_Association_Abstract {
         if ($this->useMapperMethods && ($m = $this->listObjectsMethod)) {
             $res = $object->$m();
         } else {
-            if (!$this->getIsDestLoaded($object)) $this->loadDestObjects($object);
-            $f = $this->getInMemoryField();
-            $res = array_keys($object->$f);
+            if ($this->canLoadDestObjects) {
+                if (!$this->getIsDestLoaded($object)) $this->loadDestObjects($object);
+                $f = $this->getInMemoryField();
+                $res = array_keys($object->$f);
+            } else {
+                $f = $this->getInMemoryField();
+                if (is_array($object->$f)) $res = array_keys($object->$f);
+                    else $res = array();
+            }
         }
         return $res;
     }
@@ -198,14 +204,21 @@ class Ac_Model_Association_Many extends Ac_Model_Association_Abstract {
                 $res = count($v);
             }
             else {
-                $c = $this->getCountField();
-                if (strlen($c)) {
-                    if ($object->$c === false) {
-                        $rel = $this->getRelation();
-                        $rel->loadDestCount($record);
+                if ($this->canLoadDestObjects) {
+                    $c = $this->getCountField();
+                    if (strlen($c)) {
+                        if ($object->$c === false) {
+                            $rel = $this->getRelation();
+                            $rel->loadDestCount($record);
+                        }
+                        $res = $object->$c;
+                    } else {
+                        $res = count($this->listDestObjects($object));
                     }
                 } else {
-                    $res = count($this->listDestObjects($object));
+                    $c = $this->getCountField();
+                    if (strlen($c) && $object->$c !== false) $res = $object->$c;
+                        else $res = count($this->listDestObjects($object));
                 }
             }
         }
@@ -230,7 +243,8 @@ class Ac_Model_Association_Many extends Ac_Model_Association_Abstract {
         if ($this->useMapperMethods && ($m = $this->getDestObjectMethod)) {
             $res = $object->$m($key);
         } else {
-            if (!$this->getIsDestLoaded($object)) $this->loadDestObjects($object);
+            if ($this->canLoadDestObjects && !$this->getIsDestLoaded($object)) 
+                $this->loadDestObjects($object);
             $f = $this->getInMemoryField();
             if (!isset($object->{$f}[$key])) {
                 throw Ac_E_InvalidCall::noSuchItem($this->getSingle(), $key);
