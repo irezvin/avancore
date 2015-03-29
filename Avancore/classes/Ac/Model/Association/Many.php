@@ -312,10 +312,7 @@ class Ac_Model_Association_Many extends Ac_Model_Association_Abstract {
      */
     function getPlural($dontThrow = false) {
         if ($this->plural === false) {
-            if ($this->single) $this->plural = Ac_Cg_Inflector::singularToPlural($this->single);
-            else {
-                $this->plural = $this->getId();
-            }
+            $this->plural = $this->getId();
             if (!strlen($this->plural) && !$dontThrow) {
                 throw Ac_E_InvalidCall("Cannot ".__METHOD__." without setId()");
             }
