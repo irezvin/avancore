@@ -100,5 +100,12 @@ class Ac_Model_Mixable_Data extends Ac_Mixable {
         return $res;
     }
     
+    function registerMixin(Ac_I_Mixin $mixin) {
+        parent::registerMixin($mixin);
+        if ($this->mixin instanceof Ac_Model_Data) {
+            $this->mixin->setMetaCacheMode(Ac_Model_Data::META_CACHE_NONE);
+        }
+    }
+    
     
 }

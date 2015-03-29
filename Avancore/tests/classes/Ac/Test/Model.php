@@ -172,4 +172,16 @@ class Ac_Test_Model extends Ac_Test_Base {
         $this->assertTrue(!$data->check() && strpos($data->getError(), 'Foo is not supposed to have the value "bar"') !== false);
     }
     
+    function testObjectMixable() {
+        require_once(dirname(__FILE__).'/assets/ObjectWithMixable.php');
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        $mix = new ObjectMixable();
+        $rec = $pm->loadRecord(3);
+        $rec->addMixable($mix);
+        $rec->load();
+        $this->assertFalse($rec->store());
+        $this->assertFalse($rec->canDelete());
+        $this->assertEqual($mix->events, array('doAfterLoad', 'doBeforeSave', 'doOnCanDelete'));
+    }
+    
 }
