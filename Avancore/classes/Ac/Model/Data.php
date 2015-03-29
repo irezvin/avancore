@@ -29,7 +29,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     const EVENT_ON_LIST_ASSOCIATIONS = 'onListAssociations';
 
     /**
-     * function onListFields(& $fileds)
+     * function onListProperties(& $properties)
      */
     const EVENT_ON_LIST_PROPERTIES = 'onListProperties';
     

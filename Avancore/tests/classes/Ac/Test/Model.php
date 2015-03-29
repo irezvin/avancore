@@ -152,6 +152,24 @@ class Ac_Test_Model extends Ac_Test_Base {
         $this->assertTrue($oTagB->isPersistent());
         $this->assertTrue(!array_diff(array($oTagA->tagId, $oTagB->tagId), $person->getTagIds()));
         
-    }   
+    }
+    
+    function testDataMixable() {
+        require_once(dirname(__FILE__).'/assets/DataWithMixable.php');
+        $data = new Ac_Model_Data();
+        $dMix = new DataMixable();
+        $data->addMixable($dMix);
+        $validHandlers = array('onCheck', 'onListProperties', 'onGetPropertiesInfo');
+        $currHandlers = $dMix->listEventHandlerMethods();
+        $this->assertTrue(
+            !array_diff($currHandlers, $validHandlers) 
+            && !array_diff(array_keys($currHandlers), $validHandlers), 
+            'only event methods overridden in sub-class must be bound by Ac_Model_Mixable_Data'
+        );
+        $this->assertTrue(in_array('foo', $data->listFields()));
+        $this->assertEqual($data->getPropertyInfo('foo')->caption, 'The Foo property');
+        $data->foo = 'bar';
+        $this->assertTrue(!$data->check() && strpos($data->getError(), 'Foo is not supposed to have the value "bar"') !== false);
+    }
     
 }
