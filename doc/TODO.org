@@ -77,22 +77,26 @@
 	- [X] Ac_Model_Mapper::loadFromRows for 'non-unique' records -- should return same instances
 	- [X] Ac_Model_Mapper::loadFromRows with partially-loaded records in the collection
     - [X] Ac_Model_Collection
-*** TODO Multi-table models [2014-10-05 Sun] :model:feature:
+*** WORK Multi-table models [2014-10-05 Sun]		      :model:feature:
 *** TODO Model subclassing (both "physical" and "virtual") [2014-10-05 Sun] :model:feature:
 *** TODO Cg: domain inheritance [2014-10-05 Sun]					 :cg:
 *** TODO Better integration of Ac_Accessor, Ac_Model_Object and Ac_Mixin [2014-07-25 Fri]  :core:
 *** TODO make Ac_Accessor Mixin-aware
-*** TODO currently Ac_Model_Object has its' __get. set, isset; they hide Mixin implementation
+*** DONE currently Ac_Model_Object has its' __get. set, isset; they hide Mixin implementation
+    Changed that on [2014-11-24 Mon]
 *** TODO Better support of "magic" methods in Ac_Prototyped and vice versa (through Ac_I_Accessor?) :base:feature:
 *** TODO Support of docblock-style overrides :cg:
 *** TODO Cg is able to "mix in" mixables' docblocks into generated base mixins [2014-07-25 Fri] :cg:feature:
 *** TODO Mix-in properties [2014-08-25 Mon]
-*** TODO Mix-in associations [2014-08-25 Mon]
+*** WORK Mix-in associations [2014-08-25 Mon]
 *** TODO Support of sequential instantiation of mapper' records
     - [ ] should be supported by mixins that should be able to add their resources to the 'sequential' records source
     - [ ] bring back sequential access to the collection
 ** Extensible sql schema
-*** TODO Think out what does it mean [2014-07-25 Fri] :planning:
+*** TODO Think out what does it mean [2014-07-25 Fri] - maybe the task below?? [2014-11-24 Mon] :planning:
+*** TODO Pre-made partials of Sql Select and ability to compose Select from them [2013-08-27 Tue] :sql:feature:
+    Example: adding "children" or "parents" into nested sets, path column, nesting conditions and so on.
+    We need to be able to specify partials' parameters (connected aliases, prefixes of exported aliases and so on)
 ** Extensible controller
 *** TODO Think-out concept of 'fractal' mixing (Controller & Template are both mixable and mixed); :planning:mixin:controller:
     When used as a slave, some properies are shared with the parent 
@@ -286,6 +290,12 @@
     Done on [2015-01-24 Sat]
 *** DONE Ac_Admin_Manager must save open referencing records when top referenced record is saved [2013-12-06 Fri] 
     Done on [2015-01-24 Sat]
+*** DONE Think: introduce 'logical' relations that will describe high-level associations between modesl [2014-08-03 Sun] :planning::model:meta:feature:
+    Currently there are only 'physical' relations (Ac_Model_Relation).
+    We have to create an entity that provides necessary metadata about in-memort relation
+    of the models (one, many, qualifier, src property & mapper class, dest property &
+    mapper class), interface to load/save relations, but without any implementation details.
+    - Is implemented by Ac_Model_Association - done on [2014-11-24 Mon]
 ** Not started
 *** TODO think about fields that are part of foreign key [2014-03-05 Wed]
     - Example A: userAvatar is referenced by both user->id and user->photoId. 
@@ -322,7 +332,9 @@
 **** TODO ability to specify own sort expressions
 *** TODO Get rid of Ac_Model_Collection::getStatementTail(), since not all DBMS have limit clause [2013-11-11 Mon]  
 **** Make E_DEPRECATED, that's all
-*** TODO decorators' access to the model		      :model:feature:
+*** TODO Ac_Admin_Manager returnUrl on save()/cancel() [2013-11-11 Mon] 	      :admin:feature:
+       	 Also $returnToReferer  would be nice.
+*** WORK decorators' access to the model		      :model:feature:
 *** TODO Ac_Widget_Menu [2014-03-12 Wed]		     :widget:feature:
 *** TODO Add "libraries" class to add common JS and CSS frameworks [2013-10-26 Sat] :js:feature:
        	 The idea is to provide ability to quickly add jQuery, chosen, bootstrap & so on.
@@ -385,9 +397,6 @@
     Контроллер, преобразователь, сервисные объекты являются компонентами Приложения.
 *** TODO Fully and completely get rid of pulling "defaults" from Ac_Application instance. [2013-08-27 Tue] :framework:redesign:
     Objects such as an Ac_Mail must be configured by creating object. (i.e. during Ac_Application::createMail())
-*** TODO Pre-made partials of Sql Select and ability to compose Select from them [2013-08-27 Tue] :sql:feature:
-    Example: adding "children" or "parents" into nested sets, path column, nesting conditions and so on.
-    We need to be able to specify partials' parameters (connected aliases, prefixes of exported aliases and so on)
 *** TODO Ac_Table_Column: display according to values and valueList meta-properties [2013-08-28 Wed] :admin:feature:medium:
     We need to be able to use one instance of Values for all appropriate records to reduce number of requsts to the DB.
 *** TODO Usable method do exclude/include all/some sub-mappers in Admin [2013-08-28 Wed] :admin:feature:minor:
@@ -405,6 +414,7 @@
 *** TODO Re-work Ac_Table_Column_Link (to properly get current URL; now Ac_Url::guess() is used) [2014-02-08 Sat] 
 *** TODO Document all config values used by Ac_Application_Adapter [2014-02-09 Sun] 
 *** TODO Support 1-1 relations in model [2014-07-22 Tue] :model:feature:
+**** TODO Support also to-1 relations with midTable [2014-11-24 Mon]
 *** TODO Support composite PKs by basic Ac_Model_Object/Ac_Model_Mapper  [2014-07-22 Tue] :model:feature:major:
 *** TODO Specify return type of array-returning methods that return lists of objects in docblocks  [2014-07-25 Fri] :global:doc:
 *** TODO Cache list of class files and startup scripts [2014-07-25 Fri]	   :core:performance:
@@ -415,11 +425,6 @@
     - [ ] NN-linked records are not 'referencing', only intermediary table is affected
 *** TODO Support of read-only properties, records, mappers AND managers [2014-07-31 Thu] :model:feature:
 *** TODO View-based mappers (metadata is detected automatically if SQL is used instead of table) [2014-07-31 Thu] :model:feature:
-*** TODO Think: introduce 'logical' relations that will describe high-level associations between modesl [2014-08-03 Sun] :planning::model:meta:feature:
-    Currently there are only 'physical' relations (Ac_Model_Relation).
-    We have to create an entity that provides necessary metadata about in-memort relation
-    of the models (one, many, qualifier, src property & mapper class, dest property &
-    mapper class), interface to load/save relations, but without any implementation details.
 *** TODO Think: observe referenced records from referencing ones? [2014-08-03 Sun] :planning:model:
     ...to avoid complexites such as re-qualifying models
 *** TODO $modelAinstance->removeModelB([$modelBinstance]) [2014-08-03 Sun] :model:
