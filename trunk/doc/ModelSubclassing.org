@@ -124,12 +124,16 @@
 	- [ ] option C: don't create additional mixable base class, but register
 	      it as a part of model' mapper (using Ac_Model_Mapper_Mixable_ExtraTable)
     - [X] without model mixable
-    - [ ] with model mixable
-      - [ ] Ac_Model_Mixable_Data
-	- [ ] can have properties and methods
-	- [ ] check, bind
+    - [-] with model mixable
+      - [X] Ac_Model_Mixable_Data
+	- [X] can have properties and methods
+	- [X] check, bind
+	- [X] test
+	  - [X] test smart event assignment
+	  - [X] test simple variant
       - [ ] Ac_Model_Mixable_Object
 	- [ ] can have referenced, referencing, NN records
+      - [ ] Usable mixable associations that declare list/get/create methods
   - [ ] codegen support
     - [ ] Ac_Cg_Model_Part
     - [ ] Ac_Cg_Model_Shared extends Ac_Cg_Model_Part

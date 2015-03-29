@@ -814,6 +814,28 @@ abstract class Ac_Util {
         return $g->getObjectMethods($object);
     }
     
+    static function isMethodOverridden($class, $baseClass, $method = '') {
+        static $cache = array();
+        $cid = "{$class}/{$baseClass}/{$method}";
+        if (isset($cache[$cid])) return $cache[$cid];
+        $refClass = new ReflectionClass($class);
+        $allOverridden = array();
+        foreach ($refClass->getMethods() as $m) {
+            $methodName = $m->getName();
+            $r = $m->getDeclaringClass()->getName();
+            $isOverridden = ($r !== $baseClass);
+            $cache["{$class}/{$baseClass}/{$methodName}"] = $isOverridden;
+            if ($isOverridden) $allOverridden[] = $methodName;
+        }
+        $cache["{$class}/{$baseClass}/"] = $allOverridden;
+        if (!strlen($method)) $isOverridden = $allOverridden;
+        if (!isset($cache[$cid])) {
+            throw Ac_E_InvalidCall::noSuchMethod($class, $method);
+        }
+        $isOverridden = $cache[$cid];
+        return $isOverridden;
+    }
+    
     static function htmlEntityDecode($stringOrArray, $quoteStyle = ENT_QUOTES, $charset = null) {
         if (is_array($stringOrArray)) {
             $res = array();
