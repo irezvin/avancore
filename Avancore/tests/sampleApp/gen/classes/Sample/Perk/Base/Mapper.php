@@ -114,6 +114,16 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+            
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'tags' => array (
+                'relationId' => '_tags',
+                'class' => 'Ac_Model_Association_ManyToMany',
+            ),
+        ));
+        
+    }
         
     protected function doGetInfoParams() {
         return Ac_Util::m( 

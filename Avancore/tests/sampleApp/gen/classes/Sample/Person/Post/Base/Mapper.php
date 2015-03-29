@@ -127,6 +127,20 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+            
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'person' => array (
+                'relationId' => '_person',
+                'class' => 'Ac_Model_Association_Referenced',
+            ),
+            'personPhoto' => array (
+                'relationId' => '_personPhoto',
+                'class' => 'Ac_Model_Association_Referenced',
+            ),
+        ));
+        
+    }
         
     protected function doGetInfoParams() {
         return Ac_Util::m( 

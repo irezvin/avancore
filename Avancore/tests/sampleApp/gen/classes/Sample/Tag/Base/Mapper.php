@@ -145,6 +145,20 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
         ));
         
     }
+            
+    protected function doGetAssociationPrototypes() {
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'people' => array (
+                'relationId' => '_people',
+                'class' => 'Ac_Model_Association_ManyToMany',
+            ),
+            'perks' => array (
+                'relationId' => '_perks',
+                'class' => 'Ac_Model_Association_ManyToMany',
+            ),
+        ));
+        
+    }
         
     protected function doGetInfoParams() {
         return Ac_Util::m( 
