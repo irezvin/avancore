@@ -4,6 +4,18 @@ class Ac_Test_Relation extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
 
+    function testCardinality() {
+        $a = new Ac_Model_Relation(
+            array(
+                'srcMapperClass' => 'Sample_Person_Mapper',
+                'destMapperClass' => 'Sample_Religion_Mapper',
+                'fieldLinks' => array('religionId' => 'religionId'),
+            )
+        );
+        $this->assertFalse($a->getSrcIsUnique());
+        $this->assertTrue($a->getDestIsUnique());
+    }
+    
     function testLoadNoSrcVar() {
         $pm = Sample::getInstance()->getSamplePersonMapper();
         $person = $pm->loadByPersonId(3);
