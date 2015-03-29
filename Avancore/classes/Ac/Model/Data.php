@@ -1524,13 +1524,13 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     // ----------- extra data support ----------
     
-    function getExtraData($key = false, $default = null, & $found = false) {
+    function & getExtraData($key = false, $default = null, & $found = false) {
         if (is_array($key)) $res = Ac_Util::getArrayByPath ($arr, $key, $default, $found);
         elseif ($key === false) {
                 $res = $this->extraData;
                 $found = false;
         } elseif (array_key_exists($key, $this->extraData)) {
-                $res = $this->extraData[$key];
+                $res = & $this->extraData[$key];
                 $found = true;
         } else {
                 $res = $default;
@@ -1569,6 +1569,14 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         } else {
             throw new Ac_E_InvalidUsage("Call to endUpdate() without corresponding beginUpdate()");
         }
+    }
+    
+    function clearMetaCacheForMyClass() {
+        self::clearMetaCache($this->getMetaClassId());
+    }
+    
+    static function clearMetaCache($metaClassId) {
+        unset(self::$metaCache[$metaClassId]);
     }
     
 }

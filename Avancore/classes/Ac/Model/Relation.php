@@ -596,7 +596,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             if ($m = $this->getSrcMapper()) {
                 if (!$this->fieldLinks) 
                     throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() before setFieldLinks()");
-                if ($m) $this->srcIsUnique = $m->identifiesRecordBy(array_keys($this->fieldLinks));
+                if ($m) $this->srcIsUnique = 
+                    !$this->midTableName && $m->identifiesRecordBy(array_keys($this->fieldLinks));
             }
         }
         return $this->srcIsUnique;
@@ -631,8 +632,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             if ($m = $this->getDestMapper()) {
                 if (!$this->fieldLinks) 
                     throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() before setFieldLinks()");
-                if ($m) $this->destIsUnique = $m->identifiesRecordBy (
-                    $this->fieldLinks2? array_values($this->fieldLinks2): array_values($this->fieldLinks)
+                if ($m) $this->destIsUnique = !$this->midTableName && $m->identifiesRecordBy (
+                    array_values($this->fieldLinks)
                 );
             }
         }
@@ -1946,7 +1947,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 }
             }
         } else {
-            trigger_error ('$srcData/$destData must be an array, a collection or an object', E_USER_ERROR);
+            trigger_error ('$srcData/$destData must be an array, a collection or an object, '.Ac_Util::typeClass($data).' provided', E_USER_ERROR);
         }
         return $res;
     }

@@ -167,6 +167,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 'loadDestIdsMapperMethod' => 'loadPersonIdsFor',
                 'getDestIdsMethod' => 'getPersonIds',
                 'setDestIdsMethod' => 'setPersonIds',
+                'clearDestObjectsMethod' => 'clearPeople',
             ),
             'perks' => array (
                 'relationId' => '_perks',
@@ -187,6 +188,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 'loadDestIdsMapperMethod' => 'loadPerkIdsFor',
                 'getDestIdsMethod' => 'getPerkIds',
                 'setDestIdsMethod' => 'setPerkIds',
+                'clearDestObjectsMethod' => 'clearPerks',
             ),
         ));
         

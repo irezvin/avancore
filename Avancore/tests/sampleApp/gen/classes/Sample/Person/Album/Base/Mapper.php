@@ -167,6 +167,7 @@ class Sample_Person_Album_Base_Mapper extends Ac_Model_Mapper {
                 'loadDestIdsMapperMethod' => 'loadPersonPhotoIdsFor',
                 'getDestIdsMethod' => 'getPersonPhotoIds',
                 'setDestIdsMethod' => 'setPersonPhotoIds',
+                'clearDestObjectsMethod' => 'clearPersonPhotos',
             ),
         ));
         
