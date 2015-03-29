@@ -12,6 +12,10 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
     
     var $extraTableVars = array();
     
+    var $extraRelationPrototypes = array();
+    
+    var $extraAssociationPrototypes = array();
+    
     /**
      * @var Ac_Cg_Model_Part
      */
@@ -45,8 +49,15 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
         $this->parentExtraTableClass = $this->model->parentExtraTableClass;
         $this->parentExtraTableIsAbstract = $this->model->parentExtraTableIsAbstract;
         $this->extraTableVars = $this->model->getExtraTableVars();
+        $this->extraRelationPrototypes = $this->model->extraRelationPrototypes;
+        $this->extraAssociationPrototypes = $this->model->extraAssociationPrototypes;
     }
     
+    function getAssocStrategy($relationId, $prop) {
+        $res = parent::getAssocStrategy($relationId, $prop);
+        $res->relationTargetExpression = '$this->mixin';
+        return $res;
+    }
     
     function showExtraTable() { 
         
@@ -76,6 +87,27 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
     
 <?php   } ?>    
 
+<?php if ($this->extraRelationPrototypes) { ?>
+    
+    protected function doGetRelationPrototypes() {
+<?php   if (!in_array($this->parentExtraTableClass, array('Ac_Model_Mapper_Mixable_ExtraTable'))) { ?>
+        return Ac_Util::m(parent::doGetRelationPrototypes(), <?php $this->exportArray($this->extraRelationPrototypes, 8); ?>);
+<?php   } else { ?>
+        return <?php $this->exportArray($this->extraRelationPrototypes, 8); ?>;
+<?php   } ?>        
+    }
+<?php } ?>
+<?php if ($this->associationPrototypes) { ?>
+    
+    protected function doGetAssociationPrototypes() {
+<?php   if (!in_array($this->parentExtraTableClass, array('Ac_Model_Mapper_Mixable_ExtraTable'))) { ?>
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), <?php $this->exportArray($this->extraAssociationPrototypes, 8); ?>);
+<?php   } else { ?>
+        return <?php $this->exportArray($this->extraAssociationPrototypes, 8); ?>;
+<?php   } ?>
+    }
+<?php   } ?>
+<?php   foreach (array_keys($this->assocProperties) as $relId) { $this->_showMapperMethodsForAssociation($relId, $this->assocProperties[$relId]); } ?>
 }
 
 <?php        

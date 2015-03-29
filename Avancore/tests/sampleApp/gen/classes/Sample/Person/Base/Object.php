@@ -18,18 +18,15 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     public $_personPosts = false;
     public $_personPostsCount = false;
     public $_personPostsLoaded = false;
-    public $_authorPublish = false;
-    public $_authorPublishCount = false;
-    public $_authorPublishLoaded = false;
-    public $_editorPublish = false;
-    public $_editorPublishCount = false;
-    public $_editorPublishLoaded = false;
     public $_incomingRelations = false;
     public $_incomingRelationsCount = false;
     public $_incomingRelationsLoaded = false;
     public $_outgoingRelations = false;
     public $_outgoingRelationsCount = false;
     public $_outgoingRelationsLoaded = false;
+    public $_shopProducts = false;
+    public $_shopProductsCount = false;
+    public $_shopProductsLoaded = false;
     public $personId = NULL;
     public $name = '';
     public $gender = 'F';
@@ -63,18 +60,18 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
  
     
     protected function listOwnProperties() {
-        return array ( 0 => 'portraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'personPosts', 7 => 'authorPublish', 8 => 'editorPublish', 9 => 'incomingRelations', 10 => 'outgoingRelations', 11 => 'personId', 12 => 'name', 13 => 'gender', 14 => 'isSingle', 15 => 'birthDate', 16 => 'lastUpdatedDatetime', 17 => 'createdTs', 18 => 'religionId', 19 => 'portraitId', );
+        return array ( 0 => 'portraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'personPosts', 7 => 'incomingRelations', 8 => 'outgoingRelations', 9 => 'shopProducts', 10 => 'personId', 11 => 'name', 12 => 'gender', 13 => 'isSingle', 14 => 'birthDate', 15 => 'lastUpdatedDatetime', 16 => 'createdTs', 17 => 'religionId', 18 => 'portraitId', );
     }
  
     protected function listOwnLists() {
         
-        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'authorPublish' => 'authorPublish', 'editorPublish' => 'editorPublish', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', );
+        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', 'shopProducts' => 'shopProducts', );
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'portraitPersonPhoto' => 'Sample_Person_Photo', 'religion' => 'Sample_Religion', 'tags' => 'Sample_Tag', 'personAlbums' => 'Sample_Person_Album', 'personPhotos' => 'Sample_Person_Photo', 'personPosts' => 'Sample_Person_Post', 'authorPublish' => 'Sample_Publish', 'editorPublish' => 'Sample_Publish', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', );
+        return array ( 'portraitPersonPhoto' => 'Sample_Person_Photo', 'religion' => 'Sample_Religion', 'tags' => 'Sample_Tag', 'personAlbums' => 'Sample_Person_Album', 'personPhotos' => 'Sample_Person_Photo', 'personPosts' => 'Sample_Person_Post', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', 'shopProducts' => 'Sample_Shop_Product', );
     }
 
     protected function getOwnPropertiesInfo() {
@@ -137,24 +134,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'countVarName' => '_personPostsCount',
                 'referenceVarName' => '_personPosts',
             ),
-            'authorPublish' => array (
-                'className' => 'Sample_Publish',
-                'mapperClass' => 'Sample_Publish_ImplMapper',
-                'otherModelIdInMethodsPrefix' => 'author',
-                'caption' => 'Publish',
-                'relationId' => '_authorPublish',
-                'countVarName' => '_authorPublishCount',
-                'referenceVarName' => '_authorPublish',
-            ),
-            'editorPublish' => array (
-                'className' => 'Sample_Publish',
-                'mapperClass' => 'Sample_Publish_ImplMapper',
-                'otherModelIdInMethodsPrefix' => 'editor',
-                'caption' => 'Publish',
-                'relationId' => '_editorPublish',
-                'countVarName' => '_editorPublishCount',
-                'referenceVarName' => '_editorPublish',
-            ),
             'incomingRelations' => array (
                 'className' => 'Sample_Relation',
                 'mapperClass' => 'Sample_Relation_Mapper',
@@ -174,6 +153,14 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'relationId' => '_outgoingRelations',
                 'countVarName' => '_outgoingRelationsCount',
                 'referenceVarName' => '_outgoingRelations',
+            ),
+            'shopProducts' => array (
+                'className' => 'Sample_Shop_Product',
+                'mapperClass' => 'Sample_Shop_Product_Mapper',
+                'caption' => 'Shop products',
+                'relationId' => '_shopProducts',
+                'countVarName' => '_shopProductsCount',
+                'referenceVarName' => '_shopProducts',
             ),
             'personId' => array (
                 'dataType' => 'int',
@@ -270,6 +257,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function getPortraitPersonPhoto() {
         if ($this->_portraitPersonPhoto === false) {
             $this->mapper->loadPortraitPersonPhotosFor($this);
+            
         }
         return $this->_portraitPersonPhoto;
     }
@@ -291,7 +279,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function clearPortraitPersonPhoto() {
         $this->portraitPersonPhoto = null;
     }
-    
+
     /**
      * @return Sample_Person_Photo  
      */
@@ -303,6 +291,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $this->setPortraitPersonPhoto($res);
         return $res;
     }
+
     
         
     
@@ -312,6 +301,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function getReligion() {
         if ($this->_religion === false) {
             $this->mapper->loadReligionFor($this);
+            
         }
         return $this->_religion;
     }
@@ -333,7 +323,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function clearReligion() {
         $this->religion = null;
     }
-    
+
     /**
      * @return Sample_Religion  
      */
@@ -345,6 +335,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $this->setReligion($res);
         return $res;
     }
+
     
 
     function countTags() {
@@ -353,6 +344,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_tags');
         }
         return $this->_tagsCount;
+        
     }
 
     function listTags() {
@@ -376,6 +368,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         if (!$this->_tagsLoaded) {
             $this->mapper->loadTagsFor($this);
         }
+        
         if (!isset($this->_tags[$id])) trigger_error ('No such Tag: \''.$id.'\'', E_USER_ERROR);
         return $this->_tags[$id];
     }
@@ -400,7 +393,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         }
         
     }
-    
+
     /**
      * @return Sample_Tag  
      */
@@ -440,6 +433,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_personAlbums');
         }
         return $this->_personAlbumsCount;
+        
     }
 
     function listPersonAlbums() {
@@ -463,6 +457,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         if (!$this->_personAlbumsLoaded) {
             $this->mapper->loadPersonAlbumsFor($this);
         }
+        
         if (!isset($this->_personAlbums[$id])) trigger_error ('No such Person album: \''.$id.'\'', E_USER_ERROR);
         return $this->_personAlbums[$id];
     }
@@ -485,7 +480,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $personAlbum->_person = $this;
         
     }
-    
+
     /**
      * @return Sample_Person_Album  
      */
@@ -505,6 +500,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_personPhotos');
         }
         return $this->_personPhotosCount;
+        
     }
 
     function listPersonPhotos() {
@@ -528,6 +524,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         if (!$this->_personPhotosLoaded) {
             $this->mapper->loadPersonPhotosFor($this);
         }
+        
         if (!isset($this->_personPhotos[$id])) trigger_error ('No such Person photo: \''.$id.'\'', E_USER_ERROR);
         return $this->_personPhotos[$id];
     }
@@ -550,7 +547,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $personPhoto->_person = $this;
         
     }
-    
+
     /**
      * @return Sample_Person_Photo  
      */
@@ -570,6 +567,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_personPosts');
         }
         return $this->_personPostsCount;
+        
     }
 
     function listPersonPosts() {
@@ -593,6 +591,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         if (!$this->_personPostsLoaded) {
             $this->mapper->loadPersonPostsFor($this);
         }
+        
         if (!isset($this->_personPosts[$id])) trigger_error ('No such Person post: \''.$id.'\'', E_USER_ERROR);
         return $this->_personPosts[$id];
     }
@@ -615,7 +614,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $personPost->_person = $this;
         
     }
-    
+
     /**
      * @return Sample_Person_Post  
      */
@@ -629,128 +628,13 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
 
-    function countAuthorPublish() {
-        if (is_array($this->_authorPublish)) return count($this->_authorPublish);
-        if ($this->_authorPublishCount === false) {
-            $this->mapper->loadAssocCountFor($this, '_authorPublish');
-        }
-        return $this->_authorPublishCount;
-    }
-
-    function listAuthorPublish() {
-        if (!$this->_authorPublishLoaded) {
-            $this->mapper->loadAuthorPublishFor($this);
-        }
-        return array_keys($this->_authorPublish);
-    }
-    
-    /**
-     * @return bool
-     */
-    function isAuthorPublishLoaded() {
-        return $this->_authorPublishLoaded;
-    }
-    
-    /**
-     * @return Sample_Publish 
-     */
-    function getAuthorPublish($id) {
-        if (!$this->_authorPublishLoaded) {
-            $this->mapper->loadAuthorPublishFor($this);
-        }
-        if (!isset($this->_authorPublish[$id])) trigger_error ('No such Publish: \''.$id.'\'', E_USER_ERROR);
-        return $this->_authorPublish[$id];
-    }
-    
-    /**
-     * @param Sample_Publish $authorPublish 
-     */
-    function addAuthorPublish($authorPublish) {
-        if (!is_a($authorPublish, 'Sample_Publish')) trigger_error('$authorPublish must be an instance of Sample_Publish', E_USER_ERROR);
-        $this->listAuthorPublish();
-        $this->_authorPublish[] = $authorPublish;
-        
-        $authorPublish->_authorPerson = $this;
-        
-    }
-    
-    /**
-     * @return Sample_Publish  
-     */
-    function createAuthorPublish($values = array(), $isReference = false) {
-        $m = $this->getMapper('Sample_Publish_ImplMapper');
-        $res = $m->createRecord();
-        if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
-        $this->addAuthorPublish($res);
-        return $res;
-    }
-    
-
-    function countEditorPublish() {
-        if (is_array($this->_editorPublish)) return count($this->_editorPublish);
-        if ($this->_editorPublishCount === false) {
-            $this->mapper->loadAssocCountFor($this, '_editorPublish');
-        }
-        return $this->_editorPublishCount;
-    }
-
-    function listEditorPublish() {
-        if (!$this->_editorPublishLoaded) {
-            $this->mapper->loadEditorPublishFor($this);
-        }
-        return array_keys($this->_editorPublish);
-    }
-    
-    /**
-     * @return bool
-     */
-    function isEditorPublishLoaded() {
-        return $this->_editorPublishLoaded;
-    }
-    
-    /**
-     * @return Sample_Publish 
-     */
-    function getEditorPublish($id) {
-        if (!$this->_editorPublishLoaded) {
-            $this->mapper->loadEditorPublishFor($this);
-        }
-        if (!isset($this->_editorPublish[$id])) trigger_error ('No such Publish: \''.$id.'\'', E_USER_ERROR);
-        return $this->_editorPublish[$id];
-    }
-    
-    /**
-     * @param Sample_Publish $editorPublish 
-     */
-    function addEditorPublish($editorPublish) {
-        if (!is_a($editorPublish, 'Sample_Publish')) trigger_error('$editorPublish must be an instance of Sample_Publish', E_USER_ERROR);
-        $this->listEditorPublish();
-        $this->_editorPublish[] = $editorPublish;
-        
-        $editorPublish->_editorPerson = $this;
-        
-    }
-    
-    /**
-     * @return Sample_Publish  
-     */
-    function createEditorPublish($values = array(), $isReference = false) {
-        $m = $this->getMapper('Sample_Publish_ImplMapper');
-        $res = $m->createRecord();
-        if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
-        $this->addEditorPublish($res);
-        return $res;
-    }
-    
-
     function countIncomingRelations() {
         if (is_array($this->_incomingRelations)) return count($this->_incomingRelations);
         if ($this->_incomingRelationsCount === false) {
             $this->mapper->loadAssocCountFor($this, '_incomingRelations');
         }
         return $this->_incomingRelationsCount;
+        
     }
 
     function listIncomingRelations() {
@@ -774,6 +658,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         if (!$this->_incomingRelationsLoaded) {
             $this->mapper->loadIncomingRelationsFor($this);
         }
+        
         if (!isset($this->_incomingRelations[$id])) trigger_error ('No such Relation: \''.$id.'\'', E_USER_ERROR);
         return $this->_incomingRelations[$id];
     }
@@ -796,7 +681,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $incomingRelation->_otherPerson = $this;
         
     }
-    
+
     /**
      * @return Sample_Relation  
      */
@@ -816,6 +701,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
             $this->mapper->loadAssocCountFor($this, '_outgoingRelations');
         }
         return $this->_outgoingRelationsCount;
+        
     }
 
     function listOutgoingRelations() {
@@ -839,6 +725,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         if (!$this->_outgoingRelationsLoaded) {
             $this->mapper->loadOutgoingRelationsFor($this);
         }
+        
         if (!isset($this->_outgoingRelations[$id])) trigger_error ('No such Relation: \''.$id.'\'', E_USER_ERROR);
         return $this->_outgoingRelations[$id];
     }
@@ -861,7 +748,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $outgoingRelation->_person = $this;
         
     }
-    
+
     /**
      * @return Sample_Relation  
      */
@@ -871,6 +758,64 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         if ($values) $res->bind($values);
         if ($isReference) $res->_setIsReference(true);
         $this->addOutgoingRelation($res);
+        return $res;
+    }
+    
+
+    function countShopProducts() {
+        if (is_array($this->_shopProducts)) return count($this->_shopProducts);
+        return 0;
+        
+    }
+
+    function listShopProducts() {
+        if (!is_array($this->_shopProducts)) $this->_shopProducts = array();
+        return array_keys($this->_shopProducts);
+    }
+    
+    /**
+     * @return bool
+     */
+    function isShopProductsLoaded() {
+        return $this->_shopProductsLoaded;
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getShopProduct($id) {
+        
+        if (!isset($this->_shopProducts[$id])) trigger_error ('No such Shop product: \''.$id.'\'', E_USER_ERROR);
+        return $this->_shopProducts[$id];
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getShopProductsItem($id) {
+        return $this->getShopProduct($id);
+    }
+    
+    /**
+     * @param Sample_Shop_Product $shopProduct 
+     */
+    function addShopProduct($shopProduct) {
+        if (!is_a($shopProduct, 'Sample_Shop_Product')) trigger_error('$shopProduct must be an instance of Sample_Shop_Product', E_USER_ERROR);
+        $this->listShopProducts();
+        $this->_shopProducts[] = $shopProduct;
+        
+        
+    }
+
+    /**
+     * @return Sample_Shop_Product  
+     */
+    function createShopProduct($values = array(), $isReference = false) {
+        $m = $this->getMapper('Sample_Shop_Product_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        if ($isReference) $res->_setIsReference(true);
+        $this->addShopProduct($res);
         return $res;
     }
     

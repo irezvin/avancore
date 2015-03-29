@@ -296,8 +296,12 @@ class Ac_Model_Association_ManyToMany extends Ac_Model_Association_Many {
         if ($this->useMapperMethods && ($m = $this->loadDestIdsMapperMethod)) {
             $res = $this->getMapper()->$m($srcObjects);
         } else {
-            $rel = $this->getRelation();
-            $res = $rel->loadDestNNIds($srcObjects); 
+            if ($this->canLoadDestObjects) {
+                $rel = $this->getRelation();
+                $res = $rel->loadDestNNIds($srcObjects); 
+            } else {
+                $res = array();
+            }
         }
         return $res;
     }
@@ -307,10 +311,15 @@ class Ac_Model_Association_ManyToMany extends Ac_Model_Association_Many {
             $res = $object->$m();
         } else {
             $if = $this->getIdsField();
-            if ($object->$if === false) {
-                $this->loadDestIds($object);
+            if ($this->canLoadDestObjects) {
+                if ($object->$if === false) {
+                    $this->loadDestIds($object);
+                }
+                $res = $object->$if;
+            } else {
+                if ($object->$if !== false) $res = $object->$if;
+                else $res = array();
             }
-            $res = $object->$if;
         }
         return $res;
     }
@@ -344,12 +353,15 @@ class Ac_Model_Association_ManyToMany extends Ac_Model_Association_Many {
     }
    
     protected function getGuessMap() {
-        return array_merge(parent::getGuessMap(), array(
+        $res = array_merge(parent::getGuessMap(), array(
             'loadDestIdsMapperMethod' => 'load{Single}IdsFor',
             'getDestIdsMethod' => 'get{Single}Ids',
             'setDestIdsMethod' => 'set{Single}Ids',
             'clearDestObjectsMethod' => 'clear{Plural}',
         ));
+        if (!$this->canLoadDestObjects)
+            $res['loadDestIdsMapperMethod'] = null;
+        return $res;
     }
     
     protected function genPropMap() {

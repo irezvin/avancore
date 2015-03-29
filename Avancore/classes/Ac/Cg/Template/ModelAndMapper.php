@@ -123,18 +123,8 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         }
         $this->mapperVars['defaults'] = new Ac_Cg_Php_Expression($this->exportArray($this->mapperVars['defaults'], 8, true, false, true));
         
-        $this->relationPrototypes = array();
-        
-        foreach ($this->model->listAeModelRelations() as $r) {
-            $prot = $this->model->getAeModelRelationPrototype($r);
-            $key = isset($prot['srcVarName'])? $prot['srcVarName'] : count($this->relationPrototypes);
-            if ($prop = $this->model->searchPropertyByRelation($r)) {
-                $this->assocProperties[$prop->getClassMemberName()] = $prop;
-            } else {
-                var_dump("Prop by relation not found:", $r);
-            }
-            $this->relationPrototypes[$key] = $prot;
-        }
+        $this->relationPrototypes = $this->model->getRelationPrototypes();
+        $this->assocProperties = $this->model->getAssocProperties();
         
         $this->uniqueIndexData = $this->model->tableObject->getUniqueIndexData();
         

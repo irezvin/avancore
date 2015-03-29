@@ -172,7 +172,8 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
      */
     function getAuthorPerson() {
         if ($this->_authorPerson === false) {
-            $this->mapper->loadAuthorPeopleFor($this);
+            $this->mapper->loadAuthorPeopleFor($this->mixin);
+            
         }
         return $this->_authorPerson;
     }
@@ -194,7 +195,7 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     function clearAuthorPerson() {
         $this->authorPerson = null;
     }
-    
+
     /**
      * @return Sample_Person  
      */
@@ -206,6 +207,7 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
         $this->setAuthorPerson($res);
         return $res;
     }
+
     
         
     
@@ -214,7 +216,8 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
      */
     function getEditorPerson() {
         if ($this->_editorPerson === false) {
-            $this->mapper->loadEditorPeopleFor($this);
+            $this->mapper->loadEditorPeopleFor($this->mixin);
+            
         }
         return $this->_editorPerson;
     }
@@ -236,7 +239,7 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     function clearEditorPerson() {
         $this->editorPerson = null;
     }
-    
+
     /**
      * @return Sample_Person  
      */
@@ -248,6 +251,7 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
         $this->setEditorPerson($res);
         return $res;
     }
+
     
   
     

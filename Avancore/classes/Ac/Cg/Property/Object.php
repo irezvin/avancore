@@ -39,7 +39,14 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     var $otherModelIdInMethodsPlural = false;
     var $otherModelIdInMethodsPrefix = false;
     
+    var $canLoadSrc = true;
+    var $canLoadDest = true;
+    var $canCreateDest = true;
+    
     var $mapperClass = false;
+    
+    var $relationOverrides = array();
+    var $associationOverrides = array();
     
     /**
      * @var Ac_Sql_Dbi_Relation
@@ -298,6 +305,9 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
                 $res['destIsUnique'] = false;
             }
         }
+        
+        if (is_array($this->relationOverrides))
+            Ac_Util::ms($res, $this->relationOverrides);
          
         return $res;
     }
@@ -447,6 +457,13 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             'single' => $strat->single,
             'plural' => $strat->plural,
         );
+        foreach (array(
+            'canLoadDest' => 'canLoadDestObjects', 
+            'canLoadSrc' => 'canLoadSrcObjects', 
+            'canCreateDest' => 'canCreateDestObject'
+        ) as $p => $op) {
+            if (!$this->$p) $res[$op] = false;
+        }
         if ($this->isList()) {
             if ($this->isManyToMany()) {
                 $class = 'Ac_Model_Association_ManyToMany';
@@ -462,6 +479,10 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         }
         $res['class'] = $class;
         Ac_Util::ms($res, $mm);
+        
+        if (is_array($this->associationOverrides))
+            Ac_Util::ms($res, $this->associationOverrides);
+        
         return $res;
     }
     
@@ -482,6 +503,28 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             ));
         }
         return $this->_assocStrategy;
+    }
+    
+    function setOtherModel(Ac_Cg_Model $otherModel = null, $resetProps = false) {
+        $this->_other = $otherModel;
+        
+        if ($resetProps) {
+            $this->className = false;
+            $this->varName = false;
+            $this->pluralForList = false;
+            $this->caption = false;
+        }
+        
+        if (!$this->className) $this->className = $this->getDefaultClassName();
+        
+        if (!$this->varName) $this->varName = $this->getDefaultVarName();
+        
+        if (!$this->pluralForList) $this->pluralForList = $this->getDefaultPluralForList();
+        
+        if (!$this->caption) $this->caption = $this->getDefaultCaption();
+        
+        if ($this->_other) $this->mapperClass = $this->_other->getMapperClass();
+        
     }
     
 }

@@ -188,14 +188,13 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
     
     /**
      * Loads one or more religion of given one or more people 
-     * @param Sample_Person|array $people of Sample_Religion objects
-     
+     * @param Sample_Person|array $people of Sample_Religion objects      
      */
     function loadForPeople($people) {
         $rel = $this->getRelation('_people');
         return $rel->loadSrc($people); 
     }
-
+    
     /**
      * Loads one or more people of given one or more religion 
      * @param Sample_Religion|array $religion     

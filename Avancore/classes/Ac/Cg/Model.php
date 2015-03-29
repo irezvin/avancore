@@ -134,6 +134,10 @@ class Ac_Cg_Model {
     var $createAccessors = false;
     
     var $nullableSqlColumns = false;
+    
+    protected $relationPrototypes = false;
+    
+    protected $assocProperties = false;
 
     // ---------------------------------------------------------------------
     
@@ -491,6 +495,29 @@ class Ac_Cg_Model {
             }
         }
         return $res;
+    }
+    
+    function getRelationPrototypes() {
+        if ($this->relationPrototypes === false) {
+            $this->relationPrototypes = array();
+            $this->assocProperties = array();
+            foreach ($this->listAeModelRelations() as $r) {
+                $prot = $this->getAeModelRelationPrototype($r);
+                $key = isset($prot['srcVarName'])? $prot['srcVarName'] : count($this->relationPrototypes);
+                if ($prop = $this->searchPropertyByRelation($r)) {
+                    $this->assocProperties[$prop->getClassMemberName()] = $prop;
+                } else {
+                    var_dump("Prop by relation not found:", $r);
+                }
+                $this->relationPrototypes[$key] = $prot;
+            }
+        }
+        return $this->relationPrototypes;
+    }
+    
+    function getAssocProperties() {
+        if ($this->assocProperties === false) $this->getRelationPrototypes ();
+        return $this->assocProperties;
     }
     
     /**
