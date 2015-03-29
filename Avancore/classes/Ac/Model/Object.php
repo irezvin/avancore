@@ -250,7 +250,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function doListNonCopiedFields() {
-        $m = $this->getMapper();
+        $m = $this->mapper;
         $res = $m->listPkFields();
         return $res;
     }
@@ -267,7 +267,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function doListNonComparedFields() {
-        $m = $this->getMapper();
+        $m = $this->mapper;
         $res = $m->listPkFields();
         return $res;
     }
