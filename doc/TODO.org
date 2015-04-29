@@ -152,7 +152,8 @@
       - support partially-loaded relations
       - IDs vs. References consistency
       - "list" object
-      - association change notifications, "cold" events
+      - association change notif
+ications, "cold" events
       - mark "deleted" associated' items
     - better validation
     - detect model & property names in Ac_Sql OR use Ac_Collection instead
