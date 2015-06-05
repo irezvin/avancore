@@ -585,6 +585,10 @@ class Ac_Model_Collection {
         while ($curr = $this->getNext()) $res[] = $curr;
         return $res;
     }
+    
+    function getPkName() {
+        return $this->_pkName;
+    }
         
 }
 

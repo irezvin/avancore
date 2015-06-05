@@ -18,19 +18,21 @@ class Ac_Admin_Processing_Method extends Ac_Admin_Processing {
      * @param Ac_Model_Object $record
      */
     function _doProcessRecord($record) {
-        if (!strlen($this->method)) throw new Exception ("\$method not provided");
+        if (!$this->method && !$this->setProperties) throw new Exception ("\$method not provided");
         if ($this->setProperties) {
             Ac_Accessor::setObjectProperty($record, $this->setProperties);
         }
-        if ($this->isCallback) {
-            call_user_func($this->method, $record);
-        } else {
-            $m = $this->method;
-            $record->$m();
+        if ($this->method) {
+            if ($this->isCallback) {
+                call_user_func($this->method, $record);
+            } else {
+                $m = $this->method;
+                $record->$m();
+            }
         }
-        $shouldStore = true;
-        if ((int) $this->saveAfter == self::SAVE_ALWAYS) $shouldStore = true; 
-        elseif ((int) $this->saveAfter == self::SAVE_IF_CHANGED && $record->getChanges());
+        $shouldStore = false;
+        if ($this->saveAfter == self::SAVE_ALWAYS) $shouldStore = true; 
+        elseif ($this->saveAfter == self::SAVE_IF_CHANGED && $record->getChanges()) $shouldStore = true;
         if ($shouldStore) $record->store();
     }
 }

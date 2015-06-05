@@ -11,6 +11,10 @@ class Ac_Admin_Processing_Switch extends Ac_Admin_Processing {
         if (strlen($this->fieldName)) {
             $currValue = $record->getField($this->fieldName);
             if (strlen($this->canSwitchProperty) && !Ac_Accessor::getObjectProperty($record, $this->fieldName)) return;
+            if (!$this->valueList) {
+                $pi = $record->getPropertyInfo($this->fieldName);
+                if ($pi->valueList) $this->valueList = array_keys($pi->valueList);
+            }
             $pl = array_values($this->valueList);
             if (($idx = array_search($currValue, $pl)) !== false) {
                 if ($idx >= (count($pl) - 1)) $idx = 0;
