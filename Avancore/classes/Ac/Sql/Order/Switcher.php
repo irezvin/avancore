@@ -44,7 +44,7 @@ class Ac_Sql_Order_Switcher extends Ac_Sql_Order {
     function _doGetAppliedAliases() {        
         $res = $this->aliases;
         if ($this->value !== false && isset($this->aliasesForModes[$this->value])) {
-            $res = array_unique(array_merge($res, $this->aliasesForModes[$this->value]));
+            $res = array_unique(array_merge($res, Ac_Util::toArray($this->aliasesForModes[$this->value])));
         }
         return $res;
     }

@@ -10,11 +10,19 @@ class Ac_Form_Control_Template_Tabs extends Ac_Form_Control_Template {
         $tcId = $ctx->mapIdentifier('tabs');
         $tcVar = $tcId.'_o';
         $h = $this->getHtmlHelper();
+        $initialTab = $tabs->initialTab;
+        $idx = 0;
+        $initialIndex = false;
 ?>
         <div <?php echo Ac_Util::mkAttribs($tabs->getHtmlAttribs()); ?>>
             <ul id="<?php $this->d($tcId); ?>" class="shadetabs">
 <?php           foreach (array_keys($controls) as $i) { 
                     $smId = $ctx->mapIdentifier('tab_'.$controls[$i]->name); 
+                    if ($idx === $initialTab || $controls[$i]->name == $initialTab) {
+                        $initialIndex = $idx;
+                    }
+                    $idx++;
+                    
 ?>
 
                     <li><a rel="<?php $this->d($smId); ?>" <?php $this->attribs($controls[$i]->getHeaderAttribs()); ?>>
@@ -49,6 +57,7 @@ class Ac_Form_Control_Template_Tabs extends Ac_Form_Control_Template {
             <?php echo $tcVar; ?>.setpersist(true);
             <?php echo $tcVar; ?>.setselectedClassTarget("link");
             <?php echo $tcVar; ?>.init();
+            <?php if ($initialIndex !== false) echo "{$tcVar}.expandtab({$tcVar}.tabs[{$initialIndex}]);"; ?> 
         </script>
         
 <?php

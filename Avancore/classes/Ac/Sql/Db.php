@@ -12,6 +12,16 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     protected $nextQueryArgs = array();
     
+    protected $dumpNext = false;
+    
+    const DUMP_DO = 1;
+    
+    const DUMP_OB_STOP = 2;
+    
+    const DUMP_DIE = 4;
+    
+    //const DUMP_RESULT = 3;
+    
     abstract function getDbPrefix();
     
     abstract function getDbName();
@@ -318,6 +328,12 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
         } else {
             $res = $this->preProcessQuery($query);
         }
+        if ($this->dumpNext) {
+            if ($this->dumpNext & self::DUMP_OB_STOP) Ac_Debug::savageMode();
+            var_dump($res);
+            if ($this->dumpNext & self::DUMP_DIE) die();
+            $this->dumpNext = false;
+        }
         return $res;
     }
     
@@ -366,10 +382,17 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
      * @return Ac_Sql_Db
      */
     function args($args = array()) {
-        if (!is_array($args) || func_num_args() > 1) {
-            $args = func_get_args();
-        }
+        if (func_num_args() === 0) $this->nextQueryArgs = array();
+        else $this->nextQueryArgs = func_get_args();
+        return $this;
+    }
+    
+    function argsArray(array $args) {
         $this->nextQueryArgs = $args;
+    }
+    
+    function dumpNext($options = self::DUMP_OB_STOP) {
+        $this->dumpNext = $options;
         return $this;
     }
     

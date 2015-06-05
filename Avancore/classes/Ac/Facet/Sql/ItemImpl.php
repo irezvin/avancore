@@ -21,6 +21,11 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
     /**
      * @var array
      */
+    protected $selectExtraForValues = array();
+    
+    /**
+     * @var array
+     */
     protected $selectPrototypesForValues = array();
     
     /**
@@ -79,8 +84,9 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
                 $vc = $select->getDb()->n(array($va, $vc));
             }
         }
+        // WTF
         $columns = array('title' => $tc, 'value' => $vc);
-        if (is_array($select->columns) && $select->columns) $columns = array_merge($columns, $select->columns);
+        /*if (is_array($select->columns) && $select->columns) $columns = array_merge($columns, $select->columns);*/
         $select->columns = $columns;
         if (!$select->orderBy) $select->orderBy = 'title ASC';
         if ($this->getWithCounts()) {
@@ -166,6 +172,11 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
     }
     
     function applyToSelectPrototype(array & $prototype, Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
+        /*if ($currValuesImpl === $this && $this->selectExtraForValues) {
+            if ($this->selectExtraForValues) {
+                Ac_Util::ms($prototype, $this->selectExtraForValues);
+            }
+        }*/
         if ($currValuesImpl === $this && !$this->alwaysApply) return;
         if ($this->selectExtra) {
             Ac_Util::ms($prototype, $this->selectExtra);
@@ -232,6 +243,17 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
      */
     function getSelectPrototypeForOtherValues() {
         return $this->selectPrototypeForOtherValues;
+    }    
+
+    function setSelectExtraForValues(array $selectExtraForValues) {
+        $this->selectExtraForValues = $selectExtraForValues;
+    }
+
+    /**
+     * @return array
+     */
+    function getSelectExtraForValues() {
+        return $this->selectExtraForValues;
     }    
     
 }

@@ -1525,6 +1525,19 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     function doOnWakeup() {
     }
     
+    function beginUpdate() {
+        $this->updateLevel++;
+    }
+    
+    function endUpdate() {
+        if ($this->updateLevel > 0) {
+            $this->updateLevel--;
+            if (!$this->updateLevel) $this->mustRevalidate();
+        } else {
+            throw new Ac_E_InvalidUsage("Call to endUpdate() without corresponding beginUpdate()");
+        }
+    }    
+    
     // ----------- extra data support ----------
     
     function & getExtraData($key = false, $default = null, & $found = false) {

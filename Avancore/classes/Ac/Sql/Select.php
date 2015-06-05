@@ -295,6 +295,8 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     function getOrderByClause($withOrderByKeyword = false, $asArray = false) {
         $this->beginCalc();
         $ob = Ac_Util::toArray($this->orderBy);
+        // remove empty strings
+        foreach ($ob as $k => $v) if (is_array($v)? !count($v) : !strlen($v)) unset($ob[$k]);
         if ($asArray) $res = $ob;
         else {
             $res = Ac_Util::implode_r(", ", $ob);

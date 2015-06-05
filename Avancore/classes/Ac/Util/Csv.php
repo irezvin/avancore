@@ -107,7 +107,8 @@ class Ac_Util_Csv extends Ac_Prototyped {
     }
     
     function reset() {
-        $this->header = $this->result = false;
+        $this->result = false;
+        if ($this->useHeader) $this->header = false;
         $this->prevLine = array();
     }
     
@@ -146,7 +147,7 @@ class Ac_Util_Csv extends Ac_Prototyped {
         while ($i < $n) {
             if ($ml && $prevLine) {
                 $isL = true;
-                $curr = array_pop($prevLine);
+                $curr = array_pop($prevLine)."\n";
                 $res = $prevLine;
                 $prevLine = array();
                 $d = 1;

@@ -6,6 +6,18 @@ class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
     
     protected static $modelStack = array();
     
+    /**
+     * Two forms: a) ::proto(array, true) <- 1st arg has decorators; b) ::proto(dec1, dec2, ...)
+     */
+    static function Multi(array $items, $isArray = null) {
+        if ($isArray === true)
+            return array('class' => 'Ac_Decorator_Multi', 'decorators' => $items);
+        else {
+            $args = func_get_args();
+            return array('class' => 'Ac_Decorator_Multi', 'decorators' => $args);
+        }
+    }
+
     function hasPublicVars() {
         return true;
     }

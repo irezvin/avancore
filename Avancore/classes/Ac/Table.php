@@ -181,12 +181,14 @@ class Ac_Table {
         foreach($this->listRecords() as $recordName) {
             $rMod = $row % 2;
             $record = $this->getRecord($recordName);
+            Ac_Decorator::pushModel($record);
             $trAttribs = array('class' => 'row'.$rMod);
             echo "<tr ".Ac_Util::mkAttribs($this->_trAttribs($record, $trAttribs)).">"; 
             
             for ($i = 0; $i < $nCols; $i++) {
                 $cols[$i]->showCell($record, $row);
             }
+            Ac_Decorator::popModel($record);
             echo "</tr>";
             
             $row++;

@@ -583,7 +583,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $ff = $this->_rqData['filterForm'];
             if (is_array($ff)) {
                 foreach ($ff as $k => $v) {
-                    if (is_array($v) && !$v || !strlen($v)) unset($ff[$k]);
+                    if (is_array($v)? !count($v) : !strlen($v)) unset($ff[$k]);
                 }
             }
             $res['filterForm'] = $ff;

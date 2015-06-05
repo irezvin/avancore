@@ -548,6 +548,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
                 $res = $this->fetchWithWrapper($refresh);
             } else {
                 if ($this->_presentation === false || $refresh) {
+                    if ($model = $this->getModel()) Ac_Decorator::pushModel ($model);
                     if (!strlen($this->templatePart)) trigger_error ("Cannot retrieve template to render the control '".$this->_getPath()."' - templatePart property is not set", E_USER_ERROR);
                     $template = $this->getTemplate();
                     $template->setVars($this->tplExtras);
@@ -560,6 +561,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
                         $this->_presentation .= $script;
                     }
                     $this->postProcessPresentation($this->_presentation);
+                    if ($model) Ac_Decorator::popModel();
                 }
                 $res = $this->_presentation;
             }
