@@ -297,9 +297,10 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
                 $val = $record->$slaveCol;
                 if ($val !== $myData[$slaveCol]) {
                     if (!is_array($newData)) $newData = array();
-                    if ($this->extraIsReferenced) 
+                    if ($this->extraIsReferenced) {
                         $hyData[$ownerCol] = $val;
-                    $newData[$ownerCol] = $val;
+                        $newData[$ownerCol] = $val;
+                    }
                 }
             }
         } else {

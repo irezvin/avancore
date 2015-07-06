@@ -6,6 +6,8 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
     
     function testExtraTable() {
         $mapper = Sample::getInstance()->getSampleShopProductMapper();
+        $this->resetAi('#__shop_meta');
+        $this->resetAi('#__publish');
         
         // Not directly related to the ExtraTable... but saw that bug when running the tests
         $mixable = $mapper->getMixable('upc');
@@ -92,8 +94,8 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             $this->assertEqual($editor->personId, $prod->editorId);
         }
         
-        $prodId = $this->resetAi('#__shop_products');
-        $this->getAeDb()->query("DELETE FROM #__shop_products WHERE title LIKE '%test%'");
+        $this->resetAi('#__shop_products');
+        $this->deleteProducts("p.title LIKE '%test%'");
         $this->getAeDb()->query("DELETE FROM #__people WHERE name LIKE '%test%'");
         $this->resetAi('#__people');
         
@@ -106,9 +108,31 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         $editor = $testProd->createEditorPerson();
         $editor->bind(array('name' => 'test editor', 'birthDate' => date('1990-02-02')));
         
-        $this->assertTrue(!!$testProd->store());
-        
-        $eo = $testProd->getMixable('Sample_Publish');
+        if ($this->assertTrue(!!$testProd->store())) {
+            $row = $this->getAeDb()->args($testProd->id)->fetchRow("SELECT * FROM #__shop_products WHERE id = ?");
+            if ($this->assertTrue(is_array($row))) {
+                $pubId = $row['pubId'];
+                $this->assertEqual($testProd->pubId, $pubId, 'Master object field that stores reference '
+                    . 'to an extra table field must contain valid extra table key after save');
+                if ($pubId) {
+                    $pubRow = $this->getAeDb()->args($pubId)->fetchRow("SELECT * FROM #__publish WHERE id = ?");
+                    if ($this->assertTrue(is_array($pubRow))) {
+                        // actually, that shouldn't work at the moment
+                        $this->assertEqual($pubRow['sharedObjectType'], 'product');
+                    }
+                }
+                $metaId = $row['metaId'];
+                $this->assertEqual($testProd->metaId, $metaId, 'Master object field that stores reference '
+                    . 'to an extra table field must contain valid extra table key after save');
+                if ($metaId) {
+                    $metaRow = $this->getAeDb()->args($metaId)->fetchRow("SELECT * FROM #__shop_meta WHERE id = ?");
+                    if ($this->assertTrue(is_array($metaRow))) {
+                        // actually, that shouldn't work at the moment
+                        $this->assertEqual($metaRow['sharedObjectType'], 'product');
+                    }
+                }
+            }
+        }
         
     }
     
@@ -138,7 +162,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
     function testReferencingAssoc() {
         $db = $this->getSampleApp()->getDb();
         
-        $db->query("DELETE FROM #__shop_products WHERE title = 'test prod 2'");
+        $this->getAeDb()->query("DELETE p.*, pub.* FROM #__shop_products p LEFT JOIN #__publish pub ON pub.id = p.pubId WHERE p.title = 'test prod 2'");
         $db->query("DELETE FROM #__people WHERE name = 'test prod author'");
         
         // We can create the record that is referenced by the extra table and it will 
@@ -172,7 +196,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             . 'WHERE p.title = ?');
         $this->assertEqual($prodRow, array_merge($a, $b));
         
-        $db->query("DELETE FROM #__shop_products WHERE title = 'test prod 3'");
+        $this->deleteProducts("p.title = 'test prod 3'");
         $db->query("DELETE FROM #__people WHERE name = 'test prod author 2'");
 
         // We cannot load product through extra table, but we can successfully save it from referencing record
@@ -220,7 +244,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
     function testInlineGenExtraTable() {
         $prodMap = $this->getSampleApp()->getSampleShopProductMapper();
         $db = $this->getAeDb();
-        $db->query("DELETE FROM #__shop_products WHERE sku = 'PROD_NOTE'");
+        $this->deleteProducts("p.sku = 'PROD_NOTE'");
         $db->query("DELETE FROM #__people WHERE name = 'Author of a note'");
         $prod = $prodMap->createRecord();
         $prod->bind($a = array(

@@ -1383,7 +1383,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents {
             $query = $this->db->insertStatement($this->tableName, $dataToSave);
             if ($this->db->query($query)) {
                 if (strlen($ai = $this->getAutoincFieldName()) && !isset($dataToSave[$ai])) {
-                    $newData = array($ai => $this->getLastGeneratedId());
+                    if (!is_array($newData)) $newData = array();
+                    $newData[$ai] = $this->getLastGeneratedId();
                 }
                 $res = true;
             } else {

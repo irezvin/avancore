@@ -50,7 +50,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'person' => array (
                 'className' => 'Sample_Person',

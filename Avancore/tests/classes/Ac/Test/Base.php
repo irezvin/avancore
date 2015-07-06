@@ -168,5 +168,22 @@ class Ac_Test_Base extends UnitTestCase {
         }
         return $res;
     }
+    
+    function deleteProducts($where) {
+        if (is_array($where)) {
+            foreach ($where as $w) $this->deleteProducts($w);
+        }
+        $db = $this->getAeDb();
+        if (is_numeric($where)) {
+            $where = 'p.id '.$db->q($where);
+        }
+        $db->query("
+            DELETE p.*, m.*, pub.* 
+            FROM #__shop_products p 
+                LEFT JOIN #__shop_meta m ON m.id = p.metaId
+                LEFT JOIN #__publish pub ON p.pubId = pub.id
+                WHERE $where
+        ");
+    }
 	
 }

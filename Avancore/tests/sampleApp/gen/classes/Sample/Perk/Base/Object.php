@@ -48,7 +48,7 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'tags' => array (
                 'className' => 'Sample_Tag',

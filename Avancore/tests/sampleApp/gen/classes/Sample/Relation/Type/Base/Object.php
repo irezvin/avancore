@@ -48,7 +48,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'relations' => array (
                 'className' => 'Sample_Relation',

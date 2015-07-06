@@ -57,7 +57,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'shopCategories' => array (
                 'className' => 'Sample_Shop_Category',
