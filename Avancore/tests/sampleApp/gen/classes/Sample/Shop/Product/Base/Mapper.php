@@ -33,6 +33,9 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'colMap' => array (
                     'id' => 'pubId',
                 ),
+                'fieldNames' => array (
+                    'sharedObjectType' => false,
+                ),
             ),
             'extraCode' => array (
                 'class' => 'Sample_Shop_Product_Extra_Code_MapperMixable',

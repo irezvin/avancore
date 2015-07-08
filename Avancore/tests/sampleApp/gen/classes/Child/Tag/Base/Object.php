@@ -26,7 +26,7 @@ class Child_Tag_Base_Object extends Sample_Tag {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'people' => array (
                 'className' => 'Child_Person',

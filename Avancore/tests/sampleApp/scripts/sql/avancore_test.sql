@@ -66,7 +66,7 @@ CREATE TABLE `ac_people` (
   KEY `FK_ac_person_photos_ac_people_protrait` (`personId`,`portraitId`),
   CONSTRAINT `FK_ac_person_photos_ac_people_portrait` FOREIGN KEY (`personId`, `portraitId`) REFERENCES `ac_person_photos` (`personId`, `photoId`),
   CONSTRAINT `FK_ac_person_religion` FOREIGN KEY (`religionId`) REFERENCES `ac_religion` (`religionId`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,7 +75,7 @@ CREATE TABLE `ac_people` (
 
 LOCK TABLES `ac_people` WRITE;
 /*!40000 ALTER TABLE `ac_people` DISABLE KEYS */;
-INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2014-08-10 19:24:57',4,1),(4,'Таня','F',0,'1981-12-23',NULL,'2014-08-10 19:25:10',1,3),(6,'Ян','M',1,'1981-09-21',NULL,'2014-08-31 13:03:07',4,NULL),(7,'Оля','F',1,'1981-09-08',NULL,'2014-08-31 13:04:00',1,NULL),(8,'test author','F',0,'1990-01-01',NULL,'0000-00-00 00:00:00',NULL,NULL),(9,'test editor','F',0,'1990-02-02',NULL,'0000-00-00 00:00:00',NULL,NULL),(10,'test prod author','M',0,'2015-02-05',NULL,'0000-00-00 00:00:00',NULL,NULL),(11,'test prod author 2','F',0,'2015-02-05',NULL,'0000-00-00 00:00:00',NULL,NULL),(12,'testPerson','M',0,'2014-11-07',NULL,'0000-00-00 00:00:00',5,NULL);
+INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2014-08-10 19:24:57',4,1),(4,'Таня','F',0,'1981-12-23',NULL,'2014-08-10 19:25:10',1,3),(6,'Ян','M',1,'1981-09-21',NULL,'2014-08-31 13:03:07',4,NULL),(7,'Оля','F',1,'1981-09-08',NULL,'2014-08-31 13:04:00',1,NULL),(108,'test author','F',0,'1990-01-01',NULL,'0000-00-00 00:00:00',NULL,NULL),(109,'test editor','F',0,'1990-02-02',NULL,'0000-00-00 00:00:00',NULL,NULL),(110,'test prod author','M',0,'2015-02-05',NULL,'0000-00-00 00:00:00',NULL,NULL),(111,'test prod author 2','F',0,'2015-02-05',NULL,'0000-00-00 00:00:00',NULL,NULL),(112,'Author of a note','M',0,'2014-02-14',NULL,'0000-00-00 00:00:00',NULL,NULL);
 /*!40000 ALTER TABLE `ac_people` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,7 +102,7 @@ CREATE TABLE `ac_people_tags` (
 
 LOCK TABLES `ac_people_tags` WRITE;
 /*!40000 ALTER TABLE `ac_people_tags` DISABLE KEYS */;
-INSERT INTO `ac_people_tags` VALUES (4,1),(6,1),(4,2),(7,2),(6,3),(12,5),(12,6);
+INSERT INTO `ac_people_tags` VALUES (4,1),(6,1),(4,2),(7,2),(6,3);
 /*!40000 ALTER TABLE `ac_people_tags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -245,7 +245,7 @@ CREATE TABLE `ac_publish` (
   KEY `fkPubEditor` (`editorId`),
   CONSTRAINT `fkPubAuthor` FOREIGN KEY (`authorId`) REFERENCES `ac_people` (`personId`) ON DELETE SET NULL ON UPDATE SET NULL,
   CONSTRAINT `fkPubEditor` FOREIGN KEY (`editorId`) REFERENCES `ac_people` (`personId`) ON DELETE SET NULL ON UPDATE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=70 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=62 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -254,7 +254,7 @@ CREATE TABLE `ac_publish` (
 
 LOCK TABLES `ac_publish` WRITE;
 /*!40000 ALTER TABLE `ac_publish` DISABLE KEYS */;
-INSERT INTO `ac_publish` VALUES (1,'product',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,6,'123456','2014-11-20 01:22:31','2014-12-20 01:22:31','0000-00-00 00:00:00'),(28,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(29,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(30,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(31,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(32,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(33,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(34,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(35,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(36,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(37,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(38,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(39,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(40,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(41,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(42,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(43,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(44,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(45,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(46,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(47,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(48,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(49,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(51,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(52,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(53,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(55,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(56,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(57,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(59,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(60,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(61,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(63,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(64,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(65,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(67,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',8,9,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(68,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(69,'',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `ac_publish` VALUES (1,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,6,'123456','2014-11-20 01:22:31','2014-12-20 01:22:31','0000-00-00 00:00:00'),(58,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',108,109,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(59,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(60,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(61,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
 /*!40000 ALTER TABLE `ac_publish` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -389,9 +389,9 @@ CREATE TABLE `ac_shop_meta` (
   `metaDescription` varchar(255) DEFAULT NULL,
   `metaKeywords` varchar(255) DEFAULT NULL,
   `metaNoindex` int(1) unsigned NOT NULL DEFAULT '0',
-  `sharedObjectType` enum('product','category','other') NOT NULL DEFAULT 'other',
+  `sharedObjectType` varchar(255) NOT NULL DEFAULT 'other',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=46 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -400,7 +400,7 @@ CREATE TABLE `ac_shop_meta` (
 
 LOCK TABLES `ac_shop_meta` WRITE;
 /*!40000 ALTER TABLE `ac_shop_meta` DISABLE KEYS */;
-INSERT INTO `ac_shop_meta` VALUES (1,'Купить Товар 1 он-лайн','Страница товара 1','Товар 1, купить',0,'product'),(3,'','','',0,'product'),(4,'','','',0,'product'),(5,'','','',0,'product'),(6,'','','',0,'product'),(7,'','','',0,'product'),(8,'','','',0,'product'),(10,'','','',0,'product'),(11,'','','',0,'product'),(12,'','','',0,'product'),(13,'','','',0,'product'),(14,'','','',0,'product'),(15,'','','',0,'product'),(16,'','','',0,'product'),(17,'','','',0,'product'),(18,'','','',0,'product'),(19,'','','',0,'product'),(20,'','','',0,'product'),(21,'','','',0,'product'),(22,'','','',0,'product'),(23,'','','',0,'product'),(24,'','','',0,'product'),(25,'','','',0,'product'),(27,'','','',0,'product'),(28,'','','',0,'product'),(29,'','','',0,'product'),(31,'','','',0,'product'),(32,'','','',0,'product'),(33,'','','',0,'product'),(35,'','','',0,'product'),(36,'','','',0,'product'),(37,'','','',0,'product'),(39,'','','',0,'product'),(40,'','','',0,'product'),(41,'','','',0,'product'),(43,'','','',0,'product'),(44,'','','',0,'product'),(45,'','','',0,'product');
+INSERT INTO `ac_shop_meta` VALUES (1,'Купить Товар 1 он-лайн','Страница товара 1','Товар 1, купить',0,'product'),(43,'','','',0,'product'),(47,'','','',0,'product'),(48,'','','',0,'product'),(49,'','','',0,'product'),(50,'','','',0,'product');
 /*!40000 ALTER TABLE `ac_shop_meta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -416,8 +416,8 @@ CREATE TABLE `ac_shop_product_categories` (
   `categoryId` int(10) unsigned NOT NULL,
   PRIMARY KEY (`productId`,`categoryId`),
   KEY `fkProductCategoryCategory` (`categoryId`),
-  CONSTRAINT `fkProductCategoryProduct` FOREIGN KEY (`productId`) REFERENCES `ac_shop_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fkProductCategoryCategory` FOREIGN KEY (`categoryId`) REFERENCES `ac_shop_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  CONSTRAINT `fkProductCategoryCategory` FOREIGN KEY (`categoryId`) REFERENCES `ac_shop_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fkProductCategoryProduct` FOREIGN KEY (`productId`) REFERENCES `ac_shop_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -456,8 +456,36 @@ CREATE TABLE `ac_shop_product_extraCodes` (
 
 LOCK TABLES `ac_shop_product_extraCodes` WRITE;
 /*!40000 ALTER TABLE `ac_shop_product_extraCodes` DISABLE KEYS */;
-INSERT INTO `ac_shop_product_extraCodes` VALUES (2,'1','2','3',3),(37,'','','',NULL),(38,'A','B','C',10),(39,'A1','B1','C1',11);
+INSERT INTO `ac_shop_product_extraCodes` VALUES (2,'1','2','3',3),(46,'','','',NULL),(47,'A','B','C',110),(48,'A1','B1','C1',111),(49,'','','',NULL);
 /*!40000 ALTER TABLE `ac_shop_product_extraCodes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_shop_product_notes`
+--
+
+DROP TABLE IF EXISTS `ac_shop_product_notes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_shop_product_notes` (
+  `productId` int(11) unsigned NOT NULL,
+  `note` text NOT NULL,
+  `noteAuthorId` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`productId`),
+  KEY `fkProductNoteAuthor` (`noteAuthorId`),
+  CONSTRAINT `fkProductNoteAuthor` FOREIGN KEY (`noteAuthorId`) REFERENCES `ac_people` (`personId`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fkProductNoteProduct` FOREIGN KEY (`productId`) REFERENCES `ac_shop_products` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_shop_product_notes`
+--
+
+LOCK TABLES `ac_shop_product_notes` WRITE;
+/*!40000 ALTER TABLE `ac_shop_product_notes` DISABLE KEYS */;
+INSERT INTO `ac_shop_product_notes` VALUES (46,'',NULL),(47,'',NULL),(48,'',NULL),(49,'foobar',112);
+/*!40000 ALTER TABLE `ac_shop_product_notes` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -481,7 +509,7 @@ CREATE TABLE `ac_shop_product_upc` (
 
 LOCK TABLES `ac_shop_product_upc` WRITE;
 /*!40000 ALTER TABLE `ac_shop_product_upc` DISABLE KEYS */;
-INSERT INTO `ac_shop_product_upc` VALUES (1,'1234'),(37,''),(38,''),(39,'');
+INSERT INTO `ac_shop_product_upc` VALUES (1,'1234'),(46,''),(47,''),(48,''),(49,'');
 /*!40000 ALTER TABLE `ac_shop_product_upc` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -501,7 +529,7 @@ CREATE TABLE `ac_shop_products` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idxPubId` (`pubId`),
   CONSTRAINT `fkPersonPublish` FOREIGN KEY (`pubId`) REFERENCES `ac_publish` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=40 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=50 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -510,7 +538,7 @@ CREATE TABLE `ac_shop_products` (
 
 LOCK TABLES `ac_shop_products` WRITE;
 /*!40000 ALTER TABLE `ac_shop_products` DISABLE KEYS */;
-INSERT INTO `ac_shop_products` VALUES (1,'PROD01','Товар 1',1,1),(2,'PROD02','Товар 2',NULL,NULL),(37,'1337','test product',43,67),(38,'f00','test prod 2',44,68),(39,'f01','test prod 3',45,69);
+INSERT INTO `ac_shop_products` VALUES (1,'PROD01','Товар 1',1,1),(2,'PROD02','Товар 2',NULL,NULL),(9,'xxx','yyy',NULL,NULL),(46,'1337','test product',47,58),(47,'f00','test prod 2',48,59),(48,'f01','test prod 3',49,60),(49,'PROD_NOTE','product with a note',50,61);
 /*!40000 ALTER TABLE `ac_shop_products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -584,7 +612,7 @@ CREATE TABLE `ac_tree_adjacent` (
   PRIMARY KEY (`id`),
   KEY `index_4` (`parentId`),
   KEY `index_5` (`ordering`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -620,7 +648,7 @@ CREATE TABLE `ac_tree_combos` (
   KEY `index_4` (`parentId`),
   KEY `index_5` (`ordering`),
   KEY `index_6` (`ignore`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -629,7 +657,7 @@ CREATE TABLE `ac_tree_combos` (
 
 LOCK TABLES `ac_tree_combos` WRITE;
 /*!40000 ALTER TABLE `ac_tree_combos` DISABLE KEYS */;
-INSERT INTO `ac_tree_combos` VALUES (1,0,17,NULL,1,'root',999,0,0),(2,1,12,1,1,'A',NULL,0,1),(3,2,7,2,1,'A.1',NULL,0,2),(4,10,11,2,3,'A.2',NULL,0,2);
+INSERT INTO `ac_tree_combos` VALUES (1,0,15,NULL,1,'root',999,0,0),(2,1,10,1,1,'A',NULL,0,1),(3,2,7,2,1,'A.1',NULL,0,2),(4,10,3,2,3,'A.2',NULL,0,2);
 /*!40000 ALTER TABLE `ac_tree_combos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -667,7 +695,7 @@ CREATE TABLE `ac_tree_nested_sets` (
 
 LOCK TABLES `ac_tree_nested_sets` WRITE;
 /*!40000 ALTER TABLE `ac_tree_nested_sets` DISABLE KEYS */;
-INSERT INTO `ac_tree_nested_sets` VALUES (0,1,0,9,NULL,1,'Sample_Tree_Record_Mapper',0,0),(1,1,1,8,0,1,'',0,1),(2,1,2,7,1,1,'',0,2),(3,1,3,4,2,1,'',0,3),(4,1,5,6,2,2,'',0,3);
+INSERT INTO `ac_tree_nested_sets` VALUES (0,1,0,9,NULL,1,'Sample_Tree_Record_Mapper',0,0),(1,1,1,8,0,1,'',0,1),(2,1,2,7,2,1,'',0,2),(3,1,3,4,3,2,'',0,3),(4,1,5,6,4,2,'',0,3);
 /*!40000 ALTER TABLE `ac_tree_nested_sets` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -683,7 +711,7 @@ CREATE TABLE `ac_tree_records` (
   `title` varchar(255) NOT NULL DEFAULT '',
   `tag` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -705,4 +733,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-02-09  1:58:34
+-- Dump completed on 2015-07-09  0:36:41

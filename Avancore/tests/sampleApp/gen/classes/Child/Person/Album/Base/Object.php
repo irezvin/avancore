@@ -26,7 +26,7 @@ class Child_Person_Album_Base_Object extends Sample_Person_Album {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'person' => array (
                 'className' => 'Child_Person',

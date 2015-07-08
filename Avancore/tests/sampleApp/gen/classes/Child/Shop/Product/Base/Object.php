@@ -26,7 +26,7 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'shopCategories' => array (
                 'className' => 'Child_Shop_Category',

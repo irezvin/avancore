@@ -118,7 +118,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
                     $pubRow = $this->getAeDb()->args($pubId)->fetchRow("SELECT * FROM #__publish WHERE id = ?");
                     if ($this->assertTrue(is_array($pubRow))) {
                         // actually, that shouldn't work at the moment
-                        $this->assertEqual($pubRow['sharedObjectType'], 'product');
+                        $this->assertEqual($pubRow['sharedObjectType'], 'Sample_Shop_Product_Mapper');
                     }
                 }
                 $metaId = $row['metaId'];

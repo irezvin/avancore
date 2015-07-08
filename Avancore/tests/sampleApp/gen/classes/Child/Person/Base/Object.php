@@ -26,7 +26,7 @@ class Child_Person_Base_Object extends Sample_Person {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'portraitPersonPhoto' => array (
                 'className' => 'Child_Person_Photo',

@@ -72,6 +72,8 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * @var bool
      */
     protected $overwriteModelFields = false;
+    
+    protected $objectTypeField = false;
 
     function setTableName($tableName) {
         if ($tableName !== $this->tableName) {
@@ -149,7 +151,11 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * @return array
      */
     function getRestrictions() {
-        return $this->restrictions;
+        $res = $this->restrictions;
+        if (strlen($this->objectTypeField) && $this->mixin) {
+            $res[$this->objectTypeField] = $this->mixin->getId();
+        }
+        return $res;
     }    
 
     /**
@@ -165,6 +171,23 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     function getExtraIsReferenced() {
         return $this->extraIsReferenced;
     }    
+    
+    /**
+     * Field in restrictions that will be set to mapper Id (FALSE to ignore this feature)
+     * @param string $objectTypeField
+     */
+    function setObjectTypeField($objectTypeField) {
+        $this->objectTypeField = $objectTypeField;
+    }
+
+    /**
+     * Field in restrictions that will be set to mapper Id (FALSE to ignore this feature)
+     * @return string
+     */
+    function getObjectTypeField() {
+        return $this->objectTypeField;
+    }    
+    
     
     /**
      * @return Ac_Model_Relation
@@ -268,8 +291,8 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
                 $bindData[$colName] = $data[$fieldName];
             }
         }
-        if ($this->restrictions) 
-            $bindData = array_merge($bindData, $this->restrictions);
+        if ($restrictions = $this->getRestrictions()) 
+            $bindData = array_merge($bindData, $this->getRestrictions());
         
         foreach ($this->colMap as $slaveCol => $ownerCol) {
             $bindData[$slaveCol] = $data[$ownerCol];

@@ -941,12 +941,8 @@
                             "default": "0"
                         },
                         "sharedObjectType": {
-                            "type": "enum",
-                            "enumValues": [
-                                "product",
-                                "category",
-                                "other"
-                            ],
+                            "type": "varchar",
+                            "width": "255",
                             "nullable": false,
                             "default": "other"
                         }
@@ -4098,6 +4094,15 @@
             },
             "mixableId": false,
             "objectPropertiesPrefix": false,
+            "mapperMixableExtra": [],
+            "perModelMapperMixableExtras": {
+                "shopProducts": {
+                    "fieldNames": {
+                        "sharedObjectType": false
+                    }
+                }
+            },
+            "objectTypeField": "sharedObjectType",
             "inline": false,
             "name": "publish",
             "table": "#__publish",
@@ -6215,6 +6220,9 @@
             },
             "mixableId": false,
             "objectPropertiesPrefix": false,
+            "mapperMixableExtra": [],
+            "perModelMapperMixableExtras": [],
+            "objectTypeField": false,
             "inline": false,
             "name": "shopProductExtraCodes",
             "table": "#__shop_product_extraCodes",
@@ -6581,6 +6589,9 @@
             },
             "mixableId": false,
             "objectPropertiesPrefix": false,
+            "mapperMixableExtra": [],
+            "perModelMapperMixableExtras": [],
+            "objectTypeField": false,
             "inline": true,
             "name": "shopProductNotes",
             "table": "#__shop_product_notes",
@@ -6883,6 +6894,9 @@
                     "class": "Sample_Publish_MapperMixable",
                     "colMap": {
                         "id": "pubId"
+                    },
+                    "fieldNames": {
+                        "sharedObjectType": false
                     }
                 },
                 "extraCode": {
@@ -8485,7 +8499,15 @@
             ],
             "skipMapperMixables": [
                 "fkPostPublish"
-            ]
+            ],
+            "objectTypeField": "sharedObjectType",
+            "perModelMapperMixableExtras": {
+                "shopProducts": {
+                    "fieldNames": {
+                        "sharedObjectType": false
+                    }
+                }
+            }
         },
         "shopProductExtraCodes": {
             "class": "Ac_Cg_Model_Part",

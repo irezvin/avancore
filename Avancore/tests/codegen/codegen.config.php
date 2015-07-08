@@ -93,6 +93,14 @@ $config = array(
                 'skipMapperMixables' => array(
                     'fkPostPublish',
                 ),
+                'objectTypeField' => 'sharedObjectType',
+                'perModelMapperMixableExtras' => array(
+                    'shopProducts' => array(
+                        'fieldNames' => array(
+                            'sharedObjectType' => false,
+                        ),
+                    ),
+                ),
             ),
             'shopProductExtraCodes' => array(
                 'class' => 'Ac_Cg_Model_Part',

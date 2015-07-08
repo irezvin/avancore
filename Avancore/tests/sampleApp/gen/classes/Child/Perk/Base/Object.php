@@ -26,7 +26,7 @@ class Child_Perk_Base_Object extends Sample_Perk {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'tags' => array (
                 'className' => 'Child_Tag',

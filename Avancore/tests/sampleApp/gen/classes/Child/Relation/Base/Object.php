@@ -32,7 +32,7 @@ class Child_Relation_Base_Object extends Sample_Relation {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'relationType' => array (
                 'className' => 'Child_Relation_Type',

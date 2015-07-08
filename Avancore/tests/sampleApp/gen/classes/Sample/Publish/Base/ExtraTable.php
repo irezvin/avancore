@@ -8,6 +8,8 @@ class Sample_Publish_Base_ExtraTable extends Ac_Model_Mapper_Mixable_ExtraTable 
     
     protected $implMapper = 'Sample_Publish_ImplMapper';
     
+    protected $objectTypeField = 'sharedObjectType';
+    
     
 
     
