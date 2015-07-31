@@ -180,6 +180,9 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
      * @param Ac_Url $url
      */
     function setBaseUrl($url) {
+        if (!is_object($url) || !$url instanceof Ac_Url) {
+            $url = new Ac_Url($url);
+        }
         $this->_baseUrl = $url;
         $this->_url = false;
     }

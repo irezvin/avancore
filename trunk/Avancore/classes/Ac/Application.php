@@ -619,16 +619,18 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
         return $this->user;
     }    
     
-    function setMailSender(Ac_I_MailSender $mailSender) {
+    function setMailSender(Ac_I_Mail_Sender $mailSender) {
         $this->mailSender = $mailSender;
     }
 
     /**
-     * @return Ac_I_MailSender
+     * @return Ac_I_Mail_Sender
      */
     function getMailSender() {
         if ($this->mailSender === false) {
-            $this->mailSender = Ac_Prototyped::factory($this->adapter->getMailSenderPrototype(), 'Ac_I_MailSender');
+            $proto = $this->adapter->getMailSenderPrototype();
+            Ac_Util::ms($proto, $this->adapter->getConfigValue('mailSenderPrototypeExtra', array()));
+            $this->mailSender = Ac_Prototyped::factory($proto, 'Ac_I_Mail_Sender');
             if ($this->mailSender instanceof Ac_I_Mail_Sender_WithDump) {
                 $dd = $this->mailSender->getDumpDir();
                 if ($dd === false || is_null($dd)) $this->mailSender->setDumpDir($this->adapter->getVarDumpsPath());

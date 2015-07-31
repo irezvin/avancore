@@ -34,6 +34,7 @@ if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/../P
  * @property $logEnabled
  * @property $services
  * @property $mailSenderPrototype
+ * @property $mailSenderPrototypeExtra
  *
  * @property $managerImagesUrl
  * @property $joomlaComponentName

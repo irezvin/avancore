@@ -337,13 +337,13 @@ class Ac_Accessor implements Ac_I_Accessor {
         }
     }
 
-    static function itemMatchesPattern($item, array $pattern, $strict = false, $className = false) {
+    static function itemMatchesPattern($item, array $pattern, $strict = false, $className = false, $treatArraysAsObjects = false) {
         if ($className !== false && !($item instanceof $className)) return false;
         if ($strict) {
-            foreach ($pattern as $propName => $propValue) if (self::getObjectProperty($item, $propName) !== $propValue) return false;
+            foreach ($pattern as $propName => $propValue) if (self::getObjectProperty($item, $propName, null, $treatArraysAsObjects) !== $propValue) return false;
         } else {
             foreach ($pattern as $propName => $propValue) {
-                if (self::getObjectProperty($item, $propName) != $propValue) {
+                if (self::getObjectProperty($item, $propName, null, $treatArraysAsObjects) != $propValue) {
                     return false;
                 }
             }
@@ -351,10 +351,10 @@ class Ac_Accessor implements Ac_I_Accessor {
         return true;
     }
 
-    static function findItems(array $items, array $pattern, $strict = false, $preserveKeys = false, $className = false) {
+    static function findItems(array $items, array $pattern, $strict = false, $preserveKeys = false, $className = false, $treatArraysAsObjects = false) {
         $res = array();
         foreach ($items as $k => $item) {
-            if (self::itemMatchesPattern($item, $pattern, $strict, $className)) {
+            if (self::itemMatchesPattern($item, $pattern, $strict, $className, $treatArraysAsObjects)) {
                 if (!$preserveKeys) $k = count($res);
                 $res[$k] = $item;
             }

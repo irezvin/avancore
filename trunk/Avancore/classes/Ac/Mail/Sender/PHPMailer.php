@@ -209,7 +209,8 @@ abstract class Ac_Mail_Sender_PHPMailer extends Ac_Prototyped implements Ac_I_Ma
             if ($errors) {
                 $error = print_r($errors, 1);
             }
-            $this->dumpToFile($content, $error);
+            if (strlen($content) || $error)
+                $this->dumpToFile($content, $error);
         }
         if ($e) throw $e;
         return $res;
@@ -230,7 +231,7 @@ abstract class Ac_Mail_Sender_PHPMailer extends Ac_Prototyped implements Ac_I_Ma
             $emlFileName = $this->dumpFilename.'.eml';
             $errFileName = $this->dumpFilename.'-error.txt';
             $this->lastDumpFilePrefix = $this->dumpFilename;
-        } elseif ($this->dumpDir !== false) {
+        } elseif ($this->dumpDir !== false && $this->dumpDir !== null) {
             if (($d = is_dir($this->dumpDir)) && ($w = is_writable($this->dumpDir))) {
                 $dir = $this->dumpDir;
                 $fname = date("Y-m-d-h-i-s");
