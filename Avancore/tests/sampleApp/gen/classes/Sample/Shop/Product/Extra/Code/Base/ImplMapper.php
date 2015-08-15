@@ -21,6 +21,8 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
             'gtin' => '',
             'responsiblePersonId' => NULL,
         ); 
+
+    var $typeName = 'shopProductExtraCodes'; 
  
     protected $askRelationsForDefaults = false;
  

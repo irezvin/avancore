@@ -23,6 +23,8 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
             'relationEnd' => NULL,
             'notes' => '',
         ); 
+
+    var $typeName = 'relations'; 
  
    
     protected $autoincFieldName = 'relationId';

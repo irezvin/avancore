@@ -17,6 +17,8 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
             'title' => NULL,
             'isSymmetrical' => '0',
         ); 
+
+    var $typeName = 'relationTypes'; 
  
    
     protected $autoincFieldName = 'relationTypeId';

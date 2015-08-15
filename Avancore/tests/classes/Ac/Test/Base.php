@@ -150,8 +150,20 @@ class Ac_Test_Base extends UnitTestCase {
     }
     
     function resetAi($tableName, $ai = false) {
-        // MySQL only!!!
         $db = $this->getAeDb();
+        $real = true;
+        if (!$real) {
+            $dbn = $db->getDbName();
+            $tableName = $db->replacePrefix($tableName);
+            $res = $db->fetchValue($q = "
+                SELECT `AUTO_INCREMENT`
+                FROM  INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_SCHEMA = '{$dbn}'
+                AND   TABLE_NAME   = '{$tableName}';
+            ");
+            return $res;
+        }
+        // MySQL only!!!
         $cols = $db->fetchArray("SHOW COLUMNS FROM ".$db->n($tableName), 'Field');
         $res = false;
         foreach ($cols as $col => $data) {

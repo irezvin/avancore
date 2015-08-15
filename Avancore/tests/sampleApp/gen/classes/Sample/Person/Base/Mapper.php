@@ -25,6 +25,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
             'religionId' => NULL,
             'portraitId' => NULL,
         ); 
+
+    var $typeName = 'people'; 
  
    
     protected $autoincFieldName = 'personId';

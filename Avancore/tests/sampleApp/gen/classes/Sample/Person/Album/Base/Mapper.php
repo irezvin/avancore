@@ -17,6 +17,8 @@ class Sample_Person_Album_Base_Mapper extends Ac_Model_Mapper {
             'personId' => '0',
             'albumName' => '\'\'',
         ); 
+
+    var $typeName = 'personAlbums'; 
  
    
     protected $autoincFieldName = 'albumId';

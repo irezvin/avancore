@@ -19,6 +19,8 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
             'title' => '',
             'tag' => NULL,
         ); 
+
+    var $typeName = 'treeRecords'; 
  
    
     protected $autoincFieldName = 'id';

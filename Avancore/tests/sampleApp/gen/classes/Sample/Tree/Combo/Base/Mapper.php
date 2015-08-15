@@ -25,6 +25,8 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
             'ignore' => '0',
             'depth' => '0',
         ); 
+
+    var $typeName = 'treeCombos'; 
  
    
     protected $autoincFieldName = 'id';

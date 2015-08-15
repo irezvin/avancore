@@ -283,7 +283,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         $data = array_merge($data, $md);
     }
     
-    protected function getExtraRecord($data, & $bindData = array()) {
+    protected function getExtraRecord($data, & $bindData = array(), $loadNotBind = false) {
         $bindData = array();
         $colMap = array_merge(array_combine($def = array_keys($this->getDefaults()), $def), $this->fieldNames);
         foreach (array_intersect_key($colMap, $data) as $colName => $fieldName) {
@@ -297,9 +297,12 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         foreach ($this->colMap as $slaveCol => $ownerCol) {
             $bindData[$slaveCol] = $data[$ownerCol];
         }
-        
         $record = $this->getImplMapper()->createRecord();
-        $record->bind($bindData);
+        if ($loadNotBind) {
+            $record->load($bindData, true);
+        } else {
+            $record->bind($bindData);
+        }
         return $record;
     }
     
@@ -328,7 +331,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
             }
         } else {
             $res = false;
-            $error = $res->getError();
+            $error = $res->getErrors(false, true);
         }
         return $res;
     }
@@ -349,8 +352,8 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     
     function onAfterDeleteRecord($record, array & $hyData, & $error, & $result) {
         if ($result) {
-            $extraRecord = $this->getExtraRecord($hyData);
-            if ($extraRecord->hasFullPrimaryKey()) {
+            $extraRecord = $this->getExtraRecord($hyData, $bindData, true);
+            if ($extraRecord->isPersistent()) {
                 if (!$extraRecord->delete()) { // there may be the case when extra record does not exist
                     if ($xError = $extraRecord->getError()) {
                         $result = false;
@@ -365,6 +368,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         if ($this->modelMixable) {
             $mix = Ac_Prototyped::factory($this->modelMixable, 'Ac_I_Mixable');
             if ($mix instanceof Ac_Model_Mixable_ExtraTable) $mix->setMapperExtraTable($this);
+            if (!$mix->getMixableId() && strlen($this->mixableId)) $mix->setMixableId ($this->getMixableId());
             $record->addMixable($mix);
         }
     }

@@ -21,6 +21,8 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
             'metaId' => NULL,
             'pubId' => NULL,
         ); 
+
+    var $typeName = 'shopProducts'; 
  
    
     protected $autoincFieldName = 'id';

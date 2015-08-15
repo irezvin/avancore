@@ -9,13 +9,10 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         'personId', 'name', 'gender', 'isSingle', 'birthDate', 'lastUpdatedDatetime', 'createdTs', 'religionId',  'portraitId'
     );
     
+    var $bootSampleApp = true;
+    
     function testMapper() {
-        $appClassFile = dirname(dirname(dirname(dirname(__FILE__)))).'/sampleApp/gen/classes/Sample/DomainBase.php';
-        require_once($appClassFile);
-        $appClassFile = dirname(dirname(dirname(dirname(__FILE__)))).'/sampleApp/classes/Sample.php';
-        require_once($appClassFile);
         $sam = Sample::getInstance();
-        
         $sam->addMapper(Ac_Prototyped::factory(array('id' => 'people', 'tableName' => '#__people'), 'Ac_Model_Mapper'));
         $m = $sam->getMapper('people');
         $this->assertEqual($m->pk, 'personId', 'Auto-detection of primary key by Ac_Model_Mapper');
@@ -63,12 +60,29 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         $guy->store();
         
         $this->assertTrue($guy->isPersistent());
+        
+        $tmp = $m->useRecordsCollection;
+        $m->useRecordsCollection = false;
         $guy2 = $m->loadRecord($guy->getPrimaryKey());
+        $m->useRecordsCollection = $tmp;
+        
+        $this->assertTrue($guy2->name == $guy->name);
 
         /*var_dump($guy->getDataFields());
         var_dump($guy2->getDataFields());*/
         
+        $id = $this->resetAi('#__people');
+        $guy3 = $sam->createSamplePerson();
+        $guy3->bind(array('personId' => $id, 'name' => 'Guy 3', 'gender' => 'M', 'birthDate' => '0000-00-00'));
+        if ($this->assertTrue($guy3->store())) {
+            $this->assertTrue($guy3->isPersistent());
+            $row = $sam->getDb()->args($id)->fetchRow('SELECT * FROM #__people WHERE personId = ?');
+            $this->assertTrue(is_array($row), 'New record with provided ID must be properly saved');
+        }
+        
+        
         $guy->delete();
+        $guy3->delete();
     }
     
     function testLoadFromRows() {

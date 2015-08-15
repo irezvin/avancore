@@ -5,6 +5,8 @@ class Child_Perk_Base_Mapper extends Sample_Perk_Mapper {
     var $recordClass = 'Child_Perk'; 
 
     var $id = 'Child_Perk_Mapper'; 
+
+    var $typeName = 'perks'; 
  
  
  

@@ -270,7 +270,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     function getPortraitPersonPhoto() {
         if ($this->_portraitPersonPhoto === false) {
             $this->mapper->loadPortraitPersonPhotosFor($this);
-            
         }
         return $this->_portraitPersonPhoto;
     }

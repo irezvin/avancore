@@ -4,7 +4,11 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
     
+    var $t = 0;
+    
     function testExtraTable() {
+        $this->t = microtime(true);
+        
         $mapper = Sample::getInstance()->getSampleShopProductMapper();
         $this->resetAi('#__shop_meta');
         $this->resetAi('#__publish');
@@ -22,8 +26,6 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         // Works when loading two objects (loadFromRows)
         $twoProds = $mapper->loadRecordsArray(array(1, 2), true);
         
-        //Ac_Debug::drr($twoProds);
-        
         $this->assertEqual($twoProds[1]->metaDescription, 'Страница товара 1');
         $this->assertEqual($twoProds[1]->upcCode, '1234');
         
@@ -37,6 +39,11 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         $metaId = $this->resetAi('#__shop_meta');
         
         $newProd = $mapper->createRecord();
+        $dp = $newProd->listDataProperties();
+        if (!$this->assertTrue(count($dp) == count(array_unique($dp)), 
+            "Mixin ModelObject listDataProperties() should not have repeating values")) {
+            var_dump($dp);
+        }
         $data = array(
             'id' => $prodId,
             'title' => 'Product3',
@@ -44,10 +51,13 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             'pageTitle' => '-=product-03-title=-',
             'upcCode' => '5678',
         );
+        $db = $mapper->getDb();
+        $db->args($data['pageTitle'])->query("DELETE FROM #__shop_meta WHERE pageTitle = ?");
+        $db->args($data['upcCode'])->query("DELETE FROM #__shop_product_upc WHERE upcCode = ?");
         $newProd->bind($data);
         $res = $newProd->store();
-        $db = $mapper->getDb();
         if ($this->assertTrue($res, 'Owner record row must report it is saved')) {
+            $this->assertTrue($newProd->isPersistent());
             $this->assertEqual($newProd->metaId, $metaId);
             $prodRow = $db->args($prodId)->fetchRow('SELECT * FROM #__shop_products WHERE id = ?');
             if ($this->assertTrue(is_array($prodRow), 'Owner record row must appear in the primary table')) {
@@ -63,7 +73,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             if ($this->assertTrue(is_array($upcRow), 'Extra row must appear in referencing extra table')) {
                 $this->assertEqual($upcRow['upcCode'], $data['upcCode']);
             }
-
+            
             $res = $newProd->delete();
             $this->assertTrue($res);
             $this->assertEqual(
@@ -78,8 +88,6 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             );
             // clean up
         }
-        $db->args($data['pageTitle'])->query("DELETE FROM #__shop_meta WHERE pageTitle = ?");
-        $db->args($data['upcCode'])->query("DELETE FROM #__shop_product_upc WHERE upcCode = ?");
     }
     
     function testMixableExtraTable() {

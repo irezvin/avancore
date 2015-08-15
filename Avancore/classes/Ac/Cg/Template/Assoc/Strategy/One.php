@@ -50,11 +50,10 @@ class Ac_Cg_Template_Assoc_Strategy_One extends Ac_Cg_Template_Assoc_Strategy {
     /**
      * @return <?php $this->d($prop->className); ?>  
      */
-    function create<?php $this->d($ucSingle); ?>($values = array(), $isReference = false) {
+    function create<?php $this->d($ucSingle); ?>($values = array()) {
         $m = $this->getMapper(<?php $this->str($this->prop->mapperClass); ?>);
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->set<?php $this->d($ucSingle); ?>($res);
         return $res;
     }
@@ -88,8 +87,8 @@ class Ac_Cg_Template_Assoc_Strategy_One extends Ac_Cg_Template_Assoc_Strategy {
     /**
      * @return <?php $this->d($prop->className); ?>  
      */
-    function create<?php $this->d($ucSingle); ?>($values = array(), $isReference = false) {
-        return parent::create<?php $this->d($ucSingle); ?>($values, $isReference);
+    function create<?php $this->d($ucSingle); ?>($values = array()) {
+        return parent::create<?php $this->d($ucSingle); ?>($values);
     }
 
 <?php   } ?>    

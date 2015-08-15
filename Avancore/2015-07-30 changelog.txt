@@ -1,0 +1,22 @@
+2015-07-30
+
+-   removed $ignore param from bind() since it's stupid, getBindIgnore() from Ac_Model_Object
+-   removed _legacyLoad, _legacyDelete; simplified logic of both;
+-   renamed _legacyStore to saveOwnRow();
+-   store() is now alias of save();
+-   Ac_Model_Object: 
+    -   removed References feature (not used and ill-planned)
+    -   removed _autoStore<...> methods - old gen'd code is not supported anymore
++   re-implementation of collection mechanism in Mapper-ModelObject pair
+    -   Ac_Model_Mapper implements Ac_I_LifecycleAwareCollection
+        (a descendant of Ac_I_ObjectsCollection)
+    -   Ac_Model_Object implements Ac_I_CollectionAwareObject
+    -   object can be registered in several collections
++   most storage-related functions are now handled by Ac_Model_Storage which is aggregate of Ac_Model_Mapper
+-   Ac_Model_Mapper cleanup:
+    -   removed storage-specific methods that were rarely used: locateRecord(), 
+        indexCriterion(), getKeysCriterion()
++   Added first implementation of Storage object that should handle all storage-layer
+    interaction for Mapper (an aggregate of Ac_Model_Mapper)
++   Made sure that at least tests are passing with improved storage
+
