@@ -5,8 +5,6 @@ class Child_Religion_Base_Mapper extends Sample_Religion_Mapper {
     var $recordClass = 'Child_Religion'; 
 
     var $id = 'Child_Religion_Mapper'; 
-
-    var $typeName = 'religion'; 
  
  
  

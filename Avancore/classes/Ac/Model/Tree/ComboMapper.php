@@ -40,7 +40,7 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
                 'orderingCol' => $this->nodeOrderField,
                 'db' => $this->mixin->getDb(),
                 'blocker' => new Ac_Sql_Blocker(),
-                'idIsAutoInc' => $this->mixin->getAutoincFieldName() == $this->mixin->pk,
+                'idIsAutoInc' => in_array($this->mixin->pk, $this->mixin->listGeneratedFields()),
             ));
         }
         return $this->nestedSets;

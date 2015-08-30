@@ -20,8 +20,6 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
             'titleM' => NULL,
             'titleF' => NULL,
         ); 
-
-    var $typeName = 'tags'; 
  
    
     protected $autoincFieldName = 'tagId';

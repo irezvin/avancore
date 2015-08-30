@@ -28,8 +28,6 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
             'dateModified' => '0000-00-00 00:00:00',
             'dateDeleted' => '0000-00-00 00:00:00',
         ); 
-
-    var $typeName = 'publish'; 
  
    
     protected $autoincFieldName = 'id';

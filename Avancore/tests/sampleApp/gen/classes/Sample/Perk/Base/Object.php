@@ -91,8 +91,6 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
 
     function hasUniformPropertiesInfo() { return true; }
 
-    function tracksChanges() { return true; }
-
     function countTags() {
         if (is_array($this->_tags)) return count($this->_tags);
         if ($this->_tagsCount === false) {
@@ -152,11 +150,10 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Tag  
      */
-    function createTag($values = array(), $isReference = false) {
+    function createTag($values = array()) {
         $m = $this->getMapper('Sample_Tag_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addTag($res);
         return $res;
     }

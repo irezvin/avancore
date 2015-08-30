@@ -472,7 +472,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @return Ac_Model_Object
      */
     function loadRecord($id) {
-        if ($this->useRecordsCollection && isset($this->recordsCollection[$idOrIds])) {
+        if ($this->useRecordsCollection && isset($this->recordsCollection[$id])) {
             $res = $this->recordsCollection[$id];
         } else {
             $res = $this->getStorage()->loadRecord($id);
@@ -863,11 +863,16 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     /**
      * @return bool|string FALSE or name of autoinc field
+     * @deprecated
      */
     function getAutoincFieldName() {
         return $this->autoincFieldName;
     }
-
+    
+    function listGeneratedFields() {
+        return $this->getStorage()->listGeneratedFields();
+    }
+    
     /**
      * Checks if given field(s) are enough to identify one record from the table (they must form PK or other unique index)
      * @param array|string $fieldNameOrNames Names of fields to check
@@ -1207,7 +1212,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @param mixed $hyData Persistence data
      * @return mixed persistence data on success, FALSE on failure
      */
-    final function peSave($record, $hyData, $exists = null, & $error = null, & $newData = array()) {
+    final function peSave($record, $hyData, & $exists = null, & $error = null, & $newData = array()) {
         $res = null;
         $this->triggerEvent(self::EVENT_BEFORE_STORE_RECORD, array(
             $record, & $hyData, & $newData, & $exists, & $res, & $error
@@ -1693,15 +1698,30 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return $this->identifierField;
     }
     
+
+    function setRowIdentifierField($rowIdentifierField) {
+        $this->rowIdentifierField = $rowIdentifierField;
+    }
+
+    function getRowIdentifierField() {
+        return $this->rowIdentifierField;
+    }    
+    
+    protected $rowIdentifierField = false;
+    
     function getIdentifier(Ac_Model_Object $record) {
-        if (strlen($this->identifierField)) $res = $record->{$this->identifierField};
-            else $res = $this->getStorage()->getIdentifier($record);
+        if (strlen($this->identifierField)) {
+            $res = $record->{$this->identifierField};
+            if ($res === false) $res = $this->getStorage()->getIdentifier($record);
+        } else {
+            $res = $this->getStorage()->getIdentifier($record);
+        }
         return $res;
     }
     
     protected function getIdentifierFromRow(array $row) {
-        if (strlen($this->identifierField)) $res = $row[$this->identifierField];
-            else $res = $this->getStorage()->getIdentifierFromRow($this->identifierField);
+        if (strlen($this->rowIdentifierField)) $res = $row[$this->rowIdentifierField];
+            else $res = $this->getStorage()->getIdentifierFromRow($row);
         return $res;
     }
     
@@ -1776,6 +1796,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         if (isset($this->recordsCollection[$id])) {
             if ($this->recordsCollection[$id] === $object) {
                 $actualizeResult = Ac_I_ObjectsCollection::ACTUALIZE_SAME;
+                $reg = false;
             } else {
                 $reg = $this->handleCollectionConflict($id, $object);
                 if (!$reg) $res = false;
@@ -1912,7 +1933,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     function __sleep() {
-        $res = array_keys(get_class_vars($this));
+        $res = array_keys(get_object_vars($this));
         $res = array_diff($res, array('recordsCollection'));
         return $res;
     }

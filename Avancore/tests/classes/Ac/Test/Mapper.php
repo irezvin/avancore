@@ -18,9 +18,10 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         $this->assertEqual($m->pk, 'personId', 'Auto-detection of primary key by Ac_Model_Mapper');
         $this->assertTrue(!array_diff($m->getColumnNames(), $this->peopleCols), 'Ac_Model_Mapper::getColumnNames()');
         $this->assertSame($m, Ac_Model_Mapper::getMapper('people'));
+        $m->useRecordsCollection = true;
         $rec = $m->loadRecord(3);
         $this->assertEqual(Ac_Accessor::getObjectProperty($rec, 'personId'), 3, 'Ensure Ac_Accessor retrieves values from barebones Ac_Model_Object');
-        $this->assertEqual($m->getAutoincFieldName(), 'personId', 'Ac_Model_Mapper::getAutoincFieldName()');
+        $this->assertTrue(in_array('personId', $m->listGeneratedFields()), 'Ac_Model_Mapper::listGeneratedFields()');
         
         $pm = $sam->getSamplePersonMapper();
         $pp = $pm->loadRecordsByCriteria('', array('gender', 'personId'));
@@ -54,35 +55,69 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         // TODO: people => person
         $sam = Sample::getInstance();
         $m = $sam->getSamplePersonMapper();
+        $db = $this->getAeDb();
+        
+        $this->resetAi('#__people');
+        
         $guy = $sam->createSamplePerson();
         $guy->name = 'Guy';
         $guy->birthDate = '0000-00-00';
-        $guy->store();
         
-        $this->assertTrue($guy->isPersistent());
+        $this->assertTrue($guy->store(), 'Record is successfully stored');
+        $this->assertTrue($guy->isPersistent(), 'Record is reported as persistent after save');
+        $this->assertTrue($guy->personId > 0, 'PK assigned to the record after save');
+        $name = $db->args($guy->personId)->fetchValue('SELECT name FROM #__people WHERE personId = ?');
+        $this->assertTrue($name == $guy->name, 'Record data is in the database');
         
-        $tmp = $m->useRecordsCollection;
-        $m->useRecordsCollection = false;
-        $guy2 = $m->loadRecord($guy->getPrimaryKey());
-        $m->useRecordsCollection = $tmp;
+        $guy->name = 'Guy with changed name';
+        $this->assertTrue($guy->store(), 'Record is successfully changed');
+        $name2 = $db->args($guy->personId)->fetchValue('SELECT name FROM #__people WHERE personId = ?');
+        $this->assertTrue($name2 == $guy->name, 'Changed record data is in the database');
         
-        $this->assertTrue($guy2->name == $guy->name);
-
-        /*var_dump($guy->getDataFields());
-        var_dump($guy2->getDataFields());*/
+        // test load
+        $guy2 = $sam->createSamplePerson();
+        $this->assertFalse($guy2->load(-10), 'After loading object with non-existent id load() must return false');
+        $this->assertTrue(!$guy2->isPersistent(), 'After failed load object->isPersistent() must return false');
+        $this->assertTrue($guy2->load($guy->personId), 'load() of existent record returns true');
+        $this->assertTrue($guy2->isPersistent(), 'After successful load object->isPersistent() must return true');
         
-        $id = $this->resetAi('#__people');
-        $guy3 = $sam->createSamplePerson();
-        $guy3->bind(array('personId' => $id, 'name' => 'Guy 3', 'gender' => 'M', 'birthDate' => '0000-00-00'));
-        if ($this->assertTrue($guy3->store())) {
-            $this->assertTrue($guy3->isPersistent());
-            $row = $sam->getDb()->args($id)->fetchRow('SELECT * FROM #__people WHERE personId = ?');
-            $this->assertTrue(is_array($row), 'New record with provided ID must be properly saved');
+        // test delete
+        $this->assertTrue($guy->delete(), 'Record is correctly deleted');
+        $n = $this->getAeDb()->args($guy->personId)->fetchValue('SELECT COUNT(*) FROM #__people WHERE personId = ?');
+        $this->assertEqual($n, 0, 'No record data in DB after deletion');
+        
+        // test PK tracking
+        $db->query("DELETE FROM #__tags WHERE title = 'TestTag'");
+        $id = $this->resetAi('#__tags') + 5;
+        $tag = $sam->createSampleTag();
+        
+        $tag->bind(array('tagId' => $id, 'title' => 'TestTag', 'titleM' => 'TestTagM', 'titleF' => 'TestTagF'));
+        $this->assertFalse($tag->isPersistent(), 'Record is NOT existent when it is created with pre-provided ID');
+        if ($this->assertTrue($tag->store(), 'Record with pre-provided ID is correctly saved')) {
+            $this->assertTrue($tag->isPersistent());
+            $row = $db->args($id)->fetchRow('SELECT * FROM #__tags WHERE tagId = ?');
+            $this->assertTrue(is_array($row) && $row['title'] == 'TestTag', 
+                'New record with provided ID must be properly saved and row in the DB exists');
+            
+            $newId = $id + 2;
+            $tag->tagId = $newId;
+            $this->assertTrue($tag->store(), 'Record is saved after ID is changed');
+            $row = $db->args($newId)->fetchRow('SELECT * FROM #__tags WHERE tagId = ?');
+            $this->assertTrue(is_array($row) && $row['title'] == 'TestTag', 
+                'Record with changed ID exists in DB');
+            $this->assertTrue($db->args($id)->fetchValue('SELECT COUNT(*) FROM #__tags WHERE tagId = ?') == 0, 
+                'Record with old ID is no more in DB');
+            $this->assertEqual($tag->getIdentifier(), $newId, 'The object has new identifier assigned after it is saved with different PK');
+                        
+            $newId2 = $id + 4;
+            $tag->tagId = $newId2;
+            $this->assertTrue($tag->delete(), 'Record is deleted after ID is changed, but before it is saved');
+            $this->assertTrue($db->args($newId)->fetchValue('SELECT COUNT(*) FROM #__tags WHERE tagId = ?') == 0, 'Record is correctly deleted using old ID');
+            $this->assertFalse($tag->isPersistent(), "The record is not persistent after it had been deleted");
         }
         
+        if ($tag->isPersistent()) $tag->delete();
         
-        $guy->delete();
-        $guy3->delete();
     }
     
     function testLoadFromRows() {

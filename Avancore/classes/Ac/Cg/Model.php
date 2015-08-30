@@ -77,12 +77,6 @@ class Ac_Cg_Model extends Ac_Cg_Base {
      */
     var $properties = array();
     
-    /**
-     * Whether Ac_Model_Object should track it's changes (and it's trackChanges() function should return true)
-     * @var bool
-     */
-    var $tracksChanges = false;
-    
     var $fixMapperMethodNames = false;
     
     var $extraOwnPropertiesInfo = array();

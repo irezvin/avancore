@@ -92,9 +92,6 @@ class Sample_Shop_Product_Note_Base_Object extends Ac_Model_Object {
 
     function hasUniformPropertiesInfo() { return true; }
 
-    function tracksChanges() { return true; }
-        
-    
     /**
      * @return Sample_Person 
      */

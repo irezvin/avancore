@@ -69,8 +69,8 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Child_Person  
      */
-    function createAuthorPerson($values = array(), $isReference = false) {
-        return parent::createAuthorPerson($values, $isReference);
+    function createAuthorPerson($values = array()) {
+        return parent::createAuthorPerson($values);
     }
 
     
@@ -95,8 +95,8 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Child_Person  
      */
-    function createEditorPerson($values = array(), $isReference = false) {
-        return parent::createEditorPerson($values, $isReference);
+    function createEditorPerson($values = array()) {
+        return parent::createEditorPerson($values);
     }
 
     

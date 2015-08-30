@@ -5,8 +5,6 @@ class Child_Tag_Base_Mapper extends Sample_Tag_Mapper {
     var $recordClass = 'Child_Tag'; 
 
     var $id = 'Child_Tag_Mapper'; 
-
-    var $typeName = 'tags'; 
  
  
  

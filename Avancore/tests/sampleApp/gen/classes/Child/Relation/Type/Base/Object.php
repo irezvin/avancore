@@ -66,8 +66,8 @@ class Child_Relation_Type_Base_Object extends Sample_Relation_Type {
     /**
      * @return Child_Relation  
      */
-    function createRelation($values = array(), $isReference = false) {
-        return parent::createRelation($values, $isReference);
+    function createRelation($values = array()) {
+        return parent::createRelation($values);
     }
 
     

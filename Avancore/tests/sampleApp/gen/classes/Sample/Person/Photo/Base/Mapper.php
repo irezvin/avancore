@@ -17,8 +17,6 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
             'personId' => NULL,
             'filename' => '',
         ); 
-
-    var $typeName = 'personPhotos'; 
  
    
     protected $autoincFieldName = 'photoId';

@@ -28,7 +28,6 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     var $nullableSqlColumns = array();
     var $associationPrototypes = array();
     var $hasUniformPropertiesInfo = false;
-    var $tracksChanges = false;
     var $modelCoreMixables = array();
     var $mapperCoreMixables = array();
     var $internalDefaults = false;
@@ -100,7 +99,6 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->tableName = $this->model->tableObject->name;
         $this->associationPrototypes = $this->model->getAssociationPrototypes();
         $this->hasUniformPropertiesInfo = $this->model->hasUniformPropertiesInfo;
-        $this->tracksChanges = $this->model->tracksChanges;
         $this->modelCoreMixables = $this->model->modelCoreMixables;
         $this->mapperCoreMixables = $this->model->mapperCoreMixables;
         $this->autoincFieldName = $this->calcAi($this->model);
@@ -223,10 +221,6 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         
         if ($parentModel->hasUniformPropertiesInfo == $this->model->hasUniformPropertiesInfo) {
             $this->ignoreMethods['hasUniformPropertiesInfo'] = true;
-        }
-        
-        if ($parentModel->tracksChanges == $this->model->tracksChanges) {
-            $this->ignoreMethods['tracksChanges'] = true;
         }
         
     }
@@ -392,10 +386,6 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 <?php if ($this->hasUniformPropertiesInfo && !isset($this->ignoreMethods['hasUniformPropertiesInfo'])) { ?>
 
     function hasUniformPropertiesInfo() { return true; }
-<?php } ?>
-<?php if ($this->tracksChanges && !isset($this->ignoreMethods['tracksChanges'])) { ?>
-
-    function tracksChanges() { return true; }
 <?php } ?>
 <?php if ($this->createAccessors) $this->_showModelAccessors(); ?>
 <?php foreach (array_keys($this->assocProperties) as $relId) { $this->_showModelMethodsForAssociation($relId, $this->assocProperties[$relId]); } ?>  

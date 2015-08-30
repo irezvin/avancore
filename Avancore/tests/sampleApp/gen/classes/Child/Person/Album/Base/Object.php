@@ -73,8 +73,8 @@ class Child_Person_Album_Base_Object extends Sample_Person_Album {
     /**
      * @return Child_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
-        return parent::createPerson($values, $isReference);
+    function createPerson($values = array()) {
+        return parent::createPerson($values);
     }
 
     
@@ -106,8 +106,8 @@ class Child_Person_Album_Base_Object extends Sample_Person_Album {
     /**
      * @return Child_Person_Photo  
      */
-    function createPersonPhoto($values = array(), $isReference = false) {
-        return parent::createPersonPhoto($values, $isReference);
+    function createPersonPhoto($values = array()) {
+        return parent::createPersonPhoto($values);
     }
 
     

@@ -27,6 +27,7 @@ abstract class Ac_Model_Storage extends Ac_Prototyped {
     function setMapper(Ac_Model_Mapper $mapper = null) {
         if ($mapper !== ($oldMapper = $this->mapper)) {
             $this->mapper = $mapper;
+            return true;
         }
     }
 
@@ -149,6 +150,8 @@ abstract class Ac_Model_Storage extends Ac_Prototyped {
     abstract function peSave($object, & $hyData, & $exists = null, & $error = null, & $newData = array());
 
     abstract function peReplaceNNRecords($object, $rowProto, $rows, $midTableName, & $errors = array());
+    
+    abstract function listGeneratedFields();
     
     /**
      * @param type $hyData 

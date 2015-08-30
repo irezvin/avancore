@@ -120,8 +120,6 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
         
     
     /**
@@ -156,11 +154,10 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
+    function createPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPerson($res);
         return $res;
     }
@@ -200,11 +197,10 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Photo  
      */
-    function createPersonPhoto($values = array(), $isReference = false) {
+    function createPersonPhoto($values = array()) {
         $m = $this->getMapper('Sample_Person_Photo_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPersonPhoto($res);
         return $res;
     }

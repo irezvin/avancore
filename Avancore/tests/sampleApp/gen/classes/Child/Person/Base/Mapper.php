@@ -5,8 +5,6 @@ class Child_Person_Base_Mapper extends Sample_Person_Mapper {
     var $recordClass = 'Child_Person'; 
 
     var $id = 'Child_Person_Mapper'; 
-
-    var $typeName = 'people'; 
  
  
  

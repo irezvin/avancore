@@ -160,8 +160,6 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
 
     function hasUniformPropertiesInfo() { return true; }
 
-    function tracksChanges() { return true; }
-
     function countShopCategories() {
         if (is_array($this->_shopCategories)) return count($this->_shopCategories);
         if ($this->_shopCategoriesCount === false) {
@@ -221,11 +219,10 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Shop_Category  
      */
-    function createShopCategory($values = array(), $isReference = false) {
+    function createShopCategory($values = array()) {
         $m = $this->getMapper('Sample_Shop_Category_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addShopCategory($res);
         return $res;
     }
@@ -284,11 +281,10 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createNotePerson($values = array(), $isReference = false) {
+    function createNotePerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setNotePerson($res);
         return $res;
     }

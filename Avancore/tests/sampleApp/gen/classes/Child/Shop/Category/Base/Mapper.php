@@ -5,8 +5,6 @@ class Child_Shop_Category_Base_Mapper extends Sample_Shop_Category_Mapper {
     var $recordClass = 'Child_Shop_Category'; 
 
     var $id = 'Child_Shop_Category_Mapper'; 
-
-    var $typeName = 'shopCategories'; 
  
  
     protected function doGetCoreMixables() { 

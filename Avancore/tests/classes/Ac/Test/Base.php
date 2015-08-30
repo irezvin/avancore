@@ -197,5 +197,19 @@ class Ac_Test_Base extends UnitTestCase {
                 WHERE $where
         ");
     }
+    
+    function getMaxId($tableName) {
+        $db = $this->getAeDb();
+        $tableName = $db->replacePrefix($tableName);
+        $cols = $db->fetchArray("SHOW COLUMNS FROM ".$db->n($tableName), 'Field');
+        $res = false;
+        foreach ($cols as $col => $data) {
+            if ($data['Key'] == 'PRI') {
+                $res = $db->fetchValue("SELECT MAX(".$db->n($col).") FROM ".$db->n($tableName));
+            }
+        }
+        if (!$res) $res = 0;
+        return $res;
+    }
 	
 }

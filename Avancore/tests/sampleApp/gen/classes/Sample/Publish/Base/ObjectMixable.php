@@ -200,11 +200,10 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Sample_Person  
      */
-    function createAuthorPerson($values = array(), $isReference = false) {
+    function createAuthorPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setAuthorPerson($res);
         return $res;
     }
@@ -244,11 +243,10 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Sample_Person  
      */
-    function createEditorPerson($values = array(), $isReference = false) {
+    function createEditorPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setEditorPerson($res);
         return $res;
     }

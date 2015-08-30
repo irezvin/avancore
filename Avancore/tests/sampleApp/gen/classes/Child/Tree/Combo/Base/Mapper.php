@@ -5,8 +5,6 @@ class Child_Tree_Combo_Base_Mapper extends Sample_Tree_Combo_Mapper {
     var $recordClass = 'Child_Tree_Combo'; 
 
     var $id = 'Child_Tree_Combo_Mapper'; 
-
-    var $typeName = 'treeCombos'; 
  
  
  

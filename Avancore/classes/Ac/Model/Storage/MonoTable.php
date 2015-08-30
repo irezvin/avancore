@@ -26,7 +26,11 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
      * @var array
      */
     protected $sqlColumns = false;
+    
+    protected $identifierField = '_peIdentifier';
 
+    protected $setRowIdentifierToPk = true;
+    
     /**
      * Sets name of SQL table that contains records
      */
@@ -42,8 +46,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     }
     
     function getIdentifier($object) {
-        $res = $object->{$this->primaryKey};
-        return $res;
+        return $object->_peIdentifier;
     }
 
     /**
@@ -87,6 +90,11 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     function getAutoincFieldName() {
         return $this->autoincFieldName;
     }
+    
+    function listGeneratedFields() {
+        return array($this->autoincFieldName);
+    }
+    
     
     function createRecord($typeId = false) {
         if ($typeId !== false)
@@ -186,6 +194,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         if ($d->hasToConvertDatesOnLoad()) {
             $res = $this->convertDates($oid, $this->getDateFormats()); 
         }
+        $res['_peIdentifier'] = $hyData[$this->primaryKey];
         return $res;
     }
     
@@ -229,14 +238,24 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     
     function peSave($object, & $hyData, & $exists = null, & $error = null, & $newData = array()) {
         // leave only existing columns
+        
+        if (isset($hyData['_peIdentifier'])) {
+            $exists = true;
+            $pk = $hyData['_peIdentifier'];
+        } else {
+            $exists = false;
+            $pk = null;
+        }
+        
         $dataToSave = array_intersect_key($hyData, array_flip($this->listSqlColumns()));
         
-        if (is_null($exists)) $exists = array_key_exists($this->primaryKey, $dataToSave);
-        
         if ($exists) {
-            $query = $this->db->updateStatement($this->tableName, $dataToSave, $this->primaryKey, false);
-            if ($this->db->query($query) !== false) $res = $dataToSave;
-            else {
+            $query = $this->db->updateWithKeys($this->tableName, $dataToSave, array($this->primaryKey  => $pk));
+            if ($this->db->query($query) !== false) {
+                $res = $dataToSave;
+                if (isset($dataToSave[$this->primaryKey]))
+                    $pk = $dataToSave[$this->primaryKey];
+            } else {
                 $descr = $this->db->getErrorDescr();
                 if (is_array($descr)) $descr = implode("; ", $descr);
                 $error = $this->db->getErrorCode().': '.$descr;
@@ -247,7 +266,9 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
             if ($this->db->query($query)) {
                 if (strlen($ai = $this->getAutoincFieldName()) && !isset($dataToSave[$ai])) {
                     if (!is_array($newData)) $newData = array();
-                    $newData[$ai] = $this->getLastGeneratedId();
+                    $pk = $newData[$ai] = $this->getLastGeneratedId();
+                } else {
+                    $pk = $dataToSave[$this->primaryKey];
                 }
                 $res = true;
             } else {
@@ -257,6 +278,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
                 $res = false;
             }
         }
+        $newData['_peIdentifier'] = $pk;
         return $res;
     }
     
@@ -269,7 +291,11 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
      * @return bool
      */
     function peDelete($object, $hyData, & $error = null) {
-        $key = $hyData[$this->primaryKey];
+        if (isset($hyData['_peIdentifier'])) {
+            $key = $hyData['_peIdentifier'];
+        } else {
+            $key = $hyData[$this->primaryKey];
+        }
         $res = (bool) $this->db->query($sql = "DELETE FROM ".$this->db->n($this->tableName)." WHERE "
             .$this->db->n($this->primaryKey)." ".$this->db->eqCriterion($key));
         return $res;
@@ -288,6 +314,16 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     
     function listSqlColumns() {
         return $this->getSqlColumns();
+    }
+    
+    function setMapper(Ac_Model_Mapper $mapper = null) {
+        if (($res = parent::setMapper($mapper)) && $this->identifierField) {
+            $mapper->setIdentifierField($this->identifierField);
+            if (($this->setRowIdentifierToPk) && strlen($this->primaryKey)) {
+                $mapper->setRowIdentifierField($this->primaryKey);
+            }
+        }
+        return $res;
     }
     
 }

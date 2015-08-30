@@ -80,8 +80,6 @@ class Sample_Tree_Adjacent_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
   
     
 }

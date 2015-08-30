@@ -21,8 +21,6 @@ class Sample_Tree_Adjacent_Base_Mapper extends Ac_Model_Mapper {
             'title' => '',
             'tag' => NULL,
         ); 
-
-    var $typeName = 'treeAdjacent'; 
  
    
     protected $autoincFieldName = 'id';

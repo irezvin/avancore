@@ -5,8 +5,6 @@ class Child_Tree_Record_Base_Mapper extends Sample_Tree_Record_Mapper {
     var $recordClass = 'Child_Tree_Record'; 
 
     var $id = 'Child_Tree_Record_Mapper'; 
-
-    var $typeName = 'treeRecords'; 
  
  
  

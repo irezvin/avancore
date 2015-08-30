@@ -180,18 +180,24 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     function updateStatement($tableName, $fieldValues, $keysList, $allowPartialKey = false) {
         $tableName = $this->n($tableName);
-        $keys = array();
-        $res = false;
-        $keysList = Ac_Util::toArray($keysList);
-        foreach ($keysList as $keyName) 
-            if (isset($fieldValues[$keyName])) { 
-                $keys[$keyName] = $fieldValues[$keyName];
-                unset($fieldValues[$keyName]);
-            }
-        if (count($fieldValues) && ($allowPartialKey || (count($keys) == count($keysList)))) {
+            $keys = array();
+            $res = false;
+            $keysList = Ac_Util::toArray($keysList);
+            foreach ($keysList as $keyName) 
+                if (isset($fieldValues[$keyName])) { 
+                    $keys[$keyName] = $fieldValues[$keyName];
+                    unset($fieldValues[$keyName]);
+                }
+            if (count($fieldValues) && ($allowPartialKey || (count($keys) == count($keysList)))) {
             $res = "UPDATE {$tableName} SET ".implode(", ", $this->valueCriterion($fieldValues, false, true));
             if (count($keys)) $res .= " WHERE ".$this->valueCriterion($keys); 
         }
+        return $res;
+    }
+    
+    function updateWithKeys($tableName, $fieldValues, array $keysCriterion) {
+        $res = "UPDATE {$tableName} SET ".implode(", ", $this->valueCriterion($fieldValues, false, true));
+        if (count($keysCriterion)) $res .= " WHERE ".$this->valueCriterion($keysCriterion); 
         return $res;
     }
     

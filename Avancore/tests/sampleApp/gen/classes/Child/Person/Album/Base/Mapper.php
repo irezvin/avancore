@@ -5,8 +5,6 @@ class Child_Person_Album_Base_Mapper extends Sample_Person_Album_Mapper {
     var $recordClass = 'Child_Person_Album'; 
 
     var $id = 'Child_Person_Album_Mapper'; 
-
-    var $typeName = 'personAlbums'; 
  
  
  

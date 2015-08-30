@@ -5,8 +5,6 @@ class Child_Shop_Product_Note_Base_ImplMapper extends Sample_Shop_Product_Note_I
     var $recordClass = 'Ac_Model_Record'; 
 
     var $id = 'Child_Shop_Product_Note_ImplMapper'; 
-
-    var $typeName = 'shopProductNotes'; 
  
  
  

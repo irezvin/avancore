@@ -19,8 +19,6 @@ class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
             'note' => '',
             'noteAuthorId' => NULL,
         ); 
-
-    var $typeName = 'shopProductNotes'; 
  
     protected $askRelationsForDefaults = false;
  

@@ -5,8 +5,6 @@ class Child_Relation_Type_Base_Mapper extends Sample_Relation_Type_Mapper {
     var $recordClass = 'Child_Relation_Type'; 
 
     var $id = 'Child_Relation_Type_Mapper'; 
-
-    var $typeName = 'relationTypes'; 
  
  
  

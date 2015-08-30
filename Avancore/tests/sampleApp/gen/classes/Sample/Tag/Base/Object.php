@@ -125,8 +125,6 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
 
     function hasUniformPropertiesInfo() { return true; }
 
-    function tracksChanges() { return true; }
-
     function countPeople() {
         if (is_array($this->_people)) return count($this->_people);
         if ($this->_peopleCount === false) {
@@ -186,11 +184,10 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
+    function createPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPerson($res);
         return $res;
     }
@@ -275,11 +272,10 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Perk  
      */
-    function createPerk($values = array(), $isReference = false) {
+    function createPerk($values = array()) {
         $m = $this->getMapper('Sample_Perk_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPerk($res);
         return $res;
     }

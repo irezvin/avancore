@@ -129,8 +129,6 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
         
     
     /**
@@ -165,11 +163,10 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
+    function createPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPerson($res);
         return $res;
     }
@@ -235,11 +232,10 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Album  
      */
-    function createPersonAlbum($values = array(), $isReference = false) {
+    function createPersonAlbum($values = array()) {
         $m = $this->getMapper('Sample_Person_Album_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPersonAlbum($res);
         return $res;
     }
@@ -298,11 +294,10 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createPortraitPerson($values = array(), $isReference = false) {
+    function createPortraitPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPortraitPerson($res);
         return $res;
     }
@@ -366,11 +361,10 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Post  
      */
-    function createPersonPost($values = array(), $isReference = false) {
+    function createPersonPost($values = array()) {
         $m = $this->getMapper('Sample_Person_Post_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPersonPost($res);
         return $res;
     }

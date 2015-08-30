@@ -5,8 +5,6 @@ class Child_Publish_Base_ImplMapper extends Sample_Publish_ImplMapper {
     var $recordClass = 'Ac_Model_Record'; 
 
     var $id = 'Child_Publish_ImplMapper'; 
-
-    var $typeName = 'publish'; 
  
  
  

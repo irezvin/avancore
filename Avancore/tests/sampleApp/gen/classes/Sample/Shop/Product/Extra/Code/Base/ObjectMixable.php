@@ -126,11 +126,10 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
     /**
      * @return Sample_Person  
      */
-    function createExtraCodePerson($values = array(), $isReference = false) {
+    function createExtraCodePerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setExtraCodePerson($res);
         return $res;
     }

@@ -71,8 +71,8 @@ class Child_Perk_Base_Object extends Sample_Perk {
     /**
      * @return Child_Tag  
      */
-    function createTag($values = array(), $isReference = false) {
-        return parent::createTag($values, $isReference);
+    function createTag($values = array()) {
+        return parent::createTag($values);
     }
 
     

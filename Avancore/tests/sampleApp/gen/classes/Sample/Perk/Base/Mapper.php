@@ -18,8 +18,6 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
             'perkId' => NULL,
             'name' => '',
         ); 
-
-    var $typeName = 'perks'; 
  
    
     protected $autoincFieldName = 'perkId';
