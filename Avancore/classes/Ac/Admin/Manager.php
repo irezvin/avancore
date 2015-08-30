@@ -115,7 +115,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     var $_defaultMethodName = 'list';
     
-    var $_primaryKeys = false;
+    var $_recordIdentifiers = false;
     
     /**
      * @var Ac_Model_Object
@@ -342,7 +342,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if ($redir && isset($this->_response->hasToRedirect)) $redir = false;
 
         if ($redir) {
-            $this->_primaryKeys = array();
+            $this->_recordIdentifiers = array();
             $this->_record = null;
             $u = $this->getManagerUrl('list');
             $this->_response->hasToRedirect = $u->toString();
@@ -434,7 +434,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     // ------------------------------------------- form related methods -----------------------------------------------
     
     function isNewRecord() {
-        return !$this->onlyRecord && ($this->getPrimaryKey() === false) && !$this->_recordStored && (isset($this->_rqData['new']) && $this->_rqData['new'] || $this->_isNewRecord);
+        return !$this->onlyRecord && ($this->getRecordIdentifier() === false) && !$this->_recordStored && (isset($this->_rqData['new']) && $this->_rqData['new'] || $this->_isNewRecord);
     }
     
     protected function callFeatures($method, $_ = null) {
@@ -458,11 +458,11 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $this->_record = $m->createRecord();
                 $this->callFeatures('onCreate', $this->_record);
                 if ($this->_datalink) $this->_datalink->setRecordDefaults($this->_record);
-            } elseif (($pk = $this->getPrimaryKey()) !== false) {
+            } elseif (($id = $this->getRecordIdentifier()) !== false) {
                 if ($this->onlyRecord) $this->_record = $this->onlyRecord;
                 else {
                     $m = $this->getMapper();
-                    $this->_record = $m->loadRecord($pk);
+                    $this->_record = $m->loadRecord($id);
                     $this->callFeatures('onLoad', $this->_record);
                     if (!$this->_record) $this->_record = null; else {
                         if ($this->_datalink && !$this->_datalink->canProcessRecord($this->_record))
@@ -492,9 +492,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * Returns first primary key provided or FALSE if no one is provided
      * @return mixed|bool
      */
-    function getPrimaryKey() {
-        $pks = $this->getPrimaryKeys();
-        if (count($pks)) $res = $pks[0];
+    function getRecordIdentifier() {
+        $ids = $this->getRecordIdentifiers();
+        if (count($ids)) $res = $ids[0];
             else $res = false;
         if ($this->_isNewRecord && !$this->_recordStored) $res = false;
         return $res;
@@ -504,25 +504,15 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * Returns all primary keys provided
      * @return array
      */
-    function getPrimaryKeys() {
-        if ($this->_primaryKeys === false) {
+    function getRecordIdentifiers() {
+        if ($this->_recordIdentifiers === false) {
             $res = array();
             if (isset($this->_rqData['keys']) && is_array($this->_rqData['keys'])) {
-                $pkl = $this->getPrimaryKeyLength();
-                foreach ($this->_rqData['keys'] as $key) {
-                    if (is_string($key)) {
-                        if ($pkl === 1) $res[$key] = $key;
-                        else {
-                            $u = @unserialize($key);
-                            if (($u !== false) && is_array($u) && (count($u) === $pkl)) $res[$key] = $u;
-                        }
-                    }
-                }
-                $res = array_values($res);
+                $res = array_unique($this->_rqData['keys']);
             }
-            $this->_primaryKeys = $res;
+            $this->_recordIdentifiers = $res;
         } 
-        return $this->_primaryKeys;
+        return $this->_recordIdentifiers;
     }
 
     // -------------------------------------- request related methods -------------------------------------------------
@@ -535,15 +525,14 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $res;
     }
     
-    
     /**
      * @param Ac_Model_Object & $record
      * @return Ac_Url
      */
     function getDetailsUrl($record) {
         $ctx = $this->_context->cloneObject();
-        $key = $this->getStrPk($record);
-        $ctx->setData(array('keys' => array($key), 'action' => 'details'));
+        $id = $this->getIdentifierOf($record);
+        $ctx->setData(array('keys' => array($id), 'action' => 'details'));
         $res = $ctx->getUrl();
         return $res;
     }
@@ -559,7 +548,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         
         if ($this->isNewRecord()) $d['new'] = 1;
         elseif ($rec = $this->getRecord()) {
-            $d['keys'][] = $this->getStrPk($rec);
+            $d['keys'][] = $this->getIdentifierOf($rec);
         }
         */
         $s = $this->getStateData();
@@ -579,11 +568,11 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $res['action'] = $this->isForm()? 'details' : 'list';
         }
         if ($this->isNewRecord()) $res['new'] = 1;
-        elseif (($res['action'] !== 'form') && $keys = $this->getPrimaryKeys()) {
+        elseif (($res['action'] !== 'form') && $keys = $this->getRecordIdentifiers()) {
             $res['keys'] = $keys; 
         }
         elseif ($rec = $this->getRecord()) {
-            $res['keys'][] = $this->getStrPk($rec); 
+            $res['keys'][] = $this->getIdentifierOf($rec);
         }
         if ($this->_isForm && isset($this->_rqData['form']) && !$this->_recordStored) {
             $res['form'] = $this->_rqData['form'];
@@ -1000,21 +989,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      *
      * @param Ac_Model_Record $record
      */
-    function getStrPk($record) {
+    function getIdentifierOf($record) {
         if ($this->onlyRecord) $res = '1';
-        else {
-            if (is_array($pk = $record->getPrimaryKey())) $res = serialize($pk);
-                else $res = $pk;
-        }
-        return $res;
-    }
-    
-    function getPrimaryKeyLength() {
-        if ($this->onlyRecord) $res = 1; 
-        else {
-            $mapper = $this->getMapper();
-            $res = count($mapper->listPkFields());
-        }
+            else $res = $this->getMapper()->getIdentifier($record);
         return $res;
     }
     
@@ -1160,7 +1137,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $url = $this->getManagerUrl('processing', array('processing' => $processingId));
         $d = $ctx->getData();
         if (!isset($d['keys'])) {
-            if ($keys = $this->getPrimaryKeys()) {
+            if ($keys = $this->getRecordIdentifiers()) {
                 $d['keys'] = $keys;
             }
         }

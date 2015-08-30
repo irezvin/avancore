@@ -230,7 +230,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     
     function doListNonCopiedFields() {
         $m = $this->mapper;
-        $res = $m->listPkFields();
+        $res = $m->listGeneratedFields();
         return $res;
     }
     
@@ -247,7 +247,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     
     function doListNonComparedFields() {
         $m = $this->mapper;
-        $res = $m->listPkFields();
+        $res = $m->listGeneratedFields();
         return $res;
     }
     
@@ -763,12 +763,10 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     /**
      * @return Ac_Model_Object
      */
-    function copy($withPk = false) {
+    function copy() {
         $m = $this->mapper;
         $copy = $m->createRecord();
         $flds = array_diff($this->listDataProperties(), $this->doListNonCopiedFields());
-        if (!$asReference && !$withPk) $flds = array_diff($flds, $m->listPkFields());
-        if ($withPk) $flds = array_merge($flds, $m->listPkFields());
         foreach ($flds as $v) {
             $copy->$v = $this->$v;
         }

@@ -14,7 +14,7 @@ class Ac_Admin_Column_RecordBinder extends Ac_Admin_Column {
     
      var $_recordsJson = array();
      
-     var $_recordKeys = array();
+     var $_recordIdentifiers = array();
      
      var $canEdit = true;
 
@@ -24,12 +24,12 @@ class Ac_Admin_Column_RecordBinder extends Ac_Admin_Column {
      }
      
      function trAttribsCallback(& $record, & $attribs) {
-         $attribs['id'] = $this->_context->mapIdentifier($this->trIdPrefix.$this->manager->getStrPk($record));
+         $attribs['id'] = $this->_context->mapIdentifier($this->trIdPrefix.$this->manager->getIdentifierOf($record));
      }
      
      function showCell($record, $rowNo) {
-         $this->_recordsJson[] = array('key' => $key = $this->manager->getStrPk($record));
-         $this->_recordKeys[] = $key;
+         $this->_recordsJson[] = array('key' => $id = $this->manager->getIdentifierOf($record));
+         $this->_recordIdentifiers[] = $id;
      }
      
      function showHint() {
@@ -40,10 +40,10 @@ class Ac_Admin_Column_RecordBinder extends Ac_Admin_Column {
         <script type="text/javascript">
             var _c = <?php echo $this->manager->getJsListControllerRef() ?>;
             _c.addRecords(<?php echo $jsHelper->toJson($this->_recordsJson, 16); ?>);
-<?php foreach ($this->_recordKeys as $i => $key) { ?>
+<?php foreach ($this->_recordIdentifiers as $i => $id) { ?>
             _c.getRecord(<?php echo $i; ?>)
-                .observe([AvanControllers.ListController.ShowSelected, AvanControllers.ListController.ToggleSelected], {element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->trIdPrefix.$key)); ?>})<?php 
-if ($this->canEdit) { ?>.observe([AvanControllers.ListController.EditRecord], {eventName: 'dblclick', element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->trIdPrefix.$key)); ?>}) <?php } ?>;
+                .observe([AvanControllers.ListController.ShowSelected, AvanControllers.ListController.ToggleSelected], {element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->trIdPrefix.$id)); ?>})<?php 
+if ($this->canEdit) { ?>.observe([AvanControllers.ListController.EditRecord], {eventName: 'dblclick', element: <?php echo $jsHelper->jsQuote($this->_context->mapIdentifier($this->trIdPrefix.$id)); ?>}) <?php } ?>;
 <?php } ?>
 
             delete _c;

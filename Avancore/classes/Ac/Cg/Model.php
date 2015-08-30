@@ -320,8 +320,7 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         if (($pm = $this->getParentModel())) {
             $res = $pm->className;
         } else {
-            if (count($this->tableObject->listPkFields()) == 1) $res = 'Ac_Model_Object';
-                else $res = 'Ac_Model_CpkObject'; 
+            $res = 'Ac_Model_Object';
         }
         return $res;
     }
@@ -698,10 +697,8 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     function getDefaultParentMapperClassName() {
         if ($pm = $this->getParentModel()) {
             $res = $pm->getMapperClass();
-        } elseif (count($this->tableObject->listPkFields()) == 1) {
-            $res = 'Ac_Model_Mapper';
         } else {
-            $res = 'Ac_Model_CpkMapper'; 
+            $res = 'Ac_Model_Mapper';
         }
         return $res;
     }

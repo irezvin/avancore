@@ -19,7 +19,7 @@ class Ac_Admin_Column_Reorder extends Ac_Table_Column_Reorder {
         $upJavascript = false;
         $downJavascript = false;
 
-        $spk = $this->manager->getStrPk($record);
+        $spk = $this->manager->getIdentifierOf($record);
         
         if ($canUp = $this->canOrderUp($record, $rowNo)) {
             $upJavascript = 'return '.(new Ac_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(

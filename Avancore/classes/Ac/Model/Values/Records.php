@@ -13,7 +13,7 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
      */
     var $_mapper = false;
     
-    var $_cpk = true;
+    var $_multiKey = true;
     
     var $mapperClass = false;
     
@@ -58,9 +58,9 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
             }
         }
         if ($this->valueFieldName) {
-            $this->_cpk = count($this->valueFieldName) > 1;
+            $this->_multiKey = count($this->valueFieldName) > 1;
         } else {
-           $this->_cpk = count($this->_mapper->listPkFields()) > 1;
+           $this->_multiKey = false;
         }
     }
     
@@ -84,7 +84,7 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
         $ttls = $this->_mapper->getRecordTitles($where, $this->ordering, $this->extraJoins, $this->titleFieldName, $this->titleIsProperty, $this->valueFieldName, $this->valueIsProperty);
         $res = array();
         if (is_array($ttls)) {
-            if ($this->_cpk) {
+            if ($this->_multiKey) {
                 if ($this->md5pk) {
                     foreach ($ttls as $ttl) {
                         $res[md5(implode("-", $ttl[0]))] = $ttl[1];             

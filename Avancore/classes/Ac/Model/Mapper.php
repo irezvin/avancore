@@ -789,12 +789,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         }
         if ($titleIsProperty === '?') $titleIsProperty = $this->isTitleAProperty();
         if (!$titleFieldName) {
-            $pkf = $this->listPkFields();
-            $titleFieldName = $pkf[0];
+            $titleFieldName = $this->getStorage()->getPrimaryKey();
         }
         $qpkf = array();
         if ($valueFieldName === false)
-        foreach ($this->listPkFields() as $pkf) $qpkf[] = $this->db->n('t').'.'.$this->db->n($pkf);
+            $qpkf[] = $this->db->n('t').'.'.$this->db->n($this->getStorage()->getPrimaryKey());
         else {
             $vf = $valueFieldName;
             foreach (Ac_Util::toArray($vf) as $pkf) $qpkf[] = $this->db->n('t').'.'.$this->db->n($pkf);
@@ -833,10 +832,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             }
         }
         return $res;
-    }
-
-    function listPkFields() {
-        return array($this->pk);
     }
 
     /**
@@ -912,7 +907,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         if (!$usingIndices) $usingIndices = array_merge($this->listUniqueIndices(), array_keys($customIndices));
         // If we don't have to return own key, it doesn't  matter whether we will find own instance by primary key or not
         // if ($dontReturnOwnKey) $usingIndices = array_diff($usingIndices, array('PRIMARY'));
-        foreach ($this->listPkFields() as $pkf) $pkCols[] = $this->db->n($pkf);
+        $pkCols[] = $this->db->n($this->getStorage()->getPrimaryKey());
         $cpk = count($pkCols) > 1;
         $pkCols = implode(", ", $pkCols);
         foreach ($usingIndices as $idxName) {

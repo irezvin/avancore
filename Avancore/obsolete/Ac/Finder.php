@@ -150,7 +150,7 @@ class Ac_Finder extends Ac_Prototyped {
             if (!is_array($keys)) $keys = array($keys);
         } else {
             $m = Ac_Model_Mapper::getMapper($this->mapperClass);
-            $keys = $m->listPkFields(); 
+            $keys = array($m->getStorage()->getPrimaryKey());
         }
         if (is_null($aeDb)) $sqlDb = Ac_Application::getDefaultInstance()->getDb();
         else $sqlDb = new Ac_Sql_Db_Ae($aeDb);
