@@ -159,6 +159,18 @@ abstract class Ac_Model_Storage extends Ac_Prototyped {
      */
     abstract function peDelete($object, $hyData, & $error = null);
     
+    /**
+     * Locates records in the storage using (supposedly unique) indices
+     * 
+     * @see Ac_Model_Mapper::findByIndexesInArray
+     * 
+     * @param object $object Object to provide values of the fields
+     * @param array $indices in the format array(idxId => array(field1, field2...))
+     * @param bool $ignoreIndicesWithNullValues Don't compare indices that have NULL values in $object (db-like behaviour)
+     * @return array (idxId1 => array(id1, id2...), idxId2 => array(id1, id2)) Per-index lists of identifiers
+     */
+    abstract function checkRecordPresence($object, $indices = array(), $ignoreIndicesWithNullValues = true);
+    
     function getPrototype($typeId = false, $again = false) {
         if (!isset($this->prototypes[$typeId]) || $again) {
             $this->prototypes[$typeId] = $this->createRecord($typeId);

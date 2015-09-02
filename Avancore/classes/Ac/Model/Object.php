@@ -287,10 +287,10 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     
     function _checkOwnFields() {
         parent::_checkOwnFields();
-        $dbp = $this->checkDatabasePresence(true);
+        $dbp = $this->checkPresence(true);
         if ($dbp) {
             $m = $this->mapper;
-            foreach ($dbp as $indexName => $pks) {
+            foreach ($dbp as $indexName => $identifiers) {
                 $ff = $m->listUniqueIndexFields($indexName);
                 $fn = current($ff);
                 $px = count($ff) > 1? AC_SUCH_VALUES_OF_FIELD_MULTIPLE : AC_SUCH_VALUES_OF_FIELD_SINGLE;
@@ -715,17 +715,15 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     }
     
     /**
-     * Checks record's presence in the database using all known "unique" indices. Since some "unique" indices can be not backed by the database, arrays of found PKs are
-     * returned for each index.
+     * Checks record's presence in the database using all known "unique" indices. Since some "unique" indices can be not backed by the database, 
+     * arrays of found PKs are returned for each index.
      *  
      * @param bool $dontReturnOwnKey If row with same PK as one of current instance is found, don't add it's PK to resultset
      * @param bool $checkNewRecords Whether to check in-memory newly created records
      * @return array($indexName => array($pk1, $pk2...))
-     * @see Ac_Model_Mapper::checkRecordUniqueness
      */    
-    function checkDatabasePresence($dontReturnOwnKey = false, $checkNewRecords = false) {
-       $mapper = $this->mapper;
-       return $mapper->checkRecordPresence($this, $dontReturnOwnKey, array(), array(), $checkNewRecords); 
+    function checkPresence($dontReturnOwnKey = false, $checkNewRecords = false) {
+       return $this->mapper->checkRecordPresence($this, $dontReturnOwnKey, array(), array(), $checkNewRecords); 
     }
     
     function isPersistent() {

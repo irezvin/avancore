@@ -146,11 +146,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     var $nullableSqlColumns = array();
     
-    /**
-     * @var array ('indexName' => array('fieldName1', 'fieldName2'), ...)
-     */
-    var $indexData = array();
-    
     var $useProto = false;
     
     var $managerClass = false;
@@ -266,6 +261,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @var Ac_Model_Storage
      */
     protected $storage = false;
+    
+    /**
+     * @var array ('indexName' => array('fieldName1', 'fieldName2'), ...)
+     */
+    protected $indexData = false;
         
     function __construct(array $options = array()) {
         // TODO: application & db are initialized last, id & tableName - first
@@ -352,6 +352,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 }
             }
             if (isset($idx['unique']) && $idx['unique'] || isset($idx['primary']) && $idx['primary']) {
+                if (isset($idx['primary']) && $idx['primary']) $name = 'PRIMARY';
                 $this->indexData[$name] = array_values($idx['columns']);
             }
         }
@@ -853,6 +854,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @return array ('indexName' => array('fieldName1', 'fieldName2'), ...)
      */
     function getIndexData() {
+        if ($this->indexData === false) {
+            $this->indexData = $this->doGetUniqueIndexData();
+        }
         return $this->indexData;
     }
     
@@ -887,46 +891,128 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
 
     /**
+     * Check records in storage only
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_STORAGE = 0;
+    
+    /**
+     * Check in-memory records only
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_MEMORY = 1;
+    
+    /**
+     * Check records in-memory first. If any were found, stop here, otherwise
+     * check record in the storage
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_PARTIAL = 2;
+    
+    /**
+     * Always check both in-memory and in-storage sets, combine the results
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_FULL = 3;
+
+    /**
+     * If all records are loaded, check in memory only, otherwise 
+     * fallback to Ac_Model_Mapper::PRESENCE_PARTIAL
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_SMART = 4;
+    
+    /**
+     * If all records are loaded, check in memory only, otherwise 
+     * fallback to Ac_Model_Mapper::PRESENCE_FULL
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_SMART_FULL = 5;
+    
+    var $defaultPresenceCheckMode = Ac_Model_Mapper::PRESENCE_SMART;
+    
+    /**
      * Checks record's presence in the database using all known "unique" indices. Since some "unique" indices can be not backed by the database, arrays of found PKs are
      * returned for each index.
-     *
+     * 
      * @param Ac_Model_Object $record
-     * @param bool $dontReturnOwnKey If row with same PK as one of current instance is found, don't add it's PK to resultset
-     * @param array usingIndices Names of indices to check (by default, all indices will be used)
+     * @param bool $dontReturnOwnIdentifier If row with same PK as one of current instance is found, don't add it's PK to resultset
+     * @param array $usingIndices Names of indices to check from $this->getIndexData() - by default, all indices will be used
      * @param array $customIndices ($indexName => array('key1', 'key2'...))
-     * @param bool $withNewRecords Whether to check new records WITHOUT PKs that are stored in the memory. Note that in-memory comparsion is evaluated using different rules (see below)
-     * @return array($indexName => array($pk1, $pk2...))
-     * @see Ac_Model_Mapper::checkRecordUniqueness
+     * @param bool $withNewRecords Whether to check new records that are stored in the memory
+     * @param bool $mode One of Ac_Model_Mapper::PRESENCE_* constants. Defaults to $this->defaultPresenceCheck
+     * @param bool $ignoreIndicesWithNullValues Don't compare indices that have NULL values in $object (DB-like behaviour)
+     * 
+     * @return array($indexName => array($id1, $id2...))
      *
-     * On comparsion with new records:
-     * - since new records don't have primary keys, links of their instances will be returned instead of PKs
+     * @see Ac_Model_Mapper::findByIndicesInArray
+     * @see Ac_Model_Storage::checkRecordPresence
+     * 
+     * Note: specify array(FALSE) as $usingIndices to ignore built-in indices
      */
-    function checkRecordPresence($record, $dontReturnOwnKey = false, $usingIndices=array(), $customIndices=array(), $withNewRecords = false) {
+    function checkRecordPresence(
+            $record, $dontReturnOwnIdentifier = false, array $usingIndices = array(), array $customIndices = array(), 
+            $withNewRecords = false, $mode = null, $ignoreIndicesWithNullValues = true) {
+        
     	$res = array();
-        $pkCols = array();
-        if (!$usingIndices) $usingIndices = array_merge($this->listUniqueIndices(), array_keys($customIndices));
-        // If we don't have to return own key, it doesn't  matter whether we will find own instance by primary key or not
-        // if ($dontReturnOwnKey) $usingIndices = array_diff($usingIndices, array('PRIMARY'));
-        $pkCols[] = $this->db->n($this->getStorage()->getPrimaryKey());
-        $cpk = count($pkCols) > 1;
-        $pkCols = implode(", ", $pkCols);
+        $currIdxData = $this->getIndexData();
+        if (!$usingIndices) $usingIndices = array_keys($currIdxData);
+        
+        $idxData = array();
         foreach ($usingIndices as $idxName) {
-            $idxFields = isset($customIndices[$idxName])? $customIndices[$idxName] : $this->listUniqueIndexFields($idxName);
-            $crit = $this->indexCriteria($record, $idxFields, true);
-            if ($crit) {
-                $sql = "SELECT ".$pkCols." FROM ".$this->db->n($this->tableName)." WHERE ".$crit;
-                $pks = $cpk? $this->db->fetchArray($sql) : $this->db->fetchColumn($sql);
-                if ($dontReturnOwnKey) {
-                    foreach (array_keys($pks) as $i) if ($record->matchesPk($pks[$i])) unset($pks[$i]);
-                }
-                if ($pks) $res[$idxName] = $pks;
-            }
-            if ($withNewRecords) {
-                $newRecords = $this->find($record->getDataFields($idxFields));
-                if ($dontReturnOwnKey && isset($newRecords[$record->_imId])) unset($newRecords[$record->_imId]);
-                foreach (array_keys($newRecords) as $k) $res[$idxName][] = $newRecords[$k];
+            if ($idxName !== false) {
+                if (isset($currIdxData[$idxName])) $idxData[$idxName] = $currIdxData[$idxName];
+                else throw Ac_E_InvalidCall::noSuchItem ('index', $idxName, 'getIndexData');
             }
         }
+        $idxData = array_merge($idxData, $customIndices);
+        
+        if ($mode === null) $mode = $this->defaultPresenceCheckMode;
+        
+        if ($mode == self::PRESENCE_SMART_FULL) $mode = $this->allRecordsLoaded? self::PRESENCE_SMART : self::PRESENCE_FULL;
+        if ($mode == self::PRESENCE_SMART) $mode = $this->allRecordsLoaded? self::PRESENCE_MEMORY : self::PRESENCE_PARTIAL;
+        
+        $checkStorage = false;
+        $memRecords = array();
+        
+        if ($mode == self::PRESENCE_STORAGE) {
+            $checkStorage = true;
+        } elseif ($mode == self::PRESENCE_PARTIAL) {
+            $memRecords = $this->allRecords;
+            $checkStorage = true;
+        } elseif ($mode == self::PRESENCE_FULL) {
+            $checkStorage = true;
+        } elseif ($mode == self::PRESENCE_MEMORY) {
+            $memRecords = $this->allRecords;
+        } else {
+            throw Ac_E_InvalidCall::outOfConst('mode', $value, Ac_Util::getClassConstants('Ac_Model_Mapper', 'PRESENCE_'));
+        }
+        
+        if ($memRecords && !$withNewRecords) $memRecords = array_diff_key($memRecords, $this->newRecords);
+        
+        $res = array();
+        if ($memRecords) $res = $this->findByIndicesInArray ($record, $memRecords, $idxData, true, false, $ignoreIndicesWithNullValues);
+        if ($res && $mode == self::PRESENCE_PARTIAL) {
+            $checkStorage = false;
+        }
+        if ($checkStorage) {
+            $storageInfo = $this->getStorage()->checkRecordPresence($record, $idxData, $ignoreIndicesWithNullValues);
+            if (!$res) $res = $storageInfo;
+            else foreach ($storageInfo as $idx => $ids) {
+                if (!isset($res[$idx])) $res[$idx] = $ids;
+                else $res[$idx] = array_unique(array_merge($res[$idx], $ids));
+            }
+        }
+        
+        if ($res && $dontReturnOwnIdentifier) {
+            $id = $this->getIdentifierOfObject($record);
+            foreach ($res as $idx => $keys) {
+                $keys = array_diff($keys, array($id));
+                if ($keys) $res[$idx] = $keys;
+                    else unset($res[$idx]);
+            }
+        }
+        
         return $res;
     }
     
@@ -1932,5 +2018,37 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         $res = array_diff($res, array('recordsCollection'));
         return $res;
     }
+    
+    /**
+     * Utility method to locate records in array of record by given indices
+     * 
+     * @see Ac_Model_Storage::checkRecordPresenceInArray
+     * 
+     * @param object $object Object to provide values of the fields
+     * @param array $searchIn Objects to search in
+     * @param array $indices in the format array(idxId => array(field1, field2...))
+     * @param bool $areByIdentifiers Whether keys in $searchIn are object' identifiers
+     * @param bool $strict Strict (===) search
+     * 
+     * @return array (idxId1 => array(id1, id2...), idxId2 => array(id1, id2)) Per-index lists of identifiers
+     */
+    function findByIndicesInArray($object, array $searchIn, array $indices, $areByIdentifiers = false, $strict = false) {
+        $res = array();
+        foreach ($indices as $idxName => $fields) {
+            $pattern = Ac_Util::getObjectProperty($object, Ac_Util::toArray($fields));
+            $matches = Ac_Accessor::findItems($searchIn, $pattern, $strict, true);
+            if ($areByIdentifiers) $res[$idxName] = array_keys($matches);
+            else {
+                foreach ($matches as $k => $match)
+                    $res[$idxName][] = $this->getIdentifierOfObject($match);
+            }
+        }
+        return $res;
+    }
+    
+    protected function doGetUniqueIndexData() {
+        return array();
+    }
+    
     
 }

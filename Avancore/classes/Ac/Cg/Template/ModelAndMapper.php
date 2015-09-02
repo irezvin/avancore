@@ -582,7 +582,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 <?php if ($this->uniqueIndexData && array_diff(array_keys($this->uniqueIndexData), $this->inheritedIndice)) { ?>
     
     protected function doGetUniqueIndexData() {
-    return <?php $this->exportArray(array_diff_key($this->uniqueIndexData, array_flip($this->inheritedIndice)), 8); ?>;
+        return <?php $this->exportArray(array_diff_key($this->uniqueIndexData, array_flip($this->inheritedIndice)), 8); ?>;
     }
 <?php } ?>
 <?php   $this->_showMapperLoaderMethods(); ?>

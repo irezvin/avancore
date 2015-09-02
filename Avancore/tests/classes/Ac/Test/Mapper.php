@@ -48,7 +48,6 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             'F' => array(array('__class' => 'Ac_Model_Record', 'name' => 'Таня', 'gender' => 'F', 'personId' => 4)) 
         ), $pp);
         
-        
     }
     
     function testPersistence() {
@@ -88,10 +87,20 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         
         // test PK tracking
         $db->query("DELETE FROM #__tags WHERE title = 'TestTag'");
-        $id = $this->resetAi('#__tags') + 5;
+        $maxId = $this->resetAi('#__tags') - 1;
+        $id = $maxId + 6;
         $tag = $sam->createSampleTag();
         
-        $tag->bind(array('tagId' => $id, 'title' => 'TestTag', 'titleM' => 'TestTagM', 'titleF' => 'TestTagF'));
+        $tag->bind(array('title' => 'TestTag', 'titleM' => 'TestTagM', 'titleF' => 'TestTagF'));
+        
+        $tag->tagId = $maxId;
+        $this->assertFalse($tag->check(true), 'Conflicting match when trying to assign ID of existing object');
+        $err = $tag->getErrors();
+        $this->assertTrue(isset($err['tagId']['index']), 'found conflict by PK index when trying to assign ID of existing object');
+        
+        $tag->tagId = $id;
+        $tag->check(true);
+        
         $this->assertFalse($tag->isPersistent(), 'Record is NOT existent when it is created with pre-provided ID');
         if ($this->assertTrue($tag->store(), 'Record with pre-provided ID is correctly saved')) {
             $this->assertTrue($tag->isPersistent());
@@ -102,6 +111,9 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             $newId = $id + 2;
             $tag->tagId = $newId;
             $this->assertTrue($tag->store(), 'Record is saved after ID is changed');
+            
+            $this->assertTrue($tag->check(true));
+            
             $row = $db->args($newId)->fetchRow('SELECT * FROM #__tags WHERE tagId = ?');
             $this->assertTrue(is_array($row) && $row['title'] == 'TestTag', 
                 'Record with changed ID exists in DB');
@@ -109,6 +121,13 @@ class Ac_Test_Mapper extends Ac_Test_Base {
                 'Record with old ID is no more in DB');
             $this->assertEqual($tag->getIdentifier(), $newId, 'The object has new identifier assigned after it is saved with different PK');
                         
+            $tag3 = $tag->copy();
+            $tag3->tagId = $tag->tagId;
+            $this->assertFalse($tag3->check(), 'Conflicting matches should be found');
+            $err = $tag3->getErrors();
+            $this->assertTrue(isset($err['tagId']['index']), 'found conflict by PK index');
+            $this->assertTrue(isset($err['title']['index']), 'found conflict by title index');
+            
             $newId2 = $id + 4;
             $tag->tagId = $newId2;
             $this->assertTrue($tag->delete(), 'Record is deleted after ID is changed, but before it is saved');
@@ -179,6 +198,41 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         $this->assertNull($post->personId);
     }
     
-    
+    function testPresence() {
+        $app = Sample::getInstance();
+        $m = $app->getSamplePersonMapper();
+        $m->reset();
+        $stor = $m->getStorage();
+        $rec = $m->createRecord();
+        $rec->name = 'Илья';
+        $rec->birthDate = '1981-12-23';
+        $rec->isSingle = 0;
+        $allRec = $m->getAllRecords();
+        $pres = $stor->checkRecordPresence($rec, $idx = array(
+            'idxName' => 'name', 
+            'idxBirth' => 'birthDate', 
+            'idxSingle' => 'isSingle',
+            'idxNameSingle' => array('name', 'isSingle')
+        ));
+        shuffle($allRec);
+        $pres2 = $m->findByIndicesInArray($rec, $allRec, $idx, false);
+        $isEqual = true;
+        foreach ($pres as $k => $item) {
+            if (!isset($pres2[$k]) || array_diff($item, $pres2[$k]) || array_diff($pres2[$k], $item)) {
+                $isEqual = false;
+            }
+        }
+        $k1 = array_keys($pres);
+        $k2 = array_keys($pres2);
+        sort($k1);
+        sort($k2);
+        $this->assertEqual($k1, $k2);
+        $this->assertTrue($k1 == $k2 && $isEqual, 'same results should be returned from Ac_Model_Storage::checkRecordPresence, Ac_Model_Mapper::findIndicesInArray');
+        $id = $m->getIdentifierOfObject($rec);
+        foreach (array_keys($idx) as $idxName) {
+            $proper[$idxName] = array($id);
+        }
+        $this->assertEqual($m->findByIndicesInArray($rec, array($rec), $idx, false), $proper, "Object should match to itself");
+    }    
     
 }

@@ -47,6 +47,10 @@ class Ac_Test_Base extends UnitTestCase {
             $appClassFile = dirname(dirname(dirname(dirname(__FILE__)))).'/sampleApp/classes/Sample.php';
             require_once($appClassFile);
             $this->sampleApp = Sample::getInstance();
+            $appLangFile = dirname(dirname(dirname(dirname(__FILE__)))).'/../languages/english.php';
+            if (!defined('ACLT_LANG')) {
+                require_once($appLangFile);
+            }
         }
         return $this->sampleApp;
     }

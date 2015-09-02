@@ -31,6 +31,8 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
 
     protected $setRowIdentifierToPk = true;
     
+    protected $map = array();
+    
     /**
      * Sets name of SQL table that contains records
      */
@@ -324,6 +326,47 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
             }
         }
         return $res;
+    }
+    
+    function checkRecordPresence($object, $indices = array(), $ignoreIndicesWithNullValues = true) {
+        $db = $this->getDb();
+        $columns = array();
+        $colIdxMap = array();
+        $crits = array();
+        foreach ($indices as $idxId => $fields) {
+            $pattern = Ac_Accessor::getObjectProperty($object, Ac_Util::toArray($fields));
+            if ($ignoreIndicesWithNullValues) {
+                foreach ($pattern as $k => $v) 
+                    if (is_null($v)) unset($pattern[$k]);
+                if (!$pattern) continue;
+            }
+            $criterion = $db->valueCriterion($vals = $this->mapFieldToColumnValues($pattern), 't');
+            $columns["_rp_idx_".$idxId] = "\nIF({$criterion}, 1, 0) AS ".$db->n("_rp_idx_".$idxId);
+            $colIdxMap[$idxId] = "_rp_idx_".$idxId;
+            $crits[] = $criterion;
+        }
+        $res = array();
+        if ($columns) {
+            $strCols = implode(", ", $columns);
+            $strCrits = "(".implode(") OR (", $crits).")";
+            $sql = "
+                SELECT t.*, {$strCols}
+                    FROM {$this->tableName} t 
+                    WHERE {$strCrits}
+            ";
+            list($pkData, $uniqueRows) = $this->groupRowsByIdentifiers($this->db->fetchArray($sql));
+            foreach ($uniqueRows as $pk => $row) {
+                foreach ($colIdxMap as $idx => $col) {
+                    if ($row[$col]) $res[$idx][] = $pk;
+                }
+            }
+        }
+        return $res;
+    }
+    
+    protected function mapFieldToColumnValues($fieldsAndValues) {
+        // TODO
+        return $fieldsAndValues;
     }
     
 }
