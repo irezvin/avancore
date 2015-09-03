@@ -129,11 +129,48 @@ class Ac_Test_Base extends UnitTestCase {
 		return $r;
 	}
 	
-	function assertArraysMatch($left, $right, $message = '%s', $exactItems = false) {
-		if ($exactItems !== true) {
+	static function sortArrayItems($array) {
+        $res = $array;
+        $tmp = array();
+        foreach ($res as $k => $v) {
+            if (is_array($v)) $v = self::sortArrayItems($v);
+            if (is_numeric($k)) {
+                $tmp[] = $v;
+                unset($res[$k]);
+            }
+                else $res[$k] = $v;
+        }
+        ksort($res);
+        usort($tmp, function($a, $b) {
+            $a = Ac_Test_Base::toCompare($a);
+            $b = Ac_Test_Base::toCompare($b);
+            return strcmp($a, $b);
+        });
+        $res = array_merge($res, $tmp);
+        return $res;
+    }
+    
+    static function toCompare($a) {
+        $res = $a;
+        if (is_object($res)) $res = spl_object_hash ($res);
+        elseif (is_array($res)) $res = serialize($res);
+        else $res = ''.$res;
+        return $res;
+    }
+    
+    function assertArraysMatch($left, $right, $message = '%s', $exactItems = false) {
+		if ($exactItems === 'sort') {
+            $left = self::sortArrayItems($left);
+            $right = self::sortArrayItems($right);
+//            echo '<hr />';
+//            var_dump($left, $right);
+//            echo '<hr />';
+        }
+        if ($exactItems === false) {
             $right = $this->stripRightArrayToLeft($left, $right, $exactItems); 
         }
-		return $this->assertEqual($left, $right, $message);
+		$res = $this->assertEqual($left, $right, $message);
+        return $res;
 	}
     
     function normalizeHtml($html, $stripBreaks = true) {
@@ -215,5 +252,5 @@ class Ac_Test_Base extends UnitTestCase {
         if (!$res) $res = 0;
         return $res;
     }
-	
+    
 }

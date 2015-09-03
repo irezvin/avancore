@@ -127,6 +127,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     function loadRecord($id) {
         $sql = "SELECT * FROM ".$this->db->n($this->tableName)." WHERE ".$this->db->n($this->primaryKey)." = ".$this->db->q($id)." LIMIT 1";
         $rows = $this->db->fetchArray($sql);
+        $res = null;
         if (count($rows)) {
             $objects = $this->loadFromRows($rows);
             $res = array_pop($objects);

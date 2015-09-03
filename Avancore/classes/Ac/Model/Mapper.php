@@ -130,6 +130,45 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     const INSTANCE_ID_PREFIX = '\\i\\';
     
     const INSTANCE_ID_PREFIX_LENGTH = 3;
+
+    /**
+     * Check records in storage only (and in-memory new records if $withNewRecords is TRUE)
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_STORAGE = 0;
+    
+    /**
+     * Check in-memory records only
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_MEMORY = 1;
+    
+    /**
+     * Check records in-memory first. If any were found, stop here, otherwise
+     * check record in the storage
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_PARTIAL = 2;
+    
+    /**
+     * Always check both in-memory and in-storage sets, combine the results
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_FULL = 3;
+
+    /**
+     * If all records are loaded, check in memory only, otherwise 
+     * fallback to Ac_Model_Mapper::PRESENCE_PARTIAL
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_SMART = 4;
+    
+    /**
+     * If all records are loaded, check in memory only, otherwise 
+     * fallback to Ac_Model_Mapper::PRESENCE_FULL
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_SMART_FULL = 5;
     
     var $tableName = null;
 
@@ -188,16 +227,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      */
     protected $identifierField = false;
     
-    /**
-     * Records that are not stored (only those that are created with Ac_Model_Mapper::factory() method).
-     * Record will be removed from the array after it is stored.
-     * This array is used to check uniqueness and find records by indices disregarding whether record is already stored or not.
-     * To prevent deadlocks in case of two conflicting newly created records, first one gets right to be stored, second one will be considered invalid.
-     *
-     * @var array
-     */
-    protected $newRecords = array();
-
     /**
      * Relations that were created (used only if $this->remembersRelations())
      * @var array of Ac_Model_Relation
@@ -266,6 +295,14 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @var array ('indexName' => array('fieldName1', 'fieldName2'), ...)
      */
     protected $indexData = false;
+
+    /**
+     * Default value of $mode in Ac_Model_Mapper::checkRecordPresence
+     * Must be one of Ac_Model_Mapper::PRESENCE_ constancts
+     * @see Ac_Model_Mapper::checkRecordPresence
+     * @var int 
+     */
+    var $defaultPresenceCheckMode = Ac_Model_Mapper::PRESENCE_SMART;
         
     function __construct(array $options = array()) {
         // TODO: application & db are initialized last, id & tableName - first
@@ -445,11 +482,15 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     function listRecords() {
         if ($this->allRecordsLoaded)
-            $res = array_diff(array_keys($this->allRecords), array_keys($this->newRecords));
+            $res = array_diff(array_keys($this->allRecords), $this->keysOfNewRecords);
         else {
             $res = $this->getStorage()->listRecords();
         }
         return $res;
+    }
+    
+    function areAllRecordsLoaded() {
+        return $this->allRecordsLoaded;
     }
 
     /**
@@ -889,47 +930,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         }
         return $res;
     }
-
-    /**
-     * Check records in storage only
-     * @see Ac_Model_Mapper::checkRecordPresence
-     */
-    const PRESENCE_STORAGE = 0;
-    
-    /**
-     * Check in-memory records only
-     * @see Ac_Model_Mapper::checkRecordPresence
-     */
-    const PRESENCE_MEMORY = 1;
-    
-    /**
-     * Check records in-memory first. If any were found, stop here, otherwise
-     * check record in the storage
-     * @see Ac_Model_Mapper::checkRecordPresence
-     */
-    const PRESENCE_PARTIAL = 2;
-    
-    /**
-     * Always check both in-memory and in-storage sets, combine the results
-     * @see Ac_Model_Mapper::checkRecordPresence
-     */
-    const PRESENCE_FULL = 3;
-
-    /**
-     * If all records are loaded, check in memory only, otherwise 
-     * fallback to Ac_Model_Mapper::PRESENCE_PARTIAL
-     * @see Ac_Model_Mapper::checkRecordPresence
-     */
-    const PRESENCE_SMART = 4;
-    
-    /**
-     * If all records are loaded, check in memory only, otherwise 
-     * fallback to Ac_Model_Mapper::PRESENCE_FULL
-     * @see Ac_Model_Mapper::checkRecordPresence
-     */
-    const PRESENCE_SMART_FULL = 5;
-    
-    var $defaultPresenceCheckMode = Ac_Model_Mapper::PRESENCE_SMART;
     
     /**
      * Checks record's presence in the database using all known "unique" indices. Since some "unique" indices can be not backed by the database, arrays of found PKs are
@@ -939,7 +939,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @param bool $dontReturnOwnIdentifier If row with same PK as one of current instance is found, don't add it's PK to resultset
      * @param array $usingIndices Names of indices to check from $this->getIndexData() - by default, all indices will be used
      * @param array $customIndices ($indexName => array('key1', 'key2'...))
-     * @param bool $withNewRecords Whether to check new records that are stored in the memory
+     * @param bool $withNewRecords Whether to check new records that are stored in the memory. Check will be performed even with 
+     *      $mode == PRESENCE_STORAGE. Doesn't make sense if $this->trackNewRecords == FALSE.
      * @param bool $mode One of Ac_Model_Mapper::PRESENCE_* constants. Defaults to $this->defaultPresenceCheck
      * @param bool $ignoreIndicesWithNullValues Don't compare indices that have NULL values in $object (DB-like behaviour)
      * 
@@ -947,6 +948,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      *
      * @see Ac_Model_Mapper::findByIndicesInArray
      * @see Ac_Model_Storage::checkRecordPresence
+     * @see Ac_Model_Mapper::trackNewRecords
      * 
      * Note: specify array(FALSE) as $usingIndices to ignore built-in indices
      */
@@ -977,24 +979,33 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         
         if ($mode == self::PRESENCE_STORAGE) {
             $checkStorage = true;
+            if ($withNewRecords) $memRecords = array_intersect_key($this->recordsCollection, $this->keysOfNewRecords);
         } elseif ($mode == self::PRESENCE_PARTIAL) {
-            $memRecords = $this->allRecords;
+            $memRecords = $this->recordsCollection;
             $checkStorage = true;
         } elseif ($mode == self::PRESENCE_FULL) {
             $checkStorage = true;
+            $memRecords = $this->recordsCollection;
         } elseif ($mode == self::PRESENCE_MEMORY) {
-            $memRecords = $this->allRecords;
+            $memRecords = $this->recordsCollection;
         } else {
             throw Ac_E_InvalidCall::outOfConst('mode', $value, Ac_Util::getClassConstants('Ac_Model_Mapper', 'PRESENCE_'));
         }
         
-        if ($memRecords && !$withNewRecords) $memRecords = array_diff_key($memRecords, $this->newRecords);
+        if ($memRecords && !$withNewRecords) $memRecords = array_diff_key($memRecords, $this->keysOfNewRecords);
         
         $res = array();
         if ($memRecords) $res = $this->findByIndicesInArray ($record, $memRecords, $idxData, true, false, $ignoreIndicesWithNullValues);
-        if ($res && $mode == self::PRESENCE_PARTIAL) {
+        if ($res && ($mode == self::PRESENCE_PARTIAL)) {
             $checkStorage = false;
         }
+        
+//        if ($mode === self::PRESENCE_MEMORY) {
+//            echo('<hr />');
+//            var_dump(array_keys($memRecords), $checkStorage);
+//            echo('<hr />');
+//        }
+        
         if ($checkStorage) {
             $storageInfo = $this->getStorage()->checkRecordPresence($record, $idxData, $ignoreIndicesWithNullValues);
             if (!$res) $res = $storageInfo;
@@ -1005,12 +1016,18 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         }
         
         if ($res && $dontReturnOwnIdentifier) {
+            $a = $res;
             $id = $this->getIdentifierOfObject($record);
             foreach ($res as $idx => $keys) {
                 $keys = array_diff($keys, array($id));
                 if ($keys) $res[$idx] = $keys;
                     else unset($res[$idx]);
             }
+//            if ($a !== $res) {
+//                echo "<div style='border: 1px solid red'>"; 
+//                Ac_Debug::dd($a, $res);
+//                echo "</div>";
+//            }
         }
         
         return $res;
@@ -1403,6 +1420,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 else $ord = '';
                 
             $this->allRecords = $this->loadRecordsByCriteria('', true, $ord);
+            $this->allRecordsLoaded = true;
+            
         }
         if ($key === false) {
             $res = $this->allRecords;
@@ -1497,7 +1516,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     function reset() {
         $this->recordsCollection = array();
-        $this->newRecords = array();
+        $this->keysOfNewRecords = array();
         $this->allRecords = false;
         $this->fkFieldsData = false;
         $this->triggerEvent(self::EVENT_ON_RESET);

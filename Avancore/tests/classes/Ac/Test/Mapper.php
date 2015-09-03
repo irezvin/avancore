@@ -22,6 +22,8 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         $rec = $m->loadRecord(3);
         $this->assertEqual(Ac_Accessor::getObjectProperty($rec, 'personId'), 3, 'Ensure Ac_Accessor retrieves values from barebones Ac_Model_Object');
         $this->assertTrue(in_array('personId', $m->listGeneratedFields()), 'Ac_Model_Mapper::listGeneratedFields()');
+
+        $this->assertNull($m->loadRecord(-10), 'Attempt to load non-existent record returns NULL');
         
         $pm = $sam->getSamplePersonMapper();
         $pp = $pm->loadRecordsByCriteria('', array('gender', 'personId'));
@@ -233,6 +235,113 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             $proper[$idxName] = array($id);
         }
         $this->assertEqual($m->findByIndicesInArray($rec, array($rec), $idx, false), $proper, "Object should match to itself");
-    }    
+        
+        $m->reset();
+        $m->useRecordsCollection = true;
+        $m->trackNewRecords = true;
+        
+        $idxData = array('idxName' => 'name');
+        
+        $idC = 3;
+        
+        $name3 = $this->getAeDb()->args($idC)->fetchValue('SELECT name FROM #__people WHERE personId = ?');
+        
+        $a = $m->createRecord();
+        $a->bind(array('name' => $name3));
+        $idA = $m->getIdentifierOfObject($a);
+        
+        $b = $m->createRecord();
+        $b->bind(array('name' => $name3));
+        $idB = $m->getIdentifierOfObject($b);
+        
+        $this->assertArraysMatch(
+            $m->checkRecordPresence($a, true, array(), $idxData, false, Ac_Model_Mapper::PRESENCE_STORAGE),
+            array('idxName' => array($idC)),
+            'Ac_Model_Mapper::PRESENCE_STORAGE works without $withNewRecords',
+            'sort'
+        );
+        
+        if (!$this->assertArraysMatch(
+            ($foo = $m->checkRecordPresence($a, false, array(false), $idxData, true, Ac_Model_Mapper::PRESENCE_STORAGE)),
+            ($proper = array('idxName' => array($idC, $idA, $idB))),
+            'Ac_Model_Mapper::PRESENCE_STORAGE works with $withNewRecords',
+            'sort'
+        )) var_dump($foo, $proper);
+        
+        if (!$this->assertArraysMatch(
+            ($foo = $m->checkRecordPresence($a, false, array(false), $idxData, true, Ac_Model_Mapper::PRESENCE_MEMORY)),
+            ($proper = array('idxName' => array($idA, $idB))),
+            'Ac_Model_Mapper::PRESENCE_MEMORY works with $withNewRecords',
+            'sort'
+        )) var_dump($foo, $proper);
+
+        if (!$this->assertArraysMatch(
+            ($foo = $m->checkRecordPresence($a, true, array(false), $idxData, true, Ac_Model_Mapper::PRESENCE_MEMORY)),
+            ($proper = array('idxName' => array($idB))),
+            'Ac_Model_Mapper::PRESENCE_MEMORY works with dontReturnOwnIdentifier === true',
+            'sort'
+        )) var_dump($foo, $proper);
+        
+        if (!$this->assertArraysMatch(
+            ($foo = $m->checkRecordPresence($a, true, array(false), $idxData, false, Ac_Model_Mapper::PRESENCE_MEMORY)),
+            ($proper = array()),
+            'Ac_Model_Mapper::PRESENCE_MEMORY works with dontReturnOwnIdentifier === true, withNewRecords === false',
+            'sort'
+        )) var_dump($foo, $proper);
+        
+        if (!$this->assertArraysMatch(
+            ($foo = $m->checkRecordPresence($a, true, array(false), $idxData, false, Ac_Model_Mapper::PRESENCE_PARTIAL)),
+            ($proper = array('idxName' => array($idC))),
+            'Ac_Model_Mapper::PRESENCE_PARTIAL works with dontReturnOwnIdentifier === true, withNewRecords === false',
+            'sort'
+        )) var_dump($foo, $proper);
+        
+        if (!$this->assertArraysMatch(
+            ($foo = $m->checkRecordPresence($a, true, array(false), $idxData, true, Ac_Model_Mapper::PRESENCE_PARTIAL)),
+            ($proper = array('idxName' => array($idB))),
+            'Ac_Model_Mapper::PRESENCE_PARTIAL works with dontReturnOwnIdentifier === true, withNewRecords === true, '
+            . 'does\'t return persistent object ID',
+            'sort'
+        )) var_dump($foo, $proper);
+        
+        if (!$this->assertArraysMatch(
+            ($foo = $m->checkRecordPresence($a, true, array(false), $idxData, true, Ac_Model_Mapper::PRESENCE_FULL)),
+            ($proper = array('idxName' => array($idB, $idC))),
+            'Ac_Model_Mapper::PRESENCE_FULL works with dontReturnOwnIdentifier === true, withNewRecords === true, '
+            . 'does\'t return persistent object ID',
+            'sort'
+        )) var_dump($foo, $proper);
+        
+        if (!$this->assertArraysMatch(
+            ($foo = $m->checkRecordPresence($a, true, array(false), $idxData, false, Ac_Model_Mapper::PRESENCE_FULL)),
+            ($proper = array('idxName' => array($idC))),
+            'Ac_Model_Mapper::PRESENCE_FULL works with dontReturnOwnIdentifier === true, withNewRecords === true, ',
+            'sort'
+        )) var_dump($foo, $proper);
+
+        $d = $m->loadRecord(4);
+        $d->name = $name3;
+        $idD = $m->getIdentifierOfObject($d);
+        
+        if (!$this->assertArraysMatch(
+            ($foo = $m->checkRecordPresence($a, true, array(false), $idxData, true, Ac_Model_Mapper::PRESENCE_SMART)),
+            ($proper = array('idxName' => array($idB, $idD))),
+            'Ac_Model_Mapper::PRESENCE_SMART works',
+            'sort'
+        )) var_dump($foo, $proper);
+        
+        $d->forget();
+        
+        $m->getAllRecords();
+        $this->assertTrue($m->areAllRecordsLoaded());
+        
+        if (!$this->assertArraysMatch(
+            ($foo = $m->checkRecordPresence($a, true, array(false), $idxData, true, Ac_Model_Mapper::PRESENCE_SMART_FULL)),
+            ($proper = array('idxName' => array($idB, $idC))),
+            'Ac_Model_Mapper::PRESENCE_SMART works',
+            'sort'
+        )) var_dump($foo, $proper);
+            
+    }
     
 }
