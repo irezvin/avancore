@@ -1,6 +1,11 @@
 <?php
 
 class Sample_Person_Mapper extends Sample_Person_Base_Mapper {
+
+    protected function doGetUniqueIndexData() {
+        $res = Ac_Util::m(parent::doGetUniqueIndexData(), array('idxName' => array('name')));
+        return $res;
+    }
     
     /*
     
@@ -100,5 +105,20 @@ class Sample_Person_Mapper extends Sample_Person_Base_Mapper {
     }
     
     */
+    
+    protected function doGetSqlSelectPrototype($primaryAlias = 't') {
+        $res = Ac_Util::m(parent::doGetSqlSelectPrototype($primaryAlias), array(
+            'parts' => array(
+                'birthYear' => array(
+                    'class' => 'Ac_Sql_Filter_Custom',
+                    'where' => "DATE_FORMAT(t.birthDate, '%Y') = {value}",
+//                    'php' => function($object, $crit) {
+//                        return Ac_Util::date($object->birthDate, 'Y') == $crit->values[$value];
+//                    }
+                )
+            ),
+        ));
+        return $res;
+    }
     
 }

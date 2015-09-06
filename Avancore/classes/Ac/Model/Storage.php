@@ -202,4 +202,6 @@ abstract class Ac_Model_Storage extends Ac_Prototyped {
         return $this->dateFormats[$dataTypes];
     }
     
+    abstract function partialSearch(array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false);
+    
 }

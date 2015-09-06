@@ -344,4 +344,190 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             
     }
     
+    function testSearch() {
+        $p = $this->getSampleApp()->getSamplePersonMapper();
+        $p->useRecordsCollection = true;
+        $p->reset();
+        $p->getAllRecords();
+        
+        $res = $p->aFind($options = array(
+            'query' => array(
+                'personId' => 3
+            )
+        ));
+        if (!$this->assertArraysMatch($proper = array(
+            3 => array(
+                'personId' => 3
+            ),
+        ), $actual = Ac_Debug::dr($res), 'Best case: find-by-PK works')) {
+            var_dump(compact('options', 'proper', 'actual'));
+        } else {
+            $this->assertTrue(count($res) === count($proper), 'find-by-PK returns only one result');
+        }
+        $res = $p->aFind($options = array(
+            'query' => array(
+                'personId' => array(3, 4)
+            )
+        ));
+        
+        if (!$this->assertArraysMatch($proper = array(
+            3 => array(
+                'personId' => 3,
+            ),
+            4 => array(
+                'personId' => 4,
+            ),
+        ), $actual = Ac_Debug::dr($res), 'Best case: find-by-PK works for several PKs')) {
+            var_dump(compact('options', 'proper', 'actual'));
+        } else {
+            $this->assertTrue(count($res) === count($proper), 'find-by-PK returns only one result');
+        }
+        
+        $res = $p->aFind($options = array(
+            'query' => array(
+                'personId' => 3,
+            ),
+            'offset' => 1,
+        ));
+        if (!$this->assertTrue(!count($actual = Ac_Debug::dr($res)), 'PK + offset = 0 results')) {
+            var_dump(compact('options', 'actual'));
+        }
+        
+        $res = $p->aFind($options = array(
+            'query' => array(
+                'name' => 'Илья',
+            )
+        ));
+        if (!$this->assertArraysMatch($proper = array(
+            3 => array(
+                'personId' => 3,
+                'name' => $options['query']['name'],
+            ),
+        ), $actual = Ac_Debug::dr($res), 'Best case: find-by-uindex works')) {
+            var_dump(compact('options', 'proper', 'actual'));
+        } else {
+            $this->assertTrue(count($res) === count($proper), 'find-by-uindex returns only one result');
+        }
+        
+        $res = $p->aFind($options = array(
+            'query' => array(
+                'name' => 'Илья',
+                'personId' => 4,
+            )
+        ));
+        if (!$this->assertTrue(!count($actual = Ac_Debug::dr($res)), 'Confl. PK + uindex = 0 results')) {
+            var_dump(compact('options', 'actual'));
+        }
+        
+        $res = $p->aFind($options = array(
+            'query' => array(
+                'name' => 'Илья',
+            ),
+            'offset' => 1,
+        ));
+        if (!$this->assertTrue(!count($actual = Ac_Debug::dr($res)), 'uindex + offset = 0 results')) {
+            var_dump(compact('options', 'actual'));
+        }
+
+        try {
+            $ex = null;
+            $res = $p->aFind($options = array(
+                'query' => array(
+                    'name' => 'Илья',
+                    'wtfNoSuchField' => 123,
+                ),
+            ));
+        } catch (Exception $ex) {
+        }
+        $this->assertTrue($ex && preg_match('/Criterion.*is unknown/', $ex->getMessage()), 'Unknown criterion in query produces an exception');
+        
+        // let's find something using the storage
+         
+        $res = $p->aFind($options = array(
+            'query' => array(
+                'name' => 'Таня',
+                'gender' => 'F',
+                'birthDate' => '1981-12-23',
+            )
+        ));
+        if (!$this->assertArraysMatch($proper = array(
+            4 => array(
+                'personId' => 4,
+                'name' => $options['query']['name'],
+                'gender' => $options['query']['gender'],
+                'birthDate' => $options['query']['birthDate'],
+            ),
+        ), $actual = Ac_Debug::dr($res), 'Find-no-SqlSelect-works')) {
+            var_dump(compact('options', 'proper', 'actual'));
+        } else {
+            $this->assertTrue(count($res) === count($proper), 'proper ## of results');
+        }
+         
+        $res = $p->aFind($options = array(
+            'query' => array(
+                'birthYear' => '1981',
+            )
+        ));
+        if (!$this->assertArraysMatch($proper = array(
+            4 => array(
+                'name' => 'Таня',
+            ),
+            6 => array(
+                'name' => 'Ян',
+            ),
+            7 => array(
+                'name' => 'Оля',
+            ),
+        ), $actual = Ac_Debug::dr($res), 'Find-by-SqlSelect-Part works')) {
+            var_dump(compact('options', 'proper', 'actual'));
+        } else {
+            $this->assertTrue(count($res) === count($proper), 'proper ## of results');
+        }
+         
+        $res = $p->aFind($options = array(
+            'query' => array(
+                'birthYear' => '1981',
+            ),
+            'sort' => array('gender' => false, 'birthDate'),
+        ));
+        if (
+            !$this->assertArraysMatch($proper = array(
+                6 => array( 
+                    'gender' => 'M', 
+                    'birthDate' => '1981-09-21',
+                ),
+                7 => array(
+                    'gender' => 'F', 
+                    'birthDate' => '1981-09-08',
+                ),
+                4 => array(
+                    'gender' => 'F', 
+                    'birthDate' => '1981-12-23',
+                ),
+            ), $actual = Ac_Debug::dr($res), 'Find-by-SqlSelect-Part works, order for SqlSelect works too') 
+            ||
+            !$this->assertTrue(array_keys($res) == array_keys($proper), 'same ## and order of results')) {
+            var_dump(compact('options', 'proper', 'actual'));
+        }
+         
+        $res = $p->aFind($options = array(
+            'query' => array(
+                'tags[title]' => 'Ум',
+            ),
+        ));
+        if (
+            !$this->assertArraysMatch($proper = array(
+                4 => array(
+                ),
+                6 => array( 
+                ),
+            ), $actual = Ac_Debug::dr($res), 'Find-by-SqlSelect-With-aliases work') 
+            ||
+            !$this->assertTrue(count($res) == count($proper), 'same ## and order of results')) {
+            var_dump(compact('options', 'proper', 'actual'));
+        }
+       
+        
+    }
+    
 }

@@ -322,6 +322,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     function setMapper(Ac_Model_Mapper $mapper = null) {
         if (($res = parent::setMapper($mapper)) && $this->identifierField) {
             $mapper->setIdentifierField($this->identifierField);
+            $mapper->setIdentifierPublicField($this->primaryKey);
             if (($this->setRowIdentifierToPk) && strlen($this->primaryKey)) {
                 $mapper->setRowIdentifierField($this->primaryKey);
             }
@@ -366,8 +367,198 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     }
     
     protected function mapFieldToColumnValues($fieldsAndValues) {
-        // TODO
+        // TODO: real mapping
         return $fieldsAndValues;
+    }
+    
+    protected function getWhereFromCriteria(array $query, & $unmapped) {
+        // TODO: real mapping
+        $cc = $this->getSqlColumns();
+        foreach ($query as $k => $v) {
+            if (is_scalar($v) || is_array($v)) $byValues[$k] = $v;
+        }
+        if ($byValues && ($mapped = array_intersect_key($byValues, $cc))) {
+            $unmapped = array_diff_key($byValues, $cc);
+            $db = $this->getDb();
+            $r = array();
+            foreach ($mapped as $k => $v) {
+                $r[] = $db->n(array('t', $k)).$db->eqCriterion($v);
+            }
+            if (count($r) > 1) $res = "(".implode("), (", $r).")";
+                else $res = $r[0];
+        } else {
+            $unmapped = $byValues;
+            $res = false;
+        }
+        return $res;
+    }
+    
+    protected function canSimpleSort($sort) {
+        $res = false;
+        
+        // TODO: map
+        $cc = array_flip($this->getSqlColumns());
+        
+        $db = $this->getDb();
+        if (is_scalar($sort) && isset($cc[$sort])) {
+            $res = $cc;
+        } elseif (is_array($sort)) {
+            $r = array();
+            foreach ($sort as $k => $v) {
+                if (is_numeric($k)) {
+                    $k = $v;
+                    $v = true;
+                } else {
+                    $v = (bool) $v;
+                }
+                if (isset($cc[$k])) {
+                    $r[] = $db->n(array('t', $k)).($v? '' : ' DESC');
+                } else {
+                    break;
+                }
+            }
+            if (count($r) === count($sort)) {
+                $res = implode(", ", $r);
+            }
+        }
+        return $res;
+    }
+    
+    protected function applyCriteriaToSelect(array $query, Ac_Sql_Select $select, & $remainingQuery = array()) {
+        $remainingQuery = $query;
+        $db = null;
+        
+        // support for direct SQL parts
+        foreach (array_intersect_key($query, array_flip($select->listParts())) as $k => $v) {
+            $select->getPart($k)->bind($v);
+            unset($remainingQuery[$k]);
+        }
+        
+        foreach ($remainingQuery as $k => $v) {
+            if (is_object($v)) { 
+                // support for Ac_Sql_Expression
+                if ($v instanceof Ac_Sql_Expression) {
+                    $select['where']['crit_'.$k] = $v;
+                    unset($remainingQuery[$k]);
+                // support for Ad-hoc Sql parts
+                } elseif ($v instanceof Ac_Sql_Part) {
+                    $v->applyToSelect($select);
+                    unset($remainingQuery[$k]);
+                }
+            } else {
+                // support for path-like equals
+                if (strpos($k, '[') && (is_scalar($v) || is_array($v))) {
+                    $path = Ac_Util::pathToArray($k);
+                    $tail = array_pop($path);
+                    if ($path && $tail && $select->hasTable($alias = Ac_Util::arrayToPath($path))) {
+                        if (!$db) $db = $select->getDb();
+                        $select->useAlias($alias);
+                        $select->where[$k] = $db->n(array($alias, $tail)).$db->eqCriterion($v);
+                        unset($remainingQuery[$k]);
+                    }
+                }
+            }
+        }
+    }
+    
+    protected function applySortToSelect($sort, Ac_Sql_Select $select) {
+        $res = false;
+        if (is_object($sort) && $sort instanceof Ac_Sql_Part) {
+            $res = true;
+            $sort->applyToSelect($select);
+        } 
+        if (is_scalar($sort) && in_array($sort, $select->listParts())) {
+            $part = $select->getPart($sort);
+            if ($part instanceof Ac_Sql_Order) {
+                $part->bind(true);
+                $res = true;
+            }
+        } elseif (is_array($sort) && count($sort) === 1) {
+            $kk = array_keys($sort);
+            $vv = array_values($sort);
+            $pp = $select->listParts();
+            if (isset($pp[$kk[0]]) && ($part = $select->getPart($kk[0])) instanceof Ac_Sql_Order) {
+                $pp[$kk[0]] = $vv;
+                $part->bind($vv[0]);
+                $res = true;
+            }
+        }
+        return $res;
+    }
+
+    function partialSearch(array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+        if (!$query) {
+            $where = '';
+            $remainingQuery = array();
+        } else {
+            $where = $this->getWhereFromCriteria($query, $remainingQuery);
+        }
+        if ($sort) {
+            $strSort = $this->canSimpleSort($sort);
+            if ($strSort) $sorted = true;
+        } else {
+            $strSort = '';
+            $sorted = true;
+        }
+        if (!$remainingQuery && $sorted) {
+            // simple case -- query the DB directly
+            $res = $this->loadRecordsByCriteria($where, $strSort, '', $offset, $limit); 
+        } else {
+            // must apply the Sql Select
+            
+            $selectQ = $remainingQuery;
+            $select = $this->createBlankSqlSelect();
+            $this->applyCriteriaToSelect($selectQ, $select, $remainingQuery);
+            if ($where) $select->where['_search'] = $where;
+            if ($strSort) $select->orderBy['_sort'] = $strSort;
+            elseif ($sort) $sorted = $this->applySortToSelect ($sort, $select);
+            if ($limit) $select->limitCount = $limit;
+            if ($offset) $select->limitOffset = $offset;
+            $res = $this->loadFromRows($select->getDb()->fetchArray($select, $this->primaryKey), true);
+        }
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Sql_Select
+     */
+    protected function createBlankSqlSelect(array $prototypeExtra = array()) {
+        return $this->getMapper()->createSqlSelect($prototypeExtra);
+    }
+    
+    /**
+     * @return Ac_Sql_Select
+     * 
+     * @param array $query
+     * @param type $sort
+     * @param type $limit
+     * @param type $offset
+     * @param type $remainingQuery
+     * @param type $sorted
+     */
+    function createSqlSelect(array $prototypeExtra = array(), array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+        if (!$query) {
+            $where = '';
+            $remainingQuery = array();
+        } else {
+            $where = $this->getWhereFromCriteria($query, $remainingQuery);
+        }
+        if ($sort) {
+            $strSort = $this->canSimpleSort($sort);
+            if ($strSort) $sorted = true;
+        } else {
+            $strSort = '';
+            $sorted = true;
+        }
+        $selectQ = $remainingQuery;
+        $res = $this->createBlankSqlSelect($prototypeExtra);
+        $this->applyCriteriaToSelect($selectQ, $res, $remainingQuery);
+        if ($where) $res->where['_search'] = $where;
+        if ($strSort) $res->orderBy['_sort'] = $strSort;
+        elseif ($sort) $sorted = $this->applySortToSelect ($sort, $res);
+        if ($limit) $res->limitCount = $limit;
+        if ($offset) $res->limitOffset = $offset;
+        return $res;
     }
     
 }

@@ -81,6 +81,10 @@ class HtmlReporter extends SimpleReporter {
         fail { background-color: inherit; color: red; }
         pass { background-color: inherit; color: green; }
         pre { background-color: lightgray; color: inherit; }
+        
+        .xdebug-error td, .xdebug-error th {
+            color: black;
+        }
 
         h1, h2, h3 {
             font-weight: normal;
@@ -93,6 +97,7 @@ class HtmlReporter extends SimpleReporter {
             background-color: #333;
             background: linear-gradient(to bottom, #424242 0%,#9b9b9b 100%); /* W3C */
             color: #eee;
+            background-attachment: fixed;
         }
 
         pre {
