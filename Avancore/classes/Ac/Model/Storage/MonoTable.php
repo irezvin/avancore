@@ -156,7 +156,14 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     }
     
     function loadRecordsByCriteria($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
-        $sql = "SELECT ".$this->db->n($this->tableName).".* FROM ".$this->db->n($this->tableName)." $joins  ";
+        $tableName = $this->db->n($this->tableName);
+        if (strlen($tableAlias)) {
+            $tableAlias = $this->db->n($tableAlias);
+            $tn = $tableAlias;
+        } else {
+            $tn = $tableName;
+        }
+        $sql = "SELECT {$tn}.* FROM {$tableName} {$tableAlias} $joins";
         if ($where) {
             if (is_array($where)) $where = $this->db->valueCriterion($where);
             $sql .= " WHERE ".$where;
@@ -373,21 +380,22 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     
     protected function getWhereFromCriteria(array $query, & $unmapped) {
         // TODO: real mapping
-        $cc = $this->getSqlColumns();
+        $cc = array_flip($this->getSqlColumns());
+        $byValues = array();
         foreach ($query as $k => $v) {
             if (is_scalar($v) || is_array($v)) $byValues[$k] = $v;
         }
         if ($byValues && ($mapped = array_intersect_key($byValues, $cc))) {
-            $unmapped = array_diff_key($byValues, $cc);
+            $unmapped = array_diff_key($query, $cc);
             $db = $this->getDb();
             $r = array();
             foreach ($mapped as $k => $v) {
                 $r[] = $db->n(array('t', $k)).$db->eqCriterion($v);
             }
-            if (count($r) > 1) $res = "(".implode("), (", $r).")";
+            if (count($r) > 1) $res = "(".implode(") AND (", $r).")";
                 else $res = $r[0];
         } else {
-            $unmapped = $byValues;
+            $unmapped = $query;
             $res = false;
         }
         return $res;
@@ -486,7 +494,12 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         return $res;
     }
 
-    function partialSearch(array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    
+    
+    function find(array $query = array(), $keysToList = false, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+        
+        $strict = func_num_args() <= 5 || $remainingQuery === true;
+        
         if (!$query) {
             $where = '';
             $remainingQuery = array();
@@ -502,7 +515,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         }
         if (!$remainingQuery && $sorted) {
             // simple case -- query the DB directly
-            $res = $this->loadRecordsByCriteria($where, $strSort, '', $offset, $limit); 
+            $res = $this->loadRecordsByCriteria($where, $strSort, '', $offset, $limit, 't'); 
         } else {
             // must apply the Sql Select
             
@@ -516,6 +529,15 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
             if ($offset) $select->limitOffset = $offset;
             $res = $this->loadFromRows($select->getDb()->fetchArray($select, $this->primaryKey), true);
         }
+        
+        if ($strict) {
+            if ($remainingQuery) 
+                throw new Ac_E_InvalidUsage("Criterion ".implode(" / ", array_keys($remainingQuery))." is unknown to {$this}");
+            if (!$sorted) {
+                throw new Ac_E_InvalidUsage("Sort mode ".$this->describeSort($sort)." is unknown to {$this}");
+            }
+        }
+        
         return $res;
     }
     

@@ -4,7 +4,7 @@
  * Storage *does not* checks for presence in records collection and also
  * provides less convenient interface than Mapper
  */
-abstract class Ac_Model_Storage extends Ac_Prototyped {
+abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_RecordProvider {
     
     /**
      * @var Ac_Application
@@ -202,6 +202,12 @@ abstract class Ac_Model_Storage extends Ac_Prototyped {
         return $this->dateFormats[$dataTypes];
     }
     
-    abstract function partialSearch(array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false);
+    abstract function find(array $query = array(), $keysToList = false, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false);
+    
+    function __toString() {
+        $res = get_class($this);
+        if ($this->mapper) $res .= " of ".$this->mapper->getId ();
+        return $res;
+    }
     
 }

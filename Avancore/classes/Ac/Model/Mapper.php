@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAwareCollection {
+class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAwareCollection, Ac_I_Search_FilterProvider, Ac_I_Search_RecordProvider {
     
     /**
      * function onAfterCreateRecord ($record)
@@ -64,6 +64,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * function onGetSelectPrototype(& $selectPrototype, $primaryAlias)
      */
     const EVENT_ON_GET_SELECT_PROTOTYPE = 'onGetSelectPrototype';
+
+    /**
+     * function onGetSearchPrototype(& $searchPrototype)
+     */
+    const EVENT_ON_GET_SEARCH_PROTOTYPE = 'onGetSearchPrototype';
 
     /**
      * function onGetRelationPrototypes(& $relationPrototypes)
@@ -295,6 +300,13 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @var array ('indexName' => array('fieldName1', 'fieldName2'), ...)
      */
     protected $indexData = false;
+    
+    /**
+     * @var Ac_Model_Search
+     */
+    protected $search = false;
+    
+    protected $searchPrototype = array();
 
     /**
      * Default value of $mode in Ac_Model_Mapper::checkRecordPresence
@@ -524,7 +536,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
 
     /**
      * Loads array of records.
-
+     * 
      * @return Ac_ModelObject[] Records in the same order as in $ids array
      * @param array ids - Array of record identifiers
      * @param bool $keysToList DOES NOT accept customary fields
@@ -715,7 +727,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             || is_array($keysToList) && array_values($keysToList) == array($this->identifierField)))) 
         {
             foreach ($objects as $rec) {
-                $res[$this->getIdentifier($record)] = $rec;
+                $res[$this->getIdentifier($rec)] = $rec;
             }
         } else {
             $keys = Ac_Util::toArray($keysToList);
@@ -2113,7 +2125,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         // SPECIAL CASE - we know that there are NO RECORDS
         
         if ($this->allRecordsLoaded && (!$this->recordsCollection || 
-                $this->keysOfNewRecords && !array_diff_keys($this->recordsCollection, $this->keysOfNewRecords))) {
+                $this->keysOfNewRecords && !array_diff_key($this->recordsCollection, $this->keysOfNewRecords))) {
             $res = array();
             $found = true;
         }
@@ -2129,6 +2141,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 $needsIndexResult = true;
             }
         }
+        
+        // TODO: special case when all records are requested (but not loaded yet)
         
         if (!$found) { // In-memory or loadById() single-record search
             $idField = $this->identifierField;
@@ -2258,17 +2272,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
  
-//    function find($fields, $strict = false, $newRecordsOnly = true) {
-//        $res = array();
-//        $src = $newRecordsOnly? array_intersect_key($this->recordsCollection, $this->keysOfNewRecords) : $this->recordsCollection;
-//        foreach ($src as $k => $object) {
-//            if ($object->matchesFields($fields, $strict)) $res[$k] = $object;
-//        }
-//        return $res;
-//    }
-    
    /**
-     * 
      * @param array $query
      * @param mixed $keysToList
      * @param mixed $sort
@@ -2277,43 +2281,63 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @param bool $forceStorage
      * @return array
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, $forceStorage = false) {
+    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
 
-        if ($forceStorage || is_null($res = $this->bestCaseFind($query, $keysToList, $sort, $limit, $offset))) {
+        $strict = func_num_args() <= 5 || $remainingQuery === true;
+        
+        if (is_null($res = $this->bestCaseFind($query, $keysToList, $sort, $limit, $offset))) {
             
-            if (!$forceStorage && $this->useRecordsCollection) {
-                $records = array_diff_key($this->recordsCollection, $this->keysOfNewRecords);
-            } else {
-                $records = array();
+            $res = $this->getStorage()->find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
+            
+            if ($remainingQuery || (!$sorted && $sort))  {
+                if ($sorted || !$sort) $remainingSort = false;
+                    else $remainingSort = $sort;
+                    
+                $res = $this->filter($res, $remainingQuery, $remainingSort, $limit, $offset, $remainingQuery, $finallySorted);
+                if ($remainingSort) $sorted = $finallySorted;
             }
-            $res = $this->partialSearch($records, true, $query, $sort, $limit, $offset, true, $remainingQuery, $sorted);
-            if ($remainingQuery) 
-                throw new Ac_E_InvalidUsage("Criterion ".implode(" / ", array_keys($remainingQuery))." is unknown to the mapper ".$this->getId());
-            if (!$sorted) {
-                throw new Ac_E_InvalidUsage("Sort mode ".$this->describeSort($sort)." is unknown to the mapper ".$this->getId());
+            if ($strict) {
+                if ($remainingQuery) 
+                    throw new Ac_E_InvalidUsage("Criterion ".implode(" / ", array_keys($remainingQuery))." is unknown to the mapper ".$this->getId());
+                if (!$sorted && $sort) {
+                    throw new Ac_E_InvalidUsage("Sort mode ".$this->describeSort($sort)." is unknown to the mapper ".$this->getId());
+                }
             }
             if ($keysToList === false) $res = array_values($res);
             elseif ($res && $keysToList !== true) $res = $this->indexObjects ($res, $keysToList);
+            
+        } else {
+            $remainingQuery = array();
+            $sorted = true;
         }
         
         return $res;
     }
     
-    function aFind (array $options = array()) {
-        $params = array(
+    function findA (array $options = array()) {
+        $args = array(
             'query' => array(),
             'keysToList' => true,
             'sort' => false,
             'limit' => false, 
             'offset' => false,
-            'forceStorage' => false,
+            'remainingQuery' => array(),
+            'sorted' => array(),
         );
-        foreach ($options as $k => $v) {
-            if (isset($params[$k])) $params[$k] = $v;
-            else throw new Ac_E_InvalidCall("Unknown argument: options['{$k}']. "
-            . "Valid arguments are: ".implode(", ", array_keys($params)));
+        if (isset($options['strict'])) {
+            $options['remainingQuery'] = true;
+            unset($options['strict']);
         }
-        return call_user_func_array(array($this, 'find'), array_values($params));
+        foreach ($options as $k => $v) {
+            if (isset($args[$k])) $args[$k] = & $options[$k];
+            else throw new Ac_E_InvalidCall("Unknown argument: options['{$k}']. "
+            . "Valid arguments are: ".implode(", ", array_keys($args)));
+        }
+        if (!array_key_exists('sorted', $options)) {
+            unset($args['sorted']);
+            if (!array_key_exists('remainingQuery', $options)) unset($args['remainingQuery']);
+        }
+        return call_user_func_array(array($this, 'find'), $args);
     }
     
     /**
@@ -2331,60 +2355,15 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function partialSearch(array $inMemoryRecords, $areByIdentifiers, array $query, $sort, $limit, $offset, $canUseStorage, & $remainingQuery, & $sorted) {
-        $res = $inMemoryRecords;
+    function filter(array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery, & $sorted) {
+        $strict = func_num_args() <= 5 || $remainingQuery === true;
 
-        if (!$areByIdentifiers && $res) $res = $this->indexObjects ($res);
-        
-        if ($canUseStorage) {
-            $res = $this->getStorage()->partialSearch($query, $sort, $limit, $offset, $remainingQuery, $sorted);
-        } else {
-            $sorted = false;
-            $remainingQuery = $query;
-        }
-        if ($remainingQuery) {
-            $currentQuery = $remainingQuery;
-            $this->inMemorySearch($res, $currentQuery, $limit, $offset, $remainingQuery);
-        }
-        if (!$sort) $sorted = true;
-        elseif (!$sorted) {
-            $res = $this->inMemorySort($res, $sort, $sorted);
-        }
+        if ($strict) $remainingQuery = true;
+        if (!$this->search) $this->getSearch();
+
+        $res = $this->search->filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted);
         
         return $res;
-    }
-    
-    function getKnownQueryCriteria(array $query) {
-        return array();
-    }
-    
-    function inMemorySearch(array $recordsByIdentifiers, array $query, $limit = false, $offset = false, & $remainingQuery = false) {
-        // TODO
-        return $recordsByIdentifiers;
-    }
-    
-    function getKnownSortCriteria($sort, & $reverse = false) {
-        return false;
-    }
-    
-    function inMemorySort(array $records, $sort, & $sorted = false) {
-        if ($sort) {
-            if (is_string($sort)) {
-                if ($criteria = $this->getKnownSortCriteria($sort, $reverse)) {
-                    if ($criteria instanceof Ac_I_Search_Criterion_ExtendedOrder) {
-                        $records = $criteria->apply($records, $sort, $reverse);
-                    } else {
-                        $records = uasort($records, $criteria);
-                    }
-                    if ($reverse) $records = array_reverse($records);
-                    $sorted = true;
-                }
-            }
-            if (!$sorted && is_callable($sort)) uasort($records, $sort); 
-        } else {
-            $sorted = true;
-        }
-        return $records;
     }
     
     static function describeSort($sort) {
@@ -2404,6 +2383,38 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
 
     function getIdentifierPublicField() {
         return $this->identifierPublicField;
-    }    
+    }
+    
+    function setSearchPrototype($searchPrototype = array()) {
+        if ($this->searchPrototype !== $searchPrototype) {
+            $this->search = false;
+            $this->searchPrototype = $searchPrototype;
+        }
+    }
+    
+    final function getSearchPrototype($full = false) {
+        $res = $this->searchPrototype;
+        $this->doOnGetSearchPrototype($res);
+        if ($full) $this->triggerEvent(self::EVENT_ON_GET_SEARCH_PROTOTYPE, array(& $res));
+        return $res;
+    }
+    
+    protected function doOnGetSearchPrototype(& $prototype) {
+    }
+    
+    /**
+     * @return Ac_Model_Search
+     */
+    final function getSearch() {
+        if ($this->search === false) {
+            $this->search = Ac_Prototyped::factory($this->getSearchPrototype(true), 'Ac_Model_Search');
+        }
+        return $this->search;
+    }
+    
+    function setSearch(Ac_Model_Search $search = null) {
+        if ($search === null) $this->search = false;
+            else $this->search = $search;
+    }
     
 }

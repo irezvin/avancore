@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Model_Sort_Fields extends Ac_Prototyped implements Ac_I_Search_Criterion_Order {
+class Ac_Model_SortCriterion_Fields extends Ac_Prototyped implements Ac_I_Search_Criterion_Sort {
     
     protected $fields = array();
 

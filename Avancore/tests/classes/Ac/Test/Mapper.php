@@ -347,10 +347,9 @@ class Ac_Test_Mapper extends Ac_Test_Base {
     function testSearch() {
         $p = $this->getSampleApp()->getSamplePersonMapper();
         $p->useRecordsCollection = true;
-        $p->reset();
         $p->getAllRecords();
         
-        $res = $p->aFind($options = array(
+        $res = $p->findA($options = array(
             'query' => array(
                 'personId' => 3
             )
@@ -364,7 +363,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         } else {
             $this->assertTrue(count($res) === count($proper), 'find-by-PK returns only one result');
         }
-        $res = $p->aFind($options = array(
+        $res = $p->findA($options = array(
             'query' => array(
                 'personId' => array(3, 4)
             )
@@ -383,7 +382,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             $this->assertTrue(count($res) === count($proper), 'find-by-PK returns only one result');
         }
         
-        $res = $p->aFind($options = array(
+        $res = $p->findA($options = array(
             'query' => array(
                 'personId' => 3,
             ),
@@ -393,7 +392,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             var_dump(compact('options', 'actual'));
         }
         
-        $res = $p->aFind($options = array(
+        $res = $p->findA($options = array(
             'query' => array(
                 'name' => 'Илья',
             )
@@ -409,7 +408,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             $this->assertTrue(count($res) === count($proper), 'find-by-uindex returns only one result');
         }
         
-        $res = $p->aFind($options = array(
+        $res = $p->findA($options = array(
             'query' => array(
                 'name' => 'Илья',
                 'personId' => 4,
@@ -419,7 +418,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             var_dump(compact('options', 'actual'));
         }
         
-        $res = $p->aFind($options = array(
+        $res = $p->findA($options = array(
             'query' => array(
                 'name' => 'Илья',
             ),
@@ -431,7 +430,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
 
         try {
             $ex = null;
-            $res = $p->aFind($options = array(
+            $res = $p->findA($options = array(
                 'query' => array(
                     'name' => 'Илья',
                     'wtfNoSuchField' => 123,
@@ -443,9 +442,8 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         
         // let's find something using the storage
          
-        $res = $p->aFind($options = array(
+        $res = $p->findA($options = array(
             'query' => array(
-                'name' => 'Таня',
                 'gender' => 'F',
                 'birthDate' => '1981-12-23',
             )
@@ -453,7 +451,6 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         if (!$this->assertArraysMatch($proper = array(
             4 => array(
                 'personId' => 4,
-                'name' => $options['query']['name'],
                 'gender' => $options['query']['gender'],
                 'birthDate' => $options['query']['birthDate'],
             ),
@@ -463,7 +460,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             $this->assertTrue(count($res) === count($proper), 'proper ## of results');
         }
          
-        $res = $p->aFind($options = array(
+        $res = $p->findA($options = array(
             'query' => array(
                 'birthYear' => '1981',
             )
@@ -484,7 +481,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             $this->assertTrue(count($res) === count($proper), 'proper ## of results');
         }
          
-        $res = $p->aFind($options = array(
+        $res = $p->findA($options = array(
             'query' => array(
                 'birthYear' => '1981',
             ),
@@ -506,11 +503,12 @@ class Ac_Test_Mapper extends Ac_Test_Base {
                 ),
             ), $actual = Ac_Debug::dr($res), 'Find-by-SqlSelect-Part works, order for SqlSelect works too') 
             ||
-            !$this->assertTrue(array_keys($res) == array_keys($proper), 'same ## and order of results')) {
+            !$this->assertTrue(array_keys($res) == array_keys($proper), 'same ## and order of results')) 
+        {
             var_dump(compact('options', 'proper', 'actual'));
         }
          
-        $res = $p->aFind($options = array(
+        $res = $p->findA($options = array(
             'query' => array(
                 'tags[title]' => 'Ум',
             ),
@@ -523,11 +521,36 @@ class Ac_Test_Mapper extends Ac_Test_Base {
                 ),
             ), $actual = Ac_Debug::dr($res), 'Find-by-SqlSelect-With-aliases work') 
             ||
-            !$this->assertTrue(count($res) == count($proper), 'same ## and order of results')) {
+            !$this->assertTrue(count($res) == count($proper), 'same ## and order of results')) 
+        {
             var_dump(compact('options', 'proper', 'actual'));
         }
        
-        
+        $res = $p->findA($options = array(
+            'query' => array(
+                'gender' => 'F',
+                function(Sample_Person $record) {
+                    return substr($record->birthDate, 0, 4) == 1981;
+                }
+            ),
+            'sort' => new Ac_Model_SortCriterion_Field(array('field' => 'birthDate', 'reverse' => true)),
+        ));
+        if (
+            !$this->assertArraysMatch($proper = array(
+                4 => array(
+                    'gender' => 'F', 
+                    'birthDate' => '1981-12-23',
+                ),
+                7 => array(
+                    'gender' => 'F', 
+                    'birthDate' => '1981-09-08',
+                ),
+            ), $actual = Ac_Debug::dr($res), 'Mapper find() can successfully combine SQL and in-memory') 
+            ||
+            !$this->assertTrue(array_keys($res) == array_keys($proper), 'same ## and order of results')) 
+        {
+            var_dump(compact(/*'options', */'proper', 'actual'));
+        }
     }
     
 }
