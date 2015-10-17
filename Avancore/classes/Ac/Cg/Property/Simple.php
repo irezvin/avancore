@@ -195,7 +195,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
                     if ($mod = $this->_model->_domain->searchModelByTable($foreignTbl->name)) {
                         if ($this->_col->nullable) $this->dummyCaption = new Ac_Cg_Php_Expression("''");
                         $this->values = array(
-                            'class' => 'Ac_Model_Values_Records', 
+                            'class' => 'Ac_Model_Values_Mapper', 
                             'mapperClass' => $mod->getMapperClass()
                         );
                         // it's not a primary key so we have to specify what field do we reference

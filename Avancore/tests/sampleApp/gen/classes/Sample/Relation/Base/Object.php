@@ -86,7 +86,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'controlType' => 'selectList',
                 'maxLength' => '10',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'objectPropertyName' => 'person',
@@ -97,7 +97,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'controlType' => 'selectList',
                 'maxLength' => '10',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'objectPropertyName' => 'otherPerson',
@@ -108,7 +108,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'controlType' => 'selectList',
                 'maxLength' => '10',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Relation_Type_Mapper',
                 ),
                 'objectPropertyName' => 'relationType',

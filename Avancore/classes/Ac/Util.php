@@ -256,15 +256,18 @@ abstract class Ac_Util {
         return $handle;
     }
 
-    static function listDirContents($dirPath, $recursive = false, $files = array(), $fileRegex = false, $dirRegex = false) {
+    static function listDirContents($dirPath, $recursive = false, $files = array(), $fileRegex = false, $dirRegex = false, $includeDirs = false) {
         if(!($res = opendir($dirPath))) trigger_error("$dirPath doesn't exist!", E_USER_ERROR);
         while($file = readdir($res)) {
             if($file != "." && $file != "..") {
-                if($recursive && is_dir("$dirPath/$file") && (!$dirRegex || preg_match($dirRegex, "$dirPath/$file"))) 
-                    $files=self::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex);
-                else {
-                    if (!$fileRegex || preg_match($fileRegex, "$dirPath/$file")) {
-                        array_push($files,"$dirPath/$file");
+                if(($dir = is_dir("$dirPath/$file")) && $recursive && (!$dirRegex || preg_match($dirRegex, "$dirPath/$file"))) {
+                    if ($includeDirs) array_push($files, "$dirPath/$file");
+                    $files = self::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex);
+                } else {
+                    if (!$dir || $includeDirs) {
+                        if (!$fileRegex || preg_match($fileRegex, "$dirPath/$file")) {
+                            array_push($files,"$dirPath/$file");
+                        }
                     }
                 } 
             }

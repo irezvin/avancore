@@ -382,6 +382,10 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         // TODO: real mapping
         $cc = array_flip($this->getSqlColumns());
         $byValues = array();
+        if (isset($query[Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION])) {
+            $query[$this->primaryKey] = $query[Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION];
+            unset($query[Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION]);
+        }
         foreach ($query as $k => $v) {
             if (is_scalar($v) || is_array($v)) $byValues[$k] = $v;
         }
@@ -409,7 +413,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         
         $db = $this->getDb();
         if (is_scalar($sort) && isset($cc[$sort])) {
-            $res = $cc;
+            $res = $sort;
         } elseif (is_array($sort)) {
             $r = array();
             foreach ($sort as $k => $v) {
@@ -494,12 +498,11 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         return $res;
     }
 
-    
-    
-    function find(array $query = array(), $keysToList = false, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
-        
-        $strict = func_num_args() <= 5 || $remainingQuery === true;
-        
+    /**
+     * Returns array($where, $sort) or Ac_Sql_Select with partially applied criteria.
+     * Sets $remainingQuery and $sorted output params.
+     */
+    protected function whereSortOrSelect(array $query = array(), $sort = false, & $remainingQuery = array(), & $sorted = false) {
         if (!$query) {
             $where = '';
             $remainingQuery = array();
@@ -515,29 +518,40 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         }
         if (!$remainingQuery && $sorted) {
             // simple case -- query the DB directly
-            $res = $this->loadRecordsByCriteria($where, $strSort, '', $offset, $limit, 't'); 
+            $res = array($where, $strSort);
         } else {
             // must apply the Sql Select
-            
             $selectQ = $remainingQuery;
             $select = $this->createBlankSqlSelect();
             $this->applyCriteriaToSelect($selectQ, $select, $remainingQuery);
             if ($where) $select->where['_search'] = $where;
             if ($strSort) $select->orderBy['_sort'] = $strSort;
             elseif ($sort) $sorted = $this->applySortToSelect ($sort, $select);
+            $res = $select;
+        }
+        return $res;
+    }
+    
+    function find(array $query = array(), $keysToList = false, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+        $strict = func_num_args() <= 5 || $remainingQuery === true;
+        $wss = $this->whereSortOrSelect($query, $sort, $remainingQuery, $sorted);
+        if (is_array($wss)) { // use $where and $sort
+            list($where, $strSort) = $wss;
+            $res = $this->loadRecordsByCriteria($where, $strSort, '', $offset, $limit, 't'); 
+        } else {
+            $select = $wss;
+            // must apply the Sql Select
             if ($limit) $select->limitCount = $limit;
             if ($offset) $select->limitOffset = $offset;
             $res = $this->loadFromRows($select->getDb()->fetchArray($select, $this->primaryKey), true);
         }
-        
         if ($strict) {
             if ($remainingQuery) 
                 throw new Ac_E_InvalidUsage("Criterion ".implode(" / ", array_keys($remainingQuery))." is unknown to {$this}");
             if (!$sorted) {
-                throw new Ac_E_InvalidUsage("Sort mode ".$this->describeSort($sort)." is unknown to {$this}");
+                throw new Ac_E_InvalidUsage("Sort mode ".Ac_Model_Mapper::describeSort($sort)." is unknown to {$this}");
             }
         }
-        
         return $res;
     }
     
@@ -559,6 +573,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
      * @param type $sorted
      */
     function createSqlSelect(array $prototypeExtra = array(), array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+        $strict = func_num_args() <= 5 || $remainingQuery === true;
         if (!$query) {
             $where = '';
             $remainingQuery = array();
@@ -580,6 +595,66 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         elseif ($sort) $sorted = $this->applySortToSelect ($sort, $res);
         if ($limit) $res->limitCount = $limit;
         if ($offset) $res->limitOffset = $offset;
+        if ($strict) {
+            if ($remainingQuery) 
+                throw new Ac_E_InvalidUsage("Criterion ".implode(" / ", array_keys($remainingQuery))." is unknown to {$this}");
+            if (!$sorted) {
+                throw new Ac_E_InvalidUsage("Sort mode ".Ac_Model_Mapper::describeSort($sort)." is unknown to {$this}");
+            }
+        }
+        return $res;
+    }
+    
+    function fetchTitlesIfPossible($titleProperty, $valueProperty, $sort, array $query = array()) {
+        $cc = $this->getSqlColumns();
+        $res = false;
+        if ($titleProperty === false) $titleProperty = $this->primaryKey;
+        if ($valueProperty === false) $valueProperty = $this->primaryKey;
+        if (in_array($titleProperty, $cc) && in_array($valueProperty, $cc)) {
+            // both 'properties' are columns
+            $wss = $this->whereSortOrSelect($query, $sort, $remainingQuery, $sorted);
+            if (!$remainingQuery && $sorted) {
+                $db = $this->getDb();
+                $qTitle = $db->n($titleProperty);
+                $qValue = $db->n($valueProperty);
+                $col = "t.{$qTitle} AS title, t.{$qValue} AS value";
+                if (is_array($wss)) {
+                    list ($where, $sort) = $wss;
+                    $tn = $db->n($this->tableName);
+                    if (strlen($sort)) 
+                        $o = "ORDER BY 
+                            {$sort}";
+                        else $o = "";
+                    if (strlen($where)) $w = "WHERE 
+                            {$where}";
+                        else $w = "";
+                    $q = "
+                        SELECT $col 
+                        FROM {$tn} AS t
+                        {$w}
+                        {$o}
+                    ";
+                } else {
+                    $q = $wss;
+                    $q->columns = $col;
+                }
+                $res = $db->fetchColumn($q, 'title', 'value');
+            }
+        }
+        return $res;
+    }
+    
+    function countIfPossible(array $query = array()) {
+        $stmt = $this->createSqlSelect(array(), $query, false, false, false, $remainingQuery);
+        if (!$remainingQuery) { // it's possible
+            $stmt->columns = "COUNT(DISTINCT t.".$this->getDb()->n($this->primaryKey).")";
+            $stmt->groupBy = array();
+            $stmt->limitCount = false;
+            $stmt->limitOffset = false;
+            $res = $this->getDb()->fetchValue($stmt);
+        } else {
+            $res = false;
+        }
         return $res;
     }
     

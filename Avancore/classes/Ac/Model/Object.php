@@ -881,7 +881,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
         return $res;
     }
 
-    function cleanupReferences($otherObject) {
+    protected function cleanupReferences($otherObject) {
         foreach (array_keys($vars = get_object_vars($this)) as $k) {
             if (is_object($this->$k) && Ac_Util::sameObject($this->$k, $otherObject)) {
                 $this->$k = null;

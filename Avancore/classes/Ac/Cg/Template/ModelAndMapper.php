@@ -449,7 +449,9 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 ?>
 <?php $this->phpOpen(); ?>
 
-
+/**
+ * @method <?php echo $this->modelClass; ?>[] loadFromRows(array $rows, $keysToList = false)
+ */
 <?php if ($this->model->parentMapperIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genMapperClass); ?> extends <?php $this->d($this->parentMapperClass); ?> {
 <?php foreach ($this->mapperVars as $var => $default) { ?>
 
@@ -532,6 +534,83 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
+    
+    /**
+     * Loads array of records.
+     * 
+     * @return <?php $this->d($this->modelClass); ?>[] Records in the same order as in $ids array
+     * @param array ids - Array of record identifiers
+     * @param bool $keysToList DOES NOT accept customary fields
+     */
+    function loadRecordsArray(array $ids, $keysToList = false) {
+        return parent::loadRecordsArray($ids, $keysToList);
+    }
+
+    /**
+     * @deprecated Will be removed in 0.4
+     * @return <?php $this->d($this->modelClass); ?>[]
+     */
+    function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadRecordsByCriteria($where, $keysToList, $order, $joins, $limitOffset, $limitCount, $tableAlias);
+    }
+    
+    /**
+     * Returns first matching record 
+     * 
+     * @param array $query
+     * @param mixed $sort
+     * @return <?php echo $this->modelClass; ?>
+     */
+    function findFirst (array $query = array(), $sort = false) {
+        return parent::findFirst($query, $sort);
+    }
+    
+    /**
+     * Returns the matching record only when resultset contains one record
+     * 
+     * @param array $query
+     * @return <?php echo $this->modelClass; ?>
+     */
+    function findOne (array $query = array()) {
+        return parent::findOne($query);
+    }
+    
+    /**
+     * @param array $query
+     * @param mixed $keysToList
+     * @param mixed $sort
+     * @param int $limit
+     * @param int $offset
+     * @param bool $forceStorage
+     * @return <?php echo $this->modelClass; ?>[]
+     */
+    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+        if (func_num_args() > 5) $remainingQuery = true;
+        return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
+    }
+    
+    /**
+     * Does partial search.
+     * 
+     * Objects are always returned by-identifiers.
+     * 
+     * @return <?php echo $this->modelClass; ?>[]
+     *
+     * @param array $inMemoryRecords - set of in-memory records to search in
+     * @param type $areByIdentifiers - whether $inMemoryRecords are already indexed by identifiers
+     * @param array $query - the query (set of criteria)
+     * @param mixed $sort - how to sort
+     * @param int $limit
+     * @param int $offset
+     * @param bool $canUseStorage - whether to ask storage to find missing items or apply storage-specific criteria first
+     * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
+     * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
+     */
+    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+        if (func_num_args() > 5) $remainingQuery = true;
+        return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
+    }
+    
 
 <?php if ($this->model->titleProp) { ?>
     
@@ -539,10 +618,15 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
         return <?php $this->str($this->model->titleProp); ?>;   
     }
 <?php } ?>
-<?php if ($this->model->orderingProp) { $ord = $this->model->orderingProp; if ($this->model->orderGroupProp) $ord = $this->model->orderGroupProp.', '.$ord;  ?>
+<?php if ($this->model->orderingProp) { 
     
-    function getDefaultOrdering() {
-        return <?php $this->str($ord); ?>;
+    $ord = $this->model->orderingProp; 
+    if ($this->model->orderGroupProp) 
+        $ord = array($this->model->orderGroupProp, $ord);  
+?>
+    
+    function getDefaultSort() {
+        return <?php $this->export($ord); ?>;
     }
 <?php } ?>
 <?php if ($this->relationPrototypes) { ?>

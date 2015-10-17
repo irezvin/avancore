@@ -278,10 +278,12 @@ class Ac_Model_Validator {
             || is_object($res['values']) && ($res['values'] instanceof Ac_Model_Values))
         ) {
             if (!is_object($res['values'])) {
-                $vals = Ac_Model_Values::factoryIndependent($res['values']);
+                if (is_object($this->model)) {
+                    $vals = Ac_Model_Values::factoryWithProperty ($this->model->getPropertyInfo($fieldName));
+                } else $vals = Ac_Model_Values::factoryIndependent($res['values']);
             }
             else $vals = $res['values'];
-            if (is_object($this->model)) $vals->data = $this->model;
+            if (is_object($this->model)) $vals->setData($this->model);
             $res['values'] = $vals;
         }
         $this->_fieldsInfo[$fieldName] = $res;

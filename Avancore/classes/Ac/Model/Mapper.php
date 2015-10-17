@@ -1,6 +1,8 @@
 <?php
 
 class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAwareCollection, Ac_I_Search_FilterProvider, Ac_I_Search_RecordProvider {
+
+    static $collectGarbageAfterCountFind = true;
     
     /**
      * function onAfterCreateRecord ($record)
@@ -263,8 +265,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      */
     protected $info = false;
 
-    protected $titleFieldExpression = false;
-    
     protected $validator = false;
     
     protected $updateMark = false;
@@ -276,8 +276,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     protected $dataProperties = false;
     
     protected $defaults = false;
-    
-    protected $allRecords = false;
     
     protected $fkFieldsData = false;
     
@@ -315,6 +313,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @var int 
      */
     var $defaultPresenceCheckMode = Ac_Model_Mapper::PRESENCE_SMART;
+    
+    protected static $dontCollect = 0;
         
     function __construct(array $options = array()) {
         // TODO: application & db are initialized last, id & tableName - first
@@ -494,17 +494,13 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     function listRecords() {
         if ($this->allRecordsLoaded)
-            $res = array_diff(array_keys($this->allRecords), $this->keysOfNewRecords);
+            $res = array_diff(array_keys($this->recordsCollection), $this->keysOfNewRecords);
         else {
             $res = $this->getStorage()->listRecords();
         }
         return $res;
     }
     
-    function areAllRecordsLoaded() {
-        return $this->allRecordsLoaded;
-    }
-
     /**
      * @param mixed id string or array; returns count of records that exist in the database
      */
@@ -618,6 +614,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         $res = $storage->loadRecordsByCriteria($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
         if ($keysToList === false) $res = array_values($res);
             elseif ($keysToList !== true) $res = $this->indexObjects($res, $keysToList);
+            if ($this->useRecordsCollection && !$where && !$joins && !$limitOffset && !$limitCount)
+                $this->allRecordsLoaded = true;
         return $res;
     }
 
@@ -659,7 +657,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             $objects[$identifier] = $record;
         }
 
-        if ($this->useRecordsCollection) {
+        if ($this->useRecordsCollection && !self::$dontCollect) {
             foreach ($loaded as $identifier => $record) {
                 $this->recordsCollection[$identifier] = $record;
             }
@@ -825,69 +823,35 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return false;
     }
 
-    function isTitleAProperty() {
-        return false;
-    }
-
-    function getDefaultOrdering() {
-        return false;
-    }
-    
-    function getTitles(array $search = array(), array $order = array(), $titleProperty = false, $valueProperty = false)  {
-        
-    }
-    
-    /**
-     * @deprecated
-     * @return array (array($pk1, $title1), array($pk2, $title2), ...)
-     */
-    function getRecordTitles($where = false, $ordering = false, $extraJoins = false, $titleFieldName = false, $titleIsProperty = '?', $valueFieldName = false, $valueIsProperty = false) {
-        if ($titleFieldName === false) {
-            if (!strlen($this->titleFieldExpression)) $titleFieldName = $this->getTitleFieldName();
-            else $titleFieldName = $this->titleFieldExpression;
-        }
-        if ($titleIsProperty === '?') $titleIsProperty = $this->isTitleAProperty();
-        if (!$titleFieldName) {
-            $titleFieldName = $this->getStorage()->getPrimaryKey();
-        }
-        $qpkf = array();
-        if ($valueFieldName === false)
-            $qpkf[] = $this->db->n('t').'.'.$this->db->n($this->getStorage()->getPrimaryKey());
-        else {
-            $vf = $valueFieldName;
-            foreach (Ac_Util::toArray($vf) as $pkf) $qpkf[] = $this->db->n('t').'.'.$this->db->n($pkf);
-        }
-        $spk = count($qpkf) == 1;
-        $qpkf = implode(", ", $qpkf);
-        $res = array();
-        if (!$titleIsProperty && !$valueIsProperty) {
-            $sql = "SELECT DISTINCT t.".$titleFieldName." AS _title_, ".$qpkf." FROM ".$this->db->n($this->tableName)." AS t";
-            if ($extraJoins) $sql .= " ".$extraJoins;
-            if ($where) $sql .= " WHERE ".$where;
-            if ($ordering) $sql .= " ORDER BY ".$ordering;
-            foreach ($this->db->fetchArray($sql) as $row) {
-                $title = $row['_title_'];
-                $pk = Ac_Util::array_values(array_slice($row, 1));
-                if ($spk) $pk = $pk[0];
-                $res[] = array($pk, $title);
+    function getDefaultSort() {
+        $res = false;
+        if (method_exists($this, 'getDefaultOrdering')) {
+            $res = $this->getDefaultOrdering();
+            // lame check if our getDefaultOrdering returned anything 'expression-like'
+            if (strtr($res, array('(' => '', ' ' => ''))) {
+                $res = false;
             }
-        } else {
-            $coll = new Ac_Model_Collection(get_class($this), false, $where, $ordering, $extraJoins);
-            $coll->setSequential();
-            $coll->useCursor();
-            while ($rec = $coll->getNext()) {
-                if ($valueFieldName === false) $pk = $rec->getPrimaryKey();
-                else {
-                    if (is_array($valueFieldName)) {
-                        $pk = array();
-                        if ($valueIsProperty) foreach ($vf as $f) $pk[] = $rec->getField($f);
-                            else foreach ($vf as $f) $pk[] = $rec->$f;
-                    } else {
-                        $pk = $valueIsProperty? $rec->getField($valueFieldName) : $rec->{$valueFieldName};
-                    }
-                }
-                $title = $rec->getField($titleFieldName);
-                $res[] = array($pk, $title);
+        }
+        return $res;
+    }
+    
+    function getTitles(array $query = array(), $sort = false, $titleProperty = false, $valueProperty = false) {
+        if ($titleProperty === false) $titleProperty = $this->getTitleFieldName();
+        $idForTitle = !$titleProperty;
+        $idForValue = !$valueProperty;
+        if ($sort === false) $sort = $this->getDefaultSort();
+        // TODO: check for best case find
+        $res = $this->getStorage()->fetchTitlesIfPossible($titleProperty, $valueProperty, $sort, $query);
+        if (!is_array($res)) {
+            $rem = true; // we need strict find
+            $records = $this->find($query, $idForValue? true : $valueProperty, $sort, false, false, $rem);
+            $res = array();
+            if ($idForTitle) {
+                foreach ($records as $k => $rec) $res[$k] = $this->getIdentifier($rec);
+            } elseif ($titleProperty === $valueProperty) {
+                foreach ($records as $k => $rec) $res[$k] = $k;
+            } else {
+                foreach ($records as $k => $rec) $res[$k] = $rec->getField($titleProperty);
             }
         }
         return $res;
@@ -1424,33 +1388,39 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @return array|Ac_Model_Object
      */
     function getAllRecords($key = false) {
-        if ($this->allRecords === false) {
+        if (!$this->allRecordsLoaded) {
             
-            if (($o = $this->getDefaultOrdering()) !== false) $ord = $o;
-            elseif (strlen($t = $this->getTitleFieldName()) && !$this->isTitleAProperty()) $ord = $t.' ASC';
-                else $ord = '';
-                
-            $this->allRecords = $this->loadRecordsByCriteria('', true, $ord);
+            $isProp = false;
+            if (method_exists($this, 'isTitleAProperty')) {
+                $isProp = $this->isTitleAProperty();
+            }
+            
+            $tmp = $this->useRecordsCollection;    
+            $this->useRecordsCollection = true;
+            $sort = $this->getDefaultSort();
+            if (!$sort && ($t = $this->getTitleFieldName())) {
+                $sort = $t;
+            }
+            $this->find(array(), true, $sort);
+            $this->useRecordsCollection = $tmp;
+            
             $this->allRecordsLoaded = true;
             
         }
         if ($key === false) {
-            $res = $this->allRecords;
+            $res = array_diff_key($this->recordsCollection, $this->keysOfNewRecords);
         } else {
             if (is_array($key)) {
-                $res = array();
-                foreach (array_intersect(array_keys($this->allRecords), $key) as $k) {
-                    $res[$k] = $this->allRecords[$k];
-                }
-            }
-            elseif (isset($this->allRecords[$key])) $res = $this->allRecords[$key];
-                else $res = null;
+                $res = array_intersect_key($this->recordsCollection, array_flip(array_unique($key)));
+            } elseif (isset($this->recordsCollection[$key])) {
+                $res = $this->recordsCollection[$key];
+            } else $res = null;
         }
         return $res;
     }
     
     function hasAllRecords() {
-        return is_array($this->allRecords);
+        return $this->allRecordsLoaded;
     }
     
     protected function doGetSqlSelectPrototype($primaryAlias = 't') {
@@ -1527,8 +1497,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     function reset() {
         $this->recordsCollection = array();
+        $this->allRecordsLoaded = false;
         $this->keysOfNewRecords = array();
-        $this->allRecords = false;
         $this->fkFieldsData = false;
         $this->triggerEvent(self::EVENT_ON_RESET);
     }
@@ -1875,6 +1845,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     protected function handleCollectionConflict($id, $object) {
+        if (self::$dontCollect) return;
         if ($this->collectionConflictMode === Ac_I_ObjectsCollection::CONFLICT_REMOVE_OLD) {
             $this->lastCollectionKey = $id;
             $this->lastCollectionObject = $this->recordsCollection[$id];
@@ -1907,7 +1878,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             if (null !== $otherId = $this->findRegisteredObject($object)) {
                 $actualizeResult = $this->actualizeRegisteredObject($object);
                 $reg = false;
-            } else {
+            } elseif (!self::$dontCollect) {
                 $this->recordsCollection[$id] = $object;
                 if (!strncmp($id, self::INSTANCE_ID_PREFIX, self::INSTANCE_ID_PREFIX_LENGTH))
                     $this->keysOfNewRecords[$id] = true;
@@ -1928,6 +1899,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             if (isset($this->keysOfNewRecords[$id]))
                 unset($this->keysOfNewRecords[$id]);
             if (is_object($object) && $object instanceof Ac_I_CollectionAwareObject) {
+                
+                // since we don't have a registered persistent object in our collection, we have to un-mark that all records are loaded
+                if ($this->allRecordsLoaded && $object instanceof Ac_Model_Object && $object->isPersistent())
+                    $this->allRecordsLoaded = false;
+                
                 $object->notifyUnregisteredFromCollection($this);
             }
         } else {
@@ -2116,7 +2092,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         
         $crit = array_keys($query);
         $fieldCrit = array_intersect($crit, $this->listDataProperties());
-        if (!$sort) $sort = $this->getDefaultOrdering();
+        if (!$sort) $sort = $this->getDefaultSort();
         $found = false;
         $needsIndexResult = false;
         
@@ -2130,7 +2106,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             $found = true;
         }
         
-        // SPECIAL CASE - ALL records are loaded and all records were requested
+        // SPECIAL CASE - ALL records are loaded and all records were requested; sort not requested
         
         if (!$query && !$sort && $this->allRecordsLoaded) {
             $found = true;
@@ -2158,6 +2134,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             $res = null;
             
             if (strlen($pField) && count($fieldCrit) === 1 && $fieldCrit[0] == $pField) $idField = $pField;
+            elseif (strlen($pField) && count($fieldCrit) === 1 && $fieldCrit[0] == Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION) $idField = Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION;
             
             if (strlen($idField) && count($fieldCrit) === 1 && $fieldCrit[0] == $idField) {
                 
@@ -2271,15 +2248,39 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return $res;
     }
     
+    /**
+     * Returns first matching record 
+     * 
+     * @param array $query
+     * @param mixed $sort
+     * @return Ac_Model_Object
+     */
+    function findFirst (array $query = array(), $sort = false) {
+        $res = $this->find($query, true, $sort, 1);
+        if ($res) $res = array_shift ($res);
+        return $res;
+    }
+    
+    /**
+     * Returns the matching record only when resultset contains one record
+     * @param array $query
+     * @return Ac_Model_Object
+     */
+    function findOne (array $query = array()) {
+        $res = $this->find($query, true, false, 2);
+        if (count($res) === 1) $res = array_shift ($res);
+            else $res = null;
+        return $res;
+    }
  
-   /**
+    /**
      * @param array $query
      * @param mixed $keysToList
      * @param mixed $sort
      * @param int $limit
      * @param int $offset
      * @param bool $forceStorage
-     * @return array
+     * @return Ac_Model_Object[]
      */
     function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
 
@@ -2287,15 +2288,18 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         
         if (is_null($res = $this->bestCaseFind($query, $keysToList, $sort, $limit, $offset))) {
             
-            $res = $this->getStorage()->find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
+            $remainingQuery = array();
+            
+            $res = $this->getStorage()->find($query, true, $sort, $limit, $offset, $remainingQuery, $sorted);
             
             if ($remainingQuery || (!$sorted && $sort))  {
                 if ($sorted || !$sort) $remainingSort = false;
                     else $remainingSort = $sort;
                     
-                $res = $this->filter($res, $remainingQuery, $remainingSort, $limit, $offset, $remainingQuery, $finallySorted);
+                $res = $this->filter($res, $remainingQuery, $remainingSort, $limit, $offset, $remainingQuery, $finallySorted, true);
                 if ($remainingSort) $sorted = $finallySorted;
             }
+            
             if ($strict) {
                 if ($remainingQuery) 
                     throw new Ac_E_InvalidUsage("Criterion ".implode(" / ", array_keys($remainingQuery))." is unknown to the mapper ".$this->getId());
@@ -2309,6 +2313,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         } else {
             $remainingQuery = array();
             $sorted = true;
+        }
+        
+        if ($this->useRecordsCollection && !$query && !$limit && !$offset) { 
+            // all records were asked and now collection is populated - mark that all records are loaded
+            $this->allRecordsLoaded = true;
         }
         
         return $res;
@@ -2340,6 +2349,35 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return call_user_func_array(array($this, 'find'), $args);
     }
     
+    function count (array $query = array()) {
+
+        if (!is_null($records = $this->bestCaseFind($query))) {
+            $res = count($records);
+        } else {
+            
+            $res = $this->getStorage()->countIfPossible($query);
+            
+            if ($res === false) {
+                if (self::$collectGarbageAfterCountFind) {
+                    $gc = gc_enabled();
+                    if (!$gc) gc_enable();
+                }
+                
+                self::pauseCollecting();
+                $res = count($this->find($query));
+                self::resumeCollecting();
+                
+                if (self::$collectGarbageAfterCountFind) {
+                    gc_collect_cycles();
+                    if (!$gc) gc_disable();
+                }
+            }
+            
+        }
+        
+        return $res;
+    }
+    
     /**
      * Does partial search.
      * 
@@ -2355,13 +2393,13 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter(array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery, & $sorted) {
+    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         $strict = func_num_args() <= 5 || $remainingQuery === true;
 
         if ($strict) $remainingQuery = true;
         if (!$this->search) $this->getSearch();
 
-        $res = $this->search->filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted);
+        $res = $this->search->filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
         
         return $res;
     }
@@ -2394,6 +2432,10 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     final function getSearchPrototype($full = false) {
         $res = $this->searchPrototype;
+        if (!isset($res['defaultFieldList'])) 
+            $res['defaultFieldList'] = $this->getPrototype()->listFields();
+        if (!isset($res['mapper']))
+            $res['mapper'] = $this;
         $this->doOnGetSearchPrototype($res);
         if ($full) $this->triggerEvent(self::EVENT_ON_GET_SEARCH_PROTOTYPE, array(& $res));
         return $res;
@@ -2415,6 +2457,17 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     function setSearch(Ac_Model_Search $search = null) {
         if ($search === null) $this->search = false;
             else $this->search = $search;
+        if ($this->search) {
+            $this->search->setMapper($this);
+        }
+    }
+    
+    protected static function pauseCollecting() {
+        self::$dontCollect++;
+    }
+    
+    protected static function resumeCollcting() {
+        if (self::$dontCollect) self::$dontCollect--;
     }
     
 }

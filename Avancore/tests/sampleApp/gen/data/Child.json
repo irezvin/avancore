@@ -28,6 +28,7 @@
     "dontPrefixClassesWithAppName": false,
     "strategySettings": [],
     "defaultTitlePropName": "title",
+    "autoDetectTitles": true,
     "defaultPublishedPropName": "published",
     "defaultOrderingPropName": "ordering",
     "modelDefaults": {
@@ -1687,7 +1688,7 @@
                 "religionId",
                 "portraitId"
             ],
-            "titleProp": false,
+            "titleProp": "name",
             "publishedProp": false,
             "orderingProp": false,
             "orderGroupProp": false,
@@ -2540,7 +2541,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Religion_Mapper"
                     },
                     "dummyCaption": {
@@ -2575,7 +2576,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Person_Photo_Mapper"
                     },
                     "dummyCaption": {
@@ -2782,7 +2783,7 @@
             "nullableSqlColumns": [
                 "name"
             ],
-            "titleProp": false,
+            "titleProp": "name",
             "publishedProp": false,
             "orderingProp": false,
             "orderGroupProp": false,
@@ -2959,7 +2960,7 @@
             "tableLangStringPrefix": false,
             "createAccessors": false,
             "nullableSqlColumns": [],
-            "titleProp": false,
+            "titleProp": "albumName",
             "publishedProp": false,
             "orderingProp": false,
             "orderGroupProp": false,
@@ -3119,7 +3120,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Person_Mapper"
                     },
                     "dummyCaption": false,
@@ -3223,7 +3224,7 @@
             "tableLangStringPrefix": false,
             "createAccessors": false,
             "nullableSqlColumns": [],
-            "titleProp": false,
+            "titleProp": "filename",
             "publishedProp": false,
             "orderingProp": false,
             "orderGroupProp": false,
@@ -3485,7 +3486,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Person_Mapper"
                     },
                     "dummyCaption": false,
@@ -3847,7 +3848,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Person_Photo_Mapper"
                     },
                     "dummyCaption": {
@@ -3940,7 +3941,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Publish_ImplMapper"
                     },
                     "dummyCaption": {
@@ -4113,7 +4114,7 @@
                 "editorId",
                 "pubChannelId"
             ],
-            "titleProp": false,
+            "titleProp": "pubChannelId",
             "publishedProp": "published",
             "orderingProp": false,
             "orderGroupProp": false,
@@ -4574,7 +4575,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Person_Mapper"
                     },
                     "dummyCaption": {
@@ -4609,7 +4610,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Person_Mapper"
                     },
                     "dummyCaption": {
@@ -5251,7 +5252,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Person_Mapper"
                     },
                     "dummyCaption": false,
@@ -5283,7 +5284,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Person_Mapper"
                     },
                     "dummyCaption": false,
@@ -5315,7 +5316,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Relation_Type_Mapper"
                     },
                     "dummyCaption": false,
@@ -6081,7 +6082,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Publish_ImplMapper"
                     },
                     "dummyCaption": {
@@ -6213,7 +6214,7 @@
             "nullableSqlColumns": [
                 "responsiblePersonId"
             ],
-            "titleProp": false,
+            "titleProp": "ean",
             "publishedProp": false,
             "orderingProp": false,
             "orderGroupProp": false,
@@ -6333,7 +6334,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Shop_Product_Mapper"
                     },
                     "dummyCaption": false,
@@ -6452,7 +6453,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Person_Mapper"
                     },
                     "dummyCaption": {
@@ -6701,7 +6702,7 @@
                     "maxLength": "11",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Shop_Product_Mapper"
                     },
                     "dummyCaption": false,
@@ -6762,7 +6763,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Person_Mapper"
                     },
                     "dummyCaption": {
@@ -7210,7 +7211,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Publish_ImplMapper"
                     },
                     "dummyCaption": {
@@ -7290,7 +7291,7 @@
                     "maxLength": "11",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Shop_Product_Mapper"
                     },
                     "dummyCaption": false,
@@ -7351,7 +7352,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Child_Person_Mapper"
                     },
                     "dummyCaption": {

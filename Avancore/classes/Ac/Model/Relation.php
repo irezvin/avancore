@@ -282,7 +282,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
                 $this->srcTableName = $srcMapper->tableName;
             }
             if (!$this->db) $this->db = $this->srcMapper->getApplication()->getDb();
-            if ($this->srcOrdering === false) $this->srcOrdering = $this->srcMapper->getDefaultOrdering();
+            if ($this->srcOrdering === false) $this->srcOrdering = $this->srcMapper->getDefaultSort();
             $this->srcImpl = false;
             $this->destImpl = false;
         }
@@ -303,7 +303,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
                 $this->destTableName = $destMapper->tableName;
             }
             if (!$this->db) $this->db = $this->destMapper->getApplication()->getDb();
-            if ($this->destOrdering === false) $this->destOrdering = $this->destMapper->getDefaultOrdering();
+            if ($this->destOrdering === false) $this->destOrdering = $this->destMapper->getDefaultSort();
             $this->srcImpl = false;
             $this->destImpl = false;
         }

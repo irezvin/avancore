@@ -253,7 +253,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         $prodMap = $this->getSampleApp()->getSampleShopProductMapper();
         $db = $this->getAeDb();
         $this->deleteProducts("p.sku = 'PROD_NOTE'");
-        $db->query("DELETE FROM #__people WHERE name = 'Author of a note'");
+        $db->query("DELETE FROM #__people WHERE name = 'Test author of a note'");
         $prod = $prodMap->createRecord();
         $prod->bind($a = array(
             'sku' => 'PROD_NOTE',
@@ -262,7 +262,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         ));
         $author = $prod->createNotePerson();
         $author->bind($b = array(
-            'name' => 'Author of a note', 
+            'name' => 'Test author of a note', 
             'gender' => 'M',
             'birthDate' => '2014-02-14',
         ));

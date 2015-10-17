@@ -7,6 +7,14 @@ class Sample_Person_Mapper extends Sample_Person_Base_Mapper {
         return $res;
     }
     
+    function getTitleFieldName() {
+        return 'name';
+    }
+    
+    function getDefaultSort() {
+        return 'birthDate';
+    }
+    
     /*
     
 	protected function doGetInfoParams() {
@@ -109,6 +117,10 @@ class Sample_Person_Mapper extends Sample_Person_Base_Mapper {
     protected function doGetSqlSelectPrototype($primaryAlias = 't') {
         $res = Ac_Util::m(parent::doGetSqlSelectPrototype($primaryAlias), array(
             'parts' => array(
+                'notTest' => array(
+                    'class' => 'Ac_Sql_Filter_Custom',
+                    'where' => "lcase(name) not like '%test%'",
+                ),
                 'birthYear' => array(
                     'class' => 'Ac_Sql_Filter_Custom',
                     'where' => "DATE_FORMAT(t.birthDate, '%Y') = {value}",

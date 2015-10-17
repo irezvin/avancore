@@ -301,6 +301,26 @@ class Ac_Cg_Model extends Ac_Cg_Base {
                 }
             }
         }
+        if (!strlen($this->titleProp) && $this->_domain->autoDetectTitles) {
+            $titleCol = false;
+            
+            // search for first char/varchar column with length > 1, 
+            // but prefer unique index char/varchar if found later
+            
+            foreach ($this->tableObject->listColumns() as $i) { $col = $this->tableObject->getColumn($i);
+                if (in_array(strtolower($col->type), array('char', 'varchar')) && $col->width > 1) {
+                    if ($col->isUnique()) {
+                        $titleCol = $col->name;
+                        break;
+                    } elseif ($titleCol === false) {
+                        $titleCol = $col->name;
+                    }
+                }
+            }
+            
+            if (strlen($titleCol)) $this->titleProp = $titleCol;
+            
+        }
     }
     
     function getModelBaseName() {

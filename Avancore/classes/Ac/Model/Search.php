@@ -2,6 +2,11 @@
 
 class Ac_Model_Search extends Ac_Prototyped implements Ac_I_Search_FilterProvider {
     
+    /**
+     * @var Ac_Model_Mapper
+     */
+    protected $mapper = false;
+    
     protected $criteria = array();
     
     protected $sortCriteria = array();
@@ -95,7 +100,7 @@ class Ac_Model_Search extends Ac_Prototyped implements Ac_I_Search_FilterProvide
         return $this->criteria[$id];
     }
     
-    function getApplicableSearchCriteria(array $query, array & $remainingQuery = array(), $ignoreParent = false) {
+    function getApplicableSearchCriteria(array $query, array & $remainingQuery = array(), $ignoreParent = false, $areByIds = false) {
         $res = array();
         $remainingQuery = $query;
         
@@ -118,12 +123,21 @@ class Ac_Model_Search extends Ac_Prototyped implements Ac_I_Search_FilterProvide
             unset($remainingQuery[$k]);
         }
         // extract field matches
+        if (isset($remainingQuery[Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION])) {
+            $res[Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION] = new Ac_Model_Criterion_Identifier(
+                array(
+                    'mapper' => $this->mapper? $this->mapper : null,
+                    'areByIds' => $areByIds,
+                )
+            );
+            unset($remainingQuery[Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION]);
+        }
         if ($this->defaultFieldList && $remainingQuery)  {
             $fields = array_intersect(array_keys($remainingQuery), $this->defaultFieldList);
             foreach ($fields as $field) {
                 $val = $query[$field];
-                if (is_scalar($val) && is_array($val)) {
-                    $res[$field] = new Ac_Model_Criterion_Equals();
+                if (is_scalar($val) || is_array($val)) {
+                    $res[$field] = new Ac_Model_Criterion_FieldEquals();
                     unset($remainingQuery[$field]);
                 }
             }
@@ -134,8 +148,6 @@ class Ac_Model_Search extends Ac_Prototyped implements Ac_I_Search_FilterProvide
                 $res[$k] = $v;
             }
         }
-        
-        //Ac_Debug::dd($query);
         
         return $res;
     }
@@ -176,7 +188,7 @@ class Ac_Model_Search extends Ac_Prototyped implements Ac_I_Search_FilterProvide
                 }
                 $s[$k] = $v;
             }
-            if ($s && !array_diff(array_keys($s, $this->defaultFieldList))) {
+            if ($s && !array_diff(array_keys($s), $this->defaultFieldList)) {
                 if ($bool) $res = true;
                 else $res = new Ac_Model_SortCriterion_Fields(array('fields' => $s));
             }
@@ -207,18 +219,31 @@ class Ac_Model_Search extends Ac_Prototyped implements Ac_I_Search_FilterProvide
         return $this->parentSearch;
     }
     
-    function filter(array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = false, & $sorted = false) {
+    function filter(array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         
         $strict = func_num_args() <= 5 || $remainingQuery === true;
         
         $remainingQuery = $query;
         $res = $records;
         
-        if ($query && ($criteria = $this->getApplicableSearchCriteria($query, $remainingQuery, true))) {
+        if ($query && ($criteria = $this->getApplicableSearchCriteria($query, $remainingQuery, true, $areByIds))) {
             $adHoc = array();
+            $bulk = array();
             foreach ($criteria as $k => $criterion) {
-                $adHoc[$k]  = is_object($criterion) && $criterion instanceof Ac_I_Search_Criterion_Search;
+                $adHoc[$k]  = isset($query[$k]) && is_object($query[$k]) && $query[$k] instanceof Ac_I_Search_Criterion_Search;
+                if ($criterion instanceof Ac_I_Search_Criterion_Bulk) {
+                    $bulk[$k] = $citerion;
+                }
             }
+            
+            // Apply bulk criteria
+            foreach ($bulk as $k => $criteria) {
+                if (($isAdHoc = $adHoc[$k])) $value = null;
+                    else $value = $query[$k];
+                $res = $criteria->filter($res, $k, $value, $isAdHoc);
+                unset($criteria[$k]);
+            }
+            
             foreach ($res as $key => $record) {
                 foreach ($criteria as $k => $criterion) {
                     if (($isAdHoc = $adHoc[$k])) $value = null;
@@ -284,6 +309,17 @@ class Ac_Model_Search extends Ac_Prototyped implements Ac_I_Search_FilterProvide
      */
     function getDefaultFieldList() {
         return $this->defaultFieldList;
+    }
+
+    function setMapper(Ac_Model_Mapper $mapper) {
+        $this->mapper = $mapper;
+    }
+
+    /**
+     * @return Ac_Model_Mapper
+     */
+    function getMapper() {
+        return $this->mapper;
     }    
     
 }

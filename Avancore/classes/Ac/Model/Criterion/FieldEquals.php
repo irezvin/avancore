@@ -16,15 +16,27 @@ class Ac_Model_Criterion_FieldEquals extends Ac_Prototyped implements Ac_I_Searc
      */
     protected $strict = false;
     
+    /**
+     * @var bool Whether use $this->getFieldValue() (change to TRUE in descendant classes if field-retrieval logic complicates)
+     */
+    protected $useGFV = false;
+    
+    protected function getFieldValue($record, $field) {
+        return $record->$field;
+    }
+    
     function test($record, $name, $value, $adHoc) {
         if ($this->valueIsSet) {
             $value = $this->value;
         } else {
             if ($adHoc) throw new Ac_E_InvalidUsage("Please setValue() before using test() when applying ".get_class($this)." \$adHoc");
         }
+        $strict = $this->strict;
         if ($this->field === false) $field = $name;
             else $field = $this->field;
-        $res = $strict? $record->$field === $value : $record->$field == $value;
+        $recordValue = $this->useGFV? $this->getFieldValue($record, $field) : $record->$field;
+        if (is_array($value)) $res = in_array($recordValue, $value, $strict);
+            else $res = $strict? $recordValue === $value : $recordValue == $value;
         return $res;
     }
 

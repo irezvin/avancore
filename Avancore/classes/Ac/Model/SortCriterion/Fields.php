@@ -27,8 +27,8 @@ class Ac_Model_SortCriterion_Fields extends Ac_Prototyped implements Ac_I_Search
     function __invoke($record1, $record2) {
         $res = 0;
         foreach ($this->fields as $field => $sign) {
-            $a = $record1->$field;
-            $b = $record2->$field;
+            $a = $record1->getField($field);
+            $b = $record2->getField($field);
             if ($a != $b) {
                 if ($a < $b) $res = -$sign;
                 else $res = $sign;

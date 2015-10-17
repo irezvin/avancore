@@ -414,7 +414,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
                     //'caption' => $this->_other->pluralCaption,
                     'controlType' => 'selectList',
                     'values' => array(
-                        'class' => 'Ac_Model_Values_Records',
+                        'class' => 'Ac_Model_Values_Mapper',
                         'mapperClass' => $this->_other->getMapperClass(),
                     ),
                     'showInTable' => false,

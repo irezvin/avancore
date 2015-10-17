@@ -202,12 +202,24 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
         return $this->dateFormats[$dataTypes];
     }
     
-    abstract function find(array $query = array(), $keysToList = false, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false);
+    /**
+     * Should return array with record titles (value => title) if it is possible to fetch them more efficiently than
+     * by loading all matching records.
+     */
+    function fetchTitlesIfPossible($titleProperty, $valueProperty, $sort, array $query = array()) {
+        return false; // not possible
+    }
+    
+    function countIfPossible(array $query = array()) {
+        return false; // to abstract to be possible
+    }
     
     function __toString() {
         $res = get_class($this);
-        if ($this->mapper) $res .= " of ".$this->mapper->getId ();
+        if ($this->mapper) $res .= " of ".$this->mapper->getId();
         return $res;
     }
+    
+    abstract function find(array $query = array(), $keysToList = false, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false);
     
 }

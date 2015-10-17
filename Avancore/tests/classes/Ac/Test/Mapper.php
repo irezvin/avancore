@@ -333,7 +333,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         $d->forget();
         
         $m->getAllRecords();
-        $this->assertTrue($m->areAllRecordsLoaded());
+        $this->assertTrue($m->hasAllRecords());
         
         if (!$this->assertArraysMatch(
             ($foo = $m->checkRecordPresence($a, true, array(false), $idxData, true, Ac_Model_Mapper::PRESENCE_SMART_FULL)),
@@ -551,6 +551,112 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         {
             var_dump(compact(/*'options', */'proper', 'actual'));
         }
+        
+        $allPeople = $p->getAllRecords();
+        $res = $p->filter($allPeople, $query = array('birthDate' => array('1982-04-11', '1981-12-23')));
+        if (
+            !$this->assertArraysMatch($proper = array(
+                4 => array(
+                    'birthDate' => '1981-12-23',
+                ),
+                3 => array(
+                    'birthDate' => '1982-04-11',
+                ),
+            ), $actual = Ac_Debug::dr($res), 'filter() can search in-memory by field values with array-value criterion') 
+            ||
+            !$this->assertTrue(count($res) == count($proper), 'same ## of results')) 
+        {
+            var_dump(compact(/*'options', */'proper', 'actual'));
+        }
+        
     }
+    
+    function testGetTitles() {
+        $m = $this->getSampleApp()->getSamplePersonMapper();
+        $res = $m->getTitles(array(Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION => array(7, 6, 4, 3)));
+        $proper = array (
+            7 => 'Оля',
+            6 => 'Ян',
+            4 => 'Таня',
+            3 => 'Илья',
+        );
+        if (!$this->assertEqual($res, $proper)) var_dump($res, $proper);
+        $res = $m->getTitles(array('gender' => 'F', 'notTest' => true));
+        $proper = array (
+            7 => 'Оля',
+            4 => 'Таня',
+        );
+        if (!$this->assertEqual($res, $proper)) var_dump($res, $proper);
+        $res = $m->getTitles(array('notTest' => true), array('birthYear', 'name'), 'birthYear');
+        $proper = array (
+            7 => '1981',
+            4 => '1981',
+            6 => '1981',
+            3 => '1982',
+        );
+        if (!$this->assertEqual($res, $proper)) var_dump($res, $proper);
+    }
+    
+    function testIdentifierCriterion() {
+        $m = $this->getSampleApp()->getSamplePersonMapper();
+        $records = $m->find(array(Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION => array(7, 6, 4, 3)));
+        $c = new Ac_Model_Criterion_Identifier();
+        $c->setMapper($m);
+        
+        $c->setAreByIds(true);
+        $res = $c->filter($records, '', array(7, 6), false);
+        $proper = array(7 => $records[7], 6 => $records[6]);
+        ksort($res);
+        ksort($proper);
+        $this->assertEqual($res, $proper);
+        
+        $c->setAreByIds(false);
+        $res = $c->filter($records, '', array(3, 4), false);
+        $proper = array(3 => $records[3], 4 => $records[4]);
+        ksort($res);
+        ksort($proper);
+        $this->assertEqual($res, $proper);
+        
+        $sql = $m->getStorage()->createSqlSelect(array(), array(Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION => array(7, 6, 4, 3)));
+        $ids = $this->getAeDb()->fetchColumn($sql, 'personId');
+        asort($ids);
+        $this->assertEqual($ids, array(3, 4, 6, 7));
+    }
+    
+    function testCountRecords() {
+        $m = $this->getSampleApp()->getSamplePersonMapper();
+        $m->reset();
+        $m->trackNewRecords = true;
+        $m->useRecordsCollection = true;
+        $this->assertEqual($m->count(array('notTest' => true)), 4);
+        $this->assertEqual($m->count(array('birthYear' => 1981)), 3);
+        $this->assertEqual(count($m->getRegisteredObjects()), 0);
+    }
+    
+    function testAllRecords() {
+        $m = $this->getSampleApp()->getSamplePersonMapper();
+        $m->reset();
+        $m->trackNewRecords = true;
+        $m->useRecordsCollection = true;
+        $keys = $this->getAeDb()->fetchColumn("SELECT personId FROM #__people");
+        sort($keys);
+        $this->assertFalse($m->hasAllRecords(), 'hasAllRecords() is FALSE after reset(), before all records are loaded');
+        
+        $allRec = $m->getAllRecords();
+        ksort($allRec);
+        
+        $this->assertTrue($m->hasAllRecords(), 'hasAllRecords() is TRUE after getAllRecords()');
+        $this->assertEqual($keys, array_keys($allRec), 'getAllRecords() returns array with keys of all records in the table');
+        $first = $allRec[$keys[0]];
+        $first->cleanupMembers();
+        $this->assertFalse($m->hasAllRecords(), 'hasAllRecords() is FALSE after persistent record unregistered');
+        $m->find();
+        $this->assertTrue($m->hasAllRecords(), 'hasAllRecords() is TRUE after unrestricted find()');
+        
+        $allRec = $m->getAllRecords();
+        ksort($allRec);
+        $this->assertEqual($keys, array_keys($allRec), 'getAllRecords() returns array with keys of all records in the table');
+        
+   }
     
 }

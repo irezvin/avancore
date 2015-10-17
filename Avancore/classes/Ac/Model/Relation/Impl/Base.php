@@ -162,7 +162,7 @@ class Ac_Model_Relation_Impl_Base extends Ac_Prototyped {
                 $this->destTableName = $destMapper->tableName;
             }
             if (!$this->db) $this->db = $this->destMapper->getApplication()->getDb();
-            if ($this->destOrdering === false) $this->destOrdering = $this->destMapper->getDefaultOrdering();
+            if ($this->destOrdering === false) $this->destOrdering = $this->destMapper->getDefaultSort();
             $this->destNNIdsRelation = false;
         }
     }
