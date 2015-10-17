@@ -1,0 +1,1 @@
+Avancore is fully object-oriented PHP framework with the goal to provide isolated data and presentation layers that nicely integrate with each other. Also it has a set of foundation classes that allow to create admin pages and build SQL queries with reusable schema.
