@@ -34,6 +34,11 @@ class Ac_Cg_Frontend {
     var $application = false;
     
     /**
+     * @var Ac_Cg_Generator
+     */
+    var $generator = false;
+    
+    /**
      * @var bool
      */
     protected $init = false;
@@ -67,7 +72,15 @@ class Ac_Cg_Frontend {
     }
     
     function getTitle() {
-        $res = "Avancore CodeGen v. 0.0.6 &copy; 2008 &mdash; 2015 Ilya Rezvin";
+        $prefix = array();
+        foreach ($this->generator->listDomains() as $dom) {
+            $domain = $this->generator->getDomain($dom);
+            $prefix[] = strlen($domain->caption)? $domain->caption : $domain->appName;
+        }
+        if ($prefix) $prefix = implode(", ", $prefix)." - ";
+            else $prefix = '';
+        $res = $prefix . "Avancore CodeGen v. 0.0.6 &copy; 2008 &mdash; 2015 Ilya Rezvin";
+        
         return $res;
     }
     
@@ -100,7 +113,7 @@ class Ac_Cg_Frontend {
         $this->check();
         $this->init();
             
-        $gen = new Ac_Cg_Generator($this->configPath);
+        $gen = $this->generator = new Ac_Cg_Generator($this->configPath);
         
         $gen->prepare();
     

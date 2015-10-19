@@ -698,8 +698,8 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
 //		return $res;
 //	}    
 //    
-//    protected function getRelationPrototypes() {
-//        return Ac_Util::m(parent::getRelationPrototypes(), array(
+//    protected function doGetRelationPrototypes() {
+//        return Ac_Util::m(parent::doGetRelationPrototypes(), array(
 //            '' => array(
 //                'srcMapperClass' => <?php $this->str($this->mapperClass); ?>,
 //                'destMapperClass' => '',

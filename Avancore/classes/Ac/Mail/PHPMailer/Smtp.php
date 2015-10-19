@@ -13,6 +13,8 @@ class Ac_Mail_PHPMailer_Smtp extends Ac_Mail_Sender_PHPMailer implements Ac_I_Ma
     protected $smtpSecure = Ac_I_Mail_Sender_Smtp::SMTP_SECURE_NONE;
 
     protected $smtpPassword = '';
+    
+    protected $smtpAuthType = '';
 
     function setSmtpHost($smtpHost) {
         $this->smtpHost = $smtpHost;
@@ -74,6 +76,15 @@ class Ac_Mail_PHPMailer_Smtp extends Ac_Mail_Sender_PHPMailer implements Ac_I_Ma
         $mailer->Port = $this->smtpPort;
         $mailer->Username = $this->smtpUser;
         $mailer->Password = $this->smtpPassword;
+        $mailer->AuthType = $this->smtpAuthType;
     }
+
+    function setSmtpAuthType($smtpAuthType) {
+        $this->smtpAuthType = $smtpAuthType;
+    }
+
+    function getSmtpAuthType() {
+        return $this->smtpAuthType;
+    }    
     
 }

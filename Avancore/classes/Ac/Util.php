@@ -162,8 +162,14 @@ abstract class Ac_Util {
         return implode(" ", $res);
     }
     
+    /**
+     * Important: tagBody and attribs can be swapped (for better, HTML-like readability)
+     */
     static function mkElement($tagName, $tagBody = false, $attribs = array(), $quote='"', $quoteStyle = ENT_QUOTES, $charset = false, $doubleEncode = true) {
         $res = '<'.$tagName;
+        if (is_array($tagBody) && !is_array($attribs)) {
+            list($attribs, $tagBody) = array($tagBody, $attribs);
+        }
         if ($attribs) $res .= self::mkAttribs($attribs, $quote, $quoteStyle, $charset, $doubleEncode = true);
         if ($tagBody !== false) $res .= '>'.$tagBody.'</'.$tagName.'>';
             else $res .= ' />';

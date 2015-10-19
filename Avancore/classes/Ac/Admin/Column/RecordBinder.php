@@ -19,17 +19,13 @@ class Ac_Admin_Column_RecordBinder extends Ac_Admin_Column {
      var $canEdit = true;
 
      function showHeader($rowCount, $rowNo = 1) {
-         $this->_table->trAttribsCallback = array(& $this, 'trAttribsCallback');
          $this->_context = $this->manager->getContext();
      }
      
-     function trAttribsCallback(& $record, & $attribs) {
-         $attribs['id'] = $this->_context->mapIdentifier($this->trIdPrefix.$this->manager->getStrPk($record));
-     }
-     
      function showCell($record, $rowNo) {
-         $this->_recordsJson[] = array('key' => $key = $this->manager->getStrPk($record));
-         $this->_recordKeys[] = $key;
+        $this->_table->currentRowAttribs['id'] = $this->_context->mapIdentifier($this->trIdPrefix.$this->manager->getStrPk($record));
+        $this->_recordsJson[] = array('key' => $key = $this->manager->getStrPk($record));
+        $this->_recordKeys[] = $key;
      }
      
      function showHint() {

@@ -12,5 +12,6 @@ interface Ac_I_Mail_Sender_Smtp {
     function setSmtpAuth($smtpAuth);
     function setSmtpSecure($smtpSecure);
     function setSmtpPassword($smtpPassword);
+    function setSmtpAuthType($smtpAuthType);
 
 }

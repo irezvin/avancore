@@ -18,48 +18,11 @@ class Ac_Table_Sequential extends Ac_Table {
         $this->recordClass = $recordClass;
         if (!isset($this->tableAttribs['class'])) $this->tableAttribs['class'] = 'adminlist';
     }
-    
-    function show() {
-        echo "<table ".Ac_Util::mkAttribs($this->tableAttribs)." >";
-        
-        $headerRowCount = $this->getHeaderRowCount();
-        
-        foreach(range(0, $headerRowCount - 1) as $headerRowNo) {
-            echo "<tr>"; 
-        
-            foreach($this->listColumns() as $colName) {
-                $col = $this->getColumn($colName);
-                if ($headerRowNo < $col->getHeaderRowCount()) 
-                    $col->showHeader($headerRowCount, $headerRowNo);
-            }
-            
-            echo "</tr>";
-        }
-        
-        $row = 0;
-        
-        $cols = array();
-        foreach($this->listColumns() as $colName) {
-            $cols[] = $this->getColumn($colName);
-        }
-        $nCols = count($cols);
-        
+ 
+    function resetState() {
+        parent::resetState();
         $coll = $this->_collection;
         $coll->rewind();
-        
-        while($record = $this->_fetchNextRecord()) {
-            $rMod = $row % 2;
-            $trAttribs = array('class' => 'row'.$rMod);
-            echo "<tr ".Ac_Util::mkAttribs($this->_trAttribs($record, $trAttribs)).">"; 
-            for ($i = 0; $i < $nCols; $i++) {
-                $cols[$i]->showCell($record, $row);
-            }
-            echo "</tr>";
-            
-            $row++;
-        }
-        
-        echo "</table>";
     }
     
     /**

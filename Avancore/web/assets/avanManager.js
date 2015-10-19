@@ -448,7 +448,9 @@ AvanControllers.ListControllerPagination.prototype = {
 }
 
 AvanControllers.ListController.ShowSelected = function (options) {
-        if (options && options.element) this.element = AvanControllers.getElement(options.element);
+        if (options && options.element) {
+            this.element = AvanControllers.getElement(options.element);
+        }
 }
 
 AvanControllers.ListController.ShowSelected.prototype = {

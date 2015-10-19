@@ -49,35 +49,35 @@ class Ac_Sql_Select_Table_Clone extends Ac_Sql_Select_Table {
         return $res;
     }
     
-    function getJoinClausePart() {
+    function getJoinClausePart($alias = false, $isFirst = false) {
         $m = __FUNCTION__;
         if (!$this->configured) $this->configure();
         if ($this->original) {
             $myAlias = $this->alias;
-            $res = $this->original->$m($myAlias);
+            $res = $this->original->$m($myAlias, $isFirst);
         } else {
             $res = parent::$m();
         }
         return $res;
     }
     
-    function getJoinsOn() {
+    function getJoinsOn($alias = false, $forceReturn = false) {
         $m = __FUNCTION__;
         if (!$this->configured) $this->configure();
         if ($this->original) {
             $myAlias = $this->alias;
-            $res = $this->original->$m($myAlias);
+            $res = $this->original->$m($myAlias, $forceReturn);
         } else {
             $res = parent::$m();
         }
         return $res;
     }
     
-    function getDirectRequiredAliases() {
+    function getDirectRequiredAliases($ignorePrimary = true) {
         $m = __FUNCTION__;
         if (!$this->configured) $this->configure();
         if ($this->original) {
-            $res = $this->original->$m();
+            $res = $this->original->$m($ignorePrimary);
             $res = $this->replaceAlias($res);
         }
         else {
@@ -86,11 +86,11 @@ class Ac_Sql_Select_Table_Clone extends Ac_Sql_Select_Table {
         return $res;
     }
     
-    function getAllRequiredAliases() {
+    function getAllRequiredAliases($ignorePrimary = true) {
         $m = __FUNCTION__;
         if (!$this->configured) $this->configure();
         if ($this->original) {
-            $res = $this->original->$m();
+            $res = $this->original->$m($ignorePrimary);
             $res = $this->replaceAlias($res);
         }
         else {

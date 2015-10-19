@@ -103,7 +103,7 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
         $res = $select->getDb()->fetchArray($select, 'value');
         if ($this->item->getDebug()) {
             $t1 = microtime(true) - $t0;
-            $this->item->setDebugData('impl', array('time' => round($t1, 4), 'query' => ''.$select));
+            $this->item->setDebugData('impl', array('time' => round($t1, 4), 'query' => $select->getDb()->replacePrefix(''.$select)));
         }
         return $res;
     }

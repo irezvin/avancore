@@ -235,6 +235,7 @@ class Ac_Table_Column {
      * @param int rowNo number of current row in the table
      */
     function getData($record, $rowNo, $fieldName) {
+        if (is_null($fieldName)) $fieldName = $this->fieldName;
         $res = $this->getRecordProperty($record, $fieldName);
         return $res;
     }
@@ -268,7 +269,9 @@ class Ac_Table_Column {
         if ($this->hidden) return;
         if (!$this->staticAttribs) $this->updateAttribs();
         if (is_null($data = $this->getData($record, $rowNo, $this->fieldName))) $data = $this->nullText;
-        if (!$this->hidden) echo '<td ', $this->_cellAttribs, '>', $data, '</td>';
+        if (!$this->hidden) {
+            echo '<td ', $this->_cellAttribs, '>', $data, '</td>';
+        }
     }
     
     /**

@@ -160,9 +160,6 @@ class Ac_Admin_Template_Pagination extends Ac_Legacy_Template_Html {
             <?php if ($prevSuperPageLinkActive) { $this->_showPageLink(sprintf(AC_ADMIN_PAGINATION_PREV_N_PAGES, $this->pagesPerSuperPage), $prevSuperPageLinkActive, $prevSuperPagePageNo, $this->baseUrl? true: false); echo " &#149; "; }  ?>
             <?php $this->_showPageLink(AC_ADMIN_PAGINATION_PREV_PAGE, $prevPageLinkActive, $this->currPage - 1, $this->baseUrl? true: false); echo " &#149; "; ?>
             <?php for($i = $minPage; $i <= $maxPage; $i++ ) { ?>
-                <!-- 
-                <a href="#" <?php if ($this->currPage == $i) { ?>class='selected' <?php } ?>onclick="document['<?php $this->d($fid) ?>']['<?php echo $this->pageParamName; ?>'].value='<?php $this->d($i); ?>'; document['<?php $this->d($fid) ?>'].submit(); return false;"><?php $this->d($i + 1); ?></a>
-                 -->
 <?php       $this->_showPageLink($i + 1, $this->currPage != $i, $i, $this->baseUrl? true: false, false, $this->currPage == $i); ?>                
             <?php } ?>
             <?php echo " &#149; "; $this->_showPageLink(AC_ADMIN_PAGINATION_NEXT_PAGE, $nextPageLinkActive, $this->currPage + 1, $this->baseUrl? true: false); ?>

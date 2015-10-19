@@ -25,6 +25,17 @@ class Ac_Facet_Set extends Ac_Prototyped {
     
     protected $view = false;
 
+    protected $emptyParamName = false;
+
+    protected $emptyParamValue = null;
+    
+    protected $debugData = array();
+    
+    /**
+     * @var array
+     */
+    protected $defaultValue = false;
+    
     function setParamName($paramName) {
         $this->paramName = $paramName;
     }
@@ -83,10 +94,28 @@ class Ac_Facet_Set extends Ac_Prototyped {
         foreach ($this->items as $item) $item->notifySetValueChanged();
         $items = array_keys($this->items);
         $this->valueOrder = array();
-        foreach ($value as $name => $val) {
-            if (isset($this->items[$name])) {
-                $this->valueOrder[] = $name;
-                $this->items[$name]->setValue($val);
+        $emptyParamUsed = false;
+        if ($this->emptyParamName !== false) {
+            if (isset($value[$this->emptyParamName])) {
+                if (is_null($this->emptyParamValue )) {
+                    $emptyParamUsed = true;
+                } else {
+                    $emptyParamUsed = $value[$this->emptyParamName] == $this->emptyParamValue;
+                }
+            }
+        }
+        if ($emptyParamUsed) $value = array();
+        else {
+            $noItems = !array_intersect_key($value, $this->items);
+            
+            if ($noItems && $this->defaultValue)
+                $value = $this->defaultValue;
+            
+            foreach ($value as $name => $val) {
+                if (isset($this->items[$name])) {
+                    $this->valueOrder[] = $name;
+                    $this->items[$name]->setValue($val);
+                }
             }
         }
     }
@@ -158,8 +187,21 @@ class Ac_Facet_Set extends Ac_Prototyped {
         return $this->debug;
     }    
     
+    function setDebugData($key, $data = null) {
+        if (func_num_args() == 1) {
+            $this->debugData = $key;
+            if (!$this->debugData) $this->debugData = array();
+        }
+        else {
+            if (!is_null($data))
+                $this->debugData[$key] = $data;
+            else 
+                unset ($this->debugData[$key]);
+        }
+    }
+    
     function getDebugData() {
-        $res = array();
+        $res = $this->debugData;
         $items = array();
         foreach ($this->listItems() as $i) {
             $d = $this->getItem($i)->getDebugData();
@@ -168,5 +210,32 @@ class Ac_Facet_Set extends Ac_Prototyped {
         if ($items) $res['items'] = $items;
         return $res;
     }
+
+    function setEmptyParamName($emptyParamName) {
+        $this->emptyParamName = $emptyParamName;
+    }
+
+    function getEmptyParamName() {
+        return $this->emptyParamName;
+    }
+
+    function setEmptyParamValue($emptyParamValue) {
+        $this->emptyParamValue = $emptyParamValue;
+    }
+
+    function getEmptyParamValue() {
+        return $this->emptyParamValue;
+    }    
+
+    function setDefaultValue(array $defaultValue) {
+        $this->defaultValue = $defaultValue;
+    }
+
+    /**
+     * @return array
+     */
+    function getDefaultValue() {
+        return $this->defaultValue;
+    }    
     
 }

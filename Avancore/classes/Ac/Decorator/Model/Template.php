@@ -23,6 +23,8 @@ class Ac_Decorator_Model_Template extends Ac_Decorator implements Ac_I_Decorator
     
     var $defaultDecorator = false;
     
+    var $treatArraysAsObjects = false;
+    
     protected $model = false;
     
     function setModel($model) {
@@ -64,7 +66,7 @@ class Ac_Decorator_Model_Template extends Ac_Decorator implements Ac_I_Decorator
                         }
                     }
                     if ($placeholder === $this->valuePlaceholder) $val = $value;
-                    else $val = Ac_Accessor::getObjectProperty ($model, $propName, $this->dummyValue);
+                    else $val = Ac_Accessor::getObjectProperty ($model, $propName, $this->dummyValue, $this->treatArraysAsObjects);
                     if ($this->defaultDecorator) $decorator = & $this->defaultDecorator;
                     if ($decorator) $val = Ac_Decorator::decorate($decorator, $val, $decorator);
                     $tr[$matches[0][$idx]] = $val;

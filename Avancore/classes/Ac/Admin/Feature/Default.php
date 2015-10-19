@@ -12,6 +12,11 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     var $_columnSettings = false;
     
     var $columnSettings = array();
+
+    /**
+     * @var callback to function (array & $columnConfig, $propName, Ac_Model_Property $property)
+     */
+    var $columnGeneratorCallback = false;
     
     var $formSettings = array();
 
@@ -104,6 +109,9 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
                 if (!$showInTable) $s['disabled'] = true;
                 if (isset($pi->columnPrototype) && is_array($pi->columnPrototype)) {
                     Ac_Util::ms($s, $pi->columnPrototype);
+                }
+                if ($this->columnGeneratorCallback)  {
+                    call_user_func_array($this->columnGeneratorCallback, array(& $s, $f, $pi));
                 }
                 $res[$f] = $s;
             }
@@ -251,6 +259,13 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
         
         foreach ($res as $k => $v) if (!is_array($v) && !$v) 
             unset($res[$v]);
+
+        // Re-order sub-managers beginning from subManagersExtra, in the same order
+        $tmp = $res;
+        $res = array();
+        foreach (array_unique(array_merge(array_keys($this->subManagersExtra), array_keys($tmp))) as $k) {
+            $res[$k] = $tmp[$k];
+        }
         
         return $res;
     }

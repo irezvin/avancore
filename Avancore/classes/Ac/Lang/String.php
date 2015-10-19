@@ -22,7 +22,7 @@ class Ac_Lang_String {
 		$res = Ac_Lang_Resource::getInstance()->getString($this->i, isset($this->d)? $this->d : false);
 		if (isset($this->f) && ($this->f !== false)) {
 		    $a = is_array($this->f)? $this->f : array($this->f);
-		    $res = call_user_func_array('sprintf', array_merge(array($res), $a));
+		    $res = call_user_func_array('sprintf', $args = array_merge(array($res), $a));
 		}
 		
 		if (isset($this->r) && is_array($this->r) && $this->r) $res = strtr($res, $this->r);

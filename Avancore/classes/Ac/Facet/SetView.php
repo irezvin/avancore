@@ -28,10 +28,14 @@ abstract class Ac_Facet_SetView extends Ac_Prototyped {
         $res = array();
         $myValue = Ac_Util::getArrayByPath($source, Ac_Util::pathToArray($this->facetSet->getParamName()), array());
         if (is_array($myValue)) {
-            $keys = array_intersect(array_keys($myValue), $this->facetSet->listItems());
+            $itemNames = $this->facetSet->listItems();
+            $keys = array_intersect(array_keys($myValue), $itemNames);
             foreach ($keys as $key) {
                 $value = $this->facetSet->getItem($key)->filterValue($myValue[$key]);
                 if ($value !== false) $res[$key] = $value;
+            }
+            if (false !== ($n = $this->facetSet->getEmptyParamName())) {
+                if (isset($myValue[$n])) $res[$n] = $myValue[$n];
             }
         }
         return $res;

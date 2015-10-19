@@ -6,8 +6,6 @@
 
 class Ac_Table {
     
-    var $trAttribsCallback = false;
-    
     var $recordClass = false;
     
     /**
@@ -47,6 +45,32 @@ class Ac_Table {
     
     var $_colNames = false;
 
+    /**
+     * Render-time variable - current record
+     */
+    var $currentRecord = null;
+    
+    /**
+     * Render-time variable - current row attribs (may be modified from inside of the cell)
+     */
+    var $currentRowAttribs = array();
+    
+    /**
+     * Render-time variable - ## of processed records. -1 for header row
+     */
+    var $currentRecordNo = -1;
+    
+    /**
+     * Render-time variable - ## of rendered rows at the moment (except the header) -1 for header row
+     */
+    var $currentRowNo = -1;
+    
+    /**
+     * Render-time variable - whether to skip current row (if set from a cell, the rendering will stop and we will continue to next row)
+     * @var type 
+     */
+    var $currentRowSkip = false;
+    
     /**
      * @var Ac_Application
      */
@@ -149,28 +173,46 @@ class Ac_Table {
         $res = $this->_records[$name];
         return $res;
     }
+
+    protected function resetState() {
+        $this->currentRecord = null;
+        $this->currentRecordNo = -1;
+        $this->currentRowNo = -1;
+        $this->currentRowAttribs = array();
+        $this->currentRowSkip = false;
+    }
+    
+    /**
+     * @return Ac_Model_Object
+     */
+    function _fetchNextRecord() {
+        $items = array_slice($this->records, $this->currentRecordNo, 1);
+        if (count($items)) $res = $items[0];
+            else $res = null;
+        return $res;
+    }
     
     /**
      * Renders (echo's) the table
      */
     function show() {
+        
+        $this->resetState();
+        
         echo "<table class='adminlist' ".Ac_Util::mkAttribs($this->tableAttribs)." >";
         
         $headerRowCount = $this->getHeaderRowCount();
         
         foreach(range(0, $headerRowCount - 1) as $headerRowNo) {
-            echo "<tr>";
+            ob_start();
         
             foreach($this->listColumns() as $colName) {
                 $col = $this->getColumn($colName);
                 if ($headerRowNo < $col->getHeaderRowCount()) 
                     $col->showHeader($headerRowCount, $headerRowNo);
             }
-            
-            echo "</tr>";
+            echo Ac_Util::mkElement("tr", ob_get_clean(), $this->currentRowAttribs);
         }
-        
-        $row = 0;
         
         $cols = array();
         foreach($this->listColumns() as $colName) {
@@ -178,20 +220,29 @@ class Ac_Table {
         }
         $nCols = count($cols);
         
-        foreach($this->listRecords() as $recordName) {
-            $rMod = $row % 2;
-            $record = $this->getRecord($recordName);
-            Ac_Decorator::pushModel($record);
-            $trAttribs = array('class' => 'row'.$rMod);
-            echo "<tr ".Ac_Util::mkAttribs($this->_trAttribs($record, $trAttribs)).">"; 
+        $this->currentRecordNo = 0;
+        $this->currentRowNo = 0;
+        
+        while($this->currentRecord = $this->_fetchNextRecord()) {
             
+            $rMod = $this->currentRowNo % 2;
+            Ac_Decorator::pushModel($this->currentRecord);
+            
+            $this->currentRowAttribs = array('class' => 'row'.$rMod);
+            
+            ob_start();
             for ($i = 0; $i < $nCols; $i++) {
-                $cols[$i]->showCell($record, $row);
+                $cols[$i]->showCell($this->currentRecord, $this->currentRecordNo);
+                if ($this->currentRowSkip) break;
             }
-            Ac_Decorator::popModel($record);
-            echo "</tr>";
-            
-            $row++;
+            $cells = ob_get_clean();
+            if (!$this->currentRowSkip) {
+                echo Ac_Util::mkElement("tr", $cells,  $this->currentRowAttribs);
+                $this->currentRowNo++;
+            }
+            Ac_Decorator::popModel();
+            $this->currentRecordNo++;
+            $this->currentRecord = null;
         }
         
         echo "</table>";
@@ -223,12 +274,6 @@ class Ac_Table {
         // TODO
     }
     
-    function _trAttribs(& $record, & $attribs) {
-        if ($this->trAttribsCallback) call_user_func_array($this->trAttribsCallback, array(& $record, & $attribs));
-        return $attribs;
-    }
-    
-
     function setApplication(Ac_Application $application) {
         $this->application = $application;
     }

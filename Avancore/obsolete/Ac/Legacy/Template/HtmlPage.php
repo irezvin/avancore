@@ -96,6 +96,15 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
 <?php       
     }
     
+    function showInsideHead($withMetas = true) {
+?>
+<?php   $this->showCssLibs(); ?>
+<?php   $this->showJsLibs(); ?>
+<?php   if ($withMetas) $this->showMetas(); ?>
+<?php   $this->showHeadTags(); ?>
+<?php
+    }
+    
     function showHead() {
 ?><head>
     <!-- powered by Avancore 0.3 -->
@@ -103,10 +112,7 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
 
     <title><?php echo $this->getTitle(); ?></title>
 <?php } ?>
-<?php   $this->showCssLibs(); ?>
-<?php   $this->showJsLibs(); ?>
-<?php   $this->showMetas(); ?>
-<?php   $this->showHeadTags(); ?>
+    <?php $this->showInsideHead(); ?>
 </head> 
 <?php
     }

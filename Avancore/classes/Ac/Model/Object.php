@@ -1123,7 +1123,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         $this->triggerEvent(self::EVENT_ON_CLEANUP);
         $vars = array_intersect_key(get_class_vars(get_class($this)), get_object_vars($this));
         $m = $this->mapper;
-        $m->forget($this);
+        if ($m) $m->forget($this);
         foreach ($vars as $k => $v) if (isset($this->$k)) {
             if (is_array($this->$k)) {
                 $tmp = $this->$k;

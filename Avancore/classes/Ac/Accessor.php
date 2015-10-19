@@ -162,10 +162,11 @@ class Ac_Accessor implements Ac_I_Accessor {
     }
     
     static function getObjectProperty($item, $propertyName, $defaultValue = null, $treatArraysAsObjects = false) {
-        if (is_array($item) && !$treatArraysAsObjects) {
+        if (is_array($item) && !$treatArraysAsObjects || $treatArraysAsObjects === -1) {
             $res = array();
+            if ($treatArraysAsObjects === -1) $treatArraysAsObjects = true;
             foreach ($item as $k => $v) {
-                $res[$k] = self::getObjectProperty($v, $propertyName, $defaultValue);
+                $res[$k] = self::getObjectProperty($v, $propertyName, $defaultValue, $treatArraysAsObjects);
             }
             return $res;
         } elseif (is_array($propertyName)) {

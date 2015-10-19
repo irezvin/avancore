@@ -471,7 +471,7 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     }
     
     protected function doGetDefaultCachePrototype() {
-        $res = array('cacheDir' => $this->getVarCachePath());
+        $res = array('class' => 'Ac_Cache', 'cacheDir' => $this->getVarCachePath());
         if (($cl = $this->getConfigValue('cacheLifetime')) !== false) {
             $res['lifetime'] = $cl;
         }
