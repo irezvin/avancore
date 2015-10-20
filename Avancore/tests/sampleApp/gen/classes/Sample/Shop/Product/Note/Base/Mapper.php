@@ -12,7 +12,7 @@ class Sample_Shop_Product_Note_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'productId', 1 => 'note', 2 => 'noteAuthorId', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'noteAuthorId', ); 
+    var $nullableColumns = array ( 0 => 'noteAuthorId', ); 
 
     var $defaults = array (
             'productId' => NULL,

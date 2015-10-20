@@ -10,7 +10,6 @@ class Child_Shop_Product_Extra_Code_Base_ImplMapper extends Sample_Shop_Product_
  
  
  
- 
     /**
      * @return Child_Shop_Product_Extra_Code 
      */ 

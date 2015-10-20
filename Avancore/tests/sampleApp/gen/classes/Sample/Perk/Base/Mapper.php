@@ -14,7 +14,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'perkId', 1 => 'name', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'name', ); 
+    var $nullableColumns = array ( 0 => 'name', ); 
 
     var $defaults = array (
             'perkId' => NULL,
@@ -25,10 +25,6 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
     protected $autoincFieldName = 'perkId';
     protected $askRelationsForDefaults = false;
  
- 
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (

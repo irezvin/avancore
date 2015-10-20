@@ -10,7 +10,6 @@ class Child_Person_Album_Base_Mapper extends Sample_Person_Album_Mapper {
  
  
  
- 
     /**
      * @return Child_Person_Album 
      */ 

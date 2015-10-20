@@ -25,7 +25,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     var $uniqueIndexData = false;
     var $createAccessors = false;
     var $accessors = array();
-    var $nullableSqlColumns = array();
+    var $nullableColumns = array();
     var $associationPrototypes = array();
     var $hasUniformPropertiesInfo = false;
     var $modelCoreMixables = array();
@@ -119,8 +119,8 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->mapperVars['columnNames'] = new Ac_Cg_Php_Expression($this->exportArray(array_keys($this->getDefaults($this->model)), 0, false, true, true));
         
         $this->ownProperties = array_diff($this->ownProperties, $this->model->listUsedColumns());
-        if ($this->model->nullableSqlColumns) 
-            $this->mapperVars['nullableSqlColumns'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->nullableSqlColumns, 0, false, true, true));
+        if ($this->model->nullableColumns) 
+            $this->mapperVars['nullableColumns'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->nullableColumns, 0, false, true, true));
         $this->mapperVars['defaults'] = $this->getDefaults($this->model);
         $this->mapperVars['defaults'] = new Ac_Cg_Php_Expression($this->exportArray($this->mapperVars['defaults'], 8, true, false, true));
         
@@ -191,8 +191,8 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
             unset($this->mapperVars['defaults']);
         }
         
-        if ($this->model->nullableSqlColumns == $parentModel->nullableSqlColumns) {
-            unset($this->mapperVars['nullableSqlColumns']);
+        if ($this->model->nullableColumns == $parentModel->nullableColumns) {
+            unset($this->mapperVars['nullableColumns']);
         }
         
         if ($this->calcAi($parentModel) == $this->autoincFieldName) {
@@ -469,11 +469,6 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
         return Ac_Util::m(parent::doGetCoreMixables(), <?php $this->exportArray($this->mapperCoreMixables, 8, true); ?>);
     }
     
-<?php } ?> 
-<?php if (!$this->model->getParentModel()) { ?>
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
 <?php } ?> 
 <?php if ($this->internalDefaults) { ?>
     function doGetInternalDefaults() {

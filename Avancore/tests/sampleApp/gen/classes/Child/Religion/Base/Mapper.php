@@ -10,7 +10,6 @@ class Child_Religion_Base_Mapper extends Sample_Religion_Mapper {
  
  
  
- 
     /**
      * @return Child_Religion 
      */ 

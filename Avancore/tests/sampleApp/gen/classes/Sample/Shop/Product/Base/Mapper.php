@@ -14,7 +14,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'id', 1 => 'sku', 2 => 'title', 3 => 'metaId', 4 => 'pubId', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'metaId', 1 => 'pubId', ); 
+    var $nullableColumns = array ( 0 => 'metaId', 1 => 'pubId', ); 
 
     var $defaults = array (
             'id' => NULL,
@@ -54,10 +54,6 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
         ));
     }
     
- 
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (

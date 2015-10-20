@@ -14,7 +14,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'tagId', 1 => 'title', 2 => 'titleM', 3 => 'titleF', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'titleM', 1 => 'titleF', ); 
+    var $nullableColumns = array ( 0 => 'titleM', 1 => 'titleF', ); 
 
     var $defaults = array (
             'tagId' => NULL,
@@ -27,10 +27,6 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     protected $autoincFieldName = 'tagId';
     protected $askRelationsForDefaults = false;
  
- 
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (

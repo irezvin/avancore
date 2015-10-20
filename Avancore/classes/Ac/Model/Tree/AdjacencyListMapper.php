@@ -49,7 +49,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
                 'defaults' => $this->getStmtCacheDefaults(),
             ));
             if ($this->defaultParentValue === false) {
-                if (in_array($this->nodeParentField, $mixin->listNullableSqlColumns())) {
+                if (in_array($this->nodeParentField, $mixin->listNullableColumns())) {
                     $this->defaultParentValue = null;
                 } else {
                     $this->defaultParentValue = 0;

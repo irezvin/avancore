@@ -14,7 +14,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'personId', 1 => 'name', 2 => 'gender', 3 => 'isSingle', 4 => 'birthDate', 5 => 'lastUpdatedDatetime', 6 => 'createdTs', 7 => 'religionId', 8 => 'portraitId', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'lastUpdatedDatetime', 1 => 'religionId', 2 => 'portraitId', ); 
+    var $nullableColumns = array ( 0 => 'lastUpdatedDatetime', 1 => 'religionId', 2 => 'portraitId', ); 
 
     var $defaults = array (
             'personId' => NULL,
@@ -32,10 +32,6 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     protected $autoincFieldName = 'personId';
     protected $askRelationsForDefaults = false;
  
- 
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (

@@ -9,7 +9,7 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
     /**
      * @var Ac_Application
      */
-    protected $Application = false;
+    protected $application = false;
     
     /**
      * Mapper that owns the Storage
@@ -21,6 +21,31 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
     
     protected $dateFormats = array();
 
+    /**
+     * primary key of the table
+     */
+    protected $primaryKey = false;
+    
+    /**
+     * @var array
+     */
+    protected $columns = false;
+    
+    /**
+     * @var array
+     */
+    protected $uniqueIndices = false;
+
+    /**
+     * @var array
+     */
+    protected $nullableColumns = false;
+    
+    /**
+     * @var array
+     */
+    protected $defaults = false;
+    
     /**
      * Sets Mapper that owns the Storage
      */
@@ -39,15 +64,15 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
         return $this->mapper;
     }
 
-    function setApplication(Ac_Application $Application) {
-        $this->Application = $Application;
+    function setApplication(Ac_Application $application) {
+        $this->application = $application;
     }
 
     /**
      * @return Ac_Application
      */
     function getApplication() {
-        return $this->Application;
+        return $this->application;
     }    
     
     /**
@@ -221,5 +246,87 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
     }
     
     abstract function find(array $query = array(), $keysToList = false, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false);
+    
+    protected function inspect() {
+        if ($this->primaryKey === false) $this->primaryKey = null;
+        if ($this->columns === false) $this->columns = array();
+        if ($this->uniqueIndices === false) $this->uniqueIndices = array();
+        if ($this->nullableColumns === false) $this->nullableColumns = array();
+        if ($this->defaults === false) $this->defaults = array();
+    }
+
+    /**
+     * @param string $primaryKey
+     */
+    function setPrimaryKey($primaryKey) {
+        // TODO: add immutability support to this and other inspection-related methods
+        $this->primaryKey = $primaryKey;
+    }
+
+    /**
+     * @return string
+     */
+    function getPrimaryKey() {
+        if ($this->primaryKey === false) {
+            $this->inspect();
+        }
+        return $this->primaryKey;
+    }
+
+    function setColumns(array $columns) {
+        $this->columns = $columns;
+    }
+
+    /**
+     * @return array
+     */
+    function getColumns() {
+        if ($this->columns === false) {
+            $this->inspect();
+        }
+        return $this->columns;
+    }
+
+    function setUniqueIndices(array $uniqueIndices) {
+        $this->uniqueIndices = $uniqueIndices;
+    }
+
+    /**
+     * @return array
+     */
+    function getUniqueIndices() {
+        if ($this->uniqueIndices === false) {
+            $this->inspect();
+        }
+        return $this->uniqueIndices;
+    }
+
+    function setNullableColumns(array $nullableColumns) {
+        $this->nullableColumns = $nullableColumns;
+    }
+
+    /**
+     * @return array
+     */
+    function getNullableColumns() {
+        if ($this->nullableColumns === false) {
+            $this->inspect();
+        }
+        return $this->nullableColumns;
+    }
+
+    function setDefaults(array $defaults) {
+        $this->defaults = $defaults;
+    }
+
+    /**
+     * @return array
+     */
+    function getDefaults() {
+        if ($this->defaults === false) {
+            $this->inspect();
+        }
+        return $this->defaults;
+    }
     
 }

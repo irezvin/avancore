@@ -190,7 +190,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     var $trackNewRecords = false;
     
-    var $nullableSqlColumns = array();
+    var $nullableColumns = array();
     
     var $useProto = false;
     
@@ -370,9 +370,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
 
     function setDb(Ac_Sql_Db $db) {
         $this->db = $db;
-        if (!strlen($this->pk) && strlen($this->tableName)) {
-            $this->inspect();
-        }
+        if (!$this->pk && strlen($this->tableName)) $this->getStorage ();
     }
 
     /**
@@ -386,28 +384,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return true;
     }
     
-    protected function inspect() {
-        $dbi = $this->db->getInspector();
-        $this->getColumnNames();
-        $idxs = $dbi->getIndicesForTable($this->db->replacePrefix($this->tableName));
-        $this->indexData = array();
-        foreach ($idxs as $name => $idx) {
-            if (isset($idx['primary']) && $idx['primary']) {
-                if (count($idx['columns']) == 1) {
-                    $cVals = array_values($idx['columns']);
-                    $this->pk = $cVals[0];
-                } else {
-                    $this->pk = $idx['columns'];
-                }
-            }
-            if (isset($idx['unique']) && $idx['unique'] || isset($idx['primary']) && $idx['primary']) {
-                if (isset($idx['primary']) && $idx['primary']) $name = 'PRIMARY';
-                $this->indexData[$name] = array_values($idx['columns']);
-            }
-        }
-        if (!(is_array($this->pk) && $this->pk || strlen($this->pk))) trigger_error (__FILE__."::".__FUNCTION__." - pk missing", E_USER_ERROR);
-    }
-
     /**
      * @return Ac_Model_Mapper
      */
@@ -429,22 +405,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             }
         }
         return $res;
-    }
-    
-    function getColumnNames() {
-        if ($this->columnNames === false) {
-            $cols = $this->db->getInspector()->getColumnsForTable($this->db->replacePrefix($this->tableName));
-            $this->defaults = array();
-            foreach ($cols as $name => $col) {
-                $this->defaults[$name] = $col['default'];
-                if ($col['nullable']) $this->nullableSqlColumns[] = $name;
-                if (isset($col['autoInc']) && $col['autoInc'] && ($this->autoincFieldName === false)) {
-                    $this->autoincFieldName = $name;
-                }
-            }
-            $this->columnNames = array_keys($this->defaults);
-        }
-        return $this->columnNames;
     }
     
     final function listDataProperties() {
@@ -1012,16 +972,22 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
 
     /**
      * @return array('sqlCol1', 'sqlCol2'...)
+     * @deprecated
+     * Use getColumnNames() instead
      */
     function listSqlColumns() {
-    	return $this->columnNames;
+    	return $this->getColumnNames();
+    }
+    
+    function getColumnNames() {
+        return $this->columnNames;
     }
     
     /**
      * @return array('sqlCol1', 'sqlCol2'...)
      */
-    function listNullableSqlColumns() {
-    	return $this->nullableSqlColumns;
+    function listNullableColumns() {
+    	return $this->nullableColumns;
     }
     
     // --------------- Function that work with associations and relations ---------------
@@ -1550,7 +1516,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             
             $null = array_flip(array_intersect(
                 array_keys($this->fkFieldsData), 
-                $this->listNullableSqlColumns()
+                $this->listNullableColumns()
             ));
             
             // step2: calculate restricted fields
@@ -1734,8 +1700,20 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 throw Ac_E_InvalidCall::wrongClass('storage',  $storage, 'Ac_Model_Storage');
             if (is_object($this->storage)) $this->storage->setMapper(null);
             $this->storage = $storage;
-            if (is_object($this->storage)) $this->storage->setMapper($this);
+            if (is_object($this->storage)) {
+                $this->storage->setMapper($this);
+                $this->updateInternalsFromStorage();
+            }
         }
+    }
+    
+    protected function updateInternalsFromStorage() {
+        if (!$this->columnNames) $this->columnNames = $this->storage->getColumns();
+        if (!$this->pk) $this->pk = $this->storage->getPrimaryKey();
+        if (!$this->defaults) $this->defaults = $this->storage->getDefaults();
+        if (!$this->nullableColumns) $this->nullableColumns = $this->storage->getNullableColumns();
+        
+        // indexData will be pulled from storage automatically if necessary
     }
     
     protected function createMonoTableStorage() {
@@ -1743,12 +1721,15 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             'class' => 'Ac_Model_Storage_MonoTable',
             'tableName' => $this->tableName,
             'recordClass' => $this->recordClass,
-            'primaryKey' => $this->pk,
-            'autoincFieldName' => $this->autoincFieldName,
             'application' => $this->application,
             'db' => $this->db,
-            'sqlColumns' => $this->listSqlColumns(),
         );
+        if ($this->columnNames) $res['columns'] = $this->columnNames;
+        if ($this->pk) $res['primaryKey'] = $this->pk;
+        if ($this->autoincFieldName) $res['autoincFieldName'] = $this->autoincFieldName;
+        if ($this->defaults) $res['defaults'] = $this->defaults;
+        if ($this->indexData !== false) $res['uniqueIndices'] = $this->indexData;
+        if ($this->nullableColumns !== false) $res['nullableColumns'] = $this->nullableColumns;
         return $res;
     }
     
@@ -2045,7 +2026,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     protected function doGetUniqueIndexData() {
-        return array();
+        return $this->getStorage()->getUniqueIndices();
     }
     
     /**

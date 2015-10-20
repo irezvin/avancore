@@ -14,7 +14,7 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'id', 1 => 'leftCol', 2 => 'rightCol', 3 => 'parentId', 4 => 'ordering', 5 => 'title', 6 => 'tag', 7 => 'ignore', 8 => 'depth', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'parentId', 1 => 'tag', ); 
+    var $nullableColumns = array ( 0 => 'parentId', 1 => 'tag', ); 
 
     var $defaults = array (
             'id' => NULL,
@@ -32,10 +32,6 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;
  
- 
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
  
     /**
      * @return Sample_Tree_Combo 

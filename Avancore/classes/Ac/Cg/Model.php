@@ -94,7 +94,7 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     
     var $createAccessors = false;
     
-    var $nullableSqlColumns = false;
+    var $nullableColumns = false;
     
     protected $relationPrototypes = false;
     
@@ -428,11 +428,11 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         if (!$this->parentClassName) $this->parentClassName = $this->getDefaultParentClassName();
         if (!$this->parentMapperClassName) $this->parentMapperClassName = $this->getDefaultParentMapperClassName();
         
-        if ($this->nullableSqlColumns === false) {
-            $this->nullableSqlColumns = array();
+        if ($this->nullableColumns === false) {
+            $this->nullableColumns = array();
             foreach ($this->listUsedColumns() as $i) {
                 $col = $this->tableObject->getColumn($i);
-                if ($col->nullable) $this->nullableSqlColumns[] = $i;
+                if ($col->nullable) $this->nullableColumns[] = $i;
             }
         }
         

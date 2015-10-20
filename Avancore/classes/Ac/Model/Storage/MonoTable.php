@@ -13,19 +13,9 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     protected $recordClass = false;
 
     /**
-     * primary key of the table
-     */
-    protected $primaryKey = false;
-
-    /**
      * name of auto-increment table field
      */
     protected $autoincFieldName = false;
-    
-    /**
-     * @var array
-     */
-    protected $sqlColumns = false;
     
     protected $identifierField = '_peIdentifier';
 
@@ -257,7 +247,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
             $pk = null;
         }
         
-        $dataToSave = array_intersect_key($hyData, array_flip($this->listSqlColumns()));
+        $dataToSave = array_intersect_key($hyData, array_flip($this->getColumns()));
         
         if ($exists) {
             $query = $this->db->updateWithKeys($this->tableName, $dataToSave, array($this->primaryKey  => $pk));
@@ -311,21 +301,6 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         return $res;
     }
 
-    function setSqlColumns(array $sqlColumns) {
-        $this->sqlColumns = $sqlColumns;
-    }
-
-    /**
-     * @return array
-     */
-    function getSqlColumns() {
-        return $this->sqlColumns;
-    }    
-    
-    function listSqlColumns() {
-        return $this->getSqlColumns();
-    }
-    
     function setMapper(Ac_Model_Mapper $mapper = null) {
         if (($res = parent::setMapper($mapper)) && $this->identifierField) {
             $mapper->setIdentifierField($this->identifierField);
@@ -380,7 +355,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     
     protected function getWhereFromCriteria(array $query, & $unmapped) {
         // TODO: real mapping
-        $cc = array_flip($this->getSqlColumns());
+        $cc = array_flip($this->getColumns());
         $byValues = array();
         if (isset($query[Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION])) {
             $query[$this->primaryKey] = $query[Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION];
@@ -409,7 +384,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         $res = false;
         
         // TODO: map
-        $cc = array_flip($this->getSqlColumns());
+        $cc = array_flip($this->getColumns());
         
         $db = $this->getDb();
         if (is_scalar($sort) && isset($cc[$sort])) {
@@ -606,7 +581,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     }
     
     function fetchTitlesIfPossible($titleProperty, $valueProperty, $sort, array $query = array()) {
-        $cc = $this->getSqlColumns();
+        $cc = $this->getColumns();
         $res = false;
         if ($titleProperty === false) $titleProperty = $this->primaryKey;
         if ($valueProperty === false) $valueProperty = $this->primaryKey;
@@ -656,6 +631,55 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
             $res = false;
         }
         return $res;
+    }
+    
+    protected function inspect() {
+        $dbi = $this->db->getInspector();
+        
+        // Detect column names
+        $cols = $this->db->getInspector()->getColumnsForTable($this->db->replacePrefix($this->tableName));
+        
+        $columns = array();
+        $uniqueIndices = array();
+        $nullableColumns = array();
+        $primaryKey = null;
+        $defaults = array();
+        
+        foreach ($cols as $name => $col) {
+            $defaults[$name] = $col['default'];
+            if ($col['nullable']) $nullableColumns[] = $name;
+            if (isset($col['autoInc']) && $col['autoInc'] && ($this->autoincFieldName === false)) {
+                $this->autoincFieldName = $name;
+            }
+        }
+        
+        $columns = array_keys($defaults);
+        
+        // Detect unique indices inc. primary key
+        $idxs = $dbi->getIndicesForTable($this->db->replacePrefix($this->tableName));
+        if ($this->primaryKey === false || $this->uniqueIndices === false) {
+            foreach ($idxs as $name => $idx) {
+                if (isset($idx['primary']) && $idx['primary']) {
+                    if (count($idx['columns']) == 1) {
+                        $cVals = array_values($idx['columns']);
+                        $primaryKey = $cVals[0];
+                    } else {
+                        // TODO: But composite PK isn't supported yet!
+                        $primaryKey = $idx['columns'];
+                    }
+                }
+                if (isset($idx['unique']) && $idx['unique'] || isset($idx['primary']) && $idx['primary']) {
+                    if (isset($idx['primary']) && $idx['primary']) $name = 'PRIMARY';
+                    $uniqueIndices[$name] = array_values($idx['columns']);
+                }
+            }
+        }
+        
+        if ($this->columns === false) $this->columns = $columns;
+        if ($this->uniqueIndices === false) $this->uniqueIndices = $uniqueIndices;
+        if ($this->nullableColumns === false) $this->nullableColumns = $nullableColumns;
+        if ($this->primaryKey === false) $this->primaryKey = $primaryKey;
+        if ($this->defaults === false) $this->defaults = $defaults;
     }
     
 }

@@ -1692,7 +1692,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "lastUpdatedDatetime",
                 "religionId",
                 "portraitId"
@@ -2789,7 +2789,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "name"
             ],
             "titleProp": "name",
@@ -2968,7 +2968,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [],
+            "nullableColumns": [],
             "titleProp": "albumName",
             "publishedProp": false,
             "orderingProp": false,
@@ -3232,7 +3232,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [],
+            "nullableColumns": [],
             "titleProp": "filename",
             "publishedProp": false,
             "orderingProp": false,
@@ -3624,7 +3624,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "personId",
                 "photoId",
                 "title",
@@ -4120,7 +4120,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "published",
                 "deleted",
                 "publishUp",
@@ -4863,7 +4863,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [],
+            "nullableColumns": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": false,
@@ -5077,7 +5077,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "relationBegin",
                 "relationEnd"
             ],
@@ -5514,7 +5514,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [],
+            "nullableColumns": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": false,
@@ -5687,7 +5687,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "title",
                 "parentId",
                 "metaId",
@@ -6235,7 +6235,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "responsiblePersonId"
             ],
             "titleProp": "ean",
@@ -6603,7 +6603,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "noteAuthorId"
             ],
             "titleProp": false,
@@ -6861,7 +6861,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "metaId",
                 "pubId"
             ],
@@ -7492,7 +7492,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "titleM",
                 "titleF"
             ],
@@ -7798,7 +7798,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "parentId",
                 "tag"
             ],
@@ -8001,7 +8001,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "parentId",
                 "tag"
             ],
@@ -8329,7 +8329,7 @@
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "tag"
             ],
             "titleProp": "title",

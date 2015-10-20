@@ -14,7 +14,7 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'id', 1 => 'title', 2 => 'tag', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'tag', ); 
+    var $nullableColumns = array ( 0 => 'tag', ); 
 
     var $defaults = array (
             'id' => NULL,
@@ -26,10 +26,6 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;
  
- 
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
  
     /**
      * @return Sample_Tree_Record 

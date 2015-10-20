@@ -16,6 +16,14 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         $sam->addMapper(Ac_Prototyped::factory(array('id' => 'people', 'tableName' => '#__people'), 'Ac_Model_Mapper'));
         $m = $sam->getMapper('people');
         $this->assertEqual($m->pk, 'personId', 'Auto-detection of primary key by Ac_Model_Mapper');
+        $found = false;
+        $peopl = $sam->getSamplePersonMapper();
+        
+        $peopl->getStorage();
+        if (!$this->assertTrue($peopl->identifiesRecordBy('name'), 'pre-set unique indices should be preserved after getStorage()')) {
+            var_dump($peopl->getIndexData());
+        }
+        
         $this->assertTrue(!array_diff($m->getColumnNames(), $this->peopleCols), 'Ac_Model_Mapper::getColumnNames()');
         $this->assertSame($m, Ac_Model_Mapper::getMapper('people'));
         $m->useRecordsCollection = true;
@@ -61,7 +69,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         $this->resetAi('#__people');
         
         $guy = $sam->createSamplePerson();
-        $guy->name = 'Guy';
+        $guy->name = 'test Guy';
         $guy->birthDate = '0000-00-00';
         
         $this->assertTrue($guy->store(), 'Record is successfully stored');
@@ -70,7 +78,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         $name = $db->args($guy->personId)->fetchValue('SELECT name FROM #__people WHERE personId = ?');
         $this->assertTrue($name == $guy->name, 'Record data is in the database');
         
-        $guy->name = 'Guy with changed name';
+        $guy->name = 'test Guy with changed name';
         $this->assertTrue($guy->store(), 'Record is successfully changed');
         $name2 = $db->args($guy->personId)->fetchValue('SELECT name FROM #__people WHERE personId = ?');
         $this->assertTrue($name2 == $guy->name, 'Changed record data is in the database');

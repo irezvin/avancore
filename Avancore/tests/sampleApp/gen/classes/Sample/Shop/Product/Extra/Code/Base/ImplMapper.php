@@ -14,7 +14,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'productId', 1 => 'ean', 2 => 'asin', 3 => 'gtin', 4 => 'responsiblePersonId', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'responsiblePersonId', ); 
+    var $nullableColumns = array ( 0 => 'responsiblePersonId', ); 
 
     var $defaults = array (
             'productId' => NULL,
@@ -26,10 +26,6 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
  
     protected $askRelationsForDefaults = false;
  
- 
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (

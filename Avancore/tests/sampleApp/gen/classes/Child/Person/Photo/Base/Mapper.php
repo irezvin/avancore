@@ -10,7 +10,6 @@ class Child_Person_Photo_Base_Mapper extends Sample_Person_Photo_Mapper {
  
  
  
- 
     /**
      * @return Child_Person_Photo 
      */ 

@@ -14,7 +14,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'relationId', 1 => 'personId', 2 => 'otherPersonId', 3 => 'relationTypeId', 4 => 'relationBegin', 5 => 'relationEnd', 6 => 'notes', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'relationBegin', 1 => 'relationEnd', ); 
+    var $nullableColumns = array ( 0 => 'relationBegin', 1 => 'relationEnd', ); 
 
     var $defaults = array (
             'relationId' => NULL,
@@ -30,10 +30,6 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     protected $autoincFieldName = 'relationId';
     protected $askRelationsForDefaults = false;
  
- 
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (

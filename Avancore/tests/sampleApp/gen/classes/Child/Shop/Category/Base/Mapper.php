@@ -18,7 +18,6 @@ class Child_Shop_Category_Base_Mapper extends Sample_Shop_Category_Mapper {
     }
     
  
- 
     /**
      * @return Child_Shop_Category 
      */ 

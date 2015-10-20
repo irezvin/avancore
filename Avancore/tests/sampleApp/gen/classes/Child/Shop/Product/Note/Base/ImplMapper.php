@@ -10,7 +10,6 @@ class Child_Shop_Product_Note_Base_ImplMapper extends Sample_Shop_Product_Note_I
  
  
  
- 
     /**
      * @return Child_Shop_Product_Note 
      */ 

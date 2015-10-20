@@ -14,7 +14,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'id', 1 => 'personId', 2 => 'photoId', 3 => 'title', 4 => 'content', 5 => 'pubId', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'personId', 1 => 'photoId', 2 => 'title', 3 => 'content', 4 => 'pubId', ); 
+    var $nullableColumns = array ( 0 => 'personId', 1 => 'photoId', 2 => 'title', 3 => 'content', 4 => 'pubId', ); 
 
     var $defaults = array (
             'id' => NULL,
@@ -29,10 +29,6 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;
  
- 
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (

@@ -10,7 +10,6 @@ class Child_Tag_Base_Mapper extends Sample_Tag_Mapper {
  
  
  
- 
     /**
      * @return Child_Tag 
      */ 

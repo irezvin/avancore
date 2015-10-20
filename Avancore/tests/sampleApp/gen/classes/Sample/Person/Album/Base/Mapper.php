@@ -25,10 +25,6 @@ class Sample_Person_Album_Base_Mapper extends Ac_Model_Mapper {
     protected $askRelationsForDefaults = false;
  
  
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
- 
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_person' => false,

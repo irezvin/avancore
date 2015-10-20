@@ -10,7 +10,6 @@ class Child_Publish_Base_ImplMapper extends Sample_Publish_ImplMapper {
  
  
  
- 
     /**
      * @return Child_Publish 
      */ 

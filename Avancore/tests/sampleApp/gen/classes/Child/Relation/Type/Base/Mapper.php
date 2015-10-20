@@ -10,7 +10,6 @@ class Child_Relation_Type_Base_Mapper extends Sample_Relation_Type_Mapper {
  
  
  
- 
     /**
      * @return Child_Relation_Type 
      */ 

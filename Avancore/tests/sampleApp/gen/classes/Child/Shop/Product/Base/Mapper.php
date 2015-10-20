@@ -24,7 +24,6 @@ class Child_Shop_Product_Base_Mapper extends Sample_Shop_Product_Mapper {
     }
     
  
- 
     /**
      * @return Child_Shop_Product 
      */ 

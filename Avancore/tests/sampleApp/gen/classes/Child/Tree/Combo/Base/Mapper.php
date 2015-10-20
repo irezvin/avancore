@@ -10,7 +10,6 @@ class Child_Tree_Combo_Base_Mapper extends Sample_Tree_Combo_Mapper {
  
  
  
- 
     /**
      * @return Child_Tree_Combo 
      */ 

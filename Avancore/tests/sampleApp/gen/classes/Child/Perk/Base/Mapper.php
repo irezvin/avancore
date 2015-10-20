@@ -10,7 +10,6 @@ class Child_Perk_Base_Mapper extends Sample_Perk_Mapper {
  
  
  
- 
     /**
      * @return Child_Perk 
      */ 

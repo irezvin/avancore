@@ -10,7 +10,6 @@ class Child_Tree_Adjacent_Base_Mapper extends Sample_Tree_Adjacent_Mapper {
  
  
  
- 
     /**
      * @return Child_Tree_Adjacent 
      */ 

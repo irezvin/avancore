@@ -10,7 +10,6 @@ class Child_Relation_Base_Mapper extends Sample_Relation_Mapper {
  
  
  
- 
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (
             '_incomingPerson' => false,

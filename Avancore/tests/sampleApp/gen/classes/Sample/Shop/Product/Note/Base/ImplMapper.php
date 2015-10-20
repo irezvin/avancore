@@ -14,7 +14,7 @@ class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'productId', 1 => 'note', 2 => 'noteAuthorId', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'noteAuthorId', ); 
+    var $nullableColumns = array ( 0 => 'noteAuthorId', ); 
 
     var $defaults = array (
             'productId' => NULL,
@@ -24,10 +24,6 @@ class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
  
     protected $askRelationsForDefaults = false;
  
- 
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (

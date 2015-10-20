@@ -10,7 +10,6 @@ class Child_Person_Base_Mapper extends Sample_Person_Mapper {
  
  
  
- 
     /**
      * @return Child_Person 
      */ 

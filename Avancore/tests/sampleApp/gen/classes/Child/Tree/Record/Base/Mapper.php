@@ -10,7 +10,6 @@ class Child_Tree_Record_Base_Mapper extends Sample_Tree_Record_Mapper {
  
  
  
- 
     /**
      * @return Child_Tree_Record 
      */ 
