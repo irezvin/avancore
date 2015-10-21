@@ -26,7 +26,7 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'shopCategories' => array (
                 'className' => 'Child_Shop_Category',
@@ -43,7 +43,7 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
                     'mapperClass' => 'Child_Publish_ImplMapper',
                 ),
             ),
-            'noteNotePerson' => array (
+            'notePerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
             ),
@@ -92,8 +92,8 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
     /**
      * @return Child_Shop_Category  
      */
-    function createShopCategory($values = array(), $isReference = false) {
-        return parent::createShopCategory($values, $isReference);
+    function createShopCategory($values = array()) {
+        return parent::createShopCategory($values);
     }
 
     
@@ -119,8 +119,8 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
     /**
      * @return Child_Person  
      */
-    function createNotePerson($values = array(), $isReference = false) {
-        return parent::createNotePerson($values, $isReference);
+    function createNotePerson($values = array()) {
+        return parent::createNotePerson($values);
     }
 
     

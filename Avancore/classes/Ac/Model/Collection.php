@@ -157,8 +157,7 @@ class Ac_Model_Collection {
         $this->useMapper($mapperClass);
         if (!$pkName) {
             $mapper = Ac_Model_Mapper::getMapper($mapperClass);
-            $pkName = $mapper->listPkFields();
-            if (is_array($pkName) && count($pkName) == 1) $pkName = $pkName[0];
+            $pkName = $mapper->getStorage()->getPrimaryKey();
         }
         if (!$this->_db) {
             throw new Exception("Database not provided, call setDatabase() first");
@@ -216,7 +215,7 @@ class Ac_Model_Collection {
         $this->_tableName = $this->_mapper->tableName;
         $this->_recordClass = false;
         $this->_rcFun = false;
-        $this->_pkName = $this->_mapper->listPkFields();
+        $this->_pkName = $this->_mapper->getStorage()->getPrimaryKey();
         $this->_db = $this->_mapper->getDb();
     }
     
@@ -412,9 +411,8 @@ class Ac_Model_Collection {
                         E_USER_NOTICE);
                 }
                 if (($distinct) && $this->_pkName) {
-                    $what = array();
-                    foreach ($this->_pkName as $n) $what[] = $this->_db->n($this->_alias).'.'.$this->_db->n($n);
-                    $countStmt = "SELECT COUNT(DISTINCT ".implode(", ", $what).") ".$tail;
+                    $what = $this->_db->n($this->_alias).'.'.$this->_db->n($this->_pkName);
+                    $countStmt = "SELECT COUNT(DISTINCT {$what}) ".$tail;
                 }
             } 
             $this->_count = $this->_db->fetchValue($countStmt);
@@ -464,11 +462,7 @@ class Ac_Model_Collection {
     function _loadAllRecords() {
         $this->_canSetLimits = false;
         $stmt = $this->_getStatementTail(true, true, true, true);
-        if (count($this->_pkName) == 1) $pk = $this->_pkName[0];
-        else {
-            $pk = $this->_pkName;
-            $pk[] = true;
-        }
+        $pk = $this->_pkName;
         $rows = $this->_db->fetchArray($stmt, $this->_matchKeys? $pk : false);
         if ($this->_mapper) $this->_records = $this->_mapper->loadFromRows($rows);
         else $this->_records = $rows;

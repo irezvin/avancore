@@ -56,7 +56,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'shopProducts' => array (
                 'className' => 'Sample_Shop_Product',
@@ -72,7 +72,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'arrayValue' => true,
                 'controlType' => 'selectList',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ),
                 'showInTable' => false,
@@ -154,7 +154,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Publish_ImplMapper',
                 ),
                 'isNullable' => true,
@@ -168,8 +168,6 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
 
     function countShopProducts() {
         if (is_array($this->_shopProducts)) return count($this->_shopProducts);
@@ -230,11 +228,10 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Shop_Product  
      */
-    function createShopProduct($values = array(), $isReference = false) {
+    function createShopProduct($values = array()) {
         $m = $this->getMapper('Sample_Shop_Product_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addShopProduct($res);
         return $res;
     }

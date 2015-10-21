@@ -324,11 +324,6 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
      */
     function bind($src, $ignore = false) {
         if (!is_array($src)) trigger_error ('$src must be an array', E_USER_ERROR);
-        if (!is_array($ignore) && strlen($ignore)) $ignore = explode(' ', $ignore);
-        if ($ignore)
-            foreach ($ignore as $ignorePath) if (strlen($ignorePath)) {
-                Ac_Util::unsetArrayByPath($src, Ac_Util::pathToArray($ignorePath));
-            }
         
         if ($ctob = $this->hasToConvertTypesOnBind()) $v = $this->_createValidator();
             else $v = false;
@@ -381,14 +376,14 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         
         $this->_checked = false;
         
-        $this->doOnBind($src, $ignore);
+        $this->doOnBind($src);
         
-        $this->triggerEvent(self::EVENT_ON_BIND, array(& $src, $ignore));
+        $this->triggerEvent(self::EVENT_ON_BIND, array(& $src));
         
         return true;
     }
     
-    function doOnBind($src, $ignore = false) {
+    function doOnBind($src) {
     }
     
     /**
@@ -422,6 +417,9 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         $this->_checked = false;
     }
     
+    /**
+     * @deprecated
+     */
     function getError() {
         if ($errors = $this->getErrors()) return Ac_Util::implode_r(";\n", $errors);
         else return false;
@@ -1525,6 +1523,14 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     function doOnWakeup() {
     }
     
+    function clearMetaCacheForMyClass() {
+        self::clearMetaCache($this->getMetaClassId());
+    }
+    
+    static function clearMetaCache($metaClassId) {
+        unset(self::$metaCache[$metaClassId]);
+    }
+    
     function beginUpdate() {
         $this->updateLevel++;
     }
@@ -1575,14 +1581,6 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         } else {
             unset($this->extraData[$key]);
         }
-    }
-    
-    function clearMetaCacheForMyClass() {
-        self::clearMetaCache($this->getMetaClassId());
-    }
-    
-    static function clearMetaCache($metaClassId) {
-        unset(self::$metaCache[$metaClassId]);
     }
     
 }

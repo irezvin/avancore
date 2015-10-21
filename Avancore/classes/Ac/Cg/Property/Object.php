@@ -212,13 +212,6 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         if (!strlen($res))
             $res = $this->getOtherEntityName(!$this->isList() || $forceSingle);
         if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
-        
-        if (strlen($this->otherModelIdInMethodsPrefix) && $this->_model instanceof Ac_Cg_Model_Part) {
-            //ini_set('html_errors', 1);
-            //var_dump('!'.$this->name.' '.$this->_model->name.' '.$this->otherModelIdInMethodsPrefix);
-            $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);        
-        }
-        
         return $res;
     }
     
@@ -325,7 +318,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             }
         }
         
-        if (is_array($this->relationOverrides)) 
+        if (is_array($this->relationOverrides))
             Ac_Util::ms($res, $this->relationOverrides);
          
         return $res;
@@ -367,7 +360,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             if (strlen($this->otherModelIdInMethodsSingle)) 
                 $res = $this->otherModelIdInMethodsSingle.'Ids';
             else $res = $this->getOtherEntityName(true).'Ids';
-            if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
+            if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);        
         } else $res = false;
         return $res;
     }
@@ -421,7 +414,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
                     //'caption' => $this->_other->pluralCaption,
                     'controlType' => 'selectList',
                     'values' => array(
-                        'class' => 'Ac_Model_Values_Records',
+                        'class' => 'Ac_Model_Values_Mapper',
                         'mapperClass' => $this->_other->getMapperClass(),
                     ),
                     'showInTable' => false,
@@ -433,6 +426,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         }
         $relation = $this->modelRelation;
         if ($relation) {
+            //var_dump($relation);
             $prot = $this->_model->getAeModelRelationPrototype($relation);
             if (isset($prot['srcVarName'])) {
                 if ($many) {

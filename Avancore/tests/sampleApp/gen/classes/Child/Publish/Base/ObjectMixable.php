@@ -22,11 +22,11 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
         if ($pi === false) $pi = array (
-            'authorAuthorPerson' => array (
+            'authorPerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
             ),
-            'editorEditorPerson' => array (
+            'editorPerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
             ),
@@ -69,8 +69,8 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Child_Person  
      */
-    function createAuthorPerson($values = array(), $isReference = false) {
-        return parent::createAuthorPerson($values, $isReference);
+    function createAuthorPerson($values = array()) {
+        return parent::createAuthorPerson($values);
     }
 
     
@@ -95,8 +95,8 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Child_Person  
      */
-    function createEditorPerson($values = array(), $isReference = false) {
-        return parent::createEditorPerson($values, $isReference);
+    function createEditorPerson($values = array()) {
+        return parent::createEditorPerson($values);
     }
 
     

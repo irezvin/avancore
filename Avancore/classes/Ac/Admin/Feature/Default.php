@@ -12,6 +12,11 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     var $_columnSettings = false;
     
     var $columnSettings = array();
+
+    /**
+     * @var callback to function (array & $columnConfig, $propName, Ac_Model_Property $property)
+     */
+    var $columnGeneratorCallback = false;
     
     var $formSettings = array();
 
@@ -105,6 +110,9 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
                 if (isset($pi->columnPrototype) && is_array($pi->columnPrototype)) {
                     Ac_Util::ms($s, $pi->columnPrototype);
                 }
+                if ($this->columnGeneratorCallback)  {
+                    call_user_func_array($this->columnGeneratorCallback, array(& $s, $f, $pi));
+                }
                 $res[$f] = $s;
             }
             $this->_columnSettings = $res;
@@ -180,8 +188,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     function applyToFormSettings(& $formSettings) {
         $rec = $this->manager->getRecord();
         $mpr = $this->manager->getMapper();
-        if ($mpr) $aif = $mpr->getAutoincFieldName();
-            else $aif = false;
+        $gen = $mpr->listGeneratedFields();
         $conv = new Ac_Form_Converter();
         $do = $this->displayOrderStart;
         if ($this->addErrorList) {
@@ -198,7 +205,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
                     $conf['displayOrder'] = $do;
                 $do += $this->displayOrderStep;
             }
-            if ($prop->propName === $aif) {
+            if (in_array($prop->propName, $gen)) {
                 $conf['readOnly'] = true;
                 $conf['emptyCaption'] = AC_ID_EMPTY_CAPTION;
             }
@@ -251,6 +258,13 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
         
         foreach ($res as $k => $v) if (!is_array($v) && !$v) 
             unset($res[$v]);
+
+        // Re-order sub-managers beginning from subManagersExtra, in the same order
+        $tmp = $res;
+        $res = array();
+        foreach (array_unique(array_merge(array_keys($this->subManagersExtra), array_keys($tmp))) as $k) {
+            $res[$k] = $tmp[$k];
+        }
         
         return $res;
     }

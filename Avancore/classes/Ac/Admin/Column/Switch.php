@@ -15,7 +15,7 @@ class Ac_Admin_Column_Switch extends Ac_Table_Column {
         
         $jsCall = new Ac_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
             $task,
-            array($this->manager->getStrPk($record))
+            array($this->manager->getIdentifierOf($record))
         ));
         
         $inner = $decoratedData;

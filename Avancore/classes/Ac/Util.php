@@ -162,8 +162,14 @@ abstract class Ac_Util {
         return implode(" ", $res);
     }
     
+    /**
+     * Important: tagBody and attribs can be swapped (for better, HTML-like readability)
+     */
     static function mkElement($tagName, $tagBody = false, $attribs = array(), $quote='"', $quoteStyle = ENT_QUOTES, $charset = false, $doubleEncode = true) {
         $res = '<'.$tagName;
+        if (is_array($tagBody) && !is_array($attribs)) {
+            list($attribs, $tagBody) = array($tagBody, $attribs);
+        }
         if ($attribs) $res .= self::mkAttribs($attribs, $quote, $quoteStyle, $charset, $doubleEncode = true);
         if ($tagBody !== false) $res .= '>'.$tagBody.'</'.$tagName.'>';
             else $res .= ' />';
@@ -256,15 +262,18 @@ abstract class Ac_Util {
         return $handle;
     }
 
-    static function listDirContents($dirPath, $recursive = false, $files = array(), $fileRegex = false, $dirRegex = false) {
+    static function listDirContents($dirPath, $recursive = false, $files = array(), $fileRegex = false, $dirRegex = false, $includeDirs = false) {
         if(!($res = opendir($dirPath))) trigger_error("$dirPath doesn't exist!", E_USER_ERROR);
         while($file = readdir($res)) {
             if($file != "." && $file != "..") {
-                if($recursive && is_dir("$dirPath/$file") && (!$dirRegex || preg_match($dirRegex, "$dirPath/$file"))) 
-                    $files=self::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex);
-                else {
-                    if (!$fileRegex || preg_match($fileRegex, "$dirPath/$file")) {
-                        array_push($files,"$dirPath/$file");
+                if(($dir = is_dir("$dirPath/$file")) && $recursive && (!$dirRegex || preg_match($dirRegex, "$dirPath/$file"))) {
+                    if ($includeDirs) array_push($files, "$dirPath/$file");
+                    $files = self::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex);
+                } else {
+                    if (!$dir || $includeDirs) {
+                        if (!$fileRegex || preg_match($fileRegex, "$dirPath/$file")) {
+                            array_push($files,"$dirPath/$file");
+                        }
                     }
                 } 
             }

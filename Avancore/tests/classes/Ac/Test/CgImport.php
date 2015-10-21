@@ -2,7 +2,7 @@
 
 class Ac_Test_CgImport extends Ac_Test_Base {
     
-    var $write = true;
+    var $write = false;
     
     function getConfigPath() {
         return dirname(__FILE__).'/../../../codegen/codegen.config.php';
@@ -50,7 +50,7 @@ class Ac_Test_CgImport extends Ac_Test_Base {
         $gen1->run();
         
         $out1 = $w1->getOutput();
-        
+            
         $gen2 = new Ac_Cg_Generator(array());
         $gen2->lintify = false;
         $gen2->outputDir = $this->getOut3();

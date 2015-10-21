@@ -34,6 +34,16 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     
     var $objectPropertiesPrefix = false;
     
+    var $mapperMixableExtra = array();
+    
+    /**
+     * Prototype overrides for different models' mapper mixins
+     * @var array ($otherModelNameOrRelationName => array($mapperMixableExtras)
+     */
+    var $perModelMapperMixableExtras = array();
+    
+    var $objectTypeField = false;
+    
     /**
      * @var Ac_Cg_Model
      */
@@ -297,6 +307,17 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
             'class' => $this->getExtraTableClass(),
             'colMap' => $rel['fieldLinks'],
         );
+        $otherModel = $prop->getOtherModel();
+        if (isset($this->perModelMapperMixableExtras[$otherModel->name]) && 
+            is_array($this->perModelMapperMixableExtras[$otherModel->name])) {
+            Ac_Util::ms($res, $this->perModelMapperMixableExtras[$otherModel->name]);
+        }
+        if ($otherModel->name !== ($relName = $prop->getRelation()->name)) {
+            if (isset($this->perModelMapperMixableExtras[$relName]) && 
+                is_array($this->perModelMapperMixableExtras[$relName])) {
+                Ac_Util::ms($res, $this->perModelMapperMixableExtras[$relName]);
+            }
+        }
         return $res;
     }
     
@@ -311,6 +332,11 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
             $res['implMapper'] = $this->getMapperClass();
             unset($res['tableName']);
         }
+        if (strlen($this->objectTypeField)) {
+            $res['objectTypeField'] = $this->objectTypeField;
+        }
+        if ($this->mapperMixableExtra) 
+            Ac_Util::ms($res, $this->mapperMixableExtra);
         return $res;
     }
     

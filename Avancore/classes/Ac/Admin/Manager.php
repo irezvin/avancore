@@ -115,7 +115,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     var $_defaultMethodName = 'list';
     
-    var $_primaryKeys = false;
+    var $_recordIdentifiers = false;
     
     /**
      * @var Ac_Model_Object
@@ -255,11 +255,11 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $this->_stayOnProcessing = false;
         
         if ($refresh) {
-            $form = $this->getForm();
-            $record = $this->getRecord();
+        $form = $this->getForm();
+        $record = $this->getRecord();
             $form->updateModel();
         }
-
+        
         $template = $this->getTemplate();
         if (!$this->_processSubManagers()) return true;
         
@@ -274,7 +274,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if (!(isset($this->_response->hasToRedirect) && $this->_response->hasToRedirect)) 
             $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
     }
-    
+        
     function executeRefreshDetails() {
         return $this->executeDetails(true);
     }
@@ -334,7 +334,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if ($redir && isset($this->_response->hasToRedirect)) $redir = false;
 
         if ($redir) {
-            $this->_primaryKeys = array();
+            $this->_recordIdentifiers = array();
             $this->_record = null;
             $u = $this->getManagerUrl('list');
             $this->_response->hasToRedirect = $u->toString();
@@ -352,39 +352,29 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
     }
     
-    function executeSave($withAdd = false, $stayOnDetails = false) {
+    function executeSave($withAdd = false) {
         $this->_isForm = true;
         $this->_stayOnProcessing = false;        
         
         $form = $this->getForm();
         $form->setSubmitted(true);
+        $data = $form->getValue();
         $record = $this->getRecord();
-        $form->updateModel();
+        $record->bind($data);
         $this->callFeatures('onBind', $record);
-        $this->lastRecordErrors = array();
-        $subOk = $this->_processSubManagers(true);
-        if ($subOk && $record->check() && $record->store()) {
+        if ($record->check() && $record->store()) {
             $this->_recordStored = true;
             $this->_record = null;
-            $u = $this->getReturnUrl();
             if ($withAdd) {
-                $params = array();
-                if (strlen($u)) 
-                    $params['returnUrl64'] = base64_encode($u);
-                $u = $this->getManagerUrl('new', $params)->toString();
-            } elseif (strlen($u)) {
-                $this->_response->redirectUrl = $u;
-                $u = false;
-            } elseif ($stayOnDetails) {
-                $u = $this->getManagerUrl('details')->toString();
+                $u = $this->getManagerUrl('new',array(
+                ));
             } else {
-                $u = $this->getManagerUrl('list')->toString();
+                $u = $this->getManagerUrl('list');
             }
-            $this->_response->hasToRedirect = $u;
+            $this->_response->hasToRedirect = $u->toString();
             
         } else {
         
-            $this->lastRecordErrors = $this->_record->getErrors();
             $template = $this->getTemplate();
             $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
             
@@ -396,12 +386,30 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
     
     function executeApply() {
-        return $this->executeSave(false, true);
+        $this->_isForm = true;
+        $this->_stayOnProcessing = false;
+        
+        $form = $this->getForm();
+        $form->setSubmitted(true);
+        $data = $form->getValue();
+        
+        $record = $this->getRecord();
+        $record->bind($data);
+        if ($record->check() && $record->store()) {
+            $this->_recordStored = true;
+            $u = $this->getManagerUrl('details');
+            $this->_response->hasToRedirect = $u->toString();
+        }
+        else {
+            $template = $this->getTemplate();
+            $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
+        }
     }
     
     function executeCancel() {
         $this->_record = null;
         $this->_stayOnProcessing = false;
+        
         $u = $this->getManagerUrl('list');
         $this->_response->hasToRedirect = $u->toString();
     }
@@ -418,7 +426,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     // ------------------------------------------- form related methods -----------------------------------------------
     
     function isNewRecord() {
-        return !$this->onlyRecord && ($this->getPrimaryKey() === false) && !$this->_recordStored && (isset($this->_rqData['new']) && $this->_rqData['new'] || $this->_isNewRecord);
+        return !$this->onlyRecord && ($this->getRecordIdentifier() === false) && !$this->_recordStored && (isset($this->_rqData['new']) && $this->_rqData['new'] || $this->_isNewRecord);
     }
     
     protected function callFeatures($method, $_ = null) {
@@ -442,11 +450,11 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $this->_record = $m->createRecord();
                 $this->callFeatures('onCreate', $this->_record);
                 if ($this->_datalink) $this->_datalink->setRecordDefaults($this->_record);
-            } elseif (($pk = $this->getPrimaryKey()) !== false) {
+            } elseif (($id = $this->getRecordIdentifier()) !== false) {
                 if ($this->onlyRecord) $this->_record = $this->onlyRecord;
                 else {
                     $m = $this->getMapper();
-                    $this->_record = $m->loadRecord($pk);
+                    $this->_record = $m->loadRecord($id);
                     $this->callFeatures('onLoad', $this->_record);
                     if (!$this->_record) $this->_record = null; else {
                         if ($this->_datalink && !$this->_datalink->canProcessRecord($this->_record))
@@ -476,9 +484,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * Returns first primary key provided or FALSE if no one is provided
      * @return mixed|bool
      */
-    function getPrimaryKey() {
-        $pks = $this->getPrimaryKeys();
-        if (count($pks)) $res = $pks[0];
+    function getRecordIdentifier() {
+        $ids = $this->getRecordIdentifiers();
+        if (count($ids)) $res = $ids[0];
             else $res = false;
         if ($this->_isNewRecord && !$this->_recordStored) $res = false;
         return $res;
@@ -488,25 +496,15 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * Returns all primary keys provided
      * @return array
      */
-    function getPrimaryKeys() {
-        if ($this->_primaryKeys === false) {
+    function getRecordIdentifiers() {
+        if ($this->_recordIdentifiers === false) {
             $res = array();
             if (isset($this->_rqData['keys']) && is_array($this->_rqData['keys'])) {
-                $pkl = $this->getPrimaryKeyLength();
-                foreach ($this->_rqData['keys'] as $key) {
-                    if (is_string($key)) {
-                        if ($pkl === 1) $res[$key] = $key;
-                        else {
-                            $u = @unserialize($key);
-                            if (($u !== false) && is_array($u) && (count($u) === $pkl)) $res[$key] = $u;
+                $res = array_unique($this->_rqData['keys']);
                         }
+            $this->_recordIdentifiers = $res;
                     }
-                }
-                $res = array_values($res);
-            }
-            $this->_primaryKeys = $res;
-        } 
-        return $this->_primaryKeys;
+        return $this->_recordIdentifiers;
     }
 
     // -------------------------------------- request related methods -------------------------------------------------
@@ -519,15 +517,14 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $res;
     }
     
-    
     /**
      * @param Ac_Model_Object & $record
      * @return Ac_Url
      */
     function getDetailsUrl($record) {
         $ctx = $this->_context->cloneObject();
-        $key = $this->getStrPk($record);
-        $ctx->setData(array('keys' => array($key), 'action' => 'details'));
+        $id = $this->getIdentifierOf($record);
+        $ctx->setData(array('keys' => array($id), 'action' => 'details'));
         $res = $ctx->getUrl();
         return $res;
     }
@@ -543,7 +540,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         
         if ($this->isNewRecord()) $d['new'] = 1;
         elseif ($rec = $this->getRecord()) {
-            $d['keys'][] = $this->getStrPk($rec);
+            $d['keys'][] = $this->getIdentifierOf($rec);
         }
         */
         $s = $this->getStateData();
@@ -563,33 +560,18 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $res['action'] = $this->isForm()? 'details' : 'list';
         }
         if ($this->isNewRecord()) $res['new'] = 1;
-        elseif (($res['action'] !== 'form') && $keys = $this->getPrimaryKeys()) {
+        elseif (($res['action'] !== 'form') && $keys = $this->getRecordIdentifiers()) {
             $res['keys'] = $keys; 
         }
         elseif ($rec = $this->getRecord()) {
-            $res['keys'] = array($this->getStrPk($rec)); 
+            $res['keys'][] = $this->getIdentifierOf($rec);
         }
         if ($this->_isForm && isset($this->_rqData['form']) && !$this->_recordStored) {
             $res['form'] = $this->_rqData['form'];
         }
-        if ($res['action'] === 'list') {
-            unset($res['keys']);
-        }
-        if (($u = $this->getReturnUrl()) !== null) {
-            $res['returnUrl64'] = base64_encode($u);
-        }
-        
-        if (isset($this->_rqData['filterForm'])) {
-            $ff = $this->_rqData['filterForm'];
-            if (is_array($ff)) {
-                foreach ($ff as $k => $v) {
-                    if (is_array($v)? !count($v) : !strlen($v)) unset($ff[$k]);
-                }
-            }
-            $res['filterForm'] = $ff;
-        }
         
         //if (isset($this->_rqData['pagination'])) $res['pagination'] = $this->_rqData['pagination'];
+        //if (isset($this->_rqData['filter'])) $res['filter'] = $this->_rqData['filter'];
         //if (isset($this->_rqData['order'])) $res['order'] = $this->_rqData['order'];
         return $res;
     }
@@ -660,13 +642,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     // -------------------------------------- associations related methods -------------------------------------------- 
 
-    /**
-     * @return Ac_Model_Datalink
-     */
-    function getDataLink() {
-        return $this->_datalink;
-    }
-    
     /**
      * @param Ac_Model_Datalink $datalink
      */
@@ -916,7 +891,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $this->_subManagers = array();
             if ($this->allowSubManagers && $this->getRecord() && $this->getRecord()->isPersistent()) {
                 foreach ($this->listFeatures() as $f) {
-
                     $feat = $this->getFeature($f);
                     $smc = $feat->getSubManagersConfig();
                     if (is_array($this->allowSubManagers)) {
@@ -1007,21 +981,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      *
      * @param Ac_Model_Record $record
      */
-    function getStrPk($record) {
+    function getIdentifierOf($record) {
         if ($this->onlyRecord) $res = '1';
-        else {
-            if (is_array($pk = $record->getPrimaryKey())) $res = serialize($pk);
-                else $res = $pk;
-        }
-        return $res;
-    }
-    
-    function getPrimaryKeyLength() {
-        if ($this->onlyRecord) $res = 1; 
-        else {
-            $mapper = $this->getMapper();
-            $res = count($mapper->listPkFields());
-        }
+            else $res = $this->getMapper()->getIdentifier($record);
         return $res;
     }
     
@@ -1132,35 +1094,14 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     // ---------------------------------------------------- protected supplementary methods --------------------------------------------
     
-    function _processSubManagers($forceSave = false) {
+    function _processSubManagers() {
         $subRedirect = false;
         $allState = array();
-        $res = true;
         foreach ($this->listSubManagers() as $i) {
             $s = $this->getSubManager($i);
-            if ($forceSave && $s->getMethodParamValue() == 'details') {
-                $methodName = 'executeApply';
-            } else {
-                $methodName = false;
-            }
-            $r = $s->getResponse($methodName);
-            if ($forceSave && $methodName !== false) {
-                if ($s->lastRecordErrors) {
-                    $this->_tplData['activeSubManagerId'] = $i;
-                    $res = false;
-                } else {
-                    $s->_response = false;
-                    $r = $s->getResponse('executeDetails');
-                }
-            }
+            $r = $s->getResponse();
             $this->_response->mergeWithResponse($r);
-            if (!$forceSave && isset($r->hasToRedirect) && $r->hasToRedirect) {
-                $subRedirect = $r->hasToRedirect;
-            }
-            elseif ($r->noHtml || $r->noWrap) {
-                $subRedirect = false;
-                break;
-            }
+            if (isset($r->hasToRedirect) && $r->hasToRedirect) $subRedirect = $r->hasToRedirect;
             $allState['sm_'.$i] = $s->getStateData();
         }
         if ($subRedirect) {
@@ -1169,7 +1110,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $mu->query = Ac_Util::m($mu->query, $u->query, true);
             $this->_response->hasToRedirect = $mu->toString();
         }
-        return $res;
     }
     
     /**
@@ -1189,7 +1129,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $url = $this->getManagerUrl('processing', array('processing' => $processingId));
         $d = $ctx->getData();
         if (!isset($d['keys'])) {
-            if ($keys = $this->getPrimaryKeys()) {
+            if ($keys = $this->getRecordIdentifiers()) {
                 $d['keys'] = $keys;
             }
         }
@@ -1354,22 +1294,14 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $this->getMapper()->preloadRelations($myRecs, $pr);
         }
     }
-    
+        
     /**
      * @return Ac_Model_Collection
      */
     function _getRecordsCollection() {
-        return $this->getRecordsCollection();
-    }
-    
-    /**
-     * @return Ac_Model_Collection
-     */
-    function getRecordsCollection() {
         if ($this->_recordsCollection === false) {
             if ($this->_collectionCanBeUsed()) {
                 $this->_recordsCollection = new Ac_Model_Collection($this->mapperClass, false, $this->_getWhere(), $this->_getOrder(), $this->_getJoins(), $this->_getExtraColumns());
-                    if (strlen($h = $this->_getHaving())) $this->_recordsCollection->setHaving ($h);
                 $this->_recordsCollection->setDistinct();
                 $this->_recordsCollection->setGroupBy($this->_getGroupBy());
                 foreach ($this->listFeatures() as $i) $this->getFeature($i)->onCollectionCreated ($this->_recordsCollection);
@@ -1409,16 +1341,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     function _getOrder() {
         $s = $this->_getSqlSelect();
         if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getOrderByClause(false)))) {
-            $res = $w;
-        } else {
-            $res = false;
-        }
-        return $res;
-    }
-    
-    function _getHaving() {
-        $s = $this->_getSqlSelect();
-        if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getHavingClause(false)))) {
             $res = $w;
         } else {
             $res = false;
@@ -1469,18 +1391,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         }
         return $this->configService;
     }    
-    
-    function getReturnUrl() {
-        if ($this->_returnUrl === false) {
-            $this->_returnUrl = $this->getContext()->getData('returnUrl', null);
-            if (is_null($this->_returnUrl)) {
-                $tmp = $this->getContext()->getData('returnUrl64', null);
-                if (strlen($tmp) && strlen($tmp = base64_decode($tmp))) 
-                    $this->_returnUrl = $tmp;
-            }
-        }
-        return $this->_returnUrl;
-    }
     
 }
 

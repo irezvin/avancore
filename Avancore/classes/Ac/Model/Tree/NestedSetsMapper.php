@@ -116,9 +116,9 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
             }
             if (!isset($proto['treeId']) && strlen($this->nsTreeId)) $proto['treeId'] = $this->nsTreeId;
             if (!isset($proto['treeCol'])) $proto['treeCol'] = $this->nsTreeCol;
-            $aiField = $this->mixin->getAutoincFieldName();
+            $genFields = $this->mixin->listGeneratedFields();
             if (!isset($proto['idIsAutoInc']) && $this->mixin->tableName == $proto['tableName']) {
-                if (strlen($aiField) && ($aiField == $proto['idCol'])) {
+                if (in_array($proto['idCol'], $genFields)) {
                     $proto['idIsAutoInc'] = true;
                 }
             }

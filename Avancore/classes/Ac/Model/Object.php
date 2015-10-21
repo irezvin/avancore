@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Model_Object extends Ac_Model_Data {
+abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionAwareObject {
 
     const ACTUAL_REASON_LOAD = 1;
     
@@ -16,19 +16,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     const OPERATION_DELETE = 8;
     
-    /**
-     * If $model::tracksChanges() returns true or Ac_Model_Object::CHANGES_BEFORE_SAVE, 
-     * changes will be destroyed immediately after database operation 
-     * (and before doAfterSave() method)  
-     */
-    const CHANGES_BEFORE_SAVE = 1;
-    
-    /**
-     * If $model::tracksChanges() returns AC_CHANGES_AFTER_SAVE, old values will be available in 
-     * doAfterSave() method 
-     */
-    const CHANGES_AFTER_SAVE = 2;
-
     /**
      * function onCreate()
      */
@@ -50,7 +37,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     const EVENT_AFTER_LOAD = 'onAfterLoad';
     
     /**
-     * function onActual($reason = Ac_Model_Object::ACTUAL_REASON_LOAD)
+     * function onActual($reason = self::ACTUAL_REASON_LOAD)
      */
     const EVENT_ON_ACTUAL = 'onActual';
 
@@ -128,13 +115,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * In-memory id
      * @var int
      */
-    var $_imId = 0;
-    
-    /**
-     * Name of primary key column
-     * @var string
-     */
-    var $_pk = false;
+    protected $_instanceId = 0;
     
     var $_error = false;
     
@@ -146,8 +127,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     var $_isImport = false;
     
-    var $_isReference = false;
-    
     var $_isBeingStored = false;
     
     var $_isBeingCompared = false;
@@ -157,10 +136,11 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     var $_hasDefaults = false;
 
     /**
-     * Original primary key; is used (to check record persistance and correctly update and delete record) only if $this->tracksPk() returns TRUE.
+     * Identifier under which the object is persisted in the storage
+     * Set public for quicker access
      * @var mixed
      */
-    var $_origPk = null;
+    var $_peIdentifier = null;
     
     protected $lastOperation = self::OPERATION_NONE;
     
@@ -170,6 +150,11 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
      * @var Ac_Model_Mapper
      */
     protected $mapper = false;
+    
+    /**
+     * @var Ac_I_ObjectsCollection[]
+     */
+    protected $registeredCollections = array();
     
     protected $_magicGetLock = false;
     
@@ -245,7 +230,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     function doListNonCopiedFields() {
         $m = $this->mapper;
-        $res = $m->listPkFields();
+        $res = $m->listGeneratedFields();
         return $res;
     }
     
@@ -262,7 +247,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     function doListNonComparedFields() {
         $m = $this->mapper;
-        $res = $m->listPkFields();
+        $res = $m->listGeneratedFields();
         return $res;
     }
     
@@ -302,10 +287,10 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
     function _checkOwnFields() {
         parent::_checkOwnFields();
-        $dbp = $this->checkDatabasePresence(true);
+        $dbp = $this->checkPresence(true);
         if ($dbp) {
             $m = $this->mapper;
-            foreach ($dbp as $indexName => $pks) {
+            foreach ($dbp as $indexName => $identifiers) {
                 $ff = $m->listUniqueIndexFields($indexName);
                 $fn = current($ff);
                 $px = count($ff) > 1? AC_SUCH_VALUES_OF_FIELD_MULTIPLE : AC_SUCH_VALUES_OF_FIELD_SINGLE;
@@ -330,6 +315,10 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         $this->_oldValues = $this->getDataFields();
     }
     
+    function getModelObjectInstanceId() {
+        return $this->_instanceId;
+    }
+    
     function __construct($mapperOrMapperClass = null) {
         
         if (is_array($mapperOrMapperClass)) {
@@ -341,8 +330,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
             $prototype = array();
         }
         
-        static $imId = 0;
-        $this->_imId = $imId++;
+        $this->_instanceId = uniqid();
 
         if (is_null($mapperOrMapperClass) && strlen($this->_mapperClass)) $mapperOrMapperClass = $this->_mapperClass;
         
@@ -357,18 +345,17 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         if (!strlen($this->_mapperClass)) $this->_mapperClass = $mapper->getId();
         
         $this->mapper = $mapper;
-        $this->_pk = $mapper->pk;
-        $this->_tableName = $mapper->tableName;
      
         parent::__construct($prototype);
         
-        $mapper->registerRecord($this);
+        $this->notifyObjectCollections(Ac_I_LifecycleAwareCollection::STAGE_CREATED);
+        $this->mapper->registerRecord($this);
         
         if (!$this->_hasDefaults) {
             foreach ($mapper->getDefaults() as $k => $v) $this->$k = $v;
         }
         
-        if ($this->tracksChanges()) $this->_memorizeFields();
+        $this->_memorizeFields();
         
         $this->setDefaults();
         $this->doOnCreate();
@@ -393,70 +380,63 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     
         if ($isRow) {
             
+            $row = $pkOrRow;
             $this->_otherValues = array();
-            $hyData = $this->mapper->peConvertForLoad($this, $pkOrRow);
+            $hyData = $this->mapper->peConvertForLoad($this, $row);
+            
+            if (isset($hyData['_peIdentifier'])) $this->_peIdentifier = $hyData['_peIdentifier'];
+                else $this->_peIdentifier = false;
+                
             foreach ($this->listDataProperties() as $propName) {
                 if (array_key_exists($propName, $hyData)) {
                     $this->$propName = $pkOrRow[$propName];
                     unset($pkOrRow[$propName]);
                 }
             }
-            $row = $pkOrRow;
-            $this->_otherValues = $pkOrRow;
-            $res = true;
+            $this->_otherValues = $hyData;
             
-            if ($this->tracksPk()) {
-                $this->_origPk = $res? $this->getPrimaryKey() : null;
-            }
+            //$this->_peIdentifier = $this->mapper->getIdentifier($this);
             $this->doAfterLoad();
             $this->triggerEvent(self::EVENT_AFTER_LOAD);
-            if ($res) $this->doOnActual(self::ACTUAL_REASON_LOAD);
-            if ($this->isPersistent()) {
-                $m = $this->mapper;
-                $m->notifyKeyAssigned($this);
-            }
-            if ($this->tracksChanges()) $this->_memorizeFields();
-
-            if ($res) $this->lastOperation = self::OPERATION_LOAD;
+            $this->doOnActual(self::ACTUAL_REASON_LOAD);
+            $this->notifyObjectCollections(Ac_I_LifecycleAwareCollection::STAGE_LOADED);
+            $this->_memorizeFields();
+            $this->lastOperation = self::OPERATION_LOAD;
+            $res = true;
             
         } else {
-            if (!$this->isPersistent() && $this->isReference()) {
-                $res = $this->_loadReference();
-            } else {
-                $res = $this->_legacyLoad($pkOrRow, $row);
+            
+            $primaryKey = $pkOrRow;
+            
+            $res = false;
+            
+            if ($primaryKey !== null || $this->hasFullPrimaryKey()) {
+                if ($primaryKey === null) $primaryKey = $this->mapper->getIdentifier($this);
+                if ($hyData = $this->mapper->peLoad($this, $primaryKey)) {
+                    $this->setDefaults(true);
+                    $res = $this->load($hyData, true);
+                }
             }
+            
         }
         
         return $res;
     }
     
-    function _legacyLoad($primaryKey, & $row) {
-        $k = $this->_pk;
-
-        if ($primaryKey !== null) {
-            $this->$k = $primaryKey;
+    protected function notifyObjectCollections($lifecycleStage) {
+        $hadMapper = false;
+        foreach ($this->registeredCollections as $c) {
+            if ($c === $this->mapper) $hadMapper = true;
+            if ($c instanceof Ac_I_LifecycleAwareCollection) 
+                $c->notifyCollectionObjectStage($this, Ac_I_LifecycleAwareCollection::STAGE_LOADED);
+            else
+                $c->actualizeRegisteredObject($this);
         }
-
-        $primaryKey = $this->$k;
-        
-        if ($primaryKey === null) {
-            return false;
+        if (!$hadMapper) {
+            $this->mapper->notifyCollectionObjectStage(
+                $this, Ac_I_LifecycleAwareCollection::STAGE_LOADED
+            );
         }
-        
-        $this->reset();
-
-        if ($primaryKey !== null) {
-            $this->$k = $primaryKey;
-        }
-        
-        if ($hyData = $this->mapper->peLoad($this, $this->getPrimaryKey())) {
-            $this->load($hyData, true);
-            $res = true;
-        } else {
-            $res = false;
-        }
-        
-        return $res;
     }
     
     protected function getHyData() {
@@ -464,99 +444,53 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         foreach ($this->listDataProperties() as $propName) {
             $res[$propName] = $this->$propName;
         }
+        if ($this->_peIdentifier !== false) $res['_peIdentifier'] = $this->_peIdentifier;
+            else $res['_peIdentifier'] = $this->getIdentifier();
         return $res;
     }
     
-    function _legacyStore() {
-        $k = $this->_pk;
-        $mapper = $this->mapper;
-        $tpk = $this->tracksPk();
+    // formerly _legacyStore
+    protected function saveOwnRow() {
         $hyData = $this->getHyData();
-        $error = false;
-        
-        if ($this->isPersistent()) {
-            
-            $hyData[$k] = $tpk? $this->_origPk : $this->$k;
-            $hyData = $this->mapper->peConvertForSave($this, $hyData);
-            $res = (bool) $this->mapper->peSave($this, $hyData, true, $error, $newData);
-            if (is_array($newData)) foreach ($newData as $k => $v) $this->$k = $v;
-            
-        } else {
-            
-            $skipKey = ($aif = $mapper->getAutoincFieldName()) == $k;
-            if (array_key_exists($k, $hyData) && !is_null($hyData[$k])) $skipKey = false;
-            if ($skipKey) unset($hyData[$k]);
-            
-            $hyData = $this->mapper->peConvertForSave($this, $hyData);
-            $res = $this->mapper->peSave($this, $hyData, false, $error, $newData);
-            if ($res) {
-                if (is_array($newData)) foreach ($newData as $k => $v) $this->$k = $v;
-                $res = true;
-            } else {
-                $res = false;
-            }
-            
-        }
-        
-        if ($tpk) {
-            if ($this->_origPk != $this->$k) {
-                $this->mapper->notifyKeyAssigned($this, $this->_origPk);
-            }
-        }
-
+        $hyData = $this->mapper->peConvertForSave($this, $hyData);
+        $res = (bool) $this->mapper->peSave($this, $hyData, $exists, $error, $newData);
+        if (is_array($newData)) foreach ($newData as $k => $v) $this->$k = $v;
         if (!$res) {
             if ($error !== false) {
                 $this->_errors['_store']['db'] = $error;
                 $this->_checked = true; // otherwise next getErrors() will trigger check() which will clean this error message
             }
         } else {
-            $mapper->notifyKeyAssigned($this);
-            if (($t = $this->tracksChanges()) && ($t !== self::CHANGES_AFTER_SAVE)) $this->_memorizeFields();
+            $this->_memorizeFields();
         }
+        $this->notifyObjectCollections(Ac_I_LifecycleAwareCollection::STAGE_SAVED);
         return $res;
     }
     
     function forget() {
-        $m = $this->mapper;
-        $m->forget($this);
+        foreach ($this->registeredCollections as $c) $c->unregisterObject($this);
     }
     
-    function store() {
+    function save() {
         if (!$this->_isBeingStored) { // we have to prevent recursion while saving complex in-memory record graphs
             $this->_isBeingStored = true;
             $this->intResetReferences();
             $beforeSaveResult = $this->doBeforeSave();
-            if ($this->_isReference && !$this->isPersistent()) $this->_loadReference();
             $isNew = !$this->isPersistent();
             
             $this->triggerEvent(self::EVENT_BEFORE_SAVE, array(& $beforeSaveResult));
             if ($beforeSaveResult !== false) {
                 $res = true;
                 
-                if (Ac_Accessor::methodExists($this, $m = '_storeReferencedRecords')) {
-                    trigger_error("Using $m() is deprecated; please re-generate the code", E_USER_DEPRECATED);
-                    $res = $res && ($this->$m() !== false);
-                }
-                
                 foreach ($this->getAssociations() as $assoc) {
                     if ($assoc->beforeSave($this, $this->_errors) === false) $res = false;
                 }
-                $res = $res && $this->_legacyStore();
-                if ($this->tracksPk()) $this->_origPk = $res? $this->getPrimaryKey() : null;
+                $res = $res && $this->saveOwnRow();
+                $this->_peIdentifier = $res? $this->mapper->getIdentifier($this) : null;
                 if ($res) {
                     foreach ($this->getAssociations() as $assoc) {
                         if ($assoc->afterSave($this, $this->_errors) === false) $res = false;
                     }
-                }
-                
-                if (Ac_Accessor::methodExists($this, $m = '_storeReferencingRecords')) {
-                    trigger_error("Using $m() is deprecated; please re-generate the code", E_USER_DEPRECATED);
-                    $res = $res && ($this->$m() !== false);
-                }
-                
-                if (Ac_Accessor::methodExists($this, $m = '_storeNNRecords')) {
-                    trigger_error("Using $m() is deprecated; please re-generate the code", E_USER_DEPRECATED);
-                    $res = $res && ($this->$m() !== false);
                 }
                 
                 if ($res) {
@@ -570,8 +504,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
                     if ($res !== false) {
                         $this->doOnActual(self::ACTUAL_REASON_SAVE);
                     }
-                    if (($t = $this->tracksChanges()) && ($t === self::CHANGES_AFTER_SAVE)) 
-                        $this->_memorizeFields();
+                    $this->notifyObjectCollections(Ac_I_LifecycleAwareCollection::STAGE_SAVED);
                 } else {
                     $this->doOnSaveFailed();
                     $this->triggerEvent(self::EVENT_ON_SAVE_FAILED);
@@ -586,19 +519,33 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
+    /**
+     * @deprecated
+     */
+    function store() {
+        return $this->save();
+    }
+    
     function delete() {
+        if (!$this->isPersistent()) {
+            throw new Ac_E_InvalidUsage(
+                "Attempt to delete non-persistent record (".get_class($this)
+                ." of ".$this->mapper->getId()."); check with isPersistent() first");
+        }
         if ($this->_isDeleted) return true;
             else $this->_isDeleted = true;
-        if ($this->_isReference && !$this->isPersistent()) $this->_loadReference();
         $deleteResult = $this->doBeforeDelete();
         $this->triggerEvent(self::EVENT_BEFORE_DELETE, array(& $deleteResult));
         if ($deleteResult !== false) {
-            if ($res = $this->_legacyDelete()) {
+            $res = (bool) $this->mapper->peDelete($this, $this->getHyData(), $error);
+            if ($res) {
                 $this->lastOperation = self::OPERATION_DELETE;
-            	if ($this->tracksPk()) $this->_origPk = null;
+            	$this->_peIdentifier = null;
                 $this->doAfterDelete();
                 $this->triggerEvent(self::EVENT_AFTER_DELETE);
-                $this->mapper->forget($this);
+                $this->notifyObjectCollections(Ac_I_LifecycleAwareCollection::STAGE_DELETED);
+            } else {
+                $this->_errors['_delete']['db'] = $error;
             }
         } else {
             $res = false;
@@ -606,16 +553,6 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
             $this->triggerEvent(self::EVENT_ON_DELETE_FAILED);
         }
         if (!$res) $this->_isDeleted = false;
-        return $res;
-    }
-    
-    function _legacyDelete() {
-        $hyData = $this->getHyData();
-        $res = (bool) $this->mapper->peDelete($this, $hyData, $error);
-        if ($res) {
-        } else {
-            $this->_error = $error;
-        }
         return $res;
     }
     
@@ -635,43 +572,12 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
-    function getBindIgnore() {
-        return '';
-    }
-    
-    function bind($array, $ignore = '') {
-        if (is_array($ignore)) $ignore = array_merge($ignore, $this->getBindIgnore());
-            else $ignore .= $this->getBindIgnore();
-        parent::bind($array, $ignore);
-    }
-    
     /**
-     * Template method that should return TRUE if current record should remember old values of the fields
-     * @return bool
-     */
-    function tracksChanges() {
-        return true;
-    }
-    
-    /**
-     * Template method that should return TRUE if record's primary key can be updated 
-     * (for example, for records with non-autoincremental primary key fields).
-     * 
-     * Standard implementation checks whether primary key is autoincrement field.  
-     * 
-     * @return bool
-     */
-    function tracksPk() {
-    	return true;
-    }
-    
-    /**
-     * if $this->tracksChages(): returns array (fieldName => oldValue) for changed fields
      * @param bool $newValues: return new values instead of old ones
-     * @return mixed Array or TRUE if record does not track changes
+     * @param bool $strict Whether to do a strict comparison to check for changes
+     * @return array (fieldName => oldValue) for changed fields
      */
     function getChanges($newValues = false, $field = false, $strict = true) {
-        if (!$this->tracksChanges()) return true;
         $res = array();
         foreach ($this->_oldValues as $fieldName => $fieldValue) {
             if ($strict? $this->$fieldName !== $fieldValue : $this->$fieldName != $fieldValue) $res[$fieldName] = $newValues? $this->$fieldName : $fieldValue;
@@ -684,13 +590,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function isChanged($field, $strict = true) {
-        if (!$this->tracksChanges()) return true;
         return array_key_exists($field, $this->_oldValues) && ($strict? ($this->_oldValues[$field] !== $this->{$field}) : ($this->_oldValues[$field] != $this->{$field}));
-    }
-    
-    function getError() {
-        if ($errors = $this->getErrors()) return Ac_Util::implode_r(";\n", $errors);
-        if ($this->_error) return $this->_error;
     }
     
     function reset($revert = false) {
@@ -700,10 +600,12 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
                 $this->$k = $v;
             }
         } else {
-            $this->_origPk = null;
+            $this->_peIdentifier = null;
             $this->_memorizeFields();
         }
-        if (!$this->isPersistent()) $this->mapper->memorize($this);
+        $stage = $revert && $this->isPersistent()? 
+            Ac_I_LifecycleAwareCollection::STAGE_REVERTED : Ac_I_LifecycleAwareCollection::STAGE_CREATED;
+        $this->notifyObjectCollections($stage);
     }
     
     /**
@@ -733,19 +635,56 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         if ($c) self::$metaCache[$mc][__FUNCTION__] = $res;
         return $res;
     }
+
+    /**
+     * Returns unique per-application ID of current model object
+     * @return string
+     */
+    function getIdentifier() {
+        if ($this->_peIdentifier === false) {
+            $res = $this->mapper->getIdentifier($this);
+        } else {
+            $res = $this->_peIdentifier;
+        }
+        return $res;
+    }
     
+    function getPeIdenifier() {
+        return $this->_peIdentifier;
+    }
+
+    /**
+     * @deprecated
+     * @see Ac_Model_Object::getIdentifier()
+     */
     function getPrimaryKey() {
-        return $this->{$this->_pk};
+        return $this->getIdentifier();
     }
     
+    /**
+     * @deprecated
+     * Use isPersistent() to check if record has been saved
+     */
     function hasFullPrimaryKey() {
-        return $this->{$this->_pk} !== false && !is_null($this->{$this->_pk});
+        return $this->isPersistent();
     }
     
+    function matchesIdentifier($idOrIds) {
+        if (!is_array($idOrIds)) $idOrIds = array($idOrIds); 
+        if ($this->_peIdentifier !== null) $pk = $this->_peIdentifier;
+        	else $pk = $this->mapper->getIdentifier($this);
+        foreach ($idOrIds as $k) if ($pk == $k) return true;
+        return false;        
+    }
+    
+    /**
+     * @deprecated
+     * Use matchesIdentifier()
+     */
     function matchesPk($oneOrMorePks) {
         if (!is_array($oneOrMorePks)) $oneOrMorePks = array($oneOrMorePks); 
-        if ($this->tracksPk() && ($this->_origPk !== null)) $pk = $this->_origPk;
-        	else $pk = $this->getPrimaryKey();
+        if ($this->_peIdentifier !== null) $pk = $this->_peIdentifier;
+        	else $pk = $this->mapper->getIdentifier($this);
         foreach ($oneOrMorePks as $k) if ($pk == $k) return true;
         return false;        
     }
@@ -776,74 +715,32 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     /**
-     * Checks record's presence in the database using all known "unique" indices. Since some "unique" indices can be not backed by the database, arrays of found PKs are
-     * returned for each index.
+     * Checks record's presence in the database using all known "unique" indices. Since some "unique" indices can be not backed by the database, 
+     * arrays of found PKs are returned for each index.
      *  
      * @param bool $dontReturnOwnKey If row with same PK as one of current instance is found, don't add it's PK to resultset
      * @param bool $checkNewRecords Whether to check in-memory newly created records
      * @return array($indexName => array($pk1, $pk2...))
-     * @see Ac_Model_Mapper::checkRecordUniqueness
      */    
-    function checkDatabasePresence($dontReturnOwnKey = false, $checkNewRecords = false) {
-       $mapper = $this->mapper;
-       return $mapper->checkRecordPresence($this, $dontReturnOwnKey, array(), array(), $checkNewRecords); 
+    function checkPresence($dontReturnOwnKey = false, $checkNewRecords = false) {
+       return $this->mapper->checkRecordPresence($this, $dontReturnOwnKey, array(), array(), $checkNewRecords); 
     }
     
     function isPersistent() {
-        if ($this->tracksPk()) $res = ($this->_origPk !== null);
-    	else $res = (($this->{$this->_pk}) !== false) && (($this->{$this->_pk}) !== null);
+        $res = ($this->_peIdentifier !== null);
         return $res;
     }
     
-    function isReference() {
-        return $this->_isReference;
-    }
-    
-    function _setIsReference($isReference = true) {
-        $this->_isReference = $isReference;
-    }
-    
-    function _loadReference() {
-        $res = false;
-        $iData = $this->_getCompleteUniqueIndices();
-        $where = array();
-        foreach ($iData as $idx => $f) $where = array_merge($where, $f);
-        
-        if (count($where)) {
-            $m = $this->mapper;
-            $s = $getSqlDb();
-            $r = $m->loadRecordsByCriteria($c = $s->valueCriterion($where));
-            if (count($r) == 1) {
-                $res = true;
-                $rec = $r[0];
-                
-                /*
-                 * Often the reference is changed before it's loaded (especially when it's loaded from the store() method).
-                 * We have not to overwrite fields that already were modified by an application. When record tracks its changes, we can 
-                 * rely on isChanged() method; otherwise we assume that if field has default value, it was not changed (not too accurate).
-                 */ 
-                if ($this->tracksChanges()) {
-                    foreach ($this->listDataProperties() as $v) {
-                        if (!$this->isChanged($v)) $this->$v = $rec->$v;
-                    }
-                } else {
-                    
-                    // we have to rely on object_vars of prototype record instead of class_vars since onCreate() method can alter default values
-                    $defaultVars = get_object_vars($m->getPrototype());
-                    
-                    foreach ($this->listDataProperties() as $v) {
-                        if ($this->$v === $defaultVars[$v]) $this->$v = $rec->$v;
-                    }
-                }
+    function forcePersistent($persistent = true) {
+        if ($persistent) {
+            $this->_peIdentifier = false;
+            if (($id = $this->mapper->getIdentifier($this)) === null) {
+                throw new Exception("Cannot force-persistent an object without present identifier");
             }
-            if ($this->isPersistent()) $m->notifyKeyAssigned($this);
+            $this->_peIdentifier = $id;
+        } else {
+            $this->_peIdentifier = null;
         }
-        return $res;
-    }
-    
-    function canDereference() {
-        $res = count($this->_getCompleteUniqueIndices()) > 0;
-        return $res;
     }
     
     function _getCompleteUniqueIndices() {
@@ -859,130 +756,18 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
     
-    /**
-     * Stores referenced records and populates this record foreign keys.
-     * @deprecated
-     */
-    function _autoStoreReferenced($recordOrRecords, $fieldLinks, $errorKey) {
-        $res = true;
-        if ($recordOrRecords !== false && !is_null($recordOrRecords)) {
-            if (is_array($recordOrRecords)) $r = $recordOrRecords;
-                else $r = array(& $recordOrRecords);
-            foreach (array_keys($r) as $k) {
-                $rec = $r[$k];
-                if ((!$rec->isPersistent() || $rec->getChanges())) {
-                    if (!$rec->store()) {
-                        $this->_errors[$errorKey][$k] = $rec->getErrors();
-                        $res = false;
-                    }
-                }
-                foreach ($fieldLinks as $sf => $df) $this->$sf = $rec->$df; 
-            }
-        }
-        return $res;
-    }
-    
-    /**
-     * Populates referencing records' foreign keys from this record keys and stores them
-     * @deprecated
-     */
-    function _autoStoreReferencing($recordOrRecords, $fieldLinks, $errorKey) {
-        $res = true;
-        if ($recordOrRecords !== false && !is_null($recordOrRecords)) {
-            if (is_array($recordOrRecords)) $r = $recordOrRecords;
-                else $r = array(& $recordOrRecords);
-            foreach (array_keys($r) as $k) {
-                $rec = $r[$k];
-                foreach ($fieldLinks as $sf => $df) $rec->$df = $this->$sf;
-                if ($rec->getChanges() && !$rec->_isDeleted) {
-                    if (!$rec->store()) {
-                        $this->_errors[$errorKey][$k] = $rec->getErrors();
-                        $res = false;
-                    }
-                }
-            }
-        }
-        return $res;
-    }
-    
-    /**
-     * @deprecated
-     */
-    function _autoStoreNNRecords(& $recordOrRecords, $ids, $fieldLinks, $fieldLinks2, $midTableName, $errorKey, $midWhere = false) {
-        $res = true;
-        if ($recordOrRecords !== false && !is_null($recordOrRecords)) {
-            $ids = array();
-            if (is_array($recordOrRecords)) $r = $recordOrRecords;
-                else $r = array(& $recordOrRecords);
-                
-            foreach (array_keys($r) as $k) {
-                $rec = $r[$k];
-                if ((!$rec->isPersistent() || $rec->getChanges())) {
-                    if (!$rec->store()) {
-                        $this->_errors[$errorKey][$k] = $rec->getErrors();
-                        $res = false;
-                    }
-                }
-                if (count($fieldLinks2) == 1) {
-                    $ff = array_values($fieldLinks2);
-                    $ids[] = $rec->{$ff[0]}; 
-                } else {
-                    $rc = array();
-                    foreach ($fieldLinks2 as $s => $d) {
-                        $rc[$s] = $rec->$d;
-                    }
-                    $ids[implode('-', $rc)] = $rc; // this will guarantee the uniqueness of multi-field values
-                }
-            }
-        }
-        if ($res && is_array($ids)) {
-            if (count($fieldLinks2) == 1) {
-                $ids = array_unique($ids); //TODO: check why sometimes we receive duplicate IDs...
-            } else {
-                $ids = array_values($ids);
-            }
-            $rows = array();
-            $rowProto = array();
-            if (is_array($midWhere)) $rowProto = $midWhere;
-            foreach ($fieldLinks as $s => $d) $rowProto[$d] = $this->$s;
-            $f = array_keys($fieldLinks2);
-            if (count($f) == 1) {
-                foreach ($ids as $id) {
-                    $row = $rowProto;
-                    $row[$f[0]] = $id;
-                    $rows[] = $row;                 
-                }
-            } else {
-                foreach ($ids as $id) {
-                    $row = $rowProto;
-                    $rows[] = array_merge($row, $id);                   
-                }
-            }
-            $this->mapper->peReplaceNNRecords($this, $rowProto, $rows, $midTableName, $errors);
-            if ($errors) {
-                $this->_errors[$errorKey] = $errors;
-                return $res;
-            }
-        }
-        return $res;
-    }
-    
     // +---------------------- cloning and comparison support methods ----------------------+ 
     
     /**
      * @return Ac_Model_Object
      */
-    function copy($asReference = null, $withPk = false) {
+    function copy() {
         $m = $this->mapper;
         $copy = $m->createRecord();
         $flds = array_diff($this->listDataProperties(), $this->doListNonCopiedFields());
-        if (!$asReference && !$withPk) $flds = array_diff($flds, $m->listPkFields());
-        if ($withPk) $flds = array_merge($flds, $m->listPkFields());
         foreach ($flds as $v) {
             $copy->$v = $this->$v;
         }
-        //$copy->_isReference = $this->_isReference;
-        $copy->_setIsReference(is_null($asReference)? $this->isReference() : $asReference);
         $this->doOnCopy($copy);
         $this->triggerEvent(self::EVENT_ON_COPY, array($copy));
         return $copy;
@@ -1096,7 +881,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         return $res;
     }
 
-    function cleanupReferences($otherObject) {
+    protected function cleanupReferences($otherObject) {
         foreach (array_keys($vars = get_object_vars($this)) as $k) {
             if (is_object($this->$k) && Ac_Util::sameObject($this->$k, $otherObject)) {
                 $this->$k = null;
@@ -1122,9 +907,10 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
         $this->doOnCleanup();
         $this->triggerEvent(self::EVENT_ON_CLEANUP);
         $vars = array_intersect_key(get_class_vars(get_class($this)), get_object_vars($this));
-        $m = $this->mapper;
-        $m->forget($this);
-        foreach ($vars as $k => $v) if (isset($this->$k)) {
+        foreach ($this->registeredCollections as $c) {
+            $c->unregisterObject($this);
+        }
+        foreach (array_keys($vars) as $k) if (isset($this->$k)) {
             if (is_array($this->$k)) {
                 $tmp = $this->$k;
                 foreach (array_keys($tmp) as $kk) {
@@ -1147,6 +933,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     final function setDefaults($full = false) {
+        $this->_isDeleted = false;
         $defs = $this->mapper->getDefaults($full);
         $cv = get_class_vars(get_class($this));
         // Take defaults from class vars since they can be overridden there
@@ -1294,6 +1081,26 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
             return true;
         }
         return parent::__call($method, $arguments);
+    }
+    
+    function getRegisteredObjectCollections() {
+        return $this->registeredCollections;
+    }
+    
+    function isObjectCollectionRegistered(Ac_I_ObjectsCollection $collection) {
+        return in_array($collection, $this->registeredCollections, true);
+    }
+    
+    function notifyUnregisteredFromCollection(Ac_I_ObjectsCollection $collection) {
+        if (false !== $k = array_search($collection, $this->registeredCollections, false)) {
+            unset($this->registeredCollections[$k]);
+        }
+    }
+    
+    function notifyRegisteredInCollection(Ac_I_ObjectsCollection $collection) {
+        if (false === array_search($collection, $this->registeredCollections, false)) {
+            $this->registeredCollections[] = $collection;
+        }
     }
     
 }

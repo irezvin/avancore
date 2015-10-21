@@ -47,7 +47,6 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
     function doInit() {
         
         $this->hasUniformPropertiesInfo = false;
-        $this->tracksChanges = false;
         
         $this->extraTableClass = $this->model->getExtraTableClass();
         $this->genExtraTableClass = $this->model->getGenExtraTableClass();

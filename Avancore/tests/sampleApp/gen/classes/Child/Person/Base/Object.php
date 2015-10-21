@@ -26,7 +26,7 @@ class Child_Person_Base_Object extends Sample_Person {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'portraitPersonPhoto' => array (
                 'className' => 'Child_Person_Photo',
@@ -114,8 +114,8 @@ class Child_Person_Base_Object extends Sample_Person {
     /**
      * @return Child_Person_Photo  
      */
-    function createPortraitPersonPhoto($values = array(), $isReference = false) {
-        return parent::createPortraitPersonPhoto($values, $isReference);
+    function createPortraitPersonPhoto($values = array()) {
+        return parent::createPortraitPersonPhoto($values);
     }
 
     
@@ -140,8 +140,8 @@ class Child_Person_Base_Object extends Sample_Person {
     /**
      * @return Child_Religion  
      */
-    function createReligion($values = array(), $isReference = false) {
-        return parent::createReligion($values, $isReference);
+    function createReligion($values = array()) {
+        return parent::createReligion($values);
     }
 
     
@@ -173,8 +173,8 @@ class Child_Person_Base_Object extends Sample_Person {
     /**
      * @return Child_Tag  
      */
-    function createTag($values = array(), $isReference = false) {
-        return parent::createTag($values, $isReference);
+    function createTag($values = array()) {
+        return parent::createTag($values);
     }
 
     
@@ -207,8 +207,8 @@ class Child_Person_Base_Object extends Sample_Person {
     /**
      * @return Child_Person_Album  
      */
-    function createPersonAlbum($values = array(), $isReference = false) {
-        return parent::createPersonAlbum($values, $isReference);
+    function createPersonAlbum($values = array()) {
+        return parent::createPersonAlbum($values);
     }
 
     
@@ -241,8 +241,8 @@ class Child_Person_Base_Object extends Sample_Person {
     /**
      * @return Child_Person_Photo  
      */
-    function createPersonPhoto($values = array(), $isReference = false) {
-        return parent::createPersonPhoto($values, $isReference);
+    function createPersonPhoto($values = array()) {
+        return parent::createPersonPhoto($values);
     }
 
     
@@ -275,8 +275,8 @@ class Child_Person_Base_Object extends Sample_Person {
     /**
      * @return Child_Person_Post  
      */
-    function createPersonPost($values = array(), $isReference = false) {
-        return parent::createPersonPost($values, $isReference);
+    function createPersonPost($values = array()) {
+        return parent::createPersonPost($values);
     }
 
     
@@ -309,8 +309,8 @@ class Child_Person_Base_Object extends Sample_Person {
     /**
      * @return Child_Relation  
      */
-    function createIncomingRelation($values = array(), $isReference = false) {
-        return parent::createIncomingRelation($values, $isReference);
+    function createIncomingRelation($values = array()) {
+        return parent::createIncomingRelation($values);
     }
 
     
@@ -343,8 +343,8 @@ class Child_Person_Base_Object extends Sample_Person {
     /**
      * @return Child_Relation  
      */
-    function createOutgoingRelation($values = array(), $isReference = false) {
-        return parent::createOutgoingRelation($values, $isReference);
+    function createOutgoingRelation($values = array()) {
+        return parent::createOutgoingRelation($values);
     }
 
     
@@ -377,8 +377,8 @@ class Child_Person_Base_Object extends Sample_Person {
     /**
      * @return Child_Shop_Product  
      */
-    function createExtraCodeShopProduct($values = array(), $isReference = false) {
-        return parent::createExtraCodeShopProduct($values, $isReference);
+    function createExtraCodeShopProduct($values = array()) {
+        return parent::createExtraCodeShopProduct($values);
     }
 
     
@@ -411,8 +411,8 @@ class Child_Person_Base_Object extends Sample_Person {
     /**
      * @return Child_Shop_Product  
      */
-    function createNoteShopProduct($values = array(), $isReference = false) {
-        return parent::createNoteShopProduct($values, $isReference);
+    function createNoteShopProduct($values = array()) {
+        return parent::createNoteShopProduct($values);
     }
 
     

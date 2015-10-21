@@ -25,11 +25,9 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     public $_outgoingRelationsCount = false;
     public $_outgoingRelationsLoaded = false;
     public $_extraCodeShopProducts = false;
-    public $_extraCodeShopProductsCount = false;
-    public $_extraCodeShopProductsLoaded = false;
+    public $_shopProductsCount = false;
+    public $_shopProductsLoaded = false;
     public $_noteShopProducts = false;
-    public $_noteShopProductsCount = false;
-    public $_noteShopProductsLoaded = false;
     public $personId = NULL;
     public $name = '';
     public $gender = 'F';
@@ -68,7 +66,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
  
     protected function listOwnLists() {
         
-        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', 'extraCodeShopProducts' => 'extraCodeShopProducts', 'noteShopProducts' => 'noteShopProducts', );
+        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', 'extraCodeShopProducts' => 'shopProducts', 'noteShopProducts' => 'shopProducts', );
     }
 
     
@@ -78,7 +76,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'portraitPersonPhoto' => array (
                 'className' => 'Sample_Person_Photo',
@@ -109,7 +107,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'arrayValue' => true,
                 'controlType' => 'selectList',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Tag_Mapper',
                 ),
                 'showInTable' => false,
@@ -164,7 +162,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPrefix' => 'extraCode',
                 'caption' => 'Shop products',
                 'relationId' => '_extraCodeShopProducts',
-                'countVarName' => '_extraCodeShopProductsCount',
+                'countVarName' => '_shopProductsCount',
                 'referenceVarName' => '_extraCodeShopProducts',
             ),
             'noteShopProducts' => array (
@@ -173,7 +171,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPrefix' => 'note',
                 'caption' => 'Shop products',
                 'relationId' => '_noteShopProducts',
-                'countVarName' => '_noteShopProductsCount',
+                'countVarName' => '_shopProductsCount',
                 'referenceVarName' => '_noteShopProducts',
             ),
             'personId' => array (
@@ -234,7 +232,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Religion_Mapper',
                 ),
                 'objectPropertyName' => 'religion',
@@ -247,7 +245,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Photo_Mapper',
                 ),
                 'objectPropertyName' => 'portraitPersonPhoto',
@@ -262,8 +260,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
         
     
     /**
@@ -298,11 +294,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Photo  
      */
-    function createPortraitPersonPhoto($values = array(), $isReference = false) {
+    function createPortraitPersonPhoto($values = array()) {
         $m = $this->getMapper('Sample_Person_Photo_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPortraitPersonPhoto($res);
         return $res;
     }
@@ -342,11 +337,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Religion  
      */
-    function createReligion($values = array(), $isReference = false) {
+    function createReligion($values = array()) {
         $m = $this->getMapper('Sample_Religion_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setReligion($res);
         return $res;
     }
@@ -412,11 +406,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Tag  
      */
-    function createTag($values = array(), $isReference = false) {
+    function createTag($values = array()) {
         $m = $this->getMapper('Sample_Tag_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addTag($res);
         return $res;
     }
@@ -499,11 +492,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Album  
      */
-    function createPersonAlbum($values = array(), $isReference = false) {
+    function createPersonAlbum($values = array()) {
         $m = $this->getMapper('Sample_Person_Album_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPersonAlbum($res);
         return $res;
     }
@@ -566,11 +558,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Photo  
      */
-    function createPersonPhoto($values = array(), $isReference = false) {
+    function createPersonPhoto($values = array()) {
         $m = $this->getMapper('Sample_Person_Photo_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPersonPhoto($res);
         return $res;
     }
@@ -633,11 +624,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Post  
      */
-    function createPersonPost($values = array(), $isReference = false) {
+    function createPersonPost($values = array()) {
         $m = $this->getMapper('Sample_Person_Post_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPersonPost($res);
         return $res;
     }
@@ -700,11 +690,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Relation  
      */
-    function createIncomingRelation($values = array(), $isReference = false) {
+    function createIncomingRelation($values = array()) {
         $m = $this->getMapper('Sample_Relation_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addIncomingRelation($res);
         return $res;
     }
@@ -767,11 +756,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Relation  
      */
-    function createOutgoingRelation($values = array(), $isReference = false) {
+    function createOutgoingRelation($values = array()) {
         $m = $this->getMapper('Sample_Relation_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addOutgoingRelation($res);
         return $res;
     }
@@ -792,7 +780,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      * @return bool
      */
     function isExtraCodeShopProductsLoaded() {
-        return $this->_extraCodeShopProductsLoaded;
+        return $this->_shopProductsLoaded;
     }
     
     /**
@@ -825,11 +813,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Shop_Product  
      */
-    function createExtraCodeShopProduct($values = array(), $isReference = false) {
+    function createExtraCodeShopProduct($values = array()) {
         $m = $this->getMapper('Sample_Shop_Product_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addExtraCodeShopProduct($res);
         return $res;
     }
@@ -850,7 +837,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      * @return bool
      */
     function isNoteShopProductsLoaded() {
-        return $this->_noteShopProductsLoaded;
+        return $this->_shopProductsLoaded;
     }
     
     /**
@@ -877,18 +864,17 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $this->listNoteShopProducts();
         $this->_noteShopProducts[] = $noteShopProduct;
         
-        $noteShopProduct->_noteNotePerson = $this;
+        $noteShopProduct->_notePerson = $this;
         
     }
 
     /**
      * @return Sample_Shop_Product  
      */
-    function createNoteShopProduct($values = array(), $isReference = false) {
+    function createNoteShopProduct($values = array()) {
         $m = $this->getMapper('Sample_Shop_Product_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addNoteShopProduct($res);
         return $res;
     }

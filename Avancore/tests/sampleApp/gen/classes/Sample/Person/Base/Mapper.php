@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @method Sample_Person[] loadFromRows(array $rows, $keysToList = false)
+ */
 class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
 
     var $pk = 'personId'; 
@@ -12,7 +14,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'personId', 1 => 'name', 2 => 'gender', 3 => 'isSingle', 4 => 'birthDate', 5 => 'lastUpdatedDatetime', 6 => 'createdTs', 7 => 'religionId', 8 => 'portraitId', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'lastUpdatedDatetime', 1 => 'religionId', 2 => 'portraitId', ); 
+    var $nullableColumns = array ( 0 => 'lastUpdatedDatetime', 1 => 'religionId', 2 => 'portraitId', ); 
 
     var $defaults = array (
             'personId' => NULL,
@@ -30,10 +32,6 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     protected $autoincFieldName = 'personId';
     protected $askRelationsForDefaults = false;
  
- 
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (
@@ -59,11 +57,9 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
             '_outgoingRelationsCount' => false,
             '_outgoingRelationsLoaded' => false,
             '_extraCodeShopProducts' => false,
-            '_extraCodeShopProductsCount' => false,
-            '_extraCodeShopProductsLoaded' => false,
+            '_shopProductsCount' => false,
+            '_shopProductsLoaded' => false,
             '_noteShopProducts' => false,
-            '_noteShopProductsCount' => false,
-            '_noteShopProductsLoaded' => false,
         ));
     }
     
@@ -116,7 +112,86 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
+    
+    /**
+     * Loads array of records.
+     * 
+     * @return Sample_Person[] Records in the same order as in $ids array
+     * @param array ids - Array of record identifiers
+     * @param bool $keysToList DOES NOT accept customary fields
+     */
+    function loadRecordsArray(array $ids, $keysToList = false) {
+        return parent::loadRecordsArray($ids, $keysToList);
+    }
 
+    /**
+     * @deprecated Will be removed in 0.4
+     * @return Sample_Person[]
+     */
+    function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadRecordsByCriteria($where, $keysToList, $order, $joins, $limitOffset, $limitCount, $tableAlias);
+    }
+    
+    /**
+     * Returns first matching record 
+     * 
+     * @param array $query
+     * @param mixed $sort
+     * @return Sample_Person     */
+    function findFirst (array $query = array(), $sort = false) {
+        return parent::findFirst($query, $sort);
+    }
+    
+    /**
+     * Returns the matching record only when resultset contains one record
+     * 
+     * @param array $query
+     * @return Sample_Person     */
+    function findOne (array $query = array()) {
+        return parent::findOne($query);
+    }
+    
+    /**
+     * @param array $query
+     * @param mixed $keysToList
+     * @param mixed $sort
+     * @param int $limit
+     * @param int $offset
+     * @param bool $forceStorage
+     * @return Sample_Person[]
+     */
+    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+        if (func_num_args() > 5) $remainingQuery = true;
+        return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
+    }
+    
+    /**
+     * Does partial search.
+     * 
+     * Objects are always returned by-identifiers.
+     * 
+     * @return Sample_Person[]
+     *
+     * @param array $inMemoryRecords - set of in-memory records to search in
+     * @param type $areByIdentifiers - whether $inMemoryRecords are already indexed by identifiers
+     * @param array $query - the query (set of criteria)
+     * @param mixed $sort - how to sort
+     * @param int $limit
+     * @param int $offset
+     * @param bool $canUseStorage - whether to ask storage to find missing items or apply storage-specific criteria first
+     * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
+     * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
+     */
+    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+        if (func_num_args() > 5) $remainingQuery = true;
+        return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
+    }
+    
+
+    
+    function getTitleFieldName() {
+        return 'name';   
+    }
     
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
@@ -237,8 +312,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Shop_Product_Mapper',
                 'srcVarName' => '_extraCodeShopProducts',
-                'srcCountVarName' => '_extraCodeShopProductsCount',
-                'srcLoadedVarName' => '_extraCodeShopProductsLoaded',
+                'srcCountVarName' => '_shopProductsCount',
+                'srcLoadedVarName' => '_shopProductsLoaded',
                 'fieldLinks' => array (
                     'personId' => 'responsiblePersonId',
                 ),
@@ -249,9 +324,9 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Shop_Product_Mapper',
                 'srcVarName' => '_noteShopProducts',
-                'srcCountVarName' => '_noteShopProductsCount',
-                'srcLoadedVarName' => '_noteShopProductsLoaded',
-                'destVarName' => '_noteNotePerson',
+                'srcCountVarName' => '_shopProductsCount',
+                'srcLoadedVarName' => '_shopProductsLoaded',
+                'destVarName' => '_notePerson',
                 'destCountVarName' => '_noteShopProductsCount',
                 'destLoadedVarName' => '_noteShopProductsLoaded',
                 'fieldLinks' => array (
@@ -455,7 +530,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-    return array (
+        return array (
             'PRIMARY' => array (
                 0 => 'personId',
             ),
@@ -471,7 +546,6 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-    
     /**
      * Returns (but not loads!) one or more people of given one or more personPhotos 
      * @param Sample_Person|array $portraitPersonPhotos     

@@ -77,12 +77,6 @@ class Ac_Cg_Model extends Ac_Cg_Base {
      */
     var $properties = array();
     
-    /**
-     * Whether Ac_Model_Object should track it's changes (and it's trackChanges() function should return true)
-     * @var bool
-     */
-    var $tracksChanges = false;
-    
     var $fixMapperMethodNames = false;
     
     var $extraOwnPropertiesInfo = array();
@@ -100,7 +94,7 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     
     var $createAccessors = false;
     
-    var $nullableSqlColumns = false;
+    var $nullableColumns = false;
     
     protected $relationPrototypes = false;
     
@@ -307,6 +301,26 @@ class Ac_Cg_Model extends Ac_Cg_Base {
                 }
             }
         }
+        if (!strlen($this->titleProp) && $this->_domain->autoDetectTitles) {
+            $titleCol = false;
+            
+            // search for first char/varchar column with length > 1, 
+            // but prefer unique index char/varchar if found later
+            
+            foreach ($this->tableObject->listColumns() as $i) { $col = $this->tableObject->getColumn($i);
+                if (in_array(strtolower($col->type), array('char', 'varchar')) && $col->width > 1) {
+                    if ($col->isUnique()) {
+                        $titleCol = $col->name;
+                        break;
+                    } elseif ($titleCol === false) {
+                        $titleCol = $col->name;
+                    }
+                }
+            }
+            
+            if (strlen($titleCol)) $this->titleProp = $titleCol;
+            
+        }
     }
     
     function getModelBaseName() {
@@ -326,8 +340,7 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         if (($pm = $this->getParentModel())) {
             $res = $pm->className;
         } else {
-            if (count($this->tableObject->listPkFields()) == 1) $res = 'Ac_Model_Object';
-                else $res = 'Ac_Model_CpkObject'; 
+            $res = 'Ac_Model_Object';
         }
         return $res;
     }
@@ -415,11 +428,11 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         if (!$this->parentClassName) $this->parentClassName = $this->getDefaultParentClassName();
         if (!$this->parentMapperClassName) $this->parentMapperClassName = $this->getDefaultParentMapperClassName();
         
-        if ($this->nullableSqlColumns === false) {
-            $this->nullableSqlColumns = array();
+        if ($this->nullableColumns === false) {
+            $this->nullableColumns = array();
             foreach ($this->listUsedColumns() as $i) {
                 $col = $this->tableObject->getColumn($i);
-                if ($col->nullable) $this->nullableSqlColumns[] = $i;
+                if ($col->nullable) $this->nullableColumns[] = $i;
             }
         }
         
@@ -704,10 +717,8 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     function getDefaultParentMapperClassName() {
         if ($pm = $this->getParentModel()) {
             $res = $pm->getMapperClass();
-        } elseif (count($this->tableObject->listPkFields()) == 1) {
-            $res = 'Ac_Model_Mapper';
         } else {
-            $res = 'Ac_Model_CpkMapper'; 
+            $res = 'Ac_Model_Mapper';
         }
         return $res;
     }

@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @method Sample_Publish[] loadFromRows(array $rows, $keysToList = false)
+ */
 class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $pk = 'id'; 
@@ -12,7 +14,7 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $columnNames = array ( 0 => 'id', 1 => 'sharedObjectType', 2 => 'published', 3 => 'deleted', 4 => 'publishUp', 5 => 'publishDown', 6 => 'authorId', 7 => 'editorId', 8 => 'pubChannelId', 9 => 'dateCreated', 10 => 'dateModified', 11 => 'dateDeleted', ); 
 
-    var $nullableSqlColumns = array ( 0 => 'published', 1 => 'deleted', 2 => 'publishUp', 3 => 'publishDown', 4 => 'authorId', 5 => 'editorId', 6 => 'pubChannelId', ); 
+    var $nullableColumns = array ( 0 => 'published', 1 => 'deleted', 2 => 'publishUp', 3 => 'publishDown', 4 => 'authorId', 5 => 'editorId', 6 => 'pubChannelId', ); 
 
     var $defaults = array (
             'id' => NULL,
@@ -34,14 +36,10 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
     protected $askRelationsForDefaults = false;
  
  
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
- 
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (
-            '_authorAuthorPerson' => false,
-            '_editorEditorPerson' => false,
+            '_authorPerson' => false,
+            '_editorPerson' => false,
         ));
     }
     
@@ -94,14 +92,93 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
     function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
+    
+    /**
+     * Loads array of records.
+     * 
+     * @return Sample_Publish[] Records in the same order as in $ids array
+     * @param array ids - Array of record identifiers
+     * @param bool $keysToList DOES NOT accept customary fields
+     */
+    function loadRecordsArray(array $ids, $keysToList = false) {
+        return parent::loadRecordsArray($ids, $keysToList);
+    }
 
+    /**
+     * @deprecated Will be removed in 0.4
+     * @return Sample_Publish[]
+     */
+    function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadRecordsByCriteria($where, $keysToList, $order, $joins, $limitOffset, $limitCount, $tableAlias);
+    }
+    
+    /**
+     * Returns first matching record 
+     * 
+     * @param array $query
+     * @param mixed $sort
+     * @return Sample_Publish     */
+    function findFirst (array $query = array(), $sort = false) {
+        return parent::findFirst($query, $sort);
+    }
+    
+    /**
+     * Returns the matching record only when resultset contains one record
+     * 
+     * @param array $query
+     * @return Sample_Publish     */
+    function findOne (array $query = array()) {
+        return parent::findOne($query);
+    }
+    
+    /**
+     * @param array $query
+     * @param mixed $keysToList
+     * @param mixed $sort
+     * @param int $limit
+     * @param int $offset
+     * @param bool $forceStorage
+     * @return Sample_Publish[]
+     */
+    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+        if (func_num_args() > 5) $remainingQuery = true;
+        return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
+    }
+    
+    /**
+     * Does partial search.
+     * 
+     * Objects are always returned by-identifiers.
+     * 
+     * @return Sample_Publish[]
+     *
+     * @param array $inMemoryRecords - set of in-memory records to search in
+     * @param type $areByIdentifiers - whether $inMemoryRecords are already indexed by identifiers
+     * @param array $query - the query (set of criteria)
+     * @param mixed $sort - how to sort
+     * @param int $limit
+     * @param int $offset
+     * @param bool $canUseStorage - whether to ask storage to find missing items or apply storage-specific criteria first
+     * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
+     * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
+     */
+    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+        if (func_num_args() > 5) $remainingQuery = true;
+        return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
+    }
+    
+
+    
+    function getTitleFieldName() {
+        return 'pubChannelId';   
+    }
     
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_authorAuthorPerson' => array (
+            '_authorPerson' => array (
                 'srcMapperClass' => 'Sample_Publish_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
-                'srcVarName' => '_authorAuthorPerson',
+                'srcVarName' => '_authorPerson',
                 'fieldLinks' => array (
                     'authorId' => 'personId',
                 ),
@@ -109,10 +186,10 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
             ),
-            '_editorEditorPerson' => array (
+            '_editorPerson' => array (
                 'srcMapperClass' => 'Sample_Publish_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
-                'srcVarName' => '_editorEditorPerson',
+                'srcVarName' => '_editorPerson',
                 'fieldLinks' => array (
                     'editorId' => 'personId',
                 ),
@@ -137,7 +214,7 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-    return array (
+        return array (
             'PRIMARY' => array (
                 0 => 'id',
             ),
@@ -166,7 +243,6 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
-    
     
 }
 

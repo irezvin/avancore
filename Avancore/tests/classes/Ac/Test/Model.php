@@ -18,11 +18,11 @@ class Ac_Test_Model extends Ac_Test_Base {
         $e = $pers->getErrors();
         $this->assertTrue(is_null(Ac_Util::getArrayByPath($e, array('religionId', 'valueList'))));
        
-        $vList = Ac_Model_Values::factoryWithFormOptions($pers, 'religionId');
-        $this->assertTrue($vList instanceof Ac_Model_Values_Records);
+        $vList = Ac_Model_Values::factoryWithProperty($pers->getPropertyInfo('religionId'));
+        $this->assertTrue($vList instanceof Ac_Model_Values_Mapper);
         
         // order with best possible caching
-        if ($vList instanceof Ac_Model_Values_Records) {
+        if ($vList instanceof Ac_Model_Values_Mapper) {
             $this->assertEqual(count($va = $vList->filterValuesArray(array(1, 2, 3, 999))), 3);
             $this->assertEqual(count($vList->filterValuesArray(array(1, 2, 3))), 3);
             $this->assertTrue($vList->check(1));
@@ -31,9 +31,9 @@ class Ac_Test_Model extends Ac_Test_Base {
         }
         
         // reverse order
-        $vList = Ac_Model_Values::factoryWithFormOptions($pers, 'religionId');
-        $this->assertTrue($vList instanceof Ac_Model_Values_Records);
-        if ($vList instanceof Ac_Model_Values_Records) {
+        $vList = Ac_Model_Values::factoryWithProperty($pers->getPropertyInfo('religionId'));
+        $this->assertTrue($vList instanceof Ac_Model_Values_Mapper);
+        if ($vList instanceof Ac_Model_Values_Mapper) {
             $this->assertTrue($vList->check(1));
             $this->assertEqual(count($vList->filterValuesArray(array(1, 2, 3))), 3);
             $this->assertEqual(count($va = $vList->filterValuesArray(array(1, 2, 3, 999))), 3);
@@ -42,9 +42,9 @@ class Ac_Test_Model extends Ac_Test_Base {
         }
         
         // all in the cache
-        $vList = Ac_Model_Values::factoryWithFormOptions($pers, 'religionId');
-        $this->assertTrue($vList instanceof Ac_Model_Values_Records);
-        if ($vList instanceof Ac_Model_Values_Records) {
+        $vList = Ac_Model_Values::factoryWithProperty($pers->getPropertyInfo('religionId'));
+        $this->assertTrue($vList instanceof Ac_Model_Values_Mapper);
+        if ($vList instanceof Ac_Model_Values_Mapper) {
             $rm->getAllRecords(); // will populate all records
             $this->assertTrue($vList->check(1));
             $this->assertEqual(count($vList->filterValuesArray(array(1, 2, 3))), 3);

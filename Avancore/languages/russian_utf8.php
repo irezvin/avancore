@@ -33,8 +33,8 @@ if (!defined ('AC_REQUIRED_FIELD')) define ('AC_REQUIRED_FIELD', '(Обязат�
 if (!defined ('AC_YES')) define ('AC_YES', 'Да');
 if (!defined ('AC_NO')) define ('AC_NO', 'Нет');
 
-if (!defined ('AC_SUCH_VALUES_OF_FIELD_SINGLE')) define ('AC_SUCH_VALUES_OF_FIELD_SINGLE', 'such values of a fields');
-if (!defined ('AC_SUCH_VALUES_OF_FIELD_MULTIPLE')) define ('AC_SUCH_VALUES_OF_FIELD_MULTIPLE', 'such value of a field');
+if (!defined ('AC_SUCH_VALUES_OF_FIELD_SINGLE')) define ('AC_SUCH_VALUES_OF_FIELD_SINGLE', 'such values of a field');
+if (!defined ('AC_SUCH_VALUES_OF_FIELD_MULTIPLE')) define ('AC_SUCH_VALUES_OF_FIELD_MULTIPLE', 'such value of a fields');
 if (!defined ('AC_RECORD_BY_INDEX_ALREADY_EXISTS')) define ('AC_RECORD_BY_INDEX_ALREADY_EXISTS', 'Record with %s %s already exists in the database');
 
 if (!defined('AC_VALIDATOR_MSGS')) define('AC_VALIDATOR_MSGS', 1);

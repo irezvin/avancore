@@ -147,6 +147,8 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
      */
     var $defaultTitlePropName = false;
     
+    var $autoDetectTitles = true;
+    
     /**
      * Default name for model special properties auto-detection
      * @see Ac_Cg_Model::detectSpecialProperties  
@@ -470,8 +472,11 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
 	            if (!strncmp($coolName, $this->replaceTablePrefixWith, $l)) $coolName = substr($coolName, $l);
 	        }
 	        if (strlen($this->extraStripFromIds)) {
-	            $l = strlen($this->extraStripFromIds);
-	            if (!strncmp($coolName, $this->extraStripFromIds, $l)) $coolName = substr($coolName, $l);
+                if ($this->extraStripFromIds{0} == '/') $coolName = preg_replace ($this->extraStripFromIds, '', $coolName);
+                else {
+                    $l = strlen($this->extraStripFromIds);
+                    if (!strncmp($coolName, $this->extraStripFromIds, $l)) $coolName = substr($coolName, $l);
+                }
 	        }
 	        $coolName = Ac_Cg_Util::addSpacesBeforeCamelCase($coolName);
 	        $coolName = str_replace('_', ' ', $coolName);

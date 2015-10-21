@@ -310,7 +310,10 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $a = $pm->loadByPersonId(3);
         $b = $pm->loadByPersonId(4);
         $this->assertEqual($rel->countDest($a), 0);
-        $this->assertEqual($rel->countDest($b), 2);
+        
+        if (!$this->assertEqual($res = $rel->countDest($b), 2)) {
+            var_dump($res);
+        }
         
         $a = $pm->loadByPersonId(3);
         $b = $pm->loadByPersonId(4);
