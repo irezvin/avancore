@@ -11,10 +11,10 @@ class Sample_Shop_Product_Note_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
     
     protected function doGetRelationPrototypes() {
         return array (
-            '_noteNotePerson' => array (
+            '_notePerson' => array (
                 'srcMapperClass' => 'Sample_Shop_Product_Note_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
-                'srcVarName' => '_noteNotePerson',
+                'srcVarName' => '_notePerson',
                 'srcCountVarName' => '_noteShopProductsCount',
                 'srcLoadedVarName' => '_noteShopProductsLoaded',
                 'destVarName' => '_noteShopProducts',
@@ -33,8 +33,8 @@ class Sample_Shop_Product_Note_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
     
     protected function doGetAssociationPrototypes() {
         return array (
-            'noteNotePerson' => array (
-                'relationId' => '_noteNotePerson',
+            'notePerson' => array (
+                'relationId' => '_notePerson',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
                 'single' => 'notePerson',
@@ -58,7 +58,7 @@ class Sample_Shop_Product_Note_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
      * @param Sample_Shop_Product_Note|array $shopProductNotes     
      */
     function loadNotePeopleFor($shopProductNotes) {
-        $rel = $this->getRelation('_noteNotePerson');
+        $rel = $this->getRelation('_notePerson');
         return $rel->loadDest($shopProductNotes); 
     }
 

@@ -1,11 +1,12 @@
 <?php
-
+/**
+ * @method Child_Person_Album[] loadFromRows(array $rows, $keysToList = false)
+ */
 class Child_Person_Album_Base_Mapper extends Sample_Person_Album_Mapper {
 
     var $recordClass = 'Child_Person_Album'; 
 
     var $id = 'Child_Person_Album_Mapper'; 
- 
  
  
  
@@ -58,7 +59,86 @@ class Child_Person_Album_Base_Mapper extends Sample_Person_Album_Mapper {
     function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
+    
+    /**
+     * Loads array of records.
+     * 
+     * @return Child_Person_Album[] Records in the same order as in $ids array
+     * @param array ids - Array of record identifiers
+     * @param bool $keysToList DOES NOT accept customary fields
+     */
+    function loadRecordsArray(array $ids, $keysToList = false) {
+        return parent::loadRecordsArray($ids, $keysToList);
+    }
 
+    /**
+     * @deprecated Will be removed in 0.4
+     * @return Child_Person_Album[]
+     */
+    function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadRecordsByCriteria($where, $keysToList, $order, $joins, $limitOffset, $limitCount, $tableAlias);
+    }
+    
+    /**
+     * Returns first matching record 
+     * 
+     * @param array $query
+     * @param mixed $sort
+     * @return Child_Person_Album     */
+    function findFirst (array $query = array(), $sort = false) {
+        return parent::findFirst($query, $sort);
+    }
+    
+    /**
+     * Returns the matching record only when resultset contains one record
+     * 
+     * @param array $query
+     * @return Child_Person_Album     */
+    function findOne (array $query = array()) {
+        return parent::findOne($query);
+    }
+    
+    /**
+     * @param array $query
+     * @param mixed $keysToList
+     * @param mixed $sort
+     * @param int $limit
+     * @param int $offset
+     * @param bool $forceStorage
+     * @return Child_Person_Album[]
+     */
+    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+        if (func_num_args() > 5) $remainingQuery = true;
+        return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
+    }
+    
+    /**
+     * Does partial search.
+     * 
+     * Objects are always returned by-identifiers.
+     * 
+     * @return Child_Person_Album[]
+     *
+     * @param array $inMemoryRecords - set of in-memory records to search in
+     * @param type $areByIdentifiers - whether $inMemoryRecords are already indexed by identifiers
+     * @param array $query - the query (set of criteria)
+     * @param mixed $sort - how to sort
+     * @param int $limit
+     * @param int $offset
+     * @param bool $canUseStorage - whether to ask storage to find missing items or apply storage-specific criteria first
+     * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
+     * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
+     */
+    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+        if (func_num_args() > 5) $remainingQuery = true;
+        return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
+    }
+    
+
+    
+    function getTitleFieldName() {
+        return 'albumName';   
+    }
     
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
@@ -93,7 +173,6 @@ class Child_Person_Album_Base_Mapper extends Sample_Person_Album_Mapper {
         $res = parent::loadByAlbumId($albumId);
         return $res;
     }
-    
     
 }
 

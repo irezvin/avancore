@@ -54,7 +54,6 @@ $config = array(
         'modelDefaults' => array(
             'generateMethodPlaceholders' => true,
             'noUi' => true,
-        	'tracksChanges' => true,
         	'hasUniformPropertiesInfo' => true,
         ),
         'models' => array(
@@ -92,6 +91,14 @@ $config = array(
                 ),
                 'skipMapperMixables' => array(
                     'fkPostPublish',
+                ),
+                'objectTypeField' => 'sharedObjectType',
+                'perModelMapperMixableExtras' => array(
+                    'shopProducts' => array(
+                        'fieldNames' => array(
+                            'sharedObjectType' => false,
+                        ),
+                    ),
                 ),
             ),
             'shopProductExtraCodes' => array(

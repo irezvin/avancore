@@ -22,7 +22,7 @@ class Child_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable_
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
         if ($pi === false) $pi = array (
-            'extraCodeExtraCodePerson' => array (
+            'extraCodePerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
             ),
@@ -64,8 +64,8 @@ class Child_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable_
     /**
      * @return Child_Person  
      */
-    function createExtraCodePerson($values = array(), $isReference = false) {
-        return parent::createExtraCodePerson($values, $isReference);
+    function createExtraCodePerson($values = array()) {
+        return parent::createExtraCodePerson($values);
     }
 
     

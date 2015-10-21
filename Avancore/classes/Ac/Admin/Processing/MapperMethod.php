@@ -8,7 +8,7 @@ class Ac_Admin_Processing_MapperMethod extends Ac_Admin_Processing {
     
     function executeProcess() {
         if ($this->provideRecordKeys) {
-            $args = array($this->_getRecordKeysFromRequest());
+            $args = array($this->_getIdentifiersFromRequest());
             if (!$args[0] && $this->defaultToAllRecords) {
                 $coll = $this->_doGetRecordsCollection();
                 $kk = $coll->getPkName();

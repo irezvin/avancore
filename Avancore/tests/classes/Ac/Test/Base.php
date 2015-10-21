@@ -47,6 +47,10 @@ class Ac_Test_Base extends UnitTestCase {
             $appClassFile = dirname(dirname(dirname(dirname(__FILE__)))).'/sampleApp/classes/Sample.php';
             require_once($appClassFile);
             $this->sampleApp = Sample::getInstance();
+            $appLangFile = dirname(dirname(dirname(dirname(__FILE__)))).'/../languages/english.php';
+            if (!defined('ACLT_LANG')) {
+                require_once($appLangFile);
+            }
         }
         return $this->sampleApp;
     }
@@ -125,11 +129,48 @@ class Ac_Test_Base extends UnitTestCase {
 		return $r;
 	}
 	
-	function assertArraysMatch($left, $right, $message = '%s', $exactItems = false) {
-		if ($exactItems !== true) {
+	static function sortArrayItems($array) {
+        $res = $array;
+        $tmp = array();
+        foreach ($res as $k => $v) {
+            if (is_array($v)) $v = self::sortArrayItems($v);
+            if (is_numeric($k)) {
+                $tmp[] = $v;
+                unset($res[$k]);
+            }
+                else $res[$k] = $v;
+        }
+        ksort($res);
+        usort($tmp, function($a, $b) {
+            $a = Ac_Test_Base::toCompare($a);
+            $b = Ac_Test_Base::toCompare($b);
+            return strcmp($a, $b);
+        });
+        $res = array_merge($res, $tmp);
+        return $res;
+    }
+    
+    static function toCompare($a) {
+        $res = $a;
+        if (is_object($res)) $res = spl_object_hash ($res);
+        elseif (is_array($res)) $res = serialize($res);
+        else $res = ''.$res;
+        return $res;
+    }
+    
+    function assertArraysMatch($left, $right, $message = '%s', $exactItems = false) {
+		if ($exactItems === 'sort') {
+            $left = self::sortArrayItems($left);
+            $right = self::sortArrayItems($right);
+//            echo '<hr />';
+//            var_dump($left, $right);
+//            echo '<hr />';
+        }
+        if ($exactItems === false) {
             $right = $this->stripRightArrayToLeft($left, $right, $exactItems); 
         }
-		return $this->assertEqual($left, $right, $message);
+		$res = $this->assertEqual($left, $right, $message);
+        return $res;
 	}
     
     function normalizeHtml($html, $stripBreaks = true) {
@@ -150,8 +191,20 @@ class Ac_Test_Base extends UnitTestCase {
     }
     
     function resetAi($tableName, $ai = false) {
-        // MySQL only!!!
         $db = $this->getAeDb();
+        $real = true;
+        if (!$real) {
+            $dbn = $db->getDbName();
+            $tableName = $db->replacePrefix($tableName);
+            $res = $db->fetchValue($q = "
+                SELECT `AUTO_INCREMENT`
+                FROM  INFORMATION_SCHEMA.TABLES
+                WHERE TABLE_SCHEMA = '{$dbn}'
+                AND   TABLE_NAME   = '{$tableName}';
+            ");
+            return $res;
+        }
+        // MySQL only!!!
         $cols = $db->fetchArray("SHOW COLUMNS FROM ".$db->n($tableName), 'Field');
         $res = false;
         foreach ($cols as $col => $data) {
@@ -168,5 +221,36 @@ class Ac_Test_Base extends UnitTestCase {
         }
         return $res;
     }
-	
+    
+    function deleteProducts($where) {
+        if (is_array($where)) {
+            foreach ($where as $w) $this->deleteProducts($w);
+        }
+        $db = $this->getAeDb();
+        if (is_numeric($where)) {
+            $where = 'p.id '.$db->q($where);
+        }
+        $db->query("
+            DELETE p.*, m.*, pub.* 
+            FROM #__shop_products p 
+                LEFT JOIN #__shop_meta m ON m.id = p.metaId
+                LEFT JOIN #__publish pub ON p.pubId = pub.id
+                WHERE $where
+        ");
+    }
+    
+    function getMaxId($tableName) {
+        $db = $this->getAeDb();
+        $tableName = $db->replacePrefix($tableName);
+        $cols = $db->fetchArray("SHOW COLUMNS FROM ".$db->n($tableName), 'Field');
+        $res = false;
+        foreach ($cols as $col => $data) {
+            if ($data['Key'] == 'PRI') {
+                $res = $db->fetchValue("SELECT MAX(".$db->n($col).") FROM ".$db->n($tableName));
+            }
+        }
+        if (!$res) $res = 0;
+        return $res;
+    }
+    
 }

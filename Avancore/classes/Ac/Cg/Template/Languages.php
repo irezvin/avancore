@@ -40,8 +40,8 @@ class Ac_Cg_Template_Languages extends Ac_Cg_Template {
         $this->phpOpen();
 ?>
 
-	$lang = <?php $this->exportArray($this->langStrings, 4); ?>;
-	
+    $lang = <?php $this->exportArray($this->langStrings, 4); ?>;
+    
 <?php         
     } 
     
@@ -49,14 +49,14 @@ class Ac_Cg_Template_Languages extends Ac_Cg_Template {
     function showLangFile() {
         $this->phpOpen();
 ?>
-	
-	require(dirname(__FILE__).'/../../languages/en.php');
-	Ac_Util::ms($lang, array(
-	
-//	'lang_string_1' => 'caption_1',
-//	'lang_string_2' => 'caption_2',	
-	
-	));
+    
+    require(dirname(__FILE__).'/../../languages/en.php');
+    Ac_Util::ms($lang, array(
+    
+//  'lang_string_1' => 'caption_1',
+//  'lang_string_2' => 'caption_2', 
+    
+    ));
 
 <?php        
     }

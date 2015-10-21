@@ -188,8 +188,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     function applyToFormSettings(& $formSettings) {
         $rec = $this->manager->getRecord();
         $mpr = $this->manager->getMapper();
-        if ($mpr) $aif = $mpr->getAutoincFieldName();
-            else $aif = false;
+        $gen = $mpr->listGeneratedFields();
         $conv = new Ac_Form_Converter();
         $do = $this->displayOrderStart;
         if ($this->addErrorList) {
@@ -206,7 +205,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
                     $conf['displayOrder'] = $do;
                 $do += $this->displayOrderStep;
             }
-            if ($prop->propName === $aif) {
+            if (in_array($prop->propName, $gen)) {
                 $conf['readOnly'] = true;
                 $conf['emptyCaption'] = AC_ID_EMPTY_CAPTION;
             }

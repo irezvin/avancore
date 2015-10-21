@@ -26,7 +26,7 @@ class Child_Person_Photo_Base_Object extends Sample_Person_Photo {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'person' => array (
                 'className' => 'Child_Person',
@@ -81,8 +81,8 @@ class Child_Person_Photo_Base_Object extends Sample_Person_Photo {
     /**
      * @return Child_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
-        return parent::createPerson($values, $isReference);
+    function createPerson($values = array()) {
+        return parent::createPerson($values);
     }
 
     
@@ -114,8 +114,8 @@ class Child_Person_Photo_Base_Object extends Sample_Person_Photo {
     /**
      * @return Child_Person_Album  
      */
-    function createPersonAlbum($values = array(), $isReference = false) {
-        return parent::createPersonAlbum($values, $isReference);
+    function createPersonAlbum($values = array()) {
+        return parent::createPersonAlbum($values);
     }
 
     
@@ -141,8 +141,8 @@ class Child_Person_Photo_Base_Object extends Sample_Person_Photo {
     /**
      * @return Child_Person  
      */
-    function createPortraitPerson($values = array(), $isReference = false) {
-        return parent::createPortraitPerson($values, $isReference);
+    function createPortraitPerson($values = array()) {
+        return parent::createPortraitPerson($values);
     }
 
     
@@ -174,8 +174,8 @@ class Child_Person_Photo_Base_Object extends Sample_Person_Photo {
     /**
      * @return Child_Person_Post  
      */
-    function createPersonPost($values = array(), $isReference = false) {
-        return parent::createPersonPost($values, $isReference);
+    function createPersonPost($values = array()) {
+        return parent::createPersonPost($values);
     }
 
     

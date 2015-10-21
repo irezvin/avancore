@@ -53,7 +53,6 @@ $config = array(
         'modelDefaults' => array(
             'generateMethodPlaceholders' => true,
             'noUi' => true,
-            'tracksChanges' => true,
             'hasUniformPropertiesInfo' => true,
         ),
         

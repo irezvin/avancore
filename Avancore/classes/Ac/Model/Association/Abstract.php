@@ -665,16 +665,15 @@ abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac
         return $res;
     }
     
-    function createDestObject($object, $values = array(), $isReference = false) {
+    function createDestObject($object, $values = array()) {
         if (!$this->canCreateDestObject) 
             throw new Ac_E_InvalidCall("Cannot createDestObject when \$canCreateDestObject === FALSE");
         if ($this->useModelMethods && ($m = $this->createDestObjectMethod)) {
-            $res = $object->$m($values, $isReference);
+            $res = $object->$m($values);
         } else {
             $m = $object->getDestMapper();
             $res = $m->createRecord();
             if ($values) $res->bind($values);
-            if ($isReference) $res->_setIsReference(true);
             $this->doAssignDestObject($object, $res);
         }
         return $res;

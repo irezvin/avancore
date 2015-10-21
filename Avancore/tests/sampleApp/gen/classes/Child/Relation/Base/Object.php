@@ -32,7 +32,7 @@ class Child_Relation_Base_Object extends Sample_Relation {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'relationType' => array (
                 'className' => 'Child_Relation_Type',
@@ -98,8 +98,8 @@ class Child_Relation_Base_Object extends Sample_Relation {
     /**
      * @return Child_Relation_Type  
      */
-    function createRelationType($values = array(), $isReference = false) {
-        return parent::createRelationType($values, $isReference);
+    function createRelationType($values = array()) {
+        return parent::createRelationType($values);
     }
 
     
@@ -124,8 +124,8 @@ class Child_Relation_Base_Object extends Sample_Relation {
     /**
      * @return Child_Person  
      */
-    function createIncomingPerson($values = array(), $isReference = false) {
-        return parent::createIncomingPerson($values, $isReference);
+    function createIncomingPerson($values = array()) {
+        return parent::createIncomingPerson($values);
     }
 
     
@@ -150,8 +150,8 @@ class Child_Relation_Base_Object extends Sample_Relation {
     /**
      * @return Child_Person  
      */
-    function createOutgoingPerson($values = array(), $isReference = false) {
-        return parent::createOutgoingPerson($values, $isReference);
+    function createOutgoingPerson($values = array()) {
+        return parent::createOutgoingPerson($values);
     }
 
     

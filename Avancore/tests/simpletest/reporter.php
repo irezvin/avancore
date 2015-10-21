@@ -41,7 +41,7 @@ class HtmlReporter extends SimpleReporter {
      */
     function paintHeader($test_name) {
         $this->sendNoCacheHeaders();
-        print "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">";
+        print "<!DOCTYPE HTML>";
         print "<html>\n<head>\n<title>$test_name</title>\n";
         print "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=" .
                 $this->character_set . "\">\n";
@@ -75,9 +75,52 @@ class HtmlReporter extends SimpleReporter {
      *    @access protected
      */
     protected function getCss() {
-        return ".fail { background-color: inherit; color: red; }" .
-                ".pass { background-color: inherit; color: green; }" .
-                " pre { background-color: lightgray; color: inherit; }";
+        
+        ob_start();
+?>
+        fail { background-color: inherit; color: red; }
+        pass { background-color: inherit; color: green; }
+        pre { background-color: lightgray; color: inherit; }
+        
+        .xdebug-error td, .xdebug-error th {
+            color: black;
+        }
+
+        h1, h2, h3 {
+            font-weight: normal;
+            text-shadow: 2px 2px black;
+        }
+        
+        html {
+            font-family: sans;
+            height: 100%;
+            background-color: #333;
+            background: linear-gradient(to bottom, #424242 0%,#9b9b9b 100%); /* W3C */
+            color: #eee;
+            background-attachment: fixed;
+        }
+
+        pre {
+            color: black;
+        }
+
+
+        span.fail {
+            background-color: red; color: white; padding: 1px 4px; border-radius: 5px; font-weight: bold;
+        }
+
+        body {
+            line-height: 1.8em;
+        }
+        
+        div, pre {
+            border-radius: 5px;
+            padding: 5px;
+            line-height: 1em;
+
+        }
+<?php
+        return ob_get_clean();
     }
 
     /**

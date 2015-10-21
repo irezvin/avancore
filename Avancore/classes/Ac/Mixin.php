@@ -5,22 +5,22 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
     protected $mixables = array();
     
     /**
-     * @param array $methodName => mixableId
+     * @var array $methodName => mixableId
      */
     protected $mixMethodMap = false;
     
     /**
-     * @param array $propertyName => mixableId
+     * @var array $propertyName => mixableId
      */
     protected $mixPropertyMap = false;
 
     /**
-     * @param array $id => $id IDs of 'core' mixables
+     * @var array $id => $id IDs of 'core' mixables
      */
     protected $coreMixableIds = array();
     
     /**
-     * @param array $id => $id IDs of Ac_I_Mixable_Shared
+     * @var array $id => $id IDs of Ac_I_Mixable_Shared
      */
     protected $sharedMixableIds = false;
     

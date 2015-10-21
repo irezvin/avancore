@@ -12,7 +12,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     public $title = '';
     public $metaId = NULL;
     public $pubId = NULL;
-    public $_noteNotePerson = false;
+    public $_notePerson = false;
     public $_noteShopProductsCount = false;
     public $_noteShopProductsLoaded = false;
     public $productId = NULL;
@@ -41,23 +41,23 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopCategories', 1 => 'shopCategoryIds', 7 => 'noteNotePerson', )));
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopCategories', 1 => 'shopCategoryIds', 7 => 'notePerson', )));
     }
     
  
     protected function listOwnLists() {
         
-        return array ( 'shopCategories' => 'shopCategories', 'noteNotePerson' => 'noteShopProducts', );
+        return array ( 'shopCategories' => 'shopCategories', 'notePerson' => 'noteShopProducts', );
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'shopCategories' => 'Sample_Shop_Category', 'noteNotePerson' => 'Sample_Person', );
+        return array ( 'shopCategories' => 'Sample_Shop_Category', 'notePerson' => 'Sample_Person', );
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'shopCategories' => array (
                 'className' => 'Sample_Shop_Category',
@@ -73,7 +73,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 'arrayValue' => true,
                 'controlType' => 'selectList',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Category_Mapper',
                 ),
                 'showInTable' => false,
@@ -109,27 +109,27 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Publish_ImplMapper',
                 ),
                 'isNullable' => true,
                 'caption' => 'Pub Id',
             ),
-            'noteNotePerson' => array (
+            'notePerson' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'note',
                 'caption' => 'People',
-                'relationId' => '_noteNotePerson',
+                'relationId' => '_notePerson',
                 'countVarName' => '_noteShopProductsCount',
-                'referenceVarName' => '_noteNotePerson',
+                'referenceVarName' => '_notePerson',
             ),
             'productId' => array (
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '11',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ),
                 'caption' => 'Product Id',
@@ -144,10 +144,10 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
-                'objectPropertyName' => 'noteNotePerson',
+                'objectPropertyName' => 'notePerson',
                 'isNullable' => true,
                 'caption' => 'Note Author Id',
             ),
@@ -159,8 +159,6 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
 
     function countShopCategories() {
         if (is_array($this->_shopCategories)) return count($this->_shopCategories);
@@ -221,11 +219,10 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Shop_Category  
      */
-    function createShopCategory($values = array(), $isReference = false) {
+    function createShopCategory($values = array()) {
         $m = $this->getMapper('Sample_Shop_Category_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addShopCategory($res);
         return $res;
     }
@@ -256,23 +253,23 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
      * @return Sample_Person 
      */
     function getNotePerson() {
-        if ($this->_noteNotePerson === false) {
+        if ($this->_notePerson === false) {
             $this->mapper->loadNotePeopleFor($this);
             
         }
-        return $this->_noteNotePerson;
+        return $this->_notePerson;
     }
     
     /**
      * @param Sample_Person $notePerson 
      */
     function setNotePerson($notePerson) {
-        if ($notePerson === false) $this->_noteNotePerson = false;
-        elseif ($notePerson === null) $this->_noteNotePerson = null;
+        if ($notePerson === false) $this->_notePerson = false;
+        elseif ($notePerson === null) $this->_notePerson = null;
         else {
             if (!is_a($notePerson, 'Sample_Person')) trigger_error('$notePerson must be an instance of Sample_Person', E_USER_ERROR);
-            if (!is_object($this->_noteNotePerson) && !Ac_Util::sameObject($this->_noteNotePerson, $notePerson)) { 
-                $this->_noteNotePerson = $notePerson;
+            if (!is_object($this->_notePerson) && !Ac_Util::sameObject($this->_notePerson, $notePerson)) { 
+                $this->_notePerson = $notePerson;
             }
         }
     }
@@ -284,11 +281,10 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createNotePerson($values = array(), $isReference = false) {
+    function createNotePerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setNotePerson($res);
         return $res;
     }

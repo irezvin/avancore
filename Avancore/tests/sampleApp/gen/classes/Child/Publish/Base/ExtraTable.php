@@ -11,11 +11,11 @@ class Child_Publish_Base_ExtraTable extends Sample_Publish_MapperMixable {
     
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_authorAuthorPerson' => array (
+            '_authorPerson' => array (
                 'srcMapperClass' => 'Child_Publish_ImplMapper',
                 'destMapperClass' => 'Child_Person_Mapper',
             ),
-            '_editorEditorPerson' => array (
+            '_editorPerson' => array (
                 'srcMapperClass' => 'Child_Publish_ImplMapper',
                 'destMapperClass' => 'Child_Person_Mapper',
             ),

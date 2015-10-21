@@ -26,10 +26,6 @@ class Sample_Shop_Product extends Sample_Shop_Product_Base_Object {
         );
     }
     
-    function tracksPk() {
-        return true;
-    }
-    
     /*
     protected function getOwnPropertiesInfo() {
         return Ac_Util::m(parent::getOwnPropertiesInfo(), array(

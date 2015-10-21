@@ -147,6 +147,8 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
      */
     var $defaultTitlePropName = false;
     
+    var $autoDetectTitles = true;
+    
     /**
      * Default name for model special properties auto-detection
      * @see Ac_Cg_Model::detectSpecialProperties  

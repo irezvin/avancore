@@ -46,7 +46,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'relationType' => array (
                 'className' => 'Sample_Relation_Type',
@@ -86,7 +86,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'controlType' => 'selectList',
                 'maxLength' => '10',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'objectPropertyName' => 'person',
@@ -97,7 +97,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'controlType' => 'selectList',
                 'maxLength' => '10',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'objectPropertyName' => 'otherPerson',
@@ -108,7 +108,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'controlType' => 'selectList',
                 'maxLength' => '10',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Relation_Type_Mapper',
                 ),
                 'objectPropertyName' => 'relationType',
@@ -142,8 +142,6 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
         
     
     /**
@@ -178,11 +176,10 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Relation_Type  
      */
-    function createRelationType($values = array(), $isReference = false) {
+    function createRelationType($values = array()) {
         $m = $this->getMapper('Sample_Relation_Type_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setRelationType($res);
         return $res;
     }
@@ -222,11 +219,10 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createOtherPerson($values = array(), $isReference = false) {
+    function createOtherPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setOtherPerson($res);
         return $res;
     }
@@ -266,11 +262,10 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
+    function createPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPerson($res);
         return $res;
     }

@@ -3,8 +3,8 @@
 class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
 
     public $_hasDefaults = true;
-    public $_authorAuthorPerson = false;
-    public $_editorEditorPerson = false;
+    public $_authorPerson = false;
+    public $_editorPerson = false;
     public $id = NULL;
     public $sharedObjectType = '';
     public $published = 1;
@@ -31,32 +31,32 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array ( 0 => 'authorAuthorPerson', 1 => 'editorEditorPerson', ));
+        return array_merge(parent::listOwnProperties(), array ( 0 => 'authorPerson', 1 => 'editorPerson', ));
     }
     
  
     protected function listOwnAssociations() {
-        return array ( 'authorAuthorPerson' => 'Sample_Person', 'editorEditorPerson' => 'Sample_Person', );
+        return array ( 'authorPerson' => 'Sample_Person', 'editorPerson' => 'Sample_Person', );
     }
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
         if ($pi === false) $pi = array (
-            'authorAuthorPerson' => array (
+            'authorPerson' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'author',
                 'caption' => 'People',
-                'relationId' => '_authorAuthorPerson',
-                'referenceVarName' => '_authorAuthorPerson',
+                'relationId' => '_authorPerson',
+                'referenceVarName' => '_authorPerson',
             ),
-            'editorEditorPerson' => array (
+            'editorPerson' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'editor',
                 'caption' => 'People',
-                'relationId' => '_editorEditorPerson',
-                'referenceVarName' => '_editorEditorPerson',
+                'relationId' => '_editorPerson',
+                'referenceVarName' => '_editorPerson',
             ),
             'id' => array (
                 'dataType' => 'int',
@@ -114,10 +114,10 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
-                'objectPropertyName' => 'authorAuthorPerson',
+                'objectPropertyName' => 'authorPerson',
                 'isNullable' => true,
                 'caption' => 'Author Id',
             ),
@@ -127,10 +127,10 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
-                'objectPropertyName' => 'editorEditorPerson',
+                'objectPropertyName' => 'editorPerson',
                 'isNullable' => true,
                 'caption' => 'Editor Id',
             ),
@@ -172,23 +172,23 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
      * @return Sample_Person 
      */
     function getAuthorPerson() {
-        if ($this->_authorAuthorPerson === false) {
+        if ($this->_authorPerson === false) {
             $this->mapper->loadAuthorPeopleFor($this->mixin);
             
         }
-        return $this->_authorAuthorPerson;
+        return $this->_authorPerson;
     }
     
     /**
      * @param Sample_Person $authorPerson 
      */
     function setAuthorPerson($authorPerson) {
-        if ($authorPerson === false) $this->_authorAuthorPerson = false;
-        elseif ($authorPerson === null) $this->_authorAuthorPerson = null;
+        if ($authorPerson === false) $this->_authorPerson = false;
+        elseif ($authorPerson === null) $this->_authorPerson = null;
         else {
             if (!is_a($authorPerson, 'Sample_Person')) trigger_error('$authorPerson must be an instance of Sample_Person', E_USER_ERROR);
-            if (!is_object($this->_authorAuthorPerson) && !Ac_Util::sameObject($this->_authorAuthorPerson, $authorPerson)) { 
-                $this->_authorAuthorPerson = $authorPerson;
+            if (!is_object($this->_authorPerson) && !Ac_Util::sameObject($this->_authorPerson, $authorPerson)) { 
+                $this->_authorPerson = $authorPerson;
             }
         }
     }
@@ -200,11 +200,10 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Sample_Person  
      */
-    function createAuthorPerson($values = array(), $isReference = false) {
+    function createAuthorPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setAuthorPerson($res);
         return $res;
     }
@@ -216,23 +215,23 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
      * @return Sample_Person 
      */
     function getEditorPerson() {
-        if ($this->_editorEditorPerson === false) {
+        if ($this->_editorPerson === false) {
             $this->mapper->loadEditorPeopleFor($this->mixin);
             
         }
-        return $this->_editorEditorPerson;
+        return $this->_editorPerson;
     }
     
     /**
      * @param Sample_Person $editorPerson 
      */
     function setEditorPerson($editorPerson) {
-        if ($editorPerson === false) $this->_editorEditorPerson = false;
-        elseif ($editorPerson === null) $this->_editorEditorPerson = null;
+        if ($editorPerson === false) $this->_editorPerson = false;
+        elseif ($editorPerson === null) $this->_editorPerson = null;
         else {
             if (!is_a($editorPerson, 'Sample_Person')) trigger_error('$editorPerson must be an instance of Sample_Person', E_USER_ERROR);
-            if (!is_object($this->_editorEditorPerson) && !Ac_Util::sameObject($this->_editorEditorPerson, $editorPerson)) { 
-                $this->_editorEditorPerson = $editorPerson;
+            if (!is_object($this->_editorPerson) && !Ac_Util::sameObject($this->_editorPerson, $editorPerson)) { 
+                $this->_editorPerson = $editorPerson;
             }
         }
     }
@@ -244,11 +243,10 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Sample_Person  
      */
-    function createEditorPerson($values = array(), $isReference = false) {
+    function createEditorPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setEditorPerson($res);
         return $res;
     }

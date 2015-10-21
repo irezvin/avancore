@@ -48,7 +48,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'relations' => array (
                 'className' => 'Sample_Relation',
@@ -88,8 +88,6 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
 
     function countRelations() {
         if (is_array($this->_relations)) return count($this->_relations);
@@ -148,11 +146,10 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Relation  
      */
-    function createRelation($values = array(), $isReference = false) {
+    function createRelation($values = array()) {
         $m = $this->getMapper('Sample_Relation_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addRelation($res);
         return $res;
     }

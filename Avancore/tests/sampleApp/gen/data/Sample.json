@@ -28,12 +28,12 @@
     "dontPrefixClassesWithAppName": false,
     "strategySettings": [],
     "defaultTitlePropName": "title",
+    "autoDetectTitles": true,
     "defaultPublishedPropName": "published",
     "defaultOrderingPropName": "ordering",
     "modelDefaults": {
         "generateMethodPlaceholders": true,
         "noUi": true,
-        "tracksChanges": true,
         "hasUniformPropertiesInfo": true
     },
     "schemaExtras": [],
@@ -941,12 +941,8 @@
                             "default": "0"
                         },
                         "sharedObjectType": {
-                            "type": "enum",
-                            "enumValues": [
-                                "product",
-                                "category",
-                                "other"
-                            ],
+                            "type": "varchar",
+                            "width": "255",
                             "nullable": false,
                             "default": "other"
                         }
@@ -1690,19 +1686,18 @@
                     "otherModelIdInMethodsPlural": "incomingRelations"
                 }
             },
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "lastUpdatedDatetime",
                 "religionId",
                 "portraitId"
             ],
-            "titleProp": false,
+            "titleProp": "name",
             "publishedProp": false,
             "orderingProp": false,
             "orderGroupProp": false,
@@ -2266,7 +2261,7 @@
                     "name": "_rel_fkExtraCodeResponsiblePerson",
                     "caption": "Shop products",
                     "varName": "extraCodeShopProducts",
-                    "pluralForList": "extraCodeShopProducts",
+                    "pluralForList": "shopProducts",
                     "extraPropertyInfo": [],
                     "inherited": false,
                     "ignoreInDescendants": true,
@@ -2317,7 +2312,7 @@
                     "name": "_rel_fkProductNoteAuthor",
                     "caption": "Shop products",
                     "varName": "noteShopProducts",
-                    "pluralForList": "noteShopProducts",
+                    "pluralForList": "shopProducts",
                     "extraPropertyInfo": [],
                     "inherited": false,
                     "ignoreInDescendants": true,
@@ -2555,7 +2550,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Religion_Mapper"
                     },
                     "dummyCaption": {
@@ -2590,7 +2585,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Person_Photo_Mapper"
                     },
                     "dummyCaption": {
@@ -2788,17 +2783,16 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "name"
             ],
-            "titleProp": false,
+            "titleProp": "name",
             "publishedProp": false,
             "orderingProp": false,
             "orderGroupProp": false,
@@ -2968,15 +2962,14 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [],
-            "titleProp": false,
+            "nullableColumns": [],
+            "titleProp": "albumName",
             "publishedProp": false,
             "orderingProp": false,
             "orderGroupProp": false,
@@ -3136,7 +3129,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Person_Mapper"
                     },
                     "dummyCaption": false,
@@ -3233,15 +3226,14 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [],
-            "titleProp": false,
+            "nullableColumns": [],
+            "titleProp": "filename",
             "publishedProp": false,
             "orderingProp": false,
             "orderGroupProp": false,
@@ -3503,7 +3495,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Person_Mapper"
                     },
                     "dummyCaption": false,
@@ -3626,14 +3618,13 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "personId",
                 "photoId",
                 "title",
@@ -3866,7 +3857,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Person_Photo_Mapper"
                     },
                     "dummyCaption": {
@@ -3959,7 +3950,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Publish_ImplMapper"
                     },
                     "dummyCaption": {
@@ -4039,10 +4030,10 @@
             "parentExtraTableClass": "Ac_Model_Mapper_Mixable_ExtraTable",
             "parentExtraTableIsAbstract": false,
             "extraRelationPrototypes": {
-                "_authorAuthorPerson": {
+                "_authorPerson": {
                     "srcMapperClass": "Sample_Publish_ImplMapper",
                     "destMapperClass": "Sample_Person_Mapper",
-                    "srcVarName": "_authorAuthorPerson",
+                    "srcVarName": "_authorPerson",
                     "fieldLinks": {
                         "authorId": "personId"
                     },
@@ -4050,10 +4041,10 @@
                     "destIsUnique": true,
                     "srcOutgoing": true
                 },
-                "_editorEditorPerson": {
+                "_editorPerson": {
                     "srcMapperClass": "Sample_Publish_ImplMapper",
                     "destMapperClass": "Sample_Person_Mapper",
-                    "srcVarName": "_editorEditorPerson",
+                    "srcVarName": "_editorPerson",
                     "fieldLinks": {
                         "editorId": "personId"
                     },
@@ -4063,8 +4054,8 @@
                 }
             },
             "extraAssociationPrototypes": {
-                "authorAuthorPerson": {
-                    "relationId": "_authorAuthorPerson",
+                "authorPerson": {
+                    "relationId": "_authorPerson",
                     "useMapperMethods": true,
                     "useModelMethods": true,
                     "single": "authorPerson",
@@ -4079,8 +4070,8 @@
                     "setDestObjectMethod": "setAuthorPerson",
                     "clearDestObjectMethod": "clearAuthorPerson"
                 },
-                "editorEditorPerson": {
-                    "relationId": "_editorEditorPerson",
+                "editorPerson": {
+                    "relationId": "_editorPerson",
                     "useMapperMethods": true,
                     "useModelMethods": true,
                     "single": "editorPerson",
@@ -4098,6 +4089,15 @@
             },
             "mixableId": false,
             "objectPropertiesPrefix": false,
+            "mapperMixableExtra": [],
+            "perModelMapperMixableExtras": {
+                "shopProducts": {
+                    "fieldNames": {
+                        "sharedObjectType": false
+                    }
+                }
+            },
+            "objectTypeField": "sharedObjectType",
             "inline": false,
             "name": "publish",
             "table": "#__publish",
@@ -4114,14 +4114,13 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "published",
                 "deleted",
                 "publishUp",
@@ -4130,7 +4129,7 @@
                 "editorId",
                 "pubChannelId"
             ],
-            "titleProp": false,
+            "titleProp": "pubChannelId",
             "publishedProp": "published",
             "orderingProp": false,
             "orderGroupProp": false,
@@ -4186,7 +4185,7 @@
                     "enabled": true,
                     "name": "_rel_fkPubAuthor",
                     "caption": "People",
-                    "varName": "authorAuthorPerson",
+                    "varName": "authorPerson",
                     "pluralForList": false,
                     "extraPropertyInfo": [],
                     "inherited": false,
@@ -4231,7 +4230,7 @@
                     "enabled": true,
                     "name": "_rel_fkPubEditor",
                     "caption": "People",
-                    "varName": "editorEditorPerson",
+                    "varName": "editorPerson",
                     "pluralForList": false,
                     "extraPropertyInfo": [],
                     "inherited": false,
@@ -4591,7 +4590,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Person_Mapper"
                     },
                     "dummyCaption": {
@@ -4626,7 +4625,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Person_Mapper"
                     },
                     "dummyCaption": {
@@ -4858,14 +4857,13 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [],
+            "nullableColumns": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": false,
@@ -5073,14 +5071,13 @@
                     "otherModelIdInMethodsPlural": "otherPeople"
                 }
             },
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "relationBegin",
                 "relationEnd"
             ],
@@ -5279,7 +5276,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Person_Mapper"
                     },
                     "dummyCaption": false,
@@ -5311,7 +5308,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Person_Mapper"
                     },
                     "dummyCaption": false,
@@ -5343,7 +5340,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Relation_Type_Mapper"
                     },
                     "dummyCaption": false,
@@ -5511,14 +5508,13 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [],
+            "nullableColumns": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": false,
@@ -5685,14 +5681,13 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "title",
                 "parentId",
                 "metaId",
@@ -6111,7 +6106,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Publish_ImplMapper"
                     },
                     "dummyCaption": {
@@ -6178,10 +6173,10 @@
             "parentExtraTableClass": "Ac_Model_Mapper_Mixable_ExtraTable",
             "parentExtraTableIsAbstract": false,
             "extraRelationPrototypes": {
-                "_extraCodeExtraCodePerson": {
+                "_extraCodePerson": {
                     "srcMapperClass": "Sample_Shop_Product_Extra_Code_ImplMapper",
                     "destMapperClass": "Sample_Person_Mapper",
-                    "srcVarName": "_extraCodeExtraCodePerson",
+                    "srcVarName": "_extraCodePerson",
                     "srcCountVarName": "_extraCodeShopProductsCount",
                     "srcLoadedVarName": "_extraCodeShopProductsLoaded",
                     "destVarName": "_extraCodeShopProducts",
@@ -6196,8 +6191,8 @@
                 }
             },
             "extraAssociationPrototypes": {
-                "extraCodeExtraCodePerson": {
-                    "relationId": "_extraCodeExtraCodePerson",
+                "extraCodePerson": {
+                    "relationId": "_extraCodePerson",
                     "useMapperMethods": true,
                     "useModelMethods": true,
                     "single": "extraCodePerson",
@@ -6215,6 +6210,9 @@
             },
             "mixableId": false,
             "objectPropertiesPrefix": false,
+            "mapperMixableExtra": [],
+            "perModelMapperMixableExtras": [],
+            "objectTypeField": false,
             "inline": false,
             "name": "shopProductExtraCodes",
             "table": "#__shop_product_extraCodes",
@@ -6231,17 +6229,16 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "responsiblePersonId"
             ],
-            "titleProp": false,
+            "titleProp": "ean",
             "publishedProp": false,
             "orderingProp": false,
             "orderGroupProp": false,
@@ -6342,7 +6339,7 @@
                     "enabled": true,
                     "name": "_rel_fkExtraCodeResponsiblePerson",
                     "caption": "People",
-                    "varName": "extraCodeExtraCodePerson",
+                    "varName": "extraCodePerson",
                     "pluralForList": "extraCodeShopProducts",
                     "extraPropertyInfo": [],
                     "inherited": false,
@@ -6361,7 +6358,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Shop_Product_Mapper"
                     },
                     "dummyCaption": false,
@@ -6480,7 +6477,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Person_Mapper"
                     },
                     "dummyCaption": {
@@ -6544,10 +6541,10 @@
             "parentExtraTableClass": "Ac_Model_Mapper_Mixable_ExtraTable",
             "parentExtraTableIsAbstract": false,
             "extraRelationPrototypes": {
-                "_noteNotePerson": {
+                "_notePerson": {
                     "srcMapperClass": "Sample_Shop_Product_Note_ImplMapper",
                     "destMapperClass": "Sample_Person_Mapper",
-                    "srcVarName": "_noteNotePerson",
+                    "srcVarName": "_notePerson",
                     "srcCountVarName": "_noteShopProductsCount",
                     "srcLoadedVarName": "_noteShopProductsLoaded",
                     "destVarName": "_noteShopProducts",
@@ -6562,8 +6559,8 @@
                 }
             },
             "extraAssociationPrototypes": {
-                "noteNotePerson": {
-                    "relationId": "_noteNotePerson",
+                "notePerson": {
+                    "relationId": "_notePerson",
                     "useMapperMethods": true,
                     "useModelMethods": true,
                     "single": "notePerson",
@@ -6581,6 +6578,9 @@
             },
             "mixableId": false,
             "objectPropertiesPrefix": false,
+            "mapperMixableExtra": [],
+            "perModelMapperMixableExtras": [],
+            "objectTypeField": false,
             "inline": true,
             "name": "shopProductNotes",
             "table": "#__shop_product_notes",
@@ -6597,14 +6597,13 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "noteAuthorId"
             ],
             "titleProp": false,
@@ -6663,7 +6662,7 @@
                     "enabled": true,
                     "name": "_rel_fkProductNoteAuthor",
                     "caption": "People",
-                    "varName": "noteNotePerson",
+                    "varName": "notePerson",
                     "pluralForList": "noteShopProducts",
                     "extraPropertyInfo": [],
                     "inherited": false,
@@ -6727,7 +6726,7 @@
                     "maxLength": "11",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Shop_Product_Mapper"
                     },
                     "dummyCaption": false,
@@ -6788,7 +6787,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Person_Mapper"
                     },
                     "dummyCaption": {
@@ -6856,14 +6855,13 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "metaId",
                 "pubId"
             ],
@@ -6883,6 +6881,9 @@
                     "class": "Sample_Publish_MapperMixable",
                     "colMap": {
                         "id": "pubId"
+                    },
+                    "fieldNames": {
+                        "sharedObjectType": false
                     }
                 },
                 "extraCode": {
@@ -7237,7 +7238,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Publish_ImplMapper"
                     },
                     "dummyCaption": {
@@ -7298,7 +7299,7 @@
                     "enabled": true,
                     "name": "_rel_fkProductNoteAuthor",
                     "caption": "People",
-                    "varName": "noteNotePerson",
+                    "varName": "notePerson",
                     "pluralForList": "noteShopProducts",
                     "extraPropertyInfo": [],
                     "inherited": false,
@@ -7317,7 +7318,7 @@
                     "maxLength": "11",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Shop_Product_Mapper"
                     },
                     "dummyCaption": false,
@@ -7378,7 +7379,7 @@
                     "maxLength": "10",
                     "valueList": false,
                     "values": {
-                        "class": "Ac_Model_Values_Records",
+                        "class": "Ac_Model_Values_Mapper",
                         "mapperClass": "Sample_Person_Mapper"
                     },
                     "dummyCaption": {
@@ -7485,14 +7486,13 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "titleM",
                 "titleF"
             ],
@@ -7792,14 +7792,13 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "parentId",
                 "tag"
             ],
@@ -7996,14 +7995,13 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "parentId",
                 "tag"
             ],
@@ -8325,14 +8323,13 @@
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
-            "tracksChanges": true,
             "fixMapperMethodNames": false,
             "extraOwnPropertiesInfo": [],
             "useLangStrings": "?",
             "langStringPrefix": false,
             "tableLangStringPrefix": false,
             "createAccessors": false,
-            "nullableSqlColumns": [
+            "nullableColumns": [
                 "tag"
             ],
             "titleProp": "title",
@@ -8485,7 +8482,15 @@
             ],
             "skipMapperMixables": [
                 "fkPostPublish"
-            ]
+            ],
+            "objectTypeField": "sharedObjectType",
+            "perModelMapperMixableExtras": {
+                "shopProducts": {
+                    "fieldNames": {
+                        "sharedObjectType": false
+                    }
+                }
+            }
         },
         "shopProductExtraCodes": {
             "class": "Ac_Cg_Model_Part",

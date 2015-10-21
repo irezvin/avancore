@@ -258,7 +258,8 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
             $adapter = $this->getAdapter();
             if ($this->addIncludePaths) {
                 Ac_Util::addIncludePath($adapter->getClassPaths());
-                if (strlen($gp = $adapter->getGenPath()))Ac_Util::addIncludePath($adapter->getGenPath());
+                if (strlen($gp = $adapter->getGenPath()))
+                    Ac_Util::addIncludePath($adapter->getGenPath());
             }
             $this->initDeferredMixables();
             $this->doOnInitialize();
@@ -363,13 +364,15 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
         return in_array($id, $this->listMappers());
     }
     
-    function addMapper(Ac_Model_Mapper $mapper) {
+    function addMapper(Ac_Model_Mapper $mapper, $silent = false) {
         $id = $mapper->getId();
-        if (in_array($id, $this->listMappers())) 
-            throw Ac_E_InvalidCall::alreadySuchItem('Mapper', $id);
-        $this->mappers[$id] = $mapper;
-        $mapper->setApplication($this);
-        $this->triggerEvent(self::EVENT_ON_REGISTER_MAPPERS, array($id => $mapper));
+        if (in_array($id, $this->listMappers())) {
+            if (!$silent) throw Ac_E_InvalidCall::alreadySuchItem('Mapper', $id);
+        } else {
+            $this->mappers[$id] = $mapper;
+            $mapper->setApplication($this);
+            $this->triggerEvent(self::EVENT_ON_REGISTER_MAPPERS, array($id => $mapper));
+        }
     }
     
     function setMapperAliases(array $mapperAliases, $add = false) {

@@ -34,7 +34,7 @@ class Ac_Admin_Column_Published extends Ac_Table_Column_Published {
         
         $jsCall = new Ac_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
             $task,
-            array($this->manager->getStrPk($record))
+            array($this->manager->getIdentifierOf($record))
         ));
         
         $inner = 

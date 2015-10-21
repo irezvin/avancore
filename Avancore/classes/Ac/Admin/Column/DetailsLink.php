@@ -9,7 +9,7 @@ class Ac_Admin_Column_DetailsLink extends Ac_Admin_Column {
      
      var $_idPrefix = false;
     
-     var $_recordKeys = array();
+     var $_recordIdentifiers = array();
 
      function doShowHeader() {
          $this->_context = $this->manager->getContext();
@@ -19,7 +19,7 @@ class Ac_Admin_Column_DetailsLink extends Ac_Admin_Column {
      
      function doShowCell($record, $rowNo) {
          $u = $this->manager->getDetailsUrl($record); 
-         $this->_recordKeys[$rowNo] = $this->manager->getStrPk($record);
+         $this->_recordIdentifiers[$rowNo] = $this->manager->getIdentifierOf($record);
          ?>
             <a href="<?php echo htmlspecialchars($u->toString()); ?>" id="<?php echo $this->_idPrefix.'_'.$rowNo; ?>"><?php parent::doShowCell($record, $rowNo); ?></a>
          <?php
@@ -33,7 +33,7 @@ class Ac_Admin_Column_DetailsLink extends Ac_Admin_Column {
      
         <script type="text/javascript">
             var _c = <?php echo $this->manager->getJsListControllerRef() ?>;
-<?php foreach ($this->_recordKeys as $i => $key) { ?>
+<?php foreach ($this->_recordIdentifiers as $i => $id) { ?>
             _c.getRecord(<?php echo $i; ?>)
                 .observe([AvanControllers.ListController.EditRecord], {element: '<?php echo $this->_idPrefix.'_'.$i; ?>'});
 <?php } ?>
