@@ -194,9 +194,9 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
         $this->mapper = Ac_Model_Mapper::getMapper($this->mapperClass);        
     }
     
-    function getCaption($value) {
+    function getCaptions(array $values) {
         $this->cachedValueList = $this->getValueList ();
-        return parent::getCaption($value);
+        return parent::getCaptions($values);
     }
     
     /**
