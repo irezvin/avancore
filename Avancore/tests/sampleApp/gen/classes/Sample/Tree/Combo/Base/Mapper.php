@@ -170,8 +170,8 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Tree combo',
-                'pluralCaption' => 'Tree combos',
+                'singleCaption' => new Ac_Lang_String('sample_tree_combos_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_tree_combos_plural'),
             ),
             parent::doGetInfoParams()
         );

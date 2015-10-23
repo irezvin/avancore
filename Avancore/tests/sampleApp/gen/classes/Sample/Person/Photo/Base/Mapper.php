@@ -316,8 +316,8 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Person photo',
-                'pluralCaption' => 'Person photos',
+                'singleCaption' => new Ac_Lang_String('sample_person_photos_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_person_photos_plural'),
             ),
             parent::doGetInfoParams()
         );

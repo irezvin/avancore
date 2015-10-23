@@ -270,8 +270,8 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Tag',
-                'pluralCaption' => 'Tags',
+                'singleCaption' => new Ac_Lang_String('sample_tags_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_tags_plural'),
             ),
             parent::doGetInfoParams()
         );

@@ -241,8 +241,8 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Person post',
-                'pluralCaption' => 'Person posts',
+                'singleCaption' => new Ac_Lang_String('sample_person_posts_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_person_posts_plural'),
             ),
             parent::doGetInfoParams()
         );

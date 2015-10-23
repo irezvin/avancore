@@ -204,8 +204,8 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Publish',
-                'pluralCaption' => 'Publish',
+                'singleCaption' => new Ac_Lang_String('sample_publish_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_publish_plural'),
             ),
             parent::doGetInfoParams()
         );

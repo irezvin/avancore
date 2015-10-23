@@ -25,22 +25,56 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
             'authorPerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
             ),
             'editorPerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
+            ),
+            'id' => array (
+                'caption' => 'Id',
+            ),
+            'sharedObjectType' => array (
+                'caption' => 'Shared Object Type',
+            ),
+            'published' => array (
+                'caption' => 'Published',
+            ),
+            'deleted' => array (
+                'caption' => 'Deleted',
+            ),
+            'publishUp' => array (
+                'caption' => 'Publish Up',
+            ),
+            'publishDown' => array (
+                'caption' => 'Publish Down',
             ),
             'authorId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
+                'caption' => 'Author Id',
             ),
             'editorId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
+                'caption' => 'Editor Id',
+            ),
+            'pubChannelId' => array (
+                'caption' => 'Pub Channel Id',
+            ),
+            'dateCreated' => array (
+                'caption' => 'Date Created',
+            ),
+            'dateModified' => array (
+                'caption' => 'Date Modified',
+            ),
+            'dateDeleted' => array (
+                'caption' => 'Date Deleted',
             ),
         );
     

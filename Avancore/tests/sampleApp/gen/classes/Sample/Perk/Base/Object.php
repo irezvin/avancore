@@ -53,7 +53,7 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
             'tags' => array (
                 'className' => 'Sample_Tag',
                 'mapperClass' => 'Sample_Tag_Mapper',
-                'caption' => 'Tags',
+                'caption' => new Ac_Lang_String('sample_perk_tags'),
                 'relationId' => '_tags',
                 'countVarName' => '_tagsCount',
                 'nnIdsVarName' => '_tagIds',
@@ -75,12 +75,12 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Perk Id',
+                'caption' => new Ac_Lang_String('sample_perk_perk_id'),
             ),
             'name' => array (
                 'maxLength' => '45',
                 'isNullable' => true,
-                'caption' => 'Name',
+                'caption' => new Ac_Lang_String('sample_perk_name'),
             ),
         );
     

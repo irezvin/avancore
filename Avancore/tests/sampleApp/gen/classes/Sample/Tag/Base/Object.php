@@ -59,7 +59,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
             'people' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_tag_people'),
                 'relationId' => '_people',
                 'countVarName' => '_peopleCount',
                 'nnIdsVarName' => '_personIds',
@@ -78,7 +78,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
             'perks' => array (
                 'className' => 'Sample_Perk',
                 'mapperClass' => 'Sample_Perk_Mapper',
-                'caption' => 'Perks',
+                'caption' => new Ac_Lang_String('sample_tag_perks'),
                 'relationId' => '_perks',
                 'countVarName' => '_perksCount',
                 'nnIdsVarName' => '_perkIds',
@@ -100,21 +100,21 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Tag Id',
+                'caption' => new Ac_Lang_String('sample_tag_tag_id'),
             ),
             'title' => array (
                 'maxLength' => '45',
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_tag_title'),
             ),
             'titleM' => array (
                 'maxLength' => '45',
                 'isNullable' => true,
-                'caption' => 'Title M',
+                'caption' => new Ac_Lang_String('sample_tag_title_m'),
             ),
             'titleF' => array (
                 'maxLength' => '45',
                 'isNullable' => true,
-                'caption' => 'Title F',
+                'caption' => new Ac_Lang_String('sample_tag_title_f'),
             ),
         );
     

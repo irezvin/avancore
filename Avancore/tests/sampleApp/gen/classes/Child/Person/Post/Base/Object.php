@@ -31,22 +31,38 @@ class Child_Person_Post_Base_Object extends Sample_Person_Post {
             'person' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
             ),
             'personPhoto' => array (
                 'className' => 'Child_Person_Photo',
                 'mapperClass' => 'Child_Person_Photo_Mapper',
+                'caption' => 'Person photo',
+            ),
+            'id' => array (
+                'caption' => 'Id',
+            ),
+            'personId' => array (
+                'caption' => 'Person Id',
             ),
             'photoId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Person_Photo_Mapper',
                 ),
+                'caption' => 'Photo Id',
+            ),
+            'title' => array (
+                'caption' => 'Title',
+            ),
+            'content' => array (
+                'caption' => 'Content',
             ),
             'pubId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Publish_ImplMapper',
                 ),
+                'caption' => 'Pub Id',
             ),
         );
     

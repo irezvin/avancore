@@ -166,8 +166,8 @@ class Sample_Tree_Adjacent_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Tree adjacent',
-                'pluralCaption' => 'Tree adjacent',
+                'singleCaption' => new Ac_Lang_String('sample_tree_adjacent_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_tree_adjacent_plural'),
             ),
             parent::doGetInfoParams()
         );

@@ -51,7 +51,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
             'relationType' => array (
                 'className' => 'Sample_Relation_Type',
                 'mapperClass' => 'Sample_Relation_Type_Mapper',
-                'caption' => 'Relation type',
+                'caption' => new Ac_Lang_String('sample_relation_relation_type'),
                 'relationId' => '_relationType',
                 'referenceVarName' => '_relationType',
             ),
@@ -60,7 +60,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsSingle' => 'otherPerson',
                 'otherModelIdInMethodsPlural' => 'otherPeople',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_relation_other_person'),
                 'relationId' => '_otherPerson',
                 'referenceVarName' => '_otherPerson',
             ),
@@ -69,7 +69,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsSingle' => 'person',
                 'otherModelIdInMethodsPlural' => 'people',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_relation_person'),
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
             ),
@@ -79,7 +79,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Relation Id',
+                'caption' => new Ac_Lang_String('sample_relation_relation_id'),
             ),
             'personId' => array (
                 'dataType' => 'int',
@@ -90,7 +90,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'objectPropertyName' => 'person',
-                'caption' => 'Person Id',
+                'caption' => new Ac_Lang_String('sample_relation_person_id'),
             ),
             'otherPersonId' => array (
                 'dataType' => 'int',
@@ -101,7 +101,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'objectPropertyName' => 'otherPerson',
-                'caption' => 'Other Person Id',
+                'caption' => new Ac_Lang_String('sample_relation_other_person_id'),
             ),
             'relationTypeId' => array (
                 'dataType' => 'int',
@@ -112,13 +112,13 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Relation_Type_Mapper',
                 ),
                 'objectPropertyName' => 'relationType',
-                'caption' => 'Relation Type Id',
+                'caption' => new Ac_Lang_String('sample_relation_relation_type_id'),
             ),
             'relationBegin' => array (
                 'dataType' => 'dateTime',
                 'controlType' => 'dateInput',
                 'isNullable' => true,
-                'caption' => 'Relation Begin',
+                'caption' => new Ac_Lang_String('sample_relation_relation_begin'),
                 'internalDateFormat' => 'Y-m-d H:i:s',
                 'outputDateFormat' => 'Y-m-d H:i:s',
             ),
@@ -126,13 +126,13 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'dataType' => 'dateTime',
                 'controlType' => 'dateInput',
                 'isNullable' => true,
-                'caption' => 'Relation End',
+                'caption' => new Ac_Lang_String('sample_relation_relation_end'),
                 'internalDateFormat' => 'Y-m-d H:i:s',
                 'outputDateFormat' => 'Y-m-d H:i:s',
             ),
             'notes' => array (
                 'controlType' => 'textArea',
-                'caption' => 'Notes',
+                'caption' => new Ac_Lang_String('sample_relation_notes'),
             ),
         );
     

@@ -184,8 +184,8 @@ class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Shop product note',
-                'pluralCaption' => 'Shop product notes',
+                'singleCaption' => new Ac_Lang_String('sample_shop_product_notes_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_shop_product_notes_plural'),
             ),
             parent::doGetInfoParams()
         );

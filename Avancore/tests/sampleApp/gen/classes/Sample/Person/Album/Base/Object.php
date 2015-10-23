@@ -55,14 +55,14 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
             'person' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_person_album_person'),
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
             ),
             'personPhotos' => array (
                 'className' => 'Sample_Person_Photo',
                 'mapperClass' => 'Sample_Person_Photo_Mapper',
-                'caption' => 'Person photos',
+                'caption' => new Ac_Lang_String('sample_person_album_person_photos'),
                 'relationId' => '_personPhotos',
                 'countVarName' => '_personPhotosCount',
                 'nnIdsVarName' => '_personPhotoIds',
@@ -84,7 +84,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Album Id',
+                'caption' => new Ac_Lang_String('sample_person_album_album_id'),
             ),
             'personId' => array (
                 'dataType' => 'int',
@@ -95,11 +95,11 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'objectPropertyName' => 'person',
-                'caption' => 'Person Id',
+                'caption' => new Ac_Lang_String('sample_person_album_person_id'),
             ),
             'albumName' => array (
                 'maxLength' => '255',
-                'caption' => 'Album Name',
+                'caption' => new Ac_Lang_String('sample_person_album_album_name'),
             ),
         );
     

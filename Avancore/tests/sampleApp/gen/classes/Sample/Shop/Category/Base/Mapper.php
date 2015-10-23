@@ -245,8 +245,8 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Shop category',
-                'pluralCaption' => 'Shop categories',
+                'singleCaption' => new Ac_Lang_String('sample_shop_categories_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_shop_categories_plural'),
             ),
             parent::doGetInfoParams()
         );

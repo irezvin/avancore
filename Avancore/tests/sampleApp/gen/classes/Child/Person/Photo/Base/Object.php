@@ -31,10 +31,12 @@ class Child_Person_Photo_Base_Object extends Sample_Person_Photo {
             'person' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
             ),
             'personAlbums' => array (
                 'className' => 'Child_Person_Album',
                 'mapperClass' => 'Child_Person_Album_Mapper',
+                'caption' => 'Person albums',
             ),
             'personAlbumIds' => array (
                 'values' => array (
@@ -44,15 +46,24 @@ class Child_Person_Photo_Base_Object extends Sample_Person_Photo {
             'portraitPerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
             ),
             'personPosts' => array (
                 'className' => 'Child_Person_Post',
                 'mapperClass' => 'Child_Person_Post_Mapper',
+                'caption' => 'Person posts',
+            ),
+            'photoId' => array (
+                'caption' => 'Photo Id',
             ),
             'personId' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
+                'caption' => 'Person Id',
+            ),
+            'filename' => array (
+                'caption' => 'Filename',
             ),
         );
     

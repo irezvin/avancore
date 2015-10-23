@@ -31,6 +31,13 @@ class Child_Religion_Base_Object extends Sample_Religion {
             'people' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
+            ),
+            'religionId' => array (
+                'caption' => 'Religion Id',
+            ),
+            'title' => array (
+                'caption' => 'Title',
             ),
         );
     

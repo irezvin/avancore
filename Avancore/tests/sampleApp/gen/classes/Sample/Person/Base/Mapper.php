@@ -520,8 +520,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'People',
-                'pluralCaption' => 'People',
+                'singleCaption' => new Ac_Lang_String('sample_people_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_people_plural'),
             ),
             parent::doGetInfoParams()
         );

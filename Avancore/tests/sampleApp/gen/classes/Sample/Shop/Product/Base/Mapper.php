@@ -254,8 +254,8 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Shop product',
-                'pluralCaption' => 'Shop products',
+                'singleCaption' => new Ac_Lang_String('sample_shop_products_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_shop_products_plural'),
             ),
             parent::doGetInfoParams()
         );

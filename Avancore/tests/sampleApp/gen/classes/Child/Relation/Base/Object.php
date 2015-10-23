@@ -37,6 +37,7 @@ class Child_Relation_Base_Object extends Sample_Relation {
             'relationType' => array (
                 'className' => 'Child_Relation_Type',
                 'mapperClass' => 'Child_Relation_Type_Mapper',
+                'caption' => 'Relation type',
             ),
             'incomingPerson' => array (
                 'className' => 'Child_Person',
@@ -54,22 +55,37 @@ class Child_Relation_Base_Object extends Sample_Relation {
                 'relationId' => '_outgoingPerson',
                 'referenceVarName' => '_outgoingPerson',
             ),
+            'relationId' => array (
+                'caption' => 'Relation Id',
+            ),
             'personId' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
                 'objectPropertyName' => 'outgoingPerson',
+                'caption' => 'Person Id',
             ),
             'otherPersonId' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
                 'objectPropertyName' => 'incomingPerson',
+                'caption' => 'Other Person Id',
             ),
             'relationTypeId' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Relation_Type_Mapper',
                 ),
+                'caption' => 'Relation Type Id',
+            ),
+            'relationBegin' => array (
+                'caption' => 'Relation Begin',
+            ),
+            'relationEnd' => array (
+                'caption' => 'Relation End',
+            ),
+            'notes' => array (
+                'caption' => 'Notes',
             ),
         );
     

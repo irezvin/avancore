@@ -31,14 +31,17 @@ class Child_Person_Base_Object extends Sample_Person {
             'portraitPersonPhoto' => array (
                 'className' => 'Child_Person_Photo',
                 'mapperClass' => 'Child_Person_Photo_Mapper',
+                'caption' => 'Person photo',
             ),
             'religion' => array (
                 'className' => 'Child_Religion',
                 'mapperClass' => 'Child_Religion_Mapper',
+                'caption' => 'Religion',
             ),
             'tags' => array (
                 'className' => 'Child_Tag',
                 'mapperClass' => 'Child_Tag_Mapper',
+                'caption' => 'Tags',
             ),
             'tagIds' => array (
                 'values' => array (
@@ -48,44 +51,74 @@ class Child_Person_Base_Object extends Sample_Person {
             'personAlbums' => array (
                 'className' => 'Child_Person_Album',
                 'mapperClass' => 'Child_Person_Album_Mapper',
+                'caption' => 'Person albums',
             ),
             'personPhotos' => array (
                 'className' => 'Child_Person_Photo',
                 'mapperClass' => 'Child_Person_Photo_Mapper',
+                'caption' => 'Person photos',
             ),
             'personPosts' => array (
                 'className' => 'Child_Person_Post',
                 'mapperClass' => 'Child_Person_Post_Mapper',
+                'caption' => 'Person posts',
             ),
             'incomingRelations' => array (
                 'className' => 'Child_Relation',
                 'mapperClass' => 'Child_Relation_Mapper',
                 'otherModelIdInMethodsPrefix' => 'incoming',
+                'caption' => 'Relations',
             ),
             'outgoingRelations' => array (
                 'className' => 'Child_Relation',
                 'mapperClass' => 'Child_Relation_Mapper',
                 'otherModelIdInMethodsPrefix' => 'outgoing',
+                'caption' => 'Relations',
             ),
             'extraCodeShopProducts' => array (
                 'className' => 'Child_Shop_Product',
                 'mapperClass' => 'Child_Shop_Product_Mapper',
+                'caption' => 'Shop products',
             ),
             'noteShopProducts' => array (
                 'className' => 'Child_Shop_Product',
                 'mapperClass' => 'Child_Shop_Product_Mapper',
+                'caption' => 'Shop products',
+            ),
+            'personId' => array (
+                'caption' => 'Person Id',
+            ),
+            'name' => array (
+                'caption' => 'Name',
+            ),
+            'gender' => array (
+                'caption' => 'Gender',
+            ),
+            'isSingle' => array (
+                'caption' => 'Is Single',
+            ),
+            'birthDate' => array (
+                'caption' => 'Birth Date',
+            ),
+            'lastUpdatedDatetime' => array (
+                'caption' => 'Last Updated Datetime',
+            ),
+            'createdTs' => array (
+                'caption' => 'Created Ts',
             ),
             'religionId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Religion_Mapper',
                 ),
+                'caption' => 'Religion Id',
             ),
             'portraitId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Person_Photo_Mapper',
                 ),
+                'caption' => 'Portrait Id',
             ),
         );
     

@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Model_Object extends Ac_Model_Data {
+abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionAwareObject {
 
     const ACTUAL_REASON_LOAD = 1;
     
@@ -1098,7 +1098,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     function notifyRegisteredInCollection(Ac_I_ObjectsCollection $collection) {
-        if (false === array_search($collection, $this->registeredCollections, false)) {
+        if (false === array_search($collection, $this->registeredCollections, true)) {
             $this->registeredCollections[] = $collection;
         }
     }

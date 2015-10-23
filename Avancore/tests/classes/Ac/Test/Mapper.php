@@ -338,7 +338,14 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             'sort'
         )) var_dump($foo, $proper);
         
+        $this->assertEqual($m->findRegisteredObject($d), $d->getIdentifier());
+        $this->assertTrue(in_array($m, $d->getRegisteredObjectCollections()));
+        
         $d->forget();
+        
+        // findRegisteredObject($o) should be FALSE after $o->forget()
+        $this->assertFalse($m->findRegisteredObject($d));
+        //$m->unregisterObject($d);
         
         $m->getAllRecords();
         $this->assertTrue($m->hasAllRecords());
@@ -346,7 +353,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         if (!$this->assertArraysMatch(
             ($foo = $m->checkRecordPresence($a, true, array(false), $idxData, true, Ac_Model_Mapper::PRESENCE_SMART_FULL)),
             ($proper = array('idxName' => array($idB, $idC))),
-            'Ac_Model_Mapper::PRESENCE_SMART works',
+            'Ac_Model_Mapper::PRESENCE_SMART_FULL works',
             'sort'
         )) var_dump($foo, $proper);
             

@@ -46,7 +46,7 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'extraCode',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_shop_product_extra_code_extra_code_person'),
                 'relationId' => '_extraCodePerson',
                 'countVarName' => '_extraCodeShopProductsCount',
                 'referenceVarName' => '_extraCodePerson',
@@ -59,19 +59,19 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ),
-                'caption' => 'Product Id',
+                'caption' => new Ac_Lang_String('sample_shop_product_extra_code_product_id'),
             ),
             'ean' => array (
                 'maxLength' => '255',
-                'caption' => 'Ean',
+                'caption' => new Ac_Lang_String('sample_shop_product_extra_code_ean'),
             ),
             'asin' => array (
                 'maxLength' => '255',
-                'caption' => 'Asin',
+                'caption' => new Ac_Lang_String('sample_shop_product_extra_code_asin'),
             ),
             'gtin' => array (
                 'maxLength' => '255',
-                'caption' => 'Gtin',
+                'caption' => new Ac_Lang_String('sample_shop_product_extra_code_gtin'),
             ),
             'responsiblePersonId' => array (
                 'dataType' => 'int',
@@ -84,7 +84,7 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
                 ),
                 'objectPropertyName' => 'extraCodePerson',
                 'isNullable' => true,
-                'caption' => 'Responsible Person Id',
+                'caption' => new Ac_Lang_String('sample_shop_product_extra_code_responsible_person_id'),
             ),
         );
     

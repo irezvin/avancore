@@ -49,7 +49,7 @@
         "defaultLanguage": "en",
         "useInflector": true
     },
-    "useLangStrings": false,
+    "useLangStrings": true,
     "ignoredColumnsInJunctionTables": [],
     "extraConfigByTables": [],
     "langStringPrefix": false,

@@ -61,7 +61,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
             'shopProducts' => array (
                 'className' => 'Sample_Shop_Product',
                 'mapperClass' => 'Sample_Shop_Product_Mapper',
-                'caption' => 'Shop products',
+                'caption' => new Ac_Lang_String('sample_shop_category_shop_products'),
                 'relationId' => '_shopProducts',
                 'countVarName' => '_shopProductsCount',
                 'nnIdsVarName' => '_shopProductIds',
@@ -83,12 +83,12 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Id',
+                'caption' => new Ac_Lang_String('sample_shop_category_id'),
             ),
             'title' => array (
                 'maxLength' => '255',
                 'isNullable' => true,
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_shop_category_title'),
             ),
             'leftCol' => array (
                 'dataType' => 'int',
@@ -96,7 +96,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Left Col',
+                'caption' => new Ac_Lang_String('sample_shop_category_left_col'),
             ),
             'rightCol' => array (
                 'dataType' => 'int',
@@ -104,7 +104,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Right Col',
+                'caption' => new Ac_Lang_String('sample_shop_category_right_col'),
             ),
             'ignore' => array (
                 'dataType' => 'int',
@@ -112,7 +112,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Ignore',
+                'caption' => new Ac_Lang_String('sample_shop_category_ignore'),
             ),
             'parentId' => array (
                 'dataType' => 'int',
@@ -121,7 +121,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Parent Id',
+                'caption' => new Ac_Lang_String('sample_shop_category_parent_id'),
             ),
             'ordering' => array (
                 'dataType' => 'int',
@@ -129,7 +129,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Ordering',
+                'caption' => new Ac_Lang_String('sample_shop_category_ordering'),
             ),
             'depth' => array (
                 'dataType' => 'int',
@@ -137,7 +137,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Depth',
+                'caption' => new Ac_Lang_String('sample_shop_category_depth'),
             ),
             'metaId' => array (
                 'dataType' => 'int',
@@ -146,7 +146,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Meta Id',
+                'caption' => new Ac_Lang_String('sample_shop_category_meta_id'),
             ),
             'pubId' => array (
                 'dataType' => 'int',
@@ -158,7 +158,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Publish_ImplMapper',
                 ),
                 'isNullable' => true,
-                'caption' => 'Pub Id',
+                'caption' => new Ac_Lang_String('sample_shop_category_pub_id'),
             ),
         );
     

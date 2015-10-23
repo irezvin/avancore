@@ -267,8 +267,8 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Relation',
-                'pluralCaption' => 'Relations',
+                'singleCaption' => new Ac_Lang_String('sample_relations_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_relations_plural'),
             ),
             parent::doGetInfoParams()
         );

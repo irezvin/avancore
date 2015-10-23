@@ -53,7 +53,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
             'relations' => array (
                 'className' => 'Sample_Relation',
                 'mapperClass' => 'Sample_Relation_Mapper',
-                'caption' => 'Relations',
+                'caption' => new Ac_Lang_String('sample_relation_type_relations'),
                 'relationId' => '_relations',
                 'countVarName' => '_relationsCount',
                 'referenceVarName' => '_relations',
@@ -64,11 +64,11 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Relation Type Id',
+                'caption' => new Ac_Lang_String('sample_relation_type_relation_type_id'),
             ),
             'title' => array (
                 'maxLength' => '45',
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_relation_type_title'),
             ),
             'isSymmetrical' => array (
                 'dataType' => 'bool',
@@ -78,7 +78,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
                     0 => 'No',
                     1 => 'Yes',
                 ),
-                'caption' => 'Is Symmetrical',
+                'caption' => new Ac_Lang_String('sample_relation_type_is_symmetrical'),
             ),
         );
     

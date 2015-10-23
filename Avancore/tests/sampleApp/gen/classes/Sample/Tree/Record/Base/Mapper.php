@@ -160,8 +160,8 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Tree record',
-                'pluralCaption' => 'Tree records',
+                'singleCaption' => new Ac_Lang_String('sample_tree_records_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_tree_records_plural'),
             ),
             parent::doGetInfoParams()
         );

@@ -62,7 +62,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
             'shopCategories' => array (
                 'className' => 'Sample_Shop_Category',
                 'mapperClass' => 'Sample_Shop_Category_Mapper',
-                'caption' => 'Shop categories',
+                'caption' => new Ac_Lang_String('sample_shop_product_shop_categories'),
                 'relationId' => '_shopCategories',
                 'countVarName' => '_shopCategoriesCount',
                 'nnIdsVarName' => '_shopCategoryIds',
@@ -84,15 +84,15 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Id',
+                'caption' => new Ac_Lang_String('sample_shop_product_id'),
             ),
             'sku' => array (
                 'maxLength' => '255',
-                'caption' => 'Sku',
+                'caption' => new Ac_Lang_String('sample_shop_product_sku'),
             ),
             'title' => array (
                 'maxLength' => '255',
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_shop_product_title'),
             ),
             'metaId' => array (
                 'dataType' => 'int',
@@ -101,7 +101,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Meta Id',
+                'caption' => new Ac_Lang_String('sample_shop_product_meta_id'),
             ),
             'pubId' => array (
                 'dataType' => 'int',
@@ -113,13 +113,13 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Publish_ImplMapper',
                 ),
                 'isNullable' => true,
-                'caption' => 'Pub Id',
+                'caption' => new Ac_Lang_String('sample_shop_product_pub_id'),
             ),
             'notePerson' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'note',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_shop_product_note_person'),
                 'relationId' => '_notePerson',
                 'countVarName' => '_noteShopProductsCount',
                 'referenceVarName' => '_notePerson',
@@ -132,11 +132,11 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ),
-                'caption' => 'Product Id',
+                'caption' => new Ac_Lang_String('sample_shop_product_product_id'),
             ),
             'note' => array (
                 'controlType' => 'textArea',
-                'caption' => 'Note',
+                'caption' => new Ac_Lang_String('sample_shop_product_note'),
             ),
             'noteAuthorId' => array (
                 'dataType' => 'int',
@@ -149,7 +149,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 ),
                 'objectPropertyName' => 'notePerson',
                 'isNullable' => true,
-                'caption' => 'Note Author Id',
+                'caption' => new Ac_Lang_String('sample_shop_product_note_author_id'),
             ),
         );
     

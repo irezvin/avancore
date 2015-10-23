@@ -190,8 +190,8 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Shop product extra code',
-                'pluralCaption' => 'Shop product extra codes',
+                'singleCaption' => new Ac_Lang_String('sample_shop_product_extra_codes_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_shop_product_extra_codes_plural'),
             ),
             parent::doGetInfoParams()
         );

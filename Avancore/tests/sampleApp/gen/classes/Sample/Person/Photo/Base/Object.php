@@ -59,14 +59,14 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
             'person' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_person_photo_person'),
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
             ),
             'personAlbums' => array (
                 'className' => 'Sample_Person_Album',
                 'mapperClass' => 'Sample_Person_Album_Mapper',
-                'caption' => 'Person albums',
+                'caption' => new Ac_Lang_String('sample_person_photo_person_albums'),
                 'relationId' => '_personAlbums',
                 'countVarName' => '_personAlbumsCount',
                 'nnIdsVarName' => '_personAlbumIds',
@@ -86,14 +86,14 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'portrait',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_person_photo_portrait_person'),
                 'relationId' => '_portraitPerson',
                 'referenceVarName' => '_portraitPerson',
             ),
             'personPosts' => array (
                 'className' => 'Sample_Person_Post',
                 'mapperClass' => 'Sample_Person_Post_Mapper',
-                'caption' => 'Person posts',
+                'caption' => new Ac_Lang_String('sample_person_photo_person_posts'),
                 'relationId' => '_personPosts',
                 'countVarName' => '_personPostsCount',
                 'referenceVarName' => '_personPosts',
@@ -104,7 +104,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Photo Id',
+                'caption' => new Ac_Lang_String('sample_person_photo_photo_id'),
             ),
             'personId' => array (
                 'dataType' => 'int',
@@ -115,11 +115,11 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'objectPropertyName' => 'person',
-                'caption' => 'Person Id',
+                'caption' => new Ac_Lang_String('sample_person_photo_person_id'),
             ),
             'filename' => array (
                 'maxLength' => '45',
-                'caption' => 'Filename',
+                'caption' => new Ac_Lang_String('sample_person_photo_filename'),
             ),
         );
     

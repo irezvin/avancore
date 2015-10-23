@@ -63,6 +63,8 @@ class Ac_Test_Adapter extends Ac_Test_Base {
         
         $aLd = explode(PATH_SEPARATOR, $adapter->getLanguagesPaths());
         asort($aLd);
+
+        $this->assertEqual($ld, $aLd);
         
         // Test developer-specified directory validation
         
@@ -85,8 +87,6 @@ class Ac_Test_Adapter extends Ac_Test_Base {
         
         $fooAdapter3 = new Ac_Application_Adapter(array('appClassFile' => $appClassFile, 'varFlagsPath' => $deployDir, 'checkDirs' => true));
         $this->assertEqual($fooAdapter3->getVarFlagsPath(), $deployDir);
-        
-        $this->assertEqual($ld, $aLd);
         
         // Test URLs guessing
         

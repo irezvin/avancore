@@ -207,8 +207,8 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Religion',
-                'pluralCaption' => 'Religion',
+                'singleCaption' => new Ac_Lang_String('sample_religion_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_religion_plural'),
             ),
             parent::doGetInfoParams()
         );

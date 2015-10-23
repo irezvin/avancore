@@ -31,11 +31,18 @@ class Child_Perk_Base_Object extends Sample_Perk {
             'tags' => array (
                 'className' => 'Child_Tag',
                 'mapperClass' => 'Child_Tag_Mapper',
+                'caption' => 'Tags',
             ),
             'tagIds' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Tag_Mapper',
                 ),
+            ),
+            'perkId' => array (
+                'caption' => 'Perk Id',
+            ),
+            'name' => array (
+                'caption' => 'Name',
             ),
         );
     

@@ -31,6 +31,7 @@ class Child_Tag_Base_Object extends Sample_Tag {
             'people' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
             ),
             'personIds' => array (
                 'values' => array (
@@ -40,11 +41,24 @@ class Child_Tag_Base_Object extends Sample_Tag {
             'perks' => array (
                 'className' => 'Child_Perk',
                 'mapperClass' => 'Child_Perk_Mapper',
+                'caption' => 'Perks',
             ),
             'perkIds' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Perk_Mapper',
                 ),
+            ),
+            'tagId' => array (
+                'caption' => 'Tag Id',
+            ),
+            'title' => array (
+                'caption' => 'Title',
+            ),
+            'titleM' => array (
+                'caption' => 'Title M',
+            ),
+            'titleF' => array (
+                'caption' => 'Title F',
             ),
         );
     

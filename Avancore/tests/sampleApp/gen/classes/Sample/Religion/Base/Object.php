@@ -52,7 +52,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
             'people' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_religion_people'),
                 'relationId' => '_people',
                 'countVarName' => '_peopleCount',
                 'referenceVarName' => '_people',
@@ -63,11 +63,11 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Religion Id',
+                'caption' => new Ac_Lang_String('sample_religion_religion_id'),
             ),
             'title' => array (
                 'maxLength' => '45',
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_religion_title'),
             ),
         );
     

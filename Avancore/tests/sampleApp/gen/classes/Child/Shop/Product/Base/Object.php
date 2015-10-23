@@ -31,32 +31,52 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
             'shopCategories' => array (
                 'className' => 'Child_Shop_Category',
                 'mapperClass' => 'Child_Shop_Category_Mapper',
+                'caption' => 'Shop categories',
             ),
             'shopCategoryIds' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Shop_Category_Mapper',
                 ),
             ),
+            'id' => array (
+                'caption' => 'Id',
+            ),
+            'sku' => array (
+                'caption' => 'Sku',
+            ),
+            'title' => array (
+                'caption' => 'Title',
+            ),
+            'metaId' => array (
+                'caption' => 'Meta Id',
+            ),
             'pubId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Publish_ImplMapper',
                 ),
+                'caption' => 'Pub Id',
             ),
             'notePerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
             ),
             'productId' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Shop_Product_Mapper',
                 ),
+                'caption' => 'Product Id',
+            ),
+            'note' => array (
+                'caption' => 'Note',
             ),
             'noteAuthorId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
+                'caption' => 'Note Author Id',
             ),
         );
     

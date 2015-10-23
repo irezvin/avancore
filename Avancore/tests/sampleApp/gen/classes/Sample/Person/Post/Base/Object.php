@@ -49,14 +49,14 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
             'person' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_person_post_person'),
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
             ),
             'personPhoto' => array (
                 'className' => 'Sample_Person_Photo',
                 'mapperClass' => 'Sample_Person_Photo_Mapper',
-                'caption' => 'Person photo',
+                'caption' => new Ac_Lang_String('sample_person_post_person_photo'),
                 'relationId' => '_personPhoto',
                 'referenceVarName' => '_personPhoto',
             ),
@@ -66,7 +66,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Id',
+                'caption' => new Ac_Lang_String('sample_person_post_id'),
             ),
             'personId' => array (
                 'dataType' => 'int',
@@ -75,7 +75,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Person Id',
+                'caption' => new Ac_Lang_String('sample_person_post_person_id'),
             ),
             'photoId' => array (
                 'dataType' => 'int',
@@ -88,17 +88,17 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                 ),
                 'objectPropertyName' => 'personPhoto',
                 'isNullable' => true,
-                'caption' => 'Photo Id',
+                'caption' => new Ac_Lang_String('sample_person_post_photo_id'),
             ),
             'title' => array (
                 'maxLength' => '255',
                 'isNullable' => true,
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_person_post_title'),
             ),
             'content' => array (
                 'controlType' => 'textArea',
                 'isNullable' => true,
-                'caption' => 'Content',
+                'caption' => new Ac_Lang_String('sample_person_post_content'),
             ),
             'pubId' => array (
                 'dataType' => 'int',
@@ -110,7 +110,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Publish_ImplMapper',
                 ),
                 'isNullable' => true,
-                'caption' => 'Pub Id',
+                'caption' => new Ac_Lang_String('sample_person_post_pub_id'),
             ),
         );
     

@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 5.5.30, for Linux (i686)
+-- MySQL dump 10.15  Distrib 10.0.21-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: avancore_test
 -- ------------------------------------------------------
--- Server version	5.5.30-log
+-- Server version	10.0.21-MariaDB-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -40,7 +40,7 @@ CREATE TABLE `ac_album_photos` (
 
 LOCK TABLES `ac_album_photos` WRITE;
 /*!40000 ALTER TABLE `ac_album_photos` DISABLE KEYS */;
-INSERT INTO `ac_album_photos` VALUES (3,1,1),(3,1,2),(3,2,1);
+INSERT INTO `ac_album_photos` VALUES (3,1,1),(3,2,1),(3,1,2);
 /*!40000 ALTER TABLE `ac_album_photos` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -66,7 +66,7 @@ CREATE TABLE `ac_people` (
   KEY `FK_ac_person_photos_ac_people_protrait` (`personId`,`portraitId`),
   CONSTRAINT `FK_ac_person_photos_ac_people_portrait` FOREIGN KEY (`personId`, `portraitId`) REFERENCES `ac_person_photos` (`personId`, `photoId`),
   CONSTRAINT `FK_ac_person_religion` FOREIGN KEY (`religionId`) REFERENCES `ac_religion` (`religionId`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=113 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=114 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -75,7 +75,7 @@ CREATE TABLE `ac_people` (
 
 LOCK TABLES `ac_people` WRITE;
 /*!40000 ALTER TABLE `ac_people` DISABLE KEYS */;
-INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2014-08-10 19:24:57',4,1),(4,'Таня','F',0,'1981-12-23',NULL,'2014-08-10 19:25:10',1,3),(6,'Ян','M',1,'1981-09-21',NULL,'2014-08-31 13:03:07',4,NULL),(7,'Оля','F',1,'1981-09-08',NULL,'2014-08-31 13:04:00',1,NULL),(108,'test author','F',0,'1990-01-01',NULL,'0000-00-00 00:00:00',NULL,NULL),(109,'test editor','F',0,'1990-02-02',NULL,'0000-00-00 00:00:00',NULL,NULL),(110,'test prod author','M',0,'2015-02-05',NULL,'0000-00-00 00:00:00',NULL,NULL),(111,'test prod author 2','F',0,'2015-02-05',NULL,'0000-00-00 00:00:00',NULL,NULL),(112,'Author of a note','M',0,'2014-02-14',NULL,'0000-00-00 00:00:00',NULL,NULL);
+INSERT INTO `ac_people` VALUES (3,'Илья','M',0,'1982-04-11',NULL,'2014-08-10 19:24:57',4,1),(4,'Таня','F',0,'1981-12-23',NULL,'2014-08-10 19:25:10',1,3),(6,'Ян','M',1,'1981-09-21',NULL,'2014-08-31 13:03:07',4,NULL),(7,'Оля','F',1,'1981-09-08',NULL,'2014-08-31 13:04:00',1,NULL),(108,'test author','F',0,'1990-01-01',NULL,'0000-00-00 00:00:00',NULL,NULL),(109,'test editor','F',0,'1990-02-02',NULL,'0000-00-00 00:00:00',NULL,NULL),(110,'test prod author','M',0,'2015-02-05',NULL,'0000-00-00 00:00:00',NULL,NULL),(111,'test prod author 2','F',0,'2015-02-05',NULL,'0000-00-00 00:00:00',NULL,NULL),(112,'test Author of a note','M',0,'2014-02-14',NULL,'2015-10-23 22:28:51',NULL,NULL);
 /*!40000 ALTER TABLE `ac_people` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -102,7 +102,7 @@ CREATE TABLE `ac_people_tags` (
 
 LOCK TABLES `ac_people_tags` WRITE;
 /*!40000 ALTER TABLE `ac_people_tags` DISABLE KEYS */;
-INSERT INTO `ac_people_tags` VALUES (4,1),(6,1),(4,2),(7,2),(6,3);
+INSERT INTO `ac_people_tags` VALUES (4,1),(4,2),(6,1),(6,3),(7,2);
 /*!40000 ALTER TABLE `ac_people_tags` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -202,9 +202,9 @@ CREATE TABLE `ac_person_posts` (
   UNIQUE KEY `idxPubId` (`pubId`),
   KEY `personId` (`personId`),
   KEY `FK__ac_post_photo` (`personId`,`photoId`),
-  CONSTRAINT `fkPostPublish` FOREIGN KEY (`pubId`) REFERENCES `ac_publish` (`id`),
   CONSTRAINT `FK__ac_post_person` FOREIGN KEY (`personId`) REFERENCES `ac_people` (`personId`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `FK__ac_post_photo` FOREIGN KEY (`personId`, `photoId`) REFERENCES `ac_person_photos` (`personId`, `photoId`) ON DELETE SET NULL ON UPDATE SET NULL
+  CONSTRAINT `FK__ac_post_photo` FOREIGN KEY (`personId`, `photoId`) REFERENCES `ac_person_photos` (`personId`, `photoId`) ON DELETE SET NULL ON UPDATE SET NULL,
+  CONSTRAINT `fkPostPublish` FOREIGN KEY (`pubId`) REFERENCES `ac_publish` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -583,7 +583,7 @@ CREATE TABLE `ac_tags` (
   `titleF` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`tagId`),
   UNIQUE KEY `Index_2` (`title`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -733,4 +733,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-07-09  0:36:41
+-- Dump completed on 2015-10-24  1:28:59

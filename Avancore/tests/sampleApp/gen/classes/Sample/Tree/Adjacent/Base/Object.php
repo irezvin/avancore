@@ -40,7 +40,7 @@ class Sample_Tree_Adjacent_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Id',
+                'caption' => new Ac_Lang_String('sample_tree_adjacent_id'),
             ),
             'parentId' => array (
                 'dataType' => 'int',
@@ -49,7 +49,7 @@ class Sample_Tree_Adjacent_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Parent Id',
+                'caption' => new Ac_Lang_String('sample_tree_adjacent_parent_id'),
             ),
             'ordering' => array (
                 'dataType' => 'int',
@@ -57,11 +57,11 @@ class Sample_Tree_Adjacent_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Ordering',
+                'caption' => new Ac_Lang_String('sample_tree_adjacent_ordering'),
             ),
             'title' => array (
                 'maxLength' => '255',
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_tree_adjacent_title'),
             ),
             'tag' => array (
                 'dataType' => 'int',
@@ -70,7 +70,7 @@ class Sample_Tree_Adjacent_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Tag',
+                'caption' => new Ac_Lang_String('sample_tree_adjacent_tag'),
             ),
         );
     

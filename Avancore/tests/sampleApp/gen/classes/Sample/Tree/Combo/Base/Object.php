@@ -44,7 +44,7 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Id',
+                'caption' => new Ac_Lang_String('sample_tree_combo_id'),
             ),
             'leftCol' => array (
                 'dataType' => 'int',
@@ -52,7 +52,7 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Left Col',
+                'caption' => new Ac_Lang_String('sample_tree_combo_left_col'),
             ),
             'rightCol' => array (
                 'dataType' => 'int',
@@ -60,7 +60,7 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Right Col',
+                'caption' => new Ac_Lang_String('sample_tree_combo_right_col'),
             ),
             'parentId' => array (
                 'dataType' => 'int',
@@ -69,7 +69,7 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Parent Id',
+                'caption' => new Ac_Lang_String('sample_tree_combo_parent_id'),
             ),
             'ordering' => array (
                 'dataType' => 'int',
@@ -77,11 +77,11 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Ordering',
+                'caption' => new Ac_Lang_String('sample_tree_combo_ordering'),
             ),
             'title' => array (
                 'maxLength' => '255',
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_tree_combo_title'),
             ),
             'tag' => array (
                 'dataType' => 'int',
@@ -90,7 +90,7 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Tag',
+                'caption' => new Ac_Lang_String('sample_tree_combo_tag'),
             ),
             'ignore' => array (
                 'dataType' => 'bool',
@@ -100,7 +100,7 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
                     0 => 'No',
                     1 => 'Yes',
                 ),
-                'caption' => 'Ignore',
+                'caption' => new Ac_Lang_String('sample_tree_combo_ignore'),
             ),
             'depth' => array (
                 'dataType' => 'int',
@@ -108,7 +108,7 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Depth',
+                'caption' => new Ac_Lang_String('sample_tree_combo_depth'),
             ),
         );
     

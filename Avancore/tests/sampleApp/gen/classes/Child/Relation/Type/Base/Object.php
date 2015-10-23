@@ -31,6 +31,16 @@ class Child_Relation_Type_Base_Object extends Sample_Relation_Type {
             'relations' => array (
                 'className' => 'Child_Relation',
                 'mapperClass' => 'Child_Relation_Mapper',
+                'caption' => 'Relations',
+            ),
+            'relationTypeId' => array (
+                'caption' => 'Relation Type Id',
+            ),
+            'title' => array (
+                'caption' => 'Title',
+            ),
+            'isSymmetrical' => array (
+                'caption' => 'Is Symmetrical',
             ),
         );
     

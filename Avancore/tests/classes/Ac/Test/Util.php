@@ -116,7 +116,8 @@ class Ac_Test_Util extends Ac_Test_Base {
             if (!is_dir($dir)) mkdir($dir, 0775, true);
             $t = time();
             if ($old) $t -= $ttl + 1;
-            touch($dir.'/'.basename($filename), $t);
+            $f = $dir.'/'.basename($filename);
+            touch($f, $t);
         }
     }
     

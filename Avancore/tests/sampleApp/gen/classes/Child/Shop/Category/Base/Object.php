@@ -31,17 +31,46 @@ class Child_Shop_Category_Base_Object extends Sample_Shop_Category {
             'shopProducts' => array (
                 'className' => 'Child_Shop_Product',
                 'mapperClass' => 'Child_Shop_Product_Mapper',
+                'caption' => 'Shop products',
             ),
             'shopProductIds' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Shop_Product_Mapper',
                 ),
             ),
+            'id' => array (
+                'caption' => 'Id',
+            ),
+            'title' => array (
+                'caption' => 'Title',
+            ),
+            'leftCol' => array (
+                'caption' => 'Left Col',
+            ),
+            'rightCol' => array (
+                'caption' => 'Right Col',
+            ),
+            'ignore' => array (
+                'caption' => 'Ignore',
+            ),
+            'parentId' => array (
+                'caption' => 'Parent Id',
+            ),
+            'ordering' => array (
+                'caption' => 'Ordering',
+            ),
+            'depth' => array (
+                'caption' => 'Depth',
+            ),
+            'metaId' => array (
+                'caption' => 'Meta Id',
+            ),
             'pubId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Publish_ImplMapper',
                 ),
+                'caption' => 'Pub Id',
             ),
         );
     

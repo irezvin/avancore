@@ -38,11 +38,11 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Id',
+                'caption' => new Ac_Lang_String('sample_tree_record_id'),
             ),
             'title' => array (
                 'maxLength' => '255',
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_tree_record_title'),
             ),
             'tag' => array (
                 'dataType' => 'int',
@@ -51,7 +51,7 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Tag',
+                'caption' => new Ac_Lang_String('sample_tree_record_tag'),
             ),
         );
     

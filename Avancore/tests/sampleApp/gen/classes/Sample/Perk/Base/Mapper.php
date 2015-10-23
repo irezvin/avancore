@@ -222,8 +222,8 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
     protected function doGetInfoParams() {
         return Ac_Util::m( 
             array (
-                'singleCaption' => 'Perk',
-                'pluralCaption' => 'Perks',
+                'singleCaption' => new Ac_Lang_String('sample_perks_single'),
+                'pluralCaption' => new Ac_Lang_String('sample_perks_plural'),
             ),
             parent::doGetInfoParams()
         );

@@ -24,6 +24,7 @@ $config = array(
     ),
     'domains.Sample' => array(
         'strategyClass' => 'Ac_Cg_Strategy',
+        'useLangStrings' => true,
         'appName' => 'Sample',
         'dbName' => $dbConf['db'],
         'caption' => 'Avancore_Sample',
