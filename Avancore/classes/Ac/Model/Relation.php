@@ -27,31 +27,6 @@ define('AMR_ORIGINAL_KEYS', 2);
 define('AMR_ALL_ORIGINAL_KEYS', 6);
 
 /**
- * Delete linked records when master record is delted
- */
-define('AMR_DELETE_CASCADE', 'AMR_DELETE_CASCADE');
-
-/**
- * Restrict deletion of linked records when master record is deleted
- */
-define ('AMR_DELETE_RESTRICT', 'AMR_DELETE_RESTRICT');
-
-/**
- * Perform no action when master record is deleted
- */
-define ('AMR_DELETE_NO_ACTION', 'AMR_DELETE_NO_ACTION');
-
-/**
- * Set corresponding foreign keys of linked records 
- */
-define ('AMR_DELETE_SET_VALUE', 'AMR_DELETE_SET_VALUE');
-
-/**
- * Call specified method of foreign recrods
- */
-define ('AMR_DELETE_CALL_METHOD', 'AMR_DELETE_CALL_METHOD');
-
-/**
  * Describes relation between two tables. 
  * 
  * Does all the work with related records (load, count, delete). 

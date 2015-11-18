@@ -50,7 +50,11 @@
         "useInflector": true
     },
     "useLangStrings": false,
-    "ignoredColumnsInJunctionTables": [],
+    "ignoredColumnsInJunctionTables": {
+        "#__shop_product_related": [
+            "ignore"
+        ]
+    },
     "extraConfigByTables": [],
     "langStringPrefix": false,
     "tableLangStringPrefix": false,
@@ -1122,6 +1126,69 @@
                             "table": "ac_shop_products",
                             "columns": {
                                 "productId": "id"
+                            }
+                        }
+                    }
+                },
+                "ac_shop_product_related": {
+                    "columns": {
+                        "productId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "relatedProductId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "ignore": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "1",
+                            "nullable": false,
+                            "default": "0"
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "productId",
+                                "2": "relatedProductId"
+                            }
+                        },
+                        "ignore": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "ignore"
+                            }
+                        },
+                        "relatedProductReferencing": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "relatedProductId"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "relatedProductReferenced": {
+                            "table": "ac_shop_products",
+                            "columns": {
+                                "productId": "id"
+                            }
+                        },
+                        "relatedProductReferencing": {
+                            "table": "ac_shop_products",
+                            "columns": {
+                                "relatedProductId": "id"
                             }
                         }
                     }
@@ -7083,6 +7150,116 @@
                         "fkProductNoteProduct"
                     ]
                 },
+                "_rel_relatedProductReferenced": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": true,
+                    "relation": [
+                        "#__shop_product_related",
+                        "relatedProductReferenced"
+                    ],
+                    "otherRelation": "relatedProductReferencing",
+                    "isOtherIncoming": false,
+                    "className": "Child_Shop_Product",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": "referenced",
+                    "canLoadSrc": true,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Child_Shop_Product_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": [
+                            "#__shop_product_related",
+                            "relatedProductReferenced"
+                        ],
+                        "hasModel": true,
+                        "isIncoming": true,
+                        "otherRelationName": "relatedProductReferencing",
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": true,
+                    "name": "_rel_relatedProductReferenced",
+                    "caption": "Shop products",
+                    "varName": "referencedShopProducts",
+                    "pluralForList": "referencedShopProducts",
+                    "extraPropertyInfo": [],
+                    "inherited": true,
+                    "ignoreInDescendants": false,
+                    "_other": "shopProducts",
+                    "_rel": [
+                        "#__shop_product_related",
+                        "relatedProductReferenced"
+                    ],
+                    "_otherRel": [
+                        "#__shop_product_related",
+                        "relatedProductReferencing"
+                    ]
+                },
+                "_rel_relatedProductReferencing": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": true,
+                    "relation": [
+                        "#__shop_product_related",
+                        "relatedProductReferencing"
+                    ],
+                    "otherRelation": "relatedProductReferenced",
+                    "isOtherIncoming": false,
+                    "className": "Child_Shop_Product",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": "referencing",
+                    "canLoadSrc": true,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Child_Shop_Product_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": [
+                            "#__shop_product_related",
+                            "relatedProductReferencing"
+                        ],
+                        "hasModel": true,
+                        "isIncoming": true,
+                        "otherRelationName": "relatedProductReferenced",
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": true,
+                    "name": "_rel_relatedProductReferencing",
+                    "caption": "Shop products",
+                    "varName": "referencingShopProducts",
+                    "pluralForList": "referencingShopProducts",
+                    "extraPropertyInfo": [],
+                    "inherited": true,
+                    "ignoreInDescendants": false,
+                    "_other": "shopProducts",
+                    "_rel": [
+                        "#__shop_product_related",
+                        "relatedProductReferencing"
+                    ],
+                    "_otherRel": [
+                        "#__shop_product_related",
+                        "relatedProductReferenced"
+                    ]
+                },
                 "id": {
                     "__class": "Ac_Cg_Property_Simple",
                     "colName": "id",
@@ -7426,6 +7603,32 @@
                     "hasModel": true,
                     "isIncoming": true,
                     "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                },
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": [
+                        "#__shop_product_related",
+                        "relatedProductReferenced"
+                    ],
+                    "hasModel": true,
+                    "isIncoming": true,
+                    "otherRelationName": "relatedProductReferencing",
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                },
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": [
+                        "#__shop_product_related",
+                        "relatedProductReferencing"
+                    ],
+                    "hasModel": true,
+                    "isIncoming": true,
+                    "otherRelationName": "relatedProductReferenced",
                     "isOtherRelationIncoming": false,
                     "createRelationObject": true,
                     "createAssociationObject": true

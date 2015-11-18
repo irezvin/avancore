@@ -135,6 +135,8 @@
         'sample_shop_product_product_id' => 'Product Id',
         'sample_shop_product_pub_id' => 'Pub Id',
         'sample_shop_product_publish' => 'Publish',
+        'sample_shop_product_referenced_shop_products' => 'Shop products',
+        'sample_shop_product_referencing_shop_products' => 'Shop products',
         'sample_shop_product_shop_categories' => 'Shop categories',
         'sample_shop_product_shop_product_extra_code' => 'Shop product extra code',
         'sample_shop_product_shop_product_note' => 'Shop product note',

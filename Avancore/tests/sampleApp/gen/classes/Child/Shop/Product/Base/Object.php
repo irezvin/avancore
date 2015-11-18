@@ -38,6 +38,26 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
                     'mapperClass' => 'Child_Shop_Category_Mapper',
                 ),
             ),
+            'referencedShopProducts' => array (
+                'className' => 'Child_Shop_Product',
+                'mapperClass' => 'Child_Shop_Product_Mapper',
+                'caption' => 'Shop products',
+            ),
+            'referencedShopProductIds' => array (
+                'values' => array (
+                    'mapperClass' => 'Child_Shop_Product_Mapper',
+                ),
+            ),
+            'referencingShopProducts' => array (
+                'className' => 'Child_Shop_Product',
+                'mapperClass' => 'Child_Shop_Product_Mapper',
+                'caption' => 'Shop products',
+            ),
+            'referencingShopProductIds' => array (
+                'values' => array (
+                    'mapperClass' => 'Child_Shop_Product_Mapper',
+                ),
+            ),
             'id' => array (
                 'caption' => 'Id',
             ),
@@ -114,6 +134,74 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
      */
     function createShopCategory($values = array()) {
         return parent::createShopCategory($values);
+    }
+
+    
+
+        
+    
+    /**
+     * @return Child_Shop_Product 
+     */
+    function getReferencedShopProduct($id) {
+        return parent::getReferencedShopProduct($id);
+    }
+    
+    /**
+     * @return Child_Shop_Product 
+     */
+    function getReferencedShopProductsItem($id) {
+        return parent::getReferencedShopProductsItem($id);
+    }
+    
+    /**
+     * @param Child_Shop_Product $referencedShopProduct 
+     */
+    function addReferencedShopProduct($referencedShopProduct) {
+        if (!is_a($referencedShopProduct, 'Child_Shop_Product'))
+            trigger_error('$referencedShopProduct must be an instance of Child_Shop_Product', E_USER_ERROR);
+        return parent::addReferencedShopProduct($referencedShopProduct);
+    }
+    
+    /**
+     * @return Child_Shop_Product  
+     */
+    function createReferencedShopProduct($values = array()) {
+        return parent::createReferencedShopProduct($values);
+    }
+
+    
+
+        
+    
+    /**
+     * @return Child_Shop_Product 
+     */
+    function getReferencingShopProduct($id) {
+        return parent::getReferencingShopProduct($id);
+    }
+    
+    /**
+     * @return Child_Shop_Product 
+     */
+    function getReferencingShopProductsItem($id) {
+        return parent::getReferencingShopProductsItem($id);
+    }
+    
+    /**
+     * @param Child_Shop_Product $referencingShopProduct 
+     */
+    function addReferencingShopProduct($referencingShopProduct) {
+        if (!is_a($referencingShopProduct, 'Child_Shop_Product'))
+            trigger_error('$referencingShopProduct must be an instance of Child_Shop_Product', E_USER_ERROR);
+        return parent::addReferencingShopProduct($referencingShopProduct);
+    }
+    
+    /**
+     * @return Child_Shop_Product  
+     */
+    function createReferencingShopProduct($values = array()) {
+        return parent::createReferencingShopProduct($values);
     }
 
     

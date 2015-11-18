@@ -33,6 +33,9 @@ $config = array(
         'subsystemPrefixes' => array(),
         'dontLinkSubsystems' => array(
         ),
+        'ignoredColumnsInJunctionTables' => array(
+            '#__shop_product_related' => array('ignore'),
+        ),
         'autoTablesAll' => true,
 		'autoTablesIgnore' => array(
             '#__tree_nested_sets',

@@ -743,5 +743,100 @@ class Ac_Test_Relation extends Ac_Test_Base {
             }
         }
     }
+    
+    protected function _getRefIds(Sample_Shop_Product $prod) {
+        $res = array();
+        foreach ($prod->listReferencedShopProducts() as $i) $res[] = $prod->getReferencedShopProduct($i)->id;
+        return $res;
+    }
+    
+    function testMidWhere() {
+        $pm = $this->getSampleApp()->getSampleShopProductMapper();
+        // assumes following relation structure:
+        //"productId","relatedProductId","ignore"
+        //"1","2","0"
+        //"1","3","0"
+        //"1","4","1"
+        //"2","1","1"
+        //"2","3","1"
+        //"2","4","0"
+        //"4","1","1"
+        //"4","2","1"
+        //"4","3","1"
+        $prods = $pm->loadRecordsArray(array(1, 2, 3, 4), true);
+        $pm->loadReferencedShopProductIdsFor($prods);
+        $this->assertArraysMatch($prods[1]->getReferencedShopProductIds(), array(2, 3), 'Load IDs with midWere applied', 'sort');
+        $this->assertArraysMatch($prods[2]->getReferencedShopProductIds(), array(4), 'Load IDs with midWere applied', 'sort');
+        $this->assertArraysMatch($prods[3]->getReferencedShopProductIds(), array(), 'Load IDs with midWere applied', 'sort');
+        $this->assertArraysMatch($prods[4]->getReferencedShopProductIds(), array(), 'Load IDs with midWere applied', 'sort');
+        
+        foreach ($prods as $prod) $prod->cleanupMembers ();
+        $rel = clone $pm->getRelation('_referencedShopProducts');
+        $rel->setMidWhere(false);
+        $prods = $pm->loadRecordsArray(array(1, 2, 3, 4), true);
+        $rel->loadDestNNIds($prods);
+        $this->assertArraysMatch($prods[1]->getReferencedShopProductIds(), array(2, 3, 4), 'Load IDs without midWere applied', 'sort');
+        $this->assertArraysMatch($prods[2]->getReferencedShopProductIds(), array(1, 3, 4), 'Load IDs without midWere applied', 'sort');
+        $this->assertArraysMatch($prods[3]->getReferencedShopProductIds(), array(), 'Load IDs with midWere applied', 'sort');
+        $this->assertArraysMatch($prods[4]->getReferencedShopProductIds(), array(1, 2, 3), 'Load IDs without midWere applied', 'sort');
+
+        foreach ($prods as $prod) $prod->cleanupMembers ();
+        $rel = clone $pm->getRelation('_referencedShopProducts');
+        $prods = $pm->loadRecordsArray(array(1, 2, 3, 4), true);
+        $rel->loadDest($prods);
+        $this->assertArraysMatch($a = $this->_getRefIds($prods[1]), array(2, 3), $s = 'Load items with midWere applied', 'sort');
+        $this->assertArraysMatch($this->_getRefIds($prods[2]), array(4), $s, 'sort');
+        $this->assertArraysMatch($this->_getRefIds($prods[3]), array(), $s, 'sort');
+        $this->assertArraysMatch($this->_getRefIds($prods[4]), array(), $s, 'sort');
+ 
+        foreach ($prods as $prod) $prod->cleanupMembers ();
+        $rel = clone $pm->getRelation('_referencedShopProducts');
+        $prods = $pm->loadRecordsArray(array(1, 2, 3, 4), true);
+        $prods[1]->setReferencedShopProductIds(array(3, 4));
+        $rel->loadDest($prods);
+        $this->assertArraysMatch($a = $this->_getRefIds($prods[1]), array(3, 4), $s = 'Load items with midWere applied, IDs loaded', 'sort');
+ 
+        foreach ($prods as $prod) $prod->cleanupMembers ();
+        $prods = $pm->loadRecordsArray(array(1, 2, 3, 4), true);
+        $rel = clone $pm->getRelation('_referencedShopProducts');
+        $rel->loadDestNNIds($prods[1]);
+        $rel->loadDest($prods);
+        foreach ($prods as $prod) $prod->cleanupMembers ();
+        $rel = clone $pm->getRelation('_referencedShopProducts');
+        $prods = $pm->loadRecordsArray(array(1, 2, 3, 4), true);
+        $rel->loadDest($prods);
+        $this->assertArraysMatch($a = $this->_getRefIds($prods[1]), array(2, 3), $s = 'Load items with midWere applied, IDs loaded for sone instances', 'sort');
+        $this->assertArraysMatch($this->_getRefIds($prods[2]), array(4), $s, 'sort');
+        $this->assertArraysMatch($this->_getRefIds($prods[3]), array(), $s, 'sort');
+        $this->assertArraysMatch($this->_getRefIds($prods[4]), array(), $s, 'sort');
+ 
+        foreach ($prods as $prod) $prod->cleanupMembers ();
+        $rel = clone $pm->getRelation('_referencedShopProducts');
+        $prods = $pm->loadRecordsArray(array(1, 2, 3, 4), true);
+        $rel->loadDestCount($prods);
+        $this->assertEqual($a = $prods[1]->countReferencedShopProducts(), count(array(2, 3)), $s = 'Load items with midWere applied, IDs loaded for sone instances', 'sort');
+        $this->assertEqual($a = $prods[2]->countReferencedShopProducts(), count(array(4)), $s);
+        $this->assertEqual($a = $prods[3]->countReferencedShopProducts(), count(array()), $s);
+        $this->assertEqual($a = $prods[4]->countReferencedShopProducts(), count(array()), $s);
+ 
+        foreach ($prods as $prod) $prod->cleanupMembers ();
+        $rel = clone $pm->getRelation('_referencedShopProducts');
+        $prods = $pm->loadRecordsArray(array(1, 2, 3, 4), true);
+        $rel->loadDestNNIds($prods);
+        $this->assertEqual($a = $prods[1]->countReferencedShopProducts(), count(array(2, 3)), $s = 'Count items with midWere applied');
+        $this->assertEqual($a = $prods[2]->countReferencedShopProducts(), count(array(4)), $s);
+        $this->assertEqual($a = $prods[3]->countReferencedShopProducts(), count(array()), $s);
+        $this->assertEqual($a = $prods[4]->countReferencedShopProducts(), count(array()), $s);
+ 
+        foreach ($prods as $prod) $prod->cleanupMembers ();
+        $rel = clone $pm->getRelation('_referencedShopProducts');
+        $prods = $pm->loadRecordsArray(array(1, 2, 3, 4), true);
+        $rel->loadDestNNIds($prods[1]);
+        $this->assertEqual($a = $prods[1]->countReferencedShopProducts(), count(array(2, 3)), $s = 'Count items with midWere applied, IDs loaded for sone instances');
+        $this->assertEqual($a = $prods[2]->countReferencedShopProducts(), count(array(4)), $s);
+        $this->assertEqual($a = $prods[3]->countReferencedShopProducts(), count(array()), $s);
+        $this->assertEqual($a = $prods[4]->countReferencedShopProducts(), count(array()), $s);
+        
+    }
    
 }

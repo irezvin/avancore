@@ -160,6 +160,14 @@ class Child_Shop_Product_Base_Mapper extends Sample_Shop_Product_Mapper {
                 'srcMapperClass' => 'Child_Shop_Product_Mapper',
                 'destMapperClass' => 'Child_Shop_Category_Mapper',
             ),
+            '_referencedShopProducts' => array (
+                'srcMapperClass' => 'Child_Shop_Product_Mapper',
+                'destMapperClass' => 'Child_Shop_Product_Mapper',
+            ),
+            '_referencingShopProducts' => array (
+                'srcMapperClass' => 'Child_Shop_Product_Mapper',
+                'destMapperClass' => 'Child_Shop_Product_Mapper',
+            ),
         ));
         
     }

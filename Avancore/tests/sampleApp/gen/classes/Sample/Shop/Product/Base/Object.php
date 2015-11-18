@@ -7,6 +7,14 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     public $_shopCategoriesCount = false;
     public $_shopCategoriesLoaded = false;
     public $_shopCategoryIds = false;
+    public $_referencedShopProducts = false;
+    public $_referencedShopProductsCount = false;
+    public $_referencedShopProductsLoaded = false;
+    public $_referencedShopProductIds = false;
+    public $_referencingShopProducts = false;
+    public $_referencingShopProductsCount = false;
+    public $_referencingShopProductsLoaded = false;
+    public $_referencingShopProductIds = false;
     public $id = NULL;
     public $sku = '';
     public $title = '';
@@ -41,19 +49,19 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopCategories', 1 => 'shopCategoryIds', 7 => 'notePerson', )));
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopCategories', 1 => 'shopCategoryIds', 2 => 'referencedShopProducts', 3 => 'referencedShopProductIds', 4 => 'referencingShopProducts', 5 => 'referencingShopProductIds', 11 => 'notePerson', )));
     }
     
  
     protected function listOwnLists() {
         
-        return array ( 'shopCategories' => 'shopCategories', 'notePerson' => 'noteShopProducts', );
+        return array ( 'shopCategories' => 'shopCategories', 'referencedShopProducts' => 'referencedShopProducts', 'referencingShopProducts' => 'referencingShopProducts', 'notePerson' => 'noteShopProducts', );
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'shopCategories' => 'Sample_Shop_Category', 'notePerson' => 'Sample_Person', );
+        return array ( 'shopCategories' => 'Sample_Shop_Category', 'referencedShopProducts' => 'Sample_Shop_Product', 'referencingShopProducts' => 'Sample_Shop_Product', 'notePerson' => 'Sample_Person', );
     }
 
     protected function getOwnPropertiesInfo() {
@@ -75,6 +83,46 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 'values' => array (
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Category_Mapper',
+                ),
+                'showInTable' => false,
+            ),
+            'referencedShopProducts' => array (
+                'className' => 'Sample_Shop_Product',
+                'mapperClass' => 'Sample_Shop_Product_Mapper',
+                'otherModelIdInMethodsPrefix' => 'referenced',
+                'caption' => new Ac_Lang_String('sample_shop_product_referenced_shop_products'),
+                'relationId' => '_referencedShopProducts',
+                'countVarName' => '_referencedShopProductsCount',
+                'nnIdsVarName' => '_referencedShopProductIds',
+                'referenceVarName' => '_referencedShopProducts',
+            ),
+            'referencedShopProductIds' => array (
+                'dataType' => 'int',
+                'arrayValue' => true,
+                'controlType' => 'selectList',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Mapper',
+                    'mapperClass' => 'Sample_Shop_Product_Mapper',
+                ),
+                'showInTable' => false,
+            ),
+            'referencingShopProducts' => array (
+                'className' => 'Sample_Shop_Product',
+                'mapperClass' => 'Sample_Shop_Product_Mapper',
+                'otherModelIdInMethodsPrefix' => 'referencing',
+                'caption' => new Ac_Lang_String('sample_shop_product_referencing_shop_products'),
+                'relationId' => '_referencingShopProducts',
+                'countVarName' => '_referencingShopProductsCount',
+                'nnIdsVarName' => '_referencingShopProductIds',
+                'referenceVarName' => '_referencingShopProducts',
+            ),
+            'referencingShopProductIds' => array (
+                'dataType' => 'int',
+                'arrayValue' => true,
+                'controlType' => 'selectList',
+                'values' => array (
+                    'class' => 'Ac_Model_Values_Mapper',
+                    'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ),
                 'showInTable' => false,
             ),
@@ -132,6 +180,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ),
+                'objectPropertyName' => 'referencedShopProducts',
                 'caption' => new Ac_Lang_String('sample_shop_product_product_id'),
             ),
             'note' => array (
@@ -246,6 +295,182 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
         $this->_shopCategories = array();
         $this->_shopCategoriesLoaded = true;
         $this->_shopCategoryIds = false;
+    }               
+
+    function countReferencedShopProducts() {
+        if (is_array($this->_referencedShopProducts)) return count($this->_referencedShopProducts);
+        if ($this->_referencedShopProductsCount === false) {
+            $this->mapper->loadAssocCountFor($this, '_referencedShopProducts');
+        }
+        return $this->_referencedShopProductsCount;
+        
+    }
+
+    function listReferencedShopProducts() {
+        if (!$this->_referencedShopProductsLoaded) {
+            $this->mapper->loadReferencedShopProductsFor($this);
+        }
+        return array_keys($this->_referencedShopProducts);
+    }
+    
+    /**
+     * @return bool
+     */
+    function isReferencedShopProductsLoaded() {
+        return $this->_referencedShopProductsLoaded;
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getReferencedShopProduct($id) {
+        if (!$this->_referencedShopProductsLoaded) {
+            $this->mapper->loadReferencedShopProductsFor($this);
+        }
+        
+        if (!isset($this->_referencedShopProducts[$id])) trigger_error ('No such Shop product: \''.$id.'\'', E_USER_ERROR);
+        return $this->_referencedShopProducts[$id];
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getReferencedShopProductsItem($id) {
+        return $this->getReferencedShopProduct($id);
+    }
+    
+    /**
+     * @param Sample_Shop_Product $referencedShopProduct 
+     */
+    function addReferencedShopProduct($referencedShopProduct) {
+        if (!is_a($referencedShopProduct, 'Sample_Shop_Product')) trigger_error('$referencedShopProduct must be an instance of Sample_Shop_Product', E_USER_ERROR);
+        $this->listReferencedShopProducts();
+        $this->_referencedShopProducts[] = $referencedShopProduct;
+        
+        if (is_array($referencedShopProduct->_referencingShopProducts) && !Ac_Util::sameInArray($this, $referencedShopProduct->_referencingShopProducts)) {
+                $referencedShopProduct->_referencingShopProducts[] = $this;
+        }
+        
+    }
+
+    /**
+     * @return Sample_Shop_Product  
+     */
+    function createReferencedShopProduct($values = array()) {
+        $m = $this->getMapper('Sample_Shop_Product_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        $this->addReferencedShopProduct($res);
+        return $res;
+    }
+    
+
+    function getReferencedShopProductIds() {
+        if ($this->_referencedShopProductIds === false) {
+            $this->mapper->loadReferencedShopProductIdsFor($this);
+        }
+        return $this->_referencedShopProductIds;
+    }
+    
+    function setReferencedShopProductIds($referencedShopProductIds) {
+        if (!is_array($referencedShopProductIds)) trigger_error('$referencedShopProductIds must be an array', E_USER_ERROR);
+        $this->_referencedShopProductIds = $referencedShopProductIds;
+        $this->_referencedShopProductsLoaded = false;
+        $this->_referencedShopProducts = false; 
+    }
+    
+    function clearReferencedShopProducts() {
+        $this->_referencedShopProducts = array();
+        $this->_referencedShopProductsLoaded = true;
+        $this->_referencedShopProductIds = false;
+    }               
+
+    function countReferencingShopProducts() {
+        if (is_array($this->_referencingShopProducts)) return count($this->_referencingShopProducts);
+        if ($this->_referencingShopProductsCount === false) {
+            $this->mapper->loadAssocCountFor($this, '_referencingShopProducts');
+        }
+        return $this->_referencingShopProductsCount;
+        
+    }
+
+    function listReferencingShopProducts() {
+        if (!$this->_referencingShopProductsLoaded) {
+            $this->mapper->loadReferencingShopProductsFor($this);
+        }
+        return array_keys($this->_referencingShopProducts);
+    }
+    
+    /**
+     * @return bool
+     */
+    function isReferencingShopProductsLoaded() {
+        return $this->_referencingShopProductsLoaded;
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getReferencingShopProduct($id) {
+        if (!$this->_referencingShopProductsLoaded) {
+            $this->mapper->loadReferencingShopProductsFor($this);
+        }
+        
+        if (!isset($this->_referencingShopProducts[$id])) trigger_error ('No such Shop product: \''.$id.'\'', E_USER_ERROR);
+        return $this->_referencingShopProducts[$id];
+    }
+    
+    /**
+     * @return Sample_Shop_Product 
+     */
+    function getReferencingShopProductsItem($id) {
+        return $this->getReferencingShopProduct($id);
+    }
+    
+    /**
+     * @param Sample_Shop_Product $referencingShopProduct 
+     */
+    function addReferencingShopProduct($referencingShopProduct) {
+        if (!is_a($referencingShopProduct, 'Sample_Shop_Product')) trigger_error('$referencingShopProduct must be an instance of Sample_Shop_Product', E_USER_ERROR);
+        $this->listReferencingShopProducts();
+        $this->_referencingShopProducts[] = $referencingShopProduct;
+        
+        if (is_array($referencingShopProduct->_referencedShopProducts) && !Ac_Util::sameInArray($this, $referencingShopProduct->_referencedShopProducts)) {
+                $referencingShopProduct->_referencedShopProducts[] = $this;
+        }
+        
+    }
+
+    /**
+     * @return Sample_Shop_Product  
+     */
+    function createReferencingShopProduct($values = array()) {
+        $m = $this->getMapper('Sample_Shop_Product_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        $this->addReferencingShopProduct($res);
+        return $res;
+    }
+    
+
+    function getReferencingShopProductIds() {
+        if ($this->_referencingShopProductIds === false) {
+            $this->mapper->loadReferencingShopProductIdsFor($this);
+        }
+        return $this->_referencingShopProductIds;
+    }
+    
+    function setReferencingShopProductIds($referencingShopProductIds) {
+        if (!is_array($referencingShopProductIds)) trigger_error('$referencingShopProductIds must be an array', E_USER_ERROR);
+        $this->_referencingShopProductIds = $referencingShopProductIds;
+        $this->_referencingShopProductsLoaded = false;
+        $this->_referencingShopProducts = false; 
+    }
+    
+    function clearReferencingShopProducts() {
+        $this->_referencingShopProducts = array();
+        $this->_referencingShopProductsLoaded = true;
+        $this->_referencingShopProductIds = false;
     }               
         
     

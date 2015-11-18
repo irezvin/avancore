@@ -115,7 +115,7 @@ abstract class Ac_Cg_Util {
         return array($cmd, $output, $res);
     }
     
-    static function findCommonPrefix(array $strings) {
+    static function findCommonPrefix(array $strings, $roundToWordBoundary = true) {
         $res = '';
         if (count($strings)) {
             do {
@@ -131,6 +131,27 @@ abstract class Ac_Cg_Util {
                 }
                 if ($match) $res = $s;
             } while ($match);
+        }
+        
+        // Now we should handle the cases when 'TheCoolRelation' and 'TheCookRelation' 
+        // should have 'The' and not 'TheCoo' common prefix. We will round it to nearest 
+        // Capital letter or underscore
+        if ($roundToWordBoundary && strlen($res) && preg_match('/[a-z]$/', $res)) { // common prefix ends with lcase letter
+            $startingWithLowercase = false;
+            foreach ($strings as $s) {
+                $remainder = substr($s, strlen($res));
+                if (strlen($remainder) && preg_match('/^[a-z]/', $remainder{0})) {
+                    $startingWithLowercase = true;
+                    break;
+                }
+            }
+            if ($startingWithLowercase) { // there will be subjects like 'ool'
+                $items = preg_split('/(_|[A-Z][a-z]+)/', $res, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+                if (count($items) > 1) {
+                    $last = array_pop($items);
+                    $res = substr($res, 0, -strlen($last));
+                }
+            }
         }
         return $res;
     }

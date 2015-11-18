@@ -122,18 +122,17 @@ class Sample_Shop_Product_Mapper extends Sample_Shop_Product_Base_Mapper {
 //		));
 //		return $res;
 //	}    
-//    
-//    protected function getRelationPrototypes() {
-//        return Ac_Util::m(parent::getRelationPrototypes(), array(
-//            '' => array(
-//                'srcMapperClass' => 'Sample_Shop_Product_Mapper',
-//                'destMapperClass' => '',
-//                'fieldLinks' => array(),
-//                'srcIsUnique' => false,
-//                'destIsUnique' => false,
-//            ),
-//        ));
-//    }
+    
+    protected function doGetRelationPrototypes() {
+        return Ac_Util::m(parent::doGetRelationPrototypes(), array(
+            '_referencingShopProducts' => array(
+                'midWhere' => array('ignore' => 0),
+            ),
+            '_referencedShopProducts' => array(
+                'midWhere' => array('ignore' => 0),
+            ),
+        ));
+    }
     
 }
     
