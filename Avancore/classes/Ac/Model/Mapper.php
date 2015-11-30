@@ -951,18 +951,12 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         }
         
         if ($res && $dontReturnOwnIdentifier) {
-            $a = $res;
             $id = $this->getIdentifierOfObject($record);
             foreach ($res as $idx => $keys) {
                 $keys = array_diff($keys, array($id));
                 if ($keys) $res[$idx] = $keys;
                     else unset($res[$idx]);
             }
-//            if ($a !== $res) {
-//                echo "<div style='border: 1px solid red'>"; 
-//                Ac_Debug::dd($a, $res);
-//                echo "</div>";
-//            }
         }
         
         return $res;

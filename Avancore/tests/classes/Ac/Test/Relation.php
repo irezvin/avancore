@@ -163,7 +163,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $rel = clone $pm->getRelation('_tags');
         $rel->setDestOrdering('tagId DESC');
         $a->setTagIds(array(3));
-        $d = $rel->getDest(array($a, $b), AMR_PLAIN_RESULT);
+        $d = $rel->getDest(array($a, $b), Ac_Model_Relation_Abstract::RESULT_PLAIN);
         if (!$this->assertArraysMatch(array(
             array('tagId' => 3, '__class' => 'Sample_Tag'),
             array('tagId' => 2, '__class' => 'Sample_Tag'),
@@ -177,7 +177,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $rel->setDestOrdering('tagId DESC');
         $a->setTagIds(array(1));
         $b->setTagIds(array(3));
-        $d = $rel->getDest(array($a, $b), AMR_PLAIN_RESULT);
+        $d = $rel->getDest(array($a, $b), Ac_Model_Relation_Abstract::RESULT_PLAIN);
         
         if (!$this->assertArraysMatch(array(
             array('tagId' => 3, '__class' => 'Sample_Tag'),
@@ -186,14 +186,14 @@ class Ac_Test_Relation extends Ac_Test_Base {
             Ac_Debug::drr($d);
         
         
-        $d = $rel->getDest($b, AMR_PLAIN_RESULT);
+        $d = $rel->getDest($b, Ac_Model_Relation_Abstract::RESULT_PLAIN);
         if (!$this->assertArraysMatch(array(
             array('tagId' => 3, '__class' => 'Sample_Tag'),
         ), $d))
             Ac_Debug::drr($d);
         
-        $this->assertEqual($d = $rel->countDest($a, true, AMR_PLAIN_RESULT), 1);
-        $this->assertEqual($d = $rel->countDest($b, true, AMR_PLAIN_RESULT), 1);
+        $this->assertEqual($d = $rel->countDest($a, true, Ac_Model_Relation_Abstract::RESULT_PLAIN), 1);
+        $this->assertEqual($d = $rel->countDest($b, true, Ac_Model_Relation_Abstract::RESULT_PLAIN), 1);
         
     }
     
@@ -204,7 +204,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $a2 = $am->loadByAlbumId(2);
         $rel = $am->getRelation('_personPhotos');
         
-        $d = $rel->getDest(array($a1, $a2), AMR_RECORD_KEYS);
+        $d = $rel->getDest(array($a1, $a2), Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
         if (!$this->assertArraysMatch($a = array(
             $a1->personId => array(
                 $a1->albumId => array(
@@ -226,7 +226,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $a2->setPersonPhotoIds(array(
             array('personId' => $a2->personId, 'photoId' => 1),
         ));
-        $d = $rel->getDest(array($a1, $a2), AMR_RECORD_KEYS);
+        $d = $rel->getDest(array($a1, $a2), Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
         if (!$this->assertArraysMatch($a = array(
             $a1->personId => array(
                 $a1->albumId => array(
@@ -244,7 +244,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $a1->setPersonPhotoIds(array(
             array('personId' => $a1->personId, 'photoId' => 2),
         ));
-        $d = $rel->getDest(array($a1, $a2), AMR_RECORD_KEYS);
+        $d = $rel->getDest(array($a1, $a2), Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
         if (!$this->assertArraysMatch($a = array(
             $a1->personId => array(
                 $a1->albumId => array(
@@ -265,9 +265,9 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $b = $pm->loadByPersonId(4);
         
         $rel = $pm->getRelation('_tags');
-        //Ac_Debug::drr($rel->getDest(array($a, $b), AMR_RECORD_KEYS));
-        //Ac_Debug::drr($rel->getDest(array($a, $b), AMR_PLAIN_RESULT));
-        $d = $rel->getDest(array($a, $b), AMR_ALL_ORIGINAL_KEYS);
+        //Ac_Debug::drr($rel->getDest(array($a, $b), Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS));
+        //Ac_Debug::drr($rel->getDest(array($a, $b), Ac_Model_Relation_Abstract::RESULT_PLAIN));
+        $d = $rel->getDest(array($a, $b), Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS);
         $this->assertTrue(is_array($d[0]) && !count($d[0])); // first person does not have tags
         
         
@@ -278,9 +278,9 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $rel = $am->getRelation('_personPhotos');
          */
         
-        //Ac_Debug::drr($rel->getDest(array($a1, $a2), AMR_RECORD_KEYS));
-        //Ac_Debug::drr($rel->getDest(array($a1, $a2), AMR_PLAIN_RESULT));
-        //Ac_Debug::drr($rel->getDest(array($a1, $a2), AMR_ALL_ORIGINAL_KEYS));
+        //Ac_Debug::drr($rel->getDest(array($a1, $a2), Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS));
+        //Ac_Debug::drr($rel->getDest(array($a1, $a2), Ac_Model_Relation_Abstract::RESULT_PLAIN));
+        //Ac_Debug::drr($rel->getDest(array($a1, $a2), Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS));
         
     }
     
@@ -318,10 +318,10 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $a = $pm->loadByPersonId(3);
         $b = $pm->loadByPersonId(4);
         
-        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), true, AMR_ALL_ORIGINAL_KEYS), array(0, 2))) {
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), true, Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS), array(0, 2))) {
             var_dump($c);
         }
-        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), false, AMR_ALL_ORIGINAL_KEYS), 2)) {
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), false, Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS), 2)) {
             var_dump($c);
         }
         
@@ -332,10 +332,10 @@ class Ac_Test_Relation extends Ac_Test_Base {
         
         $a->setTagIds(array(3));
 
-        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), true, AMR_ALL_ORIGINAL_KEYS), array(1, 2))) {
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), true, Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS), array(1, 2))) {
             var_dump($c);
         }
-        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), false, AMR_ALL_ORIGINAL_KEYS), 3)) {
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), false, Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS), 3)) {
             var_dump($c);
         }
         
@@ -345,10 +345,10 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $a->setTagIds(array(1));
         $b->setTagIds(array());
 
-        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), true, AMR_ALL_ORIGINAL_KEYS), array(1, 0))) {
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), true, Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS), array(1, 0))) {
             var_dump($c);
         }
-        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), false, AMR_ALL_ORIGINAL_KEYS), 1)) {
+        if (!$this->assertEqual($c = $rel->countDest(array($a, $b), false, Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS), 1)) {
             var_dump($c);
         }
         
@@ -525,13 +525,13 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $rel = clone $pm->getRelation('_tags');
         $rel->destOrdering = 'tagId';
         $pp = array('first' => $pers, 'second' => $pers2);
-        $dd = $rel->getDest($pp, AMR_PLAIN_RESULT);
+        $dd = $rel->getDest($pp, Ac_Model_Relation_Abstract::RESULT_PLAIN);
         ksort($dd);
         $this->assertEqual(array_keys($dd), array(0, 1));
         $this->assertEqual($dd[0]->tagId, 1);
         $this->assertEqual($dd[1]->tagId, 2);
 
-        $dd = $rel->getDest($pp, AMR_ORIGINAL_KEYS);
+        $dd = $rel->getDest($pp, Ac_Model_Relation_Abstract::RESULT_ORIGINAL_KEYS);
         $this->assertArraysMatch(array(
             'first' => array(
                 0 => array('__class' => 'Sample_Tag', 'tagId' => 1)
@@ -542,7 +542,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
             )
         ), $dd);
         
-        /*$dd = $rel->getDest($pp, AMR_RECORD_KEYS);
+        /*$dd = $rel->getDest($pp, Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
         Ac_Debug::drr($dd);
         $this->assertArraysMatch(array(
             $pers->personId => array(
@@ -557,14 +557,14 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $rel = clone $pm->getRelation('_tags');
         $rel->destOrdering = 'tagId';
         $pp = array('first' => $pers, 'second' => $pers2);
-        $dd = $rel->getDest($pp, AMR_ORIGINAL_KEYS);
+        $dd = $rel->getDest($pp, Ac_Model_Relation_Abstract::RESULT_ORIGINAL_KEYS);
         $this->assertArraysMatch(array(
             'second' => array(
                 0 => array('__class' => 'Sample_Tag', 'tagId' => 1),
                 1 => array('__class' => 'Sample_Tag', 'tagId' => 2)
             )
         ), $dd);
-        $dd = $rel->getDest($pp, AMR_ALL_ORIGINAL_KEYS);
+        $dd = $rel->getDest($pp, Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS);
         $this->assertArraysMatch(array(
             'first' => array(),
             'second' => array(
@@ -593,7 +593,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $rel = clone $pm->getRelation('_tags');
         $rel->destOrdering = 'tagId';
         $pp = array('first' => $pers, 'second' => $pers2);
-        $dd = $rel->getDest($pp, AMR_ALL_ORIGINAL_KEYS);
+        $dd = $rel->getDest($pp, Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS);
         $this->assertArraysMatch(array(
             'first' => array(),
             'second' => array(
@@ -715,35 +715,6 @@ class Ac_Test_Relation extends Ac_Test_Base {
     }
     
         
-    function testRelArrayQualifiers() {
-        $rel = new Ac_Model_Relation(array(
-                'srcTableName' => false,
-                'destTableName' => '#__people_tags',
-                'fieldLinks' => array(
-                    'personId' => 'idOfPerson',
-                ),
-                'srcVarName' => 'tagIds',
-                'destQualifier' => 'idOfTag',
-                'srcIsUnique' => true,
-                'destIsUnique' => false,
-                'database' => $this->getAeDb()
-        ));
-        $src = array(
-            'a' => array('personId' => 4),
-            'b' => array('personId' => 3, 'tagIds' => false),
-            'c' => array('personId' => -2, 'tagIds' => null),
-        );
-        $rel->loadDest($src);
-
-        foreach ($src as $foo) {
-            if (isset($foo['tagIds']) && is_array($foo['tagIds'])) {
-                foreach ($foo['tagIds'] as $key => $id) {
-                    $this->assertEqual($key, $id['idOfTag']);
-                }
-            }
-        }
-    }
-    
     protected function _getRefIds(Sample_Shop_Product $prod) {
         $res = array();
         foreach ($prod->listReferencedShopProducts() as $i) $res[] = $prod->getReferencedShopProduct($i)->id;

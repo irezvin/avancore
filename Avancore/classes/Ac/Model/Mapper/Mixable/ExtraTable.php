@@ -242,7 +242,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     
     protected function getMappedData(array $recordRows) {
         $rel = $this->getImplRelation();
-        $data = $rel->getSrc($recordRows, AMR_ORIGINAL_KEYS);
+        $data = $rel->getSrc($recordRows, Ac_Model_Relation_Abstract::RESULT_ORIGINAL_KEYS);
         if ($this->fieldNames)
             $data = Ac_Model_Mapper::mapRows($data, $this->fieldNames);
         return $data;

@@ -493,7 +493,9 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     protected function doGetDefaultServices() {
         return array(
             'managerConfigService' => 'Ac_Admin_ManagerConfigService',
-            'flags' => array('class' => 'Ac_Flags')
+            'flags' => array('class' => 'Ac_Flags'),
+            'Ac_Model_Relation_Provider_Evaluator' => 'Ac_Model_Relation_Provider_Evaluator',
+            'Ac_Model_Relation_Accessor_Evaluator' => 'Ac_Model_Relation_Accessor_Evaluator',
         );
     }
     

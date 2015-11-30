@@ -555,7 +555,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
             $res = $this->services[$id];
         } elseif ($this->adapter && $s = $this->adapter->getService($id, true)) {
             $res = $s;
-            Ac_Accessor::setObjectProperty($res, 'application', $this);
+            if (method_exists($res, 'setApplication')) $res->setApplication($this);
         } elseif (!$dontThrow) throw new Exception("No such service: '{$id}");
         return $res;
     }

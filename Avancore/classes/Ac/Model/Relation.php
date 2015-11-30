@@ -1,30 +1,9 @@
 <?php
-/**
- * result rows will be returned as plain numeric array
- * @see Ac_Model_Relation::getDest()
- * @see Ac_Model_Relation::getSrc()
- */
-define('AMR_PLAIN_RESULT', 0);
-/**
- * result rows will have DB keys of source records 
- * @see Ac_Model_Relation::getDest()
- * @see Ac_Model_Relation::getSrc()
- */
-define('AMR_RECORD_KEYS', 1);
-/**
- * result rows will have keys of original array 
- * @see Ac_Model_Relation::getDest()
- * @see Ac_Model_Relation::getSrc()
- */
-define('AMR_ORIGINAL_KEYS', 2);
-/**
- * results rows will have keys of original array and all keys from original array will be in result array.
- * Values in places of missing result rows will have default value.
- *  
- * @see Ac_Model_Relation::getDest()
- * @see Ac_Model_Relation::getSrc()
- */
-define('AMR_ALL_ORIGINAL_KEYS', 6);
+
+define('AMR_PLAIN_RESULT', Ac_Model_Relation_Abstract::RESULT_PLAIN);
+define('AMR_RECORD_KEYS', Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
+define('AMR_ORIGINAL_KEYS', Ac_Model_Relation_Abstract::RESULT_ORIGINAL_KEYS);
+define('AMR_ALL_ORIGINAL_KEYS', Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS);
 
 /**
  * Describes relation between two tables. 
@@ -34,12 +13,7 @@ define('AMR_ALL_ORIGINAL_KEYS', 6);
  * 
  * Interface of this class has one specific quality: most methods (load, count, delete) are in two flavours: for source table and for destination one.     
  */
-class Ac_Model_Relation extends Ac_Prototyped {
-
-    /**
-     * @var Ac_Application
-     */
-    protected $application = false;
+class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     
     /**
      * Name of source table mapper (if given). If source mapper is given, all other parameters will be taken from its function calls.
@@ -92,15 +66,9 @@ class Ac_Model_Relation extends Ac_Prototyped {
     protected $fieldLinks2 = false;
     
     /**
-     * Describes cardinality of source table (true if source fields point to unique record)
-     * @var bool 
+     * @var bool This relation is outgoing from source object (belongs to source table)
      */
-    protected $srcIsUnique = null;
-    
-    /**
-     * Describes cardinality of destination table (true if destination fields point to unique record)
-     */
-    protected $destIsUnique = null;
+    protected $srcOutgoing = false;
     
     /**
      * Name of variable in source object that contains reference to destination object (if $destUnique is false, it has to be an array with references) 
@@ -123,11 +91,6 @@ class Ac_Model_Relation extends Ac_Prototyped {
      * @var string
      */
     protected $destNNIdsVarName = false;
-    
-    /**
-     * @var bool This relation is outgoing from source object (belongs to source table)
-     */
-    protected $srcOutgoing = false;
     
     /**
      * Name of property of source object where count of linked destination records is temporarily stored (or FALSE to not to use this feature)
@@ -159,14 +122,14 @@ class Ac_Model_Relation extends Ac_Prototyped {
     protected $destOrdering = false;
     
     protected $srcOrdering = false;
-    
+        
     protected $srcExtraJoins = false;
     
     protected $destExtraJoins = false;
     
     protected $srcWhere = false;
     
-    protected $destWhere = false;
+    protected $destWhere = false;    
     
     protected $midWhere = false;
     
@@ -190,39 +153,23 @@ class Ac_Model_Relation extends Ac_Prototyped {
      * @var Ac_Model_Mapper
      */
     protected $destMapper = false;
+
+    protected $destProvider = false;
+
+    protected $srcProvider = false;
     
-    protected $srcImpl = false;
+    protected $fullDestProps = false;
     
-    protected $destImpl = false;
+    protected $fullSrcProps = false;
     
-    protected $debug = false;
-    
-    protected $immutable = false;
-    
-    // ------------------------ PUBLIC METHODS -----------------------
-    
-    /**
-     * @param array $prototype Array prototype of the object
-     */
-    function __construct (array $prototype = array()) {
-        
-        if (isset($prototype['immutable'])) {
-            $imm = $prototype['immutable'];
-            unset($prototype['immutable']);
-        }
-        else $imm = false;
-        
-        if (isset($prototype['application']) && $prototype['application']) {
-            $this->setApplication($prototype['application']);
-            unset ($prototype['application']);
-        }
+    protected function doConstruct(array $prototype = array()) {
         
         if (isset($prototype['db']) && $prototype['db']) {
             $this->setDb($prototype['db']);
             unset ($prototype['db']);
         }
         
-        parent::__construct($prototype);
+        parent::doConstruct($prototype);
         
         if (($this->srcTableName === false) && strlen($this->srcMapperClass)) {
             $this->setSrcMapper(Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->application? $this->application : null));
@@ -231,22 +178,8 @@ class Ac_Model_Relation extends Ac_Prototyped {
             $this->setDestMapper(Ac_Model_Mapper::getMapper($this->destMapperClass, $this->application? $this->application : null));
         }
         
-        if ($imm) $this->immutable = true;            
-        
     }
 
-    function hasPublicVars() {
-        return false;
-    }
-    
-    function setDebug($debug) {
-        $this->debug = (bool) $debug;
-    }
-
-    function getDebug() {
-        return $this->debug;
-    }
-    
     function setSrcMapper(Ac_Model_Mapper $srcMapper, $force = false) {
         if ($srcMapper !== ($oldSrcMapper = $this->srcMapper) || $force) {
             if ($this->immutable) throw self::immutableException();
@@ -258,8 +191,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
             }
             if (!$this->db) $this->db = $this->srcMapper->getApplication()->getDb();
             if ($this->srcOrdering === false) $this->srcOrdering = $this->srcMapper->getDefaultSort();
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
     
@@ -279,8 +211,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
             }
             if (!$this->db) $this->db = $this->destMapper->getApplication()->getDb();
             if ($this->destOrdering === false) $this->destOrdering = $this->destMapper->getDefaultSort();
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
     
@@ -291,27 +222,14 @@ class Ac_Model_Relation extends Ac_Prototyped {
         return $this->destMapper;
     }
     
-    function setApplication(Ac_Application $application) {
-        if ($application !== ($oldApplication = $this->application)) {
-            if ($this->immutable) throw self::immutableException();
-            $this->application = $application;
-            $this->setDb($this->application->getDb());
-            if (!$oldApplication) {
-                if ($this->srcMapperClass && !$this->srcMapper) $this->setSrcMapperClass($this->srcMapperClass, true);
-                if ($this->destMapperClass && !$this->destMapper) $this->setDestMapper($this->destMapper, true);
-            }
-            $this->destImpl = false;
-            $this->srcImpl = false;
+    protected function doOnSetApplication($oldApplication) {
+        $this->setDb($this->application->getDb());
+        if (!$oldApplication) {
+            if ($this->srcMapperClass && !$this->srcMapper) $this->setSrcMapperClass($this->srcMapperClass, true);
+            if ($this->destMapperClass && !$this->destMapper) $this->setDestMapper($this->destMapper, true);
         }
     }
-    
-    /**
-     * @return Ac_Application
-     */
-    function getApplication() {
-        return $this->application;
-    }
-    
+        
     /**
      * Assigns ID of source table mapper. 
      * 
@@ -327,8 +245,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
             if (strlen($srcMapperClass) && $this->application) {
                 $this->setSrcMapper(Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->application));
             }
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
 
@@ -357,8 +274,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
             if (strlen($destMapperClass) && $this->application) {
                 $this->setDestMapper(Ac_Model_Mapper::getMapper($this->destMapperClass, $this->application));
             }
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
 
@@ -383,8 +299,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($srcTableName !== ($oldSrcTableName = $this->srcTableName)) {
             if ($this->immutable) throw self::immutableException();
             $this->srcTableName = $srcTableName;
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
 
@@ -408,8 +323,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($destTableName !== ($oldDestTableName = $this->destTableName)) {
             if ($this->immutable) throw self::immutableException();
             $this->destTableName = $destTableName;
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
 
@@ -437,8 +351,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($midTableName !== ($oldMidTableName = $this->midTableName)) {
             if ($this->immutable) throw self::immutableException();
             $this->midTableName = $midTableName;
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
 
@@ -462,8 +375,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($midTableAlias !== ($oldMidTableAlias = $this->midTableAlias)) {
             if ($this->immutable) throw self::immutableException();
             $this->midTableAlias = $midTableAlias;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
     
@@ -498,8 +410,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
             if (!$fieldLinks) throw new Ac_E_InvalidCall("\$fieldLinks must not be empty");
             $this->fieldLinks = $fieldLinks;
             $this->fieldLinksRev = array_flip($fieldLinks);
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
 
@@ -540,8 +451,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
             } else {
                 throw Ac_E_InvalidCall::wrongType('fieldLinks2', $fieldLinks2, array('array', 'false'));
             }
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
             $this->fieldLinks2 = $fieldLinks2;
         }
     }
@@ -557,81 +467,29 @@ class Ac_Model_Relation extends Ac_Prototyped {
     function getFieldLinks2() {
         return $this->fieldLinks2;
     }
-
-    /**
-     * Assigns whether source records are uniquely identified by their foreign keys
-     * 
-     * If keys in $fieldLinks is enough, this must be set to TRUE.
-     * Used to determine whether SRC items will be arrays' or single objects.
-     * 
-     * @param bool $srcIsUnique
-     */
-    function setSrcIsUnique($srcIsUnique) {
-        $srcIsUnique = (bool) $srcIsUnique;
-        if ($srcIsUnique !== ($oldSrcIsUnique = $this->srcIsUnique)) {
-            if ($this->immutable) throw self::immutableException();
-            $this->srcIsUnique = $srcIsUnique;
-            $this->srcImpl = false;
-            $this->destImpl = false;
+    
+    protected function doGetSrcIsUnique() {
+        $res = false;
+        if ($m = $this->getSrcMapper()) {
+            if (!$this->fieldLinks) 
+                throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() before setFieldLinks()");
+            if ($m) $res = 
+                !$this->midTableName && $m->identifiesRecordBy(array_keys($this->fieldLinks));
         }
+        return $res;
     }
-
-    /**
-     * Returns whether source records are uniquely identified by their foreign keys
-     * 
-     * @return bool
-     */
-    function getSrcIsUnique() {
-        if ($this->srcIsUnique === null) {
-            $this->srcIsUnique = false;
-            if ($m = $this->getSrcMapper()) {
-                if (!$this->fieldLinks) 
-                    throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() before setFieldLinks()");
-                if ($m) $this->srcIsUnique = 
-                    !$this->midTableName && $m->identifiesRecordBy(array_keys($this->fieldLinks));
-            }
+    
+    protected function doGetDestIsUnique() {
+        $res = false;
+        if ($m = $this->getDestMapper()) {
+            if (!$this->fieldLinks) 
+                throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() before setFieldLinks()");
+            if ($m) $res = 
+                !$this->midTableName && $m->identifiesRecordBy (array_values($this->fieldLinks));
         }
-        return $this->srcIsUnique;
+        return $res;
     }
-
-    /**
-     * Assigns whether destination records are uniquely identified by their foreign keys
-     * 
-     * If values in $fieldLinks/$fieldLinks2 are enough to identify dest record(s), 
-     * this must be set to TRUE. 
-     * 
-     * Used to determine whether DEST items will be arrays' or single objects.
-     * 
-     * @param bool $destIsUnique
-     */
-    function setDestIsUnique($destIsUnique) {
-        $destIsUnique = (bool) $destIsUnique;
-        if ($destIsUnique !== ($oldDestIsUnique = $this->destIsUnique)) {
-            if ($this->immutable) throw self::immutableException();
-            $this->destIsUnique = $destIsUnique;
-            $this->srcImpl = false;
-            $this->destImpl = false;
-        }
-    }
-
-    /**
-     * Returns whether destination records are uniquely identified by their foreign keys
-     * @return bool
-     */
-    function getDestIsUnique() {
-        if ($this->destIsUnique === null) {
-            $this->destIsUnique = false;
-            if ($m = $this->getDestMapper()) {
-                if (!$this->fieldLinks) 
-                    throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() before setFieldLinks()");
-                if ($m) $this->destIsUnique = !$this->midTableName && $m->identifiesRecordBy (
-                    array_values($this->fieldLinks)
-                );
-            }
-        }
-        return $this->destIsUnique;
-    }
-
+    
     /**
      * Assigns name of variable in source object that contains reference to destination object 
      * (if $destIsUnique is false, it will be array with references).
@@ -644,8 +502,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($srcVarName !== ($oldSrcVarName = $this->srcVarName)) {
             if ($this->immutable) throw self::immutableException();
             $this->srcVarName = $srcVarName;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -670,8 +527,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($srcNNIdsVarName !== ($oldSrcNNIdsVarName = $this->srcNNIdsVarName)) {
             if ($this->immutable) throw self::immutableException();
             $this->srcNNIdsVarName = $srcNNIdsVarName;
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
 
@@ -698,8 +554,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($destVarName !== ($oldDestVarName = $this->destVarName)) {
             if ($this->immutable) throw self::immutableException();
             $this->destVarName = $destVarName;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -724,8 +579,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($destNNIdsVarName !== ($oldDestNNIdsVarName = $this->destNNIdsVarName)) {
             if ($this->immutable) throw self::immutableException();
             $this->destNNIdsVarName = $destNNIdsVarName;
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
 
@@ -752,8 +606,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($srcOutgoing !== ($oldSrcOutgoing = $this->srcOutgoing)) {
             if ($this->immutable) throw self::immutableException();
             $this->srcOutgoing = $srcOutgoing;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -781,8 +634,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($srcCountVarName !== ($oldSrcCountVarName = $this->srcCountVarName)) {
             if ($this->immutable) throw self::immutableException();
             $this->srcCountVarName = $srcCountVarName;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -810,8 +662,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($destCountVarName !== ($oldDestCountVarName = $this->destCountVarName)) {
             if ($this->immutable) throw self::immutableException();
             $this->destCountVarName = $destCountVarName;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -842,8 +693,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($srcLoadedVarName !== ($oldSrcLoadedVarName = $this->srcLoadedVarName)) {
             if ($this->immutable) throw self::immutableException();
             $this->srcLoadedVarName = $srcLoadedVarName;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -877,8 +727,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($destLoadedVarName !== ($oldDestLoadedVarName = $this->destLoadedVarName)) {
             if ($this->immutable) throw self::immutableException();
             $this->destLoadedVarName = $destLoadedVarName;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -910,8 +759,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($db !== ($oldDb = $this->db)) {
             if ($this->immutable) throw self::immutableException();
             $this->db = $db;
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
 
@@ -948,8 +796,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($destOrdering !== ($oldDestOrdering = $this->destOrdering)) {
             if ($this->immutable) throw self::immutableException();
             $this->destOrdering = $destOrdering;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -977,8 +824,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($srcOrdering !== ($oldSrcOrdering = $this->srcOrdering)) {
             if ($this->immutable) throw self::immutableException();
             $this->srcOrdering = $srcOrdering;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -1005,8 +851,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($srcExtraJoins !== ($oldSrcExtraJoins = $this->srcExtraJoins)) {
             if ($this->immutable) throw self::immutableException();
             $this->srcExtraJoins = $srcExtraJoins;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -1032,8 +877,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($destExtraJoins !== ($oldDestExtraJoins = $this->destExtraJoins)) {
             if ($this->immutable) throw self::immutableException();
             $this->destExtraJoins = $destExtraJoins;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -1060,8 +904,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($srcWhere !== ($oldSrcWhere = $this->srcWhere)) {
             if ($this->immutable) throw self::immutableException();
             $this->srcWhere = $srcWhere;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -1089,8 +932,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($destWhere !== ($oldDestWhere = $this->destWhere)) {
             if ($this->immutable) throw self::immutableException();
             $this->destWhere = $destWhere;
-            $this->destImpl = false;
-            $this->srcImpl = false;
+            $this->reset();
         }
     }
 
@@ -1119,8 +961,7 @@ class Ac_Model_Relation extends Ac_Prototyped {
         if ($midWhere !== ($oldMidWhere = $this->midWhere)) {
             if ($this->immutable) throw self::immutableException();
             $this->midWhere = $midWhere;
-            $this->srcImpl = false;
-            $this->destImpl = false;
+            $this->reset();
         }
     }
 
@@ -1194,96 +1035,8 @@ class Ac_Model_Relation extends Ac_Prototyped {
     function getDestQualifier() {
         return $this->destQualifier;
     }
-
-    /**
-     * Sets whether relation is immutable or not.
-     * 
-     * Immutable relation throws an Ac_E_InvalidUsage exception every time
-     * when attempt is being made to alter its' properties.
-     * 
-     * @param bool $immutable
-     */
-    function setImmutable($immutable) {
-        $this->immutable = $immutable;
-    }
-
-    /**
-     * Returns whether relation is immutable or not.
-     * 
-     * Immutable relation throws an Ac_E_InvalidUsage exception every time
-     * when attempt is being made to alter its' properties.
-     * 
-     * @return bool
-     */
-    function getImmutable() {
-        return $this->immutable;
-    }
     
     // ----------------------- Payload methods ---------------------
-    
-    /**
-     * Returns one or more destination objects for given source object
-     * @param Ac_Model_Data|object $srcData
-     * @param int $matchMode How keys of result array are composed (can be AMR_PLAIN_RESULT, AMR_RECORD_KEYS, AMR_ORIGINAL_KEYS, AMR_ALL_ORIGINAL_KEYS) -- only if srcData is array
-     * @param mixed $defaultValue Value to be returned for missing rows when $matchMode is AMR_ALL_ORIGINAL_KEYS or when $srcData is an object. By default it is null if $this->destIsUnique and empty array() if not.
-     * @return Ac_Model_Data|array
-     */
-    function getDest ($srcData, $matchMode = AMR_PLAIN_RESULT, $defaultValue = null) {
-        $impl = $this->getDestImpl();
-        if (func_num_args() >= 3) $res = $impl->getDest($srcData, $matchMode, $defaultValue);
-            else $res = $impl->getDest($srcData, $matchMode);
-        return $res;
-    }
-    
-    /**
-     * Returns one or more source objects for given destination object
-     * @param Ac_Model_Data|object $destData
-     * @param int $matchMode How keys of result array are composed (can be AMR_PLAIN_RESULT, AMR_RECORD_KEYS, AMR_ORIGINAL_KEYS, AMR_ALL_ORIGINAL_KEYS) -- only if srcData is array
-     * @param mixed $defaultValue Value to be returned for missing rows when $matchMode is AMR_ALL_ORIGINAL_KEYS or when $srcData is an object. By default it is null if $this->destIsUnique and empty array() if not.
-     * @return Ac_Model_Data|array
-     */ 
-    function getSrc ($destData, $matchMode = AMR_PLAIN_RESULT, $defaultValue = null) {
-        $impl = $this->getSrcImpl();
-        if (func_num_args() >= 3) $res = $impl->getDest($srcData, $matchMode, $defaultValue);
-            else $res = $impl->getDest($destData, $matchMode);
-        return $res;
-    }
-    
-    function countDest ($srcData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
-        $impl = $this->getDestImpl();
-        $res = $impl->countDest($srcData, $separate, $matchMode);
-        return $res;
-    }
-    
-    function countSrc ($destData, $separate = true, $matchMode = AMR_PLAIN_RESULT) {
-        $impl = $this->getSrcImpl();
-        $res = $impl->countDest($destData, $separate, $matchMode);
-        return $res;
-    }
-    
-    function deleteDest (& $srcData) {
-        $impl = $this->getDestImpl();
-        $res = $impl->deleteDest($srcData);
-        return $res;
-    }
-    
-    function deleteSrc (& $destData) {
-        $impl = $this->getSrcImpl();
-        $res = $impl->deleteDest($srcData);
-        return $res;
-    }
-    
-    function loadDest (& $srcData, $dontOverwriteLoaded = true, $biDirectional = true, $returnAll = true) {
-        $impl = $this->getDestImpl();
-        $res = $impl->loadDest($srcData, $dontOverwriteLoaded, $biDirectional, $returnAll);
-        return $res;
-    }
-    
-    function loadSrc (& $destData, $dontOverwriteLoaded = true, $biDirectional = true, $returnAll = true) {
-        $impl = $this->getSrcImpl();
-        $res = $impl->loadDest($destData, $dontOverwriteLoaded, $biDirectional, $returnAll);
-        return $res;
-    }
     
     function loadDestNNIds($srcData, $dontOverwriteLoaded = true) {
         $impl = $this->getDestImpl();
@@ -1297,83 +1050,40 @@ class Ac_Model_Relation extends Ac_Prototyped {
         return $res;
     }
     
-    /**
-     * Counts destination objects and stores result in $srcCountVarName of each corresponding $srcData object
-     */
-    function loadDestCount ($srcData, $dontOverwriteLoaded = true) {
-        $impl = $this->getDestImpl();
-        $res = $impl->loadDestCount($srcData, $dontOverwriteLoaded);
+    protected function calcNNIdsImpl(array $props) {
+        if ($props['midTableName']) {
+            $res = array(
+                'db' => $this->db,
+                'srcVarName' => $props['srcNNIdsVarName'],
+                'destMapperClass' => false,
+                'destTableName' => $props['midTableName'],
+                'destWhere' => $this->midWhere,
+                'fieldLinks' => $props['fieldLinks'],
+                'srcIsUnique' => $this->getSrcIsUnique(),
+                'destIsUnique' => false,
+            );
+            // evaluate the provider
+            $app = $this->application? $this->application: Ac_Application::getDefaultInstance();
+            if ($app) {
+                $provider = $app->getService('Ac_Model_Relation_Provider_Evaluator')->evaluateProvider($res);
+                if ($provider) $res['provider'] = $provider;
+            }
+        } else {
+            $res = false;
+        }
+        foreach (self::$depecatedImplProps as $p) unset($res[$p]);
         return $res;
     }
     
-    /**
-     * Counts source objects and stores result in $destCountVarName of each corresponding $destData object
-     */
-    function loadSrcCount ($destData, $dontOverwriteLoaded = true) {
-        $impl = $this->getSrcImpl();
-        $res = $impl->loadDestCount($srcData, $dontOverwriteLoaded);
-        return $res;
-    }
-    
-    function getDestJoin ($srcAlias = false, $destAlias = false, $type = 'left', $midAlias = false) {
-        $impl = $this->getDestImpl();
-        $res = $impl->getDestJoin($srcAlias, $destAlias, $type, $midAlias);
-        return $res;
-    }
-    
-    function getSrcJoin ($srcAlias = false, $destAlias = false, $type = 'left', $midAlias = false) {
-        $impl = $this->getSrcImpl();
-        $res = $impl->getDestJoin($destAlias, $srcAlias, $type, $midAlias);
-        return $res;
-    }
-    
-    function getCritForSrcOfDest ($dest, $srcAlias = '', $default = '0') {
-        $impl = $this->getSrcImpl();
-        $res = $impl->getCritForDestOfSrc($dest, $srcAlias, $default);
-        return $res;
-    }
-    
-    function getCritForDestOfSrc ($src, $destAlias = '', $default = '0') {
-        $impl = $this->getDestImpl();
-        $res = $impl->getCritForDestOfSrc($src, $destAlias, $default);
-        return $res;
-    }
-    
-    function __clone() {
-        $this->immutable = false;
-        if ($this->srcImpl) $this->srcImpl = clone $this->srcImpl;
-        if ($this->destImpl) $this->destImpl = clone $this->destImpl;
-    }
-
-    function __get($var) {
-        if (method_exists($this, $m = 'get'.$var)) return $this->$m();
-        else Ac_E_InvalidCall::noSuchProperty ($this, $var);
-    }
-
-    function __set($var, $value) {
-        if (method_exists($this, $m = 'set'.$var)) $this->$m($value);
-        else throw Ac_E_InvalidCall::noSuchProperty ($this, $var);
-    }
-    
-    protected static function immutableException() {
-        return new Ac_E_InvalidUsage("Cannot modify ".__CLASS__." with \$immutable == true");
-    }    
-    
-    /**
-     * @return Ac_Model_Relation_Impl_Base
-     */
-    protected function getDestImpl() {
-        if ($this->destImpl === false) {
-            $this->destImpl = new Ac_Model_Relation_Impl_Base(array(
-                'application' => $this->application,
+    protected function getFullDestProps() {
+        if ($this->fullDestProps === false) {
+            $this->fullDestProps = array(
                 'destMapperClass' => $this->destMapperClass,
                 'destTableName' => $this->destTableName,
                 'midTableName' => $this->midTableName,
                 'midTableAlias' => $this->midTableAlias,
                 'fieldLinks' => $this->fieldLinks,
                 'fieldLinks2' => $this->fieldLinks2,
-                'srcIsUnique' => $this->getSrcIsUnique(),
-                'destIsUnique' => $this->getDestIsUnique(),
                 'srcVarName' => $this->srcVarName,
                 'srcNNIdsVarName' => $this->srcNNIdsVarName,
                 'destVarName' => $this->destVarName,
@@ -1387,27 +1097,23 @@ class Ac_Model_Relation extends Ac_Prototyped {
                 'srcQualifier' => $this->srcQualifier,
                 'destQualifier' => $this->destQualifier,
                 'destMapper' => $this->getDestMapper(),
+                'destIsUnique' => $this->getDestIsUnique(),
                 'db' => $this->db,
-            ));
+            );
         }
-        return $this->destImpl;
+        return $this->fullDestProps;
+        
     }
     
-    /**
-     * @return Ac_Model_Relation_Impl_Base
-     */
-    protected function getSrcImpl() {
-        if ($this->srcImpl === false) {
-            $this->srcImpl = new Ac_Model_Relation_Impl_Base(array(
-                'application' => $this->application,
+    protected function getFullSrcProps() {
+        if ($this->fullSrcProps === false) {
+            $this->fullSrcProps = array(
                 'destMapperClass' => $this->srcMapperClass,
                 'destTableName' => $this->srcTableName,
                 'midTableName' => $this->midTableName,
                 'midTableAlias' => $this->midTableAlias,
                 'fieldLinks' => $this->midTableName? $this->fieldLinksRev2 : $this->fieldLinksRev,
                 'fieldLinks2' => $this->midTableName? $this->fieldLinksRev : false,
-                'srcIsUnique' => $this->getDestIsUnique(),
-                'destIsUnique' => $this->getSrcIsUnique(),
                 'srcVarName' => $this->destVarName,
                 'srcNNIdsVarName' => $this->destNNIdsVarName,
                 'destVarName' => $this->srcVarName,
@@ -1421,11 +1127,90 @@ class Ac_Model_Relation extends Ac_Prototyped {
                 'srcQualifier' => $this->destQualifier,
                 'destQualifier' => $this->srcQualifier,
                 'destMapper' => $this->getSrcMapper(),
+                'destIsUnique' => $this->getSrcIsUnique(),
                 'db' => $this->db,
-            ));
+            );
         }
-        return $this->srcImpl;
+        return $this->fullSrcProps;
+    }
+    
+    protected static $depecatedImplProps = array(
+        'midTableName', 'midTableAlias', 'destTableName', 'destMapperClass', 
+        'destMapper', 'destExtraJoins', 'db', 'destOrdering', 'destExtraJoins', 
+        'destWhere', 'midWhere', 'srcQualifier', 'destQualifier',
+    );
+    
+    protected function getDestImplPrototype() {
+        $fullDestProps = $this->getFullDestProps();
+        $res = array_merge(parent::getDestImplPrototype(), array(
+            'class' => 'Ac_Model_Relation_Impl',
+            'provider' => $this->getDestProvider(),
+            'destNNIdsImpl' => $this->calcNNIdsImpl($fullDestProps),
+        ), $fullDestProps);
+        foreach (self::$depecatedImplProps as $p) unset($res[$p]);
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Model_Relation_Impl
+     */
+    protected function getSrcImplPrototype() {
+        $fullSrcProps = $this->getFullSrcProps();
+        $res = array_merge($proto = parent::getSrcImplPrototype(), array(
+            'class' => 'Ac_Model_Relation_Impl',
+            'provider' => $this->getSrcProvider(),
+            'destNNIdsImpl' => $this->calcNNIdsImpl($fullSrcProps),
+        ), $fullSrcProps);
+        foreach (self::$depecatedImplProps as $p) unset($res[$p]);
+        return $res;
+    }
+
+    function getDestProvider($asIs = false) {
+        if (!$asIs && $this->destProvider === false) {
+            $app = $this->application? $this->application: Ac_Application::getDefaultInstance();
+            if ($app) $this->destProvider = $app->getService('Ac_Model_Relation_Provider_Evaluator')->evaluateProvider($this->getFullDestProps());
+        }
+        return $this->destProvider;
+    }
+    
+    function setDestProvider($destProvider) {
+        $this->destProvider = $destProvider;
+    }
+
+    function setSrcProvider($srcProvider) {
+        $this->srcProvider = $srcProvider;
+    }
+
+    /**
+     * @param bool $asIs Dont create instance
+     * @return Ac_Model_Relation_Provider (when $asIs === true, result is mixed)
+     */
+    function getSrcProvider($asIs = false) {
+        if (!$asIs && $this->srcProvider === false) {
+            $app = $this->application? $this->application: Ac_Application::getDefaultInstance();
+            if ($app) $this->srcProvider = $app->getService('Ac_Model_Relation_Provider_Evaluator')->evaluateProvider($this->getFullSrcProps());
+        }
+        return $this->srcProvider;
+    }    
+
+    function __clone() {
+        parent::__clone();
+        if ($this->srcProvider) {
+            if (is_object($this->srcProvider)) $this->srcProvider = clone $this->srcProvider;
+            if ($this->srcImpl) $this->srcImpl->setProvider($this->srcProvider);
+        }
+        if ($this->destProvider) {
+            if (is_object($this->destProvider)) $this->destProvider = clone $this->destProvider;
+            if ($this->destImpl) $this->destImpl->setProvider($this->destProvider);
+        }
+    }
+    
+    protected function reset() {
+        parent::reset();
+        $this->srcProvider = false;
+        $this->destProvider = false;
+        $this->fullSrcProps = false;
+        $this->fullDestProps = false;
     }
     
 }
-
