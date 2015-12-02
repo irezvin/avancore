@@ -216,7 +216,7 @@ class Ac_Model_Values extends Ac_Prototyped {
                     foreach ($res as $v => $c)
                         $res[$v] = $c;
             } else {
-                $res = $this->doDefaultGetTitles($value);
+                $res = $this->doDefaultGetTitles($values);
             }
         }
         return $res;

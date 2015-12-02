@@ -105,8 +105,19 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     function getSqlCriteria() {
         $res = false;
         if (($rel = $this->getRelation()) && ($rec = $this->getRecord()) ) {
-            $a = array(& $rec);
-            $res = $rel->getCritForDestOfSrc($a, 't');
+            //a very simple stub until I will come with something better... 
+            //also explains why mid-tables don't work!
+            
+            //TODO: we can use destWhere (also in array form as record defaults...)
+            
+            if ($rel->getMidTableName() || $rel->getFieldLinks2())
+                throw new Exception(__METHOD__." doesn't currently support N-N relations");
+            $fl = $rel->getFieldLinks();
+            $fk = Ac_Accessor::getObjectProperty($rec, array_keys($fl));
+            foreach ($fl as $k => $v) $crit[$v] = $fk[$k];
+            $res = $this->_manager->getApplication()->getDb()->valueCriterion($crit, 't');
+            
+            //$res = $rel->getCritForDestOfSrc($a, 't');
         } else {
         }
         return $res;
