@@ -365,6 +365,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $subOk = $this->_processSubManagers(true);
         if ($subOk && $record->check() && $record->store()) {
             $this->_recordStored = true;
+            $pk = $record->getPrimaryKey();
             $this->_record = null;
             $u = $this->getReturnUrl();
             if ($withAdd) {
@@ -376,7 +377,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $this->_response->redirectUrl = $u;
                 $u = false;
             } elseif ($stayOnDetails) {
-                $u = $this->getManagerUrl('details')->toString();
+                $u = $this->getManagerUrl('details', array('keys' => array($pk)))->toString();
             } else {
                 $u = $this->getManagerUrl('list')->toString();
             }
@@ -1301,7 +1302,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     function _getSqlSelect() {
         if ($this->_sqlSelect === false) {
             $options = array();
-            $mapper = $this->getMapper();
             foreach ($this->listFeatures() as $i) {
                 $feat = $this->getFeature($i);
                 Ac_Util::ms($options, $feat->getSqlSelectSettings());
