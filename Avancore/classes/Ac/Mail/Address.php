@@ -43,7 +43,7 @@ class Ac_Mail_Address extends Ac_Prototyped implements Ac_I_Mail_Address {
             $this->mailAddress = trim($matches[0], "<>");
             $this->mailTitle = trim(str_replace($matches[0], "", $address));
         } else {
-            $this->mailaddress = ''.$address;
+            $this->mailAddress = ''.$address;
             $this->mailTitle = null;
         }
     }

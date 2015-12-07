@@ -70,8 +70,9 @@ abstract class Ac_Mail_Sender_PHPMailer extends Ac_Prototyped implements Ac_I_Ma
             $mailer->$fn();
         }
         
-        if (self::has($a = $mail->getMailFrom()))
+        if (self::has($a = $mail->getMailFrom())) {
             self::phpMailerAddr($mailer, 'setFrom', $a);
+        }
 
         if (self::has($a = $mail->getMailRecipients())) {
             self::phpMailerAddr($mailer, 'addAddress', $a);
