@@ -74,7 +74,6 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
      * @param Ac_Form $form
      */
     function showForm ($form, $html) {
-        
         if (is_array($form->jsLibs)) foreach ($form->jsLibs as $jsLib) $this->addJsLib($jsLib);
         if (is_array($form->cssLibs)) foreach ($form->cssLibs as $cssLib) $this->addCssLib($cssLib);
         if (is_array($form->inlineStyles)) foreach ($form->inlineStyles as $inlineStyle) {
@@ -89,20 +88,20 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
         }
         
         $ctx = $form->getContext();
+        $actionUrl = $form->getActionUrl();
         if (!$ctx->isInForm) { 
             $attribs = $form->getFormTagAttribs(false);
             $hasOwnAction = isset($attribs['action']);
             if (!$hasOwnAction) {
-                $actionUrl = $form->getActionUrl();
                 $attribs['action'] = ''.$actionUrl;
             }
                 else $actionUrl = null;
+                
         ?>
         
         <form <?php echo Ac_Util::mkAttribs($attribs); ?> >
+<?php   } ?>
 <?php       if (!$form->baseUrlToAction && $actionUrl) echo $actionUrl->getHidden(); ?>
-<?php   } 
-?>
 
             <?php echo $html; ?>
 <?php   if ($form->performOwnSubmissionCheck) {
