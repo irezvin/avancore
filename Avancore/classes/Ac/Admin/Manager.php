@@ -403,8 +403,13 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     function executeCancel() {
         $this->_record = null;
         $this->_stayOnProcessing = false;
-        $u = $this->getManagerUrl('list');
-        $this->_response->hasToRedirect = $u->toString();
+        $u = $this->getReturnUrl();
+        if (strlen($u)) {
+            $this->_response->redirectUrl = ''.$u;
+        } else {
+            $u = $this->getManagerUrl('list');
+            $this->_response->hasToRedirect = ''.$u;
+        }
     }
     
     function executeGoBack() {
