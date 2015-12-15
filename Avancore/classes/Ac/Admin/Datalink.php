@@ -117,19 +117,19 @@ class Ac_Admin_Datalink {
    /**
     * @param array $formPreset
     */
-   function onManagerFormPreset($formPreset) {
+   function onManagerFormPreset(& $formPreset) {
    }
    
    /**
     * @param Ac_Form $form
     */
-   function onManagerFormCreated($form) {
+   function onManagerFormCreated(& $form) {
    }
    
    /**
     * @param array $columns
     */
-   function onManagerColumnsPreset($columns) {
+   function onManagerColumnsPreset(& $columns) {
        
    }
     

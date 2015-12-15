@@ -53,6 +53,11 @@ class Ac_Form extends Ac_Form_Control_Composite {
      */
     var $baseUrlToAction = false;
     
+    /**
+     * Always put base url arguments to hidden fields, even if the context->isInForm is TRUE
+     */
+    var $alwaysPutBaseUrlParams = false;
+    
     var $formTagAttribs = array();
     
     // Will be moved from htmlAttribs to getFormAttribs() for compatibility

@@ -123,7 +123,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
    /**
     * @param Ac_Form $form
     */
-   function onManagerFormCreated($form) {
+   function onManagerFormCreated(& $form) {
         if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {
                 $f = Ac_Util::array_values($rel->fieldLinks);
@@ -142,12 +142,14 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
    /**
     * @param array $columns
     */
-   function onManagerColumnsPreset($columns) {
+   function onManagerColumnsPreset(& $columns) {
         if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {
                 $f = Ac_Util::array_values($rel->fieldLinks);
                 foreach ($f as $fn) {
-                    if (isset($columns[$fn])) unset($columns[$fn]);
+                    if (isset($columns[$fn])) {
+                        $columns[$fn]['hidden'] = true;
+                    }
                 }
             }
         }
