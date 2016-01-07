@@ -16,8 +16,8 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
      */
     var $_parentRecord = false;
    
-    function Ac_Admin_Datalink_Subrecord($params = array()) {
-        parent::Ac_Admin_Datalink($params);
+    function __construct($params = array()) {
+        parent::__construct($params);
         if (
                isset($params['mapperClass']) && strlen($params['mapperClass'])
             && isset($params['relationId']) && strlen($params['relationId'])

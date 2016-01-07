@@ -7,7 +7,7 @@ class Ac_Upload_Storage {
      */
     var $storagePath = false;
     
-    function Ac_Upload_Storage ($options = array()) {
+    function __construct ($options = array()) {
         Ac_Util::bindAutoparams($this, $options);
         if ($this->storagePath === false) {
             $app = Ac_Application::getDefaultInstance();

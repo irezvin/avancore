@@ -36,7 +36,7 @@ class Ac_Upload_File {
     
     var $_error = false;
     
-    function Ac_Upload_File($options = array()) {
+    function __construct($options = array()) {
         Ac_Util::bindAutoparams($this, $options, true, array('uploadManager'));
     }
         

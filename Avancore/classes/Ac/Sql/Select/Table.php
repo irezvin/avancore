@@ -90,7 +90,7 @@ class Ac_Sql_Select_Table {
      * @param Ac_Sql_Select_TableProvider $tableProvider
      * @return Ac_Sql_Select_Table
      */
-    function Ac_Sql_Select_Table($tableProvider, $options = array()) {
+    function __construct($tableProvider, $options = array()) {
         if ($tableProvider) $options['tableProvider'] = $tableProvider;
         Ac_Util::bindAutoparams($this, $options, true);
     }

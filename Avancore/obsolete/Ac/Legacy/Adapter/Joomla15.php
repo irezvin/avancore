@@ -4,7 +4,7 @@ class Ac_Legacy_Adapter_Joomla15 extends Ac_Legacy_Adapter_Joomla {
     
     var $configClass = 'Ac_Legacy_Config_Joomla15';
     
-    function Ac_Legacy_Adapter_Joomla15($extraSettings = array()) {
+    function __construct($extraSettings = array()) {
         
         parent::Ac_Legacy_Adapter($extraSettings);
         

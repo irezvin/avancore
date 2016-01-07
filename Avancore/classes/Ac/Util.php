@@ -50,6 +50,7 @@ abstract class Ac_Util {
     } 
     
     static function loadClass($className) {        
+        $fileLoaded = false;
         if (!class_exists($className, false)) { // New behavior - use relative path to classDir
             $fileName = str_replace('\\', DIRECTORY_SEPARATOR, $className);
             $fileName = str_replace('_', DIRECTORY_SEPARATOR, $fileName).'.php';
@@ -61,15 +62,18 @@ abstract class Ac_Util {
                 $fileLoaded = true;
             } else {
                 $p = self::getSafeIncludePath();
-                foreach ($p as $dir) if (is_file($f = $dir.DIRECTORY_SEPARATOR.$fileName)) {
-                    require($f);
-                    $fileLoaded = true;
-                    break;
+                foreach ($p as $dir) {
+                    if (is_file($f = $dir.DIRECTORY_SEPARATOR.$fileName)) {
+                        require($f);
+                        $fileLoaded = true;
+                        break;
+                    }
                 }
             }
             //if ($fileLoaded && !class_exists($className) || interface_exists($className))
             //    trigger_error (__FILE__."::".__FUNCTION__." - class '$className' not found in the $fileName", E_USER_ERROR);
         }
+        return $fileLoaded;
     }
     
     static function registerAutoload() {
@@ -1124,5 +1128,5 @@ class _Ae_Util_ObjectVarGetter {
  * @param type $className 
  */
 function acUtilLoadClass($className) {
-    self::loadClass(self::fixClassName($className));
+    Ac_Util::loadClass(Ac_Util::fixClassName($className));
 }

@@ -2,8 +2,8 @@
 
 class Ac_Legacy_Config_Joomla extends Ac_Legacy_Config {
 
-    function Ac_Legacy_Config_Joomla($configFilePath, $configOptions = array()) {
-        parent::Ac_Legacy_Config($configFilePath, $configOptions);
+    function __construct($configFilePath, $configOptions = array()) {
+        parent::__construct($configFilePath, $configOptions);
         
         $this->liveSite = $GLOBALS['mosConfig_live_site'];
         $this->absolutePath = $GLOBALS['mosConfig_absolute_path'];

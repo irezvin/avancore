@@ -6,7 +6,7 @@ class Ac_Legacy_Template_Helper {
      */
     var $template = false;
     
-    function Ac_Legacy_Template_Helper($template) {
+    function __construct($template) {
         $this->template = $template;
     }
 }

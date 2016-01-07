@@ -34,7 +34,7 @@ class Ac_Legacy_Template {
     /**
      * @param array $vars Initial values for template variables 
      */
-    function Ac_Legacy_Template($vars = array()) {
+    function __construct($vars = array()) {
         $this->setVars($vars);
     }
     

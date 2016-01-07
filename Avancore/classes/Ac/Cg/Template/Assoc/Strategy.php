@@ -69,7 +69,7 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
     var $inherited = false;
     var $parentProp = false;
     
-    function Ac_Cg_Template_Assoc_Strategy ($options) {
+    function __construct ($options) {
         Ac_Util::simpleBindAll($options, $this);
     }
     

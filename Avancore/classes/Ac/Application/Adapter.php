@@ -321,13 +321,20 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     
     protected function intGetConfigValue($option, $fromFun = true) {
         $res = null;
+        // if $option below is passed-by-copy (''.$option), the bug below won't happen
         if (array_key_exists($option, $this->overrides)) return $this->overrides[$option];
         if ($fromFun) $option{0} = strtolower($option{0});
         if (method_exists($this, $m = 'doGet'.$option)) $res = $this->$m();
         if (is_null($res)) {
             $conf = $this->intGetArrConfig();
+            // comment this to find PHP7 bug (PHP 7.0.1, apache module)
+            $option = ''.$option; // Some real PHP7 WTFery goes here - can't write a reliable test case!!
             if (isset($conf[$option])) $res = $conf[$option];
             elseif (method_exists($this, $m = 'doGetDefault'.$option)) $res = $this->$m();
+            // uncomment to find PHP7 bug
+            //if (isset($conf[$option]) !== isset($conf[''.$option])) {
+            //    die('cookadodie PHP7 rocks');
+            //}
         }
         return $res;
     }

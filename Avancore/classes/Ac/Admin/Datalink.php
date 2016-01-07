@@ -29,7 +29,7 @@ class Ac_Admin_Datalink {
        return $res; 
    }
    
-   function Ac_Admin_Datalink($params = array()) {
+   function __construct($params = array()) {
        Ac_Util::simpleBind($params, $this);
    }
    

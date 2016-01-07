@@ -11,7 +11,7 @@ class Ac_Param_Impl_Paths {
     /**
      * Since the class is static, this method *always* throws an exception.
      */
-    function Ac_Param_Impl_Paths() {
+    function __construct() {
         trigger_error("Attempt to instantiate static class", E_USER_ERROR);
     }
     

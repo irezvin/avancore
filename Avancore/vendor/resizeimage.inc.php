@@ -26,7 +26,7 @@
          * @return RESIZEIMAGE (Class Object)
          */
         
-        function RESIZEIMAGE($imgFile="")
+        function __construct($imgFile="")
         {
             if (!function_exists("imagecreate"))
             {

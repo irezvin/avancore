@@ -111,7 +111,7 @@ class Ac_Mail {
         return $res;
     }
     
-    function Ac_Mail ($templateName, $to = false, $defaultSubject = false, $from = false, $data = array(), $textTemplate = false) {
+    function __construct ($templateName, $to = false, $defaultSubject = false, $from = false, $data = array(), $textTemplate = false) {
         $this->_htmlTemplate = $templateName;
         $this->_textTemplate = $textTemplate;
         $this->_to = $to;

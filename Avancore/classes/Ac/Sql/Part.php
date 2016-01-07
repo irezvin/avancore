@@ -44,7 +44,7 @@ class Ac_Sql_Part extends Ac_Prototyped {
     
     var $_idWithPrefix = false;
     
-    function Ac_Sql_Part($options = array()) {
+    function __construct($options = array()) {
         if (isset($options['db'])) $this->setDb($options['db']);
         if (isset($options['parentPart'])) $this->setParentPart($options['parentPart']);
         foreach (array_intersect(array_keys(get_object_vars($this)), array_keys($options)) as $k)

@@ -29,7 +29,7 @@ class Ac_Sql_Select_Expression extends Ac_Sql_Expression {
 	 * @param array|string|bool $aliases Alias or several aliases to be added to the table or TRUE to automatically detect aliases (see examples) 
 	 * @param bool $isColumn Whether expression contains only column name and first alias should be added automatically
 	 */
-	function Ac_Sql_Select_Expression($expression, $aliases = array(), $isColumn = false) {
+	function __construct($expression, $aliases = array(), $isColumn = false) {
 		$this->expression = $expression;
 		$this->isColumn = $isColumn;
 		if (!is_array($aliases)) {

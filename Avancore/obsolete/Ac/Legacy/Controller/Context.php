@@ -23,7 +23,7 @@ class Ac_Legacy_Controller_Context {
     
     var $_state = array();
     
-    function Ac_Legacy_Controller_Context($options = array()) {
+    function __construct($options = array()) {
         if (!is_array($options)) trigger_error("\$options must be an array", E_USER_ERROR);
         $this->initialize($options);
     }

@@ -8,8 +8,8 @@ class Ac_Admin_Column extends Ac_Table_Column {
      */
     var $manager = false;
     
-    function Ac_Admin_Column($table, $name, $settings = array()) {
-        parent::Ac_Table_Column($table, $name, $settings);
+    function __construct($table, $name, $settings = array()) {
+        parent::__construct($table, $name, $settings);
         if (!$this->manager && isset($table->_manager) && $table->_manager) $this->manager = $table->_manager;
     }
     

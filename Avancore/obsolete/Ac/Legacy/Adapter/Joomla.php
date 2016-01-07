@@ -16,7 +16,7 @@ class Ac_Legacy_Adapter_Joomla extends Ac_Legacy_Adapter {
     
     function Ac_Joomla_Adapter($extraSettings = array()) {
         
-        parent::Ac_Legacy_Adapter($extraSettings);
+        parent::__construct($extraSettings);
         
         $dbSettings = $this->dbSettings === false? array(
                 'db' => $GLOBALS['mosConfig_db'],

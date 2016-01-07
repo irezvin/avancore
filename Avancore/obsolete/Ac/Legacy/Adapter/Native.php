@@ -12,9 +12,9 @@ class Ac_Legacy_Adapter_Native extends Ac_Legacy_Adapter {
     
     var $configClass = 'Ac_Legacy_Config_Native';
     
-    function Ac_Legacy_Adapter_Native($extraSettings = array()) {
+    function __construct($extraSettings = array()) {
         
-        parent::Ac_Legacy_Adapter($extraSettings);
+        parent::__construct($extraSettings);
         
         if ($this->config->useDatabase) {
             

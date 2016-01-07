@@ -82,7 +82,7 @@ class Ac_Table {
      * @param object pageNav mosPageNav instance for displaying the pager
      * @param array tableAttribs Attributes of the TABLE tag
      */
-    function Ac_Table($columnSettings, $records, $pageNav, $tableAttribs = array(), $recordClass = false) {
+    function __construct($columnSettings, $records, $pageNav, $tableAttribs = array(), $recordClass = false) {
         $this->_columnSettings = $columnSettings;
         $this->_records = $records;
         $this->_pageNav = $pageNav;

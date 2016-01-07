@@ -82,7 +82,7 @@ class Ac_Table_Column {
      * @param string name of the column
      * @param array settings
      */
-    function Ac_Table_Column($table, $name, $settings = array()) {
+    function __construct($table, $name, $settings = array()) {
         $this->_table = $table;
         $this->_name = $name;
         $this->settings = $settings;

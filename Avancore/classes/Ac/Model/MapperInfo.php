@@ -37,7 +37,7 @@ class Ac_Model_MapperInfo {
      */
     var $adminFeatures = array();
     
-    function Ac_Model_MapperInfo ($mapperClass, $options = array()) {
+    function __construct ($mapperClass, $options = array()) {
         Ac_Util::simpleBindAll($options, $this);
         $this->mapperClass = $mapperClass;
     }

@@ -36,7 +36,7 @@ class Ac_Sql_RefChecker {
 	
 	var $extraRelations = false;
 	
-	function Ac_Sql_RefChecker ($options = array()) {
+	function __construct ($options = array()) {
 		Ac_Util::bindAutoparams($this, $options, true);
 	}
 	

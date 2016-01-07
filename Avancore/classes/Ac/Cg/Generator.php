@@ -130,7 +130,7 @@ class Ac_Cg_Generator {
     /**
      * @param string $configOrFileName name of file with static configuration of project
      */
-    function Ac_Cg_Generator($configOrFileName, $runtimeOptions = array()) {
+    function __construct($configOrFileName, $runtimeOptions = array()) {
         if (is_array($configOrFileName)) $this->staticConfig = $configOrFileName;
         else {
             $this->_configFileName = $configOrFileName;

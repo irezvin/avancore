@@ -129,7 +129,7 @@ class Ac_Model_Collection {
      */
     var $_recordClass = false;
     
-    function Ac_Model_Collection ($mapperClass = false, $matchingKeys = false, $where = false, $order = false, $joins = false, $extraColumns = false, $limitOffset = false, $limitCount = false) {
+    function __construct ($mapperClass = false, $matchingKeys = false, $where = false, $order = false, $joins = false, $extraColumns = false, $limitOffset = false, $limitCount = false) {
         $this->_mapperClass = $mapperClass;
         $this->_matchingKeys = $matchingKeys;
         if (strlen($where)) $this->setWhere($where);

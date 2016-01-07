@@ -2,7 +2,7 @@
 
 class Ac_Upload_Storage_Abstract {
     
-    function Ac_Upload_Storage_Abstract ($options = array()) {
+    function __construct ($options = array()) {
         if (!strcasecmp(get_class($this), 'Ac_Upload_Storage_Abstract')) trigger_error("Attempt to instantiate abstract class", E_USER_ERROR);
     }
     

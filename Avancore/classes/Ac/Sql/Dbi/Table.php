@@ -35,8 +35,8 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
     
     var $_extras = array();
     
-    function Ac_Sql_Dbi_Table(& $inspector, $name, $database, $extras = array()) {
-        parent::Ac_Sql_Dbi_Object($inspector, $name);
+    function __construct(& $inspector, $name, $database, $extras = array()) {
+        parent::__construct($inspector, $name);
         $this->_assignProperties(array('name' => $name));
         $this->_database = $database;
         if (is_array($extras)) $this->_extras = $extras;

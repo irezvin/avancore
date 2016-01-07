@@ -2,7 +2,7 @@
 
 class Ac_Legacy_Session_Joomla extends Ac_Legacy_Session {
 
-    function Ac_Legacy_Session_Joomla() {
+    function __construct() {
     }
     
     function get($varName, $default = false) {

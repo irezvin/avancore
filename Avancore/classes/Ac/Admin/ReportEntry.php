@@ -15,7 +15,7 @@ class Ac_Admin_ReportEntry {
 
     var $_entries = array();
     
-    function Ac_Admin_ReportEntry ($description = false, $type = 'message', $dateTime = false, $recordKey = false, $recordTitle = false, $recordIsAvailable = false) {
+    function __construct ($description = false, $type = 'message', $dateTime = false, $recordKey = false, $recordTitle = false, $recordIsAvailable = false) {
         if (func_num_args() == 1 && is_array($description)) Ac_Util::simpleBind($description, $this);
         else {
             $this->description = $description;

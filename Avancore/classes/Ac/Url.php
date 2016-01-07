@@ -55,7 +55,7 @@ class Ac_Url implements Ac_I_RedirectTarget {
     /**
      * @param string strUrl Ac_Url string to populate scheme, host, path etc...
      */
-    function Ac_Url($strUrl = false) {
+    function __construct($strUrl = false) {
         if ($strUrl !== false) {
             if ($strUrl instanceof Ac_Url) {
                 foreach (array_keys(get_class_vars(get_class($this))) as $f) if ($f{0} != '_') {

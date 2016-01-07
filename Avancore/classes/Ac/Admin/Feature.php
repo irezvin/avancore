@@ -24,7 +24,7 @@ class Ac_Admin_Feature {
      * @param array $options extra settings of the feature
      * @return Ac_Admin_Feature
      */
-    function Ac_Admin_Feature ($manager, $options = array()) {
+    function __construct ($manager, $options = array()) {
         if (!is_a($manager, 'Ac_Admin_Manager'))
             trigger_error ('$manager must be instance of Ac_Admin_Manager', E_USER_ERROR);
         Ac_Util::simpleBind($options, $this);

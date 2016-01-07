@@ -105,7 +105,7 @@ class Ac_Model_Validator {
      * @param object|array $model Model that we work with (can be object or associative array)
      * @param bool|array $fieldsInfo Array with fields metadata (array('fieldName' => array(...))) or FALSE (metadata will be taken from $model)
      */
-    function Ac_Model_Validator($model, $fieldsInfo = false) {
+    function __construct($model, $fieldsInfo = false) {
         $this->model = $model;
         $this->fieldsInfo = $fieldsInfo;
         if (!is_object($model) && !$fieldsInfo) trigger_error ('Model is not an object and won\'t be able to return any metadata; $fieldsInfo is also empty.', E_USER_WARNING);

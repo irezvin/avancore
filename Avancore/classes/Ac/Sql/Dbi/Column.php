@@ -17,11 +17,11 @@ class Ac_Sql_Dbi_Column extends Ac_Sql_Dbi_Object {
     var $unsigned = false;
     var $nullable = false;
     
-    function Ac_Sql_Dbi_Column(& $inspector, $name, $table, $data) {
+    function __construct(& $inspector, $name, $table, $data) {
         $data['name'] = $name;
     	//Ac_Util::simpleBind($data, $this);
     	$this->_assignProperties($data);
-        parent::Ac_Sql_Dbi_Object($inspector, $name);
+        parent::__construct($inspector, $name);
         $this->_table = $table;
     }
     
