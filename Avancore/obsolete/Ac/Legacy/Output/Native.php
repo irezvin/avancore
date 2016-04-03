@@ -21,6 +21,8 @@ class Ac_Legacy_Output_Native extends Ac_Legacy_Output {
      */
     function outputResponse(Ac_Legacy_Controller_Response_Html $r, $asModule = false) {
         
+        $response->replaceResultsInContent();
+        
         if (class_exists('Ac_Legacy_Controller_Response_Global', false)) {
             $glob = Ac_Legacy_Controller_Response_Global::getInstance();
             if ($glob->hasResponse() && ($glob->getResponse() !== $r)) $r->mergeWithResponse($glob->getResponse());

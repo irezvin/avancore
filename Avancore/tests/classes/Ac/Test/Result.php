@@ -694,6 +694,7 @@ EOD
         if (!$this->assertEqual(
             $this->normalizeHtml($c),
             $this->normalizeHtml(<<<EOD
+                <!DOCTYPE html>
                 <html>
                 <head>
                     <title>New title</title>
@@ -1189,6 +1190,55 @@ EOD
         
         if (!$this->assertEqual($str = $outer->writeAndReturn(), "{a b (first, second, third, fourth, fifth) c d...} (P.S.#1, P.S.#2)"))
             var_dump($str);
+    }
+    
+    function testDeferredsPassing() {
+        require_once(dirname(__FILE__).'/assets/deferredsAndStringObjects.php');
+        
+        $innerStat = new Ac_Result;
+        $innerStat->setDebugData('innerStat');
+         
+        $innerCached = new Ac_Result;
+        $innerStat->setDebugData('innerCached');
+        $innerCached->setCacheable(true);
+        
+        $defStat1 = new ExampleDeferred2(false, true, 'defStat1cnt');
+        $defStat1->debData = 'defStat1instance';
+        $defStat2 = new ExampleDeferred2(false, true, 'defStat2cnt');
+        $defStat2->debData = 'defStat2instance';
+        $defStat3 = new ExampleDeferred2(false, true, 'defStat3cnt');
+        $defStat3->debData = 'defStat3instance';
+        $defCached1 = new ExampleDeferred2(false, false, 'defCached1');
+        $defCached1->debData = 'defCached1instance';
+        $defCached2 = new ExampleDeferred2(false, false, 'defCached2');
+        $defCached2->debData = 'defCached2instance';
+        $defCached3 = new ExampleDeferred2(false, false, 'defCached3');
+        $defCached3->debData = 'defCached3instance';
+        
+        $outer = new Ac_Result;
+        $outer->setDebugData('outer');
+        
+        $innerStat->put($defStat1.$defCached1);
+        $innerCached->put($defStat2.$defCached2);
+        $outer->put($innerStat.$innerCached.$defStat3.$defCached3);
+        
+        var_dump('before serialize');
+        $s = serialize($outer);
+        var_dump('after serialize');
+        
+        $this->assertTrue(strpos($s, $defStat1->debData) === false);
+        $this->assertTrue(strpos($s, $defStat2->debData) === false);
+        $this->assertTrue(strpos($s, $defStat3->debData) === false);
+        $this->assertTrue(strpos($s, $defCached1->debData) !== false);
+        $this->assertTrue(strpos($s, $defCached2->debData) !== false);
+        $this->assertTrue(strpos($s, $defCached3->debData) !== false);
+        
+        $s = trim($s);
+        $s = preg_replace('/O:[0-9]+:"[^"]+"/', 'a', $s);
+        var_dump(unserialize($s));
+       
+        //echo(htmlspecialchars(serialize($outer)));
+        
     }
     
 }

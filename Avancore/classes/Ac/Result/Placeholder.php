@@ -133,6 +133,10 @@ class Ac_Result_Placeholder extends Ac_Prototyped implements ArrayAccess, Iterat
     function write(Ac_Result_Writer $writer) {
         $this->getTemplateInstance()->writePlaceholder($this, $writer);
     }
+    
+    function render(Ac_Result_Writer $writer) {
+        $this->getTemplateInstance()->renderPlaceholder($this, $writer);
+    }
 
     /**
      * @param bool $overwriteOnMerge
