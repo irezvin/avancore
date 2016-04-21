@@ -77,7 +77,8 @@ abstract class Ac_Cg_Util {
     }
     
     static function copyDirRecursive($src, $dest, $overwrite = false, $move = false) {
-        if (PATH_SEPARATOR == ';') { // it's WINDOWS
+        $isWindows = (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN');
+        if ($isWindows) {
             $cmd = 'xcopy '.escapeshellarg($src).' '.escapeshellarg($dest).' /E';
             if ($overwrite === false ) {
                 $tmpf = tmpfile();

@@ -60,9 +60,10 @@ abstract class Ac_Model_Relation_Provider_Sql extends Ac_Model_Relation_Provider
                     for ($i = 0; $i < $bKeyFields; $i++) {
                         $c .= $qKeyFields[$i].'='.$db->q($valArray[$i]).' AND ';
                     }
-                    $crit[] = $c.$qKeyFields[$bKeyFields].' = '.$db->q($valArray[$bKeyFields]);
+                    $crit[] = $c.$qKeyFields[$bKeyFields].' = '
+                        .$db->q($valArray[$bKeyFields]);
                 }
-                $res = '('.implode(')OR(', $crit).')';
+                $res = '('.implode(') OR (', $crit).')';
             }
         } else {
             $qValues = array();

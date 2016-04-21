@@ -7,6 +7,8 @@ class Child_Person_Photo_Base_Mapper extends Sample_Person_Photo_Mapper {
     var $recordClass = 'Child_Person_Photo'; 
 
     var $id = 'Child_Person_Photo_Mapper'; 
+
+    var $storage = 'Child_Person_Photo_Storage'; 
  
  
  

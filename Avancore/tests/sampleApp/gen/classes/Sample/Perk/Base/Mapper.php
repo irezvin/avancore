@@ -12,6 +12,8 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Perk_Mapper'; 
 
+    var $storage = 'Sample_Perk_Storage'; 
+
     var $columnNames = array ( 0 => 'perkId', 1 => 'name', ); 
 
     var $nullableColumns = array ( 0 => 'name', ); 

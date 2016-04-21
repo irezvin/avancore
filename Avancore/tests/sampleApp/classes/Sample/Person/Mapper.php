@@ -122,8 +122,8 @@ class Sample_Person_Mapper extends Sample_Person_Base_Mapper {
                     'where' => "lcase(name) not like '%test%'",
                 ),
                 'birthYear' => array(
-                    'class' => 'Ac_Sql_Filter_Custom',
-                    'where' => "DATE_FORMAT(t.birthDate, '%Y') = {value}",
+                    'class' => 'Ac_Sql_Filter_Equals',
+                    'colName' => "DATE_FORMAT(t.birthDate, '%Y')",
 //                    'php' => function($object, $crit) {
 //                        return Ac_Util::date($object->birthDate, 'Y') == $crit->values[$value];
 //                    }

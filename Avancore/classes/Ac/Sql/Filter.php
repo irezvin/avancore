@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Sql_Filter extends Ac_Sql_Part {
+abstract class Ac_Sql_Filter extends Ac_Sql_Part {
 
     /**
      * This filter should be placed into HAVING... clause instead of WHERE... clause of SQL select statement

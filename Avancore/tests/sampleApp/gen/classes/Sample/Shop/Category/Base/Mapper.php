@@ -12,6 +12,8 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Category_Mapper'; 
 
+    var $storage = 'Sample_Shop_Category_Storage'; 
+
     var $columnNames = array ( 0 => 'id', 1 => 'title', 2 => 'leftCol', 3 => 'rightCol', 4 => 'ignore', 5 => 'parentId', 6 => 'ordering', 7 => 'depth', 8 => 'metaId', 9 => 'pubId', ); 
 
     var $nullableColumns = array ( 0 => 'title', 1 => 'parentId', 2 => 'metaId', 3 => 'pubId', ); 

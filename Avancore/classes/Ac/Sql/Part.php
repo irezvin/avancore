@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Sql_Part extends Ac_Prototyped {
+abstract class Ac_Sql_Part extends Ac_Prototyped {
     
     /**
      * @var Ac_Sql_Part
@@ -43,6 +43,12 @@ class Ac_Sql_Part extends Ac_Prototyped {
     var $appliedOnEmptyInput = false;
     
     var $_idWithPrefix = false;
+    
+    /**
+     * The Select that current part is being applied to
+     * @var Ac_Sql_Select
+     */
+    protected $currentSelect = null;
     
     function __construct($options = array()) {
         if (isset($options['db'])) $this->setDb($options['db']);
@@ -125,12 +131,14 @@ class Ac_Sql_Part extends Ac_Prototyped {
      *
      * @param Ac_Sql_Select $select
      */
-    function applyToSelect($select) {
-        assert(is_a($select, 'Ac_Sql_Select'));
+    function applyToSelect(Ac_Sql_Select $select) {
+        $tmp = $this->currentSelect = null;
+        $this->currentSelect = $select;
         if (!$this->_db) $this->setDb($select->getDb());
         if ($this->doesApply()) {
             $this->_doApplyToSelect($select);
         }
+        $this->currentSelect = $tmp;
     }
     
     // ---------------------------------- template methods ------------------------------

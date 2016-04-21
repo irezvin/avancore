@@ -285,7 +285,7 @@ class Ac_Model_Association_ManyToMany extends Ac_Model_Association_Many {
     /**
      * @return string
      */
-    function getloadDestIdsMapperMethod() {
+    function getLoadDestIdsMapperMethod() {
         if ($this->loadDestIdsMapperMethod === false) {
             $this->guessMethods();
         }

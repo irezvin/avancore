@@ -13,9 +13,9 @@ abstract class Ac_Model_Relation_Provider extends Ac_Prototyped {
      */
     protected $unique = false;
     
-    abstract function getWithValues (array $values, $byKeys = true, array $nnValues = array());
+    abstract function getWithValues (array $rightValues, $byKeys = true, array $leftValues = array());
     
-    abstract function countWithValues (array $values, $byKeys = true, array $nnValues = array());
+    abstract function countWithValues (array $rightValues, $byKeys = true, array $leftValues = array());
     
     function setApplication(Ac_Application $application) {
         if ($application !== ($oldApplication = $this->application)) {

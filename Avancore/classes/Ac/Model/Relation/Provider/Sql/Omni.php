@@ -29,8 +29,6 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
      * @var array
      */
     protected $keys = false;
-    
-    
 
     /**
      * mapper that provides destination objects (null or FALSE if no mapper used)
@@ -57,7 +55,8 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
      */
     protected $extraJoins = false;
 
-    function getWithValues (array $values, $byKeys = true, array $nnValues = array()) {
+    function getWithValues (array $rightValues = array(), $byKeys = true, array $leftValues = array()) {
+        
         $ta = 't';
         $asTa = 'AS t';
         $cols = 't.*'; 
@@ -66,19 +65,19 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
         $useMidTable = false;
         
         // return empty result
-        if (!count($values) && !count($nnValues)) return array(array(), array());
+        if (!count($leftValues) && !count($rightValues)) return array(array(), array());
 
-        $res1 = array();
-        $res2 = array();
+        $leftIndexed = array();
+        $rightIndexed = array();
         $rows = array();
         
-        if ($this->midTableName && $values) {
+        if ($this->midTableName && $leftValues) {
             $useMidTable = true;
             
             $lta = $this->midTableAlias.'.';
-            $crit = $this->makeSqlCriteria($values, $indexKeys, $this->midTableAlias);
+            $crit = $this->makeSqlCriteria($leftValues, $indexKeys, $this->midTableAlias);
             $extraJoinCrit = false;
-            if ($nnValues) {
+            if ($rightValues) { // worst case: we need to combine left values (left keys of mid table) and right values
                 $join = 'RIGHT';
                 $notNullC = array();
                 foreach ($indexKeys as $fieldName) {
@@ -91,7 +90,7 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
                     if (strlen($extraJoinCrit)) $extraJoinCrit = "({$extraJoinCrit}) AND ({$strMidWhere})";
                         else $extraJoinCrit = $strMidWhere;
                 }
-                $crit = $notNullC." OR (".$this->makeSqlCriteria($nnValues, array_values($this->midLinks), strlen($ta)? $ta : $this->tableName).")";
+                $crit = $notNullC." OR (".$this->makeSqlCriteria($rightValues, array_values($this->midLinks), strlen($ta)? $ta : $this->tableName).")";
             } else {
                 $join = 'INNER';
                 if ($this->midWhere) {
@@ -105,11 +104,11 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
         } else {
             $fromWhere = ' FROM '.$this->db->n($this->tableName).$asTa;
             $lta = $this->db->n($this->tableName).'.';
-            if ($nnValues) {
-                $indexKeys = array_values($this->midLinks);
-                $crit = $this->makeSqlCriteria($nnValues, $indexKeys, $ta);
+            if ($rightValues) {
+                if ($this->midLinks) $indexKeys = array_values($this->midLinks);
+                $crit = $this->makeSqlCriteria($rightValues, $indexKeys, $ta);
             } else {
-                $crit = $this->makeSqlCriteria($values, $indexKeys, $ta);
+                $crit = $this->makeSqlCriteria($leftValues, $indexKeys, $ta);
             }
         }
         if ($this->extraJoins) $fromWhere .= ' '.$this->extraJoins;
@@ -125,6 +124,8 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
         if ($this->ordering) {
             $sql .= ' ORDER BY '.$this->ordering;
         }
+        
+        //var_dump($sql);
         
         if ($this->midTableName && $useMidTable) {
         
@@ -155,26 +156,26 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
                     $key = $indexKeys[0];
                     if ($this->unique) {
                         foreach ($mid as $i => $keyValue) 
-                            $res1[$keyValue[$key]] = $objects[$i];
+                            $leftIndexed[$keyValue[$key]] = $objects[$i];
                     } else {
                         foreach ($mid as $i => $keyValue) 
-                            $res1[$keyValue[$key]][] = $objects[$i];
+                            $leftIndexed[$keyValue[$key]][] = $objects[$i];
                     }
                 } else {
                     foreach ($mid as $i => $keyValue) {
-                        Ac_Util::simpleSetArrayByPathNoRef($res1, array_values($keyValue), $objects[$i], $this->unique);
+                        Ac_Util::simpleSetArrayByPathNoRef($leftIndexed, array_values($keyValue), $objects[$i], $this->unique);
                     }
                 }
             } else {
-                $res1 = $objects;
+                $leftIndexed = $objects;
             }
             $this->db->resultFreeResource($rr);
-            if ($nnValues) {
+            if ($rightValues) {
                 // next group will index the items by the keys in right table
                 $indexKeys = array_values($this->midLinks);
             }
         }
-        if (!$useMidTable || $nnValues) {
+        if (!$useMidTable || $rightValues) {
             $indexedItems = array();
             if (!$useMidTable) {
                 $rows = $this->db->fetchArray($sql);
@@ -201,22 +202,18 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
             } else {
                 $indexedItems = $objects;     
             }
-            if ($nnValues) {
-                $res2 = $indexedItems;
-            } else {
-                $res1 = $indexedItems;
-            }
+            $rightIndexed = $indexedItems;
         }
-        $res = array($res1, $res2);
+        $res = array($rightIndexed, $leftIndexed);
         return $res;
     }
     
-    function countWithValues (array $values, $separate = true, array $nnValues = array()) {
-        
+    function countWithValues (array $rightValues, $separate = true, array $leftValues = array()) {
+
         if ($this->midTableName) {
-            if ($nnValues) {
+            if ($rightValues && !$separate) { // we don't need RIGHT JOIN trick with $separate
                 $lta = $this->midTableAlias.'.';
-                $extraJoinCrit = $this->makeSqlCriteria($values, $this->keys, $this->midTableAlias);
+                $extraJoinCrit = $this->makeSqlCriteria($leftValues, $this->keys, $this->midTableAlias);
                 $keys2 = array_values($this->midLinks);
                 $join = 'RIGHT';
                 $notNullC = array();
@@ -224,7 +221,7 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
                     $notNullC[$fieldName] = $this->midTableAlias.".".$fieldName." IS NOT NULL";
                 }
                 $notNullC = "(".implode(" AND ", $notNullC).")";
-                $crit = $notNullC." OR (".$this->makeSqlCriteria($nnValues, $keys2, $this->tableName).")";
+                $crit = $notNullC." OR (".$this->makeSqlCriteria($rightValues, $keys2, $this->tableName).")";
                 if ($this->midWhere) {
                     $strMidWhere = $this->getStrMidWhere($this->midTableAlias);
                     if (strlen($extraJoinCrit)) $extraJoinCrit = "({$extraJoinCrit}) AND ({$strMidWhere})";
@@ -233,15 +230,16 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
                 $fromWhere = ' FROM '.$this->db->n($this->midTableName).' AS '.$this->midTableAlias
                     .' '.$this->getJoin($join, $this->midTableAlias, $this->tableName, $this->tableName, $this->midLinks, $extraJoinCrit);
             } else {
+                if (!$leftValues) return array();
                 $fromWhere = ' FROM '.$this->db->n($this->midTableName).' AS '.$this->midTableAlias;
                 $lta = $this->midTableAlias.'.';
-                $crit = $this->makeSqlCriteria($values, $this->keys, $this->midTableAlias);
+                $crit = $this->makeSqlCriteria($leftValues, $this->keys, $this->midTableAlias);
                 if ($this->midWhere !== false) $crit = "( $crit ) AND (".$this->getStrMidWhere($this->midTableAlias).")";
             }
         } else {
             $fromWhere = ' FROM '.$this->db->n($this->tableName);
             $lta = $this->db->n($this->tableName).'.';
-            $crit = $this->makeSqlCriteria($values, $this->keys, '');
+            $crit = $this->makeSqlCriteria($leftValues, $this->keys, '');
         }
         
         if ($this->extraJoins) $fromWhere .= ' '.$this->extraJoins;
@@ -249,7 +247,7 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
         $fromWhere .= ' WHERE ('.$crit.')';
 
         if ($this->where) $fromWhere .= ' AND ('.$this->getStrWhere().')';
-        
+
         if (!$separate) {
             $sql = 'SELECT COUNT(*) '.$fromWhere;
             $res = $this->db->fetchValue($sql);

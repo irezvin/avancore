@@ -12,6 +12,12 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     
     var $mapperVars = array();
     
+    var $storageClass = false;
+    var $genStorageClass = false;
+    var $parentStorageClass = false;
+    
+    var $storageVars = array();
+    
     var $vars = array();
     var $ownPropInfo = false;
     var $ownProperties = false;
@@ -27,6 +33,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     var $accessors = array();
     var $nullableColumns = array();
     var $associationPrototypes = array();
+    var $relationProviderPrototypes = array();
     var $hasUniformPropertiesInfo = false;
     var $modelCoreMixables = array();
     var $mapperCoreMixables = array();
@@ -57,7 +64,17 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
                 'relPath' => 'gen/'.Ac_Cg_Util::className2fileName($this->genMapperClass), 
                 'isEditable' => false, 
                 'templatePart' => 'genMapper',
-            ), 
+            ),
+            'storage' => array(
+                'relPath' => Ac_Cg_Util::className2fileName($this->storageClass),
+                'isEditable' => true, 
+                'templatePart' => 'storage',
+            ),
+            'genStorage' => array(
+                'relPath' => 'gen/'.Ac_Cg_Util::className2fileName($this->genStorageClass),
+                'isEditable' => false, 
+                'templatePart' => 'genStorage',
+            ),
         );
     }
     
@@ -69,7 +86,12 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->mapperClass = $this->model->getMapperClass();
         $this->genMapperClass = $this->model->getGenMapperClass();
         $this->parentMapperClass = $this->model->parentMapperClassName;
+        
         $this->createAccessors = $this->model->createAccessors;
+        
+        $this->storageClass = $this->model->getStorageClass();
+        $this->genStorageClass = $this->model->getGenStorageClass();
+        $this->parentStorageClass = $this->model->parentStorageClassName;
         
         foreach ($this->model->listProperties() as $name) {
             $prop = $this->model->getProperty($name);
@@ -98,6 +120,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         
         $this->tableName = $this->model->tableObject->name;
         $this->associationPrototypes = $this->model->getAssociationPrototypes();
+        $this->relationProviderPrototypes = $this->model->getRelationProviderPrototypes();
         $this->hasUniformPropertiesInfo = $this->model->hasUniformPropertiesInfo;
         $this->modelCoreMixables = $this->model->modelCoreMixables;
         $this->mapperCoreMixables = $this->model->mapperCoreMixables;
@@ -116,6 +139,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->mapperVars['recordClass'] = $this->model->getMapperRecordClass();
         $this->mapperVars['tableName'] = $this->tableName;
         $this->mapperVars['id'] = $this->mapperClass;
+        $this->mapperVars['storage'] = $this->storageClass;
         $this->mapperVars['columnNames'] = new Ac_Cg_Php_Expression($this->exportArray(array_keys($this->getDefaults($this->model)), 0, false, true, true));
         
         $this->ownProperties = array_diff($this->ownProperties, $this->model->listUsedColumns());
@@ -126,10 +150,30 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         
         $this->relationPrototypes = $this->model->getRelationPrototypes();
         $this->assocProperties = $this->model->getAssocProperties();
-        
         $this->uniqueIndexData = $this->model->tableObject->getUniqueIndexData();
         
         $this->calcInheritance();
+        
+        $storageToMapperVars = array(
+            'tableName', 
+            'recordClass', 
+            'primaryKey' => 'pk',
+            'autoincFieldName',
+            'defaults',
+            'uniqueIndices',
+            'nullableColumns',
+        );
+        foreach ($storageToMapperVars as $k => $v) {
+            if (is_numeric($k)) $k = $v;
+            if (isset($this->mapperVars[$v])) 
+                $this->storageVars[$k] = $this->mapperVars[$v];
+        }
+        if ($this->autoincFieldName && !isset($this->ignoreMethods['autoincFieldName'])) {
+            $this->storageVars['autoincFieldName'] = $this->autoincFieldName;
+        }
+        if ($this->uniqueIndexData && array_diff(array_keys($this->uniqueIndexData), $this->inheritedIndice)) {
+            $this->storageVars['uniqueIndices'] = array_diff_key($this->uniqueIndexData, array_flip($this->inheritedIndice));
+        }
     }
     
     function getModelClassMembers(Ac_Cg_Model $model) {
@@ -777,12 +821,50 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
 //            ),
 //        ));
 //    }
+<?php } ?>  
     
 }
     
-<?php } ?>  
 <?php //$this->phpClose(); ?><?php
     }
+
+    function showGenStorage() {
+
+    // ------------------------------------------- genStorage -------------------------------------------    
+        
+?>
+<?php $this->phpOpen(); ?>
+
+
+<?php if ($this->model->parentStorageIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genStorageClass); ?> extends <?php $this->d($this->parentStorageClass); ?> {
+<?php foreach ($this->storageVars as $var => $default) { ?>
+
+    var $<?php echo $var; ?> = <?php $this->export($default); ?>; 
+<?php } ?> 
+    
+}
+
+<?php 
+
+    } // showGenStorage
+
+    function showStorage() {  
+
+    // ------------------------------------------- storage -------------------------------------------    
+        
+?>
+<?php $this->phpOpen(); ?>
+
+
+class <?php $this->d($this->storageClass); ?> extends <?php $this->d($this->genStorageClass); ?> {
+<?php if ($this->model->generateMethodPlaceholders) { ?>
+<?php } ?>  
+
+}
+<?php
+
+    } // showStorage
+    
     
 }
 

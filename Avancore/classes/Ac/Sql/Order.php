@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Sql_Order extends Ac_Sql_Part {
+abstract class Ac_Sql_Order extends Ac_Sql_Part {
 
     function getAppliedOrderBy() {
         $res = array();

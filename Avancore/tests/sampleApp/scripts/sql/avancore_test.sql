@@ -1,8 +1,8 @@
--- MySQL dump 10.15  Distrib 10.0.22-MariaDB, for Linux (x86_64)
+-- MySQL dump 10.16  Distrib 10.1.10-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: avancore_test
 -- ------------------------------------------------------
--- Server version	10.0.22-MariaDB-log
+-- Server version	10.1.10-MariaDB-log
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -245,7 +245,7 @@ CREATE TABLE `ac_publish` (
   KEY `fkPubEditor` (`editorId`),
   CONSTRAINT `fkPubAuthor` FOREIGN KEY (`authorId`) REFERENCES `ac_people` (`personId`) ON DELETE SET NULL ON UPDATE SET NULL,
   CONSTRAINT `fkPubEditor` FOREIGN KEY (`editorId`) REFERENCES `ac_people` (`personId`) ON DELETE SET NULL ON UPDATE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=92 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=167 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -254,7 +254,7 @@ CREATE TABLE `ac_publish` (
 
 LOCK TABLES `ac_publish` WRITE;
 /*!40000 ALTER TABLE `ac_publish` DISABLE KEYS */;
-INSERT INTO `ac_publish` VALUES (1,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,6,'123456','2014-11-20 01:22:31','2014-12-20 01:22:31','0000-00-00 00:00:00'),(88,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',8,9,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(89,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(90,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(91,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `ac_publish` VALUES (1,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,6,'123456','2014-11-20 01:22:31','2014-12-20 01:22:31','0000-00-00 00:00:00'),(163,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',8,9,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(164,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(165,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(166,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
 /*!40000 ALTER TABLE `ac_publish` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -391,7 +391,7 @@ CREATE TABLE `ac_shop_meta` (
   `metaNoindex` int(1) unsigned NOT NULL DEFAULT '0',
   `sharedObjectType` varchar(255) NOT NULL DEFAULT 'other',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=81 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=156 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -400,7 +400,7 @@ CREATE TABLE `ac_shop_meta` (
 
 LOCK TABLES `ac_shop_meta` WRITE;
 /*!40000 ALTER TABLE `ac_shop_meta` DISABLE KEYS */;
-INSERT INTO `ac_shop_meta` VALUES (1,'Купить Товар 1 он-лайн','Страница товара 1','Товар 1, купить',0,'product'),(43,'','','',0,'product'),(77,'','','',0,'product'),(78,'','','',0,'product'),(79,'','','',0,'product'),(80,'','','',0,'product');
+INSERT INTO `ac_shop_meta` VALUES (1,'Купить Товар 1 он-лайн','Страница товара 1','Товар 1, купить',0,'product'),(43,'','','',0,'product'),(152,'','','',0,'product'),(153,'','','',0,'product'),(154,'','','',0,'product'),(155,'','','',0,'product');
 /*!40000 ALTER TABLE `ac_shop_meta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -456,7 +456,7 @@ CREATE TABLE `ac_shop_product_extraCodes` (
 
 LOCK TABLES `ac_shop_product_extraCodes` WRITE;
 /*!40000 ALTER TABLE `ac_shop_product_extraCodes` DISABLE KEYS */;
-INSERT INTO `ac_shop_product_extraCodes` VALUES (2,'1','2','3',3),(70,'','','',NULL),(71,'A','B','C',10),(72,'A1','B1','C1',11),(73,'','','',NULL);
+INSERT INTO `ac_shop_product_extraCodes` VALUES (2,'1','2','3',3),(130,'','','',NULL),(131,'A','B','C',10),(132,'A1','B1','C1',11),(133,'','','',NULL);
 /*!40000 ALTER TABLE `ac_shop_product_extraCodes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -484,7 +484,7 @@ CREATE TABLE `ac_shop_product_notes` (
 
 LOCK TABLES `ac_shop_product_notes` WRITE;
 /*!40000 ALTER TABLE `ac_shop_product_notes` DISABLE KEYS */;
-INSERT INTO `ac_shop_product_notes` VALUES (70,'',NULL),(71,'',NULL),(72,'',NULL),(73,'foobar',12);
+INSERT INTO `ac_shop_product_notes` VALUES (130,'',NULL),(131,'',NULL),(132,'',NULL),(133,'foobar',12);
 /*!40000 ALTER TABLE `ac_shop_product_notes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -538,7 +538,7 @@ CREATE TABLE `ac_shop_product_upc` (
 
 LOCK TABLES `ac_shop_product_upc` WRITE;
 /*!40000 ALTER TABLE `ac_shop_product_upc` DISABLE KEYS */;
-INSERT INTO `ac_shop_product_upc` VALUES (1,'1234'),(70,''),(71,''),(72,''),(73,'');
+INSERT INTO `ac_shop_product_upc` VALUES (1,'1234'),(130,''),(131,''),(132,''),(133,'');
 /*!40000 ALTER TABLE `ac_shop_product_upc` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -558,7 +558,7 @@ CREATE TABLE `ac_shop_products` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idxPubId` (`pubId`),
   CONSTRAINT `fkPersonPublish` FOREIGN KEY (`pubId`) REFERENCES `ac_publish` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=134 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -567,7 +567,7 @@ CREATE TABLE `ac_shop_products` (
 
 LOCK TABLES `ac_shop_products` WRITE;
 /*!40000 ALTER TABLE `ac_shop_products` DISABLE KEYS */;
-INSERT INTO `ac_shop_products` VALUES (1,'PROD01','Товар 1',1,1),(2,'PROD02','Товар 2',NULL,NULL),(3,'PROD03','Товар 3',NULL,NULL),(4,'PROD04','Товар 4',NULL,NULL),(9,'xxx','yyy',NULL,NULL),(70,'1337','test product',77,88),(71,'f00','test prod 2',78,89),(72,'f01','test prod 3',79,90),(73,'PROD_NOTE','product with a note',80,91);
+INSERT INTO `ac_shop_products` VALUES (1,'PROD01','Товар 1',1,1),(2,'PROD02','Товар 2',NULL,NULL),(3,'PROD03','Товар 3',NULL,NULL),(4,'PROD04','Товар 4',NULL,NULL),(9,'xxx','yyy',NULL,NULL),(130,'1337','test product',152,163),(131,'f00','test prod 2',153,164),(132,'f01','test prod 3',154,165),(133,'PROD_NOTE','product with a note',155,166);
 /*!40000 ALTER TABLE `ac_shop_products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -762,4 +762,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2015-11-19  1:19:40
+-- Dump completed on 2016-01-11 10:30:19

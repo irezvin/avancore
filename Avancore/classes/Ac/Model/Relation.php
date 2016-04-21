@@ -1071,7 +1071,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         } else {
             $res = false;
         }
-        foreach (self::$depecatedImplProps as $p) unset($res[$p]);
+        foreach (self::$deprecatedImplProps as $p) unset($res[$p]);
         return $res;
     }
     
@@ -1134,9 +1134,9 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $this->fullSrcProps;
     }
     
-    protected static $depecatedImplProps = array(
+    protected static $deprecatedImplProps = array(
         'midTableName', 'midTableAlias', 'destTableName', 'destMapperClass', 
-        'destMapper', 'destExtraJoins', 'db', 'destOrdering', 'destExtraJoins', 
+        /*'destMapper',*/ 'destExtraJoins', 'db', 'destOrdering', 'destExtraJoins', 
         'destWhere', 'midWhere', 'srcQualifier', 'destQualifier',
     );
     
@@ -1147,7 +1147,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             'provider' => $this->getDestProvider(),
             'destNNIdsImpl' => $this->calcNNIdsImpl($fullDestProps),
         ), $fullDestProps);
-        foreach (self::$depecatedImplProps as $p) unset($res[$p]);
+        foreach (self::$deprecatedImplProps as $p) unset($res[$p]);
         return $res;
     }
     
@@ -1161,7 +1161,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             'provider' => $this->getSrcProvider(),
             'destNNIdsImpl' => $this->calcNNIdsImpl($fullSrcProps),
         ), $fullSrcProps);
-        foreach (self::$depecatedImplProps as $p) unset($res[$p]);
+        foreach (self::$deprecatedImplProps as $p) unset($res[$p]);
         return $res;
     }
 

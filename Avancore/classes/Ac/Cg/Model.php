@@ -64,9 +64,13 @@ class Ac_Cg_Model extends Ac_Cg_Base {
      */    
     var $parentMapperClassName = false;
     
+    var $parentStorageClassName = false;
+    
     var $parentClassIsAbstract = false;
     
     var $parentMapperIsAbstract = false;
+    
+    var $parentStorageIsAbstract = false;
     
     var $parentFinderClassName = false;
     
@@ -427,6 +431,7 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         if (!$this->className) $this->className = $this->getDefaultClassName();
         if (!$this->parentClassName) $this->parentClassName = $this->getDefaultParentClassName();
         if (!$this->parentMapperClassName) $this->parentMapperClassName = $this->getDefaultParentMapperClassName();
+        if (!$this->parentStorageClassName) $this->parentStorageClassName = $this->getDefaultParentStorageClassName();
         
         if ($this->nullableColumns === false) {
             $this->nullableColumns = array();
@@ -692,8 +697,16 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         return $this->className.'_Base_Mapper';
     }
     
+    function getGenStorageClass() {
+        return $this->className.'_Base_Storage';
+    }
+    
     function getMapperClass() {
         return $this->className.'_Mapper';
+    }
+    
+    function getStorageClass() {
+        return $this->className.'_Storage';
     }
     
     function getMapperRecordClass() {
@@ -719,6 +732,15 @@ class Ac_Cg_Model extends Ac_Cg_Base {
             $res = $pm->getMapperClass();
         } else {
             $res = 'Ac_Model_Mapper';
+        }
+        return $res;
+    }
+    
+    function getDefaultParentStorageClassName() {
+        if ($pm = $this->getParentModel()) {
+            $res = $pm->getStorageClass();
+        } else {
+            $res = 'Ac_Model_Storage_MonoTable';
         }
         return $res;
     }
@@ -907,6 +929,21 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         return $res;
     }
     
+    function getRelationProviderPrototypes() {
+        $res = array();
+        foreach ($this->listProperties() as $p) {
+            $prop = $this->getProperty($p);
+            if ($prop instanceof Ac_Cg_Property_Object && $prop->isEnabled()) {
+                if ($prop->modelRelation && $prop->modelRelation->createRelationObject) {
+                    if ($proto = $prop->getRelationProviderPrototype()) {
+                        $res[$prop->varName] = $proto;
+                    }
+                }
+            }
+        }
+        return $res;
+    }
+        
     function getTemplates() {
         return array('Ac_Cg_Template_ModelAndMapper');
     }

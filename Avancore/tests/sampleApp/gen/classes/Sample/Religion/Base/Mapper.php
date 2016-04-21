@@ -12,6 +12,8 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Religion_Mapper'; 
 
+    var $storage = 'Sample_Religion_Storage'; 
+
     var $columnNames = array ( 0 => 'religionId', 1 => 'title', ); 
 
     var $defaults = array (

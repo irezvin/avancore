@@ -1681,6 +1681,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             $proto = $this->storage;
             $this->storage = null;
             $this->setStorage(Ac_Prototyped::factory($proto, 'Ac_Model_Storage'));
+            $this->storage->setMapper($this);
         }
         return $this->storage;
     }
@@ -1858,6 +1859,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 if (!strncmp($id, self::INSTANCE_ID_PREFIX, self::INSTANCE_ID_PREFIX_LENGTH))
                     $this->keysOfNewRecords[$id] = true;
                 $reg = true;
+            } else {
+                $reg = false;
             }
         }
         if ($reg && is_object($object) && $object instanceof Ac_I_CollectionAwareObject) {
@@ -2067,7 +2070,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         
         $crit = array_keys($query);
         $fieldCrit = array_intersect($crit, $this->listDataProperties());
-        if (!$sort) $sort = $this->getDefaultSort();
+        if ($sort === false) $sort = $this->getDefaultSort();
         $found = false;
         $needsIndexResult = false;
         
@@ -2326,7 +2329,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     function count (array $query = array()) {
 
-        if (!is_null($records = $this->bestCaseFind($query))) {
+        if (!is_null($records = $this->bestCaseFind($query, true, null))) {
             $res = count($records);
         } else {
             
@@ -2350,6 +2353,99 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             
         }
         
+        return $res;
+    }
+    
+    /**
+     * Count all unique records
+     * @see Ac_Model_Mapper::countWithValues
+     */
+    const GROUP_NONE = 0;
+    
+    /**
+     * Count number of records that match each value 
+     * @see Ac_Model_Mapper::countWithValues
+     */
+    const GROUP_KEYS = 1;
+    
+    /**
+     * Count records by values, but group 
+     * @see Ac_Model_Mapper::countWithValues
+     */
+    const GROUP_ORDER = 2;
+    
+    /**
+     * Counts unique records that have values of $fieldName listed in $fieldValues
+     * If $groupByValues is TRUE, will return array with number of records that match each value
+     * ($fieldValues must be scalar for that).
+     * 
+     * As count(), does not append items to collection.
+     * 
+     * @param string $fieldName
+     * @param array $fieldValues
+     * @param $groupByValues How the result should be grouped: one of following constants 
+     *         - Ac_Model_Mapper::GROUP_NONE - just count all unique records
+     *         - Ac_Model_Mapper::GROUP_KEYS - group counts by values, keys of result will match values (must be non-scalar)
+     *         - Ac_Model_Mapper::GROUP_ORDER - keys of result array will match keys of fieldValues (so $result[$i] will contain
+     *          number of records that have $fieldName === $fieldValues[$i])
+     * @return int|array Number of records
+     */
+    function countWithValues ($fieldName, array $fieldValues, $groupByValues = Ac_Model_Mapper::GROUP_NONE) {
+        if (!in_array($groupByValues, array(Ac_Model_Mapper::GROUP_NONE, Ac_Model_Mapper::GROUP_KEYS, Ac_Model_Mapper::GROUP_ORDER))) {
+            Ac_Util::getClassConstants('Ac_Model_Mapper', 'GROUP_');
+            throw Ac_E_InvalidCall::outOfConst('groupByValues', $groupByValues, $allowed, 'Ac_Model_Mapper');
+        }
+        // A. try best case find
+        if (!is_null($records = $this->bestCaseFind(array($fieldName => $fieldValues), false, null))) {
+            if ($groupByValues == self::GROUP_NONE) {
+                $res = count($records);
+            } else {
+                $res = $this->countRecordsByValues($records, $fieldName, $fieldValues, $groupByValues == self::GROUP_KEYS);
+            }
+        } else { 
+            // B. try to do optimal search using the storage
+            $res = $this->getStorage()->countWithValuesIfPossible($fieldName, $fieldValues, $groupByValues);
+            if ($res === false) { 
+                // C. Do it old-school
+                if (self::$collectGarbageAfterCountFind) {
+                    $gc = gc_enabled();
+                    if (!$gc) gc_enable();
+                }
+                
+                self::pauseCollecting();
+                $records = $this->find(array($fieldName => $fieldValues));
+                if ($groupByValues == self::GROUP_NONE) {
+                    $res = count($records);
+                } else {
+                    $res = $this->countRecordsByValues($records, $fieldName, $fieldValues, $groupByValues == self::GROUP_KEYS);
+                }
+                self::resumeCollecting();
+                
+                if (self::$collectGarbageAfterCountFind) {
+                    gc_collect_cycles();
+                    if (!$gc) gc_disable();
+                }
+            }
+        }
+        return $res;
+    }
+    
+    protected function countRecordsByValues(array $records, $fieldName, array $fieldValues, $valuesToKeys) {
+        $res = array();
+        $values = array();
+        foreach ($records as $j => $rec) {
+            $values[$j] = $rec->getField($fieldName);
+        }
+        foreach ($fieldValues as $i => $val) {
+            $k = $valuesToKeys? $val : $i;
+            $res[$k] = 0;
+            foreach ($values as $j => $value) {
+                if (is_null($value)? $value === $val : $value == $val) {
+                    $res[$k]++;
+                    unset($values[$j]);
+                }
+            }
+        }
         return $res;
     }
     
@@ -2420,6 +2516,16 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     /**
+     * @param string $relationId Identifier of incoming relation
+     * @param bool $dontThrow Don't throw an exception if no such provider found
+     * @return Ac_Model_Relation_Provider
+     */
+    function getRelationProviderByRelationId($relationId, $dontThrow = false) {
+        $res = $this->getStorage()->getRelationProviderByRelationId($relationId, $dontThrow);
+        return $res;
+    }
+    
+    /**
      * @return Ac_Model_Search
      */
     final function getSearch() {
@@ -2441,7 +2547,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         self::$dontCollect++;
     }
     
-    protected static function resumeCollcting() {
+    protected static function resumeCollecting() {
         if (self::$dontCollect) self::$dontCollect--;
     }
     

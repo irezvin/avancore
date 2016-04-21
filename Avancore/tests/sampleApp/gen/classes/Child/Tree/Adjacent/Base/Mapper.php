@@ -7,6 +7,8 @@ class Child_Tree_Adjacent_Base_Mapper extends Sample_Tree_Adjacent_Mapper {
     var $recordClass = 'Child_Tree_Adjacent'; 
 
     var $id = 'Child_Tree_Adjacent_Mapper'; 
+
+    var $storage = 'Child_Tree_Adjacent_Storage'; 
  
  
  

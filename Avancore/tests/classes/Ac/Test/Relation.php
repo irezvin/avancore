@@ -16,6 +16,18 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $this->assertTrue($a->getDestIsUnique());
     }
     
+    function _testNNMem() {
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        $pm->reset();
+        $people = $pm->loadRecordsArray(array(3, 4, 6, 7));
+        $pm->loadTagIdsFor($people);
+        $pm->loadAssocCountFor($people, '_tags');
+        $pm->loadTagsFor($people);
+        $rel = $pm->getRelation('_tags');
+        $rel->countDest($people, false);
+        $pm->reset();
+    }
+    
     function testLoadNoSrcVar() {
         $pm = Sample::getInstance()->getSamplePersonMapper();
         $person = $pm->loadByPersonId(3);
@@ -292,7 +304,9 @@ class Ac_Test_Relation extends Ac_Test_Base {
         
         $pm->loadAssocCountFor($a, '_tags');
         $pm->loadAssocCountFor($b, '_tags');
-        $this->assertEqual($a->_tagsCount, 0);
+        if (!$this->assertEqual($a->_tagsCount, 0)) {
+            var_dump($a->_tagsCount);
+        }
         $this->assertEqual($b->_tagsCount, 2);
         
         $a = $pm->loadByPersonId(3);
@@ -691,7 +705,6 @@ class Ac_Test_Relation extends Ac_Test_Base {
             'd' => array('personId' => -1, 'tagIds' => array('foo')),
         );
         $rel->loadDest($src);
-        $loaded = array();
         
         if (!$this->assertTrue(isset($src['a']['tagIds']) && is_array($src['a']['tagIds']) 
             && count($src['a']['tagIds']))) {

@@ -45,6 +45,11 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
      * @var array
      */
     protected $defaults = false;
+
+    /**
+     * @var array
+     */
+    protected $relationProviders = false;
     
     /**
      * Sets Mapper that owns the Storage
@@ -239,6 +244,23 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
         return false; // to abstract to be possible
     }
     
+    function countWithValuesIfPossible($fieldName, $fieldValues, $groupByValues = Ac_Model_Mapper::GROUP_NONE) {
+        if (!in_array($groupByValues, array(Ac_Model_Mapper::GROUP_NONE, Ac_Model_Mapper::GROUP_KEYS, Ac_Model_Mapper::GROUP_ORDER))) {
+            Ac_Util::getClassConstants('Ac_Model_Mapper', 'GROUP_');
+            throw Ac_E_InvalidCall::outOfConst('groupByValues', $groupByValues, $allowed, 'Ac_Model_Mapper');
+        }
+        return $this->implCountWithValuesIfPossible($fieldName, $fieldValues, $groupByValues);
+    }
+    
+    protected function implCountWithValuesIfPossible($fieldName, $fieldValues, $groupByValues) {
+        if ($groupByValues == Ac_Model_Mapper::GROUP_NONE) {
+            $res = $this->countIfPossible(array($fieldName => $fieldValues));
+        } else {
+            $res = false;
+        }
+        return $res;
+    }
+    
     function __toString() {
         $res = get_class($this);
         if ($this->mapper) $res .= " of ".$this->mapper->getId();
@@ -328,5 +350,64 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
         }
         return $this->defaults;
     }
+
+    protected function doOnGetRelationProviderPrototypes(array & $prototypes = array()) {
+    }
+    
+    /**
+     * @return array
+     */
+    function listRelationProviders() {
+        if (!is_array($this->relationProviders)) {
+            $this->relationProviders = array();
+            $this->doOnGetRelationProviderPrototypes($this->relationProviders);
+        }
+        return array_keys($this->relationProviders);
+    }
+    
+    function addRelationProvider($id, $relationProvider, $replace = false) {
+        $this->listRelationProviders();
+        if (isset($this->relationProviders[$id]) && !$replace) {
+            throw Ac_E_InvalidCall::alreadySuchItem('relationProvider', $id);
+        }
+        if (is_object($relationProvider) && !$relationProvider instanceof Ac_Model_Relation_Provider) {
+            throw Ac_E_InvalidCall::wrongType('relationProvider', $relationProvider, array('string', 'array', 'Ac_Model_Relation_Provider'));
+        }
+        $this->relationProviders[$id] = $relationProvider;
+    }
+    
+    function deleteRelationProvider($relationId, $throwIfNotFound = false) {
+        $res = false;
+        if (in_array($relationId, $this->listRelationProviders())) {
+            unset($this->relationProviders[$relationId]);
+            $res = true;
+        } elseif ($throwIfNotFound) {
+            throw Ac_E_InvalidCall::noSuchItem('relationProvider', $relationId);
+        }
+        return $res;
+    }
+    
+    /**
+     * @param string $relationId Identifier of incoming relation
+     * @param bool $dontThrow Don't throw an exception if no such provider found
+     * @return Ac_Model_Relation_Provider
+     */
+    function getRelationProviderByRelationId($relationId, $dontThrow = false) {
+        $res = null;
+        if (in_array($relationId, $this->listRelationProviders())) {
+            if (!is_object($this->relationProviders[$relationId])) {
+                $p = $this->relationProviders[$relationId] = Ac_Prototyped::factory($this->relationProviders[$relationId], 
+                    'Ac_Model_Relation_Provider');
+                if ($p instanceof Ac_I_WithMapper && !$p->getMapper() && $this->mapper) {
+                    $p->setMapper($this->mapper);
+                }
+            }
+            $res = $this->relationProviders[$relationId];
+        } elseif (!$dontThrow) {
+            throw Ac_E_InvalidCall::noSuchItem('relationProvider', $relationId);
+        }
+        return $res;
+    }
+    
     
 }

@@ -47,6 +47,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     
     var $relationOverrides = array();
     var $associationOverrides = array();
+    var $relationProviderOverrides = array();
     
     /**
      * @var Ac_Cg_Model_Relation
@@ -271,7 +272,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         return $res;
     }
     
-    function getAeModelRelationPrototype() {
+    function computeRelationData() {
         $res = array();
         $res['srcMapperClass'] = $this->_model->getMapperClass();
         $res['destMapperClass'] = $this->_other->getMapperClass();
@@ -311,16 +312,19 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             }
             
             // workaround for many-to-many relations
-            // TODO: figure why srcIsUnique and destIsUnique are true 
+            // TODO: figure why srcIsUnique and destIsUnique are true
             if (isset($res['midTableName']) && strlen($res['midTableName'])) {
                 $res['srcIsUnique'] = false;
                 $res['destIsUnique'] = false;
             }
         }
-        
+        return $res;
+    }
+    
+    function getAeModelRelationPrototype() {
+        $res = $this->computeRelationData();
         if (is_array($this->relationOverrides))
             Ac_Util::ms($res, $this->relationOverrides);
-         
         return $res;
     }
     
@@ -495,6 +499,36 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         
         if (is_array($this->associationOverrides))
             Ac_Util::ms($res, $this->associationOverrides);
+        
+        return $res;
+    }
+    
+    function getRelationProviderPrototype() {
+        $rel = $this->computeRelationData();
+        $res = array(); // by default return nothing
+        $links = isset($rel['fieldLinks2'])? $rel['fieldLinks2'] : $rel['fieldLinks'];
+        
+        // study the relation structure
+        
+        $right = array_values($links);
+        $rightPk = $this->_other->tableObject->listPkFields();
+
+        $rightIsSingle = count($right) == 1;
+        $rightMatchesPk = !array_diff($right, $rightPk) && count($right) == count($rightPk);
+        $hasMidTable = isset($rel['midTableName']) && strlen($rel['midTableName']);
+        
+        // now let's produce providers
+        if ($hasMidTable) {
+            if ($rightMatchesPk) {
+                $res = array(
+                    'class' => 'Ac_Model_Relation_Provider_Sql_NN_Pk',
+//                    ''
+                );
+            } elseif ($rightIsSingle) {
+            } else {
+                
+            }
+        }
         
         return $res;
     }

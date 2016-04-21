@@ -633,6 +633,31 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         return $res;
     }
     
+    protected function implCountWithValuesIfPossible($fieldName, $fieldValues, $groupByValues) {
+        if ($groupByValues === Ac_Model_Mapper::GROUP_NONE) {
+            $res = parent::implCountWithValuesIfPossible($fieldName, $fieldValues, $groupByValues);
+        } elseif (in_array($fieldName, $this->getColumns())) { // only the direct mappable field. Todo: allow mapping
+            $stmt = $this->createSqlSelect(array(), array($fieldName => $fieldValues), false, false, false, $remainingQuery);
+            if (!$remainingQuery) { // it's possible
+                $stmt->columns = array('fld' => $this->getDb()->n($fieldName), 'cnt' => "COUNT(DISTINCT t.".$this->getDb()->n($this->primaryKey).")");
+                $stmt->groupBy = array($fieldName);
+                $stmt->limitCount = false;
+                $stmt->limitOffset = false;
+                $counts = $this->getDb()->fetchColumn($stmt, 'cnt', 'fld');
+                $res = array();
+                foreach ($fieldValues as $i => $val) {
+                    $k = $groupByValues === Ac_Model_Mapper::GROUP_KEYS? $val : $i;
+                    $res[$k] = isset($counts[$val])? $counts[$val] : 0;
+                }
+            } else {
+                $res = false;
+            }
+        } else {
+            $res = false;
+        }
+        return $res;
+    }
+    
     protected function inspect() {
         $dbi = $this->db->getInspector();
         

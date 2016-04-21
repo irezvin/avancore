@@ -76,6 +76,11 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     protected $destNNIdsImpl = false;
 
     /**
+     * @var Ac_Model_Mapper|string Mapper or mapper class (will only be used if relation provider is retrieved by ID)
+     */
+    protected $destMapper = false;
+    
+    /**
      * @var Ac_Model_Relation_Provider
      */
     protected $provider = false;
@@ -409,27 +414,31 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 $this->getAllValues($srcData, $values, $keys, $this->srcNNIdsVarName, $midValues, $midKeys);
             }
 
-            $rows = array();
-            $rows2 = array();
+            $rows = array();    // rows retrieved by keys of right storage
+            $lRows = array();   // rows retrieved by left keys of "mid-table" - some Providers can do that
 
             $byKeys = $matchMode != Ac_Model_Relation_Abstract::RESULT_PLAIN;
-            list ($rows, $rows2) = $this->getWithValues($values, $byKeys, $midValues, true);
+            if ($this->fieldLinks2) {
+                list ($rows, $lRows) = $this->getWithValues($midValues, $byKeys, $values, true);
+            } else {
+                list ($rows, $lRows) = $this->getWithValues($values, $byKeys, array(), true);
+            }
 
             $defaultValue = $destIsUnique? $defaultValue : array();
             
             if ($matchMode == Ac_Model_Relation_Abstract::RESULT_ORIGINAL_KEYS || $matchMode == Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS || $matchMode === Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS && $midMap) {
                 $res = array();
-                if ($matchMode !== Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS && $rows) $this->unmapResult($keys, $map, $matchMode, $res, $rows, $defaultValue, $destIsUnique, false);
-                    else $res = $rows;
+                if ($matchMode !== Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS && $lRows) $this->unmapResult($keys, $map, $matchMode, $res, $lRows, $defaultValue, $destIsUnique, false);
+                    else $res = $lRows;
                 if ($midMap) {
-                    $this->unmapResult(array_values($this->fieldLinks2), $midMap, $matchMode, $res, $rows2, 
+                    $this->unmapResult(array_values($this->fieldLinks2), $midMap, $matchMode, $res, $rows, 
                         $defaultValue, $destIsUnique, true);                    
                 }
             } else {
-                $res = $rows;
-                if (!$res && $rows2) {
-                    if ($destIsUnique || !$byKeys) $res = array_values($rows2);
-                    else foreach ($rows2 as $rows) $res = array_merge($res, $rows);
+                $res = $lRows;
+                if (!$res && $rows) {
+                    if ($destIsUnique || !$byKeys) $res = array_values($rows);
+                    else foreach ($rows as $lRows) $res = array_merge($res, $lRows);
                 }
             }
         } elseif (is_object($srcData)) {
@@ -440,8 +449,12 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 $values = $this->getValues($srcData, $keys, false, true);
                 $midValues = array();
             }
-            list ($rows, $rows2) = $this->getWithValues(array(), false, $midValues, false);
-            $res = $rows? $rows: $rows2;
+            if ($this->fieldLinks2) {
+                list ($lRows, $rows) = $this->getWithValues($midValues, false, $values, (bool) $midValues);
+            } else {
+                list ($lRows, $rows) = $this->getWithValues($values, false, array(), false);
+            }
+            $res = $lRows? $lRows: $rows;
             if (!$res) {
                 if (!$hasDefaultValue) $defaultValue = $destIsUnique? null : array();
                     else $res = $defaultValue;
@@ -473,7 +486,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 $this->getAllValues($srcData, $values, $keys, $this->srcNNIdsVarName, $midValues, $midKeys);
             }
                 
-            $counts = $this->countWithValues($values, $separate, $midValues, true);
+            $counts = $this->countWithValues($midValues, $separate, $values, true);
             
             if (!$separate) {
                 $res = $counts;
@@ -501,7 +514,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             if (is_array($nnIds)) $res = count($nnIds);
             else {
                 $values = $this->getValues($srcData, $keys, false, false);
-                $res = $this->countWithValues($values, false, array(), false);
+                $res = $this->countWithValues(array(), false, $values, false);
             }
         } else {
             trigger_error ('$srcData/$destData must be an array, a collection or an object', E_USER_ERROR);
@@ -533,8 +546,13 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 $midValues, is_array($this->fieldLinks2)? array_values($this->fieldLinks2) : array(), false, 
                 $alreadyLoaded, $this->srcLoadedVarName);
             
-            $r = $this->getWithValues($values, true, $midValues, true);
-            list($rows, $rows2) = $r;
+            if ($this->fieldLinks2) {
+                $r = $this->getWithValues($midValues, true, $values, true);
+                list($rows2, $rows) = $r;
+            } else {
+                $r = $this->getWithValues($values, true, array());
+                list($rows, $rows2) = $r;
+            }
                 
             $res = $rows2? $rows2 : $rows; // $rows2 set will include $rows
             
@@ -580,7 +598,12 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                     $values = $this->getValues($srcData, $keys, false, false);
                     $midValues = array();
                 }
-                list ($rows, $rows2) = $this->getWithValues($values, false, $midValues, $multiple = !!$midValues);
+                if ($this->fieldLinks2) {
+                    $multiple = (bool) $midValues;
+                    list ($rows, $rows2) = $this->getWithValues($midValues, false, $values, $multiple);
+                } else {
+                    list ($rows, $rows2) = $this->getWithValues($values, false, array(), false);
+                }
                 if ($rows2) $rows = $rows2; // they are mutually exclusive -- see the logic above
                 if ($rows) {
                     $toSet = $rows;
@@ -607,6 +630,31 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             
         return $res;
     }
+
+    /**
+     * @param string|Ac_Model_Object $mapperOrId
+     */
+    function setDestMapper($mapperOrId) {
+        if (is_object($mapperOrId) && !($mapperOrId instanceof Ac_Model_Mapper)) {
+            throw Ac_E_InvalidCall::wrongClass('mapperOrId', $mapperOrId, 'Ac_Model_Mapper');
+        }
+        $this->destMapper = $mapperOrId;
+    }
+
+    /**
+     * @param bool $asIs Return mapper ID if no object was provided during setDestMapper() call
+     * @return Ac_Model_Mapper
+     */
+    function getDestMapper($asIs = false) {
+        if ($asIs) $res = $this->destMapper;
+        else {
+            $res = null;
+            if (is_object($this->destMapper)) $res = $this->destMapper;
+            elseif ($this->destMapper) 
+                $res = $this->application? $this->application->getMapper ($this->destMapper) : Ac_Model_Mapper::getMapper($this->destMapper);
+        }
+        return $res;
+    }
     
     function setProvider($provider) {
         $this->provider = $provider;
@@ -619,11 +667,10 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     function getProvider($asIs = false) {
         if (!$asIs && !is_object($this->provider)) {
             if (is_string($this->provider)) {
-                // TODO: some WTFery here: we just removed destMapper dependency
-                throw new Exception("Reltrieval of Ac_Model_Relation_Provider by id "
-                    . "({$this->provider}') isn't implemented yet "
-                    . "(destMapper dependency had just been removed from "
-                    . "Ac_Model_Relation_Impl)");
+                $mapper = $this->getDestMapper();
+                if (!$mapper) 
+                    throw new Ac_E_InvalidUsage("Cannot retrieve relation Provider by identifier string without having destMapper set");
+                $this->provider = $mapper->getRelationProviderByRelationId($this->provider);
             } elseif ($this->provider) {
                 $def = array();
                 if ($this->application) $def['application'] = $this->application;
@@ -688,10 +735,14 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                     $this->setVal($srcData[$dataKey], $this->srcCountVarName, count($m[0])); 
                 }
             }
-
+            
             if ($values) {
                 
-                $counts = $this->countWithValues($values, true);
+                if ($this->fieldLinks2) {
+                    $counts = $this->countWithValues(array(), true, $values);
+                } else {
+                    $counts = $this->countWithValues($values, true);
+                }
                 
                 if (count($keys) === 1) {
                     foreach ($map as $m) {
@@ -718,7 +769,12 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             }
             if (!$dontOverwriteLoaded || $this->isVarEmpty($srcData, $this->srcCountVarName)) {  
                 $values = $this->getValues($srcData, $keys, false, false);
-                $this->setVal($srcData, $this->srcCountVarName, $this->countWithValues($values, false, array(), false), $this->srcCountVarName);
+                if ($this->fieldLinks2) {
+                    $count = $this->countWithValues(array(), false, $values, false);
+                } else {
+                    $count = $this->countWithValues($values, false, array(), false);
+                }
+                $this->setVal($srcData, $this->srcCountVarName, $count, $this->srcCountVarName);
             }
         } else {
             trigger_error ('$srcData/$destData must be an array, a collection or an object', E_USER_ERROR);
@@ -1009,19 +1065,20 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
         return $res;
     }
     
-    protected function getWithValues ($values, $byKeys, $values2 = false, $multipleValues = true) {
+    protected function getWithValues($rightValues, $byKeys, $leftValues = array(), $multipleValues = true) {
         $prov = $this->getProvider();
         if (!$prov) throw new Ac_E_InvalidUsage("Cannot ".__FUNCTION__."(): \$provider not provided");
         
         // multiply
-        if (!$multipleValues) { 
-            $values = $values? array($values) : array();
+        if (!$multipleValues) {
+            $leftValues = $leftValues? array($leftValues) : array();
+            $byKeys = false;
+            $rightValues = $rightValues? array($rightValues) : array();
             $byKeys = false;
         }
         
-        if (!$values2) $values2 = array();
-
-        $res = $prov->getWithValues($values, $byKeys, $values2);
+        if (!$leftValues) $leftValues = array();
+        $res = $prov->getWithValues($rightValues, $byKeys, $leftValues);
         
         // de-multiply to one row
         if (!$multipleValues && $this->destIsUnique) {
@@ -1035,19 +1092,19 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     
     // TODO: optimize _countWithValues and _getWithValues to place instances into nested array faster when resultset is ordered
     
-    protected function countWithValues ($values, $separate = true, $values2 = false, $multipleValues = true) {
+    protected function countWithValues ($rightValues, $separate = true, $leftValues = false, $multipleValues = true) {
         $prov = $this->getProvider();
         if (!$prov) throw new Ac_E_InvalidUsage("Cannot getWithValues(): \$provider not provided");
         
         // multiply
         if (!$multipleValues) { 
-            $values = $values? array($values) : array();
+            $leftValues = $leftValues? array($leftValues) : array();
             $separate = false;
         }
         
-        if (!$values2) $values2 = array();
+        if (!$rightValues) $rightValues = array();
 
-        $res = $prov->countWithValues($values, $separate, $values2);
+        $res = $prov->countWithValues($rightValues, $separate, $leftValues);
         
         return $res;
     }

@@ -48,4 +48,15 @@ abstract class Ac_Model_Storage_Sql extends Ac_Model_Storage {
         return $this->db;
     }    
     
+    function setMapper(Ac_Model_Mapper $mapper = null) {
+        if (parent::setMapper($mapper)) {
+            if (!$this->application && $mapper) $this->setApplication($mapper->getApplication());
+        }
+    }
+    
+    function setApplication(Ac_Application $application) {
+        parent::setApplication($application);
+        if (!$this->db && $application) $this->setDb($application->getDb());
+    }
+    
 }

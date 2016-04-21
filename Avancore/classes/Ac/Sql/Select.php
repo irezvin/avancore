@@ -15,8 +15,26 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
 
     var $distinct = false;
     var $columns = array();
+    
+    /**
+     * Strings to put before joined aliases. If key of array matches alias of the table, the table won't be added
+     * along with 'regular joins' (useful when parts need to build custom joins)
+     */
     var $otherJoins = array();
+    
+    /**
+     * Strings to put after joined aliases. If key of array matches alias of the table, the table won't be added
+     * along with 'regular joins' (useful when parts need to build custom joins)
+     */
     var $otherJoinsAfter = array();
+    
+    /**
+     * Strings to put INSTEAD OF joined tables with matched keys (useful when parts need to build custom joins).
+     * Keys that don't match ones in $_usedAliases will be ignored.
+     * @var array 
+     */
+    var $joinOverrides = array();
+    
     var $orderBy = array();
     var $where = array();
     var $groupBy = array();
@@ -216,12 +234,28 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
         $this->beginCalc();
         $orderedAliases = $this->_getOrderedAliases($this->getUsedAliases());
         $res = '';
+        
+        // Ignore aliases overridden by otherJoins and otherJoinsAfter
+        if ($this->otherJoins) {
+            foreach (array_keys($this->otherJoins) as $j) {
+                if (!is_numeric($j)) $skipAliases[] = $j;
+            }
+        }
+        if ($this->otherJoinsAfter) {
+            foreach (array_keys($this->otherJoinsAfter) as $j) {
+                if (!is_numeric($j)) $skipAliases[] = $j;
+            }
+        }
+        
         if ($this->otherJoins) $res .= implode("\n", $this->otherJoins);
         if (!$withFirstAlias) $skipAliases[] = $orderedAliases[0];
         $first = true;
         foreach (array_diff($orderedAliases, $skipAliases) as $a) {
-            $tbl = $this->getTable($a);
-            $jcp = $tbl->getJoinClausePart(false, $first);
+            if (isset($this->joinOverrides[$a])) {
+                $jcp = $this->joinOverrides[$a];
+            } else {
+                $jcp = $this->getTable($a)->getJoinClausePart(false, $first);
+            }
             if (strlen($jcp)) {
             	if ($jcp{0} == ',') $res = $res.",\n".substr($jcp, 1);
             	else {
@@ -476,7 +510,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     }
     
     protected function listStateVars() {
-        return array('_usedAliases', 'distinct', 'columns', 'otherJoins', 'otherJoinsAfter', 'orderBy', 'where', 'groupBy', 'having', 'limitOffset', 'limitCount');
+        return array('_usedAliases', 'distinct', 'columns', 'otherJoins', 'otherJoinsAfter', 'joinOverrides', 'orderBy', 'where', 'groupBy', 'having', 'limitOffset', 'limitCount');
     }
     
     protected function pushState() {

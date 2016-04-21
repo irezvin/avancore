@@ -12,6 +12,8 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Tree_Combo_Mapper'; 
 
+    var $storage = 'Sample_Tree_Combo_Storage'; 
+
     var $columnNames = array ( 0 => 'id', 1 => 'leftCol', 2 => 'rightCol', 3 => 'parentId', 4 => 'ordering', 5 => 'title', 6 => 'tag', 7 => 'ignore', 8 => 'depth', ); 
 
     var $nullableColumns = array ( 0 => 'parentId', 1 => 'tag', ); 

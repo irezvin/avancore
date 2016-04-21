@@ -12,6 +12,8 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Product_Extra_Code_ImplMapper'; 
 
+    var $storage = 'Sample_Shop_Product_Extra_Code_Storage'; 
+
     var $columnNames = array ( 0 => 'productId', 1 => 'ean', 2 => 'asin', 3 => 'gtin', 4 => 'responsiblePersonId', ); 
 
     var $nullableColumns = array ( 0 => 'responsiblePersonId', ); 

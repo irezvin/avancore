@@ -176,8 +176,11 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
 		                if (!is_null($resArray)) $resArray[$collectionKey] = $item;
 			            if ($keyToCollection !== false) $collectionKey = Ac_Accessor::getObjectProperty($item, $keyToCollection, $k, $strictParams);
 			                else $collectionKey = $k;
-                        if ($setObjectPropertiesToDefaults) 
-                            Ac_Accessor::setObjectProperty($item, $defaults, null, $strictParams);
+                        if ($setObjectPropertiesToDefaults) {
+                            $tmp = $defaults;
+                            unset($tmp['class']);
+                            Ac_Accessor::setObjectProperty($item, $tmp, null, $strictParams);
+                        }
 			            $res[$collectionKey] = $item;
                     }
                 }

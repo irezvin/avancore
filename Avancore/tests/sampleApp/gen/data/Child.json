@@ -1739,8 +1739,10 @@
             "pluralCaption": "People",
             "parentClassName": "Sample_Person",
             "parentMapperClassName": "Sample_Person_Mapper",
+            "parentStorageClassName": "Sample_Person_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -1797,6 +1799,7 @@
                     "mapperClass": "Child_Person_Photo_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "FK_ac_person_photos_ac_people_portrait",
@@ -1842,6 +1845,7 @@
                     "mapperClass": "Child_Religion_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "FK_ac_person_religion",
@@ -1890,6 +1894,7 @@
                     "mapperClass": "Child_Tag_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -1945,6 +1950,7 @@
                     "mapperClass": "Child_Person_Album_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -1996,6 +2002,7 @@
                     "mapperClass": "Child_Person_Photo_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -2047,6 +2054,7 @@
                     "mapperClass": "Child_Person_Post_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -2098,6 +2106,7 @@
                     "mapperClass": "Child_Publish_ImplMapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -2149,6 +2158,7 @@
                     "mapperClass": "Child_Publish_ImplMapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -2200,6 +2210,7 @@
                     "mapperClass": "Child_Relation_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -2251,6 +2262,7 @@
                     "mapperClass": "Child_Relation_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -2302,6 +2314,7 @@
                     "mapperClass": "Child_Shop_Product_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -2353,6 +2366,7 @@
                     "mapperClass": "Child_Shop_Product_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -2836,8 +2850,10 @@
             "pluralCaption": "Perks",
             "parentClassName": "Sample_Perk",
             "parentMapperClassName": "Sample_Perk_Mapper",
+            "parentStorageClassName": "Sample_Perk_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -2895,6 +2911,7 @@
                     "mapperClass": "Child_Tag_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -3015,8 +3032,10 @@
             "pluralCaption": "Person albums",
             "parentClassName": "Sample_Person_Album",
             "parentMapperClassName": "Sample_Person_Album_Mapper",
+            "parentStorageClassName": "Sample_Person_Album_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -3069,6 +3088,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "FK__ac_people",
@@ -3117,6 +3137,7 @@
                     "mapperClass": "Child_Person_Photo_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -3279,8 +3300,10 @@
             "pluralCaption": "Person photos",
             "parentClassName": "Sample_Person_Photo",
             "parentMapperClassName": "Sample_Person_Photo_Mapper",
+            "parentStorageClassName": "Sample_Person_Photo_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -3333,6 +3356,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "FK_ac_person_photos_ac_people",
@@ -3381,6 +3405,7 @@
                     "mapperClass": "Child_Person_Album_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -3436,6 +3461,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -3487,6 +3513,7 @@
                     "mapperClass": "Child_Person_Post_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -3671,8 +3698,10 @@
             "pluralCaption": "Person posts",
             "parentClassName": "Sample_Person_Post",
             "parentMapperClassName": "Sample_Person_Post_Mapper",
+            "parentStorageClassName": "Sample_Person_Post_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -3731,6 +3760,7 @@
                     "mapperClass": "Child_Publish_ImplMapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "fkPostPublish",
@@ -3776,6 +3806,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "FK__ac_post_person",
@@ -3821,6 +3852,7 @@
                     "mapperClass": "Child_Person_Photo_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "FK__ac_post_photo",
@@ -4161,8 +4193,10 @@
             "pluralCaption": "Publish",
             "parentClassName": "Ac_Model_Mixable_ExtraTable",
             "parentMapperClassName": "Sample_Publish_ImplMapper",
+            "parentStorageClassName": "Sample_Publish_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -4224,6 +4258,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "fkPubAuthor",
@@ -4269,6 +4304,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "fkPubEditor",
@@ -4317,6 +4353,7 @@
                     "mapperClass": "Child_Person_Post_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -4368,6 +4405,7 @@
                     "mapperClass": "Child_Shop_Category_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -4419,6 +4457,7 @@
                     "mapperClass": "Child_Shop_Product_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -4904,8 +4943,10 @@
             "pluralCaption": "Relation types",
             "parentClassName": "Sample_Relation_Type",
             "parentMapperClassName": "Sample_Relation_Type_Mapper",
+            "parentStorageClassName": "Sample_Relation_Type_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -4961,6 +5002,7 @@
                     "mapperClass": "Child_Relation_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -5109,8 +5151,10 @@
             "pluralCaption": "Relations",
             "parentClassName": "Sample_Relation",
             "parentMapperClassName": "Sample_Relation_Mapper",
+            "parentStorageClassName": "Sample_Relation_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -5166,6 +5210,7 @@
                     "mapperClass": "Child_Relation_Type_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "FK_ac_relations_3",
@@ -5211,6 +5256,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "FK_ac_relations_incoming",
@@ -5256,6 +5302,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "FK_ac_relations_outgoing",
@@ -5546,8 +5593,10 @@
             "pluralCaption": "Religion",
             "parentClassName": "Sample_Religion",
             "parentMapperClassName": "Sample_Religion_Mapper",
+            "parentStorageClassName": "Sample_Religion_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -5603,6 +5652,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -5719,8 +5769,10 @@
             "pluralCaption": "Shop categories",
             "parentClassName": "Sample_Shop_Category",
             "parentMapperClassName": "Sample_Shop_Category_Mapper",
+            "parentStorageClassName": "Sample_Shop_Category_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -5785,6 +5837,7 @@
                     "mapperClass": "Child_Publish_ImplMapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "fkCategoryPublish",
@@ -5833,6 +5886,7 @@
                     "mapperClass": "Child_Shop_Product_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -6267,8 +6321,10 @@
             "pluralCaption": "Shop product extra codes",
             "parentClassName": "Ac_Model_Mixable_ExtraTable",
             "parentMapperClassName": "Sample_Shop_Product_Extra_Code_ImplMapper",
+            "parentStorageClassName": "Sample_Shop_Product_Extra_Code_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -6324,6 +6380,7 @@
                     "mapperClass": "Child_Shop_Product_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "fkExtraCodeProduct",
@@ -6369,6 +6426,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "fkExtraCodeResponsiblePerson",
@@ -6635,8 +6693,10 @@
             "pluralCaption": "Shop product notes",
             "parentClassName": "Ac_Model_Mixable_ExtraTable",
             "parentMapperClassName": "Sample_Shop_Product_Note_ImplMapper",
+            "parentStorageClassName": "Sample_Shop_Product_Note_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -6692,6 +6752,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "fkProductNoteAuthor",
@@ -6737,6 +6798,7 @@
                     "mapperClass": "Child_Shop_Product_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "fkProductNoteProduct",
@@ -6893,8 +6955,10 @@
             "pluralCaption": "Shop products",
             "parentClassName": "Sample_Shop_Product",
             "parentMapperClassName": "Sample_Shop_Product_Mapper",
+            "parentStorageClassName": "Sample_Shop_Product_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -6969,6 +7033,7 @@
                     "mapperClass": "Child_Publish_ImplMapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "fkPersonPublish",
@@ -7017,6 +7082,7 @@
                     "mapperClass": "Child_Shop_Category_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -7072,6 +7138,7 @@
                     "mapperClass": "Child_Shop_Product_Extra_Code_ImplMapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -7123,6 +7190,7 @@
                     "mapperClass": "Child_Shop_Product_Note_ImplMapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -7174,6 +7242,7 @@
                     "mapperClass": "Child_Shop_Product_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -7229,6 +7298,7 @@
                     "mapperClass": "Child_Shop_Product_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -7436,6 +7506,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": "fkProductNoteAuthor",
@@ -7657,8 +7728,10 @@
             "pluralCaption": "Tags",
             "parentClassName": "Sample_Tag",
             "parentMapperClassName": "Sample_Tag_Mapper",
+            "parentStorageClassName": "Sample_Tag_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -7717,6 +7790,7 @@
                     "mapperClass": "Child_Person_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -7772,6 +7846,7 @@
                     "mapperClass": "Child_Perk_Mapper",
                     "relationOverrides": [],
                     "associationOverrides": [],
+                    "relationProviderOverrides": [],
                     "modelRelation": {
                         "__class": "Ac_Cg_Model_Relation",
                         "relationName": [
@@ -7963,8 +8038,10 @@
             "pluralCaption": "Tree adjacent",
             "parentClassName": "Sample_Tree_Adjacent",
             "parentMapperClassName": "Sample_Tree_Adjacent_Mapper",
+            "parentStorageClassName": "Sample_Tree_Adjacent_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -8166,8 +8243,10 @@
             "pluralCaption": "Tree combos",
             "parentClassName": "Sample_Tree_Combo",
             "parentMapperClassName": "Sample_Tree_Combo_Mapper",
+            "parentStorageClassName": "Sample_Tree_Combo_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],
@@ -8494,8 +8573,10 @@
             "pluralCaption": "Tree records",
             "parentClassName": "Sample_Tree_Record",
             "parentMapperClassName": "Sample_Tree_Record_Mapper",
+            "parentStorageClassName": "Sample_Tree_Record_Storage",
             "parentClassIsAbstract": false,
             "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
             "parentFinderClassName": false,
             "parentFinderClassIsAbstract": false,
             "properties": [],

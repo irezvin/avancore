@@ -7,6 +7,8 @@ class Child_Shop_Product_Base_Mapper extends Sample_Shop_Product_Mapper {
     var $recordClass = 'Child_Shop_Product'; 
 
     var $id = 'Child_Shop_Product_Mapper'; 
+
+    var $storage = 'Child_Shop_Product_Storage'; 
  
  
     protected function doGetCoreMixables() { 

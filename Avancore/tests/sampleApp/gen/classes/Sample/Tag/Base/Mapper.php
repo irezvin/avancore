@@ -12,6 +12,8 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Tag_Mapper'; 
 
+    var $storage = 'Sample_Tag_Storage'; 
+
     var $columnNames = array ( 0 => 'tagId', 1 => 'title', 2 => 'titleM', 3 => 'titleF', ); 
 
     var $nullableColumns = array ( 0 => 'titleM', 1 => 'titleF', ); 

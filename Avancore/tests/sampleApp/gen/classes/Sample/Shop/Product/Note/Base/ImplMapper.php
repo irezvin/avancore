@@ -12,6 +12,8 @@ class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Product_Note_ImplMapper'; 
 
+    var $storage = 'Sample_Shop_Product_Note_Storage'; 
+
     var $columnNames = array ( 0 => 'productId', 1 => 'note', 2 => 'noteAuthorId', ); 
 
     var $nullableColumns = array ( 0 => 'noteAuthorId', ); 
