@@ -79,7 +79,7 @@ class Ac_Cg_Frontend {
         }
         if ($prefix) $prefix = implode(", ", $prefix)." - ";
             else $prefix = '';
-        $res = $prefix . "Avancore CodeGen v. 0.0.6 &copy; 2008 &mdash; 2015 Ilya Rezvin";
+        $res = $prefix . "Avancore CodeGen v. 0.0.7 &copy; 2008 &mdash; 2016 Ilya Rezvin";
         
         return $res;
     }

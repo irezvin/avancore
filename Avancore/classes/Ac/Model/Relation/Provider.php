@@ -13,9 +13,30 @@ abstract class Ac_Model_Relation_Provider extends Ac_Prototyped {
      */
     protected $unique = false;
     
-    abstract function getWithValues (array $rightValues, $byKeys = true, array $leftValues = array());
+    function getWithValues (array $destValues, $byKeys = true, array $srcValues = array()) {
+        if ($srcValues && (!$this->acceptsSrcValues())) 
+            throw new Ac_E_InvalidUsage(__METHOD__.': \$srcValues MUST be empty when acceptsSrcValues() is FALSE');
+        return $this->doGetWithValues($destValues, $byKeys, $srcValues);
+    }
     
-    abstract function countWithValues (array $rightValues, $byKeys = true, array $leftValues = array());
+    function countWithValues (array $destValues, $byKeys = true, array $srcValues = array()) {
+        if ($srcValues && (!$this->acceptsSrcValues())) 
+            throw new Ac_E_InvalidUsage(__METHOD__.': \$srcValues MUST be empty when acceptsSrcValues() is FALSE');
+        return $this->doCountWithValues($destValues, $byKeys, $srcValues);
+    }
+
+    abstract protected function doGetWithValues (array $destValues, $byKeys = true, array $srcValues = array());
+    
+    abstract protected function doCountWithValues (array $destValues, $byKeys = true, array $srcValues = array());
+    
+    
+    /**
+     * Whether getWithValues() / countWithValues() can properly handle non-empty $srcValues
+     * @return boolean
+     */
+    function acceptsSrcValues() {
+        return false;
+    }
     
     function setApplication(Ac_Application $application) {
         if ($application !== ($oldApplication = $this->application)) {

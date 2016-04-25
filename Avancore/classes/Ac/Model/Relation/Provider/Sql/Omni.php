@@ -9,6 +9,12 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
     protected $tableName = false;
 
     /**
+     * one or several keys A) in the table B) in mid table
+     * @var array
+     */
+    protected $destKeys = false;
+
+    /**
      * name of many-to-many table (FALSE or empty string if none)
      * @var string
      */
@@ -18,17 +24,18 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
      * alias of many-to-many table
      */
     protected $midTableAlias = false;
-
-    /**
-     * associative array of relations between many-to-many table and records table
-     */
-    protected $midLinks = false;
     
     /**
-     * one or several keys A) in the table B) in mid table
+     * keys of mid-table that correspond to srcValues. Must be set along with midTableName and midSrcKeys to allow mixed src-dest loading
      * @var array
      */
-    protected $keys = false;
+    protected $midSrcKeys = array();
+
+    /**
+     * keys of mid-table that correspond to destValues/destKeys. Must be set along with midTableName and midDest keys to allow mixed src-dest loading
+     * @var array
+     */
+    protected $midDestKeys = array();
 
     /**
      * mapper that provides destination objects (null or FALSE if no mapper used)
@@ -49,38 +56,75 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
      * restriction for rows in many-to-many table
      */
     protected $midWhere = false;
-
+    
     /**
      * extra joins to add to the SQL (alias of right table is `t`)
      */
     protected $extraJoins = false;
 
-    function getWithValues (array $rightValues = array(), $byKeys = true, array $leftValues = array()) {
+    function acceptsSrcValues() {
+        $res = strlen($this->midTableName) && $this->midSrcKeys && $this->midDestKeys;
+        return $res;
+    }
+
+    /**
+     * Sets keys of mid-table that correspond to srcValues. Must be set along with midTableName and midSrcKeys to allow mixed src-dest loading
+     */
+    function setMidSrcKeys(array $midSrcKeys) {
+        $this->midSrcKeys = $midSrcKeys;
+    }
+
+    /**
+     * Returns keys of mid-table that correspond to srcValues. Must be set along with midTableName and midSrcKeys to allow mixed src-dest loading
+     * @return array
+     */
+    function getMidSrcKeys() {
+        return $this->midSrcKeys;
+    }
+
+    /**
+     * Sets keys of mid-table that correspond to destValues/destKeys. Must be set along with midTableName and midDest keys to allow mixed src-dest loading
+     */
+    function setMidDestKeys(array $midDestKeys) {
+        $this->midDestKeys = $midDestKeys;
+    }
+
+    /**
+     * Returns keys of mid-table that correspond to destValues/destKeys. Must be set along with midTableName and midDest keys to allow mixed src-dest loading
+     * @return array
+     */
+    function getMidDestKeys() {
+        return $this->midDestKeys;
+    }    
+    
+    protected function doGetWithValues (array $destValues = array(), $byKeys = true, array $srcValues = array()) {
         
         $ta = 't';
         $asTa = 'AS t';
         $cols = 't.*'; 
         
-        $indexKeys = $this->keys;
         $useMidTable = false;
         
         // return empty result
-        if (!count($leftValues) && !count($rightValues)) return array(array(), array());
+        if (!count($srcValues) && !count($destValues)) return array(array(), array());
 
-        $leftIndexed = array();
-        $rightIndexed = array();
+        $srcIndexed = array();
+        $destIndexed = array();
         $rows = array();
         
-        if ($this->midTableName && $leftValues) {
-            $useMidTable = true;
+        if ($this->midTableName && $srcValues) {
             
+            if (count($this->midDestKeys) !== count($this->destKeys)) 
+                throw new Ac_E_InvalidUsage ("Number of elements in \$midDestKeys must be equal to one in \$destKeys");
+            
+            $useMidTable = true;
             $lta = $this->midTableAlias.'.';
-            $crit = $this->makeSqlCriteria($leftValues, $indexKeys, $this->midTableAlias);
+            $crit = $this->makeSqlCriteria($srcValues, $this->midSrcKeys, $this->midTableAlias);
             $extraJoinCrit = false;
-            if ($rightValues) { // worst case: we need to combine left values (left keys of mid table) and right values
+            if ($destValues) { // worst case: we need to combine left values (left keys of mid table) and right values
                 $join = 'RIGHT';
                 $notNullC = array();
-                foreach ($indexKeys as $fieldName) {
+                foreach ($this->midSrcKeys as $fieldName) {
                     $notNullC[$fieldName] = $this->midTableAlias.".".$fieldName." IS NOT NULL";
                 }
                 $notNullC = "(".implode(" AND ", $notNullC).")";
@@ -90,7 +134,7 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
                     if (strlen($extraJoinCrit)) $extraJoinCrit = "({$extraJoinCrit}) AND ({$strMidWhere})";
                         else $extraJoinCrit = $strMidWhere;
                 }
-                $crit = $notNullC." OR (".$this->makeSqlCriteria($rightValues, array_values($this->midLinks), strlen($ta)? $ta : $this->tableName).")";
+                $crit = $notNullC." OR (".$this->makeSqlCriteria($destValues, $this->destKeys, strlen($ta)? $ta : $this->tableName).")";
             } else {
                 $join = 'INNER';
                 if ($this->midWhere) {
@@ -100,34 +144,27 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
                 }
             }
             $fromWhere = ' FROM '.$this->db->n($this->midTableName).' AS '.$this->midTableAlias
-                .' '.$this->getJoin($join, $this->midTableAlias, $this->tableName, $ta, $this->midLinks, $extraJoinCrit);
+                .' '.$this->getJoin($join, $this->midTableAlias, $this->tableName, $ta, array_combine($this->midDestKeys, $this->destKeys), $extraJoinCrit);
         } else {
             $fromWhere = ' FROM '.$this->db->n($this->tableName).$asTa;
             $lta = $this->db->n($this->tableName).'.';
-            if ($rightValues) {
-                if ($this->midLinks) $indexKeys = array_values($this->midLinks);
-                $crit = $this->makeSqlCriteria($rightValues, $indexKeys, $ta);
-            } else {
-                $crit = $this->makeSqlCriteria($leftValues, $indexKeys, $ta);
-            }
+            $crit = $this->makeSqlCriteria($destValues, $this->destKeys, $ta);
         }
         if ($this->extraJoins) $fromWhere .= ' '.$this->extraJoins;
         $fromWhere .= ' WHERE ('.$crit.')';
         if ($this->where) $fromWhere .= ' AND ('.$this->getStrWhere().')'; 
 
-        foreach ($indexKeys as $key) $qKeys[] = $lta.$this->db->n($key);
-        $sKeys = implode(', ', $qKeys);
         $sql = 'SELECT ';
         if ($this->midTableName && $useMidTable) {
+            foreach ($this->midSrcKeys as $key) $qKeys[] = $lta.$this->db->n($key);
+            $sKeys = implode(', ', $qKeys);
             $sql .= 'DISTINCT '.$sKeys.', '.$this->db->n($ta? $ta: $this->tableName).'.*'.$fromWhere;
         } else $sql = 'SELECT '.$cols.' '.$fromWhere;
         if ($this->ordering) {
             $sql .= ' ORDER BY '.$this->ordering;
         }
         
-        //var_dump($sql);
-        
-        if ($this->midTableName && $useMidTable) {
+        if ($useMidTable) {
         
             $rr = $this->db->getResultResource($sql);
             $fi = $this->db->resultGetFieldsInfo($rr);
@@ -152,30 +189,27 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
             }
             
             if ($byKeys) {
-                if (count($indexKeys) === 1) {
-                    $key = $indexKeys[0];
+                if (count($this->midSrcKeys) === 1) {
+                    $key = $this->midSrcKeys[0];
                     if ($this->unique) {
                         foreach ($mid as $i => $keyValue) 
-                            $leftIndexed[$keyValue[$key]] = $objects[$i];
+                            $srcIndexed[$keyValue[$key]] = $objects[$i];
                     } else {
                         foreach ($mid as $i => $keyValue) 
-                            $leftIndexed[$keyValue[$key]][] = $objects[$i];
+                            $srcIndexed[$keyValue[$key]][] = $objects[$i];
                     }
                 } else {
                     foreach ($mid as $i => $keyValue) {
-                        Ac_Util::simpleSetArrayByPathNoRef($leftIndexed, array_values($keyValue), $objects[$i], $this->unique);
+                        Ac_Util::simpleSetArrayByPathNoRef($srcIndexed, array_values($keyValue), $objects[$i], $this->unique);
                     }
                 }
             } else {
-                $leftIndexed = $objects;
+                $srcIndexed = $objects;
             }
             $this->db->resultFreeResource($rr);
-            if ($rightValues) {
-                // next group will index the items by the keys in right table
-                $indexKeys = array_values($this->midLinks);
-            }
         }
-        if (!$useMidTable || $rightValues) {
+        if (!$useMidTable || $destValues) {
+            $indexKeys = $this->destKeys;
             $indexedItems = array();
             if (!$useMidTable) {
                 $rows = $this->db->fetchArray($sql);
@@ -202,44 +236,53 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
             } else {
                 $indexedItems = $objects;     
             }
-            $rightIndexed = $indexedItems;
+            $destIndexed = $indexedItems;
         }
-        $res = array($rightIndexed, $leftIndexed);
+        $res = array($destIndexed, $srcIndexed);
         return $res;
     }
     
-    function countWithValues (array $rightValues, $separate = true, array $leftValues = array()) {
+    protected function doCountWithValues (array $destValues, $separate = true, array $srcValues = array()) {
 
+        // important: implies that mid and dest table are 1-1 linked, and have consistent referential integrity 
+        // (when mid table is used, counts its' dest keys instead of dest records)
+        
         if ($this->midTableName) {
-            if ($rightValues && !$separate) { // we don't need RIGHT JOIN trick with $separate
-                $lta = $this->midTableAlias.'.';
-                $extraJoinCrit = $this->makeSqlCriteria($leftValues, $this->keys, $this->midTableAlias);
-                $keys2 = array_values($this->midLinks);
+            $countKeys = $this->midSrcKeys;
+            $countTableAlias = $this->midTableAlias.'.';
+            if ($destValues && !$separate) { // we don't need RIGHT JOIN trick with $separate
+                
+                if (count($this->midDestKeys) !== count($this->destKeys)) 
+                    throw new Ac_E_InvalidUsage ("Number of elements in \$midDestKeys must be equal to one in \$destKeys");
+                
+                $extraJoinCrit = $this->makeSqlCriteria($srcValues, $this->midSrcKeys, $this->midTableAlias);
                 $join = 'RIGHT';
                 $notNullC = array();
-                foreach ($this->keys as $fieldName) {
+                foreach ($this->midSrcKeys as $fieldName) {
                     $notNullC[$fieldName] = $this->midTableAlias.".".$fieldName." IS NOT NULL";
                 }
                 $notNullC = "(".implode(" AND ", $notNullC).")";
-                $crit = $notNullC." OR (".$this->makeSqlCriteria($rightValues, $keys2, $this->tableName).")";
+                $crit = $notNullC." OR (".$this->makeSqlCriteria($destValues, $this->destKeys, $this->tableName).")";
                 if ($this->midWhere) {
                     $strMidWhere = $this->getStrMidWhere($this->midTableAlias);
                     if (strlen($extraJoinCrit)) $extraJoinCrit = "({$extraJoinCrit}) AND ({$strMidWhere})";
                         else $extraJoinCrit = $strMidWhere;
                 }
                 $fromWhere = ' FROM '.$this->db->n($this->midTableName).' AS '.$this->midTableAlias
-                    .' '.$this->getJoin($join, $this->midTableAlias, $this->tableName, $this->tableName, $this->midLinks, $extraJoinCrit);
+                    .' '.$this->getJoin($join, $this->midTableAlias, $this->tableName, $this->tableName, array_combine($this->midDestKeys, $this->destKeys), $extraJoinCrit);
             } else {
-                if (!$leftValues) return array();
+                // when no destValues are provided, and we have mid-table, we count only right keys in mid table;
+                // we don't even join the dest table
+                if (!$srcValues) return array();
                 $fromWhere = ' FROM '.$this->db->n($this->midTableName).' AS '.$this->midTableAlias;
-                $lta = $this->midTableAlias.'.';
-                $crit = $this->makeSqlCriteria($leftValues, $this->keys, $this->midTableAlias);
+                $crit = $this->makeSqlCriteria($srcValues, $this->midSrcKeys, $this->midTableAlias);
                 if ($this->midWhere !== false) $crit = "( $crit ) AND (".$this->getStrMidWhere($this->midTableAlias).")";
             }
         } else {
+            $countKeys = $this->destKeys;
+            $countTableAlias = $this->db->n($this->tableName).'.';
             $fromWhere = ' FROM '.$this->db->n($this->tableName);
-            $lta = $this->db->n($this->tableName).'.';
-            $crit = $this->makeSqlCriteria($leftValues, $this->keys, '');
+            $crit = $this->makeSqlCriteria($srcValues, $this->destKeys, '');
         }
         
         if ($this->extraJoins) $fromWhere .= ' '.$this->extraJoins;
@@ -253,29 +296,26 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
             $res = $this->db->fetchValue($sql);
         } else {
             $qKeys = array();
-            foreach ($this->keys as $key) $qKeys[] = $lta.$this->db->n($key);
+            foreach ($countKeys as $key) $qKeys[] = $countTableAlias.$this->db->n($key);
             $sKeys = implode(', ', $qKeys);
             $i = 0;
-            while(in_array($cntColumn = '__count__'.$i, $this->keys)) $i++; 
+            while(in_array($cntColumn = '__count__'.$i, $this->destKeys)) $i++; 
             $sql = 'SELECT '.$sKeys.', COUNT(*) AS '.$this->db->n($cntColumn).$fromWhere.' GROUP BY '.$sKeys;
             $res = array();
-            $rr = $this->db->getResultResource($sql);
+            $rows = $this->db->fetchArray($sql);
             if ($separate) {
-                if (count($this->keys) === 1) {
-                    $key = $this->keys[0];
-                    while($row = $this->db->resultFetchAssoc($rr)) {
-                        $res[$row[$key]] = $row[$cntColumn];        
-                    }
+                if (count($countKeys) === 1) {
+                    $key = $countKeys[0];
+                    foreach ($rows as $row) 
+                        $res[$row[$key]] = $row[$cntColumn];
                 } else {
-                    while($row = $this->db->resultFetchAssoc($rr)) {
-                        $this->putRowToArray($row, $row[$cntColumn], $res, $this->keys, true);        
-                    }
+                    foreach ($rows as $row) 
+                        $this->putRowToArray($row, $row[$cntColumn], $res, $countKeys, true);        
                 }
             } else {
-                while($row = $this->db->resultFetchAssoc($rr)) 
+                foreach ($rows as $row)
                     $res[] = $row[$cntColumn];     
             }
-            $this->db->resultFreeResource($rr);
         }
         return $res;
     }
@@ -329,16 +369,16 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
     /**
      * Sets one or several referenced keys A in the table B in the many-to-many table
      */
-    function setKeys(array $keys) {
-        $this->keys = array_values($keys);
+    function setDestKeys(array $destKeys) {
+        $this->destKeys = array_values($destKeys);
     }
 
     /**
      * Returns one or several referenced keys A in the table B in the many-to-many table
      * @return array
      */
-    function getKeys() {
-        return $this->keys;
+    function getDestKeys() {
+        return $this->destKeys;
     }
 
     /**
@@ -436,20 +476,6 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
         return $res;
     }
 
-    /**
-     * Sets associative array of relations between many-to-many table and records table
-     */
-    function setMidLinks($midLinks) {
-        $this->midLinks = $midLinks;
-    }
-
-    /**
-     * Returns associative array of relations between many-to-many table and records table
-     */
-    function getMidLinks() {
-        return $this->midLinks;
-    }
-    
     static function evaluatePrototype(array $relationProps) {
         // todo: replace with something better
         $res = array(
@@ -457,7 +483,8 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
             'db' => $relationProps['db'],
             'tableName' => $relationProps['destTableName'],
             'mapper' => isset($relationProps['destMapper'])? $relationProps['destMapper'] : false,
-            'keys' => array_values($relationProps['fieldLinks']),
+            'destKeys' => isset($relationProps['fieldLinks2']) && $relationProps['fieldLinks2']? 
+                array_values($relationProps['fieldLinks2']) : array_values($relationProps['fieldLinks']),
             'ordering' => isset($relationProps['destOrdering'])? $relationProps['destOrdering'] : false,
             'extraJoins' => isset($relationProps['destExtraJoins'])? $relationProps['destExtraJoins'] : false,
             'where' => isset($relationProps['destWhere'])? $relationProps['destWhere'] : false,
@@ -466,7 +493,8 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
         if (isset($relationProps['midTableName']) && $relationProps['midTableName']) {
             $res = array_merge($res, array(
                 'midTableName' => $relationProps['midTableName'],
-                'midLinks' => $relationProps['fieldLinks2'],
+                'midSrcKeys' => array_values($relationProps['fieldLinks']),
+                'midDestKeys' => array_keys($relationProps['fieldLinks2']),
                 'midWhere' => $relationProps['midWhere'],
                 'midTableAlias' => $relationProps['midTableAlias'],
             ));

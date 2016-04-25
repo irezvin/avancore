@@ -429,7 +429,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             if ($matchMode == Ac_Model_Relation_Abstract::RESULT_ORIGINAL_KEYS || $matchMode == Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS || $matchMode === Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS && $midMap) {
                 $res = array();
                 if ($matchMode !== Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS && $lRows) $this->unmapResult($keys, $map, $matchMode, $res, $lRows, $defaultValue, $destIsUnique, false);
-                    else $res = $lRows;
+                    else $res = $midMap? $lRows : $rows;
                 if ($midMap) {
                     $this->unmapResult(array_values($this->fieldLinks2), $midMap, $matchMode, $res, $rows, 
                         $defaultValue, $destIsUnique, true);                    
@@ -1065,20 +1065,20 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
         return $res;
     }
     
-    protected function getWithValues($rightValues, $byKeys, $leftValues = array(), $multipleValues = true) {
+    protected function getWithValues($destValues, $byKeys, $srcValues = array(), $multipleValues = true) {
         $prov = $this->getProvider();
         if (!$prov) throw new Ac_E_InvalidUsage("Cannot ".__FUNCTION__."(): \$provider not provided");
         
         // multiply
         if (!$multipleValues) {
-            $leftValues = $leftValues? array($leftValues) : array();
+            $srcValues = $srcValues? array($srcValues) : array();
             $byKeys = false;
-            $rightValues = $rightValues? array($rightValues) : array();
+            $destValues = $destValues? array($destValues) : array();
             $byKeys = false;
         }
         
-        if (!$leftValues) $leftValues = array();
-        $res = $prov->getWithValues($rightValues, $byKeys, $leftValues);
+        if (!$srcValues) $srcValues = array();
+        $res = $prov->getWithValues($destValues, $byKeys, $srcValues);
         
         // de-multiply to one row
         if (!$multipleValues && $this->destIsUnique) {
@@ -1092,19 +1092,20 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     
     // TODO: optimize _countWithValues and _getWithValues to place instances into nested array faster when resultset is ordered
     
-    protected function countWithValues ($rightValues, $separate = true, $leftValues = false, $multipleValues = true) {
+    protected function countWithValues ($destValues, $separate = true, $srcValues = false, $multipleValues = true) {
         $prov = $this->getProvider();
         if (!$prov) throw new Ac_E_InvalidUsage("Cannot getWithValues(): \$provider not provided");
         
         // multiply
         if (!$multipleValues) { 
-            $leftValues = $leftValues? array($leftValues) : array();
+            $srcValues = $srcValues? array($srcValues) : array();
+            $destValues = $destValues? array($destValues) : array();
             $separate = false;
         }
         
-        if (!$rightValues) $rightValues = array();
+        if (!$destValues) $destValues = array();
 
-        $res = $prov->countWithValues($rightValues, $separate, $leftValues);
+        $res = $prov->countWithValues($destValues, $separate, $srcValues);
         
         return $res;
     }
