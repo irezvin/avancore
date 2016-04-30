@@ -115,6 +115,21 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     protected $destLoadedVarName = false;
     
     /**
+     * method to load NN Ids of all src records.
+     * Will be used when no midTableName is provided or when Provider::acceptsSrcValues() returns FALSE. 
+     * Set to array(true, 'mapperMethodName') to use Mapper method. Will use only one argument - array of objects to load NN Ids for.
+     */
+    protected $srcLoadNNIdsMethod = false;
+
+    /**
+     * method to load NN Ids of all dest records (used by DestImpl only).
+     * Will be used when no midTableName is provided or when Provider::acceptsSrcValues() returns FALSE.
+     * Set to array(true, 'mapperMethodName') to use Mapper method.
+     * Will use only one argument - array of objects to load NN Ids for.
+     */
+    protected $destLoadNNIdsMethod = false;
+    
+    /**
      * @var Ac_Sql_Db
      */
     protected $db = false;
@@ -744,6 +759,52 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      */
     function getDestLoadedVarName() {
         return $this->destLoadedVarName;
+    }
+    
+    /**
+     * Sets method to load NN Ids of all src records.
+     * Will be used when no midTableName is provided or when Provider::acceptsSrcValues() returns FALSE. 
+     * Set to array(true, 'mapperMethodName') to use Mapper method. Will use only one argument - array of objects to load NN Ids for.
+     */
+    function setSrcLoadNNIdsMethod($srcLoadNNIdsMethod) {
+        if ($srcLoadNNIdsMethod !== ($oldSrcLoadNNIdsMethod = $this->srcLoadNNIdsMethod)) {
+            if ($this->immutable) throw self::immutableException();
+            $this->srcLoadNNIdsMethod = $srcLoadNNIdsMethod;
+            $this->reset();
+        }
+    }
+
+    /**
+     * Returns method to load NN Ids of all src records.
+     * Will be used when no midTableName is provided or when Provider::acceptsSrcValues() returns FALSE. 
+     * Set to array(true, 'mapperMethodName') to use Mapper method. Will use only one argument - array of objects to load NN Ids for.
+     */
+    function getSrcLoadNNIdsMethod() {
+        return $this->srcLoadNNIdsMethod;
+    }
+
+    /**
+     * Sets method to load NN Ids of all dest records (used by DestImpl only).
+     * Will be used when no midTableName is provided or when Provider::acceptsSrcValues() returns FALSE.
+     * Set to array(true, 'mapperMethodName') to use Mapper method.
+     * Will use only one argument - array of objects to load NN Ids for.
+     */
+    function setDestLoadNNIdsMethod($destLoadNNIdsMethod) {
+        if ($destLoadNNIdsMethod !== ($oldDestLoadNNIdsMethod = $this->destLoadNNIdsMethod)) {
+            if ($this->immutable) throw self::immutableException();
+            $this->destLoadNNIdsMethod = $destLoadNNIdsMethod;
+            $this->reset();
+        }
+    }
+
+    /**
+     * Returns method to load NN Ids of all dest records (used by DestImpl only).
+     * Will be used when no midTableName is provided or when Provider::acceptsSrcValues() returns FALSE.
+     * Set to array(true, 'mapperMethodName') to use Mapper method.
+     * Will use only one argument - array of objects to load NN Ids for.
+     */
+    function getDestLoadNNIdsMethod() {
+        return $this->destLoadNNIdsMethod;
     }    
 
     /**
@@ -1090,6 +1151,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'srcCountVarName' => $this->srcCountVarName,
                 'destCountVarName' => $this->destCountVarName,
                 'srcLoadedVarName' => $this->srcLoadedVarName,
+                'srcLoadNNIdsMethod' => $this->srcLoadNNIdsMethod,
                 'destOrdering' => $this->destOrdering,
                 'destExtraJoins' => $this->destExtraJoins,
                 'destWhere' => $this->destWhere,
@@ -1120,6 +1182,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'srcCountVarName' => $this->destCountVarName,
                 'destCountVarName' => $this->srcCountVarName,
                 'srcLoadedVarName' => $this->destLoadedVarName,
+                'srcLoadNNIdsMethod' => $this->destLoadNNIdsMethod,
                 'destOrdering' => $this->srcOrdering,
                 'destExtraJoins' => $this->srcExtraJoins,
                 'destWhere' => $this->srcWhere,

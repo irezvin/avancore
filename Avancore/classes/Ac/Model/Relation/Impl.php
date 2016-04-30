@@ -70,6 +70,8 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
      */
     protected $srcLoadedVarName = false;
     
+    protected $srcLoadNNIdsMethod = false;
+    
     /**
      * @var Ac_Model_Relation_Impl
      */
@@ -387,6 +389,18 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     function getSrcLoadedVarName() {
         return $this->srcLoadedVarName;
     }
+    
+    function setSrcLoadNNIdsMethod($srcLoadNNIdsMethod) {
+        if ($srcLoadNNIdsMethod !== ($oldSrcLoadNNIdsMethod = $this->srcLoadNNIdsMethod)) {
+            if ($this->immutable) throw self::immutableException();
+            $this->srcLoadNNIdsMethod = $srcLoadNNIdsMethod;
+            $this->reset();
+        }
+    }
+
+    function getSrcLoadNNIdsMethod() {
+        return $this->srcLoadNNIdsMethod;
+    }
 
     // ----------------------- getDest... family ---------------------
     
@@ -408,8 +422,8 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             if ($matchMode != Ac_Model_Relation_Abstract::RESULT_PLAIN) {
                 $map = array();
                 $midMap = array();
-                $this->makeMapAndGetAllValues($srcData, $map, $values, $keys, false, $this->srcNNIdsVarName, 
-                    $midMap, $midValues, $midKeys, $matchMode == Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
+                $this->makeMapAndGetAllValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded,
+                    false, $matchMode == Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
             } else {
                 $this->getAllValues($srcData, $values, $keys, $this->srcNNIdsVarName, $midValues, $midKeys);
             }
@@ -479,8 +493,8 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             }
             if ($separate && $matchMode !== Ac_Model_Relation_Abstract::RESULT_PLAIN) {
                 $map = array();
-                $this->makeMapAndGetAllValues($srcData, $map, $values, $keys, 
-                    false, $this->srcNNIdsVarName, $midMap, $midValues, $midKeys, $matchMode === Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
+                $this->makeMapAndGetAllValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded, 
+                    false, $matchMode === Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
             } else {
                 $midMap = array();
                 $this->getAllValues($srcData, $values, $keys, $this->srcNNIdsVarName, $midValues, $midKeys);
@@ -542,9 +556,8 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
 
             $instancesVar = $dontOverwriteLoaded? $this->srcVarName : false;
             
-            $this->makeMapAndGetAllValues($srcData, $map, $values, $keys, $instancesVar, $this->srcNNIdsVarName, $midMap, 
-                $midValues, is_array($this->fieldLinks2)? array_values($this->fieldLinks2) : array(), false, 
-                $alreadyLoaded, $this->srcLoadedVarName);
+            $this->makeMapAndGetAllValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded, 
+                $instancesVar, false, $this->srcLoadedVarName);
             
             if ($this->fieldLinks2) {
                 $r = $this->getWithValues($midValues, true, $values, true);
@@ -725,9 +738,8 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             $values = array();
             $map = array();
             
-            $this->makeMapAndGetAllValues($srcData, $map, $values, $keys, 
-                $dontOverwriteLoaded? $this->srcCountVarName : false, $this->srcNNIdsVarName, $midMap, $midValues,
-                is_array($this->fieldLinks2)? array_values($this->fieldLinks2) : array());
+            $this->makeMapAndGetAllValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded,
+                $dontOverwriteLoaded? $this->srcCountVarName : false);
             
             if ($midMap) {
                 foreach ($midMap as $m) {
@@ -783,12 +795,17 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     
     // ------------------------ PRIVATE METHODS -----------------------
     /**
-     * Extracts keys from source array and makes map (recordKeys => srcArrayKey). Format of $map will be array($keys, $sourceKey). By traversing the map later,
+     * Extracts keys from source array and makes map (recordKeys => srcArrayKey). 
+     * Format of $map will be array($keys, $sourceKey). By traversing the map later, 
      * one can find corresponding records in the right table. 
      */
-    protected function makeMapAndGetAllValues(& $source, & $map, & $values, $keys, 
-        $instancesVar = false, $midIdsVar = false, &$midMap = null, & $midVals = null, $midKeys = array(), 
-        $useKeysForMidMapWriteKeys = false, & $alreadyLoaded = null, $isLoadedVar = false) {
+    protected function makeMapAndGetAllValues(
+        & $source, & $map, & $values, &$midMap = null, & $midVals = null, & $alreadyLoaded = null, 
+        $instancesVar = false, $useKeysForMidMapWriteKeys = false, $isLoadedVar = false
+    ) {
+        $keys = array_keys($this->fieldLinks);
+        $midKeys = is_array($this->fieldLinks2)? array_values($this->fieldLinks2) : array();
+        $midIdsVar = $this->srcNNIdsVarName;
         $map = array();
         if (!is_array($midMap)) $midMap = array();
         if (!is_array($alreadyLoaded)) $alreadyLoaded = array();
