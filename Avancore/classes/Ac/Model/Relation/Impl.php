@@ -48,12 +48,6 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     protected $destVarName = false;
     
     /**
-     * Name of variable in destination object that contains link records for N-N (with midTable) links
-     * @var string
-     */
-    protected $destNNIdsVarName = false;
-    
-    /**
      * Name of property of source object where count of linked destination records is temporarily stored (or FALSE to not to use this feature)
      * @var bool|string
      */
@@ -422,10 +416,10 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             if ($matchMode != Ac_Model_Relation_Abstract::RESULT_PLAIN) {
                 $map = array();
                 $midMap = array();
-                $this->makeMapAndGetAllValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded,
+                $this->extractSrcMapAndValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded,
                     false, $matchMode == Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
             } else {
-                $this->getAllValues($srcData, $values, $keys, $this->srcNNIdsVarName, $midValues, $midKeys);
+                $this->extractSrcValues($srcData, $values, $midValues);
             }
 
             $rows = array();    // rows retrieved by keys of right storage
@@ -493,11 +487,11 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             }
             if ($separate && $matchMode !== Ac_Model_Relation_Abstract::RESULT_PLAIN) {
                 $map = array();
-                $this->makeMapAndGetAllValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded, 
+                $this->extractSrcMapAndValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded, 
                     false, $matchMode === Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
             } else {
                 $midMap = array();
-                $this->getAllValues($srcData, $values, $keys, $this->srcNNIdsVarName, $midValues, $midKeys);
+                $this->extractSrcValues($srcData, $values, $midValues);
             }
                 
             $counts = $this->countWithValues($midValues, $separate, $values, true);
@@ -556,7 +550,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
 
             $instancesVar = $dontOverwriteLoaded? $this->srcVarName : false;
             
-            $this->makeMapAndGetAllValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded, 
+            $this->extractSrcMapAndValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded, 
                 $instancesVar, false, $this->srcLoadedVarName);
             
             if ($this->fieldLinks2) {
@@ -738,7 +732,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             $values = array();
             $map = array();
             
-            $this->makeMapAndGetAllValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded,
+            $this->extractSrcMapAndValues($srcData, $map, $values, $midMap, $midValues, $alreadyLoaded,
                 $dontOverwriteLoaded? $this->srcCountVarName : false);
             
             if ($midMap) {
@@ -799,8 +793,8 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
      * Format of $map will be array($keys, $sourceKey). By traversing the map later, 
      * one can find corresponding records in the right table. 
      */
-    protected function makeMapAndGetAllValues(
-        & $source, & $map, & $values, &$midMap = null, & $midVals = null, & $alreadyLoaded = null, 
+    protected function extractSrcMapAndValues(
+        & $source, & $map, & $values, &$midMap = null, & $midValues = null, & $alreadyLoaded = null, 
         $instancesVar = false, $useKeysForMidMapWriteKeys = false, $isLoadedVar = false
     ) {
         $keys = array_keys($this->fieldLinks);
@@ -810,7 +804,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
         if (!is_array($midMap)) $midMap = array();
         if (!is_array($alreadyLoaded)) $alreadyLoaded = array();
         $values = array();
-        if (!is_array($midVals)) $midVals = array();
+        if (!is_array($midValues)) $midValues = array();
         foreach(array_keys($source) as $k) {
             $srcItem = $source[$k];
             $hasIds = false;
@@ -857,7 +851,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                             $mk = implode('-', $v);
                         }
                             else $mk = ''.$v;
-                        $midVals[$mk] = $v;
+                        $midValues[$mk] = $v;
                     }
                     if ($useKeysForMidMapWriteKeys) {
                         if (count($keys) == 1) {
@@ -872,18 +866,22 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 }
             }
             if (!$hasIds) {
-                $vals = $this->getValues($srcItem, $keys, false, false);
-                $map[] = array($vals, $k, $items, $pks);
-                $values[] = $vals;
+                $itemValues = $this->getValues($srcItem, $keys, false, false);
+                $map[] = array($itemValues, $k, $items, $pks);
+                $values[] = $itemValues;
             }
         }
     }
     
-    protected function getAllValues(& $source, & $values, $keys, $nnIdsVar = false, & $midVals = null, 
-        $midKeys = array()) {
+    protected function extractSrcValues(& $source, & $values, & $midValues = null) {
+        
+        $keys = array_keys($this->fieldLinks);
+        $midKeys = $this->fieldLinks2? array_values($this->fieldLinks2) : array();
+        $nnIdsVar = $this->srcNNIdsVarName;
         
         $values = array();
-        if (!is_array($midVals)) $midVals = array();
+        if (!is_array($midValues)) $midValues = array();
+        
         foreach (array_keys($source) as $k) {
             $hasIds = false;
             $srcItem  = $source[$k];
@@ -894,7 +892,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                     foreach ($ids as $v) {
                         if (is_array($v)) $mk = implode('-', $v);
                             else $mk = ''.$v;
-                        $midVals[$mk] = $v;
+                        $midValues[$mk] = $v;
                     }
                 }
             }
