@@ -81,8 +81,6 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
      */
     protected $provider = false;
     
-    // ------------------------ PUBLIC METHODS -----------------------
-    
     /**
      * @param array $prototype Array prototype of the object
      */
@@ -396,8 +394,78 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
         return $this->srcLoadNNIdsMethod;
     }
 
-    // ----------------------- getDest... family ---------------------
+    /**
+     * @param string|Ac_Model_Object $mapperOrId
+     */
+    function setDestMapper($mapperOrId) {
+        if (is_object($mapperOrId) && !($mapperOrId instanceof Ac_Model_Mapper)) {
+            throw Ac_E_InvalidCall::wrongClass('mapperOrId', $mapperOrId, 'Ac_Model_Mapper');
+        }
+        $this->destMapper = $mapperOrId;
+    }
+
+    /**
+     * @param bool $asIs Return mapper ID if no object was provided during setDestMapper() call
+     * @return Ac_Model_Mapper
+     */
+    function getDestMapper($asIs = false) {
+        if ($asIs) $res = $this->destMapper;
+        else {
+            $res = null;
+            if (is_object($this->destMapper)) $res = $this->destMapper;
+            elseif ($this->destMapper) 
+                $res = $this->application? $this->application->getMapper ($this->destMapper) : Ac_Model_Mapper::getMapper($this->destMapper);
+        }
+        return $res;
+    }
     
+    function setProvider($provider) {
+        $this->provider = $provider;
+    }
+    
+    /**
+     * @param bool $asIs Dont create instance
+     * @return Ac_Model_Relation_Provider (when $asIs, result is mixed)
+     */
+    function getProvider($asIs = false) {
+        if (!$asIs && !is_object($this->provider)) {
+            if (is_string($this->provider)) {
+                $mapper = $this->getDestMapper();
+                if (!$mapper) 
+                    throw new Ac_E_InvalidUsage("Cannot retrieve relation Provider by identifier string without having destMapper set");
+                $this->provider = $mapper->getRelationProviderByRelationId($this->provider);
+            } elseif ($this->provider) {
+                $def = array();
+                if ($this->application) $def['application'] = $this->application;
+                $this->provider = Ac_Prototyped::factory($this->provider, 'Ac_Model_Relation_Provider', $def);
+            }
+            $res = $this->provider;
+            if (!$res) $res = null;
+        } else {
+            $res = $this->provider;
+        }
+        return $res;
+    }
+    
+    function setDestNNIdsImpl($destNNIdsImpl) {
+        $this->destNNIdsImpl = $destNNIdsImpl;
+    }
+    
+    /**
+     * @return Ac_Model_Relation_Impl
+     */
+    function getDestNNIdsImpl($asIs = false) {
+        if (!is_object($this->destNNIdsImpl) && !$asIs) {
+            if ($this->destNNIdsImpl) {
+                $def = array();
+                if ($this->application) $def['application'] = $this->application;
+                $this->destNNIdsImpl = Ac_Prototyped::factory($this->destNNIdsImpl, 'Ac_Model_Relation_Impl', $def);
+            }
+            if (!$this->destNNIdsImpl) return null;
+        }
+        return $this->destNNIdsImpl;
+    }
+
     /**
      * Returns one or more destination objects for given source object
      * @param Ac_Model_Data|object $srcData
@@ -472,8 +540,6 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
         }
         return $res;
     }
-    
-    // ------------------------ count / delete / load methods -------
     
     function countDest ($srcData, $separate = true, $matchMode = Ac_Model_Relation_Abstract::RESULT_PLAIN) {
         $keys = array_keys($this->fieldLinks);
@@ -637,78 +703,6 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             
         return $res;
     }
-
-    /**
-     * @param string|Ac_Model_Object $mapperOrId
-     */
-    function setDestMapper($mapperOrId) {
-        if (is_object($mapperOrId) && !($mapperOrId instanceof Ac_Model_Mapper)) {
-            throw Ac_E_InvalidCall::wrongClass('mapperOrId', $mapperOrId, 'Ac_Model_Mapper');
-        }
-        $this->destMapper = $mapperOrId;
-    }
-
-    /**
-     * @param bool $asIs Return mapper ID if no object was provided during setDestMapper() call
-     * @return Ac_Model_Mapper
-     */
-    function getDestMapper($asIs = false) {
-        if ($asIs) $res = $this->destMapper;
-        else {
-            $res = null;
-            if (is_object($this->destMapper)) $res = $this->destMapper;
-            elseif ($this->destMapper) 
-                $res = $this->application? $this->application->getMapper ($this->destMapper) : Ac_Model_Mapper::getMapper($this->destMapper);
-        }
-        return $res;
-    }
-    
-    function setProvider($provider) {
-        $this->provider = $provider;
-    }
-    
-    /**
-     * @param bool $asIs Dont create instance
-     * @return Ac_Model_Relation_Provider (when $asIs, result is mixed)
-     */
-    function getProvider($asIs = false) {
-        if (!$asIs && !is_object($this->provider)) {
-            if (is_string($this->provider)) {
-                $mapper = $this->getDestMapper();
-                if (!$mapper) 
-                    throw new Ac_E_InvalidUsage("Cannot retrieve relation Provider by identifier string without having destMapper set");
-                $this->provider = $mapper->getRelationProviderByRelationId($this->provider);
-            } elseif ($this->provider) {
-                $def = array();
-                if ($this->application) $def['application'] = $this->application;
-                $this->provider = Ac_Prototyped::factory($this->provider, 'Ac_Model_Relation_Provider', $def);
-            }
-            $res = $this->provider;
-            if (!$res) $res = null;
-        } else {
-            $res = $this->provider;
-        }
-        return $res;
-    }
-    
-    function setDestNNIdsImpl($destNNIdsImpl) {
-        $this->destNNIdsImpl = $destNNIdsImpl;
-    }
-    
-    /**
-     * @return Ac_Model_Relation_Impl
-     */
-    function getDestNNIdsImpl($asIs = false) {
-        if (!is_object($this->destNNIdsImpl) && !$asIs) {
-            if ($this->destNNIdsImpl) {
-                $def = array();
-                if ($this->application) $def['application'] = $this->application;
-                $this->destNNIdsImpl = Ac_Prototyped::factory($this->destNNIdsImpl, 'Ac_Model_Relation_Impl', $def);
-            }
-            if (!$this->destNNIdsImpl) return null;
-        }
-        return $this->destNNIdsImpl;
-    }
     
     function loadDestNNIds($srcData, $dontOverwriteLoaded = true) {
         if ($i = $this->destNNIdsImpl) {
@@ -787,7 +781,6 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
         }
     }
     
-    // ------------------------ PRIVATE METHODS -----------------------
     /**
      * Extracts keys from source array and makes map (recordKeys => srcArrayKey). 
      * Format of $map will be array($keys, $sourceKey). By traversing the map later, 
@@ -1154,8 +1147,6 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             }
         }
     }
-    
-    // ------------------------- data accessors - from Ac_Model_Relation_Abstrct -------------------------
     
     protected function setVal(& $dest, $varName, $val) {
         if (!$varName) return;
