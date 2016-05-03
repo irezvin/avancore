@@ -225,6 +225,14 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 ),
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
+                'srcLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadShopCategoryIdsFor',
+                ),
+                'destLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadShopProductIdsFor',
+                ),
                 'midTableName' => '#__shop_product_categories',
                 'fieldLinks2' => array (
                     'categoryId' => 'id',
@@ -246,6 +254,14 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 ),
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
+                'srcLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadReferencedShopProductIdsFor',
+                ),
+                'destLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadReferencingShopProductIdsFor',
+                ),
                 'midTableName' => '#__shop_product_related',
                 'fieldLinks2' => array (
                     'relatedProductId' => 'id',
@@ -267,6 +283,14 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 ),
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
+                'srcLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadReferencingShopProductIdsFor',
+                ),
+                'destLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadReferencedShopProductIdsFor',
+                ),
                 'midTableName' => '#__shop_product_related',
                 'fieldLinks2' => array (
                     'productId' => 'id',

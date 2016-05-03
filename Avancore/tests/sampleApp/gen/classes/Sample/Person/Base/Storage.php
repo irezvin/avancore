@@ -26,6 +26,24 @@ class Sample_Person_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'personId', ), ); 
  
+ 
+    
+    protected function doGetSqlSelectPrototype($primaryAlias = 't') {
+        $res = parent::doGetSqlSelectPrototype($primaryAlias);
+        Ac_Util::ms($res, array (
+                'parts' => array (
+                    'tagIds' => array (
+                        'class' => 'Ac_Sql_Filter_NNCriterion_Simple',
+                        'midSrcKey' => 'idOfPerson',
+                        'midDestKey' => 'idOfTag',
+                        'tableKey' => 'tagId',
+                        'midTableAlias' => 'mid__tags',
+                    ),
+                ),
+            ) 
+        );
+        return $res;
+    }
     
 }
 

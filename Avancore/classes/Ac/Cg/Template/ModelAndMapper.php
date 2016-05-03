@@ -841,6 +841,15 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
 
     var $<?php echo $var; ?> = <?php $this->export($default); ?>; 
 <?php } ?> 
+<?php   if ($proto = $this->model->getSqlSelectPrototype()) { ?> 
+    
+    protected function doGetSqlSelectPrototype($primaryAlias = 't') {
+        $res = parent::doGetSqlSelectPrototype($primaryAlias);
+        Ac_Util::ms($res, <?php $this->exportArray($proto, 12); ?> 
+        );
+        return $res;
+    }
+<?php   } ?>
     
 }
 

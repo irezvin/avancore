@@ -284,7 +284,9 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             $res['destVarName'] = $mirrorProp->getClassMemberName();
             if ($cmn  = $mirrorProp->getCountMemberName()) $res['destCountVarName'] = $cmn;
             if ($cmn  = $mirrorProp->getLoadedMemberName()) $res['destLoadedVarName'] = $cmn;
-            if ($this->isManyToMany()) $res['destNNIdsVarName'] = $mirrorProp->getIdsMemberName();
+            if ($this->isManyToMany()) {
+                $res['destNNIdsVarName'] = $mirrorProp->getIdsMemberName();
+            }
         }
         if ($this->isIncoming) {
             $res['fieldLinks'] = array_flip($this->_rel->columns);
@@ -295,6 +297,18 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             $res['srcIsUnique'] = $this->_rel->isThisRecordUnique();
             $res['destIsUnique'] = $this->_rel->isOtherRecordUnique();
             $res['srcOutgoing'] = true;
+        }
+        if ($this->isManyToMany()) {
+            $mem = $this->getIdsMemberName();
+            if (strlen ($mem)) {
+                $res['srcLoadNNIdsMethod'] = array(true, "load".ucfirst(preg_replace("/^_/", "", $mem))."For");
+            }
+            if ($mp = $this->getMirrorProperty()) {
+                $mem = $mp->getIdsMemberName();
+                if (strlen($mem)) {
+                    $res['destLoadNNIdsMethod'] = array(true, "load".ucfirst(preg_replace("/^_/", "", $mem))."For");
+                }
+            }
         }
         if ($this->_otherRel) {
             if ($this->isIncoming) {
@@ -607,6 +621,40 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         }
         if (isset($array['_otherRel'])) $this->_otherRel = $this->unrefRelation($array['_otherRel']);
     }
+    
+    function applyToSqlSelectPrototype(array & $prototype) {
+        $rd = $this->computeRelationData();
+        if ($this->isManyToMany()) {
+            if (isset($rd['midTableName']) && $rd['midTableName'] && isset($rd['fieldLinks2']) && count($rd['fieldLinks2'])) {
+                if (isset($rd['srcNNIdsVarName']) && $rd['srcNNIdsVarName']) {
+                    $critName = preg_replace('/^_/', '', $rd['srcNNIdsVarName']);
+                    $midTableAlias = 'mid__'.preg_replace('/^_/', '', $this->getClassMemberName());
+                    $srcCols = array_values($rd['fieldLinks']);
+                    $destCols = array_keys($rd['fieldLinks2']);
+                    $tableKeys = array_values($rd['fieldLinks2']);
+                    if (count($srcCols) == 1 && count($tableKeys) == 1) {
+                        $proto = array(
+                            'class' => 'Ac_Sql_Filter_NNCriterion_Simple',
+                            'midSrcKey' => $srcCols[0],
+                            'midDestKey' => $destCols[0],
+                            'tableKey' => $tableKeys[0],
+                        );
+                    } else {
+                        $proto = array(
+                            'class' => 'Ac_Sql_Filter_NNCriterion_Omni',
+                            'midSrcKeys' => $srcCols,
+                            'midDestKeys' => $destCols,
+                            'tableKeys' => $tableKeys,
+                        );
+                    }
+                    $proto['midTableAlias'] = $midTableAlias;
+                    $prototype['parts'][$critName] = $proto;
+                }
+            }
+            
+        }
+    }
+    
     
 }
 

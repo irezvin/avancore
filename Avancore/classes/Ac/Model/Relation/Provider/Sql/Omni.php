@@ -62,7 +62,7 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
      */
     protected $extraJoins = false;
 
-    function acceptsSrcValues() {
+    function getAcceptsSrcValues() {
         $res = strlen($this->midTableName) && $this->midSrcKeys && $this->midDestKeys;
         return $res;
     }

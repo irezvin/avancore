@@ -1316,22 +1316,22 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return $res;
     }
 
-    protected function corePeReplaceNNRecords($record, $rowProto, $rows, $midTableName, & $errors = array()) {
-        $res = $this->getStorage()->peReplaceNNRecords($record, $rowProto, $rows, $midTableName, $errors);
+    protected function corePeReplaceNNRecords($record, $rowProto, $rows, $midTableName, & $errors = array(), Ac_Model_Association_Abstract $association = null) {
+        $res = $this->getStorage()->peReplaceNNRecords($record, $rowProto, $rows, $midTableName, $errors, $association);
         return $res;
     }
     
-    final function peReplaceNNRecords($record, $rowProto, $rows, $midTableName, & $errors = array()) {
+    final function peReplaceNNRecords($record, $rowProto, $rows, $midTableName, & $errors = array(), Ac_Model_Association_Abstract $association = null) {
         $res = null;
         $this->triggerEvent(self::EVENT_BEFORE_REPLACE_NN_RECORDS, array(
-            $record, & $rowProto, & $rows, & $midTableName, & $res, & $errors
+            $record, & $rowProto, & $rows, & $midTableName, & $res, & $errors, $association
         ));
         
         if (is_null($res)) 
-            $res = $this->corePeReplaceNNRecords ($record, $rowProto, $rows, $midTableName, $errors);
+            $res = $this->corePeReplaceNNRecords ($record, $rowProto, $rows, $midTableName, $errors, $association);
         
         $this->triggerEvent(self::EVENT_AFTER_REPLACE_NN_RECORDS, array(
-            $record, & $rowProto, & $rows, & $midTableName, & $res, & $errors
+            $record, & $rowProto, & $rows, & $midTableName, & $res, & $errors, $association
         ));
         return $res;
     }
@@ -1384,21 +1384,12 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     protected function doGetSqlSelectPrototype($primaryAlias = 't') {
-        $res = array(
-            'class' => 'Ac_Sql_Select',
-			'tables' => array(
-				$primaryAlias => array(
-					'name' => $this->tableName, 
-				),
-			),
-			'tableProviders' => array(
-				'model' => array(
-					'class' => 'Ac_Model_Sql_TableProvider',
-                    'mapperAlias' => $primaryAlias,
-					'mapper' => $this,
-				),
-			),
-        );
+        $storage = $this->getStorage();
+        if (!$storage) 
+            throw Ac_E_InvalidUsage("\$storage must be present in Mapper in order to doGetSqlSelectPrototype()");
+        if (! $storage instanceof Ac_I_WithSqlSelectPrototype) 
+            throw Ac_E_InvalidUsage("\$storage must implement Ac_I_WithSqlSelectPrototype in order to doGetSqlSelectPrototype()");
+        $res = $storage->getSqlSelectPrototype($primaryAlias);
         return $res;
     }
     
@@ -1752,6 +1743,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * Returns which field is used as identifier for every record (if applicable)
      */
     function getIdentifierField() {
+        if (!strlen($this->identifierField)) $this->getStorage();
         return $this->identifierField;
     }
     
@@ -2491,6 +2483,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
 
     function getIdentifierPublicField() {
+        if (!strlen($this->identifierPublicField)) $this->getStorage();
         return $this->identifierPublicField;
     }
     

@@ -179,7 +179,7 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
     
     abstract function peSave($object, & $hyData, & $exists = null, & $error = null, & $newData = array());
 
-    abstract function peReplaceNNRecords($object, $rowProto, $rows, $midTableName, & $errors = array());
+    abstract function peReplaceNNRecords($object, $rowProto, $rows, $midTableName, & $errors = array(), Ac_Model_Association_Abstract $association = null);
     
     abstract function listGeneratedFields();
     

@@ -37,7 +37,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     protected $srcVarName = false;
     
     /**
-     * Name of variable in source object that contains link records for N-N (with midTable) links
+     * Name of variable in source object that contains link records for N-N links
      * @var string
      */
     protected $srcNNIdsVarName = false;
@@ -150,8 +150,6 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
 
     /**
      * Assigns links between intermediary table and destination table.
-     * 
-     * Only used when intermediary table was configured by setMidTableName().
      * If no intermediary table is configured, FALSE value is used.
      * 
      * @param array|bool $fieldLinks2 Fields mapping ($midTableField => $destTableField)
@@ -383,11 +381,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     }
     
     function setSrcLoadNNIdsMethod($srcLoadNNIdsMethod) {
-        if ($srcLoadNNIdsMethod !== ($oldSrcLoadNNIdsMethod = $this->srcLoadNNIdsMethod)) {
-            if ($this->immutable) throw self::immutableException();
-            $this->srcLoadNNIdsMethod = $srcLoadNNIdsMethod;
-            $this->reset();
-        }
+        $this->srcLoadNNIdsMethod = $srcLoadNNIdsMethod;
     }
 
     function getSrcLoadNNIdsMethod() {
@@ -798,6 +792,10 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
         if (!is_array($alreadyLoaded)) $alreadyLoaded = array();
         $values = array();
         if (!is_array($midValues)) $midValues = array();
+        
+        $acceptsMidValuesOnly = ($midIdsVar !== false) && !$this->getProvider()->getAcceptsSrcValues();
+        if ($acceptsMidValuesOnly) $this->loadMidIdsFor($source);
+        
         foreach(array_keys($source) as $k) {
             $srcItem = $source[$k];
             $hasIds = false;
@@ -858,7 +856,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                     }
                 }
             }
-            if (!$hasIds) {
+            if (!$hasIds && !$acceptsMidValuesOnly) {
                 $itemValues = $this->getValues($srcItem, $keys, false, false);
                 $map[] = array($itemValues, $k, $items, $pks);
                 $values[] = $itemValues;
@@ -891,6 +889,20 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             }
             if (!$hasIds) {
                 $values[] = $this->getValues($srcItem, $keys, false, false);
+            }
+        }
+    }
+    
+    protected function loadMidIdsFor(& $source) {
+        if ($this->destNNIdsImpl) $this->getDestNNIdsImpl()->loadDestNNIds($source);
+        elseif ($m = $this->srcLoadNNIdsMethod) {
+            if (is_array($m) && isset($m[0]) && $m[0] === true && isset($m[1])) {
+                $mapper = $this->getDestMapper();
+                if (!$mapper) throw new Ac_E_InvalidUsage("\$destMapper is required when using TRUE as first member of array \$srcLoadNNIdsMethod");
+                $method = $m[1];
+                $mapper->$method($source);
+            } else {
+                call_user_func($m, $source);
             }
         }
     }

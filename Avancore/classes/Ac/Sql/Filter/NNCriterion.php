@@ -5,76 +5,76 @@
  */
 
 /**
- * value format: array(leftValues => array, rightValues => array)
- * if improper value is provided (arrray without left- or rightValues), input can be converted depending on 
+ * value format: array(srcValues => array, destValues => array)
+ * if improper value is provided (arrray without src- or destValues), input can be converted depending on 
  * $this->plainInputMode
  */
 abstract class Ac_Sql_Filter_NNCriterion extends Ac_Sql_Filter {
     
     /**
-     * Throw error if input is not an associative array with one or both items (array('leftValues' => array, 'rightValues' => array'))
+     * Throw error if input is not an associative array with one or both items (array('srcValues' => array, 'destValues' => array'))
      */
     const PLAIN_INPUT_DENIED = 0;
     
     /**
-     * When input value is array($keys), convert it to array('leftValues' => array($keys))
+     * When input value is array($keys), convert it to array('srcValues' => array($keys))
      */
-    const PLAIN_INPUT_LEFT_VALUES = 1;
+    const PLAIN_INPUT_SRC_VALUES = 1;
     
     /**
-     * When input value is array($keys), convert it to array('rightValues' => array($keys))
+     * When input value is array($keys), convert it to array('destValues' => array($keys))
      */
-    const PLAIN_INPUT_RIGHT_VALUES = 2;
+    const PLAIN_INPUT_DEST_VALUES = 2;
     
     /**
      * @var int
      * One of Ac_Sql_Filter::PLAIN_INPUT_* constants
      */
-    var $plainInputMode = self::PLAIN_INPUT_LEFT_VALUES;
+    var $plainInputMode = self::PLAIN_INPUT_SRC_VALUES;
     
     /**
-     * Alias of n-n table (MUST be provided, otherwise will fail if $leftValues are provided)
+     * Alias of n-n table (MUST be provided, otherwise will fail if $srcValues are provided)
      * @var string
      */
-    var $nnTableAlias = false;
+    var $midTableAlias = false;
     
     /**
      * Alias of table that has referenced records.
      * If not provided, primary alias of SQL select will be used (if any)
      */
-    var $rightAlias = false;
+    var $destAlias = false;
     
     /**
-     * If only $leftValues are provided, stricten join of NN table
+     * If only $srcValues are provided, stricten join of NN table
      * @var bool
      */
     var $useInnerJoinIfPossible = true;
     
     var $nnRestriction = array(); // TODO: use nnRestriction
 
-    protected $leftValues = false;
+    protected $srcValues = false;
     
-    protected $rightValues = false;
+    protected $destValues = false;
     
     function _doGetAppliedAliases() {
         $res = Ac_Util::toArray($this->aliases);
-        if ($this->leftValues) {
-            if (!strlen($this->nnTableAlias)) 
-                throw new Ac_E_InvalidUsage("\$leftValues are provided, but \$nnTableAlias property is not set");
-            $res[] = $this->nnTableAlias;
+        if ($this->srcValues) {
+            if (!strlen($this->midTableAlias)) 
+                throw new Ac_E_InvalidUsage("\$srcValues are provided, but \$midTableAlias property is not set");
+            $res[] = $this->midTableAlias;
         }
-        if (strlen($this->rightAlias)) $res[] = $this->rightAlias;
+        if (strlen($this->destAlias)) $res[] = $this->destAlias;
         return $res;
     }
     
     function _doGetAppliedWhere() {
         $res = array();
-        if ($this->rightValues) {
-            $rightAlias = strlen($this->rightAlias)? $this->rightAlias : $this->currentSelect->getPrimaryAlias();
-            $res['right'] = $this->_doGetRightValuesCriterion($rightAlias);
+        if ($this->destValues) {
+            $destAlias = strlen($this->destAlias)? $this->destAlias : $this->currentSelect->getPrimaryAlias();
+            $res['dest'] = $this->_doGetDestValuesCriterion($destAlias);
         }
-        if ($this->leftValues) {
-            $res['left'] = $this->_doGetLeftNotNullCriterion();
+        if ($this->srcValues) {
+            $res['src'] = $this->_doGetSrcNotNullCriterion();
         }
         return $res;
     }
@@ -84,57 +84,57 @@ abstract class Ac_Sql_Filter_NNCriterion extends Ac_Sql_Filter {
     }
     
     function _doApplyToSelect($select) {
-        if ($this->leftValues) {
-            $nnTable = $select->getTable($this->nnTableAlias);
-            if ($this->rightValues) {
-                $tmp = $nnTable->joinsOn;
-                $joinsOn = $nnTable->getJoinsOn();
-                $nnTable->joinsOn = "(".$joinsOn.") AND (".$this->_doGetLeftValuesCriterion().")";
-                $select->joinOverrides[$this->nnTableAlias] = $nnTable->getJoinClausePart();
-                $nnTable->joinsOn = $tmp;
+        if ($this->srcValues) {
+            $midTable = $select->getTable($this->midTableAlias);
+            if ($this->destValues) {
+                $tmp = $midTable->joinsOn;
+                $joinsOn = $midTable->getJoinsOn();
+                $midTable->joinsOn = "(".$joinsOn.") AND (".$this->_doGetSrcValuesCriterion().")";
+                $select->joinOverrides[$this->midTableAlias] = $midTable->getJoinClausePart();
+                $midTable->joinsOn = $tmp;
             } elseif ($this->useInnerJoinIfPossible) {
-                $tmp = $nnTable->joinType;
-                $nnTable->joinType = "INNER JOIN";
-                $select->joinOverrides[$this->nnTableAlias] = $nnTable->getJoinClausePart();
-                $nnTable->joinType = $tmp;
+                $tmp = $midTable->joinType;
+                $midTable->joinType = "INNER JOIN";
+                $select->joinOverrides[$this->midTableAlias] = $midTable->getJoinClausePart();
+                $midTable->joinType = $tmp;
             }
         }
         parent::_doApplyToSelect($select);
     }
     
     function bind($input) {
-        $this->leftValues = $this->rightValues = false;
+        $this->srcValues = $this->destValues = false;
         return parent::bind($input);
     }
     
     function _doBind($input) {
         if (!is_array($input)) $input = Ac_Util::toArray($input);
-        if (!(isset($input['leftValues']) || isset($input['rightValues']))) {
+        if (!(isset($input['srcValues']) || isset($input['destValues']))) {
             if ($this->plainInputMode == self::PLAIN_INPUT_DENIED) {
-                throw new Ac_E_InvalidUsage("\$input must be an array with one or two keys: 'leftValues' => array, 'rightValues' => array");
-            } elseif ($this->plainInputMode == self::PLAIN_INPUT_LEFT_VALUES) {
-                $input = array('leftValues' => $input);
-            } elseif ($this->plainInputMode == self::PLAIN_INPUT_RIGHT_VALUES) {
-                $input = array('rightValues' => $input);
+                throw new Ac_E_InvalidUsage("\$input must be an array with one or two keys: 'srcValues' => array, 'destValues' => array");
+            } elseif ($this->plainInputMode == self::PLAIN_INPUT_SRC_VALUES) {
+                $input = array('srcValues' => $input);
+            } elseif ($this->plainInputMode == self::PLAIN_INPUT_DEST_VALUES) {
+                $input = array('destValues' => $input);
             }
         }
-        if (isset($input['leftValues'])) $this->leftValues = Ac_Util::toArray($this->leftValues);
-        if (isset($input['rightValues'])) $this->rightValues = Ac_Util::toArray($this->rightValues);
+        if (isset($input['srcValues'])) $this->srcValues = Ac_Util::toArray($this->srcValues);
+        if (isset($input['destValues'])) $this->destValues = Ac_Util::toArray($this->destValues);
     }
     
     /**
-     * leftCol IN (leftValue1, leftValue2...)
+     * srcCol IN (srcValue1, srcValue2...)
      */
-    abstract function _doGetLeftValuesCriterion();
+    abstract function _doGetSrcValuesCriterion();
 
     /**
-     * rightCol IN (rightValue1, rightValue2...)
+     * destCol IN (destValue1, destValue2...)
      */
-    abstract function _doGetRightValuesCriterion($rightAlias);
+    abstract function _doGetDestValuesCriterion($destAlias);
     
     /**
-     * leftCol IS NOT NULL
+     * srcCol IS NOT NULL
      */
-    abstract function _doGetLeftNotNullCriterion();
+    abstract function _doGetSrcNotNullCriterion();
     
 }

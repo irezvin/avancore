@@ -103,6 +103,8 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     protected $relationPrototypes = false;
     
     protected $assocProperties = false;
+    
+    protected $sqlSelectPrototype = false;
 
     // ---------------------------------------------------------------------
     
@@ -642,6 +644,16 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     function getAssocProperties() {
         if ($this->assocProperties === false) $this->getRelationPrototypes ();
         return $this->assocProperties;
+    }
+    
+    function getSqlSelectPrototype() {
+        if ($this->sqlSelectPrototype === false) {
+            $this->sqlSelectPrototype = array();
+            foreach ($this->listProperties() as $i) {
+                $this->getProperty($i)->applyToSqlSelectPrototype($this->sqlSelectPrototype);
+            }
+        }
+        return $this->sqlSelectPrototype;
     }
     
     /**

@@ -2,40 +2,40 @@
 
 class Ac_Sql_Filter_NNCriterion_Omni extends Ac_Sql_Filter_NNCriterion {
     
-    var $leftNNCols = false;
+    var $midSrcKeys = false;
     
-    var $rightNNCols = false;
+    var $midDestKeys = false;
     
     var $tableKeys = false;
 
     function _doGetAppliedWhere() {
         parent::_doGetAppliedWhere();
         $res = array();
-        if ($this->leftKeys) {
-            if (!$this->leftNNCols)
-                throw new Ac_E_InvalidUsage("\$leftNNCols property must be set when \$leftValues are provided");
-            if (!$this->rightNNCols)
-                throw new Ac_E_InvalidUsage("\$rightNNCols property must be set when \$leftValues are provided");
+        if ($this->srcKeys) {
+            if (!$this->midSrcKeys)
+                throw new Ac_E_InvalidUsage("\$midSrcKeys property must be set when \$srcValues are provided");
+            if (!$this->midDestKeys)
+                throw new Ac_E_InvalidUsage("\$midDestKeys property must be set when \$srcValues are provided");
         }
         
         return $res;
     }
     
-    function _doGetLeftValuesCriterion() {
-        $res = $this->makeSqlCriteria($this->leftValues, $this->leftNNCols, $this->nnTableAlias);
+    function _doGetSrcValuesCriterion() {
+        $res = $this->makeSqlCriteria($this->srcValues, $this->midSrcKeys, $this->midTableAlias);
         return $res;
     }
     
-    function _doGetRightValuesCriterion() {
-        $res = $this->makeSqlCriteria($this->rightValues, $this->rightNNCol, $this->nnTableAlias);
+    function _doGetDestValuesCriterion() {
+        $res = $this->makeSqlCriteria($this->destValues, $this->midDestKey, $this->midTableAlias);
         return $res;
     }
     
-    function _doGetLeftNotNullCriterion() {
+    function _doGetSrcNotNullCriterion() {
         $db = $this->currentSelect->getDb();
         $a = array();
-        foreach (Ac_Util::toArray($this->leftNNCols) as $col) {
-            $a[] = $res = $db->n(array($this->nnTableAlias, $col))." IS NOT NULL";
+        foreach (Ac_Util::toArray($this->midSrcKeys) as $col) {
+            $a[] = $res = $db->n(array($this->midTableAlias, $col))." IS NOT NULL";
         }
         $res = implode(" AND ", $a);
         return $res;

@@ -128,6 +128,54 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      * Will use only one argument - array of objects to load NN Ids for.
      */
     protected $destLoadNNIdsMethod = false;
+
+    /**
+     * whetner Dest source is not sql-enabled, Omni Provider cannot be used
+     * @var bool
+     */
+    protected $destNonSql = false;
+
+    /**
+     * whether Src source is not sql-enabled, Omni Provider cannot be used
+     * @var bool
+     */
+    protected $srcNonSql = false;
+
+    /**
+     * Sets whetner Dest source is not sql-enabled, Omni Provider cannot be used
+     * @param bool $destNonSql
+     */
+    function setDestNonSql($destNonSql) {
+        if ($destNonSql !== ($oldDestNonSql = $this->destNonSql)) {
+            $this->destNonSql = $destNonSql;
+        }
+    }
+
+    /**
+     * Returns whetner Dest source is not sql-enabled, Omni Provider cannot be used
+     * @return bool
+     */
+    function getDestNonSql() {
+        return $this->destNonSql;
+    }
+
+    /**
+     * Sets whether Src source is not sql-enabled, Omni Provider cannot be used
+     * @param bool $srcNonSql
+     */
+    function setSrcNonSql($srcNonSql) {
+        if ($srcNonSql !== ($oldSrcNonSql = $this->srcNonSql)) {
+            $this->srcNonSql = $srcNonSql;
+        }
+    }
+
+    /**
+     * Returns whether Src source is not sql-enabled, Omni Provider cannot be used
+     * @return bool
+     */
+    function getSrcNonSql() {
+        return $this->srcNonSql;
+    }    
     
     /**
      * @var Ac_Sql_Db
@@ -147,10 +195,6 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     protected $destWhere = false;    
     
     protected $midWhere = false;
-    
-    protected $srcQualifier = false;
-    
-    protected $destQualifier = false;
     
     /**
      * Flipped links (from destination to midtable to source table) 
@@ -1039,64 +1083,6 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $this->midWhere;
     }
 
-    /**
-     * Assigns qualifier field of source records in destination arrays.
-     * 
-     * Qualifier value is used to determine key in $srcObject->srcVarName array.
-     * If FALSE is set (by default), qualifier is not used and array keys are 
-     * simply numeric (0, 1, 2...)
-     * 
-     * @param string|bool $srcQualifier
-     */
-    function setSrcQualifier($srcQualifier) {
-        if ($srcQualifier !== ($oldSrcQualifier = $this->srcQualifier)) {
-            if ($this->immutable) throw self::immutableException();
-            $this->srcQualifier = $srcQualifier;
-        }
-    }
-
-    /**
-     * Returns qualifier field of source records in destination arrays.
-     * 
-     * Qualifier value is used to determine key in $srcObject->srcVarName array.
-     * If FALSE is returned (by default), qualifier is not used and array keys are 
-     * simply numeric (0, 1, 2...)
-     * 
-     * @return string|bool
-     */
-    function getSrcQualifier() {
-        return $this->srcQualifier;
-    }
-
-    /**
-     * Assigns qualifier field of destinaton records in source arrays.
-     * 
-     * Qualifier value is used to determine key in $destObject->destVarName array.
-     * If FALSE is set (by default), qualifier is not used and array keys are 
-     * simply numeric (0, 1, 2...)
-     * 
-     * @param string|bool $destQualifier
-     */
-    function setDestQualifier($destQualifier) {
-        if ($destQualifier !== ($oldDestQualifier = $this->destQualifier)) {
-            if ($this->immutable) throw self::immutableException();
-            $this->destQualifier = $destQualifier;
-        }
-    }
-
-    /**
-     * Returns qualifier field of destination records in source arrays.
-     * 
-     * Qualifier value is used to determine key in $destObject->destVarName array.
-     * If FALSE is returned (by default), qualifier is not used and array keys are 
-     * simply numeric (0, 1, 2...)
-     * 
-     * @return string|bool
-     */
-    function getDestQualifier() {
-        return $this->destQualifier;
-    }
-    
     // ----------------------- Payload methods ---------------------
     
     function loadDestNNIds($srcData, $dontOverwriteLoaded = true) {
@@ -1112,7 +1098,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     }
     
     protected function calcNNIdsImpl(array $props) {
-        if ($props['midTableName']) {
+        if ($props['midTableName'] && !$props['nonSql']) {
             $res = array(
                 'db' => $this->db,
                 'srcVarName' => $props['srcNNIdsVarName'],
@@ -1124,7 +1110,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'destIsUnique' => false,
             );
             // evaluate the provider
-            $app = $this->application? $this->application: Ac_Application::getDefaultInstance();
+            $app = $this->application? $this->application : Ac_Application::getDefaultInstance();
             if ($app) {
                 $provider = $app->getService('Ac_Model_Relation_Provider_Evaluator')->evaluateProvider($res);
                 if ($provider) $res['provider'] = $provider;
@@ -1156,11 +1142,10 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'destExtraJoins' => $this->destExtraJoins,
                 'destWhere' => $this->destWhere,
                 'midWhere' => $this->midWhere,
-                'srcQualifier' => $this->srcQualifier,
-                'destQualifier' => $this->destQualifier,
                 'destMapper' => $this->getDestMapper(),
                 'destIsUnique' => $this->getDestIsUnique(),
                 'db' => $this->db,
+                'nonSql' => $this->destNonSql,
             );
         }
         return $this->fullDestProps;
@@ -1187,11 +1172,10 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'destExtraJoins' => $this->srcExtraJoins,
                 'destWhere' => $this->srcWhere,
                 'midWhere' => $this->midWhere,
-                'srcQualifier' => $this->destQualifier,
-                'destQualifier' => $this->srcQualifier,
                 'destMapper' => $this->getSrcMapper(),
                 'destIsUnique' => $this->getSrcIsUnique(),
                 'db' => $this->db,
+                'nonSql' => $this->srcNonSql,
             );
         }
         return $this->fullSrcProps;
@@ -1200,7 +1184,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     protected static $deprecatedImplProps = array(
         'midTableName', 'midTableAlias', 'destTableName', 'destMapperClass', 
         /*'destMapper',*/ 'destExtraJoins', 'db', 'destOrdering', 'destExtraJoins', 
-        'destWhere', 'midWhere', 'srcQualifier', 'destQualifier',
+        'destWhere', 'midWhere', 'nonSql'
     );
     
     protected function getDestImplPrototype() {
@@ -1231,7 +1215,10 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function getDestProvider($asIs = false) {
         if (!$asIs && $this->destProvider === false) {
             $app = $this->application? $this->application: Ac_Application::getDefaultInstance();
-            if ($app) $this->destProvider = $app->getService('Ac_Model_Relation_Provider_Evaluator')->evaluateProvider($this->getFullDestProps());
+            if ($app) {
+                $prototype = $app->getService('Ac_Model_Relation_Provider_Evaluator')->evaluateProvider($this->getFullDestProps());
+                if ($prototype) $this->destProvider = Ac_Prototyped::factory ($prototype, 'Ac_Model_Relation_Provider');
+            }
         }
         return $this->destProvider;
     }
@@ -1251,7 +1238,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function getSrcProvider($asIs = false) {
         if (!$asIs && $this->srcProvider === false) {
             $app = $this->application? $this->application: Ac_Application::getDefaultInstance();
-            if ($app) $this->srcProvider = $app->getService('Ac_Model_Relation_Provider_Evaluator')->evaluateProvider($this->getFullSrcProps());
+            $prototype = $app->getService('Ac_Model_Relation_Provider_Evaluator')->evaluateProvider($this->getFullSrcProps());
+            if ($prototype) $this->srcProvider = Ac_Prototyped::factory ($prototype, 'Ac_Model_Relation_Provider');
         }
         return $this->srcProvider;
     }    

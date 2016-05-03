@@ -208,6 +208,14 @@ class Sample_Shop_Category_Base_Mapper extends Ac_Model_Mapper {
                 ),
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
+                'srcLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadShopProductIdsFor',
+                ),
+                'destLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadShopCategoryIdsFor',
+                ),
                 'midTableName' => '#__shop_product_categories',
                 'fieldLinks2' => array (
                     'productId' => 'id',

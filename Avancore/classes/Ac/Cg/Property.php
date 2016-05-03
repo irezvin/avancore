@@ -112,5 +112,9 @@ class Ac_Cg_Property extends Ac_Cg_Base {
         return $res;
     }
     
+    function applyToSqlSelectPrototype(array & $prototype) {
+        
+    }
+    
 }
 

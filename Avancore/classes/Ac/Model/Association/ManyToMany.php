@@ -197,7 +197,7 @@ class Ac_Model_Association_ManyToMany extends Ac_Model_Association_Many {
                     $rows[] = array_merge($row, $id);                   
                 }
             }
-            $mapper->peReplaceNNRecords($object, $rowProto, $rows, $midTableName, $errors);
+            $mapper->peReplaceNNRecords($object, $rowProto, $rows, $midTableName, $errors, $this);
             if ($errors) {
                 $errors[$errorKey] = $errors;
                 return $res;

@@ -240,6 +240,14 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 ),
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
+                'srcLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadTagIdsFor',
+                ),
+                'destLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadPersonIdsFor',
+                ),
                 'midTableName' => '#__people_tags',
                 'fieldLinks2' => array (
                     'idOfTag' => 'tagId',

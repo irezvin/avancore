@@ -23,6 +23,8 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         if (!$this->assertTrue($peopl->identifiesRecordBy('name'), 'pre-set unique indices should be preserved after getStorage()')) {
             var_dump($peopl->getIndexData());
         }
+
+        $this->assertEqual($peopl->getIdentifierPublicField(), 'personId', 'Generated mapper should return proper identifierPublicField (but %s)');
         
         $this->assertTrue(!array_diff($m->getColumnNames(), $this->peopleCols), 'Ac_Model_Mapper::getColumnNames()');
         $this->assertSame($m, Ac_Model_Mapper::getMapper('people'));

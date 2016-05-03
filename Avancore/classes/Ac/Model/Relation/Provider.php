@@ -14,14 +14,14 @@ abstract class Ac_Model_Relation_Provider extends Ac_Prototyped {
     protected $unique = false;
     
     function getWithValues (array $destValues, $byKeys = true, array $srcValues = array()) {
-        if ($srcValues && (!$this->acceptsSrcValues())) 
-            throw new Ac_E_InvalidUsage(__METHOD__.': \$srcValues MUST be empty when acceptsSrcValues() is FALSE');
+        if ($srcValues && (!$this->getAcceptsSrcValues())) 
+            throw new Ac_E_InvalidUsage(__METHOD__.': \$srcValues MUST be empty when getAcceptsSrcValues() is FALSE');
         return $this->doGetWithValues($destValues, $byKeys, $srcValues);
     }
     
     function countWithValues (array $destValues, $byKeys = true, array $srcValues = array()) {
-        if ($srcValues && (!$this->acceptsSrcValues())) 
-            throw new Ac_E_InvalidUsage(__METHOD__.': \$srcValues MUST be empty when acceptsSrcValues() is FALSE');
+        if ($srcValues && (!$this->getAcceptsSrcValues())) 
+            throw new Ac_E_InvalidUsage(__METHOD__.': \$srcValues MUST be empty when getAcceptsSrcValues() is FALSE');
         return $this->doCountWithValues($destValues, $byKeys, $srcValues);
     }
 
@@ -34,7 +34,7 @@ abstract class Ac_Model_Relation_Provider extends Ac_Prototyped {
      * Whether getWithValues() / countWithValues() can properly handle non-empty $srcValues
      * @return boolean
      */
-    function acceptsSrcValues() {
+    function getAcceptsSrcValues() {
         return false;
     }
     

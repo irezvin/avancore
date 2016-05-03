@@ -4,6 +4,17 @@ class Ac_Test_Relation extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
 
+    function testRelationProviderConfig() {
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        $rel = Sample::getInstance()->getSampleReligionMapper();
+        if (!$this->assertIsA($pm->getRelation('_religion')->getDestProvider(), 'Ac_Model_Relation_Provider_Mapper_Pk')) {
+            var_dump($a);
+        }
+        if (!$this->assertIsA($pm->getRelation('_religion')->getSrcProvider(), 'Ac_Model_Relation_Provider_Mapper_Omni')) {
+            var_dump($b);
+        }
+    }
+    
     function testCardinality() {
         $a = new Ac_Model_Relation(
             array(

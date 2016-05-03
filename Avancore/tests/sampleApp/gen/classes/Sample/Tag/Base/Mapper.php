@@ -191,6 +191,14 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 ),
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
+                'srcLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadPersonIdsFor',
+                ),
+                'destLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadTagIdsFor',
+                ),
                 'midTableName' => '#__people_tags',
                 'fieldLinks2' => array (
                     'idOfPerson' => 'personId',
@@ -212,6 +220,14 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 ),
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
+                'srcLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadPerkIdsFor',
+                ),
+                'destLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadTagIdsFor',
+                ),
                 'midTableName' => '#__tag_perks',
                 'fieldLinks2' => array (
                     'idOfPerk' => 'perkId',

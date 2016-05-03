@@ -204,6 +204,14 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
                 ),
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
+                'srcLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadPersonAlbumIdsFor',
+                ),
+                'destLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadPersonPhotoIdsFor',
+                ),
                 'midTableName' => '#__album_photos',
                 'fieldLinks2' => array (
                     'personId' => 'personId',

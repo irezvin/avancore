@@ -167,32 +167,36 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 				$prevMapper = $this->getMapper(true);
 			}
 			$rel = $prevMapper->getRelation($p['relationId']);
-			$protos = array();
-			if ($rel->midTableName) {
-				$midAlias = 'mid__'.$alias;
-                if (!isset($this->_tables[$midAlias])) {
-                    $protos[$midAlias] = array(
-                        'name' => $rel->midTableName,
-                        'joinsAlias' => $joinsAlias,
-                        'joinType' => $this->defaultJoinType,
-                        'joinsOn' => array_flip($rel->fieldLinks),
-                    );
-                    if ($rel->midWhere !== false && !$this->ignoreMidWhere) {
-                        $protos[$midAlias]['joinsOn'][] = new Ac_Sql_Expression($rel->getStrMidWhere($midAlias));
+            if (!$rel->getDestNonSql()) { // connect only sql-enabled relations
+                $protos = array();
+                if ($rel->midTableName) {
+                    $midAlias = 'mid__'.$alias;
+                    if (!isset($this->_tables[$midAlias])) {
+                        $protos[$midAlias] = array(
+                            'name' => $rel->midTableName,
+                            'joinsAlias' => $joinsAlias,
+                            'joinType' => $this->defaultJoinType,
+                            'joinsOn' => array_flip($rel->fieldLinks),
+                        );
+                        if ($rel->midWhere !== false && !$this->ignoreMidWhere) {
+                            $protos[$midAlias]['joinsOn'][] = new Ac_Sql_Expression($rel->getStrMidWhere($midAlias));
+                        }
+                        $joinsAlias = $midAlias;
                     }
-                    $joinsAlias = $midAlias;
                 }
-			}
-			$protos[$alias] = array(
-				'name' => $m->tableName,
-				'joinsAlias' => $joinsAlias,
-				'joinType' => $this->defaultJoinType,
-				'joinsOn' => $rel->midTableName? array_flip($rel->fieldLinks2) : array_flip($rel->fieldLinks)
-			);
-			foreach ($protos as $alias => $proto) {
-				$t = $this->addTable($proto, $alias);
-			}
-			$res = $this->_tables[$origAlias];
+                $protos[$alias] = array(
+                    'name' => $m->tableName,
+                    'joinsAlias' => $joinsAlias,
+                    'joinType' => $this->defaultJoinType,
+                    'joinsOn' => $rel->midTableName? array_flip($rel->fieldLinks2) : array_flip($rel->fieldLinks)
+                );
+                foreach ($protos as $alias => $proto) {
+                    $t = $this->addTable($proto, $alias);
+                }
+                $res = $this->_tables[$origAlias];
+            } else {
+                $res = null;
+            }
 		} else {
 			$res = null;
 		}

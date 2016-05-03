@@ -185,6 +185,14 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
                 ),
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
+                'srcLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadTagIdsFor',
+                ),
+                'destLoadNNIdsMethod' => array (
+                    0 => true,
+                    1 => 'loadPerkIdsFor',
+                ),
                 'midTableName' => '#__tag_perks',
                 'fieldLinks2' => array (
                     'idOfTag' => 'tagId',

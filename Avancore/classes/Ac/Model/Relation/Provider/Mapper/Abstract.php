@@ -16,8 +16,6 @@ abstract class Ac_Model_Relation_Provider_Mapper_Abstract extends Ac_Model_Relat
      */
     protected $mapper = null;
     
-    protected $query = false;
-
     /**
      * additional restrictions to add to $query arg of Mapper's find() method
      * @var array

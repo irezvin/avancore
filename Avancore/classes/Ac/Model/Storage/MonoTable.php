@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
+class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_WithSqlSelectPrototype {
     
     /**
      * name of SQL table that contains records
@@ -212,7 +212,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         return $res;
     }
     
-    function peReplaceNNRecords($object, $rowProto, $rows, $midTableName, & $errors = array()) {
+    function peReplaceNNRecords($object, $rowProto, $rows, $midTableName, & $errors = array(), Ac_Model_Association_Abstract $association = null) {
         $res = true;
         if (count($rowProto)) {
             $sqlDb = $this->db;
@@ -302,7 +302,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
     }
 
     function setMapper(Ac_Model_Mapper $mapper = null) {
-        if (($res = parent::setMapper($mapper)) && $this->identifierField) {
+        if (($res = parent::setMapper($mapper)) && strlen($this->identifierField)) {
             $mapper->setIdentifierField($this->identifierField);
             $mapper->setIdentifierPublicField($this->primaryKey);
             if (($this->setRowIdentifierToPk) && strlen($this->primaryKey)) {
@@ -705,6 +705,30 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql {
         if ($this->nullableColumns === false) $this->nullableColumns = $nullableColumns;
         if ($this->primaryKey === false) $this->primaryKey = $primaryKey;
         if ($this->defaults === false) $this->defaults = $defaults;
+    }
+    
+    function getSqlSelectPrototype($primaryAlias = 't') {
+        $res = $this->doGetSqlSelectPrototype($primaryAlias);
+        return $res;
+    }
+    
+    protected function doGetSqlSelectPrototype($primaryAlias = 't') {
+        $res = array(
+            'class' => 'Ac_Sql_Select',
+			'tables' => array(
+				$primaryAlias => array(
+					'name' => $this->tableName, 
+				),
+			),
+        );
+        if ($this->mapper) {
+			$res['tableProviders']['model'] = array(
+                'class' => 'Ac_Model_Sql_TableProvider',
+                'mapperAlias' => $primaryAlias,
+                'mapper' => $this->mapper,
+			);
+        }
+        return $res;
     }
     
 }
