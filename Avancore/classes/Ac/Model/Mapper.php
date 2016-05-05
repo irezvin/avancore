@@ -2358,7 +2358,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * Count number of records that match each value 
      * @see Ac_Model_Mapper::countWithValues
      */
-    const GROUP_KEYS = 1;
+    const GROUP_VALUES = 1;
     
     /**
      * Count records by values, but group 
@@ -2367,36 +2367,50 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     const GROUP_ORDER = 2;
     
     /**
-     * Counts unique records that have values of $fieldName listed in $fieldValues
+     * Counts unique records that have values of $fieldOrFields listed in $fieldValues
      * If $groupByValues is TRUE, will return array with number of records that match each value
      * ($fieldValues must be scalar for that).
      * 
+     * When several $fieldValues are used, will try to use criterion field1_field2 if such criterion exists.
+     * 
      * As count(), does not append items to collection.
      * 
-     * @param string $fieldName
-     * @param array $fieldValues
+     * @param string $fieldOrFields One or many field names
+     * @param array $fieldValues Values. One or two-dimensional array 
+     *        (number of items in in second dimension must be equal to number of fields)
      * @param $groupByValues How the result should be grouped: one of following constants 
      *         - Ac_Model_Mapper::GROUP_NONE - just count all unique records
-     *         - Ac_Model_Mapper::GROUP_KEYS - group counts by values, keys of result will match values (must be non-scalar)
+     *         - Ac_Model_Mapper::GROUP_VALUES - group counts by values, keys of result will match values (must be non-scalar)
      *         - Ac_Model_Mapper::GROUP_ORDER - keys of result array will match keys of fieldValues (so $result[$i] will contain
      *          number of records that have $fieldName === $fieldValues[$i])
-     * @return int|array Number of records
+     * @param array $query Additional restriction on records that are counted
+     * @return int|array Number of records. If several field names are provided and $groupByValues is Ac_Model_Mapper::GROUP_VALUES,
+     *         multi-dimensional array will be returned where each dimension matches respective field.
      */
-    function countWithValues ($fieldName, array $fieldValues, $groupByValues = Ac_Model_Mapper::GROUP_NONE) {
-        if (!in_array($groupByValues, array(Ac_Model_Mapper::GROUP_NONE, Ac_Model_Mapper::GROUP_KEYS, Ac_Model_Mapper::GROUP_ORDER))) {
+    function countWithValues ($fieldOrFields, array $fieldValues, $groupByValues = Ac_Model_Mapper::GROUP_NONE, array $query = array()) {
+        if (!in_array($groupByValues, array(Ac_Model_Mapper::GROUP_NONE, Ac_Model_Mapper::GROUP_VALUES, Ac_Model_Mapper::GROUP_ORDER))) {
             Ac_Util::getClassConstants('Ac_Model_Mapper', 'GROUP_');
             throw Ac_E_InvalidCall::outOfConst('groupByValues', $groupByValues, $allowed, 'Ac_Model_Mapper');
         }
+        list($fieldOrFields, $fieldValues) = Ac_Model_Mapper::checkMultiFieldCriterion($fieldOrFields, $fieldValues);
         // A. try best case find
-        if (!is_null($records = $this->bestCaseFind(array($fieldName => $fieldValues), false, null))) {
-            if ($groupByValues == self::GROUP_NONE) {
-                $res = count($records);
-            } else {
-                $res = $this->countRecordsByValues($records, $fieldName, $fieldValues, $groupByValues == self::GROUP_KEYS);
+        $hasGoodCase = false;
+        if (count($fieldOrFields) == 1) {
+            $field = $fieldOrFields[0];
+            $combinedQuery = $query;
+            $combinedQuery[$field] = $fieldValues;
+            if (!is_null($records = $this->bestCaseFind($combinedQuery, false, null))) {
+                if ($groupByValues == self::GROUP_NONE) {
+                    $res = count($records);
+                } else {
+                    $res = $this->countRecordsByValues($records, array($field), $fieldValues, $groupByValues == self::GROUP_VALUES);
+                }
+                $hasGoodCase = true;
             }
-        } else { 
+        }
+        if (!$hasGoodCase) {
             // B. try to do optimal search using the storage
-            $res = $this->getStorage()->countWithValuesIfPossible($fieldName, $fieldValues, $groupByValues);
+            $res = $this->getStorage()->countWithValuesIfPossible($fieldOrFields, $fieldValues, $groupByValues, $query, true);
             if ($res === false) { 
                 // C. Do it old-school
                 if (self::$collectGarbageAfterCountFind) {
@@ -2405,11 +2419,27 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 }
                 
                 self::pauseCollecting();
-                $records = $this->find(array($fieldName => $fieldValues));
+                $combinedQuery = $query;
+                if (count($fieldOrFields) > 1) {
+                    $combinedCrit = implode('_', $fieldOrFields);
+                    // check if we have such criterion
+                    if ($this->getSearch()->getApplicableSearchCriteria(array($combinedCrit => $fieldValues))) {
+                        $combinedQuery[$combinedCrit] = $fieldValues;
+                    } else {
+                        $combinedQuery[$combinedCrit] = new Ac_Model_Criterion_MultiField(array(
+                            'fields' => $fieldOrFields, 
+                            'values' => $fieldValues, 
+                            'strictNulls' => true
+                        ));
+                    }
+                } else {
+                    $combinedQuery[$fieldOrFields[0]] = $fieldValues;
+                }
+                $records = $this->find($combinedQuery);
                 if ($groupByValues == self::GROUP_NONE) {
                     $res = count($records);
                 } else {
-                    $res = $this->countRecordsByValues($records, $fieldName, $fieldValues, $groupByValues == self::GROUP_KEYS);
+                    $res = $this->countRecordsByValues($records, $fieldOrFields, $fieldValues, $groupByValues == self::GROUP_VALUES);
                 }
                 self::resumeCollecting();
                 
@@ -2421,20 +2451,78 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         }
         return $res;
     }
-    
-    protected function countRecordsByValues(array $records, $fieldName, array $fieldValues, $valuesToKeys) {
-        $res = array();
-        $values = array();
-        foreach ($records as $j => $rec) {
-            $values[$j] = $rec->getField($fieldName);
-        }
-        foreach ($fieldValues as $i => $val) {
-            $k = $valuesToKeys? $val : $i;
-            $res[$k] = 0;
-            foreach ($values as $j => $value) {
-                if (is_null($value)? $value === $val : $value == $val) {
-                    $res[$k]++;
-                    unset($values[$j]);
+
+    /*
+     * requires $fieldNames to be numerical array, $fieldValues must be scalar array if count($fieldValues) == 1 and
+     * numerical array with same number of elements in second dimension as in $fieldNames 
+     * (count($fieldValues[$i]) == count($fieldNames))
+     */
+    protected function countRecordsByValues(array $records, array $fieldNames, array $fieldValues, $valuesToKeys) {
+        
+        // TODO: accomplish the goal without loading all records into memory at once 
+        // A: pass $recordValues instead of $records
+        // B: pass iterator of filtered records
+        
+        if (count($fieldNames) == 1) {
+            $fieldName = $fieldNames[0];
+            $res = array();
+            $recordValues = array();
+            foreach ($records as $j => $rec) {
+                $recordValues[$j] = $rec->getField($fieldName);
+            }
+            foreach ($fieldValues as $i => $val) {
+                $k = $valuesToKeys? $val : $i;
+                $res[$k] = 0;
+                foreach ($recordValues as $j => $value) {
+                    if (is_null($value)? $value === $val : $value == $val) {
+                        $res[$k]++;
+                        unset($recordValues[$j]);
+                    }
+                }
+            }
+        } else {
+            $recordValues = array();
+            foreach ($records as $k => $rec) {
+                foreach ($fieldNames as $m => $fieldName) {
+                    $recordValues[$k][$m] = $rec->getField($fieldName);
+                }
+            }
+            // step 1: count matches into single-dimensional array with key matching key in $fieldValues array
+            $singleDim = array();
+            foreach ($fieldValues as $key => $row) {
+                $singleDim[$key] = 0;
+                foreach ($recordValues as $j => $recordRow) {
+                    $match = true;
+                    foreach ($recordRow as $m => $recordValue) {
+                        if (!(is_null($recordValue[$m])? $recordValue === $row[$m] : $recordValue == $row[$m])) {
+                            $match = false;
+                            break;
+                        }
+                        if ($match) {
+                            $singleDim[$key]++;
+                            unset($recordValues[$j]);
+                        }
+                    }
+                }
+            }
+            // step 2: convert into multi-dimensional array, if necessary
+            if ($valuesToKeys) {
+                $res = $singleDim;
+            } else {
+                $res = array();
+                if (count($fieldValues) == 2) {
+                    foreach ($fieldValues as $key => $row) 
+                        $res[$row[0]][$row[1]] = $singleDim[$key];
+                } elseif (count($fieldValues) == 3) {
+                    foreach ($fieldValues as $key => $row) 
+                        $res[$row[0]][$row[1]][$row[2]] = $singleDim[$key];
+                } elseif (count($fieldValues) == 4) {
+                    foreach ($fieldValues as $key => $row) 
+                        $res[$row[0]][$row[1]][$row[2]][$row[3]] = $singleDim[$key];
+                } else {
+                    foreach ($fieldValues as $key => $row) {
+                        Ac_Util::simpleSetArrayByPathNoRef($res, $row, $singleDim[$key]);
+                    }
                 }
             }
         }
@@ -2542,6 +2630,42 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     protected static function resumeCollecting() {
         if (self::$dontCollect) self::$dontCollect--;
+    }
+    
+    /**
+     * Checks parameters for multi-field match ( field0 == val0[0] && field1 == val0[1] || field1 == val1[0] && field2 == val2[1] )
+     * Makes sure length of each fieldValues item is same as length of fiels array, makes sure only scalars are provided.
+     * Returns array with 'normalized' fieldNames and fieldValues
+     * normalized fieldNames is always numerical array; normalized fieldValues is either two-dim array or scalar array
+     * 
+     * @param string|array $fieldNames
+     * @param array $fieldValues
+     * @param bool $singleValuesToScalars return scalar elements of arrFieldValues when count(arrFieldNames) == 1
+     * @return array(arrFieldNames, arrFieldValues)
+     * @throws Ac_E_InvalidCall
+     */
+    static function checkMultiFieldCriterion($fieldNames, $fieldValues, $singleValuesToScalars = true) {
+        // validate the values
+        $fieldNames = array_values(is_array($fieldNames)? array_values($fieldNames) : array($fieldNames));
+        if (!($cnt = count($fieldNames))) throw new Ac_E_InvalidCall("Empty \$fieldNames array not accepted");
+        $properValues = array();
+        $manyFields = $cnt > 1;
+        foreach ($fieldValues as $i => $row) {
+            if (!is_array($row)) $row = array($row); else $row = array_values($row);
+            if (($rowCnt = count($row)) !== $cnt) throw new Ac_E_InvalidCall(
+                "Number of elements in each \$fieldValues item must be the same as number of fields,"
+                . " but count(\$fieldValues['{$i}']) == {$rowCnt} instead of {$cnt}"
+            );
+            $scalar = array_filter($row, "is_scalar");
+            if (count($scalar) !== $rowCnt) {
+                $nonScalar = implode(', ', array_diff(array_keys($row), array_keys($scalar)));
+                throw new Ac_E_InvalidCall("\$fieldValues['{$i}'] contains non-scalar element(s). Key(s): ".$nonScalar);
+            }
+            if (!$manyFields && $singleValuesToScalars) $properValues[$i] = $row[0];
+                else $properValues[$i] = $row;
+        }
+        $fieldValues = $properValues;
+        return array($fieldNames, $fieldValues);
     }
     
 }

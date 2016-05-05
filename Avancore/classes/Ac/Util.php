@@ -13,6 +13,9 @@ if (!defined('AC_PHP_VERSION_MAJOR') && !defined('AC_PHP_VERSION_MINOR')) {
 
 if (!defined('AC_UTIL_DEFAULT_CHARSET')) define('AC_UTIL_DEFAULT_CHARSET', 'utf-8');
 
+/**
+ * @TODO optimize set/get by path for simple cases (length of path 1, 2, 3, 4)
+ */
 abstract class Ac_Util {
 
     protected static $autoLoadRegistered = null;

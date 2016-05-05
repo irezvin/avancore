@@ -27,7 +27,7 @@ class Ac_Model_Relation_Provider_Mapper_Pk extends Ac_Model_Relation_Provider_Ma
         if (!$this->mapper) throw new Ac_E_InvalidUsage("setMapper() first");
         $vv = $this->extractSingleValues($destValues);
         if (count($vv)) {
-            $groupMode = $byKeys? Ac_Model_Mapper::GROUP_KEYS : Ac_Model_Mapper::GROUP_ORDER;
+            $groupMode = $byKeys? Ac_Model_Mapper::GROUP_VALUES : Ac_Model_Mapper::GROUP_ORDER;
             $res = $this->mapper->countWithValues($this->mapper->getIdentifierPublicField(), $vv, $groupMode);
         } else {
             $res = array();

@@ -40,7 +40,7 @@ class Ac_Model_Relation_Provider_Mapper_Omni extends Ac_Model_Relation_Provider_
         if (!$this->mapper) throw new Ac_E_InvalidUsage("setMapper() first");
         $vv = $this->extractSingleValues($values);
         if (count($vv)) {
-            $groupMode = $byKeys? Ac_Model_Mapper::GROUP_KEYS : Ac_Model_Mapper::GROUP_ORDER;
+            $groupMode = $byKeys? Ac_Model_Mapper::GROUP_VALUES : Ac_Model_Mapper::GROUP_ORDER;
             $res = $this->mapper->countWithValues($this->keys[0], $vv, $groupMode);
         } else {
             $res = array();

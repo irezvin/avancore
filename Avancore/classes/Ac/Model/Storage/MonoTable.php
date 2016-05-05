@@ -633,21 +633,72 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
         return $res;
     }
     
-    protected function implCountWithValuesIfPossible($fieldName, $fieldValues, $groupByValues) {
+    protected function implCountWithValuesIfPossible($fieldNames, $fieldValues, $groupByValues, array $query = array()) {
         if ($groupByValues === Ac_Model_Mapper::GROUP_NONE) {
-            $res = parent::implCountWithValuesIfPossible($fieldName, $fieldValues, $groupByValues);
-        } elseif (in_array($fieldName, $this->getColumns())) { // only the direct mappable field. Todo: allow mapping
-            $stmt = $this->createSqlSelect(array(), array($fieldName => $fieldValues), false, false, false, $remainingQuery);
+            $res = parent::implCountWithValuesIfPossible($fieldNames[0], $fieldValues, $groupByValues);
+        } elseif (!array_diff($fieldNames, $this->getColumns())) { // only the direct mappable field. Todo: allow mapping
+            $combined = $query;
+            if (count($fieldNames) > 1) {
+                // make multi-criterion/
+                $eq = array();
+                foreach ($fieldValues as $row) $eq[] = $this->db->valueCriterion(array_combine($fieldNames, $row));
+                $combined['_multi_'.(implode('_', $fieldNames))] = new Ac_Sql_Expression(implode(" OR ", $eq));
+            } else {
+                $combined[$fieldNames[0]] = $fieldValues;
+            }
+            $stmt = $this->createSqlSelect(array(), $combined, false, false, false, $remainingQuery);
             if (!$remainingQuery) { // it's possible
-                $stmt->columns = array('fld' => $this->getDb()->n($fieldName), 'cnt' => "COUNT(DISTINCT t.".$this->getDb()->n($this->primaryKey).")");
-                $stmt->groupBy = array($fieldName);
-                $stmt->limitCount = false;
-                $stmt->limitOffset = false;
-                $counts = $this->getDb()->fetchColumn($stmt, 'cnt', 'fld');
-                $res = array();
-                foreach ($fieldValues as $i => $val) {
-                    $k = $groupByValues === Ac_Model_Mapper::GROUP_KEYS? $val : $i;
-                    $res[$k] = isset($counts[$val])? $counts[$val] : 0;
+                if (count($fieldNames) == 1 && $groupByValues !== Ac_Model_Mapper::GROUP_NONE) {
+                    $stmt->columns = array(
+                        'fld' => $this->getDb()->n($fieldNames[0]), 
+                        'cnt' => "COUNT(DISTINCT t.".$this->getDb()->n($this->primaryKey).")"
+                    );
+                    $stmt->groupBy = $fieldNames;
+                    $stmt->limitCount = false;
+                    $stmt->limitOffset = false;
+                    $counts = $this->getDb()->fetchColumn($stmt, 'cnt', 'fld');
+                    $res = array();
+                    foreach ($fieldValues as $i => $val) {
+                        $k = $groupByValues === Ac_Model_Mapper::GROUP_VALUES? $val : $i;
+                        $res[$k] = isset($counts[$val])? $counts[$val] : 0;
+                    }
+                } else {
+                    // a bit more difficult task
+                    if ($groupByValues !== Ac_Model_Mapper::GROUP_NONE) {
+                        $stmt->columns = $fieldNames;
+                        $stmt->groupBy = $fieldNames;
+                    } else {
+                        $stmt->columns = array();
+                        $stmt->groupBy = array();
+                    }
+                    $stmt->columns['__cnt__'] = "COUNT(DISTINCT t.".$this->getDb()->n($this->primaryKey).")";
+                    $stmt->limitCount = false;
+                    $stmt->limitOffset = false;
+                    if ($groupByValues == Ac_Model_Mapper::GROUP_NONE) {
+                        $res = $this->getDb()->fetchValue($stmt);
+                    } else {
+                        $arr = Ac_Util::indexArray($this->getDb()->fetchArray($stmt), $fieldNames, true, '__cnt__');
+                        if ($groupByValues == Ac_Model_Mapper::GROUP_ORDER) {
+                            // now have to find keys of proper fieldValues
+                            $res = array();
+                            if (count($fieldNames) === 3) {
+                                foreach ($fieldValues as $i => $row)
+                                    if (isset($arr[$row[0]]) && isset($arr[$row[0]][$row[1]]) 
+                                        && isset($arr[$row[0]][$row[1]][$row[2]])) $res[$i] = $arr[$row[0]][$row[1]][$row[2]];
+                                    else $res[$i] = 0;
+                            } elseif (count($fieldNames) === 2) {
+                                foreach ($fieldValues as $i => $row)
+                                    if (isset($arr[$row[0]]) && isset($arr[$row[0]][$row[1]]))
+                                        $res[$i] = $arr[$row[0]][$row[1]];
+                                    else $res[$i] = 0;
+                            } else {
+                                foreach ($fieldValues as $i => $row)
+                                    $res[$i] = Ac_Util::simpleGetArrayByPath ($arr, $row, 0);
+                            }
+                        } else {
+                            $res = $arr;
+                        }
+                    }
                 }
             } else {
                 $res = false;

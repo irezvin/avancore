@@ -650,20 +650,20 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         $this->assertEqual(count($m->getRegisteredObjects()), 0);
         
         // count without Grouping
-        $this->assertArraysMatch($m->countWithValues('religionId', array(4, 1), Ac_Model_Mapper::GROUP_KEYS),
+        $this->assertArraysMatch($m->countWithValues('religionId', array(4, 1), Ac_Model_Mapper::GROUP_VALUES),
             array(4 => 2, 1 => 2), 'couunt without grouping', true);
-        // count - GROUP_KEYS
-        $this->assertArraysMatch($m->countWithValues('birthYear', array(1981, 1982), Ac_Model_Mapper::GROUP_KEYS),
-            array(1981 => 3, 1982 => 1), 'count with GROUP_KEYS', true);
+        // count - GROUP_VALUES
+        $this->assertArraysMatch($m->countWithValues('birthYear', array(1981, 1982), Ac_Model_Mapper::GROUP_VALUES),
+            array(1981 => 3, 1982 => 1), 'count with GROUP_VALUES', true);
         // count - GROUP_ORDER
         $this->assertArraysMatch($m->countWithValues('birthYear', array(1981, 1982), Ac_Model_Mapper::GROUP_ORDER),
             array(0 => 3, 1 => 1), 'count with GROUP_ORDER', true);
-        $this->assertArraysMatch($m->countWithValues('personId', array(1, 2, 3, 4, 5), Ac_Model_Mapper::GROUP_KEYS),
-            array(1 => 0, 2 => 0, 3 => 1, 4 => 1, 5 => 0), 'count with GROUP_KEYS - primary keys', true);
+        $this->assertArraysMatch($m->countWithValues('personId', array(1, 2, 3, 4, 5), Ac_Model_Mapper::GROUP_VALUES),
+            array(1 => 0, 2 => 0, 3 => 1, 4 => 1, 5 => 0), 'count with GROUP_VALUES - primary keys', true);
         
         $m->getAllRecords();
-        $this->assertArraysMatch($m->countWithValues('personId', array(1, 2, 3, 4, 5), Ac_Model_Mapper::GROUP_KEYS),
-            array(1 => 0, 2 => 0, 3 => 1, 4 => 1, 5 => 0), 'count with GROUP_KEYS - primary keys - all records loaded', true);
+        $this->assertArraysMatch($m->countWithValues('personId', array(1, 2, 3, 4, 5), Ac_Model_Mapper::GROUP_VALUES),
+            array(1 => 0, 2 => 0, 3 => 1, 4 => 1, 5 => 0), 'count with GROUP_VALUES - primary keys - all records loaded', true);
         
         $m->reset();
         

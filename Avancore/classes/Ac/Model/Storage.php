@@ -244,17 +244,18 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
         return false; // to abstract to be possible
     }
     
-    function countWithValuesIfPossible($fieldName, $fieldValues, $groupByValues = Ac_Model_Mapper::GROUP_NONE) {
-        if (!in_array($groupByValues, array(Ac_Model_Mapper::GROUP_NONE, Ac_Model_Mapper::GROUP_KEYS, Ac_Model_Mapper::GROUP_ORDER))) {
+    function countWithValuesIfPossible($fieldNames, $fieldValues, $groupByValues = Ac_Model_Mapper::GROUP_NONE, array $query = array(), $dontCheck = false) {
+        if (!in_array($groupByValues, array(Ac_Model_Mapper::GROUP_NONE, Ac_Model_Mapper::GROUP_VALUES, Ac_Model_Mapper::GROUP_ORDER))) {
             Ac_Util::getClassConstants('Ac_Model_Mapper', 'GROUP_');
             throw Ac_E_InvalidCall::outOfConst('groupByValues', $groupByValues, $allowed, 'Ac_Model_Mapper');
         }
-        return $this->implCountWithValuesIfPossible($fieldName, $fieldValues, $groupByValues);
+        if (!$dontCheck) list($fieldNames, $fieldValues) = Ac_Model_Mapper::checkMultiFieldCriterion($fieldNames, $fieldValues);
+        return $this->implCountWithValuesIfPossible($fieldNames, $fieldValues, $groupByValues, $query);
     }
     
-    protected function implCountWithValuesIfPossible($fieldName, $fieldValues, $groupByValues) {
-        if ($groupByValues == Ac_Model_Mapper::GROUP_NONE) {
-            $res = $this->countIfPossible(array($fieldName => $fieldValues));
+    protected function implCountWithValuesIfPossible($fieldNames, $fieldValues, $groupByValues) {
+        if ($groupByValues == Ac_Model_Mapper::GROUP_NONE && count($fieldNames) == 1) {
+            $res = $this->countIfPossible(array($fieldNames[0] => $fieldValues));
         } else {
             $res = false;
         }
