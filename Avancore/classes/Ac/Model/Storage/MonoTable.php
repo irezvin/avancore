@@ -425,7 +425,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
             if (is_object($v)) { 
                 // support for Ac_Sql_Expression
                 if ($v instanceof Ac_Sql_Expression) {
-                    $select['where']['crit_'.$k] = $v;
+                    $select->where['crit_'.$k] = $v;
                     unset($remainingQuery[$k]);
                 // support for Ad-hoc Sql parts
                 } elseif ($v instanceof Ac_Sql_Part) {
@@ -633,18 +633,20 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
         return $res;
     }
     
-    protected function implCountWithValuesIfPossible($fieldNames, $fieldValues, $groupByValues, array $query = array()) {
-        if ($groupByValues === Ac_Model_Mapper::GROUP_NONE) {
-            $res = parent::implCountWithValuesIfPossible($fieldNames[0], $fieldValues, $groupByValues);
+    protected function implCountWithValuesIfPossible($fieldNames, $fieldValues, $groupByValues, $query, $useQueryOnly) {
+        if ($groupByValues === Ac_Model_Mapper::GROUP_NONE && (count($fieldNames) == 1 && !$query || $useQueryOnly)) {
+            if (!$query) $res = $this->countIfPossible(array($fieldNames[0] => $fieldValues));
+            else /* $useQueryOnly */ $res = $this->countIfPossible(array($query));
         } elseif (!array_diff($fieldNames, $this->getColumns())) { // only the direct mappable field. Todo: allow mapping
             $combined = $query;
-            if (count($fieldNames) > 1) {
-                // make multi-criterion/
-                $eq = array();
-                foreach ($fieldValues as $row) $eq[] = $this->db->valueCriterion(array_combine($fieldNames, $row));
-                $combined['_multi_'.(implode('_', $fieldNames))] = new Ac_Sql_Expression(implode(" OR ", $eq));
-            } else {
-                $combined[$fieldNames[0]] = $fieldValues;
+            if (!$useQueryOnly) {
+                if (count($fieldNames) > 1) {
+                    // make multi-criterion/
+                    foreach ($fieldValues as $row) $crit[] = array_combine($fieldNames, $row);
+                    $combined['_multi_'.(implode('_', $fieldNames))] = new Ac_Sql_Expression($this->db->valueCriterion($crit, false, false, true));
+                } else {
+                    $combined[$fieldNames[0]] = $fieldValues;
+                }
             }
             $stmt = $this->createSqlSelect(array(), $combined, false, false, false, $remainingQuery);
             if (!$remainingQuery) { // it's possible
@@ -662,6 +664,10 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
                         $k = $groupByValues === Ac_Model_Mapper::GROUP_VALUES? $val : $i;
                         $res[$k] = isset($counts[$val])? $counts[$val] : 0;
                     }
+                    if ($useQueryOnly) {
+                        // limit the result only to the values that we are interested in
+                        $stmt->having['__values__'] = 'fld '.$this->db->eqCriterion($value);
+                    }
                 } else {
                     // a bit more difficult task
                     if ($groupByValues !== Ac_Model_Mapper::GROUP_NONE) {
@@ -674,6 +680,12 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
                     $stmt->columns['__cnt__'] = "COUNT(DISTINCT t.".$this->getDb()->n($this->primaryKey).")";
                     $stmt->limitCount = false;
                     $stmt->limitOffset = false;
+                    if ($groupByValues !== Ac_Model_Mapper::GROUP_NONE && $useQueryOnly) {
+                        $crit = array();
+                        // limit the result only to the values that we are interested in
+                        foreach ($fieldValues as $row) $crit[] = array_combine($fieldNames, $row);
+                        $stmt->having['__values__'] = new Ac_Sql_Expression($this->db->valueCriterion($crit, false, false, true));
+                    }
                     if ($groupByValues == Ac_Model_Mapper::GROUP_NONE) {
                         $res = $this->getDb()->fetchValue($stmt);
                     } else {

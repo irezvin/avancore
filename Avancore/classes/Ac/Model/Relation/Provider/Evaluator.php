@@ -18,7 +18,7 @@ class Ac_Model_Relation_Provider_Evaluator {
         return $this->application;
     }    
     
-    protected function evaluateMapperProvider(array $relationProps) {
+    protected function evaluateMapperProvider(array $relationProps, $preferWhenSeveralFields = false) {
         $res = false;
         $mapper = false;
         if (isset($relationProps['destMapper']) && $relationProps['destMapper'])
@@ -39,7 +39,7 @@ class Ac_Model_Relation_Provider_Evaluator {
                 is_string($relationProps['destOrdering']) && preg_match('/[ ,]/', $relationProps['destOrdering']);
             $hasExtraJoins = isset($relationProps['destExtraJoins']) && $relationProps['destExtraJoins'];
 
-            if (!($hasMultiField || $hasSqlWhere || $hasSqlOrdering || $hasExtraJoins)) {
+            if (!(($hasMultiField && !$preferWhenSeveralFields) || $hasSqlWhere || $hasSqlOrdering || $hasExtraJoins)) {
             
                 // check if dest key is PK
                 $destKeys = $relationProps['fieldLinks2']? $relationProps['fieldLinks2'] : $relationProps['fieldLinks'];
@@ -69,7 +69,7 @@ class Ac_Model_Relation_Provider_Evaluator {
         // todo: replace with something better when decision 
         // about provider class is made
         if (isset($relationProps['nonSql']) && $relationProps['nonSql']) {
-            $res = $this->evaluateMapperProvider($relationProps);
+            $res = $this->evaluateMapperProvider($relationProps, true);
             if (!$res) {
                 throw new Exception ("Cannot evaluate Provider for non-sql storage (can't retrieve Mapper)");
             }

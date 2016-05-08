@@ -2384,10 +2384,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      *         - Ac_Model_Mapper::GROUP_ORDER - keys of result array will match keys of fieldValues (so $result[$i] will contain
      *          number of records that have $fieldName === $fieldValues[$i])
      * @param array $query Additional restriction on records that are counted
+     * @param bool $useQueryOnly Use only $query to locate record which will be counted
      * @return int|array Number of records. If several field names are provided and $groupByValues is Ac_Model_Mapper::GROUP_VALUES,
      *         multi-dimensional array will be returned where each dimension matches respective field.
      */
-    function countWithValues ($fieldOrFields, array $fieldValues, $groupByValues = Ac_Model_Mapper::GROUP_NONE, array $query = array()) {
+    function countWithValues ($fieldOrFields, array $fieldValues, $groupByValues = Ac_Model_Mapper::GROUP_NONE, array $query = array(), $useQueryOnly = false) {
         if (!in_array($groupByValues, array(Ac_Model_Mapper::GROUP_NONE, Ac_Model_Mapper::GROUP_VALUES, Ac_Model_Mapper::GROUP_ORDER))) {
             Ac_Util::getClassConstants('Ac_Model_Mapper', 'GROUP_');
             throw Ac_E_InvalidCall::outOfConst('groupByValues', $groupByValues, $allowed, 'Ac_Model_Mapper');
@@ -2398,7 +2399,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         if (count($fieldOrFields) == 1) {
             $field = $fieldOrFields[0];
             $combinedQuery = $query;
-            $combinedQuery[$field] = $fieldValues;
+            if (!$useQueryOnly) $combinedQuery[$field] = $fieldValues;
             if (!is_null($records = $this->bestCaseFind($combinedQuery, false, null))) {
                 if ($groupByValues == self::GROUP_NONE) {
                     $res = count($records);
@@ -2410,7 +2411,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         }
         if (!$hasGoodCase) {
             // B. try to do optimal search using the storage
-            $res = $this->getStorage()->countWithValuesIfPossible($fieldOrFields, $fieldValues, $groupByValues, $query, true);
+            $res = $this->getStorage()->countWithValuesIfPossible($fieldOrFields, $fieldValues, $groupByValues, $query, $useQueryOnly, true);
             if ($res === false) { 
                 // C. Do it old-school
                 if (self::$collectGarbageAfterCountFind) {
@@ -2420,23 +2421,25 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 
                 self::pauseCollecting();
                 $combinedQuery = $query;
-                if (count($fieldOrFields) > 1) {
-                    $combinedCrit = implode('_', $fieldOrFields);
-                    // check if we have such criterion
-                    if ($this->getSearch()->getApplicableSearchCriteria(array($combinedCrit => $fieldValues))) {
-                        $combinedQuery[$combinedCrit] = $fieldValues;
+                if (!$useQueryOnly) {
+                    if (count($fieldOrFields) > 1) {
+                        $combinedCrit = implode('_', $fieldOrFields);
+                        // check if we have such criterion
+                        if ($this->getSearch()->getApplicableSearchCriteria(array($combinedCrit => $fieldValues))) {
+                            $combinedQuery[$combinedCrit] = $fieldValues;
+                        } else {
+                            $combinedQuery[$combinedCrit] = new Ac_Model_Criterion_MultiField(array(
+                                'fields' => $fieldOrFields, 
+                                'values' => $fieldValues, 
+                                'strictNulls' => true
+                            ));
+                        }
                     } else {
-                        $combinedQuery[$combinedCrit] = new Ac_Model_Criterion_MultiField(array(
-                            'fields' => $fieldOrFields, 
-                            'values' => $fieldValues, 
-                            'strictNulls' => true
-                        ));
+                        $combinedQuery[$fieldOrFields[0]] = $fieldValues;
                     }
-                } else {
-                    $combinedQuery[$fieldOrFields[0]] = $fieldValues;
                 }
                 $records = $this->find($combinedQuery);
-                if ($groupByValues == self::GROUP_NONE) {
+                if ($groupByValues === self::GROUP_NONE) {
                     $res = count($records);
                 } else {
                     $res = $this->countRecordsByValues($records, $fieldOrFields, $fieldValues, $groupByValues == self::GROUP_VALUES);
@@ -2474,9 +2477,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 $k = $valuesToKeys? $val : $i;
                 $res[$k] = 0;
                 foreach ($recordValues as $j => $value) {
-                    if (is_null($value)? $value === $val : $value == $val) {
+                    if ((is_null($value) || is_null($val))? $value === $val : $value == $val) {
                         $res[$k]++;
-                        unset($recordValues[$j]);
+                        if (!$valuesToKeys) unset($recordValues[$j]);
                     }
                 }
             }
@@ -2494,19 +2497,20 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 foreach ($recordValues as $j => $recordRow) {
                     $match = true;
                     foreach ($recordRow as $m => $recordValue) {
-                        if (!(is_null($recordValue[$m])? $recordValue === $row[$m] : $recordValue == $row[$m])) {
+                        $equals = (is_null($recordValue) || is_null($row[$m])? $recordValue === $row[$m] : $recordValue == $row[$m]);
+                        if (!$equals) {
                             $match = false;
                             break;
                         }
-                        if ($match) {
-                            $singleDim[$key]++;
-                            unset($recordValues[$j]);
-                        }
+                    }
+                    if ($match) {
+                        $singleDim[$key]++;
+                        if (!$valuesToKeys) unset($recordValues[$j]);
                     }
                 }
             }
             // step 2: convert into multi-dimensional array, if necessary
-            if ($valuesToKeys) {
+            if (!$valuesToKeys) {
                 $res = $singleDim;
             } else {
                 $res = array();
@@ -2644,7 +2648,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @return array(arrFieldNames, arrFieldValues)
      * @throws Ac_E_InvalidCall
      */
-    static function checkMultiFieldCriterion($fieldNames, $fieldValues, $singleValuesToScalars = true) {
+    static function checkMultiFieldCriterion($fieldNames, array $fieldValues, $singleValuesToScalars = true) {
         // validate the values
         $fieldNames = array_values(is_array($fieldNames)? array_values($fieldNames) : array($fieldNames));
         if (!($cnt = count($fieldNames))) throw new Ac_E_InvalidCall("Empty \$fieldNames array not accepted");

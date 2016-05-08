@@ -232,15 +232,15 @@ class Ac_Model_Search extends Ac_Prototyped implements Ac_I_Search_FilterProvide
             foreach ($criteria as $k => $criterion) {
                 $adHoc[$k]  = isset($query[$k]) && is_object($query[$k]) && $query[$k] instanceof Ac_I_Search_Criterion_Search;
                 if ($criterion instanceof Ac_I_Search_Criterion_Bulk) {
-                    $bulk[$k] = $citerion;
+                    $bulk[$k] = $criterion;
                 }
             }
             
             // Apply bulk criteria
-            foreach ($bulk as $k => $criteria) {
+            foreach ($bulk as $k => $criterion) {
                 if (($isAdHoc = $adHoc[$k])) $value = null;
                     else $value = $query[$k];
-                $res = $criteria->filter($res, $k, $value, $isAdHoc);
+                $res = $criterion->filter($res, $k, $value, $isAdHoc);
                 unset($criteria[$k]);
             }
             
