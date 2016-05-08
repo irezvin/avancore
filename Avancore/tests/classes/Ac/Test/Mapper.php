@@ -666,8 +666,37 @@ class Ac_Test_Mapper extends Ac_Test_Base {
             array(1 => 0, 2 => 0, 3 => 1, 4 => 1, 5 => 0), 'count with GROUP_VALUES - primary keys - all records loaded', true);
         
         $m->reset();
-        
     }
+    
+    function testCountRecordsWithRestrictions() {
+        $m = $this->getSampleApp()->getSamplePersonMapper();
+        $m->reset();
+        $m->trackNewRecords = true;
+        $m->useRecordsCollection = true;
+        
+        $p = $m->getPrototype();
+        
+        if (!$this->assertArraysMatch($r = $m->countWithValues(
+                'birthYear', array(1981, 1982), Ac_Model_Mapper::GROUP_VALUES, array('gender' => 'M')
+        ), array(1981 => 1, 1982 => 1), '%s', true)) var_dump($r);
+        if (!$this->assertArraysMatch($r = $m->countWithValues(
+                'birthYear', array(1981, 1982), Ac_Model_Mapper::GROUP_VALUES, array('gender' => 'F')
+        ), array(1981 => 2, 1982 => 0), '%s', true)) var_dump($r);
+        if (!$this->assertArraysMatch($r = $m->countWithValues(
+                array('birthYear', 'gender'), 
+            [ [1982, 'M'], [1981, 'F'] ], Ac_Model_Mapper::GROUP_VALUES
+        ), [ 1982 => [ 'M' => 1 ], '1981' => ['F' => 2 ] ], '%s', true)) var_dump($r);
+        if (!$this->assertArraysMatch($r = $m->countWithValues(
+            array('isSingle', 'gender'), [ [1, 'M'], [0, 'M'], [0, 'F'] ], 
+            Ac_Model_Mapper::GROUP_VALUES, array('notTest' => true)        
+        ), [ 0 => [ 'F' => 1, 'M' => 1 ], '1' => ['M' => 1 ] ], '%s', true)) var_dump($r);
+        if (!$this->assertArraysMatch($r = $m->countWithValues(
+            array('isSingle', 'gender'), [ [1, 'M'], [0, 'F'] ], 
+            Ac_Model_Mapper::GROUP_VALUES, array('notTest' => true, 'birthYear' => array(1981, 1982)), true
+        ), [ 0 => [ 'F' => 1 ], '1' => ['M' => 1 ] ], '%s', true)) var_dump($r);
+        $m->reset();
+    }
+    
     
     function testAllRecords() {
         $m = $this->getSampleApp()->getSamplePersonMapper();
