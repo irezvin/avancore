@@ -974,7 +974,10 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     }
     
     function _getSingleFieldItem($head) {
-        if ($this->_magicGetLock === $head) return Ac_Mixin::__get($head);
+        if ($this->_magicGetLock === $head) {
+            if (Ac_Accessor::methodExists($this, $m = 'get'.$head)) return $this->$m();
+            return Ac_Mixin::__get($head);
+        }
         return parent::_getSingleFieldItem($head);
     }
     
