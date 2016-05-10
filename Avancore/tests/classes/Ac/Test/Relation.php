@@ -4,6 +4,36 @@ class Ac_Test_Relation extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
 
+    function testLoadNonSql() {
+        /*$pm = Sample::getInstance()->getSamplePersonMapper();
+        $pm->reset();
+        $rel = clone $pm->getRelation('_portraitPersonPhoto');
+        $peop = $pm->find(array('notTest' => true), true);
+        $rel->setDestNonSql(true);
+        $dest = $rel->loadDest($peop);
+        if ($this->assertIsA($p = $peop[3]->getPortraitPersonPhoto(), 'Sample_Person_Photo')) {
+            $this->assertEqual($p->personId, $peop[3]->personId);
+            $this->assertEqual($p->photoId, $peop[3]->portraitId);
+        }
+        if ($this->assertIsA($p = $peop[4]->getPortraitPersonPhoto(), 'Sample_Person_Photo')) {
+            $this->assertEqual($p->personId, $peop[4]->personId);
+            $this->assertEqual($p->photoId, $peop[4]->portraitId);
+        }*/
+        $pm = Sample::getInstance()->getSamplePersonMapper();
+        $pm->reset();
+        $rel = clone $pm->getRelation('_tags');
+        $rel->setSrcLoadNNIdsMethod(false);
+        $peop = $pm->find(array('notTest' => true), true);
+        $rel->setDestNonSql(true);
+        $dest = $rel->loadDest($peop);
+        $ok = true;
+        foreach ($peop as $p) {
+            $ok = $ok && is_array($p->_tagIds) && is_array($p->_tags) && count($p->_tags) == count($p->_tagIds)
+                && Ac_Util::getObjectProperty($p->_tags, 'tagId') == $p->_tagIds;
+        }
+        $this->assertTrue($ok, 'All tags are loaded by non-sql relation');
+    }
+    
     function testRelationProviderConfig() {
         $pm = Sample::getInstance()->getSamplePersonMapper();
         $rel = Sample::getInstance()->getSampleReligionMapper();
@@ -25,18 +55,6 @@ class Ac_Test_Relation extends Ac_Test_Base {
         );
         $this->assertFalse($a->getSrcIsUnique());
         $this->assertTrue($a->getDestIsUnique());
-    }
-    
-    function _testNNMem() {
-        $pm = Sample::getInstance()->getSamplePersonMapper();
-        $pm->reset();
-        $people = $pm->loadRecordsArray(array(3, 4, 6, 7));
-        $pm->loadTagIdsFor($people);
-        $pm->loadAssocCountFor($people, '_tags');
-        $pm->loadTagsFor($people);
-        $rel = $pm->getRelation('_tags');
-        $rel->countDest($people, false);
-        $pm->reset();
     }
     
     function testLoadNoSrcVar() {

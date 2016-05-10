@@ -26,8 +26,11 @@ class Ac_Sql_Filter_NNCriterion_Omni extends Ac_Sql_Filter_NNCriterion {
         return $res;
     }
     
-    function _doGetDestValuesCriterion() {
-        $res = $this->makeSqlCriteria($this->destValues, $this->midDestKey, $this->midTableAlias);
+    function _doGetDestValuesCriterion($destAlias) {
+        /*$keys = array();
+        $db = $this->currentSelect->getDb();
+        foreach ($this->midDestKeys as $k) $keys[] = $db->n(array($destAlias, $this->tableKeys));*/
+        $res = $this->makeSqlCriteria($this->destValues, $this->midDestKeys, $this->midTableAlias);
         return $res;
     }
     

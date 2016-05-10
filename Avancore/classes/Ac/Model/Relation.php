@@ -147,7 +147,9 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      */
     function setDestNonSql($destNonSql) {
         if ($destNonSql !== ($oldDestNonSql = $this->destNonSql)) {
+            if ($this->immutable) throw self::immutableException();
             $this->destNonSql = $destNonSql;
+            $this->reset();
         }
     }
 
@@ -165,7 +167,9 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      */
     function setSrcNonSql($srcNonSql) {
         if ($srcNonSql !== ($oldSrcNonSql = $this->srcNonSql)) {
+            if ($this->immutable) throw self::immutableException();
             $this->srcNonSql = $srcNonSql;
+            $this->reset();
         }
     }
 
@@ -1097,8 +1101,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $res;
     }
     
-    protected function calcNNIdsImpl(array $props) {
-        if ($props['midTableName'] && !$props['nonSql']) {
+    protected function calcNNIdsImpl(array $props, $srcNonSql) {
+        if ($props['midTableName'] && !$srcNonSql) {
             $res = array(
                 'db' => $this->db,
                 'srcVarName' => $props['srcNNIdsVarName'],
@@ -1137,7 +1141,6 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'srcCountVarName' => $this->srcCountVarName,
                 'destCountVarName' => $this->destCountVarName,
                 'srcLoadedVarName' => $this->srcLoadedVarName,
-                'srcLoadNNIdsMethod' => $this->srcLoadNNIdsMethod,
                 'destOrdering' => $this->destOrdering,
                 'destExtraJoins' => $this->destExtraJoins,
                 'destWhere' => $this->destWhere,
@@ -1147,9 +1150,19 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'db' => $this->db,
                 'nonSql' => $this->destNonSql,
             );
+            $m = $this->srcLoadNNIdsMethod;
+            if (is_array($m) && isset($m[0]) && $m[0] === true && isset($m[1])) {
+                $mapper = $this->getSrcMapper();
+                if (!$mapper) throw new Ac_E_InvalidUsage("\$destMapper is required when using TRUE as first member of array \$srcLoadNNIdsMethod");
+                $m[0] = $mapper;
+            }
+            if ($m) $this->fullDestProps['srcLoadNNIdsMethod'] = $m;
         }
         return $this->fullDestProps;
         
+    }
+    
+    protected function fixNNIdsMethod($method, $mapper, $varName) {
     }
     
     protected function getFullSrcProps() {
@@ -1167,7 +1180,6 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'srcCountVarName' => $this->destCountVarName,
                 'destCountVarName' => $this->srcCountVarName,
                 'srcLoadedVarName' => $this->destLoadedVarName,
-                'srcLoadNNIdsMethod' => $this->destLoadNNIdsMethod,
                 'destOrdering' => $this->srcOrdering,
                 'destExtraJoins' => $this->srcExtraJoins,
                 'destWhere' => $this->srcWhere,
@@ -1177,6 +1189,13 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'db' => $this->db,
                 'nonSql' => $this->srcNonSql,
             );
+            $m = $this->destLoadNNIdsMethod;
+            if (is_array($m) && isset($m[0]) && $m[0] === true && isset($m[1])) {
+                $mapper = $this->getDestMapper();
+                if (!$mapper) throw new Ac_E_InvalidUsage("\$destMapper is required when using TRUE as first member of array \$destLoadNNIdsMethod");
+                $m[0] = $mapper;
+            }
+            if ($m) $this->fullSrcProps['srcLoadNNIdsMethod'] = $m;
         }
         return $this->fullSrcProps;
     }
@@ -1192,7 +1211,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         $res = array_merge(parent::getDestImplPrototype(), array(
             'class' => 'Ac_Model_Relation_Impl',
             'provider' => $this->getDestProvider(),
-            'destNNIdsImpl' => $this->calcNNIdsImpl($fullDestProps),
+            'destNNIdsImpl' => $this->calcNNIdsImpl($fullDestProps, $this->srcNonSql),
         ), $fullDestProps);
         foreach (self::$deprecatedImplProps as $p) unset($res[$p]);
         return $res;
@@ -1206,7 +1225,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         $res = array_merge($proto = parent::getSrcImplPrototype(), array(
             'class' => 'Ac_Model_Relation_Impl',
             'provider' => $this->getSrcProvider(),
-            'destNNIdsImpl' => $this->calcNNIdsImpl($fullSrcProps),
+            'destNNIdsImpl' => $this->calcNNIdsImpl($fullSrcProps, $this->destNonSql),
         ), $fullSrcProps);
         foreach (self::$deprecatedImplProps as $p) unset($res[$p]);
         return $res;

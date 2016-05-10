@@ -42,7 +42,12 @@ class Ac_Model_Relation_Provider_Mapper_Omni extends Ac_Model_Relation_Provider_
                 } else {
                     $query[$this->keys[0]] = $vv;
                 }
-                $res = $this->mapper->find($query, $byKeys? $this->keys[0] : false, $this->sort);
+                $idx = false;
+                if ($byKeys) {
+                    $idx = $this->keys;
+                    $idx[] = (bool) $this->unique;
+                }
+                $res = $this->mapper->find($query, $idx, $this->sort);
             } else {
                 $res = array();
             }
@@ -58,7 +63,12 @@ class Ac_Model_Relation_Provider_Mapper_Omni extends Ac_Model_Relation_Provider_
                         'values' => $vv,
                     ));
                 }
-                $res = $this->mapper->find($query, $this->keys[0], $this->sort);
+                $idx = false;
+                if ($byKeys) {
+                    $idx = $this->keys;
+                    $idx[] = (bool) $this->unique;
+                }
+                $res = $this->mapper->find($query, $idx, $this->sort);
             } else {
                 $res = array();
             }

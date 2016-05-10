@@ -2660,9 +2660,10 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 "Number of elements in each \$fieldValues item must be the same as number of fields,"
                 . " but count(\$fieldValues['{$i}']) == {$rowCnt} instead of {$cnt}"
             );
-            $scalar = array_filter($row, "is_scalar");
-            if (count($scalar) !== $rowCnt) {
+            $scalar = array_filter($row, "is_scalar") + array_filter($row, "is_null");
+            if (count($scalar) !== $rowCnt) { 
                 $nonScalar = implode(', ', array_diff(array_keys($row), array_keys($scalar)));
+                var_dump($row);
                 throw new Ac_E_InvalidCall("\$fieldValues['{$i}'] contains non-scalar element(s). Key(s): ".$nonScalar);
             }
             if (!$manyFields && $singleValuesToScalars) $properValues[$i] = $row[0];

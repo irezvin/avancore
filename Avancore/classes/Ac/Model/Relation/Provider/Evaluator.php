@@ -81,6 +81,7 @@ class Ac_Model_Relation_Provider_Evaluator {
             }
             if ($omni) $res = Ac_Model_Relation_Provider_Sql_Omni::evaluatePrototype($relationProps);
         }
+        if (isset($relationProps['destIsUnique'])) $res['unique'] = $relationProps['destIsUnique'];
         return $res;
     }
     

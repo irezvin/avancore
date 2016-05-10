@@ -434,6 +434,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 $this->provider = Ac_Prototyped::factory($this->provider, 'Ac_Model_Relation_Provider', $def);
             }
             $res = $this->provider;
+            $res->setUnique($this->destIsUnique);
             if (!$res) $res = null;
         } else {
             $res = $this->provider;
@@ -705,7 +706,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             // TODO: this should be implemented in NNIdsImpl
             $this->fixNNIds($srcData, array_keys($this->fieldLinks2), $this->srcNNIdsVarName);
         } else {
-            trigger_error("loadDestNNIds() produces no effect without non-empty setDestNNIDsImpl()", E_USER_WARNING);
+            trigger_error("loadDestNNIds() produces no effect without non-empty setDestNNIdsImpl()", E_USER_WARNING);
         }
         return $res;
     }
@@ -894,16 +895,11 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     }
     
     protected function loadMidIdsFor(& $source) {
-        if ($this->destNNIdsImpl) $this->getDestNNIdsImpl()->loadDestNNIds($source);
+        if ($this->destNNIdsImpl) {
+            $this->loadDestNNIds($source);
+        }
         elseif ($m = $this->srcLoadNNIdsMethod) {
-            if (is_array($m) && isset($m[0]) && $m[0] === true && isset($m[1])) {
-                $mapper = $this->getDestMapper();
-                if (!$mapper) throw new Ac_E_InvalidUsage("\$destMapper is required when using TRUE as first member of array \$srcLoadNNIdsMethod");
-                $method = $m[1];
-                $mapper->$method($source);
-            } else {
-                call_user_func($m, $source);
-            }
+            call_user_func($m, $source);
         }
     }
     

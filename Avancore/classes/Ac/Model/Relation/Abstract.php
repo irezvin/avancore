@@ -304,14 +304,14 @@ abstract class Ac_Model_Relation_Abstract extends Ac_Prototyped {
         return new Ac_E_InvalidUsage("Cannot modify ".__CLASS__." with \$immutable == true");
     }    
     
-    protected function getSrcImpl() {
+    function getSrcImpl() {
         if ($this->srcImpl === false) {
             $this->srcImpl = Ac_Prototyped::factory($this->getSrcImplPrototype());
         }
         return $this->srcImpl;
     }
     
-    protected function getDestImpl() {
+    function getDestImpl() {
         if ($this->destImpl === false) {
             $this->destImpl = Ac_Prototyped::factory($this->getDestImplPrototype());
         }
