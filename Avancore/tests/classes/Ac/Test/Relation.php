@@ -5,7 +5,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
     protected $bootSampleApp = true;
 
     function testLoadNonSql() {
-        /*$pm = Sample::getInstance()->getSamplePersonMapper();
+        $pm = Sample::getInstance()->getSamplePersonMapper();
         $pm->reset();
         $rel = clone $pm->getRelation('_portraitPersonPhoto');
         $peop = $pm->find(array('notTest' => true), true);
@@ -18,7 +18,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         if ($this->assertIsA($p = $peop[4]->getPortraitPersonPhoto(), 'Sample_Person_Photo')) {
             $this->assertEqual($p->personId, $peop[4]->personId);
             $this->assertEqual($p->photoId, $peop[4]->portraitId);
-        }*/
+        }
         $pm = Sample::getInstance()->getSamplePersonMapper();
         $pm->reset();
         $rel = clone $pm->getRelation('_tags');

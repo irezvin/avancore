@@ -171,6 +171,24 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     const PRESENCE_SMART = 4;
     
     /**
+     * Count all unique records
+     * @see Ac_Model_Mapper::countWithValues
+     */
+    const GROUP_NONE = 0;
+    
+    /**
+     * Count number of records that match each value 
+     * @see Ac_Model_Mapper::countWithValues
+     */
+    const GROUP_VALUES = 1;
+    
+    /**
+     * Count records by values, but group 
+     * @see Ac_Model_Mapper::countWithValues
+     */
+    const GROUP_ORDER = 2;
+    
+    /**
      * If all records are loaded, check in memory only, otherwise 
      * fallback to Ac_Model_Mapper::PRESENCE_FULL
      * @see Ac_Model_Mapper::checkRecordPresence
@@ -2347,24 +2365,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         
         return $res;
     }
-    
-    /**
-     * Count all unique records
-     * @see Ac_Model_Mapper::countWithValues
-     */
-    const GROUP_NONE = 0;
-    
-    /**
-     * Count number of records that match each value 
-     * @see Ac_Model_Mapper::countWithValues
-     */
-    const GROUP_VALUES = 1;
-    
-    /**
-     * Count records by values, but group 
-     * @see Ac_Model_Mapper::countWithValues
-     */
-    const GROUP_ORDER = 2;
     
     /**
      * Counts unique records that have values of $fieldOrFields listed in $fieldValues
