@@ -163,7 +163,7 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
                 $res[] = array($pk, $title);
             }
         } else {
-            $coll = new Ac_Model_Collection(get_class($mapper), false, $where, $ordering, $extraJoins);
+            $coll = new Ac_Legacy_Collection(get_class($mapper), false, $where, $ordering, $extraJoins);
             $coll->setSequential();
             $coll->useCursor();
             while ($rec = $coll->getNext()) {

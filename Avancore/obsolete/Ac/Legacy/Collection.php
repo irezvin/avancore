@@ -9,7 +9,7 @@
  * - to minimize memory usage, cursor approach can be used (one or more, but limited number of records is used to traverse through the resultset)
  * - unbuffered queries are also supported (when used with Ac_Legacy_Database implementation that supports unbuffered queries) 
  */
-class Ac_Model_Collection {
+class Ac_Legacy_Collection {
     
     /**
      * @var array

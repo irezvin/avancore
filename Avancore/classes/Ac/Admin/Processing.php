@@ -54,7 +54,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     var $_records = false;
     
     /**
-     * @var Ac_Model_Collection
+     * @var Ac_Legacy_Collection
      */
     var $_recordsCollection = false;
     
@@ -204,7 +204,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     
     /**
      * Returns record source that will actually be used to access records 
-     * @return Ac_Model_Collection
+     * @return Ac_Legacy_Collection
      */
     function _doGetRecordsCollection() {
         if ($this->_recordsCollection === false) {
@@ -214,7 +214,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
                 if ($this->defaultToAllRecords == self::DEFAULT_RECORDS_BY_FILTERS) {
                     $this->_recordsCollection = clone $this->manager->getRecordsCollection ($this->manager->mapperClass);
                 } else {
-                    $this->_recordsCollection = new Ac_Model_Collection();
+                    $this->_recordsCollection = new Ac_Legacy_Collection();
                     $this->_recordsCollection->setDatabase($this->application->getDb());
                 }
                 // Most straightforward way

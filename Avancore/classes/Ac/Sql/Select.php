@@ -416,11 +416,11 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     }
     
     /**
-     * @return Ac_Model_Collection
+     * @return Ac_Legacy_Collection
      */
     function createCollection($mapperClass = false, $pkName = false, $ignorePrimaryAlias = false) {
         if (!strlen($mapperClass) && !strlen($pkName)) trigger_error("Even mapper class or pk name must be provided", E_USER_ERROR);
-        $res = new Ac_Model_Collection();
+        $res = new Ac_Legacy_Collection();
         
         $this->beginCalc();
         

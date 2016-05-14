@@ -130,7 +130,7 @@ class Ac_Admin_Feature {
     function onSubManagerCreated($id, $subManager, $smConfig = array()) {
     }
     
-    function onCollectionCreated(Ac_Model_Collection $collection) {
+    function onCollectionCreated(Ac_Legacy_Collection $collection) {
     }
     
     function onLoad($record) {

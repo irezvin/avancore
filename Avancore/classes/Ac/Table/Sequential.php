@@ -3,7 +3,7 @@
 class Ac_Table_Sequential extends Ac_Table {
     
     /**
-     * @var Ac_Model_Collection
+     * @var Ac_Legacy_Collection
      */
     var $_collection = false;
     
@@ -11,7 +11,7 @@ class Ac_Table_Sequential extends Ac_Table {
     var $_ptr = 0;
 
     /**
-     * @param Ac_Model_Collection $collection
+     * @param Ac_Legacy_Collection $collection
      */
     function __construct ($columnSettings, $collection, $pageNav, $tableAttribs = array(), $recordClass = false) {
         $this->_columnSettings = $columnSettings;

@@ -129,7 +129,7 @@ class Ac_Finder extends Ac_Prototyped {
     }
     
     /**
-     * @return Ac_Model_Collection
+     * @return Ac_Legacy_Collection
      */
     function createCollection(Ac_Sql_Db $sqlDb = null) {
         $sqlSelect = $this->createSqlSelect($sqlDb);

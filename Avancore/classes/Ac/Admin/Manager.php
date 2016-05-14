@@ -82,7 +82,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     var $_recordClass = false;
     
     /**
-     * @var Ac_Model_Collection
+     * @var Ac_Legacy_Collection
      */
     var $_recordsCollection = false;
     
@@ -1333,19 +1333,19 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
         
     /**
-     * @return Ac_Model_Collection
+     * @return Ac_Legacy_Collection
      */
     function _getRecordsCollection() {
         return $this->getRecordsCollection();
     }
     
     /**
-     * @return Ac_Model_Collection
+     * @return Ac_Legacy_Collection
      */
     function getRecordsCollection() {
         if ($this->_recordsCollection === false) {
             if ($this->_collectionCanBeUsed()) {
-                $this->_recordsCollection = new Ac_Model_Collection($this->mapperClass, false, $this->_getWhere(), $this->_getOrder(), $this->_getJoins(), $this->_getExtraColumns());
+                $this->_recordsCollection = new Ac_Legacy_Collection($this->mapperClass, false, $this->_getWhere(), $this->_getOrder(), $this->_getJoins(), $this->_getExtraColumns());
                     if (strlen($h = $this->_getHaving())) $this->_recordsCollection->setHaving ($h);
                 $this->_recordsCollection->setDistinct();
                 $this->_recordsCollection->setGroupBy($this->_getGroupBy());
