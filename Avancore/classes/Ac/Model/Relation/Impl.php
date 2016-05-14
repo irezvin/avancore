@@ -531,7 +531,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                     else $res = $defaultValue;
             }
         } else {
-            trigger_error ('$srcData/$destData must be an array or an object', E_USER_ERROR);
+            throw Ac_E_InvalidCall::wrongType('$srcData', array('array', 'object'), $srcData);
         }
         return $res;
     }
@@ -542,7 +542,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             $values = array();
             $midKeys = is_array($this->fieldLinks2)? array_values($this->fieldLinks2) : array();
             if ($matchMode === Ac_Model_Relation_Abstract::RESULT_PLAIN && is_array($srcData) && $separate) {
-                trigger_error("Using countSrc or countDest(array, true, Ac_Model_Relation_Abstract::RESULT_PLAIN) "
+                throw new Ac_E_InvalidUsage ("Using countSrc or countDest(array, true, Ac_Model_Relation_Abstract::RESULT_PLAIN) "
                     . "does not make sense; using Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS instead", E_USER_NOTICE);
                 $matchMode = Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS;
             }
@@ -572,8 +572,6 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                         0, false, true, true);
                 }
             }
-        } elseif (is_a($srcData, 'Ac_Model_Collection')) {
-            trigger_error ('Collection as $srcData/$destData is not implemented yet', E_USER_ERROR);
         } elseif (is_object($srcData)) {
             if ($this->srcNNIdsVarName !== false) {
                 $nnIds = $this->getValue($srcData, $this->srcNNIdsVarName);
@@ -586,7 +584,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 $res = $this->countWithValues(array(), false, $values, false);
             }
         } else {
-            trigger_error ('$srcData/$destData must be an array, a collection or an object', E_USER_ERROR);
+            throw Ac_E_InvalidCall::wrongType('srcData', array('array', 'object'), $srcData);
         }
         return $res;
     }
@@ -693,7 +691,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 }
             }
         } else {
-            trigger_error ('$srcData/$destData must be an array or an object, '.Ac_Util::typeClass($srcData).' provided', E_USER_ERROR);
+            throw Ac_E_InvalidCall::wrongType('srcData', array('array', 'object'), $srcData);
         }
             
         return $res;
@@ -715,7 +713,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
      * Counts destination objects and stores result in $srcCountVarName of each corresponding $srcData object
      */
     function loadDestCount ($srcData, $dontOverwriteLoaded = true) {
-        if (!$this->srcCountVarName)  trigger_error ('Can\'t '.__FUNCTION__.'() when $srcCountVarName is not set');
+        if (!$this->srcCountVarName)  throw new Ac_E_InvalidUsage ('Can\'t '.__FUNCTION__.'() when $srcCountVarName is not set');
         $keys = array_keys($this->fieldLinks);
         if (is_array($srcData)) { // we assume that this array is of objects or rows
             $values = array();
@@ -756,8 +754,6 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                     }
                 }
             }
-        } elseif (is_a($srcData, 'Ac_Model_Collection')) {
-            trigger_error ('Collection as $srcData/$destData is not implemented yet', E_USER_ERROR);
         } elseif (is_object($srcData)) {
             if ($this->srcNNIdsVarName && is_array($v = $this->getValue($srcData, $this->srcNNIdsVarName))) {
                 $this->setVal($srcData, $this->srcCountVarName, count($v));
@@ -772,7 +768,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 $this->setVal($srcData, $this->srcCountVarName, $count, $this->srcCountVarName);
             }
         } else {
-            trigger_error ('$srcData/$destData must be an array, a collection or an object', E_USER_ERROR);
+            throw Ac_E_InvalidCall::wrongType('$srcData', array('array', 'object'), $srcData);
         }
     }
     
@@ -1264,7 +1260,9 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     protected function getValue($src, $fieldName) {
         static $g = array();
         if (is_array($src)) {
-            if (!array_key_exists($fieldName, $src)) trigger_error('Cannot extract field \''.$fieldName.'\' from an array', E_USER_ERROR);
+            if (!array_key_exists($fieldName, $src)) {
+                throw new Ac_E_InvalidAccess('Cannot extract field \''.$fieldName.'\' from an array');
+            }
             $res = $src[$fieldName];
         } else {
             $cls = get_class($src);
@@ -1275,7 +1273,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                     case method_exists($src, 'get'.$fieldName): $getter = 'getFromGetter'; break;
                     case is_a($src, 'Ac_Model_Data'): $getter = 'getFromAeData'; break;
                     default:
-                        trigger_error('Cannot extract field \''.$fieldName.'\' from an object', E_USER_ERROR);
+                        throw new Ac_E_InvalidAccess('Cannot extract field \''.$fieldName.'\' from an object');
                 }
                 $g[$cls][$fieldName] = $getter;
             }

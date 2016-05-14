@@ -10,6 +10,9 @@ class Ac_Table_Sequential extends Ac_Table {
     var $_eof = false;
     var $_ptr = 0;
 
+    /**
+     * @param Ac_Model_Collection $collection
+     */
     function __construct ($columnSettings, $collection, $pageNav, $tableAttribs = array(), $recordClass = false) {
         $this->_columnSettings = $columnSettings;
         $this->_collection = $collection;
