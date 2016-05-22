@@ -171,6 +171,13 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     const PRESENCE_SMART = 4;
     
     /**
+     * If all records are loaded, check in memory only, otherwise 
+     * fallback to Ac_Model_Mapper::PRESENCE_FULL
+     * @see Ac_Model_Mapper::checkRecordPresence
+     */
+    const PRESENCE_SMART_FULL = 5;
+    
+    /**
      * Count all unique records
      * @see Ac_Model_Mapper::countWithValues
      */
@@ -189,11 +196,10 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     const GROUP_ORDER = 2;
     
     /**
-     * If all records are loaded, check in memory only, otherwise 
-     * fallback to Ac_Model_Mapper::PRESENCE_FULL
-     * @see Ac_Model_Mapper::checkRecordPresence
+     * Special name of the criterion to provide the Search instance or a Search "prototype override"
+     * to the mapper instead of using the built-in one
      */
-    const PRESENCE_SMART_FULL = 5;
+    const QUERY_SEARCH = '_query_search_';
     
     var $tableName = null;
 
@@ -2425,7 +2431,13 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                     if (count($fieldOrFields) > 1) {
                         $combinedCrit = implode('_', $fieldOrFields);
                         // check if we have such criterion
-                        if ($this->getSearch()->getApplicableSearchCriteria(array($combinedCrit => $fieldValues))) {
+                        
+                        $search = $this->getAppliedSearch($query);
+                        // save search instance for future use
+                        if ($search !== $this->search) {
+                            $combinedQuery[self::QUERY_SEARCH] = $search;
+                        }
+                        if ($search->getApplicableSearchCriteria(array($combinedCrit => $fieldValues))) {
                             $combinedQuery[$combinedCrit] = $fieldValues;
                         } else {
                             $combinedQuery[$combinedCrit] = new Ac_Model_Criterion_MultiField(array(
@@ -2552,9 +2564,10 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         $strict = func_num_args() <= 5 || $remainingQuery === true;
 
         if ($strict) $remainingQuery = true;
-        if (!$this->search) $this->getSearch();
-
-        $res = $this->search->filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
+        
+        $search = $this->getAppliedSearch($query);
+        
+        $res = $search->filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
         
         return $res;
     }
@@ -2618,6 +2631,35 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             $this->search = Ac_Prototyped::factory($this->getSearchPrototype(true), 'Ac_Model_Search');
         }
         return $this->search;
+    }
+    
+    /**
+     * Extracts Ac_Model_Search or its' prototype from $query[Ac_Model_Mapper::QUERY_SEARCH] and
+     * returns instance that will be used (returns Mapper's own search if none provided).
+     * Unsets the "criterion" from the query.
+     * 
+     * @param array $query
+     * @return Ac_Model_Search
+     * @throws Ac_E_InvalidCall
+     */
+    protected function getAppliedSearch(array & $query) {
+        if (isset($query[self::QUERY_SEARCH]) && $query[self::QUERY_SEARCH]) {
+            $search = $query[self::QUERY_SEARCH];
+            if (is_array($search)) {
+                $proto = Ac_Util::m($this->getSearchPrototype(true), $search);
+                $res = Ac_Prototyped::factory($proto, 'Ac_Model_Search');
+            } elseif (is_object($search)) {
+                if ($search instanceof Ac_Model_Search)
+                    $res = $search;
+                else 
+                    throw Ac_E_InvalidCall::wrongType("\$query[Ac_Model_Mapper::QUERY_SEARCH]", 
+                        $search, array('array', 'Ac_Model_Search'));
+            }
+            unset($query[self::QUERY_SEARCH]);
+        } else {
+            $res = $this->getSearch();
+        }
+        return $res;
     }
     
     function setSearch(Ac_Model_Search $search = null) {

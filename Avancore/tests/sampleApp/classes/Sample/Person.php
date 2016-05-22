@@ -24,7 +24,7 @@ class Sample_Person extends Sample_Person_Base_Object {
     
     function __construct($mapperOrMapperClass = null) {
         parent::__construct($mapperOrMapperClass);
-        $this->instanceIf = self::$lastInstanceId++;
+        $this->instanceId = self::$lastInstanceId++;
     }
     
     function intResetReferences() {

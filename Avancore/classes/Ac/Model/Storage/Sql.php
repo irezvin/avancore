@@ -1,7 +1,7 @@
 <?php
 
 abstract class Ac_Model_Storage_Sql extends Ac_Model_Storage {
-
+    
     /**
      * Loads first record matching criteria
      * 

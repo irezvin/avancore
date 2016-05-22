@@ -1,6 +1,12 @@
 <?php
 
 class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_WithSqlSelectPrototype {
+
+    /**
+     * Special name of the criterion to provide the Ac_Sql_Select instance or its' "prototype override"
+     * to the Ac_Model_Storage_MonoTable instead of using the built-in one
+     */
+    const QUERY_SQL_SELECT = '_query_sql_select_';
     
     /**
      * name of SQL table that contains records
@@ -497,12 +503,47 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
         } else {
             // must apply the Sql Select
             $selectQ = $remainingQuery;
-            $select = $this->createBlankSqlSelect();
+            $select = $this->getAppliedSelect($selectQ);
             $this->applyCriteriaToSelect($selectQ, $select, $remainingQuery);
             if ($where) $select->where['_search'] = $where;
             if ($strSort) $select->orderBy['_sort'] = $strSort;
             elseif ($sort) $sorted = $this->applySortToSelect ($sort, $select);
             $res = $select;
+        }
+        return $res;
+    }
+    
+    /**
+     * Extracts Ac_Sql_Select or its' prototype from $query[Ac_Model_Storage_MonoTable::QUERY_SQL_SELECT]
+     * and returns instance that will be used (returns Storage own search if none provided).
+     * Unsets the "criterion" from the query.
+     * 
+     * @param array $query
+     * @return Ac_Sql_Select
+     * @throws Ac_E_InvalidCall
+     */
+    protected function getAppliedSelect(array & $query, array $prototypeExtra = array()) {
+        if (isset($query[self::QUERY_SQL_SELECT]) && $query[self::QUERY_SQL_SELECT]) {
+            $sel = $query[self::QUERY_SQL_SELECT];
+            if (is_array($sel)) {
+                if ($prototypeExtra) $proto = Ac_Util::m($prototypeExtra, $sel);
+                    else $proto = $sel;
+                $res = $this->createBlankSqlSelect($proto);
+            } elseif (is_object($sel)) {
+                if ($sel instanceof Ac_Sql_Select) {
+                    if ($prototypeExtra) {
+                        throw new Ac_E_InvalidUsage("Cannot use \$prototypeExtra along with instance provided "
+                            . "in \$query[Ac_Model_Search::QUERY_SQL_SELECT]");
+                    } else {
+                        $res = $sel;
+                    }
+                } else 
+                    throw Ac_E_InvalidCall::wrongType("\$query[Ac_Model_Search::QUERY_SQL_SELECT]", 
+                        $sel, array('array', 'Ac_Sql_Select'));
+            }
+            unset($query[self::QUERY_SQL_SELECT]);
+        } else {
+            $res = $this->createBlankSqlSelect($prototypeExtra);
         }
         return $res;
     }
@@ -563,7 +604,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
             $sorted = true;
         }
         $selectQ = $remainingQuery;
-        $res = $this->createBlankSqlSelect($prototypeExtra);
+        $res = $this->getAppliedSelect($selectQ, $prototypeExtra);
         $this->applyCriteriaToSelect($selectQ, $res, $remainingQuery);
         if ($where) $res->where['_search'] = $where;
         if ($strSort) $res->orderBy['_sort'] = $strSort;

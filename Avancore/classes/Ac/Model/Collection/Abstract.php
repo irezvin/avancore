@@ -71,10 +71,10 @@ abstract class Ac_Model_Collection_Abstract extends Ac_Prototyped implements Ite
      */
     function setIsOpen($isOpen) {
         if ($isOpen !== ($oldIsOpen = $this->isOpen)) {
-            $this->isOpen = $isOpen;
             if (!$this->isOpen) {
                 $this->resetState();
             }
+            $this->isOpen = $isOpen;
         }
     }
 
@@ -113,11 +113,11 @@ abstract class Ac_Model_Collection_Abstract extends Ac_Prototyped implements Ite
      * @return int
      */
     function getCount() { 
+        if (!$this->isOpen) {
+            if ($this->autoOpen) $this->setIsOpen(true);
+            else throw new Ac_E_InvalidUsage("Cannot ".__FUNCTION__."(): need to open() first");
+        }
         if ($this->count === false) {
-            if (!$this->isOpen) {
-                if ($this->autoOpen) $this->setIsOpen(true);
-                else throw new Ac_E_InvalidUsage("Cannot ".__FUNCTION__."(): need to open() first");
-            }
             $this->count = $this->doCount();
         }
         return $this->count;
