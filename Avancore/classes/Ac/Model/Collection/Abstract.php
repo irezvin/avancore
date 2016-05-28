@@ -101,8 +101,7 @@ abstract class Ac_Model_Collection_Abstract extends Ac_Prototyped implements Ite
      */
     function getAutoOpen() {
         return $this->autoOpen;
-    }    
-    
+    }
 
     /**
      * Retrieves count of all available items (if supported by the storage) 
@@ -312,6 +311,30 @@ abstract class Ac_Model_Collection_Abstract extends Ac_Prototyped implements Ite
     }
     
     /**
+     * Alias of fetchItem() (for compatibility with legacy Collection)
+     * @deprecated
+     */
+    function getNext() {
+        return $this->fetchItem();
+    }
+    
+    /**
+     * Alias of fetchGroup() (for compatibility with legacy Collection)
+     * @deprecated
+     * @return array
+     */
+    function getRecords() {
+        return $this->fetchGroup();
+    }
+    
+    /**
+     * @return bool
+     */
+    function isEof() {
+        return $this->stop && $this->extIndex >= $this->intIndex;
+    }
+    
+    /**
      * Resets internal state on open() call
      */
     protected function resetState() {
@@ -362,7 +385,7 @@ abstract class Ac_Model_Collection_Abstract extends Ac_Prototyped implements Ite
                 $len = count($this->currentGroup);
                 $this->intIndex += $len;
                 // retrieved less then asked, nothing, all items, or we already have whole number of needed items?
-                if ($len < $this->groupSize || !$len || !$limit || $this->limit && $this->intIndex >= $this->limit) {
+                if ($len < $limit || !$len || !$limit || $this->limit && $this->intIndex >= $this->limit) {
                     $this->stop();
                 }
             }

@@ -19,6 +19,8 @@ class Ac_Admin_Feature {
      */
     var $disabled = false;
     
+    var $usesSql = null;
+    
     /**
      * @param Ac_Admin_Manager $manager
      * @param array $options extra settings of the feature
@@ -89,18 +91,6 @@ class Ac_Admin_Feature {
     function applyToFilterForm($filterForm) {
     }
     
-    function getOrderPrototypes() {
-        return array();
-    }
-    
-    function getFilterPrototypes() {
-        return array();
-    }
-    
-    function getSqlSelectSettings() {
-        return array();
-    }
-    
     /**
      * Should return array with either Ac_Admin_Action objects or with prototypes 
      *
@@ -130,7 +120,10 @@ class Ac_Admin_Feature {
     function onSubManagerCreated($id, $subManager, $smConfig = array()) {
     }
     
-    function onCollectionCreated(Ac_Legacy_Collection $collection) {
+    function onBeforeCreateCollection(array & $collectionPrototype = array()) {
+    }
+    
+    function onCollectionCreated(Ac_Model_Collection_Abstract $collection) {
     }
     
     function onLoad($record) {
@@ -142,7 +135,32 @@ class Ac_Admin_Feature {
     function onBind($record) {
     }
     
+    function getSearchSettings() {
+        return array();
+    }
+    
+    // ------ sql-based features which may not be supported by all storages  ------
+    
+    function usesSqlSelect() {
+        if ($this->usesSql === null) {
+            $this->usesSql = $this->getSqlSelectSettings() || $this->getOrderPrototypes() || $this->getFilterPrototypes();
+        }
+        return $this->usesSql;
+    }
+    
+    function getSqlSelectSettings() {
+        return array();
+    }
+    
     function onCreateSqlSelect(Ac_Sql_Select $select) {
+    }
+    
+    function getOrderPrototypes() {
+        return array();
+    }
+    
+    function getFilterPrototypes() {
+        return array();
     }
     
 }

@@ -2085,7 +2085,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     protected function bestCaseFind (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false) {
         
         $crit = array_keys($query);
-        $fieldCrit = array_intersect($crit, $this->listDataProperties());
+        $fieldCrit = array_values(array_intersect($crit, $this->listDataProperties()));
         if ($sort === false) $sort = $this->getDefaultSort();
         $found = false;
         $needsIndexResult = false;
@@ -2713,6 +2713,52 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         }
         $fieldValues = $properValues;
         return array($fieldNames, $fieldValues);
+    }
+    
+    /**
+     * Creates Collection instance that will provide access to the current mapper with the specific query parameters
+     * @return Ac_Model_Collection
+     */
+    function createCollection(array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false) {
+        $res = array(
+            'class' => 'Ac_Model_Collection_Mapper',
+        );
+        if ($query) $res['query'] = $query;
+        if ($sort !== false) $res['sort'] = $sort;
+        if ($limit !== false) $res['limit'] = $limit;
+        if ($offset !== false) $res['offset'] = $offset;
+        if ($keysToList === true) $res['keyProperty'] = $this->identifierField;
+        elseif ($keysToList !== false) {
+            if (!is_scalar($keysToList)) {
+                throw new Ac_E_InvalidCall("Only scalar \$keysToList is accepted in ".__METHOD__);
+            }
+            $res['keyProperty'] = $this->keysToList;
+        }
+        if (isset($res['query'][self::QUERY_SEARCH])) {
+            $search = $res['query'][self::QUERY_SEARCH];
+            if ($search) {
+                if (is_array($search)) $res['searchPrototype'] = $search;
+                elseif (is_object($search)) $res['search'] = $search;
+                else throw Ac_E_InvalidCall::wrongType("\$query[Ac_Model_Mapper::QUERY_SEARCH]", 
+                        $search, array('array', 'Ac_Model_Search'));
+            }
+            $res['searchInheritsMapper'] = false;
+            unset($res['query'][self::QUERY_SEARCH]);
+        }
+        if ($this->getStorage() instanceof Ac_I_WithSqlSelectPrototype) {
+            $res['class'] = 'Ac_Model_Collection_SqlMapper';
+            if (isset($res['query'][Ac_Model_Storage_MonoTable::QUERY_SQL_SELECT])) {
+                $select = $res['query'][Ac_Model_Storage_MonoTable::QUERY_SQL_SELECT];
+                if ($select) {
+                    if (is_array($select)) $res['sqlSelectPrototype'] = $select;
+                    elseif (is_object($select)) $res['sqlSelect'] = $select;
+                    else throw Ac_E_InvalidCall::wrongType("\$query[Ac_Model_Mapper::QUERY_SQL_SELECT]", 
+                            $select, array('array', 'Ac_Model_Search'));
+                }
+                unset($res['query'][Ac_Model_Storage_MonoTable::QUERY_SQL_SELECT]);
+            }
+        }
+        return $res;
     }
     
 }

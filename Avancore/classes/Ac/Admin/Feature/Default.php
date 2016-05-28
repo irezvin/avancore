@@ -37,6 +37,8 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     
     var $sqlSelectSettings = array();
     
+    var $searchSettings = array();
+    
     var $processingSettings = array();
 
     var $addErrorList = true;
@@ -295,6 +297,10 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     
     function getSqlSelectSettings() {
         return $this->sqlSelectSettings;
+    }
+    
+    function getSearchSettings() {
+        return $this->searchSettings;
     }
     
 }

@@ -146,7 +146,7 @@ class Ac_Table_Column {
             $getters[$rc][$fieldName][$s] = $this->determineGetter($record, $fieldName);
         $g = $getters[$rc][$fieldName][$s];*/
         $g = $this->determineGetter($record, $fieldName);
-        $res = $this->$g[0] ($record, $fieldName, $g[1]);
+        $res = $this->{$g[0]} ($record, $fieldName, $g[1]);
         
         if ($this->decorator) $res = Ac_Decorator::decorate($this->decorator, $res, $this->decorator, $record);
         return $res;

@@ -84,9 +84,6 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     function setRecordDefaults($record) {
         if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {
-/*                foreach ($rel->fieldLinks as $srcField => $destField) {
-                    $record->$destField = $rec->$srcField;
-                }*/
                 $def = array();
                 foreach ($rel->fieldLinks as $srcField => $destField) {
                     $def[$destField] = $rec->$srcField;
@@ -94,6 +91,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
                 $record->bind($def);
             } else {
                 // We would have some difficulties with mid-tables... 
+                throw new Ac_E_InvalidUsage(__CLASS__." does not support relations with \$midTableName");
             }
         }
     }
@@ -101,39 +99,19 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     function doAfterBindRecord(& $record, $requestData) {
         $this->setRecordDefaults($record);
     }
-    
-    function getSqlCriteria() {
-        $res = false;
+
+    function getQueryPart() {
+        $res = array();
         if (($rel = $this->getRelation()) && ($rec = $this->getRecord()) ) {
-            //a very simple stub until I will come with something better... 
-            //also explains why mid-tables don't work!
-            
-            //TODO: we can use destWhere (also in array form as record defaults...)
-            
             if ($rel->getMidTableName() || $rel->getFieldLinks2())
-                throw new Exception(__METHOD__." doesn't currently support N-N relations");
+                throw new Ac_E_InvalidUsage(__CLASS__." does not support relations with \$midTableName");
             $fl = $rel->getFieldLinks();
             $fk = Ac_Accessor::getObjectProperty($rec, array_keys($fl));
-            foreach ($fl as $k => $v) $crit[$v] = $fk[$k];
-            $res = $this->_manager->getApplication()->getDb()->valueCriterion($crit, 't');
-            
-            //$res = $rel->getCritForDestOfSrc($a, 't');
-        } else {
+            foreach ($fl as $k => $v) $res[$v] = $fk[$k];
         }
         return $res;
     }
-   
-    function getSqlExtraJoins() {
-        $res = false;
-        /*if ($this->_relation) {
-            $res = $this->_relation->getDestJoin('t', 'sub');
-        }*/
-        return $res;
-    }
     
-   /**
-    * @param Ac_Form $form
-    */
    function onManagerFormCreated($form) {
         if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {

@@ -535,7 +535,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
                         throw new Ac_E_InvalidUsage("Cannot use \$prototypeExtra along with instance provided "
                             . "in \$query[Ac_Model_Search::QUERY_SQL_SELECT]");
                     } else {
-                        $res = $sel;
+                        $res = clone $sel;
                     }
                 } else 
                     throw Ac_E_InvalidCall::wrongType("\$query[Ac_Model_Search::QUERY_SQL_SELECT]", 

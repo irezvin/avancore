@@ -27,19 +27,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     var $_stayOnProcessing = false;
     
     /**
-     * @var Ac_Sql_Filter
-     */
-    var $_sqlFilter = false;
-    
-    /**
-     * @var Ac_Sql_Order
-     */
-    var $_sqlOrder = false;
-
-    /**
      * @var Ac_Sql_Select
      */
-    var $_sqlSelect = false;
+    protected $sqlSelect = false;
     
     /**
      * Datalink that is injected when Manager is created...
@@ -82,9 +72,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     var $_recordClass = false;
     
     /**
-     * @var Ac_Legacy_Collection
+     * @var Ac_Model_Collection_Mapper
      */
-    var $_recordsCollection = false;
+    protected $recordsCollection = false;
     
     /**
      * Prototypes of table columns
@@ -425,6 +415,10 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     protected function callFeatures($method, $_ = null) {
         $args = func_get_args();
         array_shift($args);
+        return $this->callFeaturesA($method, $args);
+    }
+    
+    protected function callFeaturesA($method, array $args = array()) {
         foreach ($this->listFeatures() as $id) {
             $feat = $this->getFeature($id);
             if (method_exists($feat, $method)) call_user_func_array(array($feat, $method), $args);
@@ -763,17 +757,13 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      */
     function getTable() {
         if ($this->_table === false) {
-            if ($this->_collectionCanBeUsed()) {
-                $this->_table = new Ac_Table_Sequential($this->_getColumnSettings(), $this->_getRecordsCollection(), $this->getPagination(), array(), $this->_getRecordClass());
-                //var_dump($this->_getRecordsCollection()->getStatementTail(), $this->_getRecordsCollection()->_extraColumns);
-            } else {
-                $records = array($this->onlyRecord);
-                $this->_table = new Ac_Table ($this->_getColumnSettings(), $records, $this->_getCompatPagenav(), array(), $this->_getRecordClass());
-            }
+            $this->_table = new Ac_Table_Sequential($this->_getColumnSettings(), $this->getRecordsCollection(), $this->getPagination(), array(), $this->_getRecordClass());
             $this->_table->_manager = $this;
             $p = $this->getPagination();
-            $c = $this->_getRecordsCollection();
-            $c->setLimits($p->getOffset(), $p->getNumberOfRecordsPerPage());
+            $c = $this->getRecordsCollection();
+            $c->close();
+            $c->setOffset($p->getOffset());
+            $c->setLimit($p->getNumberOfRecordsPerPage());
             $this->_preloadRelations();            
         }
         return $this->_table;
@@ -874,9 +864,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $context = $this->getContext();
             $pgContext = $context->spawn('pagination');
             $this->_pagination = new Ac_Admin_Pagination($pgContext, array(), $this->_instanceId.'_pagination');
-            if ($coll = $this->_getRecordsCollection()) {
+            if ($coll = $this->getRecordsCollection()) {
                 if (!$this->dontCount)
-                    $this->_pagination->totalRecords = $coll->countRecords();
+                    $this->_pagination->totalRecords = $coll->getCount();
             } else {
                 $this->_pagination->totalRecords = 1;
             }
@@ -1207,155 +1197,111 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
 
     /**
-     * @return bool
-     */
-    function _collectionCanBeUsed() {
-        return !$this->onlyRecord;
-    }
-    
-    /**
-     * @return Ac_Sql_Filter
-     * @access protected
-     */
-    function _getSqlFilter() {
-        if ($this->_sqlFilter === false) {
-            $allFilters = array();
-            foreach ($this->listFeatures() as $i) {
-                $f = $this->getFeature($i);
-                $allFilters = array_merge($allFilters, $f->getFilterPrototypes());
-            }
-            if (!count($allFilters)) $this->_sqlFilter = null;
-            else {
-                if (0 && (count($allFilters) == 1)) {
-                    $filterSettings = Ac_Util::array_values(array_slice($allFilters, 0, 1));
-                    $filterSettings = $allFilters[0];
-                } else {
-                    $filterSettings = array(
-                        'class' => 'Ac_Sql_Filter_Multiple',
-                        'filters' => $allFilters, 
-                        'applied' => true,
-                    );
-                }
-                $this->_sqlFilter = Ac_Sql_Part::factory($filterSettings, 'Ac_Sql_Filter');
-            }
-        }
-        return $this->_sqlFilter;
-    }
-    
-    /**
-     * @return Ac_Sql_Order
-     * @access protected
-     */
-    function _getSqlOrder() {
-        if ($this->_sqlOrder === false) {
-            $allOrders = array();
-            foreach ($this->listFeatures() as $i) {
-                $f = $this->getFeature($i);
-                $allOrders = array_merge($allOrders, $f->getOrderPrototypes());
-            }
-            if (!count($allOrders)) $this->_sqlOrder = null;
-            else {
-                if (0 && (count($allOrders) == 1)) {
-                    $orderSettings = Ac_Util::array_values(array_slice($allOrders, 0, 1));
-                    $orderSettings = $orderSettings[0];
-                } else {
-                    $orderSettings = array(
-                        'class' => 'Ac_Sql_Order_Multiple',
-                        'orders' => $allOrders, 
-                        'applied' => 1,
-                    );
-                }
-                $this->_sqlOrder = Ac_Sql_Part::factory($orderSettings, 'Ac_Sql_Order');
-            }
-        }
-        return $this->_sqlOrder;
-    }
-    
-    /**
      * @return Ac_Sql_Select
      * @access protected
-     */
-    function _getSqlSelect() {
-        if ($this->_sqlSelect === false) {
-            $options = array();
-            $mapper = $this->getMapper();
-            foreach ($this->listFeatures() as $i) {
-                $feat = $this->getFeature($i);
-                Ac_Util::ms($options, $feat->getSqlSelectSettings());
-            }
-            $f = $this->_getSqlFilter();
-            $o = $this->_getSqlOrder();
-            $ff = $this->getFilterForm();
-            $sqlDb = $this->application->getDb();
-            $options = Ac_Util::m($this->getMapper()->getSqlSelectPrototype('t'), $options);
-            $this->_sqlSelect = new Ac_Sql_Select($sqlDb, $options);
-            if ($ff) {
-                $fVal = $ff->getValue();
-            } else {
-                $fVal = array();
-            }
-            if ($f) {
-                $f->bind($fVal);
-                $f->applyToSelect($this->_sqlSelect);
-            }
-            if ($o) {
-                $o->bind($fVal);
-                $o->applyToSelect($this->_sqlSelect);
-            }
-            // find missing filters and apply them to respective parts
-            $filtersInManager = $f? $f->listFilters() : array();
-            $filtersInForm = array_keys($fVal);
-            $filtersInMapper = $this->_sqlSelect->listParts();
-            $filtersToSet = array_diff(array_intersect($filtersInForm, $filtersInMapper), $filtersInManager);
-            foreach ($filtersToSet as $partName) {
-                $this->_sqlSelect->getPart($partName)->bind($fVal[$partName]);
-            }
-            $this->callFeatures('onCreateSqlSelect', $this->_sqlSelect);
-        }
-        return $this->_sqlSelect;
-    }
-    
-    /**
-     * @return Ac_Sql_Select
      */
     function getSqlSelect() {
-        return $this->_getSqlSelect();
+        if ($this->sqlSelect === false) {
+            $proto = array(
+                'parts' => array(),
+            );
+            $usesSqlSelect = false;
+            foreach ($this->listFeatures() as $i) {
+                $feat = $this->getFeature($i);
+                if ($feat->usesSqlSelect()) {
+                    $usesSqlSelect = true;
+                    Ac_Util::ms($proto, $feat->getSqlSelectSettings());
+                    Ac_Util::ms($proto['parts'], $feat->getFilterPrototypes());
+                    Ac_Util::ms($proto['parts'], $feat->getOrderPrototypes());
+                }
+            }
+            if (!$proto['parts']) unset($proto['parts']);
+            if ($usesSqlSelect) {
+                $this->sqlSelect = $this->getMapper()->createSqlSelect($proto);
+                if (!in_array('t.*', $this->sqlSelect->columns)) {
+                    array_unshift($this->sqlSelect->columns, 't.*');
+                }
+                $this->callFeatures('onCreateSqlSelect', $this->sqlSelect);
+            } else {
+                $this->sqlSelect = null;
+            }
+        }
+        return $this->sqlSelect;
+    }
+    
+    /**
+     * @return Ac_Sql_Select
+     */
+    function _getSqlSelect() {
+        return $this->getSqlSelect();
     }
     
     function _preloadRelations() {
         if ($pr = $this->_getPreloadRelations()) {
-            $myRecs = array();
-            while ($rec = $this->_recordsCollection->getNext()) {
-                $myRecs[] = $rec;
-            }
+            $myRecs = $this->recordsCollection->fetchGroup();
             $this->getMapper()->preloadRelations($myRecs, $pr);
         }
     }
         
     /**
-     * @return Ac_Legacy_Collection
-     */
-    function _getRecordsCollection() {
-        return $this->getRecordsCollection();
-    }
-    
-    /**
-     * @return Ac_Legacy_Collection
+     * @return Ac_Model_Collection_Mapper
      */
     function getRecordsCollection() {
-        if ($this->_recordsCollection === false) {
-            if ($this->_collectionCanBeUsed()) {
-                $this->_recordsCollection = new Ac_Legacy_Collection($this->mapperClass, false, $this->_getWhere(), $this->_getOrder(), $this->_getJoins(), $this->_getExtraColumns());
-                    if (strlen($h = $this->_getHaving())) $this->_recordsCollection->setHaving ($h);
-                $this->_recordsCollection->setDistinct();
-                $this->_recordsCollection->setGroupBy($this->_getGroupBy());
-                foreach ($this->listFeatures() as $i) $this->getFeature($i)->onCollectionCreated ($this->_recordsCollection);
+        if ($this->recordsCollection === false) {
+
+            if ($this->onlyRecord) {
+                $proto = array(
+                    'class' => 'Ac_Model_Collection_Array',
+                    'items' => array($this->onlyRecord),
+                );
             } else {
-                $this->_recordsCollection = null;
+            
+                $proto = array(
+                    'class' => 'Ac_Model_Collection_Mapper',
+                    'application' => $this->getApplication(),
+                    'mapper' => $this->getMapper(),
+                    'query' => array(),
+                    'autoOpen' => true,
+                );
+                
+                $searchPrototype = array();
+                
+                foreach ($this->listFeatures() as $i) {
+                    Ac_Util::ms($searchPrototype, $this->getFeature($i)->getSearchSettings());
+                }
+                
+                if ($searchPrototype) $proto['query'][Ac_Model_Mapper::QUERY_SEARCH] = $searchPrototype;
+                
+                if ($s = $this->getSqlSelect()) {
+                    $proto['class'] = 'Ac_Model_Collection_SqlMapper';
+                    $proto['query'][Ac_Model_Storage_MonoTable::QUERY_SQL_SELECT] = $s;
+                }
+                
+                if ($this->_datalink && $qp = $this->_datalink->getQueryPart()) {
+                    $proto['query'] = $qp;
+                }
+                
+                Ac_Util::ms($proto['query'], $fv = $this->getFilterValue());
+                $this->callFeaturesA('onBeforeCreateCollection', array(& $proto));
+                $this->recordsCollection = Ac_Prototyped::factory($proto, 'Ac_Model_Collection_Abstract');
+                foreach ($this->listFeatures() as $i) $this->getFeature($i)->onCollectionCreated ($this->recordsCollection);
             }
         }
-        
-        return $this->_recordsCollection;
+        return $this->recordsCollection;
+    }
+    
+    function getFilterValue() {
+        $f = $this->getFilterForm();
+        $res = array();
+        if ($f) {
+            $val = $f->getValue();
+            foreach ($val as $k => $v) {
+                if (is_array($v) && !array_diff($v, array(null))) $v = null;
+                if ($v !== null && $v !== '') $res[$k] = $v;
+            }
+            unset($res['submit']);
+        }
+        return $res;
     }
     
     function _getRecordClass() {
@@ -1369,66 +1315,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             }
         }
         return $this->_recordClass;
-    }
-    
-    function _getWhere() {
-        if ($this->_datalink && ($c = $this->_datalink->getSqlCriteria())) {
-            $res = $c;
-        } else {
-            $res = false;
-        }
-        if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getWhereClause(false)))) {
-            $res = strlen($res)? "($res) AND ($w)" : $w;
-        }
-        return $res;
-    }
-    
-    function _getOrder() {
-        $s = $this->_getSqlSelect();
-        if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getOrderByClause(false)))) {
-            $res = $w;
-        } else {
-            $res = false;
-        }
-        return $res;
-    }
-    
-    function _getHaving() {
-        $s = $this->_getSqlSelect();
-        if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getHavingClause(false)))) {
-            $res = $w;
-        } else {
-            $res = false;
-        }
-        return $res;
-    }
-
-    function _getGroupBy() {
-        if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getGroupByClause(false)))) {
-            $res = $w;
-        } else {
-            $res = false;
-        }
-        return $res;
-    }
-    
-    function _getJoins() {
-        if ($this->_datalink && $j = $this->_datalink->getSqlExtraJoins()) {
-            $res = $j;
-        } else {
-            $res = false;
-        }
-        if (($sel = $this->_getSqlSelect()) && (strlen($s = $sel->getFromClause(false, array('t'))))) {
-            if (strlen($res)) $res = $res . ' '. $s;
-                else $res = $s;
-        }
-        return $res;
-    }
-    
-    function _getExtraColumns() {
-        $res = array();
-        if (($s = $this->_getSqlSelect())) $res = array_merge($res, $s->getColumnsList(false, false, true));
-        return $res;
     }
     
     function setConfigService(Ac_Admin_ManagerConfigService $configService) {

@@ -113,6 +113,11 @@ class Ac_Model_Values extends Ac_Prototyped {
             $res['class'] = 'Ac_Model_Values_Records';
         }
         
+        // Ugly hack for better compatibility with legacy code
+        if (!isset($res['class']) || $res['class'] === 'Ac_Model_Values') {
+            unset($res['mapperClass']);
+        }
+        
         if ($optionsOverride) Ac_Util::ms($res, $optionsOverride);
         return $res;
     }
