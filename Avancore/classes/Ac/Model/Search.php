@@ -82,6 +82,12 @@ class Ac_Model_Search extends Ac_Prototyped implements Ac_I_Search_FilterProvide
         return array_keys($this->criteria);
     }
     
+    function listAllCriteria() {
+        $res = $this->listOwnCritera();
+        if ($this->parentSearch) $res = array_unique(array_merge($res, $this->parentSearch->listAllCriteria()));
+        return $res;
+    }
+    
     /**
      * @return Ac_I_Search_Criterion_Search
      */
@@ -154,6 +160,12 @@ class Ac_Model_Search extends Ac_Prototyped implements Ac_I_Search_FilterProvide
     
     function listOwnSortCriteria() {
         return array_keys($this->sortCriteria);
+    }
+    
+    function listAllSortCriteria() {
+        $res = $this->listOwnSortCriteria();
+        if ($this->parentSearch) $res = array_unique(array_merge($res, $this->parentSearch->listAllSortCriteria()));
+        return $res;
     }
     
     /**

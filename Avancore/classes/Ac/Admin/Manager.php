@@ -74,7 +74,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     /**
      * @var Ac_Model_Collection_Mapper
      */
-    protected $recordsCollection = false;
+    protected $collection = false;
     
     /**
      * Prototypes of table columns
@@ -1230,6 +1230,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
     
     /**
+     * @deprecated - use getSqlSelect()
      * @return Ac_Sql_Select
      */
     function _getSqlSelect() {
@@ -1238,16 +1239,24 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     function _preloadRelations() {
         if ($pr = $this->_getPreloadRelations()) {
-            $myRecs = $this->recordsCollection->fetchGroup();
+            $myRecs = $this->collection->fetchGroup();
             $this->getMapper()->preloadRelations($myRecs, $pr);
         }
+    }
+    
+    /**
+     * @deprecated - use getCollection()
+     * @return Ac_Model_Collection_Mapper
+     */
+    function getRecordsCollection() {
+        return $this->getCollection();
     }
         
     /**
      * @return Ac_Model_Collection_Mapper
      */
-    function getRecordsCollection() {
-        if ($this->recordsCollection === false) {
+    function getCollection() {
+        if ($this->collection === false) {
 
             if ($this->onlyRecord) {
                 $proto = array(
@@ -1270,38 +1279,59 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                     Ac_Util::ms($searchPrototype, $this->getFeature($i)->getSearchSettings());
                 }
                 
-                if ($searchPrototype) $proto['query'][Ac_Model_Mapper::QUERY_SEARCH] = $searchPrototype;
+                if ($searchPrototype) {
+                    $proto['searchPrototype'] = $searchPrototype;
+                }
                 
                 if ($s = $this->getSqlSelect()) {
                     $proto['class'] = 'Ac_Model_Collection_SqlMapper';
-                    $proto['query'][Ac_Model_Storage_MonoTable::QUERY_SQL_SELECT] = $s;
+                    $proto['sqlSelect'] = $s;
                 }
                 
                 if ($this->_datalink && $qp = $this->_datalink->getQueryPart()) {
                     $proto['query'] = $qp;
                 }
                 
-                Ac_Util::ms($proto['query'], $fv = $this->getFilterValue());
                 $this->callFeaturesA('onBeforeCreateCollection', array(& $proto));
-                $this->recordsCollection = Ac_Prototyped::factory($proto, 'Ac_Model_Collection_Abstract');
-                foreach ($this->listFeatures() as $i) $this->getFeature($i)->onCollectionCreated ($this->recordsCollection);
+                $this->collection = Ac_Prototyped::factory($proto, 'Ac_Model_Collection_Abstract');
+                foreach ($this->listFeatures() as $i) $this->getFeature($i)->onCollectionCreated ($this->collection);
+                list($query, $sort) = $this->getQueryAndSort($this->collection);
+                if ($query) $this->collection->setQuery(Ac_Util::m($this->collection->getQuery(), $query));
+                if ($sort !== null) $this->collection->setSort($sort);
             }
         }
-        return $this->recordsCollection;
+        return $this->collection;
     }
     
-    function getFilterValue() {
+    protected function getQueryAndSort(Ac_Model_Collection_Mapper $collection) {
         $f = $this->getFilterForm();
-        $res = array();
+        $query = array();
+        $sort = false;
+        $val = array();
+        $sort = null;
         if ($f) {
             $val = $f->getValue();
             foreach ($val as $k => $v) {
-                if (is_array($v) && !array_diff($v, array(null))) $v = null;
-                if ($v !== null && $v !== '') $res[$k] = $v;
+                // filter out empty arrays for cases such as date selector
+                if (is_array($v) && !array_diff($v, array(null, '', false))) unset($val[$k]);
+                
+                // filter out nulls - filter form returns them when not submitted, 
+                // and empty strings - filter form returns them when submitted
+                elseif ($v === null || $v === '' || $v === false) unset($val[$k]);
             }
-            unset($res['submit']);
+            // TODO: improve this ugly kludge with criteria enumeration
+            $searchCrit = $collection->listPossibleCriteria();
+            $sortCrit = $collection->listPossibleSortCriteria();
+            $query = array_intersect_key($val, array_flip($searchCrit));
+            if (isset($val['sort']) && in_array($val['sort'], $sortCrit) && !isset($query['sort'])) {
+                $sort = $val['sort'];
+            }
+        } else {
+            $searchCrit = array();
+            $sortCrit = array();
         }
-        return $res;
+        $this->callFeaturesA('onGetQueryAndSort', array(& $query, & $sort, $val, $searchCrit, $sortCrit));
+        return array($query, $sort);
     }
     
     function _getRecordClass() {

@@ -120,6 +120,9 @@ class Ac_Admin_Feature {
     function onSubManagerCreated($id, $subManager, $smConfig = array()) {
     }
     
+    function onGetQueryAndSort(array &$query, & $sort, $filterFormData, array $searchCrit, array $sortCrit) {
+    }
+    
     function onBeforeCreateCollection(array & $collectionPrototype = array()) {
     }
     

@@ -47,6 +47,35 @@ class Ac_Model_Collection_SqlMapper extends Ac_Model_Collection_Mapper {
         return $res;
     }
     
+    /**
+     * @return Ac_Sql_Select
+     */
+    function getSqlSelectInstance() {
+        if ($this->sqlSelectPrototype) {
+            if ($this->isOpen) throw new Ac_E_InvalidUsage("Cannot instantiate Sql Select in ".__FUNCTION__."() "
+                . "while isOpen(). close() first");
+            $this->sqlSelect = $this->getMapper()->createSqlSelect($this->sqlSelectPrototype);
+            $this->sqlSelectPrototype = null;
+        }
+        if ($this->sqlSelect) $res = $this->sqlSelect;
+            else $res = null;
+        return $res;
+    }
+    
+    /**
+     * @return array
+     */
+    protected function listExtraCriteria() {
+        $res = array();
+        if ($sel = $this->getSqlSelectInstance()) {
+            $res = $sel->listParts();
+        } else {
+            $res = parent::listExtraCriteria();
+        }
+        return $res;
+    }
+    
+    
     protected function resetState() {
         parent::resetState();
         if ($this->sqlSelect) {

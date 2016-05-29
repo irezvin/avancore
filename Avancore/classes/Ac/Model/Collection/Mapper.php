@@ -227,6 +227,58 @@ class Ac_Model_Collection_Mapper extends Ac_Model_Collection_Abstract {
     function getKeyProperty() {
         return $this->keyProperty;
     }
+
+    /**
+     * @return Ac_Model_Search
+     */
+    function getSearchInstance() {
+        if ($this->searchPrototype) {
+            if ($this->isOpen) throw new Ac_E_InvalidUsage("Cannot instantiate search in ".__FUNCTION__."() "
+                . "while isOpen(). close() first");
+            $this->search = Ac_Prototyped::factory($this->searchPrototype, 'Ac_Model_Search');
+            if ($this->searchInheritsMapper)  if ($this->searchInheritsMapper) $this->search->setParentSearch(
+                $this->getMapper(false, true)->getSearch()
+            );
+            $this->searchPrototype = null;
+        }
+        if ($this->search) $res = $this->search;
+            else $res = null;
+        return $res;
+    }
+
+    /**
+     * @return array
+     */
+    protected function listExtraCriteria() {
+        $m = $this->getMapper(false, true);
+        if (($stor = $m->getStorage()) instanceof Ac_Model_Storage_Sql) {
+            $sel = $m->createSqlSelect();
+            $res = $sel->listParts();
+        } else {
+            $res = array();
+        }
+        return $res;
+    }
+    
+    function listPossibleCriteria() {
+        $m = $this->getMapper(false, true);
+        $s = $this->getSearchInstance();
+        if ($s) $res = $s->listAllCriteria(); 
+        else $res = $m->getSearch()->listAllCriteria();
+        $res = array_merge($res, $this->listExtraCriteria());
+        $res = array_merge($res, $m->getPrototype()->listProperties());
+        $res = array_unique($res);
+        return $res;
+    }
+    
+    function listPossibleSortCriteria() {
+        $m = $this->getMapper(false, true);
+        $s = $this->getSearchInstance();
+        if ($s) $res = $s->listAllSortCriteria(); 
+        else $res = $m->getSearch()->listAllSortCriteria();
+        $res = array_unique($res);
+        return $res;
+    }
     
     protected function resetState() {
         parent::resetState();
