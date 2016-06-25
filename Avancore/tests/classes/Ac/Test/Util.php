@@ -14,6 +14,82 @@ class Ac_Test_Util extends Ac_Test_Base {
         if (!$this->assertEqual($c['foo'], $b['foo'])) var_dump($c);
         
     }
+
+    function rmDir($dir) {
+        if (!is_dir($dir)) return;
+        $path = realpath($dir);
+        $parent = realpath(Sample::getInstance()->getAdapter()->getAppRootDir());
+        if (!!strncmp($path, $parent, strlen($parent))) return false;
+        $directory = new RecursiveDirectoryIterator($dir);
+        $iterator = new RecursiveIteratorIterator($directory);
+        $dirs = array();
+        foreach ($iterator as $item) {
+            $f = basename($item);
+            if ($f === '.') {
+                $dirs[] = dirname(''.$item);
+                continue;
+            }
+            elseif ($f === '..') continue;
+            if (is_dir(''.$item)) $dirs[] = ''.$item;
+            else unlink(''.$item);
+        }
+        sort($dirs);
+        foreach (array_reverse($dirs) as $d) {
+            rmdir($d);
+        }
+    }    
+    
+    function testCgDirSync() {
+        $sa = $this->getSampleApp();
+        $dir = $sa->getAdapter()->getVarCachePath();
+        $src = $dir."/dirSyncSrc";
+        $dest = $dir."/dirSyncDest";
+        $this->rmDir($src);
+        $this->rmDir($dest);
+        if (!is_dir($src)) mkdir($src, 0777, true);
+        if (!is_dir($dest)) mkdir($dest, 0777, true);
+        $this->mkStuff("
+            Sample/First/Base/Object.php
+            Sample/First/Base/Mapper.php
+            Sample/Second/Base/Object.php
+            Sample/Second/Base/Mapper.php
+        ", $src);
+        $this->mkStuff("
+            Sample/First/Base/Object.php
+            Sample/Obsolete/Base/Mapper.php
+        ", $dest);
+        $ds = new Ac_Cg_DirSync;
+        
+        $ds->srcDir = $src;
+        $ds->destDir = $dest;
+        
+        $ds->clearSrc();
+        
+        $ds->deleteFromDest = true;
+        $ds->overwriteDest = true;
+        $this->assertTrue($ds->run());
+        $wl = $ds->getWorkList();
+        
+        $ds->dryRun = false;
+        $this->assertTrue($ds->run());
+        $destList = $ds->listDest();
+        sort($wl);
+        sort($destList);
+        $this->assertEqual($wl, $destList);
+        $proper = preg_split("/\s*[\n\r]+\s*/", trim("Sample/
+            Sample/First/
+            Sample/First/Base/
+            Sample/First/Base/Object.php
+            Sample/First/Base/Mapper.php
+            Sample/Second/
+            Sample/Second/Base/
+            Sample/Second/Base/Object.php
+            Sample/Second/Base/Mapper.php"
+        ));
+        sort($proper);
+        $this->assertEqual($destList, $proper);
+    }
+    
     
     function testIndexArray() {
         

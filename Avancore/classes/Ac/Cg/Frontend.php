@@ -135,6 +135,10 @@ class Ac_Cg_Frontend {
                     'class' => 'Ac_Form_Control_Toggle',
                     'caption' => 'Create non-editable files',
                 ),
+                'copyEditable' => array(
+                    'class' => 'Ac_Form_Control_Toggle',
+                    'caption' => 'Deploy editable files after generation',
+                ),
                 'copyGen' => array(
                     'class' => 'Ac_Form_Control_Toggle',
                     'caption' => 'Deploy non-editable files after generation',
@@ -163,6 +167,7 @@ class Ac_Cg_Frontend {
         $createEditableFiles = (bool) $value['createEditableFiles'];
         $createNonEditableFiles = (bool) $value['createNonEditableFiles'];
         $copyGen = (bool) $value['copyGen'];
+        $copyEditable = (bool) $value['copyEditable'];
         
         $gen->clearOutputDir =  $cleanOutputDir;
         $gen->genEditable = $createEditableFiles;
@@ -220,8 +225,13 @@ class Ac_Cg_Frontend {
 
 <?php   if ($copyGen && $createNonEditableFiles) { ?>
 <?php       $ds = DIRECTORY_SEPARATOR; ?>
-<?php 	    list($cmd, $output, $res) = Ac_Cg_Util::copyDirRecursive("output{$ds}gen", $this->getGenDeployPath(), true, true); ?>
-<?php 	    echo '<pre>'.htmlspecialchars($cmd)."</pre><p>{$res}</p><pre>".$output.'</pre>'; ?>
+<?php 	    $err = implode("\n", Ac_Cg_Util::copyDirRecursive("output/gen", $this->getGenDeployPath(), true, true)); ?>
+<?php 	    if ($err) echo "<pre>".$err."</pre>"; ?>
+<?php   } ?>
+<?php   if ($copyEditable && $createEditableFiles) { ?>
+<?php       $ds = DIRECTORY_SEPARATOR; ?>
+<?php 	    $err = implode("\n", Ac_Cg_Util::copyDirRecursive("output/classes", dirname($this->getGenDeployPath()).'/classes', false, false)); ?>
+<?php 	    if ($err) echo "<pre>".$err."</pre>"; ?>
 <?php   } ?>
 
 <?php 
