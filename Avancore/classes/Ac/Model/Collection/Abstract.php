@@ -104,6 +104,14 @@ abstract class Ac_Model_Collection_Abstract extends Ac_Prototyped implements Ite
     }
 
     /**
+     * @deprecated
+     * use Ac_Model_Collection::getCount()
+     */
+    function countRecords() {
+        return $this->getCount();
+    }
+    
+    /**
      * Retrieves count of all available items (if supported by the storage) 
      * disregarding $offset and $limit values. 
      * 

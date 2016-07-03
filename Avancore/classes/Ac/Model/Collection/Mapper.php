@@ -280,6 +280,15 @@ class Ac_Model_Collection_Mapper extends Ac_Model_Collection_Abstract {
         return $res;
     }
     
+    function setKeys(array $keys = array()) {
+        $cr = Ac_Model_Search::IDENTIFIER_CRITERION;
+        if ($keys) {
+            $this->query[$cr] = $keys;
+        } else {
+            unset($this->query[$cr]);
+        }
+    }
+    
     protected function resetState() {
         parent::resetState();
         if ($this->cleanGroupOnAdvance && function_exists('gc_enable')) gc_enable();

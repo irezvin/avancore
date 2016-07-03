@@ -1218,9 +1218,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             if (!$proto['parts']) unset($proto['parts']);
             if ($usesSqlSelect) {
                 $this->sqlSelect = $this->getMapper()->createSqlSelect($proto);
-                if (!in_array('t.*', $this->sqlSelect->columns)) {
-                    array_unshift($this->sqlSelect->columns, 't.*');
-                }
                 $this->callFeatures('onCreateSqlSelect', $this->sqlSelect);
             } else {
                 $this->sqlSelect = null;
@@ -1264,36 +1261,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                     'items' => array($this->onlyRecord),
                 );
             } else {
-            
-                $proto = array(
-                    'class' => 'Ac_Model_Collection_Mapper',
-                    'application' => $this->getApplication(),
-                    'mapper' => $this->getMapper(),
-                    'query' => array(),
-                    'autoOpen' => true,
-                );
-                
-                $searchPrototype = array();
-                
-                foreach ($this->listFeatures() as $i) {
-                    Ac_Util::ms($searchPrototype, $this->getFeature($i)->getSearchSettings());
-                }
-                
-                if ($searchPrototype) {
-                    $proto['searchPrototype'] = $searchPrototype;
-                }
-                
-                if ($s = $this->getSqlSelect()) {
-                    $proto['class'] = 'Ac_Model_Collection_SqlMapper';
-                    $proto['sqlSelect'] = $s;
-                }
-                
-                if ($this->_datalink && $qp = $this->_datalink->getQueryPart()) {
-                    $proto['query'] = $qp;
-                }
-                
-                $this->callFeaturesA('onBeforeCreateCollection', array(& $proto));
-                $this->collection = Ac_Prototyped::factory($proto, 'Ac_Model_Collection_Abstract');
+                $this->collection = $this->createBareCollection();
                 foreach ($this->listFeatures() as $i) $this->getFeature($i)->onCollectionCreated ($this->collection);
                 list($query, $sort) = $this->getQueryAndSort($this->collection);
                 if ($query) $this->collection->setQuery(Ac_Util::m($this->collection->getQuery(), $query));
@@ -1301,6 +1269,43 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             }
         }
         return $this->collection;
+    }
+
+    /**
+     * @return Ac_Model_Collection_Mapper
+     */
+    function createBareCollection() {
+        $proto = array(
+            'class' => 'Ac_Model_Collection_Mapper',
+            'application' => $this->getApplication(),
+            'mapper' => $this->getMapper(),
+            'query' => array(),
+            'autoOpen' => true,
+        );
+
+        $searchPrototype = array();
+
+        foreach ($this->listFeatures() as $i) {
+            Ac_Util::ms($searchPrototype, $this->getFeature($i)->getSearchSettings());
+        }
+
+        if ($searchPrototype) {
+            $proto['searchPrototype'] = $searchPrototype;
+        }
+
+        if ($s = $this->getSqlSelect()) {
+            $proto['class'] = 'Ac_Model_Collection_SqlMapper';
+            $proto['sqlSelect'] = $s;
+        }
+
+        if ($this->_datalink && $qp = $this->_datalink->getQueryPart()) {
+            $proto['query'] = $qp;
+        }
+                
+        $this->callFeaturesA('onBeforeCreateCollection', array(& $proto));
+        $res = Ac_Prototyped::factory($proto, 'Ac_Model_Collection_Abstract');
+        return $res;
+        
     }
     
     protected function getQueryAndSort(Ac_Model_Collection_Mapper $collection) {

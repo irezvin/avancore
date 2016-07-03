@@ -551,6 +551,11 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
         } else {
             $res = $this->createBlankSqlSelect($prototypeExtra);
         }
+        // TODO: fix this ugly hack with t.*
+        $alias = $res->getEffectivePrimaryAlias();
+        if (!in_array($allCol = $alias.'.*', $res->columns)) {
+            array_unshift($res->columns, $allCol);
+        }
         return $res;
     }
     

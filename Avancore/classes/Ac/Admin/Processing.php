@@ -225,9 +225,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
                     $this->_recordsCollection->setKeys($this->_recordIdentifiers, $this->_mapperClass);
                     $this->_applyDatalinkToCollection();
                 } else {
-                    $this->_getMapper();
-                    $this->_recordsCollection->useMapper($this->_mapperClass);
-                    $this->_applyDatalinkToCollection();
+                    $this->manager->createBareCollection();
                 }
             }
         }
