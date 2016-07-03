@@ -4,13 +4,20 @@
  */
 class Child_Person_Post_Base_Mapper extends Sample_Person_Post_Mapper {
 
-    var $recordClass = 'Child_Person_Post'; 
+    var $recordClass = 'Child_Person_Post';
 
-    var $id = 'Child_Person_Post_Mapper'; 
+    var $id = 'Child_Person_Post_Mapper';
 
-    var $storage = 'Child_Person_Post_Storage'; 
+    var $storage = 'Child_Person_Post_Storage';
  
- 
+    protected function doGetCoreMixables() { 
+        return Ac_Util::m(parent::doGetCoreMixables(), array (
+            'publish' => array (
+                'class' => 'Child_Publish_MapperMixable',
+            ),
+        ));
+    }
+    
  
     /**
      * @return Child_Person_Post 
@@ -144,6 +151,10 @@ class Child_Person_Post_Base_Mapper extends Sample_Person_Post_Mapper {
     
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
+            '_publish' => array (
+                'srcMapperClass' => 'Child_Person_Post_Mapper',
+                'destMapperClass' => 'Child_Publish_ImplMapper',
+            ),
             '_person' => array (
                 'srcMapperClass' => 'Child_Person_Post_Mapper',
                 'destMapperClass' => 'Child_Person_Mapper',

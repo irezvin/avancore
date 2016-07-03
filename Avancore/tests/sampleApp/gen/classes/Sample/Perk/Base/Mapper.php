@@ -4,25 +4,24 @@
  */
 class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
 
-    var $pk = 'perkId'; 
+    var $pk = 'perkId';
 
-    var $recordClass = 'Sample_Perk'; 
+    var $recordClass = 'Sample_Perk';
 
-    var $tableName = '#__perks'; 
+    var $tableName = '#__perks';
 
-    var $id = 'Sample_Perk_Mapper'; 
+    var $id = 'Sample_Perk_Mapper';
 
-    var $storage = 'Sample_Perk_Storage'; 
+    var $storage = 'Sample_Perk_Storage';
 
-    var $columnNames = array ( 0 => 'perkId', 1 => 'name', ); 
+    var $columnNames = array ( 0 => 'perkId', 1 => 'name', );
 
-    var $nullableColumns = array ( 0 => 'name', ); 
+    var $nullableColumns = array ( 0 => 'name', );
 
     var $defaults = array (
             'perkId' => NULL,
             'name' => '',
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'perkId';
     protected $askRelationsForDefaults = false;

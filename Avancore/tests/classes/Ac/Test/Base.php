@@ -30,12 +30,19 @@ class Ac_Test_Base extends UnitTestCase {
     }
     
 	/**
-	 * @return Ac_Sql_Db_Ae
+	 * @return Ac_Sql_Db
 	 */
 	function getAeDb() {
 		if ($this->aeDb === false) $this->aeDb = Ac_Prototyped::factory (self::$config['dbPrototype'], 'Ac_Sql_Db');
 		return $this->aeDb;
 	}
+    
+    /**
+     * @return Ac_Sql_Db
+     */
+    function getDb() {
+        return $this->getAeDb();
+    }
     
     /**
      * @return Sample

@@ -4,28 +4,39 @@
  */
 class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
 
-    var $pk = 'productId'; 
+    protected $identifierField = NULL;
 
-    var $recordClass = 'Ac_Model_Record'; 
+    var $pk = 'productId';
 
-    var $tableName = '#__shop_product_notes'; 
+    var $recordClass = 'Ac_Model_Record';
 
-    var $id = 'Sample_Shop_Product_Note_ImplMapper'; 
+    var $tableName = '#__shop_product_notes';
 
-    var $storage = 'Sample_Shop_Product_Note_Storage'; 
+    var $id = 'Sample_Shop_Product_Note_ImplMapper';
 
-    var $columnNames = array ( 0 => 'productId', 1 => 'note', 2 => 'noteAuthorId', ); 
+    var $storage = 'Sample_Shop_Product_Note_Storage';
 
-    var $nullableColumns = array ( 0 => 'noteAuthorId', ); 
+    var $columnNames = array ( 0 => 'productId', 1 => 'note', 2 => 'noteAuthorId', );
+
+    var $nullableColumns = array ( 0 => 'noteAuthorId', );
 
     var $defaults = array (
             'productId' => NULL,
             'note' => '',
             'noteAuthorId' => NULL,
-        ); 
- 
+        );
     protected $askRelationsForDefaults = false;
  
+    protected function doGetCoreMixables() { 
+        return Ac_Util::m(parent::doGetCoreMixables(), array (
+            'Ac_Model_Typer_Abstract' => array (
+                'class' => 'Ac_Model_Typer_ExtraTable',
+                'tableName' => '#__shop_product_notes',
+                'uniformTypeId' => 'Sample_Shop_Product_Mapper',
+            ),
+        ));
+    }
+    
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (

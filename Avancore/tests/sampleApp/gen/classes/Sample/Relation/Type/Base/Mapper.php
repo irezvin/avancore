@@ -4,24 +4,23 @@
  */
 class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
 
-    var $pk = 'relationTypeId'; 
+    var $pk = 'relationTypeId';
 
-    var $recordClass = 'Sample_Relation_Type'; 
+    var $recordClass = 'Sample_Relation_Type';
 
-    var $tableName = '#__relation_types'; 
+    var $tableName = '#__relation_types';
 
-    var $id = 'Sample_Relation_Type_Mapper'; 
+    var $id = 'Sample_Relation_Type_Mapper';
 
-    var $storage = 'Sample_Relation_Type_Storage'; 
+    var $storage = 'Sample_Relation_Type_Storage';
 
-    var $columnNames = array ( 0 => 'relationTypeId', 1 => 'title', 2 => 'isSymmetrical', ); 
+    var $columnNames = array ( 0 => 'relationTypeId', 1 => 'title', 2 => 'isSymmetrical', );
 
     var $defaults = array (
             'relationTypeId' => NULL,
             'title' => NULL,
             'isSymmetrical' => '0',
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'relationTypeId';
     protected $askRelationsForDefaults = false;

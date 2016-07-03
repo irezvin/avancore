@@ -8,6 +8,12 @@ class Child_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable_
      */
     protected $mapperExtraTable = false;
 
+    protected $mixableId = 'Child_Shop_Product_Extra_Code';
+    
+    function hasPublicVars() {
+        return true;
+    }
+
     /**
      * @return Child 
      */

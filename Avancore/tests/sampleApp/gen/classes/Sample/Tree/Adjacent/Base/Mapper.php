@@ -4,19 +4,19 @@
  */
 class Sample_Tree_Adjacent_Base_Mapper extends Ac_Model_Mapper {
 
-    var $pk = 'id'; 
+    var $pk = 'id';
 
-    var $recordClass = 'Sample_Tree_Adjacent'; 
+    var $recordClass = 'Sample_Tree_Adjacent';
 
-    var $tableName = '#__tree_adjacent'; 
+    var $tableName = '#__tree_adjacent';
 
-    var $id = 'Sample_Tree_Adjacent_Mapper'; 
+    var $id = 'Sample_Tree_Adjacent_Mapper';
 
-    var $storage = 'Sample_Tree_Adjacent_Storage'; 
+    var $storage = 'Sample_Tree_Adjacent_Storage';
 
-    var $columnNames = array ( 0 => 'id', 1 => 'parentId', 2 => 'ordering', 3 => 'title', 4 => 'tag', ); 
+    var $columnNames = array ( 0 => 'id', 1 => 'parentId', 2 => 'ordering', 3 => 'title', 4 => 'tag', );
 
-    var $nullableColumns = array ( 0 => 'parentId', 1 => 'tag', ); 
+    var $nullableColumns = array ( 0 => 'parentId', 1 => 'tag', );
 
     var $defaults = array (
             'id' => NULL,
@@ -24,8 +24,7 @@ class Sample_Tree_Adjacent_Base_Mapper extends Ac_Model_Mapper {
             'ordering' => '0',
             'title' => '',
             'tag' => NULL,
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;

@@ -134,6 +134,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     const EVENT_ON_LIST_MAPPERS = 'onListMappers';
     
+    /**
+     * function onGetIdentifier (Ac_Model_Object $record, & $result)
+     */
+    const EVENT_ON_GET_IDENTIFIER = 'onGetIdentifier';
+    
     const INSTANCE_ID_PREFIX = '\\i\\';
     
     const INSTANCE_ID_PREFIX_LENGTH = 3;
@@ -244,7 +249,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     protected $lastCollectionKey = null;
     
-    
     /**
      * Keys in $recordsCollection of records that didn't have their instance IDs
      * @array (key => true)
@@ -257,6 +261,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * which field is used as identifier for every record (if applicable)
      */
     protected $identifierField = false;
+    
+    protected $rowIdentifierField = false;
     
     /**
      * Relations that were created (used only if $this->remembersRelations())
@@ -300,6 +306,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     protected $dataProperties = false;
     
     protected $defaults = false;
+
+    /**
+     * @var array
+     */
+    protected $restriction = false;
     
     protected $fkFieldsData = false;
     
@@ -310,8 +321,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     protected $computedDefaults = false;
     
     protected $mappers = false;
-    
-    protected $typeField = false;
     
     /**
      * @var Ac_Model_Storage
@@ -329,7 +338,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     protected $search = false;
     
     protected $searchPrototype = array();
-
+    
     /**
      * Default value of $mode in Ac_Model_Mapper::checkRecordPresence
      * Must be one of Ac_Model_Mapper::PRESENCE_ constancts
@@ -339,7 +348,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     var $defaultPresenceCheckMode = Ac_Model_Mapper::PRESENCE_SMART;
     
     protected static $dontCollect = 0;
-        
+    
     function __construct(array $options = array()) {
         // TODO: application & db are initialized last, id & tableName - first
         parent::__construct($options);
@@ -444,6 +453,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     final function registerRecord(Ac_Model_Object $record) {
+        if ($this->restriction) $record->bind($this->restriction);
         $this->coreRegisterRecord($record);
         $this->triggerEvent(self::EVENT_AFTER_CREATE_RECORD, array(& $record));
     }
@@ -640,7 +650,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         foreach ($loaded as $identifier => $record) {
             $objects[$identifier] = $record;
         }
-
+        
         if ($this->useRecordsCollection && !self::$dontCollect) {
             foreach ($loaded as $identifier => $record) {
                 $this->recordsCollection[$identifier] = $record;
@@ -886,6 +896,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         $indexData = $this->getIndexData();
         $indexData['PRIMARY'] = array($this->pk);
         if (!is_array($fieldNameOrNames)) $fieldNameOrNames = array($fieldNameOrNames);
+        if ($this->restriction) $fieldOrFieldNames += array_keys($this->restriction);
         $res = false;
         foreach ($indexData as $fieldsOfIndex) {
             if (!array_diff($fieldsOfIndex, $fieldNameOrNames)) {
@@ -1419,6 +1430,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     final function getSqlSelectPrototype($primaryAlias = 't') {
         $res = $this->doGetSqlSelectPrototype($primaryAlias);
+        if ($this->restriction) {
+            $res['where']['__restriction'] = $this->getDb()->valueCriterion($this->restriction, $primaryAlias);
+        }
         $this->triggerEvent(self::EVENT_ON_GET_SELECT_PROTOTYPE, array(
             & $res, $primaryAlias
         ));
@@ -1576,6 +1590,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     final function getInternalDefaults() {
         if ($this->internalDefaults === false) {
             $this->internalDefaults = $this->doGetInternalDefaults();
+            if ($this->restriction) 
+                foreach ($this->restriction as $k => $v) 
+                    $this->internalDefaults[$k] = $v;
             $this->triggerEvent(self::EVENT_ON_GET_INTERNAL_DEFAULTS, array(& $this->internalDefaults));
             if ($this->askRelationsForDefaults || $this->additionalRelations) {
                 Ac_Util::ms($this->internalDefaults, $this->getRelationDefaults());
@@ -1583,6 +1600,18 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         }
         return $this->internalDefaults;
     }
+    
+    
+    function setRestriction(array $restriction) {
+        $this->restriction = $restriction;
+    }
+
+    /**
+     * @return array
+     */
+    function getRestriction() {
+        return $this->restriction;
+    }    
     
     protected function doGetInternalDefaults() {
         return array();
@@ -1629,10 +1658,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     function addMixable(Ac_I_Mixable $mixable, $id = false, $canReplace = false) {
-        parent::addMixable($mixable, $id, $canReplace);
+        $res = parent::addMixable($mixable, $id, $canReplace);
         Ac_Model_Data::clearMetaCache($this->getId());
         $this->dataProperties = false;
         $this->resetPrototype();
+        return $res;
     }
     
     function resetPrototype() {
@@ -1682,10 +1712,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             if (!$this->listMappers()) {
                 if (strlen($this->tableName) && strlen($this->recordClass)) 
                     $storage = $this->createMonoTableStorage();
-            } else {
-                if (strlen($this->tableName) && strlen($this->typeField)) {
-                    $storage = $this->createStorageWithTypeField();
-                }
             }
             if (!$storage && !$dontThrowIfCantCreate) {
                 throw new Ac_E_InvalidUsage(__METHOD__.": cannot guess default Ac_Model_Storage, setStorage() first");
@@ -1743,13 +1769,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return $res;
     }
     
-    protected function createStorageWithTypeField() {
-        $res = $this->createMonoTableStorage();
-        $res['class'] = 'Ac_Model_Storage_WithTypeField';
-        $res['typeField'] = $this->typeField;
-        return $res;
-    }
-    
     function isAbstract() {
         return $this->recordClass == false;
     }
@@ -1766,8 +1785,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     /**
      * Returns which field is used as identifier for every record (if applicable)
      */
-    function getIdentifierField() {
-        if (!strlen($this->identifierField)) $this->getStorage();
+    function getIdentifierField($asIs = false) {
+        if ($this->identifierField === false)
+            $this->getStorage();
         return $this->identifierField;
     }
     
@@ -1780,14 +1800,16 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return $this->rowIdentifierField;
     }    
     
-    protected $rowIdentifierField = false;
-    
     function getIdentifier(Ac_Model_Object $record) {
         if (strlen($this->identifierField)) {
             $res = $record->{$this->identifierField};
             if ($res === false) $res = $this->getStorage()->getIdentifier($record);
         } else {
-            $res = $this->getStorage()->getIdentifier($record);
+            $res = false;
+            $this->triggerEvent(self::EVENT_ON_GET_IDENTIFIER, array($record, & $res));
+            if ($res === false) {
+                $res = $this->getStorage()->getIdentifier($record);
+            }
         }
         return $res;
     }
@@ -2280,6 +2302,12 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
 
         $strict = func_num_args() <= 5 || $remainingQuery === true;
         
+        if ($this->restriction) {
+            foreach ($this->restriction as $k => $v) {
+                $query[$k] = $v;
+            }
+        }
+        
         if (is_null($res = $this->bestCaseFind($query, $keysToList, $sort, $limit, $offset))) {
             
             $remainingQuery = array();
@@ -2705,7 +2733,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             $scalar = array_filter($row, "is_scalar") + array_filter($row, "is_null");
             if (count($scalar) !== $rowCnt) { 
                 $nonScalar = implode(', ', array_diff(array_keys($row), array_keys($scalar)));
-                var_dump($row);
                 throw new Ac_E_InvalidCall("\$fieldValues['{$i}'] contains non-scalar element(s). Key(s): ".$nonScalar);
             }
             if (!$manyFields && $singleValuesToScalars) $properValues[$i] = $row[0];

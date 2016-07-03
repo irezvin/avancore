@@ -4,6 +4,37 @@ class Ac_Test_Relation extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
 
+    function testResultOriginalKeys() {
+        $rel = new Ac_Model_Relation(array(
+            'destTableName' => '#__publish',
+            'fieldLinks' => array(
+                'pubId' => 'id'
+            ),
+            'db' => $this->getDb(),
+            'destIsUnique' => true,
+        ));
+        $src = $this->getDb()->fetchArray('SELECT * FROM #__person_posts WHERE pubId IN (117, 118) ORDER BY pubId ASC');
+        $dest = $rel->getDest($src, Ac_Model_Relation::RESULT_ORIGINAL_KEYS);
+        $ok = true;
+        if (!$this->assertEqual(array_keys($src), array_keys($dest))) $ok = false;
+        if (!$this->assertTrue(isset($dest[0]) && $dest[0]['id'] == 117)) $ok = false;
+        if (!$this->assertTrue(isset($dest[1]) && $dest[1]['id'] == 118)) $ok = false;
+        if (!$ok) {
+            var_dump($src, $dest);
+        }
+        
+        $src = $this->getDb()->fetchArray('SELECT * FROM #__person_posts WHERE id IN (1, 2, 3) ORDER BY id ASC', 'id');
+        $dest = $rel->getDest($src, Ac_Model_Relation::RESULT_ALL_ORIGINAL_KEYS);
+        $ok = true;
+        if (!$this->assertEqual(array_keys($src), array_keys($dest))) $ok = false;
+        if (!$this->assertTrue(array_key_exists(1, $dest) && !$dest[1])) $ok = false;
+        if (!$this->assertTrue(isset($dest[2]) && $dest[2]['id'] == 118)) $ok = false;
+        if (!$this->assertTrue(isset($dest[3]) && $dest[3]['id'] == 117)) $ok = false;
+        if (!$ok) {
+            var_dump($src, $dest);
+        }
+    }
+    
     function testLoadNonSql() {
         $pm = Sample::getInstance()->getSamplePersonMapper();
         $pm->reset();
@@ -309,7 +340,11 @@ class Ac_Test_Relation extends Ac_Test_Base {
         //Ac_Debug::drr($rel->getDest(array($a, $b), Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS));
         //Ac_Debug::drr($rel->getDest(array($a, $b), Ac_Model_Relation_Abstract::RESULT_PLAIN));
         $d = $rel->getDest(array($a, $b), Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS);
-        $this->assertTrue(is_array($d[0]) && !count($d[0])); // first person does not have tags
+        
+        // first person does not have tags
+        if (!$this->assertTrue(is_array($d[0]) && !count($d[0]))) {
+            Ac_Debug::drr($d);
+        }
         
         
         /*
@@ -575,7 +610,7 @@ class Ac_Test_Relation extends Ac_Test_Base {
         $this->assertEqual($dd[1]->tagId, 2);
 
         $dd = $rel->getDest($pp, Ac_Model_Relation_Abstract::RESULT_ORIGINAL_KEYS);
-        $this->assertArraysMatch(array(
+        if (!$this->assertArraysMatch(array(
             'first' => array(
                 0 => array('__class' => 'Sample_Tag', 'tagId' => 1)
             ),
@@ -583,7 +618,9 @@ class Ac_Test_Relation extends Ac_Test_Base {
                 0 => array('__class' => 'Sample_Tag', 'tagId' => 1),
                 1 => array('__class' => 'Sample_Tag', 'tagId' => 2)
             )
-        ), $dd);
+        ), $dd)) {
+            Ac_Debug::drr($pp, $dd);
+        }
         
         /*$dd = $rel->getDest($pp, Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS);
         Ac_Debug::drr($dd);

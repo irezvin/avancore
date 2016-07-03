@@ -4,12 +4,11 @@
  */
 class Child_Shop_Category_Base_Mapper extends Sample_Shop_Category_Mapper {
 
-    var $recordClass = 'Child_Shop_Category'; 
+    var $recordClass = 'Child_Shop_Category';
 
-    var $id = 'Child_Shop_Category_Mapper'; 
+    var $id = 'Child_Shop_Category_Mapper';
 
-    var $storage = 'Child_Shop_Category_Storage'; 
- 
+    var $storage = 'Child_Shop_Category_Storage';
  
     protected function doGetCoreMixables() { 
         return Ac_Util::m(parent::doGetCoreMixables(), array (

@@ -4,7 +4,7 @@ abstract class Ac_Impl_ArraySerializer {
 
     static $parents = array();
     
-    static $alwaysUnserializedClasses = array();
+    static $alwaysUnserializedClasses = array('Ac_Cg_Member');
     
     static function pushParent($parent) {
         self::$parents[] = $parent;

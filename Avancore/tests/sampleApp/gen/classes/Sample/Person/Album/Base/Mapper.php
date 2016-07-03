@@ -4,24 +4,23 @@
  */
 class Sample_Person_Album_Base_Mapper extends Ac_Model_Mapper {
 
-    var $pk = 'albumId'; 
+    var $pk = 'albumId';
 
-    var $recordClass = 'Sample_Person_Album'; 
+    var $recordClass = 'Sample_Person_Album';
 
-    var $tableName = '#__person_albums'; 
+    var $tableName = '#__person_albums';
 
-    var $id = 'Sample_Person_Album_Mapper'; 
+    var $id = 'Sample_Person_Album_Mapper';
 
-    var $storage = 'Sample_Person_Album_Storage'; 
+    var $storage = 'Sample_Person_Album_Storage';
 
-    var $columnNames = array ( 0 => 'albumId', 1 => 'personId', 2 => 'albumName', ); 
+    var $columnNames = array ( 0 => 'albumId', 1 => 'personId', 2 => 'albumName', );
 
     var $defaults = array (
             'albumId' => NULL,
             'personId' => '0',
             'albumName' => '\'\'',
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'albumId';
     protected $askRelationsForDefaults = false;

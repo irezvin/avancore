@@ -909,6 +909,75 @@
                         }
                     }
                 },
+                "ac_shop_classifier": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "title": {
+                            "type": "varchar",
+                            "width": "255",
+                            "nullable": false,
+                            "default": ""
+                        },
+                        "type": {
+                            "type": "varchar",
+                            "width": "16",
+                            "nullable": false,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        },
+                        "type_title": {
+                            "primary": false,
+                            "unique": true,
+                            "columns": {
+                                "1": "type",
+                                "2": "title"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "fkClassifierType": {
+                            "table": "ac_shop_classifier_type",
+                            "columns": {
+                                "type": "type"
+                            }
+                        }
+                    }
+                },
+                "ac_shop_classifier_type": {
+                    "columns": {
+                        "type": {
+                            "type": "varchar",
+                            "width": "16",
+                            "nullable": false,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "type"
+                            }
+                        }
+                    },
+                    "relations": []
+                },
                 "ac_shop_meta": {
                     "columns": {
                         "id": {
@@ -1285,6 +1354,268 @@
                             "table": "ac_publish",
                             "columns": {
                                 "pubId": "id"
+                            }
+                        }
+                    }
+                },
+                "ac_shop_spec_computer": {
+                    "columns": {
+                        "productId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "hdd": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "ram": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "os": {
+                            "type": "varchar",
+                            "width": "255",
+                            "nullable": false,
+                            "default": ""
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "productId"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "fkSpecsComputer": {
+                            "table": "ac_shop_specs",
+                            "columns": {
+                                "productId": "productId"
+                            }
+                        }
+                    }
+                },
+                "ac_shop_spec_food": {
+                    "columns": {
+                        "productId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "storageType": {
+                            "type": "enum",
+                            "enumValues": [
+                                "shelfStable",
+                                "frozen",
+                                "refrigerated"
+                            ],
+                            "nullable": true,
+                            "default": "shelfStable"
+                        },
+                        "storageTerm": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "3",
+                            "nullable": false,
+                            "default": "0"
+                        },
+                        "storageTermUnit": {
+                            "type": "enum",
+                            "enumValues": [
+                                "days",
+                                "months",
+                                "years"
+                            ],
+                            "nullable": false,
+                            "default": "days"
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "productId"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "fkSpecsFood": {
+                            "table": "ac_shop_specs",
+                            "columns": {
+                                "productId": "productId"
+                            }
+                        }
+                    }
+                },
+                "ac_shop_spec_laptop": {
+                    "columns": {
+                        "productId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "weight": {
+                            "type": "decimal",
+                            "unsigned": true,
+                            "width": "3",
+                            "decimals": "1",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "battery": {
+                            "type": "varchar",
+                            "width": "255",
+                            "nullable": false,
+                            "default": ""
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "productId"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "fkSpecLaptopProduct": {
+                            "table": "ac_shop_specs",
+                            "columns": {
+                                "productId": "productId"
+                            }
+                        }
+                    }
+                },
+                "ac_shop_spec_monitor": {
+                    "columns": {
+                        "productId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "diagonal": {
+                            "type": "decimal",
+                            "unsigned": true,
+                            "width": "4",
+                            "decimals": "1",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "hRes": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "5",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "vRes": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "5",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "matrixTypeId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": true,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "productId"
+                            }
+                        },
+                        "fkMonitorMatrixType": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "matrixTypeId"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "fkMonitorMatrixType": {
+                            "table": "ac_shop_classifier",
+                            "columns": {
+                                "matrixTypeId": "id"
+                            }
+                        },
+                        "fkMonitorSpec": {
+                            "table": "ac_shop_specs",
+                            "columns": {
+                                "productId": "productId"
+                            }
+                        }
+                    }
+                },
+                "ac_shop_specs": {
+                    "columns": {
+                        "productId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "detailsUrl": {
+                            "type": "varchar",
+                            "width": "255",
+                            "nullable": false,
+                            "default": ""
+                        },
+                        "specsType": {
+                            "type": "varchar",
+                            "width": "40",
+                            "nullable": false,
+                            "default": ""
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "productId"
+                            }
+                        },
+                        "specsType": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "specsType"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "specsProduct": {
+                            "table": "ac_shop_products",
+                            "columns": {
+                                "productId": "id"
                             }
                         }
                     }
@@ -1766,6 +2097,7 @@
                 "religionId",
                 "portraitId"
             ],
+            "mapperVars": [],
             "titleProp": "name",
             "publishedProp": false,
             "orderingProp": false,
@@ -2129,14 +2461,14 @@
                         "createRelationObject": true,
                         "createAssociationObject": true
                     },
-                    "enabled": false,
+                    "enabled": true,
                     "name": "_rel_fkPubAuthor",
                     "caption": "Publish",
                     "varName": "authorPublish",
                     "pluralForList": "authorPublish",
                     "extraPropertyInfo": [],
                     "inherited": false,
-                    "ignoreInDescendants": true,
+                    "ignoreInDescendants": false,
                     "_other": "publish",
                     "_rel": [
                         "#__publish",
@@ -2181,14 +2513,14 @@
                         "createRelationObject": true,
                         "createAssociationObject": true
                     },
-                    "enabled": false,
+                    "enabled": true,
                     "name": "_rel_fkPubEditor",
                     "caption": "Publish",
                     "varName": "editorPublish",
                     "pluralForList": "editorPublish",
                     "extraPropertyInfo": [],
                     "inherited": false,
-                    "ignoreInDescendants": true,
+                    "ignoreInDescendants": false,
                     "_other": "publish",
                     "_rel": [
                         "#__publish",
@@ -2344,7 +2676,7 @@
                     "pluralForList": "shopProducts",
                     "extraPropertyInfo": [],
                     "inherited": false,
-                    "ignoreInDescendants": true,
+                    "ignoreInDescendants": false,
                     "_other": "shopProducts",
                     "_rel": [
                         "#__shop_product_extraCodes",
@@ -2396,7 +2728,7 @@
                     "pluralForList": "shopProducts",
                     "extraPropertyInfo": [],
                     "inherited": false,
-                    "ignoreInDescendants": true,
+                    "ignoreInDescendants": false,
                     "_other": "shopProducts",
                     "_rel": [
                         "#__shop_product_notes",
@@ -2875,6 +3207,7 @@
             "nullableColumns": [
                 "name"
             ],
+            "mapperVars": [],
             "titleProp": "name",
             "publishedProp": false,
             "orderingProp": false,
@@ -3055,6 +3388,7 @@
             "tableLangStringPrefix": false,
             "createAccessors": false,
             "nullableColumns": [],
+            "mapperVars": [],
             "titleProp": "albumName",
             "publishedProp": false,
             "orderingProp": false,
@@ -3323,6 +3657,7 @@
             "tableLangStringPrefix": false,
             "createAccessors": false,
             "nullableColumns": [],
+            "mapperVars": [],
             "titleProp": "filename",
             "publishedProp": false,
             "orderingProp": false,
@@ -3727,6 +4062,7 @@
                 "content",
                 "pubId"
             ],
+            "mapperVars": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": false,
@@ -3738,7 +4074,14 @@
             "hasUniformPropertiesInfo": true,
             "altDomainPrefix": false,
             "modelCoreMixables": [],
-            "mapperCoreMixables": [],
+            "mapperCoreMixables": {
+                "publish": {
+                    "class": "Sample_Publish_MapperMixable",
+                    "colMap": {
+                        "id": "pubId"
+                    }
+                }
+            },
             "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
@@ -3780,7 +4123,7 @@
                         "createRelationObject": true,
                         "createAssociationObject": true
                     },
-                    "enabled": false,
+                    "enabled": true,
                     "name": "_rel_fkPostPublish",
                     "caption": "Publish",
                     "varName": "publish",
@@ -4117,9 +4460,7 @@
                 "fkCategoryPublish",
                 "fkPostPublish"
             ],
-            "skipMapperMixables": [
-                "fkPostPublish"
-            ],
+            "skipMapperMixables": [],
             "masterProperties": {
                 "fkPersonPublish": "_rel_fkPersonPublish",
                 "fkCategoryPublish": "_rel_fkCategoryPublish",
@@ -4133,6 +4474,9 @@
                     "srcMapperClass": "Sample_Publish_ImplMapper",
                     "destMapperClass": "Sample_Person_Mapper",
                     "srcVarName": "_authorPerson",
+                    "destVarName": "_authorPublish",
+                    "destCountVarName": "_authorPublishCount",
+                    "destLoadedVarName": "_authorPublishLoaded",
                     "fieldLinks": {
                         "authorId": "personId"
                     },
@@ -4144,6 +4488,9 @@
                     "srcMapperClass": "Sample_Publish_ImplMapper",
                     "destMapperClass": "Sample_Person_Mapper",
                     "srcVarName": "_editorPerson",
+                    "destVarName": "_editorPublish",
+                    "destCountVarName": "_editorPublishCount",
+                    "destLoadedVarName": "_editorPublishLoaded",
                     "fieldLinks": {
                         "editorId": "personId"
                     },
@@ -4230,6 +4577,15 @@
                 "editorId",
                 "pubChannelId"
             ],
+            "mapperVars": {
+                "identifierField": {
+                    "visibility": "protected",
+                    "default": null,
+                    "comment": "",
+                    "name": "foo",
+                    "__class": "Ac_Cg_Member"
+                }
+            },
             "titleProp": "pubChannelId",
             "publishedProp": "published",
             "orderingProp": false,
@@ -4241,7 +4597,13 @@
             "hasUniformPropertiesInfo": true,
             "altDomainPrefix": false,
             "modelCoreMixables": [],
-            "mapperCoreMixables": [],
+            "mapperCoreMixables": {
+                "Ac_Model_Typer_Abstract": {
+                    "class": "Ac_Model_Typer_ExtraTable",
+                    "tableName": "#__publish",
+                    "objectTypeField": "sharedObjectType"
+                }
+            },
             "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
@@ -4972,6 +5334,7 @@
             "tableLangStringPrefix": false,
             "createAccessors": false,
             "nullableColumns": [],
+            "mapperVars": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": false,
@@ -5192,6 +5555,7 @@
                 "relationBegin",
                 "relationEnd"
             ],
+            "mapperVars": [],
             "titleProp": false,
             "publishedProp": false,
             "orderingProp": false,
@@ -5631,6 +5995,7 @@
             "tableLangStringPrefix": false,
             "createAccessors": false,
             "nullableColumns": [],
+            "mapperVars": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": false,
@@ -5812,6 +6177,7 @@
                 "metaId",
                 "pubId"
             ],
+            "mapperVars": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": "ordering",
@@ -6281,6 +6647,417 @@
                 }
             ]
         },
+        "shopClassifier": {
+            "__class": "Ac_Cg_Model",
+            "name": "shopClassifier",
+            "table": "#__shop_classifier",
+            "subsystemPrefixes": [],
+            "single": "shopClassifier",
+            "plural": "shopClassifier",
+            "className": "Sample_Shop_Classifier",
+            "singleCaption": "Shop classifier",
+            "pluralCaption": "Shop classifier",
+            "parentClassName": "Ac_Model_Object",
+            "parentMapperClassName": "Ac_Model_Mapper",
+            "parentStorageClassName": "Ac_Model_Storage_MonoTable",
+            "parentClassIsAbstract": false,
+            "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
+            "parentFinderClassName": false,
+            "parentFinderClassIsAbstract": false,
+            "properties": [],
+            "fixMapperMethodNames": false,
+            "extraOwnPropertiesInfo": [],
+            "useLangStrings": "?",
+            "langStringPrefix": false,
+            "tableLangStringPrefix": false,
+            "createAccessors": false,
+            "nullableColumns": [],
+            "mapperVars": [],
+            "titleProp": "title",
+            "publishedProp": false,
+            "orderingProp": false,
+            "orderGroupProp": false,
+            "useIndexNamesInMapper": false,
+            "uiListBaseClass": "Ac_Page_List",
+            "uiFormBaseClass": "Ac_Page_Form",
+            "generateMethodPlaceholders": true,
+            "hasUniformPropertiesInfo": true,
+            "altDomainPrefix": false,
+            "modelCoreMixables": [],
+            "mapperCoreMixables": [],
+            "noUi": true,
+            "parentModelName": false,
+            "onlyColumns": false,
+            "ignoreColumns": [],
+            "onlyRelations": false,
+            "ignoreRelations": [],
+            "errors": [],
+            "warnings": [],
+            "_properties": {
+                "_rel_fkClassifierType": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": false,
+                    "relation": "fkClassifierType",
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Classifier_Type",
+                    "thisIsUnique": false,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": false,
+                    "canLoadSrc": true,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Classifier_Type_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": "fkClassifierType",
+                        "hasModel": true,
+                        "isIncoming": false,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": true,
+                    "name": "_rel_fkClassifierType",
+                    "caption": "Shop classifier type",
+                    "varName": "shopClassifierType",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_other": "shopClassifierType",
+                    "_rel": [
+                        "#__shop_classifier",
+                        "fkClassifierType"
+                    ]
+                },
+                "_rel_fkMonitorMatrixType": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": true,
+                    "relation": [
+                        "#__shop_spec_monitor",
+                        "fkMonitorMatrixType"
+                    ],
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Spec",
+                    "thisIsUnique": true,
+                    "otherIsUnique": false,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": "monitor",
+                    "canLoadSrc": true,
+                    "canLoadDest": false,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Spec_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": [
+                            "#__shop_spec_monitor",
+                            "fkMonitorMatrixType"
+                        ],
+                        "hasModel": true,
+                        "isIncoming": true,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": true,
+                    "name": "_rel_fkMonitorMatrixType",
+                    "caption": "Shop specs",
+                    "varName": "monitorShopSpecs",
+                    "pluralForList": "shopSpecs",
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_other": "shopSpecs",
+                    "_rel": [
+                        "#__shop_spec_monitor",
+                        "fkMonitorMatrixType"
+                    ]
+                },
+                "id": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "id",
+                    "dataType": "int",
+                    "controlType": false,
+                    "maxLength": "10",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": null,
+                    "extraPropInfo": [],
+                    "attribs": {
+                        "size": "6"
+                    },
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "id",
+                    "caption": "Id",
+                    "varName": "id",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_classifier",
+                        "id"
+                    ]
+                },
+                "title": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "title",
+                    "dataType": false,
+                    "controlType": false,
+                    "maxLength": "255",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": "",
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "title",
+                    "caption": "Title",
+                    "varName": "title",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_classifier",
+                        "title"
+                    ]
+                },
+                "type": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "type",
+                    "dataType": false,
+                    "controlType": "selectList",
+                    "maxLength": "16",
+                    "valueList": false,
+                    "values": {
+                        "class": "Ac_Model_Values_Mapper",
+                        "mapperClass": "Sample_Shop_Classifier_Type_Mapper"
+                    },
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": "",
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "type",
+                    "caption": "Type",
+                    "varName": "type",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_classifier",
+                        "type"
+                    ]
+                }
+            },
+            "_relations": [
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": "fkClassifierType",
+                    "hasModel": true,
+                    "isIncoming": false,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                },
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": [
+                        "#__shop_spec_monitor",
+                        "fkMonitorMatrixType"
+                    ],
+                    "hasModel": true,
+                    "isIncoming": true,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                }
+            ]
+        },
+        "shopClassifierType": {
+            "__class": "Ac_Cg_Model",
+            "name": "shopClassifierType",
+            "table": "#__shop_classifier_type",
+            "subsystemPrefixes": [],
+            "single": "shopClassifierType",
+            "plural": "shopClassifierType",
+            "className": "Sample_Shop_Classifier_Type",
+            "singleCaption": "Shop classifier type",
+            "pluralCaption": "Shop classifier type",
+            "parentClassName": "Ac_Model_Object",
+            "parentMapperClassName": "Ac_Model_Mapper",
+            "parentStorageClassName": "Ac_Model_Storage_MonoTable",
+            "parentClassIsAbstract": false,
+            "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
+            "parentFinderClassName": false,
+            "parentFinderClassIsAbstract": false,
+            "properties": [],
+            "fixMapperMethodNames": false,
+            "extraOwnPropertiesInfo": [],
+            "useLangStrings": "?",
+            "langStringPrefix": false,
+            "tableLangStringPrefix": false,
+            "createAccessors": false,
+            "nullableColumns": [],
+            "mapperVars": [],
+            "titleProp": "type",
+            "publishedProp": false,
+            "orderingProp": false,
+            "orderGroupProp": false,
+            "useIndexNamesInMapper": false,
+            "uiListBaseClass": "Ac_Page_List",
+            "uiFormBaseClass": "Ac_Page_Form",
+            "generateMethodPlaceholders": true,
+            "hasUniformPropertiesInfo": true,
+            "altDomainPrefix": false,
+            "modelCoreMixables": [],
+            "mapperCoreMixables": [],
+            "noUi": true,
+            "parentModelName": false,
+            "onlyColumns": false,
+            "ignoreColumns": [],
+            "onlyRelations": false,
+            "ignoreRelations": [],
+            "errors": [],
+            "warnings": [],
+            "_properties": {
+                "_rel_fkClassifierType": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": true,
+                    "relation": [
+                        "#__shop_classifier",
+                        "fkClassifierType"
+                    ],
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Classifier",
+                    "thisIsUnique": true,
+                    "otherIsUnique": false,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": false,
+                    "canLoadSrc": true,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Classifier_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": [
+                            "#__shop_classifier",
+                            "fkClassifierType"
+                        ],
+                        "hasModel": true,
+                        "isIncoming": true,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": true,
+                    "name": "_rel_fkClassifierType",
+                    "caption": "Shop classifier",
+                    "varName": "shopClassifier",
+                    "pluralForList": "shopClassifier",
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_other": "shopClassifier",
+                    "_rel": [
+                        "#__shop_classifier",
+                        "fkClassifierType"
+                    ]
+                },
+                "type": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "type",
+                    "dataType": false,
+                    "controlType": false,
+                    "maxLength": "16",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": null,
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "type",
+                    "caption": "Type",
+                    "varName": "type",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_classifier_type",
+                        "type"
+                    ]
+                }
+            },
+            "_relations": [
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": [
+                        "#__shop_classifier",
+                        "fkClassifierType"
+                    ],
+                    "hasModel": true,
+                    "isIncoming": true,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                }
+            ]
+        },
         "shopProductExtraCodes": {
             "__class": "Ac_Cg_Model_Part",
             "masterFkIds": [
@@ -6361,6 +7138,15 @@
             "nullableColumns": [
                 "responsiblePersonId"
             ],
+            "mapperVars": {
+                "identifierField": {
+                    "visibility": "protected",
+                    "default": null,
+                    "comment": "",
+                    "name": "foo",
+                    "__class": "Ac_Cg_Member"
+                }
+            },
             "titleProp": "ean",
             "publishedProp": false,
             "orderingProp": false,
@@ -6372,7 +7158,13 @@
             "hasUniformPropertiesInfo": true,
             "altDomainPrefix": false,
             "modelCoreMixables": [],
-            "mapperCoreMixables": [],
+            "mapperCoreMixables": {
+                "Ac_Model_Typer_Abstract": {
+                    "class": "Ac_Model_Typer_ExtraTable",
+                    "tableName": "#__shop_product_extraCodes",
+                    "uniformTypeId": "Sample_Shop_Product_Mapper"
+                }
+            },
             "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
@@ -6733,6 +7525,15 @@
             "nullableColumns": [
                 "noteAuthorId"
             ],
+            "mapperVars": {
+                "identifierField": {
+                    "visibility": "protected",
+                    "default": null,
+                    "comment": "",
+                    "name": "foo",
+                    "__class": "Ac_Cg_Member"
+                }
+            },
             "titleProp": false,
             "publishedProp": false,
             "orderingProp": false,
@@ -6744,7 +7545,13 @@
             "hasUniformPropertiesInfo": true,
             "altDomainPrefix": false,
             "modelCoreMixables": [],
-            "mapperCoreMixables": [],
+            "mapperCoreMixables": {
+                "Ac_Model_Typer_Abstract": {
+                    "class": "Ac_Model_Typer_ExtraTable",
+                    "tableName": "#__shop_product_notes",
+                    "uniformTypeId": "Sample_Shop_Product_Mapper"
+                }
+            },
             "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
@@ -6996,6 +7803,7 @@
                 "metaId",
                 "pubId"
             ],
+            "mapperVars": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": false,
@@ -7355,6 +8163,58 @@
                     "_otherRel": [
                         "#__shop_product_related",
                         "relatedProductReferenced"
+                    ]
+                },
+                "_rel_specsProduct": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": true,
+                    "relation": [
+                        "#__shop_specs",
+                        "specsProduct"
+                    ],
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Spec",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": false,
+                    "canLoadSrc": true,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Spec_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": [
+                            "#__shop_specs",
+                            "specsProduct"
+                        ],
+                        "hasModel": true,
+                        "isIncoming": true,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": true,
+                    "name": "_rel_specsProduct",
+                    "caption": "Shop spec",
+                    "varName": "shopSpec",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_other": "shopSpecs",
+                    "_rel": [
+                        "#__shop_specs",
+                        "specsProduct"
                     ]
                 },
                 "id": {
@@ -7733,6 +8593,19 @@
                 },
                 {
                     "__class": "Ac_Cg_Model_Relation",
+                    "relationName": [
+                        "#__shop_specs",
+                        "specsProduct"
+                    ],
+                    "hasModel": true,
+                    "isIncoming": true,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                },
+                {
+                    "__class": "Ac_Cg_Model_Relation",
                     "relationName": "fkProductNoteAuthor",
                     "hasModel": true,
                     "isIncoming": false,
@@ -7740,6 +8613,1675 @@
                     "isOtherRelationIncoming": false,
                     "createRelationObject": false,
                     "createAssociationObject": false
+                }
+            ]
+        },
+        "shopSpecComputer": {
+            "__class": "Ac_Cg_Model_Part",
+            "masterFkIds": [
+                "fkMonitorSpec"
+            ],
+            "skipMapperMixables": true,
+            "masterProperties": [],
+            "isReferenced": true,
+            "parentExtraTableClass": "Ac_Model_Mapper_Mixable_ExtraTable",
+            "parentExtraTableIsAbstract": false,
+            "extraRelationPrototypes": {
+                "_shopSpecComputerShopSpec": {
+                    "srcMapperClass": "Sample_Shop_Spec_Computer_ImplMapper",
+                    "destMapperClass": "Sample_Shop_Spec_Mapper",
+                    "srcVarName": "_shopSpecComputerShopSpec",
+                    "fieldLinks": {
+                        "productId": "productId"
+                    },
+                    "srcIsUnique": true,
+                    "destIsUnique": true,
+                    "srcOutgoing": true
+                }
+            },
+            "extraAssociationPrototypes": {
+                "shopSpecComputerShopSpec": {
+                    "relationId": "_shopSpecComputerShopSpec",
+                    "useMapperMethods": true,
+                    "useModelMethods": true,
+                    "single": "shopSpecComputerShopSpec",
+                    "plural": "shopSpecComputerShopSpecs",
+                    "canLoadSrcObjects": false,
+                    "class": "Ac_Model_Association_One",
+                    "loadDestObjectsMapperMethod": "loadShopSpecComputerShopSpecsFor",
+                    "loadSrcObjectsMapperMethod": null,
+                    "getSrcObjectsMapperMethod": "getOfShopSpecComputerShopSpecs",
+                    "createDestObjectMethod": "createShopSpecComputerShopSpec",
+                    "getDestObjectMethod": "getShopSpecComputerShopSpec",
+                    "setDestObjectMethod": "setShopSpecComputerShopSpec",
+                    "clearDestObjectMethod": "clearShopSpecComputerShopSpec"
+                }
+            },
+            "mixableId": false,
+            "objectPropertiesPrefix": false,
+            "mapperMixableExtra": [],
+            "perModelMapperMixableExtras": [],
+            "objectTypeField": false,
+            "inline": false,
+            "name": "shopSpecComputer",
+            "table": "#__shop_spec_computer",
+            "subsystemPrefixes": [],
+            "single": "shopSpecComputer",
+            "plural": "shopSpecComputer",
+            "className": "Sample_Shop_Spec_Computer",
+            "singleCaption": "Shop spec computer",
+            "pluralCaption": "Shop spec computer",
+            "parentClassName": "Ac_Model_Mixable_ExtraTable",
+            "parentMapperClassName": "Ac_Model_Mapper",
+            "parentStorageClassName": "Ac_Model_Storage_MonoTable",
+            "parentClassIsAbstract": false,
+            "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
+            "parentFinderClassName": false,
+            "parentFinderClassIsAbstract": false,
+            "properties": [],
+            "fixMapperMethodNames": false,
+            "extraOwnPropertiesInfo": [],
+            "useLangStrings": "?",
+            "langStringPrefix": false,
+            "tableLangStringPrefix": false,
+            "createAccessors": false,
+            "nullableColumns": [],
+            "mapperVars": [],
+            "titleProp": "os",
+            "publishedProp": false,
+            "orderingProp": false,
+            "orderGroupProp": false,
+            "useIndexNamesInMapper": false,
+            "uiListBaseClass": "Ac_Page_List",
+            "uiFormBaseClass": "Ac_Page_Form",
+            "generateMethodPlaceholders": true,
+            "hasUniformPropertiesInfo": true,
+            "altDomainPrefix": false,
+            "modelCoreMixables": [],
+            "mapperCoreMixables": [],
+            "noUi": true,
+            "parentModelName": false,
+            "onlyColumns": false,
+            "ignoreColumns": [],
+            "onlyRelations": false,
+            "ignoreRelations": [],
+            "errors": {
+                "masterFkIds": [
+                    {
+                        "notFound": "Property specified by foreign key 'fkMonitorSpec' not found"
+                    }
+                ]
+            },
+            "warnings": [],
+            "masterModelName": "",
+            "_properties": {
+                "_rel_fkSpecsComputer": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": false,
+                    "relation": "fkSpecsComputer",
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Spec",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": "shopSpecComputer",
+                    "canLoadSrc": false,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Spec_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": "fkSpecsComputer",
+                        "hasModel": true,
+                        "isIncoming": false,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": true,
+                    "name": "_rel_fkSpecsComputer",
+                    "caption": "Shop spec",
+                    "varName": "shopSpecComputerShopSpec",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_other": "shopSpecs",
+                    "_rel": [
+                        "#__shop_spec_computer",
+                        "fkSpecsComputer"
+                    ]
+                },
+                "productId": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "productId",
+                    "dataType": "int",
+                    "controlType": "selectList",
+                    "maxLength": "10",
+                    "valueList": false,
+                    "values": {
+                        "class": "Ac_Model_Values_Mapper",
+                        "mapperClass": "Sample_Shop_Spec_Mapper"
+                    },
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": null,
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "productId",
+                    "caption": "Product Id",
+                    "varName": "productId",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_computer",
+                        "productId"
+                    ]
+                },
+                "hdd": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "hdd",
+                    "dataType": "int",
+                    "controlType": false,
+                    "maxLength": "10",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": 0,
+                    "extraPropInfo": [],
+                    "attribs": {
+                        "size": "6"
+                    },
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "hdd",
+                    "caption": "Hdd",
+                    "varName": "hdd",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_computer",
+                        "hdd"
+                    ]
+                },
+                "ram": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "ram",
+                    "dataType": "int",
+                    "controlType": false,
+                    "maxLength": "10",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": 0,
+                    "extraPropInfo": [],
+                    "attribs": {
+                        "size": "6"
+                    },
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "ram",
+                    "caption": "Ram",
+                    "varName": "ram",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_computer",
+                        "ram"
+                    ]
+                },
+                "os": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "os",
+                    "dataType": false,
+                    "controlType": false,
+                    "maxLength": "255",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": "",
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "os",
+                    "caption": "Os",
+                    "varName": "os",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_computer",
+                        "os"
+                    ]
+                }
+            },
+            "_relations": [
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": "fkSpecsComputer",
+                    "hasModel": true,
+                    "isIncoming": false,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                }
+            ]
+        },
+        "shopSpecFood": {
+            "__class": "Ac_Cg_Model_Part",
+            "masterFkIds": [],
+            "skipMapperMixables": true,
+            "masterProperties": [],
+            "isReferenced": true,
+            "parentExtraTableClass": "Ac_Model_Mapper_Mixable_ExtraTable",
+            "parentExtraTableIsAbstract": false,
+            "extraRelationPrototypes": {
+                "_shopSpecFoodShopSpec": {
+                    "srcMapperClass": "Sample_Shop_Spec_Food_ImplMapper",
+                    "destMapperClass": "Sample_Shop_Spec_Mapper",
+                    "srcVarName": "_shopSpecFoodShopSpec",
+                    "fieldLinks": {
+                        "productId": "productId"
+                    },
+                    "srcIsUnique": true,
+                    "destIsUnique": true,
+                    "srcOutgoing": true
+                }
+            },
+            "extraAssociationPrototypes": {
+                "shopSpecFoodShopSpec": {
+                    "relationId": "_shopSpecFoodShopSpec",
+                    "useMapperMethods": true,
+                    "useModelMethods": true,
+                    "single": "shopSpecFoodShopSpec",
+                    "plural": "shopSpecFoodShopSpecs",
+                    "canLoadSrcObjects": false,
+                    "class": "Ac_Model_Association_One",
+                    "loadDestObjectsMapperMethod": "loadShopSpecFoodShopSpecsFor",
+                    "loadSrcObjectsMapperMethod": null,
+                    "getSrcObjectsMapperMethod": "getOfShopSpecFoodShopSpecs",
+                    "createDestObjectMethod": "createShopSpecFoodShopSpec",
+                    "getDestObjectMethod": "getShopSpecFoodShopSpec",
+                    "setDestObjectMethod": "setShopSpecFoodShopSpec",
+                    "clearDestObjectMethod": "clearShopSpecFoodShopSpec"
+                }
+            },
+            "mixableId": false,
+            "objectPropertiesPrefix": false,
+            "mapperMixableExtra": [],
+            "perModelMapperMixableExtras": [],
+            "objectTypeField": false,
+            "inline": false,
+            "name": "shopSpecFood",
+            "table": "#__shop_spec_food",
+            "subsystemPrefixes": [],
+            "single": "shopSpecFood",
+            "plural": "shopSpecFood",
+            "className": "Sample_Shop_Spec_Food",
+            "singleCaption": "Shop spec food",
+            "pluralCaption": "Shop spec food",
+            "parentClassName": "Ac_Model_Mixable_ExtraTable",
+            "parentMapperClassName": "Ac_Model_Mapper",
+            "parentStorageClassName": "Ac_Model_Storage_MonoTable",
+            "parentClassIsAbstract": false,
+            "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
+            "parentFinderClassName": false,
+            "parentFinderClassIsAbstract": false,
+            "properties": [],
+            "fixMapperMethodNames": false,
+            "extraOwnPropertiesInfo": [],
+            "useLangStrings": "?",
+            "langStringPrefix": false,
+            "tableLangStringPrefix": false,
+            "createAccessors": false,
+            "nullableColumns": [
+                "storageType"
+            ],
+            "mapperVars": [],
+            "titleProp": false,
+            "publishedProp": false,
+            "orderingProp": false,
+            "orderGroupProp": false,
+            "useIndexNamesInMapper": false,
+            "uiListBaseClass": "Ac_Page_List",
+            "uiFormBaseClass": "Ac_Page_Form",
+            "generateMethodPlaceholders": true,
+            "hasUniformPropertiesInfo": true,
+            "altDomainPrefix": false,
+            "modelCoreMixables": [],
+            "mapperCoreMixables": [],
+            "noUi": true,
+            "parentModelName": false,
+            "onlyColumns": false,
+            "ignoreColumns": [],
+            "onlyRelations": false,
+            "ignoreRelations": [],
+            "errors": [],
+            "warnings": [],
+            "masterModelName": "",
+            "_properties": {
+                "_rel_fkSpecsFood": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": false,
+                    "relation": "fkSpecsFood",
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Spec",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": "shopSpecFood",
+                    "canLoadSrc": false,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Spec_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": "fkSpecsFood",
+                        "hasModel": true,
+                        "isIncoming": false,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": true,
+                    "name": "_rel_fkSpecsFood",
+                    "caption": "Shop spec",
+                    "varName": "shopSpecFoodShopSpec",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_other": "shopSpecs",
+                    "_rel": [
+                        "#__shop_spec_food",
+                        "fkSpecsFood"
+                    ]
+                },
+                "productId": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "productId",
+                    "dataType": "int",
+                    "controlType": "selectList",
+                    "maxLength": "10",
+                    "valueList": false,
+                    "values": {
+                        "class": "Ac_Model_Values_Mapper",
+                        "mapperClass": "Sample_Shop_Spec_Mapper"
+                    },
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": null,
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "productId",
+                    "caption": "Product Id",
+                    "varName": "productId",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_food",
+                        "productId"
+                    ]
+                },
+                "storageType": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "storageType",
+                    "dataType": false,
+                    "controlType": "selectList",
+                    "maxLength": false,
+                    "valueList": {
+                        "shelfStable": "shelfStable",
+                        "frozen": "frozen",
+                        "refrigerated": "refrigerated"
+                    },
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": "shelfStable",
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": true,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "storageType",
+                    "caption": "Storage Type",
+                    "varName": "storageType",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_food",
+                        "storageType"
+                    ]
+                },
+                "storageTerm": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "storageTerm",
+                    "dataType": "int",
+                    "controlType": false,
+                    "maxLength": "3",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": 0,
+                    "extraPropInfo": [],
+                    "attribs": {
+                        "size": "6"
+                    },
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "storageTerm",
+                    "caption": "Storage Term",
+                    "varName": "storageTerm",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_food",
+                        "storageTerm"
+                    ]
+                },
+                "storageTermUnit": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "storageTermUnit",
+                    "dataType": false,
+                    "controlType": "selectList",
+                    "maxLength": false,
+                    "valueList": {
+                        "days": "days",
+                        "months": "months",
+                        "years": "years"
+                    },
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": "days",
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "storageTermUnit",
+                    "caption": "Storage Term Unit",
+                    "varName": "storageTermUnit",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_food",
+                        "storageTermUnit"
+                    ]
+                }
+            },
+            "_relations": [
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": "fkSpecsFood",
+                    "hasModel": true,
+                    "isIncoming": false,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                }
+            ]
+        },
+        "shopSpecLaptop": {
+            "__class": "Ac_Cg_Model_Part",
+            "masterFkIds": [
+                "fkMonitorSpec"
+            ],
+            "skipMapperMixables": true,
+            "masterProperties": [],
+            "isReferenced": true,
+            "parentExtraTableClass": "Ac_Model_Mapper_Mixable_ExtraTable",
+            "parentExtraTableIsAbstract": false,
+            "extraRelationPrototypes": {
+                "_shopSpecLaptopShopSpec": {
+                    "srcMapperClass": "Sample_Shop_Spec_Laptop_ImplMapper",
+                    "destMapperClass": "Sample_Shop_Spec_Mapper",
+                    "srcVarName": "_shopSpecLaptopShopSpec",
+                    "fieldLinks": {
+                        "productId": "productId"
+                    },
+                    "srcIsUnique": true,
+                    "destIsUnique": true,
+                    "srcOutgoing": true
+                }
+            },
+            "extraAssociationPrototypes": {
+                "shopSpecLaptopShopSpec": {
+                    "relationId": "_shopSpecLaptopShopSpec",
+                    "useMapperMethods": true,
+                    "useModelMethods": true,
+                    "single": "shopSpecLaptopShopSpec",
+                    "plural": "shopSpecLaptopShopSpecs",
+                    "canLoadSrcObjects": false,
+                    "class": "Ac_Model_Association_One",
+                    "loadDestObjectsMapperMethod": "loadShopSpecLaptopShopSpecsFor",
+                    "loadSrcObjectsMapperMethod": null,
+                    "getSrcObjectsMapperMethod": "getOfShopSpecLaptopShopSpecs",
+                    "createDestObjectMethod": "createShopSpecLaptopShopSpec",
+                    "getDestObjectMethod": "getShopSpecLaptopShopSpec",
+                    "setDestObjectMethod": "setShopSpecLaptopShopSpec",
+                    "clearDestObjectMethod": "clearShopSpecLaptopShopSpec"
+                }
+            },
+            "mixableId": false,
+            "objectPropertiesPrefix": false,
+            "mapperMixableExtra": [],
+            "perModelMapperMixableExtras": [],
+            "objectTypeField": false,
+            "inline": false,
+            "name": "shopSpecLaptop",
+            "table": "#__shop_spec_laptop",
+            "subsystemPrefixes": [],
+            "single": "shopSpecLaptop",
+            "plural": "shopSpecLaptop",
+            "className": "Sample_Shop_Spec_Laptop",
+            "singleCaption": "Shop spec laptop",
+            "pluralCaption": "Shop spec laptop",
+            "parentClassName": "Ac_Model_Mixable_ExtraTable",
+            "parentMapperClassName": "Ac_Model_Mapper",
+            "parentStorageClassName": "Ac_Model_Storage_MonoTable",
+            "parentClassIsAbstract": false,
+            "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
+            "parentFinderClassName": false,
+            "parentFinderClassIsAbstract": false,
+            "properties": [],
+            "fixMapperMethodNames": false,
+            "extraOwnPropertiesInfo": [],
+            "useLangStrings": "?",
+            "langStringPrefix": false,
+            "tableLangStringPrefix": false,
+            "createAccessors": false,
+            "nullableColumns": [],
+            "mapperVars": [],
+            "titleProp": "battery",
+            "publishedProp": false,
+            "orderingProp": false,
+            "orderGroupProp": false,
+            "useIndexNamesInMapper": false,
+            "uiListBaseClass": "Ac_Page_List",
+            "uiFormBaseClass": "Ac_Page_Form",
+            "generateMethodPlaceholders": true,
+            "hasUniformPropertiesInfo": true,
+            "altDomainPrefix": false,
+            "modelCoreMixables": [],
+            "mapperCoreMixables": [],
+            "noUi": true,
+            "parentModelName": false,
+            "onlyColumns": false,
+            "ignoreColumns": [],
+            "onlyRelations": false,
+            "ignoreRelations": [],
+            "errors": {
+                "masterFkIds": [
+                    {
+                        "notFound": "Property specified by foreign key 'fkMonitorSpec' not found"
+                    }
+                ]
+            },
+            "warnings": [],
+            "masterModelName": "",
+            "_properties": {
+                "_rel_fkSpecLaptopProduct": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": false,
+                    "relation": "fkSpecLaptopProduct",
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Spec",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": "shopSpecLaptop",
+                    "canLoadSrc": false,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Spec_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": "fkSpecLaptopProduct",
+                        "hasModel": true,
+                        "isIncoming": false,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": true,
+                    "name": "_rel_fkSpecLaptopProduct",
+                    "caption": "Shop spec",
+                    "varName": "shopSpecLaptopShopSpec",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_other": "shopSpecs",
+                    "_rel": [
+                        "#__shop_spec_laptop",
+                        "fkSpecLaptopProduct"
+                    ]
+                },
+                "productId": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "productId",
+                    "dataType": "int",
+                    "controlType": "selectList",
+                    "maxLength": "10",
+                    "valueList": false,
+                    "values": {
+                        "class": "Ac_Model_Values_Mapper",
+                        "mapperClass": "Sample_Shop_Spec_Mapper"
+                    },
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": null,
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "productId",
+                    "caption": "Product Id",
+                    "varName": "productId",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_laptop",
+                        "productId"
+                    ]
+                },
+                "weight": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "weight",
+                    "dataType": "float",
+                    "controlType": false,
+                    "maxLength": false,
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": 0,
+                    "extraPropInfo": [],
+                    "attribs": {
+                        "size": "6"
+                    },
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "weight",
+                    "caption": "Weight",
+                    "varName": "weight",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_laptop",
+                        "weight"
+                    ]
+                },
+                "battery": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "battery",
+                    "dataType": false,
+                    "controlType": false,
+                    "maxLength": "255",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": "",
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "battery",
+                    "caption": "Battery",
+                    "varName": "battery",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_laptop",
+                        "battery"
+                    ]
+                }
+            },
+            "_relations": [
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": "fkSpecLaptopProduct",
+                    "hasModel": true,
+                    "isIncoming": false,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                }
+            ]
+        },
+        "shopSpecMonitor": {
+            "__class": "Ac_Cg_Model_Part",
+            "masterFkIds": [
+                "fkMonitorSpec"
+            ],
+            "skipMapperMixables": true,
+            "masterProperties": {
+                "fkMonitorSpec": "_rel_fkMonitorSpec"
+            },
+            "isReferenced": false,
+            "parentExtraTableClass": "Ac_Model_Mapper_Mixable_ExtraTable",
+            "parentExtraTableIsAbstract": false,
+            "extraRelationPrototypes": {
+                "_monitorShopClassifier": {
+                    "srcMapperClass": "Sample_Shop_Spec_Monitor_ImplMapper",
+                    "destMapperClass": "Sample_Shop_Classifier_Mapper",
+                    "srcVarName": "_monitorShopClassifier",
+                    "srcCountVarName": "_monitorShopSpecsCount",
+                    "srcLoadedVarName": "_monitorShopSpecsLoaded",
+                    "destVarName": "_monitorShopSpecs",
+                    "destCountVarName": "_shopSpecsCount",
+                    "destLoadedVarName": "_shopSpecsLoaded",
+                    "fieldLinks": {
+                        "matrixTypeId": "id"
+                    },
+                    "srcIsUnique": false,
+                    "destIsUnique": true,
+                    "srcOutgoing": true
+                }
+            },
+            "extraAssociationPrototypes": {
+                "monitorShopClassifier": {
+                    "relationId": "_monitorShopClassifier",
+                    "useMapperMethods": true,
+                    "useModelMethods": true,
+                    "single": "monitorShopClassifier",
+                    "plural": "monitorShopClassifier",
+                    "canLoadSrcObjects": false,
+                    "class": "Ac_Model_Association_One",
+                    "loadDestObjectsMapperMethod": "loadMonitorShopClassifierFor",
+                    "loadSrcObjectsMapperMethod": null,
+                    "getSrcObjectsMapperMethod": "getOfMonitorShopClassifier",
+                    "createDestObjectMethod": "createMonitorShopClassifier",
+                    "getDestObjectMethod": "getMonitorShopClassifier",
+                    "setDestObjectMethod": "setMonitorShopClassifier",
+                    "clearDestObjectMethod": "clearMonitorShopClassifier"
+                }
+            },
+            "mixableId": false,
+            "objectPropertiesPrefix": false,
+            "mapperMixableExtra": [],
+            "perModelMapperMixableExtras": [],
+            "objectTypeField": false,
+            "inline": false,
+            "name": "shopSpecMonitor",
+            "table": "#__shop_spec_monitor",
+            "subsystemPrefixes": [],
+            "single": "shopSpecMonitor",
+            "plural": "shopSpecMonitor",
+            "className": "Sample_Shop_Spec_Monitor",
+            "singleCaption": "Shop spec monitor",
+            "pluralCaption": "Shop spec monitor",
+            "parentClassName": "Ac_Model_Mixable_ExtraTable",
+            "parentMapperClassName": "Ac_Model_Mapper",
+            "parentStorageClassName": "Ac_Model_Storage_MonoTable",
+            "parentClassIsAbstract": false,
+            "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
+            "parentFinderClassName": false,
+            "parentFinderClassIsAbstract": false,
+            "properties": [],
+            "fixMapperMethodNames": false,
+            "extraOwnPropertiesInfo": [],
+            "useLangStrings": "?",
+            "langStringPrefix": false,
+            "tableLangStringPrefix": false,
+            "createAccessors": false,
+            "nullableColumns": [
+                "matrixTypeId"
+            ],
+            "mapperVars": {
+                "identifierField": {
+                    "visibility": "protected",
+                    "default": null,
+                    "comment": "",
+                    "name": "foo",
+                    "__class": "Ac_Cg_Member"
+                }
+            },
+            "titleProp": false,
+            "publishedProp": false,
+            "orderingProp": false,
+            "orderGroupProp": false,
+            "useIndexNamesInMapper": false,
+            "uiListBaseClass": "Ac_Page_List",
+            "uiFormBaseClass": "Ac_Page_Form",
+            "generateMethodPlaceholders": true,
+            "hasUniformPropertiesInfo": true,
+            "altDomainPrefix": false,
+            "modelCoreMixables": [],
+            "mapperCoreMixables": {
+                "Ac_Model_Typer_Abstract": {
+                    "class": "Ac_Model_Typer_ExtraTable",
+                    "tableName": "#__shop_spec_monitor",
+                    "uniformTypeId": "Sample_Shop_Spec_Mapper"
+                }
+            },
+            "noUi": true,
+            "parentModelName": false,
+            "onlyColumns": false,
+            "ignoreColumns": [],
+            "onlyRelations": false,
+            "ignoreRelations": [],
+            "errors": [],
+            "warnings": [],
+            "masterModelName": "shopSpecs",
+            "_properties": {
+                "_rel_fkMonitorMatrixType": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": false,
+                    "relation": "fkMonitorMatrixType",
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Classifier",
+                    "thisIsUnique": false,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": "monitor",
+                    "canLoadSrc": false,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Classifier_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": "fkMonitorMatrixType",
+                        "hasModel": true,
+                        "isIncoming": false,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": true,
+                    "name": "_rel_fkMonitorMatrixType",
+                    "caption": "Shop classifier",
+                    "varName": "monitorShopClassifier",
+                    "pluralForList": "monitorShopSpecs",
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_other": "shopClassifier",
+                    "_rel": [
+                        "#__shop_spec_monitor",
+                        "fkMonitorMatrixType"
+                    ]
+                },
+                "_rel_fkMonitorSpec": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": false,
+                    "relation": "fkMonitorSpec",
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Spec",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": false,
+                    "canLoadSrc": true,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Spec_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": "fkMonitorSpec",
+                        "hasModel": true,
+                        "isIncoming": false,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": false,
+                    "name": "_rel_fkMonitorSpec",
+                    "caption": "Shop spec",
+                    "varName": "shopSpec",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": true,
+                    "_other": "shopSpecs",
+                    "_rel": [
+                        "#__shop_spec_monitor",
+                        "fkMonitorSpec"
+                    ]
+                },
+                "productId": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "productId",
+                    "dataType": "int",
+                    "controlType": "selectList",
+                    "maxLength": "10",
+                    "valueList": false,
+                    "values": {
+                        "class": "Ac_Model_Values_Mapper",
+                        "mapperClass": "Sample_Shop_Spec_Mapper"
+                    },
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": null,
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "productId",
+                    "caption": "Product Id",
+                    "varName": "productId",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_monitor",
+                        "productId"
+                    ]
+                },
+                "diagonal": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "diagonal",
+                    "dataType": "float",
+                    "controlType": false,
+                    "maxLength": false,
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": 0,
+                    "extraPropInfo": [],
+                    "attribs": {
+                        "size": "6"
+                    },
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "diagonal",
+                    "caption": "Diagonal",
+                    "varName": "diagonal",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_monitor",
+                        "diagonal"
+                    ]
+                },
+                "hRes": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "hRes",
+                    "dataType": "int",
+                    "controlType": false,
+                    "maxLength": "5",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": 0,
+                    "extraPropInfo": [],
+                    "attribs": {
+                        "size": "6"
+                    },
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "hRes",
+                    "caption": "H Res",
+                    "varName": "hRes",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_monitor",
+                        "hRes"
+                    ]
+                },
+                "vRes": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "vRes",
+                    "dataType": "int",
+                    "controlType": false,
+                    "maxLength": "5",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": 0,
+                    "extraPropInfo": [],
+                    "attribs": {
+                        "size": "6"
+                    },
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "vRes",
+                    "caption": "V Res",
+                    "varName": "vRes",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_monitor",
+                        "vRes"
+                    ]
+                },
+                "matrixTypeId": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "matrixTypeId",
+                    "dataType": "int",
+                    "controlType": "selectList",
+                    "maxLength": "10",
+                    "valueList": false,
+                    "values": {
+                        "class": "Ac_Model_Values_Mapper",
+                        "mapperClass": "Sample_Shop_Classifier_Mapper"
+                    },
+                    "dummyCaption": {
+                        "__class": "Ac_Cg_Php_Expression",
+                        "expression": "''"
+                    },
+                    "isRte": false,
+                    "required": false,
+                    "default": null,
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": true,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "matrixTypeId",
+                    "caption": "Matrix Type Id",
+                    "varName": "matrixTypeId",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_spec_monitor",
+                        "matrixTypeId"
+                    ]
+                }
+            },
+            "_relations": [
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": "fkMonitorMatrixType",
+                    "hasModel": true,
+                    "isIncoming": false,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                },
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": "fkMonitorSpec",
+                    "hasModel": true,
+                    "isIncoming": false,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                }
+            ]
+        },
+        "shopSpecs": {
+            "__class": "Ac_Cg_Model",
+            "name": "shopSpecs",
+            "table": "#__shop_specs",
+            "subsystemPrefixes": [],
+            "single": "shopSpec",
+            "plural": "shopSpecs",
+            "className": "Sample_Shop_Spec",
+            "singleCaption": "Shop spec",
+            "pluralCaption": "Shop specs",
+            "parentClassName": "Ac_Model_Object",
+            "parentMapperClassName": "Ac_Model_Mapper",
+            "parentStorageClassName": "Ac_Model_Storage_MonoTable",
+            "parentClassIsAbstract": false,
+            "parentMapperIsAbstract": false,
+            "parentStorageIsAbstract": false,
+            "parentFinderClassName": false,
+            "parentFinderClassIsAbstract": false,
+            "properties": [],
+            "fixMapperMethodNames": false,
+            "extraOwnPropertiesInfo": [],
+            "useLangStrings": "?",
+            "langStringPrefix": false,
+            "tableLangStringPrefix": false,
+            "createAccessors": false,
+            "nullableColumns": [],
+            "mapperVars": [],
+            "titleProp": "detailsUrl",
+            "publishedProp": false,
+            "orderingProp": false,
+            "orderGroupProp": false,
+            "useIndexNamesInMapper": false,
+            "uiListBaseClass": "Ac_Page_List",
+            "uiFormBaseClass": "Ac_Page_Form",
+            "generateMethodPlaceholders": true,
+            "hasUniformPropertiesInfo": true,
+            "altDomainPrefix": false,
+            "modelCoreMixables": [],
+            "mapperCoreMixables": [],
+            "noUi": true,
+            "parentModelName": false,
+            "onlyColumns": false,
+            "ignoreColumns": [],
+            "onlyRelations": false,
+            "ignoreRelations": [],
+            "errors": [],
+            "warnings": [],
+            "_properties": {
+                "_rel_specsProduct": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": false,
+                    "relation": "specsProduct",
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Product",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": false,
+                    "canLoadSrc": true,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Product_Mapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": "specsProduct",
+                        "hasModel": true,
+                        "isIncoming": false,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": true,
+                    "name": "_rel_specsProduct",
+                    "caption": "Shop product",
+                    "varName": "shopProduct",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_other": "shopProducts",
+                    "_rel": [
+                        "#__shop_specs",
+                        "specsProduct"
+                    ]
+                },
+                "_rel_fkSpecsComputer": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": true,
+                    "relation": [
+                        "#__shop_spec_computer",
+                        "fkSpecsComputer"
+                    ],
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Spec_Computer",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": false,
+                    "canLoadSrc": true,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Spec_Computer_ImplMapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": [
+                            "#__shop_spec_computer",
+                            "fkSpecsComputer"
+                        ],
+                        "hasModel": true,
+                        "isIncoming": true,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": false,
+                    "name": "_rel_fkSpecsComputer",
+                    "caption": "Shop spec computer",
+                    "varName": "shopSpecComputer",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": true,
+                    "_other": "shopSpecComputer",
+                    "_rel": [
+                        "#__shop_spec_computer",
+                        "fkSpecsComputer"
+                    ]
+                },
+                "_rel_fkSpecsFood": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": true,
+                    "relation": [
+                        "#__shop_spec_food",
+                        "fkSpecsFood"
+                    ],
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Spec_Food",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": false,
+                    "canLoadSrc": true,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Spec_Food_ImplMapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": [
+                            "#__shop_spec_food",
+                            "fkSpecsFood"
+                        ],
+                        "hasModel": true,
+                        "isIncoming": true,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": false,
+                    "name": "_rel_fkSpecsFood",
+                    "caption": "Shop spec food",
+                    "varName": "shopSpecFood",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": true,
+                    "_other": "shopSpecFood",
+                    "_rel": [
+                        "#__shop_spec_food",
+                        "fkSpecsFood"
+                    ]
+                },
+                "_rel_fkSpecLaptopProduct": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": true,
+                    "relation": [
+                        "#__shop_spec_laptop",
+                        "fkSpecLaptopProduct"
+                    ],
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Spec_Laptop",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": false,
+                    "canLoadSrc": true,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Spec_Laptop_ImplMapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": [
+                            "#__shop_spec_laptop",
+                            "fkSpecLaptopProduct"
+                        ],
+                        "hasModel": true,
+                        "isIncoming": true,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": false,
+                    "name": "_rel_fkSpecLaptopProduct",
+                    "caption": "Shop spec laptop",
+                    "varName": "shopSpecLaptop",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": true,
+                    "_other": "shopSpecLaptop",
+                    "_rel": [
+                        "#__shop_spec_laptop",
+                        "fkSpecLaptopProduct"
+                    ]
+                },
+                "_rel_fkMonitorSpec": {
+                    "__class": "Ac_Cg_Property_Object",
+                    "isPrivateVar": true,
+                    "isIncoming": true,
+                    "relation": [
+                        "#__shop_spec_monitor",
+                        "fkMonitorSpec"
+                    ],
+                    "otherRelation": false,
+                    "isOtherIncoming": false,
+                    "className": "Sample_Shop_Spec_Monitor",
+                    "thisIsUnique": true,
+                    "otherIsUnique": true,
+                    "idrSuffixSingle": "",
+                    "idrSuffixPlural": "",
+                    "otherModelIdInMethodsSingle": false,
+                    "otherModelIdInMethodsPlural": false,
+                    "otherModelIdInMethodsPrefix": false,
+                    "canLoadSrc": true,
+                    "canLoadDest": true,
+                    "canCreateDest": true,
+                    "mapperClass": "Sample_Shop_Spec_Monitor_ImplMapper",
+                    "relationOverrides": [],
+                    "associationOverrides": [],
+                    "relationProviderOverrides": [],
+                    "modelRelation": {
+                        "__class": "Ac_Cg_Model_Relation",
+                        "relationName": [
+                            "#__shop_spec_monitor",
+                            "fkMonitorSpec"
+                        ],
+                        "hasModel": true,
+                        "isIncoming": true,
+                        "otherRelationName": false,
+                        "isOtherRelationIncoming": false,
+                        "createRelationObject": true,
+                        "createAssociationObject": true
+                    },
+                    "enabled": false,
+                    "name": "_rel_fkMonitorSpec",
+                    "caption": "Shop spec monitor",
+                    "varName": "shopSpecMonitor",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": true,
+                    "_other": "shopSpecMonitor",
+                    "_rel": [
+                        "#__shop_spec_monitor",
+                        "fkMonitorSpec"
+                    ]
+                },
+                "productId": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "productId",
+                    "dataType": "int",
+                    "controlType": "selectList",
+                    "maxLength": "10",
+                    "valueList": false,
+                    "values": {
+                        "class": "Ac_Model_Values_Mapper",
+                        "mapperClass": "Sample_Shop_Product_Mapper"
+                    },
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": null,
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "productId",
+                    "caption": "Product Id",
+                    "varName": "productId",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_specs",
+                        "productId"
+                    ]
+                },
+                "detailsUrl": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "detailsUrl",
+                    "dataType": false,
+                    "controlType": false,
+                    "maxLength": "255",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": "",
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "detailsUrl",
+                    "caption": "Details Url",
+                    "varName": "detailsUrl",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_specs",
+                        "detailsUrl"
+                    ]
+                },
+                "specsType": {
+                    "__class": "Ac_Cg_Property_Simple",
+                    "colName": "specsType",
+                    "dataType": false,
+                    "controlType": false,
+                    "maxLength": "40",
+                    "valueList": false,
+                    "values": false,
+                    "dummyCaption": false,
+                    "isRte": false,
+                    "required": false,
+                    "default": "",
+                    "extraPropInfo": [],
+                    "attribs": [],
+                    "isNullable": false,
+                    "enabled": true,
+                    "isPrivateVar": false,
+                    "name": "specsType",
+                    "caption": "Specs Type",
+                    "varName": "specsType",
+                    "pluralForList": false,
+                    "extraPropertyInfo": [],
+                    "inherited": false,
+                    "ignoreInDescendants": false,
+                    "_col": [
+                        "#__shop_specs",
+                        "specsType"
+                    ]
+                }
+            },
+            "_relations": [
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": "specsProduct",
+                    "hasModel": true,
+                    "isIncoming": false,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                },
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": [
+                        "#__shop_spec_computer",
+                        "fkSpecsComputer"
+                    ],
+                    "hasModel": true,
+                    "isIncoming": true,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                },
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": [
+                        "#__shop_spec_food",
+                        "fkSpecsFood"
+                    ],
+                    "hasModel": true,
+                    "isIncoming": true,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                },
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": [
+                        "#__shop_spec_laptop",
+                        "fkSpecLaptopProduct"
+                    ],
+                    "hasModel": true,
+                    "isIncoming": true,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
+                },
+                {
+                    "__class": "Ac_Cg_Model_Relation",
+                    "relationName": [
+                        "#__shop_spec_monitor",
+                        "fkMonitorSpec"
+                    ],
+                    "hasModel": true,
+                    "isIncoming": true,
+                    "otherRelationName": false,
+                    "isOtherRelationIncoming": false,
+                    "createRelationObject": true,
+                    "createAssociationObject": true
                 }
             ]
         },
@@ -7772,6 +10314,7 @@
                 "titleM",
                 "titleF"
             ],
+            "mapperVars": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": false,
@@ -8082,6 +10625,7 @@
                 "parentId",
                 "tag"
             ],
+            "mapperVars": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": "ordering",
@@ -8287,6 +10831,7 @@
                 "parentId",
                 "tag"
             ],
+            "mapperVars": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": "ordering",
@@ -8616,6 +11161,7 @@
             "nullableColumns": [
                 "tag"
             ],
+            "mapperVars": [],
             "titleProp": "title",
             "publishedProp": false,
             "orderingProp": false,
@@ -8764,9 +11310,7 @@
                 "fkCategoryPublish",
                 "fkPostPublish"
             ],
-            "skipMapperMixables": [
-                "fkPostPublish"
-            ],
+            "skipMapperMixables": [],
             "objectTypeField": "sharedObjectType",
             "perModelMapperMixableExtras": {
                 "shopProducts": {
@@ -8787,6 +11331,31 @@
             "inline": true,
             "masterFkIds": [
                 "fkProductNoteProduct"
+            ]
+        },
+        "shopSpecFood": {
+            "class": "Ac_Cg_Model_Part",
+            "skipMapperMixables": true
+        },
+        "shopSpecComputer": {
+            "class": "Ac_Cg_Model_Part",
+            "skipMapperMixables": true,
+            "masterFkIds": [
+                "fkMonitorSpec"
+            ]
+        },
+        "shopSpecMonitor": {
+            "class": "Ac_Cg_Model_Part",
+            "skipMapperMixables": true,
+            "masterFkIds": [
+                "fkMonitorSpec"
+            ]
+        },
+        "shopSpecLaptop": {
+            "class": "Ac_Cg_Model_Part",
+            "skipMapperMixables": true,
+            "masterFkIds": [
+                "fkMonitorSpec"
             ]
         }
     }

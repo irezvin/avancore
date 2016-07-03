@@ -1063,14 +1063,15 @@ abstract class Ac_Util {
      * @param false|scalar|array $valueKeys if provided, members will be replaced by extracted keys' or
      *      properties' values before placing into result array (scalar $valueKeys means sclar result member, 
      *      array $valueKeys means always array result member)
+     * @param bool $retainOriginalKey when $unique === false, elements on deepest level of result array will have keys of items in $flatArray
      * 
      */
-    static function indexArray(array $flatArray, $keyList, $unique = false, $valueKeys = false) {
+    static function indexArray(array $flatArray, $keyList, $unique = false, $valueKeys = false, $retainOriginalKey = false) {
         $res = array();
         if (is_array($keyList) && count($keyList) == 1) $keyList = array_shift($keyList);
         if (!is_array($keyList)) {
             // simple version
-            foreach ($flatArray as $v) {
+            foreach ($flatArray as $ok => $v) {
                 if (is_object($v)) {
                     $k = Ac_Accessor::getObjectProperty($v, $keyList);
                 }
@@ -1081,10 +1082,11 @@ abstract class Ac_Util {
                     $v = Ac_Accessor::getObjectProperty($v, $valueKeys, null, true);
                 
                 if ($unique) $res[$k] = $v;
+                elseif ($retainOriginalKey) $res[$k][$ok] = $v; 
                 else $res[$k][] = $v;
             }
         } else {
-            foreach ($flatArray as $v) {
+            foreach ($flatArray as $ok => $v) {
                 if (is_object($v)) {
                     $path = array_values(Ac_Accessor::getObjectProperty($v, $keyList));
                 }
@@ -1095,7 +1097,12 @@ abstract class Ac_Util {
                 }
                 if ($valueKeys !== false && !is_null($valueKeys))
                     $v = Ac_Accessor::getObjectProperty($v, $valueKeys, null, true);
-                Ac_Util::simpleSetArrayByPathNoRef ($res, $path, $v, $unique);
+                if (!$unique && $retainOriginalKey) {
+                    $path[] = $ok;
+                    Ac_Util::simpleSetArrayByPathNoRef ($res, $path, $v, true);
+                } else {
+                    Ac_Util::simpleSetArrayByPathNoRef ($res, $path, $v, $unique);
+                }
             }
         }
         return $res;

@@ -104,7 +104,7 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
     protected $<?php echo $var; ?> = <?php $this->export($val); ?>;
     
 <?php   } ?>    
-
+    
 <?php if ($this->extraRelationPrototypes) { ?>
     
     protected function doGetRelationPrototypes() {
@@ -152,6 +152,12 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
      * @var <?php echo $this->extraTableClass; ?> 
      */
     protected $mapperExtraTable = false;
+
+    protected $mixableId = <?php $this->export($this->modelClass); ?>;
+    
+    function hasPublicVars() {
+        return true;
+    }
 
     /**
      * @return <?php echo $this->domain->getAppClass(); ?> 

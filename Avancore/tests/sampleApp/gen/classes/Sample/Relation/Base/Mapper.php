@@ -4,19 +4,19 @@
  */
 class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
 
-    var $pk = 'relationId'; 
+    var $pk = 'relationId';
 
-    var $recordClass = 'Sample_Relation'; 
+    var $recordClass = 'Sample_Relation';
 
-    var $tableName = '#__relations'; 
+    var $tableName = '#__relations';
 
-    var $id = 'Sample_Relation_Mapper'; 
+    var $id = 'Sample_Relation_Mapper';
 
-    var $storage = 'Sample_Relation_Storage'; 
+    var $storage = 'Sample_Relation_Storage';
 
-    var $columnNames = array ( 0 => 'relationId', 1 => 'personId', 2 => 'otherPersonId', 3 => 'relationTypeId', 4 => 'relationBegin', 5 => 'relationEnd', 6 => 'notes', ); 
+    var $columnNames = array ( 0 => 'relationId', 1 => 'personId', 2 => 'otherPersonId', 3 => 'relationTypeId', 4 => 'relationBegin', 5 => 'relationEnd', 6 => 'notes', );
 
-    var $nullableColumns = array ( 0 => 'relationBegin', 1 => 'relationEnd', ); 
+    var $nullableColumns = array ( 0 => 'relationBegin', 1 => 'relationEnd', );
 
     var $defaults = array (
             'relationId' => NULL,
@@ -26,8 +26,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
             'relationBegin' => NULL,
             'relationEnd' => NULL,
             'notes' => '',
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'relationId';
     protected $askRelationsForDefaults = false;

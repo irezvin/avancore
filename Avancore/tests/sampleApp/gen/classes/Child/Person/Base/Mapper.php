@@ -4,12 +4,11 @@
  */
 class Child_Person_Base_Mapper extends Sample_Person_Mapper {
 
-    var $recordClass = 'Child_Person'; 
+    var $recordClass = 'Child_Person';
 
-    var $id = 'Child_Person_Mapper'; 
+    var $id = 'Child_Person_Mapper';
 
-    var $storage = 'Child_Person_Storage'; 
- 
+    var $storage = 'Child_Person_Storage';
  
  
     /**

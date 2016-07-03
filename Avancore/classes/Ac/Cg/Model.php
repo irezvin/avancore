@@ -100,6 +100,8 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     
     var $nullableColumns = false;
     
+    var $mapperVars = array();
+    
     protected $relationPrototypes = false;
     
     protected $assocProperties = false;

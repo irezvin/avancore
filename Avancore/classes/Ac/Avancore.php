@@ -8,7 +8,7 @@ if (!class_exists('Ac_Util', false)) {
 
 class Ac_Avancore extends Ac_Application {
     
-    const version = '0.3.2-TRUNK';
+    const version = '0.3.4-dev';
     
     protected $defaultAssetsPlaceholder = '{AC}';
     

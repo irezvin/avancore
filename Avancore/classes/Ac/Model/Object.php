@@ -386,11 +386,21 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
             
             if (isset($hyData['_peIdentifier'])) $this->_peIdentifier = $hyData['_peIdentifier'];
                 else $this->_peIdentifier = false;
-                
+
             foreach ($this->listDataProperties() as $propName) {
                 if (array_key_exists($propName, $hyData)) {
-                    $this->$propName = $pkOrRow[$propName];
-                    unset($pkOrRow[$propName]);
+                    $this->$propName = $hyData[$propName];
+                    unset($hyData[$propName]);
+                }
+            }
+            // now go for the mixables with prefixed values
+            if ($this->mixables) {
+                foreach ($hyData as $propName => $value) {
+                    $path = explode('::', $propName, 2);
+                    if (isset($path[1]) && isset($this->mixables[$path[0]])) {
+                        $this->$propName = $value;
+                        unset($hyData[$propName]);
+                    }
                 }
             }
             $this->_otherValues = $hyData;

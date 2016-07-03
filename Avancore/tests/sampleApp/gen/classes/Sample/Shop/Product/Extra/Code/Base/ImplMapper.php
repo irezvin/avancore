@@ -4,19 +4,21 @@
  */
 class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
 
-    var $pk = 'productId'; 
+    protected $identifierField = NULL;
 
-    var $recordClass = 'Ac_Model_Record'; 
+    var $pk = 'productId';
 
-    var $tableName = '#__shop_product_extraCodes'; 
+    var $recordClass = 'Ac_Model_Record';
 
-    var $id = 'Sample_Shop_Product_Extra_Code_ImplMapper'; 
+    var $tableName = '#__shop_product_extraCodes';
 
-    var $storage = 'Sample_Shop_Product_Extra_Code_Storage'; 
+    var $id = 'Sample_Shop_Product_Extra_Code_ImplMapper';
 
-    var $columnNames = array ( 0 => 'productId', 1 => 'ean', 2 => 'asin', 3 => 'gtin', 4 => 'responsiblePersonId', ); 
+    var $storage = 'Sample_Shop_Product_Extra_Code_Storage';
 
-    var $nullableColumns = array ( 0 => 'responsiblePersonId', ); 
+    var $columnNames = array ( 0 => 'productId', 1 => 'ean', 2 => 'asin', 3 => 'gtin', 4 => 'responsiblePersonId', );
+
+    var $nullableColumns = array ( 0 => 'responsiblePersonId', );
 
     var $defaults = array (
             'productId' => NULL,
@@ -24,10 +26,19 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
             'asin' => '',
             'gtin' => '',
             'responsiblePersonId' => NULL,
-        ); 
- 
+        );
     protected $askRelationsForDefaults = false;
  
+    protected function doGetCoreMixables() { 
+        return Ac_Util::m(parent::doGetCoreMixables(), array (
+            'Ac_Model_Typer_Abstract' => array (
+                'class' => 'Ac_Model_Typer_ExtraTable',
+                'tableName' => '#__shop_product_extraCodes',
+                'uniformTypeId' => 'Sample_Shop_Product_Mapper',
+            ),
+        ));
+    }
+    
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (

@@ -10,11 +10,13 @@ Ac_Test_Base::$config = $config;
 ini_set('error_reporting', E_ALL);
 ini_set('display_errors', 1);
 
+$v = Ac_Avancore::version;
+
 if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
     
     $classes = explode(',', $_GET['class']);
 	
-    $ts = new TestSuite('Avancore Framework v0.3 Tests');
+    $ts = new TestSuite("Ac {$v} Test".(count($classes == 1)? '' : 's').": {$_GET['class']}");
     
     foreach ($classes as $class) {
 
@@ -28,7 +30,8 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
     $ts->run(new Ac_Test_Reporter('UTF-8'));
     
 } else {
-	$t = new TestSuite('Avancore Framework v0.3 Tests');
+    $title = "Avancore Framework {$v} Tests";
+    $t = new TestSuite($title);
     $classes = array();
     foreach ($files = glob(dirname(__FILE__).'/classes/Ac/Test/*.php') as $file) {
         $class = 'Ac_Test_'.basename($file, '.php');
@@ -40,5 +43,7 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
 	
 }
 
-if (function_exists('xdebug_time_index')) var_dump(xdebug_time_index(), round(memory_get_peak_usage()/1024/1024, 2).'M');
+if (function_exists('xdebug_time_index')) {
+    var_dump(xdebug_time_index(), round(memory_get_peak_usage()/1024/1024, 2).'M');
+}
 

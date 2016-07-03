@@ -7,7 +7,7 @@ class Sample_Shop_Product_Note_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
     protected $implMapper = 'Sample_Shop_Product_Note_ImplMapper';
     
     
-
+    
     
     protected function doGetRelationPrototypes() {
         return array (

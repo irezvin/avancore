@@ -17,6 +17,12 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
      */
     protected $mapperExtraTable = false;
 
+    protected $mixableId = 'Sample_Shop_Product_Extra_Code';
+    
+    function hasPublicVars() {
+        return true;
+    }
+
     /**
      * @return Sample 
      */

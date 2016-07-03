@@ -4,19 +4,21 @@
  */
 class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
 
-    var $pk = 'id'; 
+    protected $identifierField = NULL;
 
-    var $recordClass = 'Ac_Model_Record'; 
+    var $pk = 'id';
 
-    var $tableName = '#__publish'; 
+    var $recordClass = 'Ac_Model_Record';
 
-    var $id = 'Sample_Publish_ImplMapper'; 
+    var $tableName = '#__publish';
 
-    var $storage = 'Sample_Publish_Storage'; 
+    var $id = 'Sample_Publish_ImplMapper';
 
-    var $columnNames = array ( 0 => 'id', 1 => 'sharedObjectType', 2 => 'published', 3 => 'deleted', 4 => 'publishUp', 5 => 'publishDown', 6 => 'authorId', 7 => 'editorId', 8 => 'pubChannelId', 9 => 'dateCreated', 10 => 'dateModified', 11 => 'dateDeleted', ); 
+    var $storage = 'Sample_Publish_Storage';
 
-    var $nullableColumns = array ( 0 => 'published', 1 => 'deleted', 2 => 'publishUp', 3 => 'publishDown', 4 => 'authorId', 5 => 'editorId', 6 => 'pubChannelId', ); 
+    var $columnNames = array ( 0 => 'id', 1 => 'sharedObjectType', 2 => 'published', 3 => 'deleted', 4 => 'publishUp', 5 => 'publishDown', 6 => 'authorId', 7 => 'editorId', 8 => 'pubChannelId', 9 => 'dateCreated', 10 => 'dateModified', 11 => 'dateDeleted', );
+
+    var $nullableColumns = array ( 0 => 'published', 1 => 'deleted', 2 => 'publishUp', 3 => 'publishDown', 4 => 'authorId', 5 => 'editorId', 6 => 'pubChannelId', );
 
     var $defaults = array (
             'id' => NULL,
@@ -31,12 +33,21 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
             'dateCreated' => '0000-00-00 00:00:00',
             'dateModified' => '0000-00-00 00:00:00',
             'dateDeleted' => '0000-00-00 00:00:00',
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;
  
+    protected function doGetCoreMixables() { 
+        return Ac_Util::m(parent::doGetCoreMixables(), array (
+            'Ac_Model_Typer_Abstract' => array (
+                'class' => 'Ac_Model_Typer_ExtraTable',
+                'tableName' => '#__publish',
+                'objectTypeField' => 'sharedObjectType',
+            ),
+        ));
+    }
+    
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (
@@ -181,6 +192,9 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
                 'srcMapperClass' => 'Sample_Publish_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_authorPerson',
+                'destVarName' => '_authorPublish',
+                'destCountVarName' => '_authorPublishCount',
+                'destLoadedVarName' => '_authorPublishLoaded',
                 'fieldLinks' => array (
                     'authorId' => 'personId',
                 ),
@@ -192,6 +206,9 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
                 'srcMapperClass' => 'Sample_Publish_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_editorPerson',
+                'destVarName' => '_editorPublish',
+                'destCountVarName' => '_editorPublishCount',
+                'destLoadedVarName' => '_editorPublishLoaded',
                 'fieldLinks' => array (
                     'editorId' => 'personId',
                 ),

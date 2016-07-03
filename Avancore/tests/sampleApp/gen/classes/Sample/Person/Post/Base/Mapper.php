@@ -4,19 +4,19 @@
  */
 class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
 
-    var $pk = 'id'; 
+    var $pk = 'id';
 
-    var $recordClass = 'Sample_Person_Post'; 
+    var $recordClass = 'Sample_Person_Post';
 
-    var $tableName = '#__person_posts'; 
+    var $tableName = '#__person_posts';
 
-    var $id = 'Sample_Person_Post_Mapper'; 
+    var $id = 'Sample_Person_Post_Mapper';
 
-    var $storage = 'Sample_Person_Post_Storage'; 
+    var $storage = 'Sample_Person_Post_Storage';
 
-    var $columnNames = array ( 0 => 'id', 1 => 'personId', 2 => 'photoId', 3 => 'title', 4 => 'content', 5 => 'pubId', ); 
+    var $columnNames = array ( 0 => 'id', 1 => 'personId', 2 => 'photoId', 3 => 'title', 4 => 'content', 5 => 'pubId', );
 
-    var $nullableColumns = array ( 0 => 'personId', 1 => 'photoId', 2 => 'title', 3 => 'content', 4 => 'pubId', ); 
+    var $nullableColumns = array ( 0 => 'personId', 1 => 'photoId', 2 => 'title', 3 => 'content', 4 => 'pubId', );
 
     var $defaults = array (
             'id' => NULL,
@@ -25,15 +25,26 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
             'title' => '',
             'content' => '',
             'pubId' => NULL,
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;
  
+    protected function doGetCoreMixables() { 
+        return Ac_Util::m(parent::doGetCoreMixables(), array (
+            'publish' => array (
+                'class' => 'Sample_Publish_MapperMixable',
+                'colMap' => array (
+                    'id' => 'pubId',
+                ),
+            ),
+        ));
+    }
+    
  
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), array (
+            '_publish' => false,
             '_person' => false,
             '_personPhoto' => false,
         ));
@@ -171,6 +182,17 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
+            '_publish' => array (
+                'srcMapperClass' => 'Sample_Person_Post_Mapper',
+                'destMapperClass' => 'Sample_Publish_ImplMapper',
+                'srcVarName' => '_publish',
+                'fieldLinks' => array (
+                    'pubId' => 'id',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => true,
+                'srcOutgoing' => true,
+            ),
             '_person' => array (
                 'srcMapperClass' => 'Sample_Person_Post_Mapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
@@ -206,6 +228,21 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     
     protected function doGetAssociationPrototypes() {
         return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
+            'publish' => array (
+                'relationId' => '_publish',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'publish',
+                'plural' => 'publish',
+                'class' => 'Ac_Model_Association_One',
+                'loadDestObjectsMapperMethod' => 'loadPublishFor',
+                'loadSrcObjectsMapperMethod' => 'loadForPublish',
+                'getSrcObjectsMapperMethod' => 'getOfPublish',
+                'createDestObjectMethod' => 'createPublish',
+                'getDestObjectMethod' => 'getPublish',
+                'setDestObjectMethod' => 'setPublish',
+                'clearDestObjectMethod' => 'clearPublish',
+            ),
             'person' => array (
                 'relationId' => '_person',
                 'useMapperMethods' => true,
@@ -282,6 +319,35 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
             else $res = null;
         return $res;
     }
+    /**
+     * Returns (but not loads!) one or more personPosts of given one or more publish 
+     * @param Sample_Person_Post|array $publish     
+     * @return Sample_Person_Post|array of Sample_Person_Post objects  
+     */
+    function getOfPublish($publish) {
+        $rel = $this->getRelation('_publish');
+        $res = $rel->getSrc($publish); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more personPosts of given one or more publish 
+     * @param Sample_Publish|array $publish of Sample_Person_Post objects      
+     */
+    function loadForPublish($publish) {
+        $rel = $this->getRelation('_publish');
+        return $rel->loadSrc($publish); 
+    }
+    
+    /**
+     * Loads one or more publish of given one or more personPosts 
+     * @param Sample_Person_Post|array $personPosts     
+     */
+    function loadPublishFor($personPosts) {
+        $rel = $this->getRelation('_publish');
+        return $rel->loadDest($personPosts); 
+    }
+
     /**
      * Returns (but not loads!) several personPosts of given one or more people 
      * @param Sample_Person_Post|array $people     

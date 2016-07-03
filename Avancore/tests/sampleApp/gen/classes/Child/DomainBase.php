@@ -5,7 +5,7 @@ abstract class Child_DomainBase extends Sample {
     protected function doOnInitialize() {
         parent::doOnInitialize();
  
-        $this->setMapperAliases(array ( 'Sample_Person_Mapper' => 'Child_Person_Mapper', 'Sample_Perk_Mapper' => 'Child_Perk_Mapper', 'Sample_Person_Album_Mapper' => 'Child_Person_Album_Mapper', 'Sample_Person_Photo_Mapper' => 'Child_Person_Photo_Mapper', 'Sample_Person_Post_Mapper' => 'Child_Person_Post_Mapper', 'Sample_Publish_ImplMapper' => 'Child_Publish_ImplMapper', 'Sample_Relation_Type_Mapper' => 'Child_Relation_Type_Mapper', 'Sample_Relation_Mapper' => 'Child_Relation_Mapper', 'Sample_Religion_Mapper' => 'Child_Religion_Mapper', 'Sample_Shop_Category_Mapper' => 'Child_Shop_Category_Mapper', 'Sample_Shop_Product_Extra_Code_ImplMapper' => 'Child_Shop_Product_Extra_Code_ImplMapper', 'Sample_Shop_Product_Note_ImplMapper' => 'Child_Shop_Product_Note_ImplMapper', 'Sample_Shop_Product_Mapper' => 'Child_Shop_Product_Mapper', 'Sample_Tag_Mapper' => 'Child_Tag_Mapper', 'Sample_Tree_Adjacent_Mapper' => 'Child_Tree_Adjacent_Mapper', 'Sample_Tree_Combo_Mapper' => 'Child_Tree_Combo_Mapper', 'Sample_Tree_Record_Mapper' => 'Child_Tree_Record_Mapper', ), true);
+        $this->setMapperAliases(array ( 'Sample_Person_Mapper' => 'Child_Person_Mapper', 'Sample_Perk_Mapper' => 'Child_Perk_Mapper', 'Sample_Person_Album_Mapper' => 'Child_Person_Album_Mapper', 'Sample_Person_Photo_Mapper' => 'Child_Person_Photo_Mapper', 'Sample_Person_Post_Mapper' => 'Child_Person_Post_Mapper', 'Sample_Publish_ImplMapper' => 'Child_Publish_ImplMapper', 'Sample_Relation_Type_Mapper' => 'Child_Relation_Type_Mapper', 'Sample_Relation_Mapper' => 'Child_Relation_Mapper', 'Sample_Religion_Mapper' => 'Child_Religion_Mapper', 'Sample_Shop_Category_Mapper' => 'Child_Shop_Category_Mapper', 'Sample_Shop_Classifier_Mapper' => 'Child_Shop_Classifier_Mapper', 'Sample_Shop_Classifier_Type_Mapper' => 'Child_Shop_Classifier_Type_Mapper', 'Sample_Shop_Product_Extra_Code_ImplMapper' => 'Child_Shop_Product_Extra_Code_ImplMapper', 'Sample_Shop_Product_Note_ImplMapper' => 'Child_Shop_Product_Note_ImplMapper', 'Sample_Shop_Product_Mapper' => 'Child_Shop_Product_Mapper', 'Sample_Shop_Spec_Computer_ImplMapper' => 'Child_Shop_Spec_Computer_ImplMapper', 'Sample_Shop_Spec_Food_ImplMapper' => 'Child_Shop_Spec_Food_ImplMapper', 'Sample_Shop_Spec_Laptop_ImplMapper' => 'Child_Shop_Spec_Laptop_ImplMapper', 'Sample_Shop_Spec_Monitor_ImplMapper' => 'Child_Shop_Spec_Monitor_ImplMapper', 'Sample_Shop_Spec_Mapper' => 'Child_Shop_Spec_Mapper', 'Sample_Tag_Mapper' => 'Child_Tag_Mapper', 'Sample_Tree_Adjacent_Mapper' => 'Child_Tree_Adjacent_Mapper', 'Sample_Tree_Combo_Mapper' => 'Child_Tree_Combo_Mapper', 'Sample_Tree_Record_Mapper' => 'Child_Tree_Record_Mapper', ), true);
     }
 
 
@@ -41,6 +41,12 @@ abstract class Child_DomainBase extends Sample {
             'Child_Shop_Category_Mapper' => array (
                 'class' => 'Child_Shop_Category_Mapper',
             ),
+            'Child_Shop_Classifier_Mapper' => array (
+                'class' => 'Child_Shop_Classifier_Mapper',
+            ),
+            'Child_Shop_Classifier_Type_Mapper' => array (
+                'class' => 'Child_Shop_Classifier_Type_Mapper',
+            ),
             'Child_Shop_Product_Extra_Code_ImplMapper' => array (
                 'class' => 'Child_Shop_Product_Extra_Code_ImplMapper',
             ),
@@ -49,6 +55,21 @@ abstract class Child_DomainBase extends Sample {
             ),
             'Child_Shop_Product_Mapper' => array (
                 'class' => 'Child_Shop_Product_Mapper',
+            ),
+            'Child_Shop_Spec_Computer_ImplMapper' => array (
+                'class' => 'Child_Shop_Spec_Computer_ImplMapper',
+            ),
+            'Child_Shop_Spec_Food_ImplMapper' => array (
+                'class' => 'Child_Shop_Spec_Food_ImplMapper',
+            ),
+            'Child_Shop_Spec_Laptop_ImplMapper' => array (
+                'class' => 'Child_Shop_Spec_Laptop_ImplMapper',
+            ),
+            'Child_Shop_Spec_Monitor_ImplMapper' => array (
+                'class' => 'Child_Shop_Spec_Monitor_ImplMapper',
+            ),
+            'Child_Shop_Spec_Mapper' => array (
+                'class' => 'Child_Shop_Spec_Mapper',
             ),
             'Child_Tag_Mapper' => array (
                 'class' => 'Child_Tag_Mapper',
@@ -136,6 +157,20 @@ abstract class Child_DomainBase extends Sample {
     }
     
     /**
+     * @return Child_Shop_Classifier_Mapper 
+     */
+    function getChildShopClassifierMapper() {
+        return $this->getMapper('Child_Shop_Classifier_Mapper');
+    }
+    
+    /**
+     * @return Child_Shop_Classifier_Type_Mapper 
+     */
+    function getChildShopClassifierTypeMapper() {
+        return $this->getMapper('Child_Shop_Classifier_Type_Mapper');
+    }
+    
+    /**
      * @return Child_Shop_Product_Extra_Code_ImplMapper 
      */
     function getChildShopProductExtraCodeImplMapper() {
@@ -154,6 +189,41 @@ abstract class Child_DomainBase extends Sample {
      */
     function getChildShopProductMapper() {
         return $this->getMapper('Child_Shop_Product_Mapper');
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Computer_ImplMapper 
+     */
+    function getChildShopSpecComputerImplMapper() {
+        return $this->getMapper('Child_Shop_Spec_Computer_ImplMapper');
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Food_ImplMapper 
+     */
+    function getChildShopSpecFoodImplMapper() {
+        return $this->getMapper('Child_Shop_Spec_Food_ImplMapper');
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Laptop_ImplMapper 
+     */
+    function getChildShopSpecLaptopImplMapper() {
+        return $this->getMapper('Child_Shop_Spec_Laptop_ImplMapper');
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Monitor_ImplMapper 
+     */
+    function getChildShopSpecMonitorImplMapper() {
+        return $this->getMapper('Child_Shop_Spec_Monitor_ImplMapper');
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Mapper 
+     */
+    function getChildShopSpecMapper() {
+        return $this->getMapper('Child_Shop_Spec_Mapper');
     }
     
     /**
@@ -255,6 +325,20 @@ abstract class Child_DomainBase extends Sample {
     }
     
     /**
+     * @return Child_Shop_Classifier_Mapper 
+     */
+    function getSampleShopClassifierMapper() {
+        return $this->getChildShopClassifierMapper();
+    }
+    
+    /**
+     * @return Child_Shop_Classifier_Type_Mapper 
+     */
+    function getSampleShopClassifierTypeMapper() {
+        return $this->getChildShopClassifierTypeMapper();
+    }
+    
+    /**
      * @return Child_Shop_Product_Extra_Code_ImplMapper 
      */
     function getSampleShopProductExtraCodeImplMapper() {
@@ -273,6 +357,41 @@ abstract class Child_DomainBase extends Sample {
      */
     function getSampleShopProductMapper() {
         return $this->getChildShopProductMapper();
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Computer_ImplMapper 
+     */
+    function getSampleShopSpecComputerImplMapper() {
+        return $this->getChildShopSpecComputerImplMapper();
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Food_ImplMapper 
+     */
+    function getSampleShopSpecFoodImplMapper() {
+        return $this->getChildShopSpecFoodImplMapper();
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Laptop_ImplMapper 
+     */
+    function getSampleShopSpecLaptopImplMapper() {
+        return $this->getChildShopSpecLaptopImplMapper();
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Monitor_ImplMapper 
+     */
+    function getSampleShopSpecMonitorImplMapper() {
+        return $this->getChildShopSpecMonitorImplMapper();
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Mapper 
+     */
+    function getSampleShopSpecMapper() {
+        return $this->getChildShopSpecMapper();
     }
     
     /**
@@ -455,6 +574,36 @@ abstract class Child_DomainBase extends Sample {
     
  
     /**
+     * @return Child_Shop_Classifier 
+     */
+    static function Child_Shop_Classifier ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Child_Shop_Classifier 
+     */
+    function createChildShopClassifier () {
+        return $this->getMapper('Child_Shop_Classifier_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Child_Shop_Classifier_Type 
+     */
+    static function Child_Shop_Classifier_Type ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Child_Shop_Classifier_Type 
+     */
+    function createChildShopClassifierType () {
+        return $this->getMapper('Child_Shop_Classifier_Type_Mapper')->createRecord();
+    }
+    
+ 
+    /**
      * @return Child_Shop_Product_Extra_Code 
      */
     static function Child_Shop_Product_Extra_Code ($object = null) {
@@ -496,6 +645,81 @@ abstract class Child_DomainBase extends Sample {
      */
     function createChildShopProduct () {
         return $this->getMapper('Child_Shop_Product_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Child_Shop_Spec_Computer 
+     */
+    static function Child_Shop_Spec_Computer ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Computer 
+     */
+    function createChildShopSpecComputer () {
+        return $this->getMapper('Child_Shop_Spec_Computer_ImplMapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Child_Shop_Spec_Food 
+     */
+    static function Child_Shop_Spec_Food ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Food 
+     */
+    function createChildShopSpecFood () {
+        return $this->getMapper('Child_Shop_Spec_Food_ImplMapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Child_Shop_Spec_Laptop 
+     */
+    static function Child_Shop_Spec_Laptop ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Laptop 
+     */
+    function createChildShopSpecLaptop () {
+        return $this->getMapper('Child_Shop_Spec_Laptop_ImplMapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Child_Shop_Spec_Monitor 
+     */
+    static function Child_Shop_Spec_Monitor ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Child_Shop_Spec_Monitor 
+     */
+    function createChildShopSpecMonitor () {
+        return $this->getMapper('Child_Shop_Spec_Monitor_ImplMapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Child_Shop_Spec 
+     */
+    static function Child_Shop_Spec ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Child_Shop_Spec 
+     */
+    function createChildShopSpec () {
+        return $this->getMapper('Child_Shop_Spec_Mapper')->createRecord();
     }
     
  

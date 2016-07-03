@@ -94,7 +94,7 @@ $config = array(
                     'fkPostPublish',
                 ),
                 'skipMapperMixables' => array(
-                    'fkPostPublish',
+                    //'fkPostPublish',
                 ),
                 'objectTypeField' => 'sharedObjectType',
                 'perModelMapperMixableExtras' => array(
@@ -117,6 +117,29 @@ $config = array(
                 'masterFkIds' => array(
                     'fkProductNoteProduct',
                 ),
+            ),
+            'shopSpecFood' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'skipMapperMixables' => true,
+                /*'inline' => true,
+                'masterFkIds' => array(
+                    'fkSpecsFood',
+                ),*/
+            ),
+            'shopSpecComputer' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'skipMapperMixables' => true,
+                'masterFkIds' => array('fkMonitorSpec'),
+            ),
+            'shopSpecMonitor' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'skipMapperMixables' => true,
+                'masterFkIds' => array('fkMonitorSpec'),
+            ),
+            'shopSpecLaptop' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'skipMapperMixables' => true,
+                'masterFkIds' => array('fkMonitorSpec'),
             ),
         ),
     ),

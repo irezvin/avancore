@@ -499,8 +499,11 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             
             if ($matchMode == Ac_Model_Relation_Abstract::RESULT_ORIGINAL_KEYS || $matchMode == Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS || $matchMode === Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS && $midMap) {
                 $res = array();
-                if ($matchMode !== Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS && $lRows) $this->unmapResult($keys, $map, $matchMode, $res, $lRows, $defaultValue, $destIsUnique, false);
-                    else $res = $midMap? $lRows : $rows;
+                if ($matchMode !== Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS) {
+                    $this->unmapResult($keys, $map, $matchMode, $res, $lRows? $lRows : $rows, $defaultValue, $destIsUnique, false);
+                } else {
+                    $res = $midMap? $lRows : $rows;
+                }
                 if ($midMap) {
                     $this->unmapResult(array_values($this->fieldLinks2), $midMap, $matchMode, $res, $rows, 
                         $defaultValue, $destIsUnique, true);                    

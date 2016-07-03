@@ -23,6 +23,12 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
      */
     protected $mapperExtraTable = false;
 
+    protected $mixableId = 'Sample_Publish';
+    
+    function hasPublicVars() {
+        return true;
+    }
+
     /**
      * @return Sample 
      */

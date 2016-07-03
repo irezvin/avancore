@@ -52,6 +52,8 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
      */
     protected $where = false;
     
+    protected $restriction = array();
+    
     /**
      * restriction for rows in many-to-many table
      */
@@ -152,7 +154,7 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
         }
         if ($this->extraJoins) $fromWhere .= ' '.$this->extraJoins;
         $fromWhere .= ' WHERE ('.$crit.')';
-        if ($this->where) $fromWhere .= ' AND ('.$this->getStrWhere().')'; 
+        if ($this->where || $this->restriction) $fromWhere .= ' AND ('.$this->getStrWhere().')'; 
 
         $sql = 'SELECT ';
         if ($this->midTableName && $useMidTable) {
@@ -398,6 +400,8 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
             if ($this->application) $def['application'] = $this->application;
             $this->mapper = Ac_Prototyped::factory($mapper, 'Ac_Model_Mapper', $def);
         }
+        if ($this->mapper) $this->restriction = $this->mapper->getRestriction();
+            else $this->restriction = array();
     }
 
     /**
@@ -467,6 +471,11 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
     protected function getStrWhere($alias = 't') {
         if (is_array($this->where)) $res = $this->db->valueCriterion($this->where, $alias);
         else $res = $this->where;
+        if ($this->restriction) {
+            $r = $this->db->valueCriterion($this->restriction, $alias);
+            if (strlen($res)) $res = "({$res}) AND ({$r})";
+                else $res = $r;
+        }
         return $res;
     }
     

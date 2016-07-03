@@ -4,19 +4,19 @@
  */
 class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
 
-    var $pk = 'id'; 
+    var $pk = 'id';
 
-    var $recordClass = 'Sample_Shop_Product'; 
+    var $recordClass = 'Sample_Shop_Product';
 
-    var $tableName = '#__shop_products'; 
+    var $tableName = '#__shop_products';
 
-    var $id = 'Sample_Shop_Product_Mapper'; 
+    var $id = 'Sample_Shop_Product_Mapper';
 
-    var $storage = 'Sample_Shop_Product_Storage'; 
+    var $storage = 'Sample_Shop_Product_Storage';
 
-    var $columnNames = array ( 0 => 'id', 1 => 'sku', 2 => 'title', 3 => 'metaId', 4 => 'pubId', ); 
+    var $columnNames = array ( 0 => 'id', 1 => 'sku', 2 => 'title', 3 => 'metaId', 4 => 'pubId', );
 
-    var $nullableColumns = array ( 0 => 'metaId', 1 => 'pubId', ); 
+    var $nullableColumns = array ( 0 => 'metaId', 1 => 'pubId', );
 
     var $defaults = array (
             'id' => NULL,
@@ -24,8 +24,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
             'title' => '',
             'metaId' => NULL,
             'pubId' => NULL,
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;
@@ -71,6 +70,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
             '_referencingShopProductsCount' => false,
             '_referencingShopProductsLoaded' => false,
             '_referencingShopProductIds' => false,
+            '_shopSpec' => false,
             '_notePerson' => false,
             '_noteShopProductsCount' => false,
             '_noteShopProductsLoaded' => false,
@@ -296,6 +296,17 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                     'productId' => 'id',
                 ),
             ),
+            '_shopSpec' => array (
+                'srcMapperClass' => 'Sample_Shop_Product_Mapper',
+                'destMapperClass' => 'Sample_Shop_Spec_Mapper',
+                'srcVarName' => '_shopSpec',
+                'destVarName' => '_shopProduct',
+                'fieldLinks' => array (
+                    'id' => 'productId',
+                ),
+                'srcIsUnique' => true,
+                'destIsUnique' => true,
+            ),
         ));
         
     }
@@ -364,6 +375,22 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'getDestIdsMethod' => 'getReferencingShopProductIds',
                 'setDestIdsMethod' => 'setReferencingShopProductIds',
                 'clearDestObjectsMethod' => 'clearReferencingShopProducts',
+            ),
+            'shopSpec' => array (
+                'relationId' => '_shopSpec',
+                'useMapperMethods' => true,
+                'useModelMethods' => true,
+                'single' => 'shopSpec',
+                'plural' => 'shopSpecs',
+                'isReferenced' => false,
+                'class' => 'Ac_Model_Association_One',
+                'loadDestObjectsMapperMethod' => 'loadShopSpecsFor',
+                'loadSrcObjectsMapperMethod' => 'loadForShopSpecs',
+                'getSrcObjectsMapperMethod' => 'getOfShopSpecs',
+                'createDestObjectMethod' => 'createShopSpec',
+                'getDestObjectMethod' => 'getShopSpec',
+                'setDestObjectMethod' => 'setShopSpec',
+                'clearDestObjectMethod' => 'clearShopSpec',
             ),
         ));
         
@@ -525,6 +552,35 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
         return $rel->loadDestNNIds($shopProducts); 
     }
     
+    /**
+     * Returns (but not loads!) one or more shopProducts of given one or more shopSpecs 
+     * @param Sample_Shop_Product|array $shopSpecs     
+     * @return Sample_Shop_Product|array of Sample_Shop_Product objects  
+     */
+    function getOfShopSpecs($shopSpecs) {
+        $rel = $this->getRelation('_shopSpec');
+        $res = $rel->getSrc($shopSpecs); 
+        return $res;
+    }
+    
+    /**
+     * Loads one or more shopProducts of given one or more shopSpecs 
+     * @param Sample_Shop_Spec|array $shopSpecs of Sample_Shop_Product objects      
+     */
+    function loadForShopSpecs($shopSpecs) {
+        $rel = $this->getRelation('_shopSpec');
+        return $rel->loadSrc($shopSpecs); 
+    }
+    
+    /**
+     * Loads one or more shopSpecs of given one or more shopProducts 
+     * @param Sample_Shop_Product|array $shopProducts     
+     */
+    function loadShopSpecsFor($shopProducts) {
+        $rel = $this->getRelation('_shopSpec');
+        return $rel->loadDest($shopProducts); 
+    }
+
     
     
     /**

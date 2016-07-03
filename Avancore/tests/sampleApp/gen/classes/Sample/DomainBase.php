@@ -39,6 +39,12 @@ abstract class Sample_DomainBase extends Ac_Application {
             'Sample_Shop_Category_Mapper' => array (
                 'class' => 'Sample_Shop_Category_Mapper',
             ),
+            'Sample_Shop_Classifier_Mapper' => array (
+                'class' => 'Sample_Shop_Classifier_Mapper',
+            ),
+            'Sample_Shop_Classifier_Type_Mapper' => array (
+                'class' => 'Sample_Shop_Classifier_Type_Mapper',
+            ),
             'Sample_Shop_Product_Extra_Code_ImplMapper' => array (
                 'class' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
             ),
@@ -47,6 +53,21 @@ abstract class Sample_DomainBase extends Ac_Application {
             ),
             'Sample_Shop_Product_Mapper' => array (
                 'class' => 'Sample_Shop_Product_Mapper',
+            ),
+            'Sample_Shop_Spec_Computer_ImplMapper' => array (
+                'class' => 'Sample_Shop_Spec_Computer_ImplMapper',
+            ),
+            'Sample_Shop_Spec_Food_ImplMapper' => array (
+                'class' => 'Sample_Shop_Spec_Food_ImplMapper',
+            ),
+            'Sample_Shop_Spec_Laptop_ImplMapper' => array (
+                'class' => 'Sample_Shop_Spec_Laptop_ImplMapper',
+            ),
+            'Sample_Shop_Spec_Monitor_ImplMapper' => array (
+                'class' => 'Sample_Shop_Spec_Monitor_ImplMapper',
+            ),
+            'Sample_Shop_Spec_Mapper' => array (
+                'class' => 'Sample_Shop_Spec_Mapper',
             ),
             'Sample_Tag_Mapper' => array (
                 'class' => 'Sample_Tag_Mapper',
@@ -134,6 +155,20 @@ abstract class Sample_DomainBase extends Ac_Application {
     }
     
     /**
+     * @return Sample_Shop_Classifier_Mapper 
+     */
+    function getSampleShopClassifierMapper() {
+        return $this->getMapper('Sample_Shop_Classifier_Mapper');
+    }
+    
+    /**
+     * @return Sample_Shop_Classifier_Type_Mapper 
+     */
+    function getSampleShopClassifierTypeMapper() {
+        return $this->getMapper('Sample_Shop_Classifier_Type_Mapper');
+    }
+    
+    /**
      * @return Sample_Shop_Product_Extra_Code_ImplMapper 
      */
     function getSampleShopProductExtraCodeImplMapper() {
@@ -152,6 +187,41 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function getSampleShopProductMapper() {
         return $this->getMapper('Sample_Shop_Product_Mapper');
+    }
+    
+    /**
+     * @return Sample_Shop_Spec_Computer_ImplMapper 
+     */
+    function getSampleShopSpecComputerImplMapper() {
+        return $this->getMapper('Sample_Shop_Spec_Computer_ImplMapper');
+    }
+    
+    /**
+     * @return Sample_Shop_Spec_Food_ImplMapper 
+     */
+    function getSampleShopSpecFoodImplMapper() {
+        return $this->getMapper('Sample_Shop_Spec_Food_ImplMapper');
+    }
+    
+    /**
+     * @return Sample_Shop_Spec_Laptop_ImplMapper 
+     */
+    function getSampleShopSpecLaptopImplMapper() {
+        return $this->getMapper('Sample_Shop_Spec_Laptop_ImplMapper');
+    }
+    
+    /**
+     * @return Sample_Shop_Spec_Monitor_ImplMapper 
+     */
+    function getSampleShopSpecMonitorImplMapper() {
+        return $this->getMapper('Sample_Shop_Spec_Monitor_ImplMapper');
+    }
+    
+    /**
+     * @return Sample_Shop_Spec_Mapper 
+     */
+    function getSampleShopSpecMapper() {
+        return $this->getMapper('Sample_Shop_Spec_Mapper');
     }
     
     /**
@@ -334,6 +404,36 @@ abstract class Sample_DomainBase extends Ac_Application {
     
  
     /**
+     * @return Sample_Shop_Classifier 
+     */
+    static function Sample_Shop_Classifier ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Shop_Classifier 
+     */
+    function createSampleShopClassifier () {
+        return $this->getMapper('Sample_Shop_Classifier_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Shop_Classifier_Type 
+     */
+    static function Sample_Shop_Classifier_Type ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Shop_Classifier_Type 
+     */
+    function createSampleShopClassifierType () {
+        return $this->getMapper('Sample_Shop_Classifier_Type_Mapper')->createRecord();
+    }
+    
+ 
+    /**
      * @return Sample_Shop_Product_Extra_Code 
      */
     static function Sample_Shop_Product_Extra_Code ($object = null) {
@@ -375,6 +475,81 @@ abstract class Sample_DomainBase extends Ac_Application {
      */
     function createSampleShopProduct () {
         return $this->getMapper('Sample_Shop_Product_Mapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Shop_Spec_Computer 
+     */
+    static function Sample_Shop_Spec_Computer ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Shop_Spec_Computer 
+     */
+    function createSampleShopSpecComputer () {
+        return $this->getMapper('Sample_Shop_Spec_Computer_ImplMapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Shop_Spec_Food 
+     */
+    static function Sample_Shop_Spec_Food ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Shop_Spec_Food 
+     */
+    function createSampleShopSpecFood () {
+        return $this->getMapper('Sample_Shop_Spec_Food_ImplMapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Shop_Spec_Laptop 
+     */
+    static function Sample_Shop_Spec_Laptop ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Shop_Spec_Laptop 
+     */
+    function createSampleShopSpecLaptop () {
+        return $this->getMapper('Sample_Shop_Spec_Laptop_ImplMapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Shop_Spec_Monitor 
+     */
+    static function Sample_Shop_Spec_Monitor ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Shop_Spec_Monitor 
+     */
+    function createSampleShopSpecMonitor () {
+        return $this->getMapper('Sample_Shop_Spec_Monitor_ImplMapper')->createRecord();
+    }
+    
+ 
+    /**
+     * @return Sample_Shop_Spec 
+     */
+    static function Sample_Shop_Spec ($object = null) {
+        return $object;
+    }
+    
+    /**
+     * @return Sample_Shop_Spec 
+     */
+    function createSampleShopSpec () {
+        return $this->getMapper('Sample_Shop_Spec_Mapper')->createRecord();
     }
     
  

@@ -28,6 +28,11 @@ class Child_Person_Post_Base_Object extends Sample_Person_Post {
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
         if ($pi === false) $pi = array (
+            'publish' => array (
+                'className' => 'Child_Publish',
+                'mapperClass' => 'Child_Publish_ImplMapper',
+                'caption' => 'Publish',
+            ),
             'person' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
@@ -69,6 +74,32 @@ class Child_Person_Post_Base_Object extends Sample_Person_Post {
         return $pi;
                 
     }
+    
+        
+    
+    /**
+     * @return Child_Publish 
+     */
+    function getPublish() {
+        return parent::getPublish();
+    }
+    
+    /**
+     * @param Child_Publish $publish 
+     */
+    function setPublish($publish) {
+        if ($publish && !is_a($publish, 'Child_Publish')) 
+            trigger_error('$publish must be an instance of Child_Publish', E_USER_ERROR);
+        return parent::setPublish($publish);
+    }
+    
+    /**
+     * @return Child_Publish  
+     */
+    function createPublish($values = array()) {
+        return parent::createPublish($values);
+    }
+
     
         
     

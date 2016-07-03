@@ -4,24 +4,23 @@
  */
 class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
 
-    var $pk = 'photoId'; 
+    var $pk = 'photoId';
 
-    var $recordClass = 'Sample_Person_Photo'; 
+    var $recordClass = 'Sample_Person_Photo';
 
-    var $tableName = '#__person_photos'; 
+    var $tableName = '#__person_photos';
 
-    var $id = 'Sample_Person_Photo_Mapper'; 
+    var $id = 'Sample_Person_Photo_Mapper';
 
-    var $storage = 'Sample_Person_Photo_Storage'; 
+    var $storage = 'Sample_Person_Photo_Storage';
 
-    var $columnNames = array ( 0 => 'photoId', 1 => 'personId', 2 => 'filename', ); 
+    var $columnNames = array ( 0 => 'photoId', 1 => 'personId', 2 => 'filename', );
 
     var $defaults = array (
             'photoId' => NULL,
             'personId' => NULL,
             'filename' => '',
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'photoId';
     protected $askRelationsForDefaults = false;

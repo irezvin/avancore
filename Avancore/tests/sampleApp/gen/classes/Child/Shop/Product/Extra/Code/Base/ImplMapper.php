@@ -4,13 +4,22 @@
  */
 class Child_Shop_Product_Extra_Code_Base_ImplMapper extends Sample_Shop_Product_Extra_Code_ImplMapper {
 
-    var $recordClass = 'Ac_Model_Record'; 
+    protected $identifierField = NULL;
 
-    var $id = 'Child_Shop_Product_Extra_Code_ImplMapper'; 
+    var $recordClass = 'Ac_Model_Record';
 
-    var $storage = 'Child_Shop_Product_Extra_Code_Storage'; 
+    var $id = 'Child_Shop_Product_Extra_Code_ImplMapper';
+
+    var $storage = 'Child_Shop_Product_Extra_Code_Storage';
  
- 
+    protected function doGetCoreMixables() { 
+        return Ac_Util::m(parent::doGetCoreMixables(), array (
+            'Ac_Model_Typer_Abstract' => array (
+                'uniformTypeId' => 'Child_Shop_Product_Mapper',
+            ),
+        ));
+    }
+    
  
     /**
      * @return Child_Shop_Product_Extra_Code 

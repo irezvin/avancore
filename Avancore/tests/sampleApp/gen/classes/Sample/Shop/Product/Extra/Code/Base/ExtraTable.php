@@ -8,8 +8,10 @@ class Sample_Shop_Product_Extra_Code_Base_ExtraTable extends Ac_Model_Mapper_Mix
     
     protected $implMapper = 'Sample_Shop_Product_Extra_Code_ImplMapper';
     
+    protected $modelMixableId = 'Sample_Shop_Product_Extra_Code';
     
-
+    
+    
     
     protected function doGetRelationPrototypes() {
         return array (

@@ -4,26 +4,25 @@
  */
 class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
 
-    var $pk = 'id'; 
+    var $pk = 'id';
 
-    var $recordClass = 'Sample_Tree_Record'; 
+    var $recordClass = 'Sample_Tree_Record';
 
-    var $tableName = '#__tree_records'; 
+    var $tableName = '#__tree_records';
 
-    var $id = 'Sample_Tree_Record_Mapper'; 
+    var $id = 'Sample_Tree_Record_Mapper';
 
-    var $storage = 'Sample_Tree_Record_Storage'; 
+    var $storage = 'Sample_Tree_Record_Storage';
 
-    var $columnNames = array ( 0 => 'id', 1 => 'title', 2 => 'tag', ); 
+    var $columnNames = array ( 0 => 'id', 1 => 'title', 2 => 'tag', );
 
-    var $nullableColumns = array ( 0 => 'tag', ); 
+    var $nullableColumns = array ( 0 => 'tag', );
 
     var $defaults = array (
             'id' => NULL,
             'title' => '',
             'tag' => NULL,
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;

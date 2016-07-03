@@ -8,6 +8,12 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
      */
     protected $mapperExtraTable = false;
 
+    protected $mixableId = 'Child_Publish';
+    
+    function hasPublicVars() {
+        return true;
+    }
+
     /**
      * @return Child 
      */

@@ -15,6 +15,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     public $_referencingShopProductsCount = false;
     public $_referencingShopProductsLoaded = false;
     public $_referencingShopProductIds = false;
+    public $_shopSpec = false;
     public $id = NULL;
     public $sku = '';
     public $title = '';
@@ -49,7 +50,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopCategories', 1 => 'shopCategoryIds', 2 => 'referencedShopProducts', 3 => 'referencedShopProductIds', 4 => 'referencingShopProducts', 5 => 'referencingShopProductIds', 11 => 'notePerson', )));
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopCategories', 1 => 'shopCategoryIds', 2 => 'referencedShopProducts', 3 => 'referencedShopProductIds', 4 => 'referencingShopProducts', 5 => 'referencingShopProductIds', 6 => 'shopSpec', 12 => 'notePerson', )));
     }
     
  
@@ -61,7 +62,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     
  
     protected function listOwnAssociations() {
-        return array ( 'shopCategories' => 'Sample_Shop_Category', 'referencedShopProducts' => 'Sample_Shop_Product', 'referencingShopProducts' => 'Sample_Shop_Product', 'notePerson' => 'Sample_Person', );
+        return array ( 'shopCategories' => 'Sample_Shop_Category', 'referencedShopProducts' => 'Sample_Shop_Product', 'referencingShopProducts' => 'Sample_Shop_Product', 'shopSpec' => 'Sample_Shop_Spec', 'notePerson' => 'Sample_Person', );
     }
 
     protected function getOwnPropertiesInfo() {
@@ -125,6 +126,13 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ),
                 'showInTable' => false,
+            ),
+            'shopSpec' => array (
+                'className' => 'Sample_Shop_Spec',
+                'mapperClass' => 'Sample_Shop_Spec_Mapper',
+                'caption' => new Ac_Lang_String('sample_shop_product_shop_spec'),
+                'relationId' => '_shopSpec',
+                'referenceVarName' => '_shopSpec',
             ),
             'id' => array (
                 'dataType' => 'int',
@@ -472,6 +480,49 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
         $this->_referencingShopProductsLoaded = true;
         $this->_referencingShopProductIds = false;
     }               
+        
+    
+    /**
+     * @return Sample_Shop_Spec 
+     */
+    function getShopSpec() {
+        if ($this->_shopSpec === false) {
+            $this->mapper->loadShopSpecsFor($this);
+            
+        }
+        return $this->_shopSpec;
+    }
+    
+    /**
+     * @param Sample_Shop_Spec $shopSpec 
+     */
+    function setShopSpec($shopSpec) {
+        if ($shopSpec === false) $this->_shopSpec = false;
+        elseif ($shopSpec === null) $this->_shopSpec = null;
+        else {
+            if (!is_a($shopSpec, 'Sample_Shop_Spec')) trigger_error('$shopSpec must be an instance of Sample_Shop_Spec', E_USER_ERROR);
+            if (!is_object($this->_shopSpec) && !Ac_Util::sameObject($this->_shopSpec, $shopSpec)) { 
+                $this->_shopSpec = $shopSpec;
+            }
+        }
+    }
+    
+    function clearShopSpec() {
+        $this->shopSpec = null;
+    }
+
+    /**
+     * @return Sample_Shop_Spec  
+     */
+    function createShopSpec($values = array()) {
+        $m = $this->getMapper('Sample_Shop_Spec_Mapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        $this->setShopSpec($res);
+        return $res;
+    }
+
+    
         
     
     /**

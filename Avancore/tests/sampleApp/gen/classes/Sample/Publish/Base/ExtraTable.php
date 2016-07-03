@@ -10,8 +10,10 @@ class Sample_Publish_Base_ExtraTable extends Ac_Model_Mapper_Mixable_ExtraTable 
     
     protected $objectTypeField = 'sharedObjectType';
     
+    protected $modelMixableId = 'Sample_Publish';
     
-
+    
+    
     
     protected function doGetRelationPrototypes() {
         return array (
@@ -19,6 +21,9 @@ class Sample_Publish_Base_ExtraTable extends Ac_Model_Mapper_Mixable_ExtraTable 
                 'srcMapperClass' => 'Sample_Publish_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_authorPerson',
+                'destVarName' => '_authorPublish',
+                'destCountVarName' => '_authorPublishCount',
+                'destLoadedVarName' => '_authorPublishLoaded',
                 'fieldLinks' => array (
                     'authorId' => 'personId',
                 ),
@@ -30,6 +35,9 @@ class Sample_Publish_Base_ExtraTable extends Ac_Model_Mapper_Mixable_ExtraTable 
                 'srcMapperClass' => 'Sample_Publish_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_editorPerson',
+                'destVarName' => '_editorPublish',
+                'destCountVarName' => '_editorPublishCount',
+                'destLoadedVarName' => '_editorPublishLoaded',
                 'fieldLinks' => array (
                     'editorId' => 'personId',
                 ),

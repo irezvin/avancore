@@ -309,10 +309,16 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
 
     function setMapper(Ac_Model_Mapper $mapper = null) {
         if (($res = parent::setMapper($mapper)) && strlen($this->identifierField)) {
-            $mapper->setIdentifierField($this->identifierField);
-            $mapper->setIdentifierPublicField($this->primaryKey);
-            if (($this->setRowIdentifierToPk) && strlen($this->primaryKey)) {
-                $mapper->setRowIdentifierField($this->primaryKey);
+            if ($mapper->getIdentifierField() === false) {
+                $mapper->setIdentifierField($this->identifierField);
+            }
+            if ($mapper->getIdentifierPublicField() === false) {
+                $mapper->setIdentifierPublicField($this->primaryKey);
+            }
+            if ($mapper->getRowIdentifierField() === false) {
+                if (($this->setRowIdentifierToPk) && strlen($this->primaryKey)) {
+                    $mapper->setRowIdentifierField($this->primaryKey);
+                }
             }
         }
         return $res;

@@ -4,27 +4,26 @@
  */
 class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
 
-    var $pk = 'tagId'; 
+    var $pk = 'tagId';
 
-    var $recordClass = 'Sample_Tag'; 
+    var $recordClass = 'Sample_Tag';
 
-    var $tableName = '#__tags'; 
+    var $tableName = '#__tags';
 
-    var $id = 'Sample_Tag_Mapper'; 
+    var $id = 'Sample_Tag_Mapper';
 
-    var $storage = 'Sample_Tag_Storage'; 
+    var $storage = 'Sample_Tag_Storage';
 
-    var $columnNames = array ( 0 => 'tagId', 1 => 'title', 2 => 'titleM', 3 => 'titleF', ); 
+    var $columnNames = array ( 0 => 'tagId', 1 => 'title', 2 => 'titleM', 3 => 'titleF', );
 
-    var $nullableColumns = array ( 0 => 'titleM', 1 => 'titleF', ); 
+    var $nullableColumns = array ( 0 => 'titleM', 1 => 'titleF', );
 
     var $defaults = array (
             'tagId' => NULL,
             'title' => NULL,
             'titleM' => NULL,
             'titleF' => NULL,
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'tagId';
     protected $askRelationsForDefaults = false;

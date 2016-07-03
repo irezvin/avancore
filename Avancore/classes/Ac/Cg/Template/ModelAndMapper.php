@@ -135,6 +135,8 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
             $this->pkStr = $this->exportArray($pk, 0, false, true, true);
         }
         
+        $this->mapperVars = $this->model->mapperVars;
+        
         $this->mapperVars['pk'] = new Ac_Cg_Php_Expression($this->pkStr);
         $this->mapperVars['recordClass'] = $this->model->getMapperRecordClass();
         $this->mapperVars['tableName'] = $this->tableName;
@@ -189,7 +191,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     function calcAi(Ac_Cg_Model $model) {
         
         $res = false;
-        foreach ($model->listUsedColumns() as $cn) {
+        foreach (array_intersect($model->listUsedColumns(), $model->tableObject->listColumns()) as $cn) {
             $col = $model->tableObject->getColumn($cn);
             if ($col->autoInc) {
                 $res = $cn;
@@ -497,10 +499,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
  * @method <?php echo $this->modelClass; ?>[] loadFromRows(array $rows, $keysToList = false)
  */
 <?php if ($this->model->parentMapperIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genMapperClass); ?> extends <?php $this->d($this->parentMapperClass); ?> {
-<?php foreach ($this->mapperVars as $var => $default) { ?>
-
-    var $<?php echo $var; ?> = <?php $this->export($default); ?>; 
-<?php } ?> 
+<?php $this->declareClassMembers ($this->mapperVars); ?>
 <?php if ($this->autoincFieldName && !isset($this->ignoreMethods['autoincFieldName'])) { ?>
    
     protected $autoincFieldName = <?php $this->str($this->autoincFieldName) ?>;

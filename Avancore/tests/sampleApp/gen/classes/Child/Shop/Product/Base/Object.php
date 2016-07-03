@@ -58,6 +58,11 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
                     'mapperClass' => 'Child_Shop_Product_Mapper',
                 ),
             ),
+            'shopSpec' => array (
+                'className' => 'Child_Shop_Spec',
+                'mapperClass' => 'Child_Shop_Spec_Mapper',
+                'caption' => 'Shop spec',
+            ),
             'id' => array (
                 'caption' => 'Id',
             ),
@@ -206,6 +211,32 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
 
     
 
+        
+    
+    /**
+     * @return Child_Shop_Spec 
+     */
+    function getShopSpec() {
+        return parent::getShopSpec();
+    }
+    
+    /**
+     * @param Child_Shop_Spec $shopSpec 
+     */
+    function setShopSpec($shopSpec) {
+        if ($shopSpec && !is_a($shopSpec, 'Child_Shop_Spec')) 
+            trigger_error('$shopSpec must be an instance of Child_Shop_Spec', E_USER_ERROR);
+        return parent::setShopSpec($shopSpec);
+    }
+    
+    /**
+     * @return Child_Shop_Spec  
+     */
+    function createShopSpec($values = array()) {
+        return parent::createShopSpec($values);
+    }
+
+    
         
     
     /**

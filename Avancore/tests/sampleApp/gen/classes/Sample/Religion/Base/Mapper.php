@@ -4,23 +4,22 @@
  */
 class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
 
-    var $pk = 'religionId'; 
+    var $pk = 'religionId';
 
-    var $recordClass = 'Sample_Religion'; 
+    var $recordClass = 'Sample_Religion';
 
-    var $tableName = '#__religion'; 
+    var $tableName = '#__religion';
 
-    var $id = 'Sample_Religion_Mapper'; 
+    var $id = 'Sample_Religion_Mapper';
 
-    var $storage = 'Sample_Religion_Storage'; 
+    var $storage = 'Sample_Religion_Storage';
 
-    var $columnNames = array ( 0 => 'religionId', 1 => 'title', ); 
+    var $columnNames = array ( 0 => 'religionId', 1 => 'title', );
 
     var $defaults = array (
             'religionId' => NULL,
             'title' => NULL,
-        ); 
- 
+        );
    
     protected $autoincFieldName = 'religionId';
     protected $askRelationsForDefaults = false;

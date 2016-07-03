@@ -148,6 +148,17 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
            else echo $out;
     }
     
+    function declareClassMember($var, $default, $indent = 4) {
+        if (!$default instanceof Ac_Cg_Member) $default = Ac_Cg_Member::va($default);
+        $default->export($var, $indent);
+    }
+    
+    function declareClassMembers($arr, $indent = 4) {
+        foreach ($arr as $var => $default) {
+            $this->declareClassMember($var, $default, $indent);
+        }
+    }
+    
     function showDenyHtaccess() {
 ?>
     <IfModule mod_version.c>

@@ -6,10 +6,62 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
     
     var $t = 0;
     
+    function testExtraTableFields() {
+        // all extra table fields must be loaded that are listed in object mixable' listDataProperties, 
+        // especially its' primary key
+        
+       //$rows = $this->getAeDb()->fetchArray("SELECT * FROM #__publish WHERE id IN (118, 117, 1) ORDER BY id DESC", 'id');
+       $ob = Sample::getInstance()->getSamplePersonPostMapper()->find(array('pubId' => array(117, 118)), 'pubId');
+       $ids = array();
+       foreach ($ob as $o) {
+           $ids[$o->pubId] = $o->getMixable('Sample_Publish')->id;
+       }
+       if (!$this->assertArraysMatch($ids, array(
+           117 => 117,
+           118 => 118
+       ))) var_dump($ids);
+    }
+    
+    function testPreloadedRows() {
+        
+        // test with referenced Extra Table
+        
+        $items = $this->getAeDb()->fetchArray("SELECT * FROM #__publish");
+        
+        $mapper = Sample::getInstance()->getSampleShopProductMapper();
+        $mapper->reset();
+        $extra = $mapper->getMixable('publish');
+        $extra->pushPreloadedRows($items);
+        $mapper->loadRecord(1);
+        $this->assertEqual($extra->getPreloadedHits(), 1);
+        $extra->popPreloadedRows();
+
+        $mapper = Sample::getInstance()->getSamplePersonPostMapper();
+        $extra = $mapper->getMixable('publish');
+        $extra->pushPreloadedRows($items);
+        $posts = $mapper->find(array(new Ac_Sql_Expression('pubId IS NOT NULL')));
+        $this->assertEqual($extra->getPreloadedHits(), 2);
+        $extra->popPreloadedRows();
+        
+        // test with inline
+        
+        $items = $this->getAeDb()->fetchArray("SELECT * FROM #__shop_product_notes");
+        $mapper = Sample::getInstance()->getSampleShopProductMapper();
+        $mapper->reset();
+        $extra = $mapper->getMixable('note');
+        $extra->pushPreloadedRows($items);
+        $prod = $mapper->loadRecord(1);
+        $this->assertEqual($extra->getPreloadedHits(), 1);
+        $this->assertEqual($prod->note, 'xxx');
+        
+    }
+    
     function testExtraTable() {
         $this->t = microtime(true);
         
         $mapper = Sample::getInstance()->getSampleShopProductMapper();
+        $mapper->reset();
+        
         $this->resetAi('#__shop_meta');
         $this->resetAi('#__publish');
         

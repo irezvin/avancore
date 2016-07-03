@@ -5,7 +5,7 @@ class Child_Shop_Product_Note_Base_ExtraTable extends Sample_Shop_Product_Note_M
     protected $implMapper = 'Child_Shop_Product_Note_ImplMapper';
     
     
-
+    
     
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (

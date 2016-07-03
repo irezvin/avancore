@@ -6,8 +6,10 @@ class Child_Publish_Base_ExtraTable extends Sample_Publish_MapperMixable {
     
     protected $implMapper = 'Child_Publish_ImplMapper';
     
+    protected $modelMixableId = 'Child_Publish';
     
-
+    
+    
     
     protected function doGetRelationPrototypes() {
         return Ac_Util::m(parent::doGetRelationPrototypes(), array (
