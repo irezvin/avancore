@@ -2,47 +2,88 @@
 
 class Sample_Person_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_portraitPersonPhoto = false;
-    public $_religion = false;
-    public $_tags = false;
-    public $_tagsCount = false;
-    public $_tagsLoaded = false;
-    public $_tagIds = false;
-    public $_personAlbums = false;
-    public $_personAlbumsCount = false;
-    public $_personAlbumsLoaded = false;
-    public $_personPhotos = false;
-    public $_personPhotosCount = false;
-    public $_personPhotosLoaded = false;
-    public $_personPosts = false;
-    public $_personPostsCount = false;
-    public $_personPostsLoaded = false;
-    public $_authorPublish = false;
-    public $_authorPublishCount = false;
-    public $_authorPublishLoaded = false;
-    public $_editorPublish = false;
-    public $_editorPublishCount = false;
-    public $_editorPublishLoaded = false;
-    public $_incomingRelations = false;
-    public $_incomingRelationsCount = false;
-    public $_incomingRelationsLoaded = false;
-    public $_outgoingRelations = false;
-    public $_outgoingRelationsCount = false;
-    public $_outgoingRelationsLoaded = false;
-    public $_extraCodeShopProducts = false;
-    public $_shopProductsCount = false;
-    public $_shopProductsLoaded = false;
-    public $_noteShopProducts = false;
-    public $personId = NULL;
-    public $name = '';
-    public $gender = 'F';
-    public $isSingle = 1;
-    public $birthDate = NULL;
-    public $lastUpdatedDatetime = NULL;
-    public $createdTs = false;
-    public $religionId = NULL;
-    public $portraitId = NULL;
+
+    var $_hasDefaults = true;
+
+    var $_portraitPersonPhoto = false;
+
+    var $_religion = false;
+
+    var $_tags = false;
+
+    var $_tagsCount = false;
+
+    var $_tagsLoaded = false;
+
+    var $_tagIds = false;
+
+    var $_personAlbums = false;
+
+    var $_personAlbumsCount = false;
+
+    var $_personAlbumsLoaded = false;
+
+    var $_personPhotos = false;
+
+    var $_personPhotosCount = false;
+
+    var $_personPhotosLoaded = false;
+
+    var $_personPosts = false;
+
+    var $_personPostsCount = false;
+
+    var $_personPostsLoaded = false;
+
+    var $_authorPublish = false;
+
+    var $_authorPublishCount = false;
+
+    var $_authorPublishLoaded = false;
+
+    var $_editorPublish = false;
+
+    var $_editorPublishCount = false;
+
+    var $_editorPublishLoaded = false;
+
+    var $_incomingRelations = false;
+
+    var $_incomingRelationsCount = false;
+
+    var $_incomingRelationsLoaded = false;
+
+    var $_outgoingRelations = false;
+
+    var $_outgoingRelationsCount = false;
+
+    var $_outgoingRelationsLoaded = false;
+
+    var $_extraCodeShopProducts = false;
+
+    var $_shopProductsCount = false;
+
+    var $_shopProductsLoaded = false;
+
+    var $_noteShopProducts = false;
+
+    var $personId = NULL;
+
+    var $name = '';
+
+    var $gender = 'F';
+
+    var $isSingle = 1;
+
+    var $birthDate = NULL;
+
+    var $lastUpdatedDatetime = NULL;
+
+    var $createdTs = false;
+
+    var $religionId = NULL;
+
+    var $portraitId = NULL;
     
     var $_mapperClass = 'Sample_Person_Mapper';
     

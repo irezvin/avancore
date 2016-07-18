@@ -2,12 +2,20 @@
 
 class Sample_Shop_Spec_Computer_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
 
-    public $_hasDefaults = true;
-    public $_shopSpecComputerShopSpec = false;
-    public $productId = NULL;
-    public $hdd = 0;
-    public $ram = 0;
-    public $os = '';
+
+    var $_hasDefaults = true;
+
+    var $_shopSpecComputerShopSpec = false;
+
+    var $productId = NULL;
+
+    var $hdd = 0;
+
+    var $ram = 0;
+
+    var $os = '';
+
+    protected $preserveMetaCache = true;
     
     /**
      * @var Sample_Shop_Spec_Computer_MapperMixable 

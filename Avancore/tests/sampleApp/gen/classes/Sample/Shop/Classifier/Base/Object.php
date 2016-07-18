@@ -2,14 +2,22 @@
 
 class Sample_Shop_Classifier_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_shopClassifierType = false;
-    public $_monitorShopSpecs = false;
-    public $_shopSpecsCount = false;
-    public $_shopSpecsLoaded = false;
-    public $id = NULL;
-    public $title = '';
-    public $type = '';
+
+    var $_hasDefaults = true;
+
+    var $_shopClassifierType = false;
+
+    var $_monitorShopSpecs = false;
+
+    var $_shopSpecsCount = false;
+
+    var $_shopSpecsLoaded = false;
+
+    var $id = NULL;
+
+    var $title = '';
+
+    var $type = '';
     
     var $_mapperClass = 'Sample_Shop_Classifier_Mapper';
     

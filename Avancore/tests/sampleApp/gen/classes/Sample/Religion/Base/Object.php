@@ -2,12 +2,18 @@
 
 class Sample_Religion_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_people = false;
-    public $_peopleCount = false;
-    public $_peopleLoaded = false;
-    public $religionId = NULL;
-    public $title = '';
+
+    var $_hasDefaults = true;
+
+    var $_people = false;
+
+    var $_peopleCount = false;
+
+    var $_peopleLoaded = false;
+
+    var $religionId = NULL;
+
+    var $title = '';
     
     var $_mapperClass = 'Sample_Religion_Mapper';
     

@@ -204,28 +204,26 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     
     /**
      * Returns record source that will actually be used to access records 
-     * @return Ac_Legacy_Collection
+     * @return Ac_Model_Collection_Abstract
      */
     function _doGetRecordsCollection() {
         if ($this->_recordsCollection === false) {
             if (!$this->_extRecords) $this->_recordIdentifiers = $this->_getIdentifiersFromRequest();
             if ($this->_noRecords || ($this->defaultToAllRecords == self::DEFAULT_RECORDS_NONE && is_array($this->_recordIdentifiers) && !count($this->_recordIdentifiers))) $this->_records = array();
             if (!$this->_recordsCollection) {
-                if ($this->defaultToAllRecords == self::DEFAULT_RECORDS_BY_FILTERS) {
-                    $this->_recordsCollection = clone $this->manager->getRecordsCollection ($this->manager->mapperClass);
-                } else {
-                    $this->_recordsCollection = new Ac_Legacy_Collection();
-                    $this->_recordsCollection->setDatabase($this->application->getDb());
-                }
-                // Most straightforward way
                 if (is_array($this->_records)) {
-                    $this->_recordsCollection->setRecords($this->_records);
-                } elseif (is_array($this->_recordIdentifiers) && $this->_recordIdentifiers) {
-                    $this->_getMapper();
-                    $this->_recordsCollection->setKeys($this->_recordIdentifiers, $this->_mapperClass);
-                    $this->_applyDatalinkToCollection();
+                    $this->_recordsCollection = new Ac_Model_Collection_Array(array('items' => $this->_records));
                 } else {
-                    $this->manager->createBareCollection();
+                    if ($this->defaultToAllRecords == self::DEFAULT_RECORDS_BY_FILTERS) {
+                        $this->_recordsCollection = clone $this->manager->getRecordsCollection ($this->manager->mapperClass);
+                    } else {
+                        $this->_recordsCollection = $this->manager->createBareCollection();
+                    }
+                    // Filter to selected records, if applicable
+                    if (is_array($this->_recordIdentifiers) && $this->_recordIdentifiers) {
+                        $this->_recordsCollection->setKeys($this->_recordIdentifiers, $this->_mapperClass);
+                        $this->_applyDatalinkToCollection();
+                    }
                 }
             }
         }

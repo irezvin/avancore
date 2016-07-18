@@ -283,6 +283,13 @@ abstract class Ac_Model_Collection_Abstract extends Ac_Prototyped implements Ite
     }
 
     /**
+     * @deprecated Use Ac_Model_Collection_Abstract::fetchItem
+     */
+    function fetchNext() {
+        return $this->fetchItem();
+    }
+    
+    /**
      * Returns next item in the list and advances internal pointer.
      * If collection isn't open, will open() it automatically.
      * If $groupSize is 0, will fetch all items (with regard to $limit and $offset) into memory before iterating.

@@ -2,19 +2,32 @@
 
 class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_person = false;
-    public $_personAlbums = false;
-    public $_personAlbumsCount = false;
-    public $_personAlbumsLoaded = false;
-    public $_personAlbumIds = false;
-    public $_portraitPerson = false;
-    public $_personPosts = false;
-    public $_personPostsCount = false;
-    public $_personPostsLoaded = false;
-    public $photoId = NULL;
-    public $personId = 0;
-    public $filename = '';
+
+    var $_hasDefaults = true;
+
+    var $_person = false;
+
+    var $_personAlbums = false;
+
+    var $_personAlbumsCount = false;
+
+    var $_personAlbumsLoaded = false;
+
+    var $_personAlbumIds = false;
+
+    var $_portraitPerson = false;
+
+    var $_personPosts = false;
+
+    var $_personPostsCount = false;
+
+    var $_personPostsLoaded = false;
+
+    var $photoId = NULL;
+
+    var $personId = 0;
+
+    var $filename = '';
     
     var $_mapperClass = 'Sample_Person_Photo_Mapper';
     

@@ -498,7 +498,9 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
         }
         if ($sort) {
             $strSort = $this->canSimpleSort($sort);
-            if ($strSort) $sorted = true;
+            if ($strSort) {
+                $sorted = true;
+            }
         } else {
             $strSort = '';
             $sorted = true;
@@ -618,7 +620,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
         $res = $this->getAppliedSelect($selectQ, $prototypeExtra);
         $this->applyCriteriaToSelect($selectQ, $res, $remainingQuery);
         if ($where) $res->where['_search'] = $where;
-        if ($strSort) $res->orderBy['_sort'] = $strSort;
+        if ($strSort) $res->orderBy['_sort'] = $this->getDb()->n(array($res->getEffectivePrimaryAlias(), $strSort));
         elseif ($sort) $sorted = $this->applySortToSelect ($sort, $res);
         if ($limit) $res->limitCount = $limit;
         if ($offset) $res->limitOffset = $offset;

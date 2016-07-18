@@ -23,12 +23,12 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
      * @var array $id => $id IDs of Ac_I_Mixable_Shared
      */
     protected $sharedMixableIds = false;
-    
+
     const ACCESS_GET = 0;
     const ACCESS_SET = 1;
     const ACCESS_ISSET = 2;
     const ACCESS_UNSET = 3;
-
+    
     function __construct(array $prototype = array()) {
         $this->registerCoreMixables();
         // TODO: initialize while providing values to mixables

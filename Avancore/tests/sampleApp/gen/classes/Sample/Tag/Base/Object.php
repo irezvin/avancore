@@ -2,19 +2,32 @@
 
 class Sample_Tag_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_people = false;
-    public $_peopleCount = false;
-    public $_peopleLoaded = false;
-    public $_personIds = false;
-    public $_perks = false;
-    public $_perksCount = false;
-    public $_perksLoaded = false;
-    public $_perkIds = false;
-    public $tagId = NULL;
-    public $title = '';
-    public $titleM = NULL;
-    public $titleF = NULL;
+
+    var $_hasDefaults = true;
+
+    var $_people = false;
+
+    var $_peopleCount = false;
+
+    var $_peopleLoaded = false;
+
+    var $_personIds = false;
+
+    var $_perks = false;
+
+    var $_perksCount = false;
+
+    var $_perksLoaded = false;
+
+    var $_perkIds = false;
+
+    var $tagId = NULL;
+
+    var $title = '';
+
+    var $titleM = NULL;
+
+    var $titleF = NULL;
     
     var $_mapperClass = 'Sample_Tag_Mapper';
     

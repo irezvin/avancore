@@ -2,13 +2,20 @@
 
 class Sample_Perk_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_tags = false;
-    public $_tagsCount = false;
-    public $_tagsLoaded = false;
-    public $_tagIds = false;
-    public $perkId = NULL;
-    public $name = '';
+
+    var $_hasDefaults = true;
+
+    var $_tags = false;
+
+    var $_tagsCount = false;
+
+    var $_tagsLoaded = false;
+
+    var $_tagIds = false;
+
+    var $perkId = NULL;
+
+    var $name = '';
     
     var $_mapperClass = 'Sample_Perk_Mapper';
     

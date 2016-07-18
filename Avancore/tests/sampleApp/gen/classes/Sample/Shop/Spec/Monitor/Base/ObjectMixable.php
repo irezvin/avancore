@@ -2,15 +2,26 @@
 
 class Sample_Shop_Spec_Monitor_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
 
-    public $_hasDefaults = true;
-    public $_monitorShopClassifier = false;
-    public $_monitorShopSpecsCount = false;
-    public $_monitorShopSpecsLoaded = false;
-    public $productId = NULL;
-    public $diagonal = 0;
-    public $hRes = 0;
-    public $vRes = 0;
-    public $matrixTypeId = NULL;
+
+    var $_hasDefaults = true;
+
+    var $_monitorShopClassifier = false;
+
+    var $_monitorShopSpecsCount = false;
+
+    var $_monitorShopSpecsLoaded = false;
+
+    var $productId = NULL;
+
+    var $diagonal = 0;
+
+    var $hRes = 0;
+
+    var $vRes = 0;
+
+    var $matrixTypeId = NULL;
+
+    protected $preserveMetaCache = true;
     
     /**
      * @var Sample_Shop_Spec_Monitor_MapperMixable 

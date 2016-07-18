@@ -14,6 +14,28 @@ class Ac_Model_Mixable_Data extends Ac_Mixable {
     
     protected $errors = array();
     
+    /**
+     * don't disable meta cache of mixin
+     * @var bool
+     */
+    protected $preserveMetaCache = false;
+
+    /**
+     * Sets don't disable meta cache of mixin
+     * @param bool $preserveMetaCache
+     */
+    function setPreserveMetaCache($preserveMetaCache) {
+        $this->preserveMetaCache = $preserveMetaCache;
+    }
+
+    /**
+     * Returns don't disable meta cache of mixin
+     * @return bool
+     */
+    function getPreserveMetaCache() {
+        return $this->preserveMetaCache;
+    }    
+    
     // --- to-be-overridden methods ---
     
     protected function getOwnPropertiesInfo() {
@@ -102,7 +124,7 @@ class Ac_Model_Mixable_Data extends Ac_Mixable {
     
     function registerMixin(Ac_I_Mixin $mixin) {
         parent::registerMixin($mixin);
-        if ($this->mixin instanceof Ac_Model_Data) {
+        if ($this->mixin instanceof Ac_Model_Data && !$this->preserveMetaCache) {
             $this->mixin->setMetaCacheMode(Ac_Model_Data::META_CACHE_NONE);
         }
     }

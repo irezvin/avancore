@@ -4,6 +4,29 @@ class Ac_Test_Model extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
 
+    function _testGetPropertyInfoMemLeak() { // TODO: find proper test case
+        $sam = Sample::getInstance()->getSampleShopProductMapper();
+        $item0 = $sam->createRecord(); // load all necessary data
+        $mem = memory_get_usage();
+        $fields = array_merge($item0->listDataProperties(), array('authorPerson'));
+        Ac_Prototyped::$countInstances = true;
+        Ac_Debug::clear();
+        gc_enable();
+        for ($i = 0; $i < 1000; $i++) {
+            $item = $sam->createRecord();
+            $data = array();
+            //foreach ($fields as $field) $data[$field] = $item->$field;
+            $data = Ac_Accessor::getObjectProperty($item, $fields);
+            $item->cleanupMembers();
+            unset($item);
+            unset($prop);
+            gc_collect_cycles();
+        }
+        $mem1 = memory_get_usage();
+        var_dump($mem, $mem1, $mem1 - $mem, Ac_Debug::$instanceStats);
+        Ac_Prototyped::$countInstances = false;
+    }
+
     function testPartialValidateRelations() {
         $pm = Sample::getInstance()->getSamplePersonMapper();
         $rm = Sample::getInstance()->getSampleReligionMapper();

@@ -2,9 +2,7 @@
 
 class Ac_Debug {
     
-    static $created = array();
-    
-    static $deleted = array();
+    static $instanceStats = array();
     
     static $misc = array();
     
@@ -101,8 +99,7 @@ class Ac_Debug {
     }
     
     static function clear() {
-        self::$created = array();
-        self::$deleted = array();
+        self::$instanceStats = array();
         self::$misc = array();
     }
     
@@ -131,16 +128,22 @@ class Ac_Debug {
         }
     }
     
-    static function reportConstruct($obj) {
-        $c = get_class($obj);
-        if (!isset(self::$created[$c])) self::$created[$c] = 1;
-            else self::$created[$c]++;
+    static function reportConstruct($obj, $mask = true) {
+        if (!is_array($mask) || in_array(get_class($this), $mask)) {
+            $c = get_class($obj);
+            if (!isset(self::$instanceStats[$c])) 
+                self::$instanceStats[$c] = array('c' => 0, 'd' => 0);
+            self::$instanceStats[$c]['c']++;
+        }
     }
     
-    static function reportDestruct($obj) {
-        $c = get_class($obj);
-        if (!isset(self::$deleted[$c])) self::$deleted[$c] = 1;
-            else self::$deleted[$c]++;
+    static function reportDestruct($obj, $mask = true) {
+        if (!is_array($mask) || in_array(get_class($this), $mask)) {
+            $c = get_class($obj);
+            if (!isset(self::$instanceStats[$c])) 
+                self::$instanceStats[$c] = array('c' => 0, 'd' => 0);
+            self::$instanceStats[$c]['d']++;
+        }
     }
     
     static function getInstanceCounters($class = false) {

@@ -57,9 +57,9 @@ class Ac_Form_Control_Repeater extends Ac_Form_Control_Composite {
         
     }
     
-    function listControls() {
-        if (!$this->controlsInit) $this->initControls();
-        return parent::listControls();
+    function listControls($existingOnly = false) {
+        if (!$this->controlsInit && !$existingOnly) $this->initControls();
+        return parent::listControls($existingOnly);
     }
     
     /**

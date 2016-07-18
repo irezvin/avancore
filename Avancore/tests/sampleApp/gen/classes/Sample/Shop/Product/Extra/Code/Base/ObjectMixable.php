@@ -2,15 +2,26 @@
 
 class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
 
-    public $_hasDefaults = true;
-    public $_extraCodePerson = false;
-    public $_extraCodeShopProductsCount = false;
-    public $_extraCodeShopProductsLoaded = false;
-    public $productId = NULL;
-    public $ean = '';
-    public $asin = '';
-    public $gtin = '';
-    public $responsiblePersonId = NULL;
+
+    var $_hasDefaults = true;
+
+    var $_extraCodePerson = false;
+
+    var $_extraCodeShopProductsCount = false;
+
+    var $_extraCodeShopProductsLoaded = false;
+
+    var $productId = NULL;
+
+    var $ean = '';
+
+    var $asin = '';
+
+    var $gtin = '';
+
+    var $responsiblePersonId = NULL;
+
+    protected $preserveMetaCache = true;
     
     /**
      * @var Sample_Shop_Product_Extra_Code_MapperMixable 

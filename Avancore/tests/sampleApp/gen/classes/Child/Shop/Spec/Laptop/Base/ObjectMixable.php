@@ -2,6 +2,8 @@
 
 class Child_Shop_Spec_Laptop_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
 
+
+    protected $preserveMetaCache = true;
     
     /**
      * @var Child_Shop_Spec_Laptop_MapperMixable 

@@ -24,6 +24,7 @@ class Ac_Debug_Profiler_Counter extends Ac_Prototyped {
     
     function __destruct() {
         if ($this->autoStop) $this->stop();
+        parent::__destruct();
     }
     
     protected function setId($id) {

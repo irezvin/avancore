@@ -2,16 +2,26 @@
 
 class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $id = NULL;
-    public $leftCol = 0;
-    public $rightCol = 1;
-    public $parentId = NULL;
-    public $ordering = 0;
-    public $title = '';
-    public $tag = NULL;
-    public $ignore = 0;
-    public $depth = 0;
+
+    var $_hasDefaults = true;
+
+    var $id = NULL;
+
+    var $leftCol = 0;
+
+    var $rightCol = 1;
+
+    var $parentId = NULL;
+
+    var $ordering = 0;
+
+    var $title = '';
+
+    var $tag = NULL;
+
+    var $ignore = 0;
+
+    var $depth = 0;
     
     var $_mapperClass = 'Sample_Tree_Combo_Mapper';
     

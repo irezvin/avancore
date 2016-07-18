@@ -279,7 +279,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
         $r = array();
         foreach ($indexFields as $f) {
             if (!$this->hasProperty($f)) continue;
-            $p = $this->getPropertyInfo($f);
+            $p = $this->getPropertyInfo($f, true);
             $r[] = "'".($p->caption? $p->caption : $f)."'";
         }
         return implode(", ", $r);

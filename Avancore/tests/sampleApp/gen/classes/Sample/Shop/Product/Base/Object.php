@@ -2,31 +2,56 @@
 
 class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_shopCategories = false;
-    public $_shopCategoriesCount = false;
-    public $_shopCategoriesLoaded = false;
-    public $_shopCategoryIds = false;
-    public $_referencedShopProducts = false;
-    public $_referencedShopProductsCount = false;
-    public $_referencedShopProductsLoaded = false;
-    public $_referencedShopProductIds = false;
-    public $_referencingShopProducts = false;
-    public $_referencingShopProductsCount = false;
-    public $_referencingShopProductsLoaded = false;
-    public $_referencingShopProductIds = false;
-    public $_shopSpec = false;
-    public $id = NULL;
-    public $sku = '';
-    public $title = '';
-    public $metaId = NULL;
-    public $pubId = NULL;
-    public $_notePerson = false;
-    public $_noteShopProductsCount = false;
-    public $_noteShopProductsLoaded = false;
-    public $productId = NULL;
-    public $note = '';
-    public $noteAuthorId = NULL;
+
+    var $_hasDefaults = true;
+
+    var $_shopCategories = false;
+
+    var $_shopCategoriesCount = false;
+
+    var $_shopCategoriesLoaded = false;
+
+    var $_shopCategoryIds = false;
+
+    var $_referencedShopProducts = false;
+
+    var $_referencedShopProductsCount = false;
+
+    var $_referencedShopProductsLoaded = false;
+
+    var $_referencedShopProductIds = false;
+
+    var $_referencingShopProducts = false;
+
+    var $_referencingShopProductsCount = false;
+
+    var $_referencingShopProductsLoaded = false;
+
+    var $_referencingShopProductIds = false;
+
+    var $_shopSpec = false;
+
+    var $id = NULL;
+
+    var $sku = '';
+
+    var $title = '';
+
+    var $metaId = NULL;
+
+    var $pubId = NULL;
+
+    var $_notePerson = false;
+
+    var $_noteShopProductsCount = false;
+
+    var $_noteShopProductsLoaded = false;
+
+    var $productId = NULL;
+
+    var $note = '';
+
+    var $noteAuthorId = NULL;
     
     var $_mapperClass = 'Sample_Shop_Product_Mapper';
     

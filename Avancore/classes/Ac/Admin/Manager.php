@@ -1165,6 +1165,10 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $ctx;
     }
     
+    function getPreloadRelations() {
+        return $this->_getPreloadRelations();
+    }
+    
     function _getPreloadRelations() {
         if ($this->_preloadRelations === false) {
             $this->_preloadRelations = array();
@@ -1272,6 +1276,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
 
     /**
+     * Creates Tthe collection without applied filters
      * @return Ac_Model_Collection_Mapper
      */
     function createBareCollection() {

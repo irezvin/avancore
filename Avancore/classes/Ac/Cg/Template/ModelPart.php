@@ -58,6 +58,9 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
         $this->inline = $this->model->inline;
         
         parent::doInit();
+
+        if (!$this->model->inline)
+            $this->vars['preserveMetaCache'] = Ac_Cg_Member::prot(true);
     }
     
     protected function calcInheritance() {
@@ -134,8 +137,6 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
     
     function showModelGenObject() {  
 
-        $fieldVisibility = $this->createAccessors? 'protected' : 'public';
-        
     // ------------------------------------------- modelGenObject -------------------------------------------    
         
 ?>
@@ -144,9 +145,7 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
 
 <?php if ($this->model->parentClassIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genModelClass); ?> extends <?php $this->d($this->parentClass); ?> {
 
-<?php foreach($this->vars as $var => $default) { ?>
-    <?php echo $fieldVisibility; ?> $<?php $this->d($var); ?> = <?php $this->export($default); ?>;
-<?php } ?>
+<?php $this->declareClassMembers ($this->vars, 4); ?>
     
     /**
      * @var <?php echo $this->extraTableClass; ?> 

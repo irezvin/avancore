@@ -2,21 +2,36 @@
 
 class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_shopProducts = false;
-    public $_shopProductsCount = false;
-    public $_shopProductsLoaded = false;
-    public $_shopProductIds = false;
-    public $id = NULL;
-    public $title = NULL;
-    public $leftCol = 0;
-    public $rightCol = 0;
-    public $ignore = 0;
-    public $parentId = NULL;
-    public $ordering = 0;
-    public $depth = 0;
-    public $metaId = NULL;
-    public $pubId = NULL;
+
+    var $_hasDefaults = true;
+
+    var $_shopProducts = false;
+
+    var $_shopProductsCount = false;
+
+    var $_shopProductsLoaded = false;
+
+    var $_shopProductIds = false;
+
+    var $id = NULL;
+
+    var $title = NULL;
+
+    var $leftCol = 0;
+
+    var $rightCol = 0;
+
+    var $ignore = 0;
+
+    var $parentId = NULL;
+
+    var $ordering = 0;
+
+    var $depth = 0;
+
+    var $metaId = NULL;
+
+    var $pubId = NULL;
     
     var $_mapperClass = 'Sample_Shop_Category_Mapper';
     

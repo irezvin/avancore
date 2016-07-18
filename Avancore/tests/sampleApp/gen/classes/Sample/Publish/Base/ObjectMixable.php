@@ -2,21 +2,38 @@
 
 class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
 
-    public $_hasDefaults = true;
-    public $_authorPerson = false;
-    public $_editorPerson = false;
-    public $id = NULL;
-    public $sharedObjectType = '';
-    public $published = 1;
-    public $deleted = 0;
-    public $publishUp = '0000-00-00 00:00:00';
-    public $publishDown = '0000-00-00 00:00:00';
-    public $authorId = NULL;
-    public $editorId = NULL;
-    public $pubChannelId = NULL;
-    public $dateCreated = '0000-00-00 00:00:00';
-    public $dateModified = '0000-00-00 00:00:00';
-    public $dateDeleted = '0000-00-00 00:00:00';
+
+    var $_hasDefaults = true;
+
+    var $_authorPerson = false;
+
+    var $_editorPerson = false;
+
+    var $id = NULL;
+
+    var $sharedObjectType = '';
+
+    var $published = 1;
+
+    var $deleted = 0;
+
+    var $publishUp = '0000-00-00 00:00:00';
+
+    var $publishDown = '0000-00-00 00:00:00';
+
+    var $authorId = NULL;
+
+    var $editorId = NULL;
+
+    var $pubChannelId = NULL;
+
+    var $dateCreated = '0000-00-00 00:00:00';
+
+    var $dateModified = '0000-00-00 00:00:00';
+
+    var $dateDeleted = '0000-00-00 00:00:00';
+
+    protected $preserveMetaCache = true;
     
     /**
      * @var Sample_Publish_MapperMixable 

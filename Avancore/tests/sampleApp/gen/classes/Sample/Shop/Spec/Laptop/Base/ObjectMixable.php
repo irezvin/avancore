@@ -2,11 +2,18 @@
 
 class Sample_Shop_Spec_Laptop_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
 
-    public $_hasDefaults = true;
-    public $_shopSpecLaptopShopSpec = false;
-    public $productId = NULL;
-    public $weight = 0;
-    public $battery = '';
+
+    var $_hasDefaults = true;
+
+    var $_shopSpecLaptopShopSpec = false;
+
+    var $productId = NULL;
+
+    var $weight = 0;
+
+    var $battery = '';
+
+    protected $preserveMetaCache = true;
     
     /**
      * @var Sample_Shop_Spec_Laptop_MapperMixable 

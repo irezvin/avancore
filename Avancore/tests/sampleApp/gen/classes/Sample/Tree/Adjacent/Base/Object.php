@@ -2,12 +2,18 @@
 
 class Sample_Tree_Adjacent_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $id = NULL;
-    public $parentId = NULL;
-    public $ordering = 0;
-    public $title = '';
-    public $tag = NULL;
+
+    var $_hasDefaults = true;
+
+    var $id = NULL;
+
+    var $parentId = NULL;
+
+    var $ordering = 0;
+
+    var $title = '';
+
+    var $tag = NULL;
     
     var $_mapperClass = 'Sample_Tree_Adjacent_Mapper';
     

@@ -2,10 +2,14 @@
 
 class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $id = NULL;
-    public $title = '';
-    public $tag = NULL;
+
+    var $_hasDefaults = true;
+
+    var $id = NULL;
+
+    var $title = '';
+
+    var $tag = NULL;
     
     var $_mapperClass = 'Sample_Tree_Record_Mapper';
     

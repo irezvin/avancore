@@ -407,8 +407,12 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
         return $this;
     }
     
+    /**
+     * @return Ac_Sql_Db
+     */
     function argsArray(array $args) {
         $this->nextQueryArgs = $args;
+        return $this;
     }
     
     function dumpNext($options = self::DUMP_OB_STOP) {

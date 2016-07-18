@@ -176,6 +176,13 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         if ($this->uniqueIndexData && array_diff(array_keys($this->uniqueIndexData), $this->inheritedIndice)) {
             $this->storageVars['uniqueIndices'] = array_diff_key($this->uniqueIndexData, array_flip($this->inheritedIndice));
         }
+        
+        if ($this->createAccessors) {
+            foreach ($this->vars as $k => $v) 
+                if (!$v instanceof Ac_Cg_Member) 
+                    $this->vars[$k] = Ac_Cg_Member::prot($v);
+        }
+        
     }
     
     function getModelClassMembers(Ac_Cg_Model $model) {
@@ -352,8 +359,6 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     }
     
     function showModelGenObject() {  
-
-        $fieldVisibility = $this->createAccessors? 'protected' : 'public';
         
     // ------------------------------------------- modelGenObject -------------------------------------------    
         
@@ -363,9 +368,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 
 <?php if ($this->model->parentClassIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genModelClass); ?> extends <?php $this->d($this->parentClass); ?> {
 
-<?php foreach($this->vars as $var => $default) { ?>
-    <?php echo $fieldVisibility; ?> $<?php $this->d($var); ?> = <?php $this->export($default); ?>;
-<?php } ?>
+<?php $this->declareClassMembers ($this->vars, 4); ?>
     
     var $_mapperClass = <?php $this->str($this->mapperClass); ?>;
     

@@ -2,13 +2,20 @@
 
 class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_relations = false;
-    public $_relationsCount = false;
-    public $_relationsLoaded = false;
-    public $relationTypeId = NULL;
-    public $title = '';
-    public $isSymmetrical = 0;
+
+    var $_hasDefaults = true;
+
+    var $_relations = false;
+
+    var $_relationsCount = false;
+
+    var $_relationsLoaded = false;
+
+    var $relationTypeId = NULL;
+
+    var $title = '';
+
+    var $isSymmetrical = 0;
     
     var $_mapperClass = 'Sample_Relation_Type_Mapper';
     

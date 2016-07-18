@@ -2,17 +2,28 @@
 
 class Sample_Relation_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_relationType = false;
-    public $_otherPerson = false;
-    public $_person = false;
-    public $relationId = NULL;
-    public $personId = 0;
-    public $otherPersonId = 0;
-    public $relationTypeId = 0;
-    public $relationBegin = NULL;
-    public $relationEnd = NULL;
-    public $notes = '';
+
+    var $_hasDefaults = true;
+
+    var $_relationType = false;
+
+    var $_otherPerson = false;
+
+    var $_person = false;
+
+    var $relationId = NULL;
+
+    var $personId = 0;
+
+    var $otherPersonId = 0;
+
+    var $relationTypeId = 0;
+
+    var $relationBegin = NULL;
+
+    var $relationEnd = NULL;
+
+    var $notes = '';
     
     var $_mapperClass = 'Sample_Relation_Mapper';
     

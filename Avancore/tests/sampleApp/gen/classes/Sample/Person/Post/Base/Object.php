@@ -2,16 +2,26 @@
 
 class Sample_Person_Post_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_publish = false;
-    public $_person = false;
-    public $_personPhoto = false;
-    public $id = NULL;
-    public $personId = NULL;
-    public $photoId = NULL;
-    public $title = '';
-    public $content = NULL;
-    public $pubId = NULL;
+
+    var $_hasDefaults = true;
+
+    var $_publish = false;
+
+    var $_person = false;
+
+    var $_personPhoto = false;
+
+    var $id = NULL;
+
+    var $personId = NULL;
+
+    var $photoId = NULL;
+
+    var $title = '';
+
+    var $content = NULL;
+
+    var $pubId = NULL;
     
     var $_mapperClass = 'Sample_Person_Post_Mapper';
     

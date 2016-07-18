@@ -32,6 +32,7 @@ class Sample_Person extends Sample_Person_Base_Object {
     }
     
     function __destruct() {
+        parent::__destruct();
         self::$destructed[$this->instanceId] = true;
     }
     

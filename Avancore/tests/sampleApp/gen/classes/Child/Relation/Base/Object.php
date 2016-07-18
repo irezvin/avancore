@@ -2,8 +2,10 @@
 
 class Child_Relation_Base_Object extends Sample_Relation {
 
-    public $_incomingPerson = false;
-    public $_outgoingPerson = false;
+
+    var $_incomingPerson = false;
+
+    var $_outgoingPerson = false;
     
     var $_mapperClass = 'Child_Relation_Mapper';
     

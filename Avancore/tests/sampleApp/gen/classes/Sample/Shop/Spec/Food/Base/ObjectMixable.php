@@ -2,12 +2,20 @@
 
 class Sample_Shop_Spec_Food_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
 
-    public $_hasDefaults = true;
-    public $_shopSpecFoodShopSpec = false;
-    public $productId = NULL;
-    public $storageType = 'shelfStable';
-    public $storageTerm = 0;
-    public $storageTermUnit = 'days';
+
+    var $_hasDefaults = true;
+
+    var $_shopSpecFoodShopSpec = false;
+
+    var $productId = NULL;
+
+    var $storageType = 'shelfStable';
+
+    var $storageTerm = 0;
+
+    var $storageTermUnit = 'days';
+
+    protected $preserveMetaCache = true;
     
     /**
      * @var Sample_Shop_Spec_Food_MapperMixable 

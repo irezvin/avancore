@@ -2,11 +2,16 @@
 
 class Sample_Shop_Spec_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_shopProduct = false;
-    public $productId = NULL;
-    public $detailsUrl = '';
-    public $specsType = '';
+
+    var $_hasDefaults = true;
+
+    var $_shopProduct = false;
+
+    var $productId = NULL;
+
+    var $detailsUrl = '';
+
+    var $specsType = '';
     
     var $_mapperClass = 'Sample_Shop_Spec_Mapper';
     

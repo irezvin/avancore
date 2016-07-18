@@ -201,7 +201,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
         foreach ($rec->listFields() as $p) {
             $prop = $rec->getPropertyInfo($p, true);
             if (isset($prop->showInForm) && !$prop->showInForm) continue;
-            $conf = Ac_Util::m($this->formFieldDefaults, $conv->getControlSettings($prop));
+            $conf = Ac_Util::m($this->formFieldDefaults, $conv->getControlSettings($prop, $rec));
             if ($do !== false) {
                 if (!isset($conf['displayOrder'])) 
                     $conf['displayOrder'] = $do;
