@@ -61,7 +61,7 @@ class Ac_Table_Column_Published extends Ac_Table_Column {
         return $res;
     }
     
-    function getData($record, $rowNo, $fieldName) {
+    function getData($record, $rowNo, $fieldName = null) {
         $data = intval(parent::getData($record, $rowNo, $this->fieldName));
         $img = $data? $this->getPublishedImg() : $this->getUnpublishedImg();
         $alt = $data? $this->getPublishedAlt() : $this->getUnpublishedAlt();

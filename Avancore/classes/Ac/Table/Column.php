@@ -222,7 +222,7 @@ class Ac_Table_Column {
         if ($this->_staticMeta === false) {
             if (!$this->useAeDataFacilities) $res = null; else {
                 $record = $this->_table->getRecordPrototype(); 
-                $res = $this->getPropertyInfo($record, $fieldName, true);        
+                $res = $this->getPropertyInfo($record, $fieldName, true);
             }
             $this->_staticMeta = $res;
         }
@@ -234,7 +234,7 @@ class Ac_Table_Column {
      * @param object record Database record
      * @param int rowNo number of current row in the table
      */
-    function getData($record, $rowNo, $fieldName) {
+    function getData($record, $rowNo, $fieldName = null) {
         if (is_null($fieldName)) $fieldName = $this->fieldName;
         $res = $this->getRecordProperty($record, $fieldName);
         return $res;

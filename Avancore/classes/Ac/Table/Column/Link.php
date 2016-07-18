@@ -36,7 +36,7 @@ class Ac_Table_Column_Link extends Ac_Table_Column {
         $this->_aAttribs = Ac_Util::mkAttribs(Ac_Util::m($this->linkAttribs, array('title' => $this->linkTitle)));
     }
     
-    function getData($record, $rowNo) {
+    function getData($record, $rowNo, $fieldName = null) {
         if ($strUrl = $this->getStringUrl($record)) {
             $res =  '<a '.$this->_aAttribs.' href="'.$strUrl.'">'.$this->getLinkText($record, $rowNo).'</a>';
         } else $res = $this->nullText;
