@@ -57,7 +57,7 @@ class Ac_Legacy_Controller_Context {
                 else $p = $path;
             $val = $this->getData($p, $defaultValue);
             if (!is_array($path)) $res[$path] = $val;
-                else Ac_Util::simpleSetArrayByPath ($res, $path, $val);
+                else Ac_Util::setArrayByPathRef ($res, $path, $val);
         }
         return $res;
     }

@@ -202,7 +202,7 @@ class Ac_Model_Relation_Provider_Sql_Omni extends Ac_Model_Relation_Provider_Sql
                     }
                 } else {
                     foreach ($mid as $i => $keyValue) {
-                        Ac_Util::simpleSetArrayByPathNoRef($srcIndexed, array_values($keyValue), $objects[$i], $this->unique);
+                        Ac_Util::setArrayByPath($srcIndexed, array_values($keyValue), $objects[$i], $this->unique);
                     }
                 }
             } else {

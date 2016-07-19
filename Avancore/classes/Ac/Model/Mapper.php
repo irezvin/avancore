@@ -2565,7 +2565,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                         $res[$row[0]][$row[1]][$row[2]][$row[3]] = $singleDim[$key];
                 } else {
                     foreach ($fieldValues as $key => $row) {
-                        Ac_Util::simpleSetArrayByPathNoRef($res, $row, $singleDim[$key]);
+                        Ac_Util::setArrayByPath($res, $row, $singleDim[$key]);
                     }
                 }
             }

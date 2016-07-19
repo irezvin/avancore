@@ -752,7 +752,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                     foreach ($map as $m) {
                         $countPath = $m[0];
                         $dataKey = $m[1];
-                        $count = Ac_Util::simpleGetArrayByPath($counts, $countPath, 0);
+                        $count = Ac_Util::getArrayByPathRef($counts, $countPath, 0);
                         $this->setVal($srcData[$dataKey], $this->srcCountVarName, $count);
                     }
                 }
@@ -931,7 +931,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                         continue;
                     }
                 }
-                if (is_array($m[1])) Ac_Util::simpleSetArrayByPath ($res, $m[1], $toSet);
+                if (is_array($m[1])) Ac_Util::setArrayByPathRef ($res, $m[1], $toSet);
                     else $res[$m[1]] = $toSet; 
             }
         } else {
@@ -942,7 +942,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                     if ($useCounts) $toSet = count($m[0]);
                     else {
                         foreach ($m[0] as $rowPath) {
-                            $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
+                            $row = Ac_Util::getArrayByPathRef($rows, $rowPath, false);
                             if ($row !== false) {
                                $toSet = array_merge($toSet, $row);
                             }
@@ -954,7 +954,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                     if ($useCounts) {
                         $toSet = isset($m[0][0]) && $m[0][0] !== false && $m[0][0] !== null? 1: 0;
                     } else {
-                        $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
+                        $row = Ac_Util::getArrayByPathRef($rows, $rowPath, false);
                         if ($row !== false) {
                            $toSet = $row;
                         }
@@ -967,7 +967,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                         continue;
                     }
                 }
-                if (is_array($m[1])) Ac_Util::simpleSetArrayByPath ($res, $m[1], $toSet);
+                if (is_array($m[1])) Ac_Util::setArrayByPathRef ($res, $m[1], $toSet);
                     else $res[$m[1]] = $toSet; 
             }
         }
@@ -1043,7 +1043,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 if ($mapMultiple && !$destIsUnique) {
                     $toSet = array();
                     foreach ($m[0] as $rowPath) {
-                        $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
+                        $row = Ac_Util::getArrayByPathRef($rows, $rowPath, false);
                         if ($row !== false) {
                            $toSet = array_merge($toSet, $row);
                            if ($biDirectional) $this->linkBack($row, $data[$dataKey], $this->destVarName, 
@@ -1052,7 +1052,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                     }
                 } else {
                     $rowPath = $m[0];
-                    $row = Ac_Util::simpleGetArrayByPath($rows, $rowPath, false);
+                    $row = Ac_Util::getArrayByPathRef($rows, $rowPath, false);
                     if ($row !== false) {
                        $toSet = $row;
                        if ($biDirectional) $this->linkBack($row, $data[$dataKey], $this->destVarName, !$destIsUnique, $srcIsUnique);
@@ -1231,12 +1231,12 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     
     protected function putRowToArray(& $row, & $instance, & $array, $keys, $unique) {
         foreach ($keys as $key) $path[] = $row[$key];
-        Ac_Util::simpleSetArrayByPathNoRef($array, $path, $instance, $unique);
+        Ac_Util::setArrayByPath($array, $path, $instance, $unique);
     }
     
     protected function putInstanceToArray(& $instance, & $array, $keys, $isDest, $unique) {
         $path = $this->getValues($instance, $keys);
-        Ac_Util::simpleSetArrayByPathNoRef($array, $path, $instance, $unique);
+        Ac_Util::setArrayByPath($array, $path, $instance, $unique);
     }
     
     protected function getFromArray($src, $fieldName) {

@@ -53,7 +53,7 @@ abstract class Ac_Model_Relation_Provider extends Ac_Prototyped {
     
     protected function putRowToArray(& $row, & $instance, & $array, $keys, $unique) {
         foreach ($keys as $key) $path[] = $row[$key];
-        Ac_Util::simpleSetArrayByPathNoRef($array, $path, $instance, $unique);
+        Ac_Util::setArrayByPath($array, $path, $instance, $unique);
     }
 
     /**

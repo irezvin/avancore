@@ -759,7 +759,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
                                     else $res[$i] = 0;
                             } else {
                                 foreach ($fieldValues as $i => $row)
-                                    $res[$i] = Ac_Util::simpleGetArrayByPath ($arr, $row, 0);
+                                    $res[$i] = Ac_Util::getArrayByPathRef ($arr, $row, 0);
                             }
                         } else {
                             $res = $arr;

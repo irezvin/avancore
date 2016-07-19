@@ -37,7 +37,7 @@ class Ac_Param_Source_Context extends Ac_Prototyped implements Ac_I_Param_Destin
     
     function setParamValue(array $path, $value) {
         $tmp = $this->data->getData();
-        Ac_Util::simpleSetArrayByPath($tmp, $path, $value);
+        Ac_Util::setArrayByPathRef($tmp, $path, $value);
         $this->data->setData($tmp);
     }
     
