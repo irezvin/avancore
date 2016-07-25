@@ -1,0 +1,9 @@
+[types],
+name,description
+typeC,typeC description
+typeD,typeD description
+,
+[items],
+name,type
+item1,typeC
+item2,typeD

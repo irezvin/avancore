@@ -247,14 +247,20 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
             }
         }
         
-        if ($this->otherJoins) $res .= implode("\n", $this->otherJoins);
-        if (!$withFirstAlias) $skipAliases[] = $orderedAliases[0];
+        $oj = $this->otherJoins;
+        $na = array();
+        if (!$withFirstAlias) {
+            $skipAliases[] = $orderedAliases[0];
+            if ($oj !== false) $res .= implode("\n", $this->otherJoins);
+            $oj = false;
+        }
         $first = true;
         foreach (array_diff($orderedAliases, $skipAliases) as $a) {
+            if (in_array($a, $na)) continue;
             if (isset($this->joinOverrides[$a])) {
                 $jcp = $this->joinOverrides[$a];
             } else {
-                $jcp = $this->getTable($a)->getJoinClausePart(false, $first);
+                $jcp = $this->getTable($a)->getJoinClausePart($na, false, $first);
             }
             if (strlen($jcp)) {
             	if ($jcp{0} == ',') $res = $res.",\n".substr($jcp, 1);
@@ -262,6 +268,10 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
             		if (strlen($res)) $res .= "\n";
             		$res .= $jcp;
             	}
+            }
+            if ($oj !== false) {
+                 $res .= implode("\n", $this->otherJoins);
+                 $oj = false;
             }
             $first = false;
         }
@@ -352,6 +362,10 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
             $res = '';
         }
         return $res;
+    }
+    
+    function getAllAliases() {
+        return $this->_getOrderedAliases($this->getUsedAliases());
     }
     
     function _getOrderedAliases($usedAliases) {

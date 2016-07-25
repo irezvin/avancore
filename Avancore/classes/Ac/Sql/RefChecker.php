@@ -77,11 +77,11 @@ class Ac_Sql_RefChecker {
 		return $res;
 	}
 	
-	function createSelect($tableName, $alias = false, $otherTableName = false, $otherRelName = false, $type = 'INNER JOIN', $obeyNonRefValues = false) {
+	function getTablePrototypes($tableName, $alias = false, $otherTableName = false, $otherRelName = false, $type = 'INNER JOIN', $obeyNonRefValues = false, $dbName = false) {
 		if (!$alias) $alias = $tableName;
 		$tablePrototypes = array(
 			$alias => array(
-				'name' => $tableName,
+				'name' => strlen($dbName)? new Ae_Sql_Expression($this->_db->n(array($dbName, $tableName))) : $tableName,
 			), 
 		);
 		$rtc = $this->_getRelationsToCheck();
@@ -104,7 +104,7 @@ class Ac_Sql_RefChecker {
 						}
 					}
 					$tablePrototypes['rel_'.$relTableName.$suffix] = array(
-						'name' => $rel->table,
+						'name' => strlen($dbName)? new Ae_Sql_Expression($this->_db->n(array($dbName, $rel->table))) : $rel->table,
 						'joinsAlias' => $alias,
 						'joinType' => $type,
 						'joinsOn' => $joinsOn,
@@ -114,12 +114,22 @@ class Ac_Sql_RefChecker {
 		} else {
 			if (!$this->suppressWarnings) trigger_error("Table \'$tableName\' doesn't have outgoing references", E_USER_WARNING);
 		}
-		$s = new Ac_Sql_Select($this->_db, array(
-			'primaryAlias' => $alias,
+		return $tablePrototypes;
+        
+    }
+    
+    /**
+     * @return Ac_Sql_Select
+     */
+	function createSelect($tableName, $alias = false, $otherTableName = false, $otherRelName = false, $type = 'INNER JOIN', $obeyNonRefValues = false, $dbName = false) {
+        $tablePrototypes = $this->getTablePrototypes($tableName, $alias, $otherTableName, $otherRelName, $type, $obeyNonRefValues, $dbName);
+        $ak = array_keys($tablePrototypes);
+        $s = new Ac_Sql_Select($this->_db, array(
+			'primaryAlias' => $ak[0],
 			'tables' => $tablePrototypes,
 		));
 		$s->setUsedAliases(array_keys($tablePrototypes));
-		return $s;
+        return $s;
 	}
 
 	/**

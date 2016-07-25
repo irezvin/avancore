@@ -146,18 +146,25 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
      	";
 		$this->assertEqual($this->normalizeStatement($select->getFromClause()), $this->normalizeStatement($rightStatement5, true));
 	}
-	
+    
 	function testSupplementaryFunctions() {
 		$sqlSelect = $this->createMySelect();
-		//$this->assertTrue($sqlSelect->hasTable('people'));
+		
+        //$this->assertTrue($sqlSelect->hasTable('people'));
 		$this->assertIsA($sqlSelect->getTable('people'), 'Ac_Sql_Select_Table');
 		$this->expectError(new PatternExpectation('/is already in tables collection/i'));
 		$sqlSelect->addTable($options  = array(
 			'alias' => 'people'
 		));
 		//$this->assertFalse($sqlSelect->hasTable('foobar'));
-		$this->expectError(new PatternExpectation('/no such table/i'));
-		$sqlSelect->getTable('foobar');
+		//$this->expectError(new PatternExpectation('/no such table/i'));
+        $e = null;
+        try {
+            $sqlSelect->getTable('foobar');
+        } catch (Ac_E_InvalidCall $e) {
+            
+        }
+        $this->assertTrue($e !== null);
 		
 		unset($sqlSelect);
 		$sqlSelect = $this->createMySelect();
@@ -177,7 +184,7 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
 			`#__people` AS `people`,
      		`#__relations` AS `relations`
      	";
-		$this->assertEqual($this->normalizeStatement($sqlSelect->getFromClause()), $this->normalizeStatement($rightStatement, true));
+		$this->assertEqual($this->normalizeStatement($a = $sqlSelect->getFromClause()), $this->normalizeStatement($rightStatement, true));
 		
 		$t->joinType = 'NATURAL JOIN';
 		$t->joinsOn = array('foo');

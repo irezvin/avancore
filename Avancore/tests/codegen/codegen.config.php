@@ -36,7 +36,7 @@ $config = array(
         'ignoredColumnsInJunctionTables' => array(
             '#__shop_product_related' => array('ignore'),
         ),
-        'autoTablesAll' => true,
+        'autoTablesAll' => '/^#__/',
 		'autoTablesIgnore' => array(
             '#__tree_nested_sets',
             '#__shop_product_upc',

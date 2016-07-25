@@ -245,7 +245,7 @@ CREATE TABLE `ac_publish` (
   KEY `fkPubEditor` (`editorId`),
   CONSTRAINT `fkPubAuthor` FOREIGN KEY (`authorId`) REFERENCES `ac_people` (`personId`) ON DELETE SET NULL ON UPDATE SET NULL,
   CONSTRAINT `fkPubEditor` FOREIGN KEY (`editorId`) REFERENCES `ac_people` (`personId`) ON DELETE SET NULL ON UPDATE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=204 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=375 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -254,7 +254,7 @@ CREATE TABLE `ac_publish` (
 
 LOCK TABLES `ac_publish` WRITE;
 /*!40000 ALTER TABLE `ac_publish` DISABLE KEYS */;
-INSERT INTO `ac_publish` VALUES (1,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,6,'123456','2014-11-20 01:22:31','2014-12-20 01:22:31','0000-00-00 00:00:00'),(117,'Sample_Person_Post_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,7,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(118,'Sample_Person_Post_Mapper',0,1,'2012-01-01 00:00:00','2013-01-01 00:00:00',3,3,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(190,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(191,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(192,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(193,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(200,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',8,9,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(201,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(202,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(203,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `ac_publish` VALUES (1,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,6,'123456','2014-11-20 01:22:31','2014-12-20 01:22:31','0000-00-00 00:00:00'),(117,'Sample_Person_Post_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,7,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(118,'Sample_Person_Post_Mapper',0,1,'2012-01-01 00:00:00','2013-01-01 00:00:00',3,3,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(190,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(191,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(192,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(193,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(371,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',8,9,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(372,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(373,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(374,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
 /*!40000 ALTER TABLE `ac_publish` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -441,7 +441,7 @@ CREATE TABLE `ac_shop_meta` (
   `metaNoindex` int(1) unsigned NOT NULL DEFAULT '0',
   `sharedObjectType` varchar(255) NOT NULL DEFAULT 'other',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=244 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=415 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -450,7 +450,7 @@ CREATE TABLE `ac_shop_meta` (
 
 LOCK TABLES `ac_shop_meta` WRITE;
 /*!40000 ALTER TABLE `ac_shop_meta` DISABLE KEYS */;
-INSERT INTO `ac_shop_meta` VALUES (1,'Купить Товар 1 он-лайн','Страница товара 1','Товар 1, купить',0,'product'),(43,'','','',0,'product'),(230,'','','',0,'product'),(231,'','','',0,'product'),(232,'','','',0,'product'),(233,'','','',0,'product'),(240,'','','',0,'product'),(241,'','','',0,'product'),(242,'','','',0,'product'),(243,'','','',0,'product');
+INSERT INTO `ac_shop_meta` VALUES (1,'Купить Товар 1 он-лайн','Страница товара 1','Товар 1, купить',0,'product'),(43,'','','',0,'product'),(230,'','','',0,'product'),(231,'','','',0,'product'),(232,'','','',0,'product'),(233,'','','',0,'product'),(411,'','','',0,'product'),(412,'','','',0,'product'),(413,'','','',0,'product'),(414,'','','',0,'product');
 /*!40000 ALTER TABLE `ac_shop_meta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -506,7 +506,7 @@ CREATE TABLE `ac_shop_product_extraCodes` (
 
 LOCK TABLES `ac_shop_product_extraCodes` WRITE;
 /*!40000 ALTER TABLE `ac_shop_product_extraCodes` DISABLE KEYS */;
-INSERT INTO `ac_shop_product_extraCodes` VALUES (2,'1','2','3',3),(18,'','','',NULL),(19,'A','B','C',10),(20,'A1','B1','C1',11),(21,'','','',NULL);
+INSERT INTO `ac_shop_product_extraCodes` VALUES (2,'1','2','3',3),(154,'','','',NULL),(155,'A','B','C',10),(156,'A1','B1','C1',11),(157,'','','',NULL);
 /*!40000 ALTER TABLE `ac_shop_product_extraCodes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -534,7 +534,7 @@ CREATE TABLE `ac_shop_product_notes` (
 
 LOCK TABLES `ac_shop_product_notes` WRITE;
 /*!40000 ALTER TABLE `ac_shop_product_notes` DISABLE KEYS */;
-INSERT INTO `ac_shop_product_notes` VALUES (1,'xxx',3),(18,'',NULL),(19,'',NULL),(20,'',NULL),(21,'foobar',12);
+INSERT INTO `ac_shop_product_notes` VALUES (1,'xxx',3),(154,'',NULL),(155,'',NULL),(156,'',NULL),(157,'foobar',12);
 /*!40000 ALTER TABLE `ac_shop_product_notes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -588,7 +588,7 @@ CREATE TABLE `ac_shop_product_upc` (
 
 LOCK TABLES `ac_shop_product_upc` WRITE;
 /*!40000 ALTER TABLE `ac_shop_product_upc` DISABLE KEYS */;
-INSERT INTO `ac_shop_product_upc` VALUES (1,'1234'),(18,''),(19,''),(20,''),(21,'');
+INSERT INTO `ac_shop_product_upc` VALUES (1,'1234'),(154,''),(155,''),(156,''),(157,'');
 /*!40000 ALTER TABLE `ac_shop_product_upc` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -608,7 +608,7 @@ CREATE TABLE `ac_shop_products` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idxPubId` (`pubId`),
   CONSTRAINT `fkPersonPublish` FOREIGN KEY (`pubId`) REFERENCES `ac_publish` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=158 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -617,7 +617,7 @@ CREATE TABLE `ac_shop_products` (
 
 LOCK TABLES `ac_shop_products` WRITE;
 /*!40000 ALTER TABLE `ac_shop_products` DISABLE KEYS */;
-INSERT INTO `ac_shop_products` VALUES (1,'PROD01','Товар 1',1,1),(2,'PROD02','Товар 2',NULL,NULL),(3,'PROD03','Товар 3',NULL,NULL),(4,'PROD04','Товар 4',NULL,NULL),(9,'xxx','yyy',NULL,NULL),(10,'mc-food1','Food 1',NULL,NULL),(11,'mc-computer1','Computer 1',NULL,NULL),(12,'mc-laptop1','Laptop 1',NULL,NULL),(13,'mc-laptop2','Laptop 2',NULL,NULL),(18,'1337','test product',240,200),(19,'f00','test prod 2',241,201),(20,'f01','test prod 3',242,202),(21,'PROD_NOTE','product with a note',243,203);
+INSERT INTO `ac_shop_products` VALUES (1,'PROD01','Товар 1',1,1),(2,'PROD02','Товар 2',NULL,NULL),(3,'PROD03','Товар 3',NULL,NULL),(4,'PROD04','Товар 4',NULL,NULL),(9,'xxx','yyy',NULL,NULL),(10,'mc-food1','Food 1',NULL,NULL),(11,'mc-computer1','Computer 1',NULL,NULL),(12,'mc-laptop1','Laptop 1',NULL,NULL),(13,'mc-laptop2','Laptop 2',NULL,NULL),(154,'1337','test product',411,371),(155,'f00','test prod 2',412,372),(156,'f01','test prod 3',413,373),(157,'PROD_NOTE','product with a note',414,374);
 /*!40000 ALTER TABLE `ac_shop_products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -939,6 +939,445 @@ LOCK TABLES `ac_tree_records` WRITE;
 INSERT INTO `ac_tree_records` VALUES (1,'-= top =-',NULL),(2,'A',NULL),(3,'A.1',NULL),(4,'A.2',NULL);
 /*!40000 ALTER TABLE `ac_tree_records` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `im_template`
+--
+
+DROP TABLE IF EXISTS `im_template`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_template` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `importId` int(10) unsigned NOT NULL,
+  `lineNo` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_template`
+--
+
+LOCK TABLES `im_template` WRITE;
+/*!40000 ALTER TABLE `im_template` DISABLE KEYS */;
+/*!40000 ALTER TABLE `im_template` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_aipk`
+--
+
+DROP TABLE IF EXISTS `im_test_aipk`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_aipk` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `content` varchar(45) DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_aipk`
+--
+
+LOCK TABLES `im_test_aipk` WRITE;
+/*!40000 ALTER TABLE `im_test_aipk` DISABLE KEYS */;
+/*!40000 ALTER TABLE `im_test_aipk` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_aipk_import`
+--
+
+DROP TABLE IF EXISTS `im_test_aipk_import`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_aipk_import` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `importId` int(11) NOT NULL DEFAULT '1',
+  `itemId` int(11) DEFAULT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `content` varchar(45) DEFAULT NULL,
+  `otherContent` varchar(45) DEFAULT NULL,
+  `isDraft` int(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=286 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_aipk_import`
+--
+
+LOCK TABLES `im_test_aipk_import` WRITE;
+/*!40000 ALTER TABLE `im_test_aipk_import` DISABLE KEYS */;
+/*!40000 ALTER TABLE `im_test_aipk_import` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_aipk_linked`
+--
+
+DROP TABLE IF EXISTS `im_test_aipk_linked`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_aipk_linked` (
+  `masterId` int(11) NOT NULL,
+  `name` varchar(45) NOT NULL,
+  `otherContent` varchar(45) NOT NULL DEFAULT '',
+  PRIMARY KEY (`masterId`),
+  UNIQUE KEY `name_UNIQUE` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_aipk_linked`
+--
+
+LOCK TABLES `im_test_aipk_linked` WRITE;
+/*!40000 ALTER TABLE `im_test_aipk_linked` DISABLE KEYS */;
+/*!40000 ALTER TABLE `im_test_aipk_linked` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_categories`
+--
+
+DROP TABLE IF EXISTS `im_test_categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_categories` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  `parentId` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idxTitle` (`name`),
+  KEY `fk_im_test_categories_1_idx` (`parentId`),
+  CONSTRAINT `fk_im_test_categories_1` FOREIGN KEY (`parentId`) REFERENCES `im_test_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_categories`
+--
+
+LOCK TABLES `im_test_categories` WRITE;
+/*!40000 ALTER TABLE `im_test_categories` DISABLE KEYS */;
+/*!40000 ALTER TABLE `im_test_categories` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_categories_import`
+--
+
+DROP TABLE IF EXISTS `im_test_categories_import`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_categories_import` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `categoryId` int(10) DEFAULT NULL,
+  `categoryName` varchar(45) DEFAULT NULL,
+  `description` mediumtext,
+  `parentId` int(10) DEFAULT NULL,
+  `parentName` varchar(45) DEFAULT NULL,
+  `importStatus` varchar(45) NOT NULL DEFAULT 'unprocessed',
+  `problems` varchar(45) DEFAULT NULL,
+  `importId` int(10) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idxStatus` (`importStatus`),
+  KEY `idxName` (`categoryName`),
+  KEY `idxItemId` (`categoryId`),
+  KEY `idxTypeId` (`parentId`),
+  KEY `idxType` (`parentName`),
+  KEY `idxImportId` (`importId`)
+) ENGINE=InnoDB AUTO_INCREMENT=820 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_categories_import`
+--
+
+LOCK TABLES `im_test_categories_import` WRITE;
+/*!40000 ALTER TABLE `im_test_categories_import` DISABLE KEYS */;
+/*!40000 ALTER TABLE `im_test_categories_import` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_classifiers_import`
+--
+
+DROP TABLE IF EXISTS `im_test_classifiers_import`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_classifiers_import` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `classifierId` int(10) DEFAULT NULL,
+  `title` varchar(45) DEFAULT NULL,
+  `description` varchar(45) DEFAULT NULL,
+  `classifierType` varchar(45) NOT NULL DEFAULT '',
+  `importStatus` varchar(45) NOT NULL DEFAULT 'unprocessed',
+  `problems` varchar(45) DEFAULT NULL,
+  `importId` int(10) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idxStatus` (`importStatus`),
+  KEY `idxName` (`title`),
+  KEY `idxItemId` (`classifierId`),
+  KEY `idxType` (`classifierType`),
+  KEY `idxImportId` (`importId`)
+) ENGINE=InnoDB AUTO_INCREMENT=577 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_classifiers_import`
+--
+
+LOCK TABLES `im_test_classifiers_import` WRITE;
+/*!40000 ALTER TABLE `im_test_classifiers_import` DISABLE KEYS */;
+INSERT INTO `im_test_classifiers_import` VALUES (574,1,'typeC',NULL,'type','unchanged',NULL,1),(575,2,'typeD',NULL,'type','unchanged',NULL,1);
+/*!40000 ALTER TABLE `im_test_classifiers_import` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_item_categories`
+--
+
+DROP TABLE IF EXISTS `im_test_item_categories`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_item_categories` (
+  `itemId` int(10) unsigned NOT NULL,
+  `categoryId` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`itemId`,`categoryId`),
+  KEY `fk_im_test_item_categories_1_idx` (`categoryId`),
+  KEY `fk_im_test_item_categories_1_idx1` (`itemId`),
+  CONSTRAINT `categoryId` FOREIGN KEY (`categoryId`) REFERENCES `im_test_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `itemId` FOREIGN KEY (`itemId`) REFERENCES `im_test_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_item_categories`
+--
+
+LOCK TABLES `im_test_item_categories` WRITE;
+/*!40000 ALTER TABLE `im_test_item_categories` DISABLE KEYS */;
+/*!40000 ALTER TABLE `im_test_item_categories` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_item_categories_import`
+--
+
+DROP TABLE IF EXISTS `im_test_item_categories_import`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_item_categories_import` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `categoryId` int(10) DEFAULT NULL,
+  `categoryName` mediumtext,
+  `importStatus` varchar(45) NOT NULL DEFAULT 'unprocessed',
+  `problems` varchar(45) DEFAULT NULL,
+  `importId` int(10) NOT NULL,
+  `lineNo` int(10) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idxStatus` (`importStatus`),
+  KEY `idxName` (`categoryId`),
+  KEY `idxLineNo` (`lineNo`),
+  KEY `idxImportId` (`importId`)
+) ENGINE=InnoDB AUTO_INCREMENT=538 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_item_categories_import`
+--
+
+LOCK TABLES `im_test_item_categories_import` WRITE;
+/*!40000 ALTER TABLE `im_test_item_categories_import` DISABLE KEYS */;
+/*!40000 ALTER TABLE `im_test_item_categories_import` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_items`
+--
+
+DROP TABLE IF EXISTS `im_test_items`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_items` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  `description` mediumtext,
+  `imageFileName` varchar(255) DEFAULT NULL,
+  `thumbFileName` varchar(255) DEFAULT NULL,
+  `typeId` int(10) unsigned DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idxName` (`name`),
+  KEY `fk_im_test_items_1_idx` (`typeId`),
+  CONSTRAINT `fk_im_test_items_1` FOREIGN KEY (`typeId`) REFERENCES `im_test_types` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_items`
+--
+
+LOCK TABLES `im_test_items` WRITE;
+/*!40000 ALTER TABLE `im_test_items` DISABLE KEYS */;
+/*!40000 ALTER TABLE `im_test_items` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_items_import`
+--
+
+DROP TABLE IF EXISTS `im_test_items_import`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_items_import` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `itemId` int(10) DEFAULT NULL,
+  `name` varchar(45) DEFAULT NULL,
+  `description` mediumtext,
+  `typeId` int(10) DEFAULT NULL,
+  `type` varchar(45) DEFAULT NULL,
+  `importStatus` varchar(45) NOT NULL DEFAULT 'unprocessed',
+  `problems` varchar(45) DEFAULT NULL,
+  `relatedText1` mediumtext,
+  `pictureUrl` varchar(255) DEFAULT NULL,
+  `importId` int(10) NOT NULL,
+  `lineNo` int(10) NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idxStatus` (`importStatus`),
+  KEY `idxName` (`name`),
+  KEY `idxItemId` (`itemId`),
+  KEY `idxTypeId` (`typeId`),
+  KEY `idxType` (`type`),
+  KEY `idxLineNo` (`lineNo`),
+  KEY `idxImportId` (`importId`),
+  KEY `idxPictureUrl` (`pictureUrl`)
+) ENGINE=InnoDB AUTO_INCREMENT=374 DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_items_import`
+--
+
+LOCK TABLES `im_test_items_import` WRITE;
+/*!40000 ALTER TABLE `im_test_items_import` DISABLE KEYS */;
+INSERT INTO `im_test_items_import` VALUES (372,NULL,'item1',NULL,1,'typeC','unprocessed',NULL,NULL,NULL,1,8),(373,NULL,'item2',NULL,2,'typeD','unprocessed',NULL,NULL,NULL,1,9);
+/*!40000 ALTER TABLE `im_test_items_import` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_pictures_import`
+--
+
+DROP TABLE IF EXISTS `im_test_pictures_import`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_pictures_import` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `importId` int(10) NOT NULL,
+  `importStatus` varchar(45) NOT NULL DEFAULT 'unprocessed',
+  `problems` varchar(45) DEFAULT NULL,
+  `pictureUrl` varchar(255) DEFAULT NULL,
+  `pictureFileName` varchar(255) DEFAULT NULL,
+  `thumbFileName` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `idxStatus` (`importStatus`),
+  KEY `idxImportId` (`importId`),
+  KEY `idxPictureUrl` (`pictureUrl`),
+  KEY `idxPictureFileName` (`pictureFileName`),
+  KEY `idxThumbFileName` (`thumbFileName`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_pictures_import`
+--
+
+LOCK TABLES `im_test_pictures_import` WRITE;
+/*!40000 ALTER TABLE `im_test_pictures_import` DISABLE KEYS */;
+/*!40000 ALTER TABLE `im_test_pictures_import` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_related`
+--
+
+DROP TABLE IF EXISTS `im_test_related`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_related` (
+  `itemId` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `relatedText1` mediumtext NOT NULL,
+  PRIMARY KEY (`itemId`),
+  KEY `fk_im_test_related_1_idx` (`itemId`),
+  CONSTRAINT `fk_im_test_related_1` FOREIGN KEY (`itemId`) REFERENCES `im_test_items` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_related`
+--
+
+LOCK TABLES `im_test_related` WRITE;
+/*!40000 ALTER TABLE `im_test_related` DISABLE KEYS */;
+/*!40000 ALTER TABLE `im_test_related` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_source_of_copy`
+--
+
+DROP TABLE IF EXISTS `im_test_source_of_copy`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_source_of_copy` (
+  `id` varchar(45) NOT NULL,
+  `name` varchar(45) NOT NULL DEFAULT '',
+  `description` varchar(45) NOT NULL DEFAULT '',
+  `thisWillBeRelatedText` varchar(45) NOT NULL DEFAULT '',
+  `somethingElse` varchar(45) DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_source_of_copy`
+--
+
+LOCK TABLES `im_test_source_of_copy` WRITE;
+/*!40000 ALTER TABLE `im_test_source_of_copy` DISABLE KEYS */;
+INSERT INTO `im_test_source_of_copy` VALUES ('a','aaa','aaa description','aaa related','aaa else'),('b','bbb','bbb description','bbb related','bbb else');
+/*!40000 ALTER TABLE `im_test_source_of_copy` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `im_test_types`
+--
+
+DROP TABLE IF EXISTS `im_test_types`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `im_test_types` (
+  `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+  `name` varchar(45) NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `idxTitle` (`name`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `im_test_types`
+--
+
+LOCK TABLES `im_test_types` WRITE;
+/*!40000 ALTER TABLE `im_test_types` DISABLE KEYS */;
+INSERT INTO `im_test_types` VALUES (1,'typeC'),(2,'typeD');
+/*!40000 ALTER TABLE `im_test_types` ENABLE KEYS */;
+UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -949,4 +1388,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-07-03 13:08:11
+-- Dump completed on 2016-07-25  3:32:44

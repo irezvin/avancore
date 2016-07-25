@@ -268,7 +268,7 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
 				}
 			}
 		}
-		if (!is_object($res) && !$dontTriggerError) trigger_error("No such table '{$alias}'; check with hasTable() first", E_USER_ERROR);
+		if (!is_object($res) && !$dontTriggerError) throw Ac_E_InvalidCall::noSuchItem("table", $alias, "hasTable");
 		return $res;
 	}
 	

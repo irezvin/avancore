@@ -83,8 +83,10 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
             elseif ($p = $this->getModelProperty()) {
                 if (isset($p->values) && $p->values) {
                     $ovr = array();
-                    if ($p->isStatic) $ovr['data'] = $this->_model;
-                    $proto = Ac_Model_Values::getPrototypeFromProperty($p);
+                    if ($p->isStatic) {
+                        $ovr['data'] = $this->_model;
+                    }
+                    $proto = Ac_Model_Values::getPrototypeFromProperty($p, $ovr);
                 }
             }
             if ($proto !== false) {

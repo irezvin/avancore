@@ -397,8 +397,12 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
     function _calculateModelsConfig() {
         if ($this->autoTablesAll || $this->autoTables) {
             $dbs = $this->getDatabase();
-            if ($this->autoTablesAll) $autoTables = $dbs->listTables();
-                else $autoTables = $this->autoTables;
+            if ($this->autoTablesAll) {
+                $autoTables = $dbs->listTables();
+                if (is_string($this->autoTablesAll)) {
+                    $autoTables = preg_grep($this->autoTablesAll, $autoTables);
+                }
+            } else $autoTables = $this->autoTables;
             if ($this->autoTablesIgnore) $autoTables = array_diff($autoTables, $this->autoTablesIgnore);
             $autoConf = array();
             foreach ($autoTables as $tName) {

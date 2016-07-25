@@ -72,6 +72,8 @@ class Ac_Sql_Select_Table {
      */
     var $joinsOn = false;
     
+    var $joinsNested = false;
+    
     var $isDetail = false;
     
     var $useIndex = false;
@@ -277,17 +279,44 @@ class Ac_Sql_Select_Table {
         return $res;
     }
     
-    function getJoinClausePart($alias = false, $isFirst = false) {
+    function getUsedNestedTables() {
+        // TODO: optimize to avoid tables X tables scanning
+        $res = array();
+        $sqlSelect = $this->getSqlSelect(true);
+        $usedAliases = $sqlSelect->getUsedAliases();
+        foreach ($usedAliases as $alias) {
+            $table = $sqlSelect->getTable($alias);
+            if ($table->joinsAlias == $this->alias && $table->joinsNested) {
+                $res[$alias] = $table;
+            }
+        }
+        return $res;
+    }
+    
+    
+    function getJoinClausePart(& $nestedAliases = array(), $alias = false, $isFirst = false) {
         $sqlSelect = $this->getSqlSelect();
+        if ($alias === false) $alias = $this->alias;
         if ($this->omitInFromClause) $res = '';
         elseif ($this->isPrimary()) {
             $res = $this->getSqlSrc();
-            $alias = $this->alias;
             if (strlen($alias)) $res .= ' AS '.$sqlSelect->n($alias);
         }
         else {
-            
-            if ($alias === false) $alias = $this->alias;
+           
+            $strNested = "";
+            $lBracket = "";
+            $rBracket = "";
+            $nestedTables = $this->getUsedNestedTables();
+            $nestedAliases = array();
+            if ($nestedTables) {
+                foreach ($nestedTables as $nAlias => $table) {
+                    $strNested .= " ".$table->getJoinClausePart($nestedAliases);
+                    $nestedAliases[] = $nAlias;
+                }
+                $lBracket = "(";
+                $rBracket = ") ";
+            }
             
             $sqlSelect = $this->getSqlSelect(true);
 
@@ -315,9 +344,10 @@ class Ac_Sql_Select_Table {
                 if (!strlen($joinType) || (trim($joinType) == ',')) {
                     $joinType = ',';
                 }
-                $res = $joinType.' '.$this->getSqlSrc();
+                $res = $joinType.' '.$lBracket.$this->getSqlSrc();
                 if (strlen($alias)) $res .= ' AS '.$sqlSelect->n($alias);
-
+                $res .= $strNested.$rBracket;
+                
                 if ($this->useIndex !== false) {
                     $res .= ' USE INDEX('.(is_array($this->useIndex)? implode(", ", $this->useIndex) : $this->useIndex).')'; 
                 }
@@ -327,8 +357,9 @@ class Ac_Sql_Select_Table {
             } else {
                 if ($isFirst) $res = "";
                 else $res = ", ";
-                $res .= $sqlSelect->n($this->name);
+                $res .= $lBracket.$this->getSqlSrc();
                 if (strlen($alias)) $res .= ' AS '.$sqlSelect->n($alias);
+                $res .= $strNested.$rBracket;
                 if ($this->useIndex !== false) {
                     $res .= ' USE INDEX('.(is_array($this->useIndex)? implode(", ", $this->useIndex) : $this->useIndex).')'; 
                 }

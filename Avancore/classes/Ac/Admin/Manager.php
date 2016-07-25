@@ -1313,6 +1313,11 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         
     }
     
+    protected function filterNonEmpty($v) {
+        if (is_array($v)) return (bool) array_filter($v, array($this, 'filterNonEmpty'));
+        return $v !== null && $v !== false && $v !== '';
+    }
+    
     protected function getQueryAndSort(Ac_Model_Collection_Mapper $collection) {
         $f = $this->getFilterForm();
         $query = array();
@@ -1321,14 +1326,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $sort = null;
         if ($f) {
             $val = $f->getValue();
-            foreach ($val as $k => $v) {
-                // filter out empty arrays for cases such as date selector
-                if (is_array($v) && !array_diff($v, array(null, '', false))) unset($val[$k]);
-                
-                // filter out nulls - filter form returns them when not submitted, 
-                // and empty strings - filter form returns them when submitted
-                elseif ($v === null || $v === '' || $v === false) unset($val[$k]);
-            }
+            $val = array_filter($val, array($this, 'filterNonEmpty'));
             // TODO: improve this ugly kludge with criteria enumeration
             $searchCrit = $collection->listPossibleCriteria();
             $sortCrit = $collection->listPossibleSortCriteria();

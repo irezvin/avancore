@@ -96,7 +96,7 @@ class Ac_Model_Values extends Ac_Prototyped {
     }
     
     static function getPrototypeFromProperty(Ac_Model_Property $prop, array $optionsOverride = array()) {
-        if ($prop->isStatic && !(isset($optionsOverride['data']) || !$optionsOverride['data'])) {
+        if ($prop->isStatic && !(isset($optionsOverride['data']) && $optionsOverride['data'])) {
             throw new Ac_E_InvalidCall("Cannot ".__METHOD__."() when \$prop->isStatic "
                 . "and no 'data' key provided in \$optionsOverride");
         }
