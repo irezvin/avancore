@@ -35,3 +35,8 @@ td.details:hover {
 }
 
 .logStats tr.item td table td, .logStats tr.item th table td {font-size: 1em}
+
+.logStats {
+    background-color: #f5f5f5;
+    color: black;
+}
