@@ -28,7 +28,30 @@ class Ac_Etl_Matcher extends Ac_Prototyped implements Ac_Etl_I_Matcher {
      * @var Ac_Sql_Db
      */
     protected $sqlDb = false;
+    /**
+     * RegExps search => replace to apply to left columns before matching
+     * @var array
+     */
+    protected $leftFixes = array();
 
+    /**
+     * RegExps search => replace to apply to right columns before matching
+     * @var array
+     */
+    protected $rightFixes = array();
+
+    /**
+     * function($left, $right, & $res, $leftWithFixes, $rightWithFixes) that returns additional matches
+     * @var callback
+     */
+    protected $callback = false;    
+    
+    /**
+     * comapre lowercased varsions of field names
+     * @var bool
+     */
+    protected $caseFold = true;
+    
     function setTablePair(Ac_Etl_I_TablePair $tablePair) {
         $this->tablePair = $tablePair;
         $this->colMatches = false;
@@ -52,10 +75,6 @@ class Ac_Etl_Matcher extends Ac_Prototyped implements Ac_Etl_I_Matcher {
         return $this->sqlDb;
     }    
     
-    function getLeftDbName() {
-        
-    }
-    
     function getColMatches() {
         if ($this->colMatches === false) {
             if (!$this->sqlDb) throw new Exception("setSqlDb() first");
@@ -75,9 +94,9 @@ class Ac_Etl_Matcher extends Ac_Prototyped implements Ac_Etl_I_Matcher {
                 $leftTable = $leftDb->getTable($m['leftTableName']);
                 $rightDb = new Ac_Sql_Dbi_Database($dbi, $m['rightDbName'], $this->tablePair->getRightDbPrefix());
                 $rightTable = $rightDb->getTable($m['rightTableName']);
-                $matches = array_diff(array_intersect($leftTable->listColumns(), $rightTable->listColumns()), $this->ignore);
-                foreach ($matches as $m) {
-                    $this->colMatches[$m] = $m;
+                $matches = $this->matchColumns($leftTable->listColumns(), $rightTable->listColumns());
+                foreach ($matches as $left => $right) {
+                    $this->colMatches[$left] = $right;
                 }
                 $this->colMatches = array_merge($this->colMatches, $this->overrides);
                 foreach ($this->colMatches as $k => $v) if (is_scalar($v) && !strlen($v)) unset($this->colMatches[$k]);
@@ -88,8 +107,6 @@ class Ac_Etl_Matcher extends Ac_Prototyped implements Ac_Etl_I_Matcher {
         if ($this->noCache) unset($this->colMatches);
         return $res;
     }
-    
-    
 
     /**
      * Sets which columns will be ignored when creating the matches
@@ -138,5 +155,96 @@ class Ac_Etl_Matcher extends Ac_Prototyped implements Ac_Etl_I_Matcher {
     function clear() {
         $this->colMatches = false;
     }
+    
+    protected function applyFixes($strings, array $regExps, array $ignore = array()) {
+        $res = array();
+        foreach ($strings as $string) {
+            $orig = $string;
+            foreach ($regExps as $search => $replace) $string = preg_replace($search, $replace, $string);
+            if ($this->caseFold) $string = strtolower($string);
+            if (strlen($string) && !in_array($string, $ignore))
+                $res[$string] = $orig;
+        }
+        return $res;
+    }
+    
+    protected function matchColumns(array $left, array $right) {
+        $leftMap = $this->applyFixes($left, $this->leftFixes, $this->ignore);
+        $rightMap = $this->applyFixes($right, $this->rightFixes, $this->ignore);
+        $same = array_intersect(array_keys($leftMap), array_keys($rightMap));
+        $res = array();
+        foreach ($same as $mapped) {
+            $res[$leftMap[$mapped]] = $rightMap[$mapped];
+        }
+        if ($this->callback) {
+            $items = call_user_func_array($this->$callback, array($left, $right, & $res, $leftMap, $rightMap));
+            if (is_array($items))
+                foreach ($items as $k => $v) {
+                    $res[$k] = $v;
+                }
+        }
+        return $res;
+    }
+    
+    /**
+     * Sets RegExps search => replace to apply to left columns before matching
+     */
+    function setLeftFixes(array $leftFixes) {
+        $this->leftFixes = $leftFixes;
+    }
+
+    /**
+     * Returns RegExps search => replace to apply to left columns before matching
+     * @return array
+     */
+    function getLeftFixes() {
+        return $this->leftFixes;
+    }
+
+    /**
+     * Sets RegExps search => replace to apply to right columns before matching
+     */
+    function setRightFixes(array $rightFixes) {
+        $this->rightFixes = $rightFixes;
+    }
+
+    /**
+     * Returns RegExps search => replace to apply to right columns before matching
+     * @return array
+     */
+    function getRightFixes() {
+        return $this->rightFixes;
+    }
+
+    /**
+     * Sets function($left, $right, & $res, $leftWithFixes, $rightWithFixes) that returns additional matches
+     */
+    function setCallback(callback $callback) {
+        $this->callback = $callback;
+    }
+
+    /**
+     * Returns function($left, $right, & $res, $leftWithFixes, $rightWithFixes) that returns additional matches
+     * @return callback
+     */
+    function getCallback() {
+        return $this->callback;
+    }    
+    
+    /**
+     * Sets comapre lowercased varsions of field names
+     * @param bool $caseFold
+     */
+    function setCaseFold($caseFold) {
+        $this->caseFold = $caseFold;
+    }
+
+    /**
+     * Returns comapre lowercased varsions of field names
+     * @return bool
+     */
+    function getCaseFold() {
+        return $this->caseFold;
+    }    
     
 }

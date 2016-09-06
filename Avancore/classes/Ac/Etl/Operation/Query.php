@@ -22,12 +22,7 @@ class Ac_Etl_Operation_Query extends Ac_Etl_Operation {
                 'targetDb' => $this->import->getTargetDbName(),
                 'importId' => $this->import->getImportId(),
             ), $this->params));
-            $res = $res && (bool) $this->getDb()->query($sp);
-            if ($res) {
-                $this->addAffected("query.".$k);
-                $this->addAffected("query");
-            }
-            if (!$res) break;
+            $this->getDb()->query($sp);
         }
         return $res;
     }

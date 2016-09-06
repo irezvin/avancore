@@ -7,7 +7,7 @@
 /**
  * Loads data from some external table into internal Import table
  */
-class Ac_Etl_Operation_Loader extends Ac_Etl_Operation {
+class Ac_Etl_Operation_Load extends Ac_Etl_Operation {
     
     protected $srcTableName = false;
     

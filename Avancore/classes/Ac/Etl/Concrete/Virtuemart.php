@@ -264,7 +264,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),*/
             
             'productsWriter' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'products',
                 'targetSqlName' => 'jos_virtuemart_products',
                 /*'selectPrototype' => array(
@@ -319,7 +319,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
                 'keyMap' => array('virtuemart_product_id' => 'virtuemart_product_id'),
             ),
             'productDescriptionsWriter' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'products',
                 'targetSqlName' => 'jos_virtuemart_products_en_gb',
                 'nameMap' => array('virtuemart_product_id' => 'virtuemart_product_id'),
@@ -337,7 +337,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),
             
             'pricesWriter' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'products',
                 'targetSqlName' => 'jos_virtuemart_product_prices',
                 'nameMap' => array('virtuemart_product_id' => 'virtuemart_product_id'),
@@ -363,7 +363,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             // ---- manufacturers ---
             
             'manufacturerNamesCreator' => array(
-                'class' => 'Ac_Etl_Operation_Copier',
+                'class' => 'Ac_Etl_Operation_Copy',
                 'tableId' => 'products',
                 'targetTableId' => 'manufacturers',
                 'ignoreLineNumbers' => true,
@@ -375,7 +375,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
                 ),
                 'innerOperations' => array(
                     'updater' => array(
-                        'class' => 'Ac_Etl_Operation_Writer',
+                        'class' => 'Ac_Etl_Operation_Write',
                         'tableId' => 'manufacturers',
                         'statusColName' => 'importStatus',
                         'targetSqlName' => 'jos_virtuemart_manufacturers_en_gb',
@@ -393,7 +393,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),
                             
             'manufacturersCreator' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'manufacturers',
                 'targetSqlName' => 'jos_virtuemart_manufacturers',
                 'nameMap' => array('classifierId' => 'virtuemart_manufacturer_id'),
@@ -410,7 +410,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),
                             
             'productManufacturers' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'products',
                 'targetSqlName' => 'jos_virtuemart_product_manufacturers',
                 'nameMap' => array('manufacturerId' => 'virtuemart_manufacturer_id', 'virtuemart_product_id' => 'virtuemart_product_id'),
@@ -420,7 +420,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             
             
             'categoryNamesCreator' => array(
-                'class' => 'Ac_Etl_Operation_Copier',
+                'class' => 'Ac_Etl_Operation_Copy',
                 'tableId' => 'categoryParents',
                 'targetTableId' => 'categoryNames',
                 'ignoreLineNumbers' => true,
@@ -432,7 +432,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
                 ),
                 'innerOperations' => array(
                     'updater' => array(
-                        'class' => 'Ac_Etl_Operation_Writer',
+                        'class' => 'Ac_Etl_Operation_Write',
                         'tableId' => 'categoryNames',
                         'statusColName' => 'importStatus',
                         'targetSqlName' => 'jos_virtuemart_categories_en_gb',
@@ -451,7 +451,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),
             
             'categoriesCreator' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'categoryNames',
                 'targetSqlName' => 'jos_virtuemart_categories',
                 'nameMap' => array('classifierId' => 'virtuemart_category_id'),
@@ -466,7 +466,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),
             
             'categoryParentIds' => array(
-                'class' => 'Ac_Etl_Operation_Copier',
+                'class' => 'Ac_Etl_Operation_Copy',
                 'tableId' => 'categoryParents',
                 'targetTableId' => 'categoryNames',
                 'reverseKeys' => array('rightName' => 'title'),
@@ -474,7 +474,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),
             
             'categoryParents' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'categoryParents',
                 'targetSqlName' => 'jos_virtuemart_category_categories',
                 'nameMap' => array('leftId' => 'category_child_id'),
@@ -484,7 +484,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),
             
             'productCategoryIds' => array(
-                'class' => 'Ac_Etl_Operation_Copier',
+                'class' => 'Ac_Etl_Operation_Copy',
                 'tableId' => 'products',
                 'targetTableId' => 'categoryParents',
                 'reverseKeys' => array('categoryName' => 'leftName'),
@@ -492,7 +492,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),
                             
             'productCategories' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'products',
                 'targetSqlName' => 'jos_virtuemart_product_categories',
                 'nameMap' => array('categoryId' => 'virtuemart_category_id', 'virtuemart_product_id' => 'virtuemart_product_id'),
@@ -500,7 +500,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             
             
             'pictureCreator' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'products',
                 'targetSqlName' => 'jos_virtuemart_medias',
                 'nameMap' => array(array(new Ac_Sql_Value('product'), 'file_type'), 'pictureUrl' => 'file_title'),
@@ -529,7 +529,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),
             
             'productMedias' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'products',
                 'targetSqlName' => 'jos_virtuemart_product_medias',
                 'nameMap' => array('pictureId' => 'virtuemart_media_id', 'virtuemart_product_id' => 'virtuemart_product_id'),
@@ -539,14 +539,14 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),
             
             'customsCreator' => array(
-                'class' => 'Ac_Etl_Operation_Copier',
+                'class' => 'Ac_Etl_Operation_Copy',
                 'tableId' => 'productCustoms',
                 'targetTableId' => 'customNames',
                 'ignoreLineNumbers' => true,
                 'colMatches' => array('title' => 'rightName'),
                 'innerOperations' => array(
                     'updater' => array(
-                        'class' => 'Ac_Etl_Operation_Writer',
+                        'class' => 'Ac_Etl_Operation_Write',
                         'tableId' => 'customNames',
                         'statusColName' => 'importStatus',
                         'targetSqlName' => 'jos_virtuemart_customs',
@@ -584,7 +584,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             // customsCreator will be used instead
             
             /*'customsResolver' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'productCustoms',
                 'statusColName' => 'importStatus',
                 'targetSqlName' => 'jos_virtuemart_customs',
@@ -594,7 +594,7 @@ class Ac_Etl_Concrete_Virtuemart extends Ac_Etl_Import {
             ),*/
             
             'customsWriter' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'productCustoms',
                 'targetSqlName' => 'jos_virtuemart_product_customfields',
                 'selectPrototype' => array(

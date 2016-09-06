@@ -28,7 +28,7 @@ class Etl_Test_AiWriter extends Etl_Test_Class_Abstract {
         ));
         $im->setOperations(array(
             'itemWriter' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'aipk',
                 'targetSqlName' => '#__test_aipk',
                 'nameMap' => array(
@@ -61,7 +61,7 @@ class Etl_Test_AiWriter extends Etl_Test_Class_Abstract {
                 'dontWriteNames' => true,
             ),
             'linkedWriter' => array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => 'aipk',
                 'targetSqlName' => '#__test_aipk_linked',
                 'nameMap' => array(

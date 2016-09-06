@@ -37,7 +37,7 @@ class Etl_Test_LoadOperation extends Etl_Test_Class_Abstract {
             'sqlTableName' => '#__test_items_import',
         )));
         $im->setImportId(1);
-        $loader = new Ac_Etl_Operation_Loader(array(
+        $loader = new Ac_Etl_Operation_Load(array(
             'tableId' => 'items',
             'id' => 'loader',
             'srcTableName' => '#__test_source_of_copy',

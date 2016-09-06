@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Etl_Operation_Writer extends Ac_Etl_Operation {
+class Ac_Etl_Operation_Write extends Ac_Etl_Operation {
 
     /**
      * SQL name of data table to write to
@@ -122,6 +122,11 @@ class Ac_Etl_Operation_Writer extends Ac_Etl_Operation {
      * @var array
      */
     protected $lockExtra = false;
+    
+    /**
+     * @var bool
+     */
+    protected $oneRun = false;
     
     function setDebugRecordsEquality($debugRecordsEquality) {
         $this->debugRecordsEquality = (bool) $debugRecordsEquality;
@@ -304,7 +309,7 @@ class Ac_Etl_Operation_Writer extends Ac_Etl_Operation {
                 $allProcessed = true;
             }
         
-        } while ($res && !$allProcessed);
+        } while ($res && !$allProcessed && !$this->oneRun);
         
         return $res;
         
@@ -1052,6 +1057,20 @@ class Ac_Etl_Operation_Writer extends Ac_Etl_Operation {
      */
     function getUseReplace() {
         return $this->useReplace;
+    }    
+
+    /**
+     * @param bool $oneRun
+     */
+    function setOneRun($oneRun) {
+        $this->oneRun = $oneRun;
+    }
+
+    /**
+     * @return bool
+     */
+    function getOneRun() {
+        return $this->oneRun;
     }    
    
     

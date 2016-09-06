@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Etl_Operation_Copier extends Ac_Etl_Operation {
+class Ac_Etl_Operation_Copy extends Ac_Etl_Operation {
     
     /**
      * @var array targetColumn => srcColumnOrExpression
@@ -144,7 +144,7 @@ class Ac_Etl_Operation_Copier extends Ac_Etl_Operation {
             $this->addAffected('copyForward');
         } else {
             if (!$this->forwardKeys) 
-                throw new Ac_E_Etl("\$forwardKeys must be provided when \$handleExisting property is other than Ac_Etl_Operation_Copier::handleExistingIgnore");
+                throw new Ac_E_Etl("\$forwardKeys must be provided when \$handleExisting property is other than Ac_Etl_Operation_Copy::handleExistingIgnore");
 
             // update 'existing' firstly, otherwise we won't be able do distinguish them from 'non-existing'
             

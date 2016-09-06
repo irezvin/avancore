@@ -19,7 +19,7 @@ class Ac_Etl_Table extends Ac_Prototyped {
 
     protected $loadedRecords = array();
     
-    protected $loadedChunkSize = 3000;
+    var $loadedChunkSize = 3000;
     
     protected $loadData = 0;
     
@@ -55,11 +55,13 @@ class Ac_Etl_Table extends Ac_Prototyped {
     function appendRecords(array $records, $lineNo = false) {
         foreach ($records as $record) {
             $this->appendRecord($record, $lineNo);
+            if ($lineNo !== false) $lineNo++;
         }
     }
     
     function appendRecord($record, $lineNo = false) {
-        if ($lineNo !== false) $record['lineNo'] = $lineNo;
+        if ($lineNo !== false && !isset($record['lineNo']))
+            $record['lineNo'] = $lineNo;
         if (!$this->hasLineNo()) unset($record['lineNo']);
         $this->loadedRecords[] = $record;
         if (count($this->loadedRecords) >= $this->loadedChunkSize) $this->write();
@@ -124,7 +126,7 @@ class Ac_Etl_Table extends Ac_Prototyped {
             $this->maxLengths = array();
             foreach ($this->getImporterDbiTable()->listColumns() as $name) {
                 $width = $this->getImporterDbiTable()->getColumn($name)->width;
-                if (!strlen($width)) $with = false;
+                if (!strlen($width)) $width = false;
                 $this->maxLengths[$name] = $width;
             }
         }

@@ -1,8 +1,8 @@
--- MySQL dump 10.16  Distrib 10.1.14-MariaDB, for Linux (x86_64)
+-- MySQL dump 10.16  Distrib 10.1.16-MariaDB, for Linux (x86_64)
 --
 -- Host: localhost    Database: avancore_test
 -- ------------------------------------------------------
--- Server version	10.1.14-MariaDB
+-- Server version	10.1.16-MariaDB
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -42,6 +42,30 @@ LOCK TABLES `ac_album_photos` WRITE;
 /*!40000 ALTER TABLE `ac_album_photos` DISABLE KEYS */;
 INSERT INTO `ac_album_photos` VALUES (3,1,1),(3,2,1),(3,1,2);
 /*!40000 ALTER TABLE `ac_album_photos` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ac_cpk`
+--
+
+DROP TABLE IF EXISTS `ac_cpk`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ac_cpk` (
+  `foo` int(11) NOT NULL,
+  `bar` int(11) NOT NULL,
+  `baz` int(11) DEFAULT NULL,
+  PRIMARY KEY (`foo`,`bar`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ac_cpk`
+--
+
+LOCK TABLES `ac_cpk` WRITE;
+/*!40000 ALTER TABLE `ac_cpk` DISABLE KEYS */;
+/*!40000 ALTER TABLE `ac_cpk` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -245,7 +269,7 @@ CREATE TABLE `ac_publish` (
   KEY `fkPubEditor` (`editorId`),
   CONSTRAINT `fkPubAuthor` FOREIGN KEY (`authorId`) REFERENCES `ac_people` (`personId`) ON DELETE SET NULL ON UPDATE SET NULL,
   CONSTRAINT `fkPubEditor` FOREIGN KEY (`editorId`) REFERENCES `ac_people` (`personId`) ON DELETE SET NULL ON UPDATE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=375 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=380 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -254,7 +278,7 @@ CREATE TABLE `ac_publish` (
 
 LOCK TABLES `ac_publish` WRITE;
 /*!40000 ALTER TABLE `ac_publish` DISABLE KEYS */;
-INSERT INTO `ac_publish` VALUES (1,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,6,'123456','2014-11-20 01:22:31','2014-12-20 01:22:31','0000-00-00 00:00:00'),(117,'Sample_Person_Post_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,7,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(118,'Sample_Person_Post_Mapper',0,1,'2012-01-01 00:00:00','2013-01-01 00:00:00',3,3,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(190,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(191,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(192,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(193,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(371,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',8,9,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(372,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(373,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(374,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
+INSERT INTO `ac_publish` VALUES (1,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,6,'123456','2014-11-20 01:22:31','2014-12-20 01:22:31','0000-00-00 00:00:00'),(117,'Sample_Person_Post_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',3,7,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(118,'Sample_Person_Post_Mapper',0,1,'2012-01-01 00:00:00','2013-01-01 00:00:00',3,3,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(190,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(191,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(192,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(193,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(376,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',8,9,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(377,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(378,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00'),(379,'Sample_Shop_Product_Mapper',1,0,'0000-00-00 00:00:00','0000-00-00 00:00:00',NULL,NULL,NULL,'0000-00-00 00:00:00','0000-00-00 00:00:00','0000-00-00 00:00:00');
 /*!40000 ALTER TABLE `ac_publish` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -441,7 +465,7 @@ CREATE TABLE `ac_shop_meta` (
   `metaNoindex` int(1) unsigned NOT NULL DEFAULT '0',
   `sharedObjectType` varchar(255) NOT NULL DEFAULT 'other',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=415 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=420 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -450,7 +474,7 @@ CREATE TABLE `ac_shop_meta` (
 
 LOCK TABLES `ac_shop_meta` WRITE;
 /*!40000 ALTER TABLE `ac_shop_meta` DISABLE KEYS */;
-INSERT INTO `ac_shop_meta` VALUES (1,'Купить Товар 1 он-лайн','Страница товара 1','Товар 1, купить',0,'product'),(43,'','','',0,'product'),(230,'','','',0,'product'),(231,'','','',0,'product'),(232,'','','',0,'product'),(233,'','','',0,'product'),(411,'','','',0,'product'),(412,'','','',0,'product'),(413,'','','',0,'product'),(414,'','','',0,'product');
+INSERT INTO `ac_shop_meta` VALUES (1,'Купить Товар 1 он-лайн','Страница товара 1','Товар 1, купить',0,'product'),(43,'','','',0,'product'),(230,'','','',0,'product'),(231,'','','',0,'product'),(232,'','','',0,'product'),(233,'','','',0,'product'),(416,'','','',0,'product'),(417,'','','',0,'product'),(418,'','','',0,'product'),(419,'','','',0,'product');
 /*!40000 ALTER TABLE `ac_shop_meta` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -506,7 +530,7 @@ CREATE TABLE `ac_shop_product_extraCodes` (
 
 LOCK TABLES `ac_shop_product_extraCodes` WRITE;
 /*!40000 ALTER TABLE `ac_shop_product_extraCodes` DISABLE KEYS */;
-INSERT INTO `ac_shop_product_extraCodes` VALUES (2,'1','2','3',3),(154,'','','',NULL),(155,'A','B','C',10),(156,'A1','B1','C1',11),(157,'','','',NULL);
+INSERT INTO `ac_shop_product_extraCodes` VALUES (2,'1','2','3',3),(158,'','','',NULL),(159,'A','B','C',10),(160,'A1','B1','C1',11),(161,'','','',NULL);
 /*!40000 ALTER TABLE `ac_shop_product_extraCodes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -534,7 +558,7 @@ CREATE TABLE `ac_shop_product_notes` (
 
 LOCK TABLES `ac_shop_product_notes` WRITE;
 /*!40000 ALTER TABLE `ac_shop_product_notes` DISABLE KEYS */;
-INSERT INTO `ac_shop_product_notes` VALUES (1,'xxx',3),(154,'',NULL),(155,'',NULL),(156,'',NULL),(157,'foobar',12);
+INSERT INTO `ac_shop_product_notes` VALUES (1,'xxx',3),(158,'',NULL),(159,'',NULL),(160,'',NULL),(161,'foobar',12);
 /*!40000 ALTER TABLE `ac_shop_product_notes` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -588,7 +612,7 @@ CREATE TABLE `ac_shop_product_upc` (
 
 LOCK TABLES `ac_shop_product_upc` WRITE;
 /*!40000 ALTER TABLE `ac_shop_product_upc` DISABLE KEYS */;
-INSERT INTO `ac_shop_product_upc` VALUES (1,'1234'),(154,''),(155,''),(156,''),(157,'');
+INSERT INTO `ac_shop_product_upc` VALUES (1,'1234'),(158,''),(159,''),(160,''),(161,'');
 /*!40000 ALTER TABLE `ac_shop_product_upc` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -608,7 +632,7 @@ CREATE TABLE `ac_shop_products` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `idxPubId` (`pubId`),
   CONSTRAINT `fkPersonPublish` FOREIGN KEY (`pubId`) REFERENCES `ac_publish` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=158 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=162 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -617,7 +641,7 @@ CREATE TABLE `ac_shop_products` (
 
 LOCK TABLES `ac_shop_products` WRITE;
 /*!40000 ALTER TABLE `ac_shop_products` DISABLE KEYS */;
-INSERT INTO `ac_shop_products` VALUES (1,'PROD01','Товар 1',1,1),(2,'PROD02','Товар 2',NULL,NULL),(3,'PROD03','Товар 3',NULL,NULL),(4,'PROD04','Товар 4',NULL,NULL),(9,'xxx','yyy',NULL,NULL),(10,'mc-food1','Food 1',NULL,NULL),(11,'mc-computer1','Computer 1',NULL,NULL),(12,'mc-laptop1','Laptop 1',NULL,NULL),(13,'mc-laptop2','Laptop 2',NULL,NULL),(154,'1337','test product',411,371),(155,'f00','test prod 2',412,372),(156,'f01','test prod 3',413,373),(157,'PROD_NOTE','product with a note',414,374);
+INSERT INTO `ac_shop_products` VALUES (1,'PROD01','Товар 1',1,1),(2,'PROD02','Товар 2',NULL,NULL),(3,'PROD03','Товар 3',NULL,NULL),(4,'PROD04','Товар 4',NULL,NULL),(9,'xxx','yyy',NULL,NULL),(10,'mc-food1','Food 1',NULL,NULL),(11,'mc-computer1','Computer 1',NULL,NULL),(12,'mc-laptop1','Laptop 1',NULL,NULL),(13,'mc-laptop2','Laptop 2',NULL,NULL),(158,'1337','test product',416,376),(159,'f00','test prod 2',417,377),(160,'f01','test prod 3',418,378),(161,'PROD_NOTE','product with a note',419,379);
 /*!40000 ALTER TABLE `ac_shop_products` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -828,7 +852,7 @@ CREATE TABLE `ac_tree_adjacent` (
   PRIMARY KEY (`id`),
   KEY `index_4` (`parentId`),
   KEY `index_5` (`ordering`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -864,7 +888,7 @@ CREATE TABLE `ac_tree_combos` (
   KEY `index_4` (`parentId`),
   KEY `index_5` (`ordering`),
   KEY `index_6` (`ignore`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -927,7 +951,7 @@ CREATE TABLE `ac_tree_records` (
   `title` varchar(255) NOT NULL DEFAULT '',
   `tag` int(11) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1003,7 +1027,7 @@ CREATE TABLE `im_test_aipk_import` (
   `otherContent` varchar(45) DEFAULT NULL,
   `isDraft` int(1) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=286 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1091,7 +1115,7 @@ CREATE TABLE `im_test_categories_import` (
   KEY `idxTypeId` (`parentId`),
   KEY `idxType` (`parentName`),
   KEY `idxImportId` (`importId`)
-) ENGINE=InnoDB AUTO_INCREMENT=820 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1125,7 +1149,7 @@ CREATE TABLE `im_test_classifiers_import` (
   KEY `idxItemId` (`classifierId`),
   KEY `idxType` (`classifierType`),
   KEY `idxImportId` (`importId`)
-) ENGINE=InnoDB AUTO_INCREMENT=577 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=614 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1134,7 +1158,7 @@ CREATE TABLE `im_test_classifiers_import` (
 
 LOCK TABLES `im_test_classifiers_import` WRITE;
 /*!40000 ALTER TABLE `im_test_classifiers_import` DISABLE KEYS */;
-INSERT INTO `im_test_classifiers_import` VALUES (574,1,'typeC',NULL,'type','unchanged',NULL,1),(575,2,'typeD',NULL,'type','unchanged',NULL,1);
+INSERT INTO `im_test_classifiers_import` VALUES (612,1,'typeC',NULL,'type','unchanged',NULL,1),(613,2,'typeD',NULL,'type','unchanged',NULL,1);
 /*!40000 ALTER TABLE `im_test_classifiers_import` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1185,7 +1209,7 @@ CREATE TABLE `im_test_item_categories_import` (
   KEY `idxName` (`categoryId`),
   KEY `idxLineNo` (`lineNo`),
   KEY `idxImportId` (`importId`)
-) ENGINE=InnoDB AUTO_INCREMENT=538 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1256,7 +1280,7 @@ CREATE TABLE `im_test_items_import` (
   KEY `idxLineNo` (`lineNo`),
   KEY `idxImportId` (`importId`),
   KEY `idxPictureUrl` (`pictureUrl`)
-) ENGINE=InnoDB AUTO_INCREMENT=374 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=401 DEFAULT CHARSET=utf8;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1265,7 +1289,7 @@ CREATE TABLE `im_test_items_import` (
 
 LOCK TABLES `im_test_items_import` WRITE;
 /*!40000 ALTER TABLE `im_test_items_import` DISABLE KEYS */;
-INSERT INTO `im_test_items_import` VALUES (372,NULL,'item1',NULL,1,'typeC','unprocessed',NULL,NULL,NULL,1,8),(373,NULL,'item2',NULL,2,'typeD','unprocessed',NULL,NULL,NULL,1,9);
+INSERT INTO `im_test_items_import` VALUES (399,NULL,'item1',NULL,1,'typeC','unprocessed',NULL,NULL,NULL,1,8),(400,NULL,'item2',NULL,2,'typeD','unprocessed',NULL,NULL,NULL,1,9);
 /*!40000 ALTER TABLE `im_test_items_import` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1366,7 +1390,7 @@ CREATE TABLE `im_test_types` (
   `name` varchar(45) NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `idxTitle` (`name`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -1388,4 +1412,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-07-25  3:32:44
+-- Dump completed on 2016-09-07  0:33:14

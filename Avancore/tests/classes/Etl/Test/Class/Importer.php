@@ -77,7 +77,7 @@ class Etl_Test_Class_Importer extends Ac_Etl_Import {
         // Type writer
         $this->setOperations(array(
             'typeImporter' => array(
-                'class' => 'Ac_Etl_Operation_Copier',
+                'class' => 'Ac_Etl_Operation_Copy',
                 'tableId' => 'items',
                 'targetTableId' => 'types',
                 'distinct' => true,
@@ -91,7 +91,7 @@ class Etl_Test_Class_Importer extends Ac_Etl_Import {
                 ),
                 'innerOperations' => array(
                     'updater' => array(
-                        'class' => 'Ac_Etl_Operation_Writer',
+                        'class' => 'Ac_Etl_Operation_Write',
                         'statusColName' => 'importStatus',
                         'problemsColName' => 'problems',
                         'tableId' => 'types',

@@ -62,6 +62,19 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         
     }
     
+    function testListRecords() {
+        $sam = Sample::getInstance();
+        $m = $sam->getSamplePersonMapper();
+        $db = $sam->getDb();
+        $m->reset();
+        $this->assertIsA($arr = $m->listRecords(), 'array');
+        $this->assertEqual(count($arr), $db->fetchValue('SELECT COUNT(*) FROM #__people'));
+        $m = $sam->getSampleShopProductMapper();
+        $m->reset();
+        $this->assertIsA($arr = $m->listRecords(), 'array');
+        $this->assertEqual(count($arr), $db->fetchValue('SELECT COUNT(*) FROM #__shop_products'));
+    }
+    
     function testPersistence() {
         // TODO: people => person
         $sam = Sample::getInstance();

@@ -393,7 +393,7 @@ class Ac_Etl_Hierarchy_Operation extends Ac_Etl_Operation {
         $this->calcIntProperties();
         
         $categoryWriterPrototype = array(
-            'class' => 'Ac_Etl_Operation_Writer',
+            'class' => 'Ac_Etl_Operation_Write',
             'statusColName' => 'importStatus',
             'problemsColName' => 'problems',
             'tableId' => $this->iCategoryListImportId,
@@ -411,14 +411,14 @@ class Ac_Etl_Hierarchy_Operation extends Ac_Etl_Operation {
             $res['categoryWriter'] = $categoryWriterPrototype;
         } else {
             $res['creator'] = array(
-                'class' => 'Ac_Etl_Operation_Copier',
+                'class' => 'Ac_Etl_Operation_Copy',
                 'tableId' => $this->iCcImportId,
                 'targetTableId' => $this->iCategoryListImportId,
                 'distinct' => true,
                 'ignoreLineNumbers' => true,
                 'colMatches' => array($this->iCategoryImportNameCol => $this->iCcImportCategoryNameCol),
                 'cleanTargetTable' => false,
-                'handleExisting' => Ac_Etl_Operation_Copier::handleExistingUpdate,
+                'handleExisting' => Ac_Etl_Operation_Copy::handleExistingUpdate,
                 'forwardKeys' => array($this->iCategoryImportNameCol => $this->iCcImportCategoryNameCol),
                 'innerOperations' => array(
                     'updater' => $categoryWriterPrototype,
@@ -433,7 +433,7 @@ class Ac_Etl_Hierarchy_Operation extends Ac_Etl_Operation {
         if (!$this->iDontCreateParentToChildRelations) {
             
             $res['parentsResolver'] = array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => $this->iCcImportId,
                 'targetSqlName' => $this->iCategoryListTargetName,
                 'nameMap' => array($this->iCcImportParentNameCol => $this->iCategoryNameCol),
@@ -442,7 +442,7 @@ class Ac_Etl_Hierarchy_Operation extends Ac_Etl_Operation {
             );
             
             $res['parentsWriter'] = array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => $this->iCcImportId,
                 'targetSqlName' => $this->iCcTargetName,
                 'nameMap' => array($this->iCcImportCategoryIdCol => $this->iCcTargetCategoryIdCol),
@@ -459,7 +459,7 @@ class Ac_Etl_Hierarchy_Operation extends Ac_Etl_Operation {
             // write back category IDs to item-to-category import table
             
             $res['itemsCategoryCopier'] = array(
-                'class' => 'Ac_Etl_Operation_Copier',
+                'class' => 'Ac_Etl_Operation_Copy',
                 'targetTableId' => $this->iCategoryListImportId,
                 'tableId' => $this->iItemCategoryImportId,
                 'reverseKeys' => array($this->iItemCategoryNameCol => $this->iCategoryImportNameCol),
@@ -471,7 +471,7 @@ class Ac_Etl_Hierarchy_Operation extends Ac_Etl_Operation {
         if (strlen($this->iItemCategoryTargetName)) {
             
             $res['itemCategoryWriter'] = array(
-                'class' => 'Ac_Etl_Operation_Writer',
+                'class' => 'Ac_Etl_Operation_Write',
                 'tableId' => $this->iItemCategoryImportId,
                 'targetSqlName' => $this->iItemCategoryTargetName,
                 'insertIgnore' => true,
