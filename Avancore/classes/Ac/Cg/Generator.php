@@ -1,6 +1,8 @@
 <?php
 
 class Ac_Cg_Generator {
+
+    const CONTENT_DIR = '__DIR__';
     
     var $dbPrototype = false;
     
@@ -89,22 +91,19 @@ class Ac_Cg_Generator {
      */
     var $writer = false;
     
-    /**
-     * Names of entities (domains and models) to proceess (by default, generator processes all domains, all models). Can be in following forms:
-     * - string 'domain1, domain2.model1, domain2.model2, ...
-     * - array ('domain1', 'domain2.model1', 'domain3' => array(), 'domain4' => array('model4', 'model5'))
-     * In specified above array form, 'domain1' or 'domain3' => array() means 'all models from domains 1 and 3'   
-     * @var array
-     */
-    var $genEntities = array();
-    
     var $genEditable = true;
     
     var $genNonEditable = true;
     
     var $ovrEditable = true;
     
-    var $strategySettings = array();
+    var $ovrNonEditable = true;
+    
+    var $deployNonEditable = false;
+    
+    var $deployEditable = false;
+    
+    var $deployPath = false;
     
     /**
      * Are added under each domain's config 
@@ -127,14 +126,17 @@ class Ac_Cg_Generator {
     
     var $lintCommand = "php -l %s 2>&1";
     
+    var $importantLog = array();
+    
     /**
      * @param string $configOrFileName name of file with static configuration of project
      */
-    function __construct($configOrFileName, $runtimeOptions = array()) {
+    function __construct($configOrFileName = false, $runtimeOptions = array()) {
         if (is_array($configOrFileName)) $this->staticConfig = $configOrFileName;
         else {
             $this->_configFileName = $configOrFileName;
-            $this->_loadStaticConfig();
+            if (strlen($this->_configFileName))
+                $this->_loadStaticConfig();
         }
         if (isset($this->staticConfig['generator']) && is_array($this->staticConfig['generator'])) {
             if (isset($this->staticConfig['generator']['staticConfig'])) unset($this->staticConfig['generator']['staticConfig']);
@@ -267,32 +269,17 @@ class Ac_Cg_Generator {
      */
     function _expandPaths($array) {
         $keys = array_keys($array);
-        foreach ($keys as $i=>$k) 
+        foreach ($keys as $k) 
         {
             if (is_array($array[$k])) {$ak = Ac_Cg_Generator::_expandPaths($array[$k]); $array[$k] = $ak;}
             if ((($sp = strpos($k, '.')) !== false) && ($sp != 0)) {
-                list($head, $tail) = explode('.', $k, 2);
                 $value = $array[$k];
-                $replacement = array ($head => array());
                 unset($array[$k]);
                 $path = explode('.', $k);
                 Ac_Util::setArrayByPath($array, $path, $value);
             }
         }
         return $array;
-    }
-    
-    /**
-     * @return Ac_Cg_Strategy
-     */
-    function createStrategyForDomain($domainName) {
-        $class = Ac_Util::getArrayByPath($this->staticConfig, array('domains', $domainName, 'strategyClass'), 'Ac_Cg_Strategy');
-        if (is_array($this->strategySettings)) $ss = $this->strategySettings; else $ss = array();
-        $ss['genNonEditable'] = $this->genNonEditable;
-        $dom = $this->getDomain($domainName);
-        Ac_Util::ms($ss, $dom->getStrategySettings());
-        $res = new $class($this, $domainName, $this->outputDir, $this->genEditable, $this->ovrEditable, $ss);
-        return $res;
     }
     
     function log($message, $important = false) {
@@ -306,8 +293,18 @@ class Ac_Cg_Generator {
                 }
             }
             if ($this->_logFile) fputs($this->_logFile, date("Y-m-d H:i:s")."\t".$message."\n");
-            if ($important || $this->verbose) echo $message."\n";
         }
+        if ($important || $this->verbose) {
+            $c = $important? 'important' : '';
+            if (PHP_SAPI === 'cli') {
+                static $stderr;
+                if (!$stderr) $stderr = fopen('php://stderr', 'a');
+                fputs($stderr, $message."\n");
+            } else {
+                echo "<p class='message {$c}'>$message</p>\n";
+            }
+        }
+        if ($important) $this->importantLog[] = $message;
     }
     
     function prepare() {
@@ -318,18 +315,30 @@ class Ac_Cg_Generator {
         }
     }
     
-    function run() {
+    protected $runData = false;
+    
+    function begin() {
+        if ($this->runData !== false) throw new Ac_E_InvalidUsage("Cannot ".__METHOD__." when hasBegan(); call end() first");
         
-        $errLog = $this->logFileName.'.errors.log';
-        $settings = array('error_reporting' => E_ALL, 'html_errors' => false, 'display_errors' => 0, 'log_errors' => 1, 'error_log' => $errLog, 'ignore_repeated_errors' => true);
+        $this->runData = array();
+        
+        $settings = array(
+            'error_reporting' => E_ALL, 
+            'html_errors' => false, 
+            'display_errors' => 0, 
+            'log_errors' => 1, 
+            'ignore_repeated_errors' => true
+        );
+        
+        if (strlen($this->logFileName)) {
+            $errLog = $this->logFileName.'.errors.log';
+            $settings['error_log'] = $errLog; 
+        }
+        
         $oldSettings = array();
+        
         if ($this->overwriteLog && is_file($errLog)) {
-            fclose(fopen($errLog, "w"));
-        } else {
-            if (is_file($errLog)) {
-                $f = fopen($errLog, "w");
-                fputs($f, "\n\n----------------------------------\n\n");
-            }
+            unlink($errLog);
         }
         
         foreach ($settings as $s => $v) {
@@ -344,28 +353,102 @@ class Ac_Cg_Generator {
         
         if ($this->clearOutputDir && $this->outputDir) Ac_Cg_Util::cleanDir($this->outputDir);
         
-        $todo = $this->parseGenEntities();
+        $this->runData['oldSettings'] = $oldSettings;
+        $this->runData['writer'] = $this->getWriter();
+    }
+    
+    function end() {
+        if ($this->runData === false) throw new Ac_E_InvalidUsage("Cannot ".__METHOD__." without prior begin(); check with hasBegan() next time");
         
-        foreach ($todo as $domain => $models) {
-            $strat = $this->createStrategyForDomain($domain);
-            $strat->generateCodeForModels($models);
-            $strat->generateCommonCode();
-        }
+        $writer = $this->runData['writer'];
         
         $this->_outputBytes = $writer->getTotalSize();
         $this->_outputFiles = $writer->getFileCount();
         
         $this->log('Generator finished: '.$this->getOutputBytes().' bytes in '.$this->getOutputFiles().' files ----------------');
         
+        $oldSettings = $this->runData['oldSettings'];
+        
         foreach ($oldSettings as $s => $v) {
             if ($s == "error_log" && strlen(ini_get("open_basedir")) && !strlen($v)) {
                 // workaround for open_basedir warning when restoring error_log option back to empty
                 ini_restore($s);
             }
-                else ini_set($s, $v); 
+            else ini_set($s, $v); 
+        }
+        $this->runData = false;
+    }
+    
+    function deploy() {
+        
+        // TODO: use REAL lists of editable and non-editable files instead of (hardcoded) /gen and /classes
+        
+        if ($this->deployNonEditable && $this->genNonEditable) {
+            if (!strlen($this->deployPath)) throw new Ac_E_InvalidUsage("Cannot \$deployNonEditable without \$deployPath!");
+            $this->writer->deploy($this->outputDir.'/gen', $this->deployPath, false, $err, true);
+            if ($err) $this->log ($err, true);
+        }
+        if ($this->deployEditable && $this->genEditable) {
+            if (!strlen($this->deployPath)) throw new Ac_E_InvalidUsage("Cannot \$deployEditable without \$deployPath!");
+            $this->writer->deploy($this->outputDir.'/classes', dirname($this->deployPath).'/classes', true, $err, true);
+            if ($err) $this->log ($err, true);
         }
         
     }
+    
+    function hasBegan() {
+        return (bool) $this->runData;
+    }
+    
+    function run($todo = false) {
+        
+        if (!$this->hasBegan()) $this->begin();
+        
+        foreach ($this->listDomains() as $name) {
+            $dom = $this->getDomain($name);
+            foreach ($dom->getAllTemplateInstances() as $tpl)
+                $this->processTemplate($tpl);
+        }
+        
+        $this->deploy();
+        
+        $this->end();
+        
+    }
+    
+    function __destruct() {
+        if ($this->hasBegan()) {
+            trigger_error("Destroying Generator that had begin() without end() called", E_USER_NOTICE);
+            $this->end();
+        }
+    }
+    
+    /**
+     * Processes a fully-instantiated and configured template
+     */
+    function processTemplate(Ac_Cg_Template $template) {
+        if (!$this->hasBegan()) throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() without prior begin(). Check with hasBegan() next time!");
+        $writer = $this->runData['writer'];
+        foreach ($template->listFiles() as $n) {
+            $skip = false;
+            $p = $template->getFilePath($n);
+            $editable = $template->fileIsUserEditable($n);
+            if ($editable) {
+                if (!$this->genEditable) $skip = true;
+                $ovr = $this->ovrEditable;
+            } else {
+            	if (!$this->genNonEditable) $skip = true;
+                $ovr = $this->ovrNonEditable;
+            }
+            if (!$skip) {
+                $this->log($p.": writing file ");
+                $template->outputFile($n, $writer, $ovr);
+                if (strlen($this->outputDir)) $p = rtrim($this->outputDir, '/\\').'/'.$p;
+                if ($this->lintify && is_file($p)) $this->runLint($p);
+            }
+        }
+    }
+    
     
     function getOutputBytes() {
         return $this->_outputBytes;
@@ -432,6 +515,37 @@ class Ac_Cg_Generator {
         return $this->writer;
     }
     
+    function syncAvancore($destDir, $destWebDir = false, $srcDir = false, $overwriteDest = false, $deleteFromDest = false) {
+        if ($srcDir === false) $srcDir = dirname(__FILE__).'/../../..';
+            if ($destWebDir == false) $destWebDir = $destDir.'/web/assets';
+
+        if (!is_dir($srcDir)) throw new Ac_E_InvalidUsage("\$srcDir '{$srcDir}' does not exist");
+        if (!is_file($srcDir.'/classes/Ac/Avancore.php'))
+            throw new Ac_E_InvalidUsage("Directory '{$srcDir}' doesn't look like one that has Avancore installation");
+        if (!is_dir($destDir)) mkdir($destDir, 0777, true);
+        
+        $sync = new Ac_Cg_DirSync(array(
+            'srcDir' => $srcDir,
+            'destDir' => $destDir,
+        ));
+        $sync->ensureDirsNotNested();
+            
+        $copy = array(
+            'bin', 'classes', 'languages', 'obsolete', 'vendor', 'web/assets' => $destWebDir
+        );
+        foreach ($copy as $src => $dest) {
+            if (is_numeric($src)) $src = $dest;
+            $fullDest = rtrim($destDir, '/').'/'.ltrim($dest, '/');
+            if (!is_dir($fullDest)) mkdir($fullDest, 0777, true);
+            $ds = new Ac_Cg_DirSync(array(
+                'dryRun' => false,
+                'srcDir' => $srcDir.'/'.$src,
+                'destDir' => $fullDest,
+                'overwriteDest' => $overwriteDest,
+                'deleteFromDest' => $deleteFromDest,
+            ));
+            $ds->run();
+        }
+    }
     
 }
-

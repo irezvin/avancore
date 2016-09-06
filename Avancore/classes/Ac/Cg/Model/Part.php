@@ -91,7 +91,9 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     }
     
     function getTemplates() {
-        return array('Ac_Cg_Template_ModelPart');
+        return array(
+            'modelAndMapper' => 'Ac_Cg_Template_ModelPart',
+        );
     }
     
     function getGenModelClass() {

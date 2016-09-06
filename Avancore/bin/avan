@@ -1,0 +1,36 @@
+#!/usr/bin/php
+<?php
+
+if (PHP_SAPI !== 'cli') die('Cli usage only');
+
+require_once(dirname(__FILE__).'/../classes/Ac/Avancore.php');
+$avan = Ac_Avancore::getInstance();
+Ac_Util::addIncludePath(dirname(__FILE__).'/../obsolete');
+
+$avan = new Ac_Cg_Cli();
+
+$avan->run();
+
+
+//$cg = new Ac_Cg_Generator();
+//$cg->logFileName = false;
+//$cg->outputDir = '.';
+//$cg->ovrEditable = false;
+//$cg->ovrNonEditable = false;
+//
+//if (isset($_SERVER['argv'][1])) {
+//    $appName = $_SERVER['argv'][1];
+//} else {
+//    $appName = '';
+//}
+//if (!isset($appName) || !strlen($appName)) $appName = 'Foo';
+//$tp = new Ac_Cg_Template_Skel(array(
+//    'generator' => $cg,
+//    'appName' => $appName,
+//));
+//
+//$cg->begin();
+//$cg->processTemplate($tp);
+//$cg->end();
+//
+//$cg->syncAvancore('vendor/Avancore', '../../web/avancore', false, true, true);

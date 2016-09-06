@@ -89,12 +89,20 @@ class Ac_Cg_DirSync extends Ac_Prototyped {
         return $ok;
     }
     
+    static function identical($a, $b) {
+        $res = filesize($a) === filesize($b) 
+            && (fileperms($a) & 0777) === (fileperms($b) & 0777)
+            && md5_file($a) === md5_file($b);
+        return $res;
+    }
+    
     protected function copy($srcBase, $path) {
         $fullSrc = rtrim($srcBase, "/")."/".ltrim($path, "/");
         $fullDest = rtrim($this->workBase, "/")."/".ltrim($path, "/");
         if (!$this->dryRun) {
-            if (!is_file($fullDest) || filesize($fullSrc) !== filesize($fullDest) || md5_file($fullSrc) !== md5_file($fullDest)) {
+            if (!is_file($fullDest) || !self::identical($fullSrc, $fullDest)) {
                 $ok = copy($fullSrc, $fullDest) !== false;
+                if ($ok) @chmod($fullDest, fileperms($fullSrc) & 0777);
             } else {
                 $ok = true;
             }
@@ -147,9 +155,17 @@ class Ac_Cg_DirSync extends Ac_Prototyped {
         $this->delAll($this->workList);
     }
     
+    function ensureDirsNotNested() {
+        $s = realpath($this->srcDir).DIRECTORY_SEPARATOR;
+        $d = realpath($this->destDir).DIRECTORY_SEPARATOR;
+        if (!strncmp($s, $d, strlen($s))) throw new Ac_E_InvalidUsage ("Dest dir '{$d}' is supposedly located in src dir '{$s}'");
+        if (!strncmp($d, $s, strlen($d))) throw new Ac_E_InvalidUsage ("Src dir '{$s}' is supposedly located in dest dir '{$d}'");
+    }
+    
     function run($clearLogs = false) {
         $this->checkDir('srcDir');
         $this->checkDir('destDir', true);
+        $this->ensureDirsNotNested();
         $src = $this->listSrc();
         $dest = $this->listDest();
         if ($clearLogs) {

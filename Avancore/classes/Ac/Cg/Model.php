@@ -189,8 +189,6 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     
     var $mapperCoreMixables = array();
     
-    var $noUi = true;
-    
     /**
      * Null or empty string - force NO parent model
      * FALSE - default behaviour (no parent model if there is no parent domain; otherwise, parent model
@@ -959,7 +957,9 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     }
         
     function getTemplates() {
-        return array('Ac_Cg_Template_ModelAndMapper');
+        return array(
+            'modelAndMapper' => 'Ac_Cg_Template_ModelAndMapper'
+        );
     }
     
     /**

@@ -10,7 +10,6 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
     var $mapperPrototypes = array();
     var $modelClasses = array();
     var $modelMethodSuffixes = array();
-    var $optName = false;
     var $adminMenu = array();
     var $mapperAliases = array();
     
@@ -24,10 +23,6 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
         
         foreach ($this->domain->listModels() as $m) {
             $mod = $this->domain->getModel($m);
-            $modName = $mod->getModelBaseName();
-            if (!$mod->noUi) {
-                $this->adminMenu[$modName.'_List'] = $mod->pluralCaption;
-            }
             $mapperClass = $mod->getMapperClass();
             $mapperMethodSuffix = str_replace ("_", "", $mapperClass);
             $this->mapperPrototypes[$mod->getMapperClass()] = array('class' => $mod->getMapperClass());
@@ -42,7 +37,6 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
             $this->modelClasses[$mod->getMapperClass()] = $mod->className;  
             $this->modelMethodSuffixes[$mod->getMapperClass()] = str_replace("_", "", $mod->className);
         }
-        $this->optName = 'com_'.$this->domain->josComId;
     }
     
     function _generateFilesList() {
