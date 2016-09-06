@@ -147,12 +147,14 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         $dir = $this->detectClassesDir();
         if (strlen($dir)) {
             $dir = dirname($dir);
-            $deployDirName = 'deploy';
             if (isset($this->configFromInit['deployDirPath'])) {
                 $res = $this->configFromInit['deployDirPath'];
                 if (!is_dir($res)) trigger_error("Warning: directory mentioned in 'deployDirPath' init-provided property, '{$res}', does not exist", E_USER_WARNING);
             } elseif (strlen($dir)) {
-                if (is_dir($n = $dir.'/deploy')) {
+                if (is_dir($n = $dir.'/config')) {
+                    $res = $n;
+                    if (strlen($this->appClass) && is_dir($n = $dir.'/'.$this->appClass)) $res = $n;
+                } elseif (is_dir($n = $dir.'/deploy')) {
                     $res = $n;
                     if (strlen($this->appClass) && is_dir($n = $dir.'/'.$this->appClass)) $res = $n;
                 }

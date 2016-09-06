@@ -361,7 +361,6 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     function setId($id) {
-        if ($this->id !== false && $this->id !== $id) throw new Exception("Can setId() only once! Old id was '{$this->id}', new one is '{$id}'");
         $this->id = $id;
     }
     

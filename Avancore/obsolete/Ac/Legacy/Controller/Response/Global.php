@@ -26,8 +26,11 @@ class Ac_Legacy_Controller_Response_Global {
     /**
      * @return Ac_Legacy_Controller_Response_Html
      */
-    static function r() {
-        return Ac_Legacy_Controller_Response_Global::getInstance()->getResponse();
+    static function r($dontCreate = false) {
+        $i = Ac_Legacy_Controller_Response_Global::getInstance();
+        if (!$dontCreate || $i->hasResponse()) $res = $i->getResponse();
+            else $res = null;
+        return $res;
     }
     
     /**
@@ -55,6 +58,10 @@ class Ac_Legacy_Controller_Response_Global {
             $response->mergeWithResponse($this->response);
             $this->response = false;
         }
+    }
+    
+    function clearResponse() {
+        $this->response = false;
     }
     
 }

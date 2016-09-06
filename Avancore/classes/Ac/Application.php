@@ -135,6 +135,8 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
     
     protected $initsCoreMixables = false;
     
+    protected $components = array();
+    
     /**
      * @var array Properties that will be after deferred mixables are created
      */
@@ -691,6 +693,16 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
             $this->setMixables($this->deferredMixables, false);
             $this->deferredMixables = array();
         }
+    }
+    
+    /**
+     * @return Ac_Application_Component
+     */
+    protected function getComponent($class) {
+        if (!isset($this->components[$class])) {
+            $this->components[$class] = new $class(array('application' => $this));
+        }
+        return $this->components[$class];
     }
     
 }

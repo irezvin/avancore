@@ -5,7 +5,6 @@
     "appClass": false,
     "appBaseClass": "Ac_Application",
     "caption": "Avancore_Child",
-    "josComId": "child",
     "dbName": "avancore_test",
     "relationsToNonModels": false,
     "tablePrefix": "ac_",
@@ -13,7 +12,7 @@
     "stripTablePrefixFromIds": true,
     "extraStripFromIds": false,
     "autoTables": [],
-    "autoTablesAll": true,
+    "autoTablesAll": "\/^#__\/",
     "autoTablesIgnore": [
         "#__tree_nested_sets",
         "#__shop_product_upc",
@@ -64,6 +63,7 @@
     "autoParentModels": true,
     "parentTableMap": [],
     "dontInheritProperties": [],
+    "domainTemplates": false,
     "inspector": {
         "__class": "Ac_Sql_Dbi_Inspector_Canned",
         "tableData": {
@@ -135,6 +135,39 @@
                             }
                         }
                     }
+                },
+                "ac_cpk": {
+                    "columns": {
+                        "foo": {
+                            "type": "int",
+                            "width": "11",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "bar": {
+                            "type": "int",
+                            "width": "11",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "baz": {
+                            "type": "int",
+                            "width": "11",
+                            "nullable": true,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "foo",
+                                "2": "bar"
+                            }
+                        }
+                    },
+                    "relations": []
                 },
                 "ac_people": {
                     "columns": {
@@ -2052,6 +2085,1000 @@
                         }
                     },
                     "relations": []
+                },
+                "im_template": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "importId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "lineNo": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        }
+                    },
+                    "relations": []
+                },
+                "im_test_aipk": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "width": "11",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "content": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": ""
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        }
+                    },
+                    "relations": []
+                },
+                "im_test_aipk_import": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "width": "11",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "importId": {
+                            "type": "int",
+                            "width": "11",
+                            "nullable": false,
+                            "default": "1"
+                        },
+                        "itemId": {
+                            "type": "int",
+                            "width": "11",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "name": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "content": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "otherContent": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "isDraft": {
+                            "type": "int",
+                            "width": "1",
+                            "nullable": false,
+                            "default": "0"
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        }
+                    },
+                    "relations": []
+                },
+                "im_test_aipk_linked": {
+                    "columns": {
+                        "masterId": {
+                            "type": "int",
+                            "width": "11",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "name": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "otherContent": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": ""
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "masterId"
+                            }
+                        },
+                        "name_UNIQUE": {
+                            "primary": false,
+                            "unique": true,
+                            "columns": {
+                                "1": "name"
+                            }
+                        }
+                    },
+                    "relations": []
+                },
+                "im_test_categories": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "name": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "parentId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": true,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        },
+                        "idxTitle": {
+                            "primary": false,
+                            "unique": true,
+                            "columns": {
+                                "1": "name"
+                            }
+                        },
+                        "fk_im_test_categories_1_idx": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "parentId"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "fk_im_test_categories_1": {
+                            "table": "im_test_categories",
+                            "columns": {
+                                "parentId": "id"
+                            }
+                        }
+                    }
+                },
+                "im_test_categories_import": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "categoryId": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "categoryName": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "description": {
+                            "type": "mediumtext",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "parentId": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "parentName": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "importStatus": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": "unprocessed"
+                        },
+                        "problems": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "importId": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        },
+                        "idxStatus": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "importStatus"
+                            }
+                        },
+                        "idxName": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "categoryName"
+                            }
+                        },
+                        "idxItemId": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "categoryId"
+                            }
+                        },
+                        "idxTypeId": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "parentId"
+                            }
+                        },
+                        "idxType": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "parentName"
+                            }
+                        },
+                        "idxImportId": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "importId"
+                            }
+                        }
+                    },
+                    "relations": []
+                },
+                "im_test_classifiers_import": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "classifierId": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "title": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "description": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "classifierType": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": ""
+                        },
+                        "importStatus": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": "unprocessed"
+                        },
+                        "problems": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "importId": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        },
+                        "idxStatus": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "importStatus"
+                            }
+                        },
+                        "idxName": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "title"
+                            }
+                        },
+                        "idxItemId": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "classifierId"
+                            }
+                        },
+                        "idxType": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "classifierType"
+                            }
+                        },
+                        "idxImportId": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "importId"
+                            }
+                        }
+                    },
+                    "relations": []
+                },
+                "im_test_item_categories": {
+                    "columns": {
+                        "itemId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "categoryId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "itemId",
+                                "2": "categoryId"
+                            }
+                        },
+                        "fk_im_test_item_categories_1_idx": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "categoryId"
+                            }
+                        },
+                        "fk_im_test_item_categories_1_idx1": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "itemId"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "categoryId": {
+                            "table": "im_test_categories",
+                            "columns": {
+                                "categoryId": "id"
+                            }
+                        },
+                        "itemId": {
+                            "table": "im_test_items",
+                            "columns": {
+                                "itemId": "id"
+                            }
+                        }
+                    }
+                },
+                "im_test_item_categories_import": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "categoryId": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "categoryName": {
+                            "type": "mediumtext",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "importStatus": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": "unprocessed"
+                        },
+                        "problems": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "importId": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "lineNo": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        },
+                        "idxStatus": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "importStatus"
+                            }
+                        },
+                        "idxName": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "categoryId"
+                            }
+                        },
+                        "idxLineNo": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "lineNo"
+                            }
+                        },
+                        "idxImportId": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "importId"
+                            }
+                        }
+                    },
+                    "relations": []
+                },
+                "im_test_items": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "name": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "description": {
+                            "type": "mediumtext",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "imageFileName": {
+                            "type": "varchar",
+                            "width": "255",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "thumbFileName": {
+                            "type": "varchar",
+                            "width": "255",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "typeId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": true,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        },
+                        "idxName": {
+                            "primary": false,
+                            "unique": true,
+                            "columns": {
+                                "1": "name"
+                            }
+                        },
+                        "fk_im_test_items_1_idx": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "typeId"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "fk_im_test_items_1": {
+                            "table": "im_test_types",
+                            "columns": {
+                                "typeId": "id"
+                            }
+                        }
+                    }
+                },
+                "im_test_items_import": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "itemId": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "name": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "description": {
+                            "type": "mediumtext",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "typeId": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "type": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "importStatus": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": "unprocessed"
+                        },
+                        "problems": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "relatedText1": {
+                            "type": "mediumtext",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "pictureUrl": {
+                            "type": "varchar",
+                            "width": "255",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "importId": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "lineNo": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        },
+                        "idxStatus": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "importStatus"
+                            }
+                        },
+                        "idxName": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "name"
+                            }
+                        },
+                        "idxItemId": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "itemId"
+                            }
+                        },
+                        "idxTypeId": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "typeId"
+                            }
+                        },
+                        "idxType": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "type"
+                            }
+                        },
+                        "idxLineNo": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "lineNo"
+                            }
+                        },
+                        "idxImportId": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "importId"
+                            }
+                        },
+                        "idxPictureUrl": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "pictureUrl"
+                            }
+                        }
+                    },
+                    "relations": []
+                },
+                "im_test_pictures_import": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "importId": {
+                            "type": "int",
+                            "width": "10",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "importStatus": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": "unprocessed"
+                        },
+                        "problems": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "pictureUrl": {
+                            "type": "varchar",
+                            "width": "255",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "pictureFileName": {
+                            "type": "varchar",
+                            "width": "255",
+                            "nullable": true,
+                            "default": null
+                        },
+                        "thumbFileName": {
+                            "type": "varchar",
+                            "width": "255",
+                            "nullable": true,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        },
+                        "idxStatus": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "importStatus"
+                            }
+                        },
+                        "idxImportId": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "importId"
+                            }
+                        },
+                        "idxPictureUrl": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "pictureUrl"
+                            }
+                        },
+                        "idxPictureFileName": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "pictureFileName"
+                            }
+                        },
+                        "idxThumbFileName": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "thumbFileName"
+                            }
+                        }
+                    },
+                    "relations": []
+                },
+                "im_test_related": {
+                    "columns": {
+                        "itemId": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "relatedText1": {
+                            "type": "mediumtext",
+                            "nullable": false,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "itemId"
+                            }
+                        },
+                        "fk_im_test_related_1_idx": {
+                            "primary": false,
+                            "unique": false,
+                            "columns": {
+                                "1": "itemId"
+                            }
+                        }
+                    },
+                    "relations": {
+                        "fk_im_test_related_1": {
+                            "table": "im_test_items",
+                            "columns": {
+                                "itemId": "id"
+                            }
+                        }
+                    }
+                },
+                "im_test_source_of_copy": {
+                    "columns": {
+                        "id": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": null
+                        },
+                        "name": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": ""
+                        },
+                        "description": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": ""
+                        },
+                        "thisWillBeRelatedText": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": ""
+                        },
+                        "somethingElse": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": true,
+                            "default": ""
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        }
+                    },
+                    "relations": []
+                },
+                "im_test_types": {
+                    "columns": {
+                        "id": {
+                            "type": "int",
+                            "unsigned": true,
+                            "width": "10",
+                            "nullable": false,
+                            "default": null,
+                            "autoInc": true
+                        },
+                        "name": {
+                            "type": "varchar",
+                            "width": "45",
+                            "nullable": false,
+                            "default": null
+                        }
+                    },
+                    "indices": {
+                        "PRIMARY": {
+                            "primary": true,
+                            "unique": true,
+                            "columns": {
+                                "1": "id"
+                            }
+                        },
+                        "idxTitle": {
+                            "primary": false,
+                            "unique": true,
+                            "columns": {
+                                "1": "name"
+                            }
+                        }
+                    },
+                    "relations": []
                 }
             }
         },
@@ -2101,7 +3128,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -3211,7 +4237,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -3392,7 +4417,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -3661,7 +4685,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -4073,7 +5096,6 @@
                     }
                 }
             },
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -4569,7 +5591,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -5312,7 +6333,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -5524,7 +6544,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -5964,7 +6983,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -6153,7 +7171,6 @@
                     }
                 }
             },
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -6642,7 +7659,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -6907,7 +7923,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -7121,7 +8136,6 @@
                     "uniformTypeId": "Child_Shop_Product_Mapper"
                 }
             },
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -7508,7 +8522,6 @@
                     "uniformTypeId": "Child_Shop_Product_Mapper"
                 }
             },
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -7791,7 +8804,6 @@
                     }
                 }
             },
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -8653,7 +9665,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -8936,7 +9947,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -9219,7 +10229,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -9494,7 +10503,6 @@
                     "uniformTypeId": "Child_Shop_Spec_Mapper"
                 }
             },
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -9819,7 +10827,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -10280,7 +11287,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -10591,7 +11597,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -10797,7 +11802,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],
@@ -11127,7 +12131,6 @@
             "altDomainPrefix": false,
             "modelCoreMixables": [],
             "mapperCoreMixables": [],
-            "noUi": true,
             "parentModelName": false,
             "onlyColumns": false,
             "ignoreColumns": [],

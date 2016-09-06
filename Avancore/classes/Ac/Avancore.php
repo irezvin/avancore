@@ -19,16 +19,21 @@ class Ac_Avancore extends Ac_Application {
     function getVersion() {
         return self::$version;
     }
+ 
+    protected function doOnInitialize() {
+        if ($res = parent::doOnInitialize()) {
+            if ($this->addIncludePaths) {
+                Ac_Util::addIncludePath(dirname(dirname(dirname(__FILE__))).'/obsolete');
+            }
+        }
+        return $res;
+    }
     
     /**
      * @return Ac_Avancore
      */
     static function getInstance($id = null) {
         return Ac_Application::getApplicationInstance('Ac_Avancore', $id);
-    }
-    
-    protected function doOnInitialize() {
-        parent::doOnInitialize();
     }
     
     function getDefaultAssetPlaceholders() {

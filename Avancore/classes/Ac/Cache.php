@@ -71,7 +71,7 @@ class Ac_Cache {
         if (($cd = self::getDefaultCacheDir()) !== false) {
             $res = array(
                 'class' => 'Ac_Cache',
-            	'cacheDir' => $cd,
+                'cacheDir' => $cd,
             );
             if (($l = (int) self::getDefaultCacheLifeTime())) $res['lifetime'] = $l;
         }
@@ -93,7 +93,7 @@ class Ac_Cache {
     }
     
     /**
-	 * @return array('group' => array('nFiles' => int, 'totalSize' => int)
+     * @return array('group' => array('nFiles' => int, 'totalSize' => int)
      */
     function calculateGroupStats() {
         $res = $this->getUtil()->getStatsRecursive($this->cacheDir);
@@ -113,45 +113,45 @@ class Ac_Cache {
         return $this->util;
     }
     
-	function has($id, $group = false, & $howOld = null, $lifetime = false, & $filename = null) {
-		$res = false;
-		$howOld = false;
-		if ($lifetime === false) $lifetime = $this->lifetime;
-		if ($this->enabled) {
-			$filename = $this->getFilename($id, $group);
-			if (file_exists($filename)) {
-				$howOld = time() - filemtime($filename);
-				if (!$lifetime || $howOld <= $lifetime) $res = true;
-			}
-		}
-		return $res;
-	}
-	
-	function get($id, $group = false, $default = null, $evenOld = false) {
-	    
-	    if (!$this->triedCleanup) $this->tryCleanup();
-	    
-		if ($this->has($id, $group, $howOld, $evenOld? $this->lifetime : 0, $filename)) {
-			$res = file_get_contents($filename);
-		} else {
-			$res = $default;
-		}
-		return $res;
-	}
-	
-	function getFilename($id, $group = false) {
-	    
-	    $fn = $this->cacheDir.DIRECTORY_SEPARATOR.$this->globalPrefix;
-	    
-	    if (!is_scalar($id)) $id = md5(serialize(id));
-	        else $id = (string) $id;
-	    
-	    if ($group === false) $group = $this->defaultGroup;
-	    
+    function has($id, $group = false, & $howOld = null, $lifetime = false, & $filename = null) {
+        $res = false;
+        $howOld = false;
+        if ($lifetime === false) $lifetime = $this->lifetime;
+        if ($this->enabled) {
+            $filename = $this->getFilename($id, $group);
+            if (file_exists($filename)) {
+                $howOld = time() - filemtime($filename);
+                if (!$lifetime || $howOld <= $lifetime) $res = true;
+            }
+        }
+        return $res;
+    }
+    
+    function get($id, $group = false, $default = null, $evenOld = false) {
+        
+        if (!$this->triedCleanup) $this->tryCleanup();
+        
+        if ($this->has($id, $group, $howOld, $evenOld? $this->lifetime : 0, $filename)) {
+            $res = file_get_contents($filename);
+        } else {
+            $res = $default;
+        }
+        return $res;
+    }
+    
+    function getFilename($id, $group = false) {
+        
+        $fn = $this->cacheDir.DIRECTORY_SEPARATOR.$this->globalPrefix;
+        
+        if (!is_scalar($id)) $id = md5(serialize(id));
+            else $id = (string) $id;
+        
+        if ($group === false) $group = $this->defaultGroup;
+        
         if ($this->subdirs || $this->groupsToDirs) $fn .= $group.DIRECTORY_SEPARATOR;
             else $fn .= $group.'_';
-	        
-	    $sd = min($this->subdirs, strlen($id));
+            
+        $sd = min($this->subdirs, strlen($id));
         for ($i = 0; $i < $sd; $i++) {
             $fn .= substr($id, $i, 1).DIRECTORY_SEPARATOR;
         }
@@ -160,10 +160,10 @@ class Ac_Cache {
             
         $fn .= $id;
         
-		return $fn;
-	}
-	
-	function put($id, $content, $group = false) {
+        return $fn;
+    }
+    
+    function put($id, $content, $group = false) {
         
         if ($this->enabled) {
 
@@ -194,12 +194,12 @@ class Ac_Cache {
         } else {
             $res = false;
         }
-			
-		return $res;
-	}
-	
-	function delete($id, $group = false) {
-	    
+            
+        return $res;
+    }
+    
+    function delete($id, $group = false) {
+        
         if ($this->enabled) {
 
             if (!$this->triedCleanup) $this->tryCleanup();
@@ -213,31 +213,31 @@ class Ac_Cache {
         } else {
             $res = false;
         }
-	    return $res;
-	}
-	
-	function hasToCleanup() {
-	    $res = false;
-	    if (is_dir($this->cacheDir)) {
-	        $fn = $this->cacheDir.DIRECTORY_SEPARATOR.$this->globalPrefix.'.cleanup';
-	        if (is_file($fn)) { 
-	            $t = filemtime($fn);
-	            if ((time() - $t) >= $this->cleanupInterval) $res = $fn;   
-	        } else touch($fn);
-	    }
-	    return $res;
-	}
-	
-	function tryCleanup($force = false) {
-	    $this->triedCleanup = true;
-	    if (($fn = $this->hasToCleanup()) || $force) {
-	        $this->getUtil()->purgeRecursive($this->cacheDir, $this->lifetime);
-	        if (strlen($fn)) touch($fn);
-	    }
-	}
-	
-	function deleteAll() {
-	    $this->getUtil()->deleteRecursive($this->cacheDir);
-	}
+        return $res;
+    }
+    
+    function hasToCleanup() {
+        $res = false;
+        if (is_dir($this->cacheDir)) {
+            $fn = $this->cacheDir.DIRECTORY_SEPARATOR.$this->globalPrefix.'.cleanup';
+            if (is_file($fn)) { 
+                $t = filemtime($fn);
+                if ((time() - $t) >= $this->cleanupInterval) $res = $fn;   
+            } else touch($fn);
+        }
+        return $res;
+    }
+    
+    function tryCleanup($force = false) {
+        $this->triedCleanup = true;
+        if (($fn = $this->hasToCleanup()) || $force) {
+            $this->getUtil()->purgeRecursive($this->cacheDir, $this->lifetime);
+            if (strlen($fn)) touch($fn);
+        }
+    }
+    
+    function deleteAll() {
+        $this->getUtil()->deleteRecursive($this->cacheDir);
+    }
     
 }

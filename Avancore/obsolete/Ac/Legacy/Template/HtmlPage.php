@@ -107,12 +107,12 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
     
     function showHead() {
 ?><head>
-    <!-- powered by Avancore 0.3 -->
+    <!-- powered by Avancore <?php echo Ac_Avancore::version ?> -->
 <?php   if ($this->getTitle()) { ?>
 
     <title><?php echo $this->getTitle(); ?></title>
 <?php } ?>
-    <?php $this->showInsideHead(); ?>
+    <?php $this->showInsideHead(); ?> 
 </head> 
 <?php
     }

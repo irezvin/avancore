@@ -26,7 +26,7 @@ abstract class Ac_Util {
      * @param bool $prepend Add this path to beginning of include_path list (not the end)
      */
     static function addIncludePath($path = false, $prepend = false) {
-        if ($path === false) $path = dirname(dirname(__FILE__));
+        if ($path === false) $path = array(dirname(dirname(__FILE__)), dirname(dirname(dirname(__FILE__))).'/obsolete');
         $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
         if (!is_array($path)) $path = array($path);
         if ($prepend) $paths = array_merge($path, array_diff($paths, $path));
@@ -79,7 +79,7 @@ abstract class Ac_Util {
         return $fileLoaded;
     }
     
-    static function registerAutoload() {
+    static function registerAutoload($addIncludePath = false) {
         $res = false;
         if (self::$autoLoadRegistered === null) {
             if (function_exists('spl_autoload_register')) {
@@ -104,6 +104,7 @@ abstract class Ac_Util {
         } else {
             $res = self::$autoLoadRegistered;
         }
+        if ($addIncludePath) self::addIncludePath();
         return $res;
     }
     

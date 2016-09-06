@@ -104,14 +104,21 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
     }
     
     function listRecords() {
-        $ord = $this->mapper->getDefaultOrdering();
-        if (strlen($ord)) $orderClause = "\nORDER BY $ord";
-        else $orderClause = "";
-        $res = $this->db->fetchColumn(
-            "SELECT ".$this->db->n($this->primaryKey)
-            ."\nFROM ".$this->db->n($this->tableName)
-            .$orderClause
-        );
+        $sort = $this->mapper->getDefaultSort();
+        $clause = false;
+        if (!$sort || ($clause = $this->canSimpleSort($sort))) {
+            
+            $sel = "
+                SELECT ".$this->db->n($this->primaryKey)
+                ."\nFROM ".$this->db->n($this->tableName);
+            if ($clause) $sel .= "\nORDER BY {$clause}";
+            $res = $this->db->fetchColumn($sel);
+            
+        } else {
+            $sel = $this->createSqlSelect();
+            $sel->columns = $this->db->n($this->primaryKey);
+            $res = $this->db->fetchColumn($sel);
+        }
         return $res;
     }
     
