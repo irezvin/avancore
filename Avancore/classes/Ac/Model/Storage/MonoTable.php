@@ -827,7 +827,12 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
         if ($this->columns === false) $this->columns = $columns;
         if ($this->uniqueIndices === false) $this->uniqueIndices = $uniqueIndices;
         if ($this->nullableColumns === false) $this->nullableColumns = $nullableColumns;
-        if ($this->primaryKey === false) $this->primaryKey = $primaryKey;
+        if ($this->primaryKey === false) {
+            $this->primaryKey = $primaryKey;
+            if ($this->mapper && !strlen($this->mapper->getIdentifierPublicField())) {
+                $this->mapper->setIdentifierPublicField ($this->primaryKey);
+            }
+        }
         if ($this->defaults === false) $this->defaults = $defaults;
     }
     

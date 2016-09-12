@@ -420,18 +420,18 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     
             $res = false;
 
-            if ($primaryKey !== null || $this->hasFullPrimaryKey()) {
+            if ($primaryKey !== null || $this->isPersistent() || !is_null($primaryKey = $this->mapper->calcIdentifier($this))) {
                 if ($primaryKey === null) $primaryKey = $this->mapper->getIdentifier($this);
                 if ($hyData = $this->mapper->peLoad($this, $primaryKey)) {
                     $this->setDefaults(true);
                     $res = $this->load($hyData, true);
-        }
-        }
+                }
+            }
         
         }
         
         return $res;
-        }
+    }
         
     protected function notifyObjectCollections($lifecycleStage) {
         $hadMapper = false;
@@ -676,7 +676,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
      * Use isPersistent() to check if record has been saved
      */
     function hasFullPrimaryKey() {
-        return $this->isPersistent();
+        return $this->isPersistent() || $this->mapper->calcIdentifier($this) !== null;
     }
     
     function matchesIdentifier($idOrIds) {
@@ -746,11 +746,11 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
             $this->_peIdentifier = false;
             if (($id = $this->mapper->getIdentifier($this)) === null) {
                 throw new Exception("Cannot force-persistent an object without present identifier");
-    }
+            }
             $this->_peIdentifier = $id;
-                } else {
+        } else {
             $this->_peIdentifier = null;
-                    }
+        }
     }
     
     function _getCompleteUniqueIndices() {

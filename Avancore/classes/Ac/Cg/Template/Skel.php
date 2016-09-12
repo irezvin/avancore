@@ -399,7 +399,7 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
                     '{AC}' => $url.'/avancore',
                 ),
                 'useLangStrings' => false,
-                'managerImagesUrl' => '{AC}/vendor/images',
+                'managerImagesUrl' => '{AC}/vendor/images/',
 
                 // will be set later in app.config.local.php
                 'dbName' => '**dbname**',
@@ -416,6 +416,77 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
     <?php
     }
 
+    function getCodegenConfig() {
+        $res = array(
+            'generator' => array(
+                'dbPrototype' => new Ac_Cg_Php_Expression('$appConfig[\'dbPrototype\']'),
+                'outputDir' => new Ac_Cg_Php_Expression('dirname(__FILE__).'.$this->export($this->cgRelOutputPath, true)),
+                'logFileName' => new Ac_Cg_Php_Expression('dirname(__FILE__).'.$this->export($this->cgRelLogPath, true)),
+                'overwriteLog' => true,
+
+                'domainDefaults' => new Ac_Cg_Php_Expression(array(
+                        'defaultTitlePropName' => 'title',
+                        'defaultPublishedPropName' => 'published',
+                        'defaultOrderingPropName' => 'ordering',
+                ), 'domainDefaults', 'default settings for all domains', true),
+            ),
+
+            'domains' => array(
+                'defaultDomain' => new Ac_Cg_Php_Expression(array(
+                    'dbName' => new Ac_Cg_Php_Expression('$appConfig[\'dbName\']'),
+                        'tablePrefix' => new Ac_Cg_Php_Expression('$appConfig[\'dbPrototype\'][\'dbPrefix\']'),
+                        'replaceTablePrefixWith' => '#__',
+                        'useLangStrings' => new Ac_Cg_Php_Expression(
+                            'isset($config[\'useLangStrings\']) && $config[\'useLangStrings\']', 
+                            false, 'will generate language strings'
+                        ),
+
+                    'subsystemPrefixes' => new Ac_Cg_Php_Expression(array(), 
+                        false, "parts of model identifiers that will be used as subsystem names (model that reference\n"
+                        ."each other within one subsystem don't have common prefix in the property identifiers)", true),
+
+                    'subsystemPrefixes' => new Ac_Cg_Php_Expression(array(), 
+                        false, "which subsystems don't reference each other", true),
+                    
+                    'subsystemPrefixes' => new Ac_Cg_Php_Expression(is_string($this->tables) || is_array($this->tables), 
+                        false, "generate models from all tables", true),
+                    
+                    'autoTablesAll' => new Ac_Cg_Php_Expression(!(is_string($this->tables) || is_array($this->tables)), 
+                        false, "generate models from all tables", true),
+                    
+                    'autoTablesIgnore' => new Ac_Cg_Php_Expression(array(), 
+                        false, "array or regExp", true),
+                    
+                    'autoTables' => new Ac_Cg_Php_Expression(
+                        is_string($this->tables) || is_array($this->tables)? $this->tables : array(), 
+                        false, "array or regExp -- used only if autoTablesAll === FALSE", true),
+                    
+                    'defaultTitleColumn' => new Ac_Cg_Php_Expression('title', 
+                        false, "one or more columns that will be used as titles of records", true),
+                    
+                    'defaultTitleColumn' => new Ac_Cg_Php_Expression('title', 
+                        false, "one or more columns that will be used as titles of records", true),
+                    
+                    'dictionary' => new Ac_Cg_Php_Expression(array(
+                        'data' => new Ac_Cg_Php_Expression(array(), 
+                            false, "'index' => array('singular' => 'index', 'plural' => 'indices'),", true)
+                        ), false, "exceptions for the inflector", true
+                    ), 
+                    
+                    'schemaExtras' => new Ac_Cg_Php_Expression(array(
+                        'tables' => array(), 
+                    ), false, "overrides for the SQL schema that will be auto-generated from the database", true),
+                    
+                    'modelDefaults' => new Ac_Cg_Php_Expression(array(
+                        'generateMethodPlaceholders' => false,
+                        'hasUniformPropertiesInfo' => true,
+                    ), false, "default settings for all models", true),
+                ), new Ac_Cg_Php_Expression('$appConfig["appName"]'), false, true)
+            )
+        );
+        return $res;
+    }
+    
     // --- config/codegen.config.php -----------------------------------------------
 
     function showConfigCodegenConfigPhp () {
@@ -427,72 +498,9 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
             require(dirname(__FILE__).'/app.config.php');
             $appConfig = $config;
 
-            $config = array(
-
-                'generator' => array(
-                    'dbPrototype' => $appConfig['dbPrototype'],
-                    'outputDir' => dirname(__FILE__).<?php $this->export($this->cgRelOutputPath); ?>,
-                    'logFileName' => dirname(__FILE__).<?php $this->export($this->cgRelLogPath); ?>,
-                    'overwriteLog' => true,
-
-                    // default settings for all domains
-                    'domainDefaults' => array(
-                        'defaultTitlePropName' => 'title',
-                        'defaultPublishedPropName' => 'published',
-                        'defaultOrderingPropName' => 'ordering',
-                    ),
-                ),
-
-                'domains' => array(
-                    $appConfig['appName'] => array(
-                        'dbName' => $appConfig['dbName'],
-                        'tablePrefix' => $appConfig['dbPrototype']['dbPrefix'],
-                        'replaceTablePrefixWith' => '#__',
-
-                        // will generate language strings
-                        'useLangStrings' => isset($config['useLangStrings']) && $config['useLangStrings'],
-
-                        // parts of model identifiers that will be used as subsystem names 
-                        // (model that reference each other within one subsystem don't have common prefix in the property identifiers)
-                        'subsystemPrefixes' => array(),
-
-                        // which subsystems don't reference each other
-                        'dontLinkSubsystems' => array(
-                        ),
-
-                        // generate models from all tables
-                        'autoTablesAll' => <?php echo is_string($this->tables) || is_array($this->tables)? 'false' : 'true' ?>, 
-
-                        // array or regExp
-                        'autoTablesIgnore' => array(), 
-
-                        // array or regExp -- used only if autoTablesAll === FALSE
-                        'autoTables' => <?php echo is_string($this->tables) || is_array($this->tables)? $this->export($this->tables, true) : 'array()' ?>, 
-
-                        // one or more columns that will be used as titles of records
-                        'defaultTitleColumn' => 'title', 
-
-                        // exceptions for the inflector
-                        'dictionary' => array(
-                            'data' => array(
-                                // 'index' => array('singular' => 'index', 'plural' => 'indices'),
-                            ),
-                        ),
-
-                        // overrides for the SQL schema that will be auto-generated from the database
-                        'schemaExtras' => array(
-                            'tables' => array(
-                            ),
-                        ),
-
-                        // default settings for all models
-                        'modelDefaults' => array(
-                            'generateMethodPlaceholders' => false,
-                            'hasUniformPropertiesInfo' => true,
-                        ),
-                    ),
-                ),
-            );
+            $config = <?php $this->export($this->getCodegenConfig(), false, 12); ?>;
+            
+            
     <?php
     }
 

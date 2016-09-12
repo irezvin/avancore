@@ -442,11 +442,12 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
             $data = array_merge($data, $newData);
         
         $record = $this->getExtraRecord($data, $myData);
-        
-        if ($record->hasFullPrimaryKey()) {
+
+        if ($record->isPersistent() || !is_null($cpk = $record->getMapper()->calcIdentifier($record))) {
             $record->load();
             $record->bind($myData);
         }
+
         if ($record->store()) {
             $res = $record;
             foreach ($this->colMap as $slaveCol => $ownerCol) {

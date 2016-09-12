@@ -18,7 +18,7 @@ class Ac_Cg_Layout_Joomla extends Ac_Cg_Layout {
     var $pathAssets = 'media/com_{app}';
     var $pathVendor = '{pathApp}/vendor';
     var $pathAvancore = 'libraries/avancore';
-    var $pathAvancoreAssets = 'media/avancore';
+    var $pathAvancoreAssets = '../../media/avancore';
     var $pathCodegenWeb = 'administrator/components/com_{app}/codegen';
     var $pathBootstrap = '{pathApp}';
     
@@ -53,6 +53,7 @@ class Ac_Cg_Layout_Joomla extends Ac_Cg_Layout {
                     $tmp->surePathApp = true;
                     $tmp->pathApp = '{pathAdminComponent}';
                     if ($tmp->detect($dir)) {
+                        $this->pathApp = '{pathAdminComponent}';
                         $res = parent::detect($dir, $setToFound, $foundItems);
                     }
                 }
@@ -104,6 +105,10 @@ class Ac_Cg_Layout_Joomla extends Ac_Cg_Layout {
     
     function getCliInfo() {
         return array('foundApps' => $this->foundApps);
+    }
+    
+    function hasDefaultCopyTarget() {
+        return true;
     }
 
 }

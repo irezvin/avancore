@@ -135,8 +135,6 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
      */
     var $_models = false;
     
-    var $strategySettings = array();
-    
     /**
      * Default name for model special properties auto-detection
      * @see Ac_Cg_Model::detectSpecialProperties  
@@ -444,7 +442,7 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
             $this->_gen->log("<strong>{$this->name}</strong>: table '{$tableName}' has no primary key and will be ignored.", true);
             return false;
         } elseif (count($pk) > 1) {
-            $this->_gen->log("<strong>{$this->name}</strong>: table '{$tableName}' has composite primary key: '".implode("', '", $pk)."'. Composite PKs are not supported yet and table will be ignored.", true);
+            $this->_gen->log("<strong>{$this->name}</strong>: table '{$tableName}' has composite primary key: '".implode("', '", $pk)."'. Composite PKs are not supported yet and the table will be ignored.", true);
             return false;
         }
         
@@ -598,20 +596,6 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
         return $res;
     }
     
-    /**
-     * This function is called by Ac_Cg_Generator when Ac_Cg_Strategy object is initialized for this Ac_Cg_Domain
-     * Function result is merged with prototype for strategy settings.
-     * @return array
-     */
-    function getStrategySettings() {
-        if (is_array($this->strategySettings)) $res = $this->strategySettings;
-            else $res = array();
-            
-        if ($this->needsLangStrings()) $res['domainTemplates'] = array('Ac_Cg_Template_Domain', 'Ac_Cg_Template_Languages');
-            
-        return $res;
-    }
-    
     function getBiJunctionIgnore($tableName) {
         $res = array();
         
@@ -743,7 +727,7 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
             $res = array(
                 'domain' => 'Ac_Cg_Template_Domain',
             );
-            if ($this->useLangStrings) $res['languages'] = 'Ac_Cg_Template_Languages';
+            if ($this->needsLangStrings()) $res['languages'] = 'Ac_Cg_Template_Languages';
         } else {
             $res = $this->domainTemplates;
         }

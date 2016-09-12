@@ -20,7 +20,7 @@ abstract class Ac_Model_Relation_Provider_Mapper_Abstract extends Ac_Model_Relat
      * additional restrictions to add to $query arg of Mapper's find() method
      * @var array
      */
-    protected $query = false;
+    protected $query = array();
 
     /**
      * value to Mapper's find() $sort

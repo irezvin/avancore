@@ -23,11 +23,12 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
         'tables',
         'avancore-dir',
         'dir',
-        'gen',
+        'mode',
         'deploy',
-        'cg',
+        'gen',
         'skip-copy',
         'skip-deploy',
+        'skip-lint',
         'help',
     );
     
@@ -41,7 +42,7 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
 
             create  - create skeleton of an application
             copy    - create or update the copy of Avancore framework
-            cg      - generate or re-generate the model code (and clean cache)
+            gen     - generate or re-generate the model code (and clean cache)
             clean   - clean cache directory
             info    - show information on detected directories and application type
             help    - show this help message
@@ -55,8 +56,8 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
         avan [--action=]copy [--avancore-path=DIR]
              [--type=auto|native|joomla] [--dir=DIR]
     
-        avan [--action=]cg [--gen=all|editable|non-editable] [--skip-deploy[=true]]
-             [--type=auto|native|joomla] [--dir=DIR]
+        avan [--action=]gen [--mode=all|editable|non-editable] [--skip-deploy[=true]]
+             [--type=auto|native|joomla] [--dir=DIR] [--skip-lint[=true]]
              
         avan [--action=]clean
         
@@ -94,7 +95,7 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
 
                             b) 'true' - default to all tables
 
-        --cg[=true]         Immediately generate the code based on all tables in the 
+        --gen[=true]        Immediately generate the code based on all tables in the 
                             database (requires --db argument)
 
         --skip-copy[=true]  Don't copy Avancore to the created application skeleton
@@ -105,9 +106,9 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
                             where Avancore installation with Ac_Avancore class used 
                             by the current tool is located)
 
-    CG arguments:
+    GEN arguments:
 
-        --gen=MODE          Which files to generate:
+        --mode=MODE         Which files to generate:
                             all            - (default) generate all types of files
                             editable       - generate only editable files
                             non-editable   - generate only non-editable files
@@ -117,8 +118,10 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
                             Don't copy generated code to the application classes' 
                             and gen' directories (note: 'editable' files are never
                             overwritten)
+                            
+        --skip-lint[=true]  Don't lint every generated file with PHP interpreter (faster)
 
-    Avancore <?php echo Ac_Avancore::version ?> (c) 2007-2016 Ilya Rezvin irezvin@gmail.com
+    Avancore <?php echo Ac_Avancore::version ?> (c) 2007-<?php echo date('Y'); ?> Ilya Rezvin irezvin@gmail.com
     License: Modified BSD License
 
 <?php
@@ -203,9 +206,9 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
         $db = $this->get('db');
         $tables = $this->get('tables');
         
-        $cg = $this->get('cg', (bool) $db);
+        $gen = $this->get('gen', (bool) $db);
         
-        if (!is_bool($cg)) throw Ac_E_InvalidCall::outOfSet('cg', $cg, array('true', 'false'));
+        if (!is_bool($gen)) throw Ac_E_InvalidCall::outOfSet('gen', $gen, array('true', 'false'));
         
         $dontCopy = $this->get('skip-copy', false);
         if (!is_bool($dontCopy)) throw Ac_E_InvalidCall::outOfSet('skip-copy', $dontCopy, array('true', 'false'));
@@ -222,7 +225,7 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
             'dbName' => $db,
         ));
         
-        if ($cg) {
+        if ($gen) {
             if (!strlen($db) && $app->getSkel()->getDbRequired())
                 throw new Ac_E_Cli("--db is required with --cg=true"
                     ." for '".$app->getType()."' app type");
@@ -234,10 +237,7 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
         
         $app->createSkel($destDir);
         
-        //Ac_Debug::ddd($app->getSkel()->tables, $app->getSkel()->dbName);
-        
-        if ($cg) {
-        
+        if ($gen) {
             if (!$app->detect($destDir)) throw new Exception ("Cannot detect the generated application");
             $gen = $app->generateCode(true, true, true, true);
             $this->genStats($gen);
@@ -250,25 +250,29 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
     }
 
     function actionCopy() {
-        $this->getApp(true)->copyAvancore(null, $this->get('avancore-dir', false));
+        $app = $this->getApp();
+        $app->copyAvancore(null, $this->get('avancore-dir', false));
     }
     
-    function actionCg() {
+    function actionGen() {
         $skipDeploy = $this->get('skip-deploy', false);
         if (!is_bool($skipDeploy)) throw Ac_E_InvalidCall::outOfSet('skip-deploy', $skipDeploy, array('true', 'false'));
         
-        $gen = $this->get('gen', 'all');
-        if (!in_array($gen, $a = array('editable', 'non-ediable', 'all')))
-            throw Ac_E_InvalidCall::outOfSet('gen', $gen, $a);
+        $skipLint = $this->get('skip-lint', false);
+        if (!is_bool($skipLint)) throw Ac_E_InvalidCall::outOfSet('skip-lint', $skipLint, array('true', 'false'));
+        
+        $mode = $this->get('mode', 'all');
+        if (!in_array($mode, $a = array('editable', 'non-ediable', 'all')))
+            throw Ac_E_InvalidCall::outOfSet('mode', $mode, $a);
             
-        $genEditable = $gen == 'all' || $gen == 'editable';
-        $genNonEditable = $gen == 'all' || $gen == 'nonEditable';
+        $genEditable = $mode == 'all' || $mode == 'editable';
+        $genNonEditable = $mode == 'all' || $mode == 'nonEditable';
  
         $deploy = !$skipDeploy;
 
-        $gen = $this->getApp(true)->generateCode($genEditable, $genNonEditable, $deploy, $deploy);
+        $mode = $this->getApp(true)->generateCode($genEditable, $genNonEditable, $deploy, $deploy, $skipLint);
         $this->getApp()->cleanCache($found, $files, $dirs);
-        $this->genStats($gen);
+        $this->genStats($mode);
     }
 
     function actionClean() {

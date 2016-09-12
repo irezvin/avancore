@@ -2,6 +2,8 @@
 
 class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
 
+    var $resetStateOnNoArgs = false;
+    
     var $separateToolbar = false;
     
 	var $_templateClass = 'Ac_Legacy_Controller_Std_Admin_Template';
@@ -44,12 +46,13 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
             Ac_Util::unsetArrayByPath($state, array('keys'));
             
             $data = $c->getData();
-            if (isset($data[$this->_methodParamName]) && $data[$this->_methodParamName] == 'list') {
+            if (!isset($data[$this->_methodParamName]) || $data[$this->_methodParamName] == 'list') {
 	            if (!is_array($state)) $state = array();
-	            if (!count($data)) $state = array();
+	            if ($this->resetStateOnNoArgs && !count($data)) $state = array();
                 if ($c->getData('filterForm')) $state['filterForm'] = array();
                 
-	            Ac_Util::ms($state, $c->getData(), true);
+                $state = Ac_Util::ms($state, $c->getData(), true);
+                
 	            $c->setData($state);
 	            Ac_Util::setArrayByPath($_SESSION[$sv], $p, $state);
             }

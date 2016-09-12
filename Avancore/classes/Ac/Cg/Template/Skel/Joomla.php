@@ -7,6 +7,8 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
      */
     protected $layout = false;
     
+    var $tables = null;
+    
     /**
      * Cg Log path relative to the config file
      */
@@ -39,6 +41,18 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
             '{pathVarTmp}/.htaccess' => array('templatePart' => 'localHtaccess'),
             '{pathVarLog}/.htaccess' => array('templatePart' => 'localHtaccess'),
         ));
+        return $res;
+    }
+    
+    function getCodegenConfig() {
+        if (is_null($this->tables))
+            $this->tables = '/#__'.strtolower($this->appName).'_/';
+        $res = parent::getCodegenConfig();
+        $res['domains']['defaultDomain']->expression = array_merge(
+            array(
+                'dontPrefixClassesWithAppName' => true,
+                'appClassName' => ucfirst($this->appName),
+        ), $res['domains']['defaultDomain']->expression);
         return $res;
     }
 
@@ -88,13 +102,13 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
                 'appName' => '[[App]]',
 
                 'assetPlaceholders' => array(
-                    '{FOO}' => $url.'/media/com_[[app]]',
+                    '{<?php echo strtoupper($this->appName); ?>}' => $url.'/media/com_[[app]]',
                     '{AC}' => $url.'/media/avancore',
                     '{JQUERY}' => $url.'/media/jui/js/jquery.js'
                 ),
 
                 'useLangStrings' => false,
-                'managerImagesUrl' => '{AC}/vendor/images',
+                'managerImagesUrl' => '{AC}/vendor/images/',
 
                 // will be set later in app.config.local.php
                 'dbName' => '**dbname**',
@@ -104,6 +118,11 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
                         'dsn' => '**not set**',
                     ),
                 ),
+                
+                'varFlagsPath' => dirname(__FILE__).'/../../../<?php echo $this->layout->getPathVar('pathVarFlags'); ?>',
+                'varTmpPath' => dirname(__FILE__).'/../../../<?php echo $this->layout->getPathVar('pathVarTmp'); ?>',
+                'varLogPath' => dirname(__FILE__).'/../../../<?php echo $this->layout->getPathVar('pathVarLog'); ?>',
+                'varCachePath' => dirname(__FILE__).'/../../../<?php echo $this->layout->getPathVar('pathVarCache'); ?>',
 
             );
 
@@ -279,7 +298,7 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
      * Whether tables param is required for initial code generation
      */
     function getTablesRequired() {
-        return true;
+        return false;
     }
     
 }

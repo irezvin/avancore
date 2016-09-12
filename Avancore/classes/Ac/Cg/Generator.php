@@ -135,8 +135,12 @@ class Ac_Cg_Generator {
         if (is_array($configOrFileName)) $this->staticConfig = $configOrFileName;
         else {
             $this->_configFileName = $configOrFileName;
-            if (strlen($this->_configFileName))
+            if (strlen($this->_configFileName)) {
+                // when codegen log path is not in codegen.config.php, we will product log in the same dir
+                // (useful for old layouts when 'avan gen' is called from some other place)
+                $this->logFileName = dirname($configOrFileName).'/generator_log.txt';
                 $this->_loadStaticConfig();
+            }
         }
         if (isset($this->staticConfig['generator']) && is_array($this->staticConfig['generator'])) {
             if (isset($this->staticConfig['generator']['staticConfig'])) unset($this->staticConfig['generator']['staticConfig']);

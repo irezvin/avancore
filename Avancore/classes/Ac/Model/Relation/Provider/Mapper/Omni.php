@@ -80,7 +80,7 @@ class Ac_Model_Relation_Provider_Mapper_Omni extends Ac_Model_Relation_Provider_
         if (!$this->mapper) throw new Ac_E_InvalidUsage("setMapper() first");
         $vv = $this->n == 1? $this->extractSingleValues($values) : $this->extractMultiValues($values);
         if (count($vv)) {
-            $groupMode = $byKeys? Ac_Model_Mapper::GROUP_VALUES : Ac_Model_Mapper::GROUP_ORDER;
+            $groupMode = $byKeys? Ac_Model_Mapper::GROUP_VALUES : Ac_Model_Mapper::GROUP_NONE;
             $query = $this->query;
             if ($this->criterionName) {
                 $query[$this->criterionName] = $vv;
@@ -90,9 +90,9 @@ class Ac_Model_Relation_Provider_Mapper_Omni extends Ac_Model_Relation_Provider_
             }
             $res = $this->mapper->countWithValues($this->keys, $vv, $groupMode, $query, $useQueryOnly);
         } else {
-            $res = array();
+            $res = $byKeys? array() : 0;
         }
-        return array($res, array());
+        return $res;
     }
     
     protected function extractMultiValues(array $values) {

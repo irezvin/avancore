@@ -32,7 +32,7 @@ if (is_dir('/home/nivzer')) {
 
 }
 
-$config['assetPlaceholders']['{TOOLBAR}'] = '{AC}/vendor/images';
+$config['assetPlaceholders']['{TOOLBAR}'] = '{AC}/vendor/images/';
 
 $config['dbPrototype'] = array(
     'class' => 'Ac_Sql_Db_Pdo',

@@ -206,7 +206,7 @@ class Ac_Cg_App extends Ac_Prototyped {
      * @param type $deployEditable
      * @param type $deployNonEditable
      */
-    function generateCode($genEditable, $genNonEditable, $deployEditable, $deployNonEditable) {
+    function generateCode($genEditable, $genNonEditable, $deployEditable, $deployNonEditable, $skipLint = false) {
         if (!$this->layoutExists()) 
             throw new Ac_E_InvalidUsage("Cannot ".__METHOD__." when app layout not found");
         $layout = $this->getLayout();
@@ -215,6 +215,7 @@ class Ac_Cg_App extends Ac_Prototyped {
             throw new Ac_E_InvalidUsage("Cannot locate codegen.config.php");
         $gen = new Ac_Cg_Generator($configFile);
         $gen->deployPath = $layout->getPathVar('pathGen', true, true);
+        if ($skipLint) $gen->lintify = false;
         foreach (compact('genEditable', 'genNonEditable', 'deployEditable', 'deployNonEditable') as $k => $v)
             $gen->$k = $v;
         $gen->run();
@@ -225,7 +226,7 @@ class Ac_Cg_App extends Ac_Prototyped {
      * @return Ac_Cg_Generator
      */
     function copyAvancore(Ac_Cg_Generator $gen = null, $srcDir = false) {
-        if (!$this->layoutExists()) 
+        if (!$this->layoutExists() && !$this->layout->hasDefaultCopyTarget()) 
             throw new Ac_E_InvalidUsage("Cannot ".__METHOD__." when app layout not found");
         $avancoreDir = $this->getLayout()->getPathVar('pathAvancore', true);
         $webDir = $this->getLayout()->getPathVar('pathAvancoreAssets');

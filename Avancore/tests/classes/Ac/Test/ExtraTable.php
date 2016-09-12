@@ -126,6 +126,20 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
                 $this->assertEqual($upcRow['upcCode'], $data['upcCode']);
             }
             
+            // Now change the records
+            $newProd->pageTitle = $newPageTitle = 'Foo';
+            $newProd->upcCode = $newUpcCode = '1234';
+            $this->assertTrue((bool) $newProd->save());
+            $metaRow = $db->args($metaId)->fetchRow('SELECT * FROM #__shop_meta WHERE id = ?');
+            if ($this->assertTrue(is_array($metaRow), 'Extra row must appear in referenced extra table')) {
+                $this->assertEqual($metaRow['pageTitle'], $newPageTitle);
+            }
+            $upcRow = $db->args($prodId)->fetchRow('SELECT * FROM #__shop_product_upc WHERE productId = ?');
+            if ($this->assertTrue(is_array($upcRow), 'Extra row must appear in referencing extra table')) {
+                $this->assertEqual($upcRow['upcCode'], $newUpcCode);
+            }
+            
+            
             $res = $newProd->delete();
             $this->assertTrue($res);
             $this->assertEqual(

@@ -538,7 +538,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $u;
     }
     
-    function getStateData() {
+    function getStateData($withFilterForm = null) {
         $res = array();
         if ($this->_stayOnProcessing) {
             $res['action'] = 'processing';
@@ -563,14 +563,20 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $res['returnUrl64'] = base64_encode($u);
         }
         
-        if (isset($this->_rqData['filterForm'])) {
-            $ff = $this->_rqData['filterForm'];
-            if (is_array($ff)) {
-                foreach ($ff as $k => $v) {
-                    if (is_array($v)? !count($v) : !strlen($v)) unset($ff[$k]);
+        if ($withFilterForm === null) {
+            $withFilterForm = $res['action'] !== 'list';
+        }
+        
+        if ($withFilterForm) {
+            if (isset($this->_rqData['filterForm'])) {
+                $ff = $this->_rqData['filterForm'];
+                if (is_array($ff)) {
+                    foreach ($ff as $k => $v) {
+                        if (is_array($v)? !count($v) : !strlen($v)) unset($ff[$k]);
+                    }
                 }
+                $res['filterForm'] = $ff;
             }
-            $res['filterForm'] = $ff;
         }
         
         //if (isset($this->_rqData['pagination'])) $res['pagination'] = $this->_rqData['pagination'];

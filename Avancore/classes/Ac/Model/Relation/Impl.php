@@ -543,11 +543,9 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
         $keys = array_keys($this->fieldLinks);
         if (is_array($srcData)) { // we assume that this is array of objects or array of rows
             $values = array();
-            $midKeys = is_array($this->fieldLinks2)? array_values($this->fieldLinks2) : array();
             if ($matchMode === Ac_Model_Relation_Abstract::RESULT_PLAIN && is_array($srcData) && $separate) {
                 throw new Ac_E_InvalidUsage ("Using countSrc or countDest(array, true, Ac_Model_Relation_Abstract::RESULT_PLAIN) "
                     . "does not make sense; using Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS instead", E_USER_NOTICE);
-                $matchMode = Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS;
             }
             if ($separate && $matchMode !== Ac_Model_Relation_Abstract::RESULT_PLAIN) {
                 $map = array();
@@ -558,7 +556,11 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 $this->extractSrcValues($srcData, $values, $midValues);
             }
                 
-            $counts = $this->countWithValues($midValues, $separate, $values, true);
+            if (!$this->fieldLinks2) {
+                $counts = $this->countWithValues($values, $separate, array(), true);
+            } else {
+                $counts = $this->countWithValues($midValues, $separate, $values, true);
+            }
             
             if (!$separate) {
                 $res = $counts;
@@ -648,7 +650,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                                 $items = $loaded;
                                 foreach ($loaded as $item) {
                                     if (is_object($item) && $item instanceof Ac_Model_Object) {
-                                        if ($item->hasFullPrimaryKey()) $pks[$item->getPrimaryKey()] = $item;
+                                        if ($item->isPersistent()) $pks[$item->getIdentifier()] = $item;
                                     }
                                 }
                             }
@@ -819,8 +821,8 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                             $items = $v;
                             foreach ($v as $item) {
                                 if (is_object($item) && $item instanceof Ac_Model_Object 
-                                    && $item->hasFullPrimaryKey()) {
-                                    $pk = $item->getPrimaryKey();
+                                    && $item->isPersistent()) {
+                                    $pk = $item->getIdentifier();
                                     $pks[$pk] = true;   
                                 }
                             }
@@ -1187,11 +1189,11 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 } else {
                     $skip = false;
                     if (isset($lt->$varName) && is_array($v = $lt->$varName)) {
-                        if ($lt instanceof Ac_Model_Object && $lt->hasFullPrimaryKey()) {
-                            $pk = $lt->getPrimaryKey();
+                        if ($lt instanceof Ac_Model_Object && $lt->isPersistent()) {
+                            $pk = $lt->getIdentifier();
                             foreach ($v as $item) {
                                 if (is_object($item) && $item instanceof Ac_Model_Object 
-                                    && $item->hasFullPrimaryKey() && $item->getPrimaryKey() == $pk) {
+                                    && $item->isPersistent() && $item->getIdentifier() == $pk) {
                                     $skip = true;
                                     break;
                                 }

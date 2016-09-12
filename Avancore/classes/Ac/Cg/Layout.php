@@ -118,7 +118,7 @@ abstract class Ac_Cg_Layout extends Ac_Prototyped {
      */
     function getDetectDirs($dir = false) {
         $res = array_intersect_key($this->getPathVars($dir), array_flip($this->listDetectPaths()));
-        $res['pathConfig'] = $this->expandPlaceholders(array($this->pathConfig, 'deploy'), $this->getMapTr());
+        $res['pathConfig'] = $this->expandPlaceholders(array($this->pathConfig, str_replace('/config', '/deploy', $this->pathConfig)), $this->getMapTr());
         return $res;
     }
     
@@ -219,6 +219,10 @@ abstract class Ac_Cg_Layout extends Ac_Prototyped {
     
     function getCliInfo() {
         return array();
+    }
+    
+    function hasDefaultCopyTarget() {
+        return false;
     }
     
     

@@ -1799,6 +1799,15 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return $this->rowIdentifierField;
     }    
     
+    function calcIdentifier(Ac_Model_Object $record) {
+        $res = null;
+        if (strlen($this->identifierPublicField)) {
+            $res = $record->{$this->identifierPublicField};
+            if ($res === false) $res = null;
+        }
+        return $res;
+    }
+    
     function getIdentifier(Ac_Model_Object $record) {
         if (strlen($this->identifierField)) {
             $res = $record->{$this->identifierField};
@@ -2743,11 +2752,12 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     /**
      * Creates Collection instance that will provide access to the current mapper with the specific query parameters
-     * @return Ac_Model_Collection
+     * @return Ac_Model_Collection_Abstract
      */
     function createCollection(array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false) {
         $res = array(
             'class' => 'Ac_Model_Collection_Mapper',
+            'mapper' => $this,
         );
         if ($query) $res['query'] = $query;
         if ($sort !== false) $res['sort'] = $sort;
@@ -2784,6 +2794,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 unset($res['query'][Ac_Model_Storage_MonoTable::QUERY_SQL_SELECT]);
             }
         }
+        $res = Ac_Prototyped::factory($res, 'Ac_Model_Collection_Abstract');
         return $res;
     }
     

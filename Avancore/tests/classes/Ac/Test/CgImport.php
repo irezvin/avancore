@@ -42,7 +42,12 @@ class Ac_Test_CgImport extends Ac_Test_Base {
         $gen1->lintify = false;
         $gen1->outputDir = $this->getOut2();
         $gen1->logFileName = $this->getLog2();
+        ob_start();
         $gen1->prepare();
+        $s = ob_get_clean();
+        if (!$this->assertTrue(preg_match('/#__cpk.*composite primary key/i', $s))) {
+            echo $s;
+        }
         $gen1->genEditable = 1;
         $gen1->genNonEditable = 1;
         $gen1->clearOutputDir = 1;

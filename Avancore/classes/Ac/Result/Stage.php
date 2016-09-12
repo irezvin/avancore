@@ -198,7 +198,6 @@ class Ac_Result_Stage extends Ac_Prototyped {
                 $this->current = $new;
             }
         } elseif ($this->current->getOverrideMode() == Ac_Result::OVERRIDE_ALL) {
-                //Ac_Debug::ddd($this->root === $this->stack[0][0]);
             $curr = $this->current;
             // goto root node
             array_splice($this->stack, 1);

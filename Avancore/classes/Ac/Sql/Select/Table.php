@@ -294,7 +294,7 @@ class Ac_Sql_Select_Table {
     }
     
     
-    function getJoinClausePart(& $nestedAliases = array(), $alias = false, $isFirst = false) {
+    function getJoinClausePart(array & $nestedAliases = array(), $alias = false, $isFirst = false) {
         $sqlSelect = $this->getSqlSelect();
         if ($alias === false) $alias = $this->alias;
         if ($this->omitInFromClause) $res = '';
