@@ -47,9 +47,6 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     }
 
     function setDbPrefix($dbPrefix) {
-        if (strlen($this->dbPrefix) && $dbPrefix !== $this->dbPrefix) 
-            throw new Ac_E_InvalidUsage("Ac_Sql_Db_Pdo:: can \$setDbPrefix() only once");
-        
         if ($dbPrefix !== ($oldDbPrefix = $this->dbPrefix)) {
             $this->dbPrefix = $dbPrefix;
         }

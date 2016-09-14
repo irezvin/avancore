@@ -773,7 +773,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         } 
         return $this->_recordPrototype;
     }
-    
+
     /**
      * @return Ac_Table 
      */
@@ -1203,8 +1203,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $ctx->setBaseUrl($url);
         return $ctx;
     }
-    
-    function _getPreloadRelations() {
+
+    function getPreloadRelations() {
         if ($this->_preloadRelations === false) {
             $this->_preloadRelations = array();
             foreach ($this->listFeatures() as $f) {
@@ -1338,6 +1338,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             foreach ($filtersToSet as $partName) {
                 $this->_sqlSelect->getPart($partName)->bind($fVal[$partName]);
             }
+            if (strlen($w = $this->_getWhere())) {
+                $this->_sqlSelect->where['_adminManagerWhere'] = $w;
+            }
             $this->callFeatures('onCreateSqlSelect', $this->_sqlSelect);
         }
         return $this->_sqlSelect;
@@ -1351,7 +1354,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
     
     function _preloadRelations() {
-        if ($pr = $this->_getPreloadRelations()) {
+        if ($pr = $this->getPreloadRelations()) {
             $myRecs = array();
             while ($rec = $this->_recordsCollection->getNext()) {
                 $myRecs[] = $rec;

@@ -23,7 +23,7 @@ abstract class Ac_Cg_Util {
         while($file = readdir($res)) {
             if($file != "." && $file != ".." && $file != ".svn") {
                 if($recursive && is_dir("$dirPath/$file") && (!$dirRegex || preg_match($dirRegex, "$dirPath/$file"))) { 
-                    if ($includeDirNames) array_push($files, "$dirPath/$file");    
+                    if ($includeDirNames) array_push($files, "$dirPath/$file");
                     $files=Ac_Cg_Util::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex, $includeDirNames);
                 }
                 else {
@@ -76,46 +76,18 @@ abstract class Ac_Cg_Util {
         return $c;
     }
     
-    static function copyDirRecursive($src, $dest, $overwrite = false, $move = false) {
-        if (PATH_SEPARATOR == ';') { // it's WINDOWS
-            $cmd = 'xcopy '.escapeshellarg($src).' '.escapeshellarg($dest).' /E';
-            if ($overwrite === false ) {
-                $tmpf = tmpfile();
-                fputs($tmpf, str_repeat('n', 10240), 10240);
-                fclose($tmpf);
-                $p = realpath($tmpf);
-                $cmd .=  ' < '.escapeshellarg($p);
-            } else {
-                $cmd .= ' /Y';
-            }
-        } else {
-            $cmd = 'cp -R'.($overwrite? 'f' : 'n').' '.escapeshellarg($src).'/* '.escapeshellarg($dest)/*.' --preserve=mode'*/;
-        }
-        //var_dump($cmd);
-        exec($cmd, $output, $res);
-        $output = implode("\n", $output);
-        
-        if (!$res && $move) {
-
-            if (PATH_SEPARATOR == ';') {
-                $tmpf2 = tempnam('.', 'cg');
-                file_put_contents($tmpf2, str_repeat('y', 10240));
-                $p = realpath($tmpf2);
-                
-                $cmd2 = 'del /S '.escapeshellarg($src).' < '.escapeshellarg($p); 
-            } else {
-                $cmd2 = 'rm -Rf '.escapeshellarg($src);
-            }
-            exec($cmd2, $output2, $res);
-            $cmd .= "\n".$cmd2;
-            $output2 = implode("\n", $output2);
-            $output .= "\n\n".$output2;
-        }
-        
-        return array($cmd, $output, $res);
+    static function copyDirRecursive($src, $dest, $overwrite = false, $deleteNotSync = false) {
+        $ds = new Ac_Cg_DirSync();
+        $ds->srcDir = $src;
+        $ds->destDir = $dest;
+        $ds->overwriteDest = $overwrite;
+        $ds->dryRun = false;
+        $ds->deleteFromDest = $deleteNotSync;
+        $ds->run();
+        return $ds->getErr();
     }
     
-    static function findCommonPrefix(array $strings) {
+    static function findCommonPrefix(array $strings, $roundToWordBoundary = true) {
         $res = '';
         if (count($strings)) {
             do {
@@ -131,6 +103,27 @@ abstract class Ac_Cg_Util {
                 }
                 if ($match) $res = $s;
             } while ($match);
+        }
+        
+        // Now we should handle the cases when 'TheCoolRelation' and 'TheCookRelation' 
+        // should have 'The' and not 'TheCoo' common prefix. We will round it to nearest 
+        // Capital letter or underscore
+        if ($roundToWordBoundary && strlen($res) && preg_match('/[a-z]$/', $res)) { // common prefix ends with lcase letter
+            $startingWithLowercase = false;
+            foreach ($strings as $s) {
+                $remainder = substr($s, strlen($res));
+                if (strlen($remainder) && preg_match('/^[a-z]/', $remainder{0})) {
+                    $startingWithLowercase = true;
+                    break;
+                }
+            }
+            if ($startingWithLowercase) { // there will be subjects like 'ool'
+                $items = preg_split('/(_|[A-Z][a-z]+)/', $res, -1, PREG_SPLIT_DELIM_CAPTURE | PREG_SPLIT_NO_EMPTY);
+                if (count($items) > 1) {
+                    $last = array_pop($items);
+                    $res = substr($res, 0, -strlen($last));
+                }
+            }
         }
         return $res;
     }
@@ -167,6 +160,15 @@ abstract class Ac_Cg_Util {
             }
             if ($diff) $res[$k] = $v;
         }
+        return $res;
+    }
+    
+    function indent($text, $indent = 4, $char = ' ') {
+        preg_match_all("/^ +/m", $text, $matches);
+        if ($matches) {
+            $leftPart = str_repeat(' ', min(array_map('strlen', $matches[0])));
+        } else $leftPart = '';
+        $res = preg_replace("/^{$leftPart}/m", str_repeat($char, $indent), $text);
         return $res;
     }
     

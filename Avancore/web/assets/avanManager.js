@@ -866,11 +866,46 @@ AvanControllers.ActionsController.Click.prototype = {
 }
 
 AvanControllers.FormController = function(aOptions) {
+    this.records = [];
+        
+    if (aOptions)  {
+    
+        AvanControllers.initFromProps(aOptions, this);
+    
+        if (aOptions.records instanceof Array) {
+            this.addRecords(aOptions.records);
+        }
+    }
 }
 
 AvanControllers.FormController.prototype = {
     form: null,
-    manager: null
+    manager: null,
+    records: null,
+    actionsController: false,
+    addRecords: function(prototypes) {
+    	for (var i in prototypes) if (Ajs_Util.hasOwnProperty(prototypes, i)) {
+            var index = this.records.length;
+            var rec = new AvanControllers.ListControllerRecord(prototypes[i]);
+            rec.listController = this;
+            rec.index = this.records.length;
+            rec.observe(this, {}, true);
+            this.records[index] = rec;
+            rec.setSelected(true);
+    	}
+        if (this.actionsController) this.actionsController.update(this.records);
+    },
+    setActionsController: function(aActionsController) {
+        this.actionsController = aActionsController;
+        if (this.actionsController) this.actionsController.update(this.records);
+    },
+    update: function(record, params) {
+        if (!params || typeof(params.selected != 'undefined')) {
+            if (this.actionsController) {
+                this.actionsController.update(this.records);
+            }
+        }
+    }
 }
 
 AvanControllers.ManagerController = function(aOptions) {

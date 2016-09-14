@@ -298,10 +298,10 @@ class Ac_Model_DateTime {
     	if (is_a($src, 'DateTime')) {
     		$srcTs = (int) $src->format('U');
     	} else {
-	        if (!is_int($src)) { 
+	        if (!is_numeric($src)) { 
 	            $dtp = Ac_Model_DateTime::getInstance();
 	            $srcTs = $dtp->fromString($src, false, $useGmt, $wasZeroDate); 
-	        } else $srcTs = $src;
+	        } else $srcTs = (int) $src;
     	}
         
         if (is_null($srcTs) || $srcTs === false) return $srcTs;

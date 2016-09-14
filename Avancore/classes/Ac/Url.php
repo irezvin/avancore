@@ -82,7 +82,9 @@ class Ac_Url implements Ac_I_RedirectTarget {
     function fromString($strUrl) {
         static $defs = array('scheme' => false, 'host' => false, 'port' => false, 'user' => false, 'pass' => false, 'path' => false, 'query' => array(), 'fragment' => false);
         if (is_string($strUrl) && strlen($strUrl)) {
-            $props = array_merge($defs, parse_url ($strUrl));
+            $u = parse_url($strUrl);
+            if (is_array($u)) $props = array_merge($defs, $u);
+            else $props = $defs;
             if (!$props['query']) $props['query'] = array(); else parse_str($props['query'], $props['query']);
             foreach($props as $propName=>$propValue) $this->$propName = $propValue;
         }

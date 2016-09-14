@@ -979,7 +979,7 @@ class PHPMailer
                     $this->encodeHeader($this->secureHeader(trim($this->Subject)))
                 );
             }
-
+            
             // Sign with DKIM if enabled
             if (!empty($this->DKIM_domain)
                 && !empty($this->DKIM_private)
