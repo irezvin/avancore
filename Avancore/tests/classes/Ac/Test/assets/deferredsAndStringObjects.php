@@ -88,3 +88,36 @@ class ExampleEvaluator extends Ac_Prototyped implements Ac_I_Deferred_Evaluator 
     }
     
 }
+
+class ExampleEvaluator2 implements Ac_I_Deferred_Evaluator {
+
+    static $sfx = '';
+    
+    function evaluateDeferreds(array $deferreds) {
+        $res = array();
+        foreach ($deferreds as $k => $def) {
+            $res[$k] = ''.$def.self::$sfx;
+        }
+        return $res;
+    }    
+    
+}
+
+class ExampleDeferred2 extends Ac_Deferred {
+    
+    static $defArg = '*def*';
+    
+    var $debData = '';
+    
+    function getEvaluatorArg() {
+        if ($this->evaluatorArg === false) $res = self::$defArg;
+            else $res = $this->evaluatorArg;
+        return $res;
+    }
+    
+    function getEvaluatorPrototype() {
+        if (!$this->evaluatorPrototype) return array('class' => 'ExampleEvaluator2');
+        else return $this->evaluatorPrototype;
+    }
+    
+}

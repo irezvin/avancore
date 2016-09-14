@@ -80,6 +80,14 @@ class Ac_Test_Controller extends Ac_Test_Base {
             "controller' getUrl() returns used params after second invocation after reset()"
         );
         
+        $c->reset();
+        $c->setAction('withTemplate');
+        var_dump($c->getResult());
+        
+        $c->reset();
+        $c->setAction('resultTemplateAccess');
+        var_dump($c->getResult());
+        
     }    
 }
 
@@ -109,5 +117,34 @@ class testController1 extends Ac_Cr_Controller {
     function defaultHandler() {
         echo "Default handler; action is:".$this->getAction();
     }
+    
+    function actionWithTemplate() {
+        $tpl = new testControllerTemplate1(array('component' => $this));
+        return $tpl->renderTo(new Ac_Result_Html, 'foo');
+    }
+    
+    function actionResultTemplateAccess() {
+        $tpl = new testControllerTemplate1(array('component' => $this));
+        $tpl->setComponent($this);
+        $this->lastResult = new Ac_Result_Html;
+        $tpl->fetchBar();
+        return $this->lastResult;
+    }    
+    
 
+}
+
+class testControllerTemplate1 extends Ac_Template {
+    
+    protected function partFoo (Ac_Cr_Context $context) {
+        echo $context->mapHtmlParam('xxx');
+        echo "\n".$context->param->action;
+    }
+    
+    protected function partBar (Ac_Result_Html $result, $xxx = null) {
+        $result->beginCapture();
+        echo "<p>The result</p>";
+        $result->endCapture();
+    }
+    
 }

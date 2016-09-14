@@ -105,9 +105,15 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
         }
     }
     
+    /**
+     * @param Ac_Result_Placeholder $placeholder
+     * @param type $id
+     * @return \Ac_Result_Placeholder
+     */
     function addPlaceholder(Ac_Result_Placeholder $placeholder, $id) {
         if (isset($this->placeholders[$id])) throw Ac_E_InvalidCall::alreadySuchItem ('Placeholder', $id, 'removePlaceholder');
         $this->placeholders[$id] = $placeholder;
+        return $placeholder;
     }
     
     function isDefaultPlaceholder($id) {
@@ -373,9 +379,6 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
      
         $this->serializeTime = microtime(true);
         
-        // this will register string objects if needed
-        $this->getStringObjects(); 
-        
         if ($this->serializationState === self::SERIALIZATION_INNER) { // we already have been visited - just release the lock
             
             $this->serializationState = self::SERIALIZATION_NONE;
@@ -388,8 +391,14 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
             
         }
         
-        // SERIALIZATION all properties by default
-        return array_keys(get_object_vars($this));
+        // this will register string objects if needed
+        $this->getStringObjects(); 
+        
+        
+        $props = get_object_vars($this);
+        unset($props['bunches']); // don't serialize bunches
+        $res = array_keys($props);
+        return $res;
     }
     
     function __wakeup() {
@@ -491,6 +500,8 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
         } else {
             $length = strlen(''.$stringObject);
             $this->content = substr($this->content, 0, $pos).$newContent.substr($this->content, $pos + $length);
+            $mark = $stringObject->getStringObjectMark();
+            unset($this->stringObjects[$mark]); // unregister it since we replaced it
             $this->touchStringObjects();
         }
     }
@@ -508,6 +519,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
         $this->stringObjectsUpdated = false;
         $this->foundSubResults = false;
         $this->bunches = array();
+        $this->stringObjects = array();
     }
     
     function getSubResults() {

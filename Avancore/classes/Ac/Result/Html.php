@@ -25,6 +25,7 @@ class Ac_Result_Html extends Ac_Result_Http_Abstract {
             parent::doGetDefaultPlaceholders(), array(
                 'doctype' => array(
                     'class' => 'Ac_Result_Placeholder_Single',
+                    'items' => self::DOCTYPE_HTML5,
                     'template' => array(
                         'class' => 'Ac_Result_Placeholder_Template',
                         'prefix' => "",
@@ -69,7 +70,7 @@ class Ac_Result_Html extends Ac_Result_Http_Abstract {
                             ),
                         ),
                         'description' => array(
-                            'class' => 'Ac_Result_Placeholder_Composite',
+                            'class' => 'Ac_Result_Placeholder',
                             'template' => array(
                                 'class' => 'Ac_Result_Placeholder_Template_Tag',
                                 'glue' => ' ',

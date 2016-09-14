@@ -8,7 +8,7 @@ class Ac_Template extends Ac_Prototyped {
     
     protected $fields = array();
     
-    protected $methodSignatures = array();
+    protected static $methodSignatures = array();
     
     /**
      * @var Ac_Result
@@ -75,19 +75,22 @@ class Ac_Template extends Ac_Prototyped {
         return $res;
     }
     
-    protected function noSuchArgument($methodName, $argument, array $signature) {
+    protected function noSuchArgument($class, $method, $argument, array $signature) {
         $descr = $this->getDescription();
         $signs = self::describeArgs($signature);
-        $cl = get_class($this);
-        return new Ac_E_Template("No such argument: '{$argument}' in method {$cl}::{$methodName}({$signs}) of template '{$descr}'");
+        return new Ac_E_Template("No such argument: \${$argument} in method {$class}::{$method}({$signs}) of template '{$descr}'");
     }
     
-    protected function missingArguments($methodName, array $missingArgs) {
+    protected function missingArguments($class, $method, array $missingArgs) {
         $descr = $this->getDescription();
-        $signature = $this->getSignature($methodName);
-        $missing = $this->getSignature(array_intersect_key($signature, array_flip($missingArgs)));
-        $cl = get_class($this);
-        return new Ac_E_Template("Missing argument(s) '{$missing}' in method {$cl}::{$methodName}({$signs}) of template '{$descr}'");
+        $signature = self::getSignature($class, $method);
+        foreach ($signature as $sign) {
+            $signs[] = $sign['readable'];
+        }
+        $signs = implode(', ', $signs);
+        $missing = implode(", $", array_intersect(array_keys($signature), $missingArgs));
+        $class = get_class($this);
+        return new Ac_E_Template("Missing argument(s): \${$missing} in method {$class}::{$method}({$signs}) of template '{$descr}'");
     }
     
     function getField($name, $own = false) {
@@ -143,9 +146,8 @@ class Ac_Template extends Ac_Prototyped {
     }
     
     function __call($name, $args) {
-        $px = substr($name, 0, 4);
-        $show = !strncmp($px, 'show', 4);
-        $fetch = !$show && !strncmp($px, 'fetch', 5);
+        $show = !strncmp($name, 'show', 4);
+        $fetch = !$show && !strncmp($name, 'fetch', 5);
         if ($show || $fetch) {
             $partName = substr($name, $show? 4 : 5);
             if ($show) $this->showWithArgs($partName, $args);
@@ -155,10 +157,10 @@ class Ac_Template extends Ac_Prototyped {
         }
     }
     
-    protected function getSignature($methodName) {
-        if (!isset($this->methodSignatures[$methodName])) {
-            $this->methodSignatures[$methodName] = array();
-            $m = new ReflectionMethod(get_class($this), $methodName);
+    protected function getSignature($class, $method) {
+        if (!isset(self::$methodSignatures[$key = $class.'::'.$method])) {
+            self::$methodSignatures[$key] = array();
+            $m = new ReflectionMethod($class, $method);
             foreach ($m->getParameters() as $param) {
                 $s = $param.'';
                 $class = false;
@@ -168,19 +170,20 @@ class Ac_Template extends Ac_Prototyped {
                     if ($s1[0]{0} !== '$') $class = $s1{0};
                 }
                 /* @var $param ReflectionParameter */
-                $this->methodSignatures[$methodName][$param->getName()] = array(
+                self::$methodSignatures[$key][$param->getName()] = array(
                     'class' => $class,
                     'isArray' => $param->isArray(),
                     'optional' => $param->isOptional(),
                     'defaultValue' => $param->isOptional()? $param->getDefaultValue() : null,
                     'string' => $s,
+                    'readable' => preg_replace('/^[^>]+> /', '', rtrim($s, ' ]')),
                 );
             }
         }
-        return $this->methodSignatures[$methodName];
+        return self::$methodSignatures[$key];
     }
     
-    protected function invokeMethod($methodName, array $args) {
+    protected function invokeMethod($object, $method, array $args) {
         ob_start();
         $this->push();
         $popped = false;
@@ -188,11 +191,12 @@ class Ac_Template extends Ac_Prototyped {
             if (count($this->stack) == 1 && $this->wrapTopLevel !== false) {
                 $this->wrap($this->wrapTopLevel);
             }
-            $args = $this->getArgs($methodName, $args, $missingArgs);
-            if (count($missingArgs)) 
-                throw $this->missingArguments ($methodName, $missingArgs);
+            $args = $this->getArgs($object, $method, $args, $missingArgs);
+            if (count($missingArgs)) {
+                throw $this->missingArguments (get_class($object), $method, $missingArgs);
+            }
             // TODO: load replacement file here (if any)
-            call_user_func_array(array($this, $methodName), $args);
+            call_user_func_array(array($object, $method), $args);
             $buffer = ob_get_clean();
 
             if ($this->wrap !== false) $buffer = $this->applyWrapper($buffer);
@@ -253,8 +257,9 @@ class Ac_Template extends Ac_Prototyped {
     /**
      * @return array
      */
-    protected function getArgs($methodName, array $args, & $missingArgs = array()) {
-        $sig = $this->getSignature($methodName);
+    protected function getArgs($object, $method, array $args, & $missingArgs = array()) {
+        $class = get_class($object);
+        $sig = self::getSignature($class, $method);
         $missingArgs = array();
         if (count($sig) || count($args)) {
             $res = array();
@@ -268,7 +273,7 @@ class Ac_Template extends Ac_Prototyped {
                     if (isset($indexes[$k])) {
                         $idx = $indexes[$k];
                     } else {
-                        throw $this->noSuchArgument($methodName, $k, $sig);
+                        throw $this->noSuchArgument($class, $method, $k, $sig);
                     }
                 }
                 if ($v === self::ARG_AUTO) continue;
@@ -316,9 +321,9 @@ class Ac_Template extends Ac_Prototyped {
     }
     
     protected function fetchWithArgs($partName, array $args) {
-        $methodName = 'part'.$partName;
-        if (method_exists($this, $methodName)) {
-            $res = $this->invokeMethod($methodName, $args);
+        $method = 'part'.$partName;
+        if (method_exists($this, $method)) {
+            $res = $this->invokeMethod($this, $method, $args);
         } else {
             throw $this->noSuchPart($partName);
         }

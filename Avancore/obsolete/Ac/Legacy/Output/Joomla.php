@@ -39,6 +39,8 @@ class Ac_Legacy_Output_Joomla extends Ac_Legacy_Output {
      * @param Ac_Legacy_Controller_Response_Html $response
      */
     function outputResponse(Ac_Legacy_Controller_Response_Html $response, $asModule = false) {
+
+        $response->replaceResultsInContent();
         
         if (func_num_args() > 1) {
             $asModule = func_get_arg(1);
