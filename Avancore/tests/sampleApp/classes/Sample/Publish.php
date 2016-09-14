@@ -2,8 +2,6 @@
 
 class Sample_Publish extends Sample_Publish_Base_ObjectMixable {
     
-    protected $mixableId = 'Sample_Publish';
-    
     /*
     protected function getOwnPropertiesInfo() {
         return Ac_Util::m(parent::getOwnPropertiesInfo(), array(

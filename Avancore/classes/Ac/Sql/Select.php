@@ -15,8 +15,26 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
 
     var $distinct = false;
     var $columns = array();
+    
+    /**
+     * Strings to put before joined aliases. If key of array matches alias of the table, the table won't be added
+     * along with 'regular joins' (useful when parts need to build custom joins)
+     */
     var $otherJoins = array();
+    
+    /**
+     * Strings to put after joined aliases. If key of array matches alias of the table, the table won't be added
+     * along with 'regular joins' (useful when parts need to build custom joins)
+     */
     var $otherJoinsAfter = array();
+    
+    /**
+     * Strings to put INSTEAD OF joined tables with matched keys (useful when parts need to build custom joins).
+     * Keys that don't match ones in $_usedAliases will be ignored.
+     * @var array 
+     */
+    var $joinOverrides = array();
+    
     var $orderBy = array();
     var $where = array();
     var $groupBy = array();
@@ -216,18 +234,44 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
         $this->beginCalc();
         $orderedAliases = $this->_getOrderedAliases($this->getUsedAliases());
         $res = '';
-        if ($this->otherJoins) $res .= implode("\n", $this->otherJoins);
-        if (!$withFirstAlias) $skipAliases[] = $orderedAliases[0];
+        
+        // Ignore aliases overridden by otherJoins and otherJoinsAfter
+        if ($this->otherJoins) {
+            foreach (array_keys($this->otherJoins) as $j) {
+                if (!is_numeric($j)) $skipAliases[] = $j;
+            }
+        }
+        if ($this->otherJoinsAfter) {
+            foreach (array_keys($this->otherJoinsAfter) as $j) {
+                if (!is_numeric($j)) $skipAliases[] = $j;
+            }
+        }
+        
+        $oj = $this->otherJoins;
+        $na = array();
+        if (!$withFirstAlias) {
+            $skipAliases[] = $orderedAliases[0];
+            if ($oj !== false) $res .= implode("\n", $this->otherJoins);
+            $oj = false;
+        }
         $first = true;
         foreach (array_diff($orderedAliases, $skipAliases) as $a) {
-            $tbl = $this->getTable($a);
-            $jcp = $tbl->getJoinClausePart(false, $first);
+            if (in_array($a, $na)) continue;
+            if (isset($this->joinOverrides[$a])) {
+                $jcp = $this->joinOverrides[$a];
+            } else {
+                $jcp = $this->getTable($a)->getJoinClausePart($na, false, $first);
+            }
             if (strlen($jcp)) {
             	if ($jcp{0} == ',') $res = $res.",\n".substr($jcp, 1);
             	else {
             		if (strlen($res)) $res .= "\n";
             		$res .= $jcp;
             	}
+            }
+            if ($oj !== false) {
+                 $res .= implode("\n", $this->otherJoins);
+                 $oj = false;
             }
             $first = false;
         }
@@ -320,6 +364,10 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
         return $res;
     }
     
+    function getAllAliases() {
+        return $this->_getOrderedAliases($this->getUsedAliases());
+    }
+    
     function _getOrderedAliases($usedAliases) {
         $allRequiredAliases = array($this->getEffectivePrimaryAlias());
         if (!count($usedAliases)) {
@@ -382,11 +430,11 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     }
     
     /**
-     * @return Ac_Model_Collection
+     * @return Ac_Legacy_Collection
      */
     function createCollection($mapperClass = false, $pkName = false, $ignorePrimaryAlias = false) {
         if (!strlen($mapperClass) && !strlen($pkName)) trigger_error("Even mapper class or pk name must be provided", E_USER_ERROR);
-        $res = new Ac_Model_Collection();
+        $res = new Ac_Legacy_Collection();
         
         $this->beginCalc();
         
@@ -476,7 +524,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     }
     
     protected function listStateVars() {
-        return array('_usedAliases', 'distinct', 'columns', 'otherJoins', 'otherJoinsAfter', 'orderBy', 'where', 'groupBy', 'having', 'limitOffset', 'limitCount');
+        return array('_usedAliases', 'distinct', 'columns', 'otherJoins', 'otherJoinsAfter', 'joinOverrides', 'orderBy', 'where', 'groupBy', 'having', 'limitOffset', 'limitCount');
     }
     
     protected function pushState() {

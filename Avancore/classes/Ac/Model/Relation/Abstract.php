@@ -1,12 +1,294 @@
 <?php
 
-/**
- * Defines members and methods that are common to Ac_Model_Relation and Ac_Model_Relation_Tree objects
- * (that are used mostly for data retrieval)
- */
-class Ac_Model_Relation_Abstract extends Ac_Prototyped {
+abstract class Ac_Model_Relation_Abstract extends Ac_Prototyped {
     
+    /**
+     * result rows will be returned as plain numeric array
+     * @see Ac_Model_Relation::getDest()
+     * @see Ac_Model_Relation::getSrc()
+     */
+    const RESULT_PLAIN = 0;
+    
+    /**
+     * result rows will have DB keys of source records 
+     * @see Ac_Model_Relation::getDest()
+     * @see Ac_Model_Relation::getSrc()
+     */
+    const RESULT_RECORD_KEYS = 1;
+    
+    /**
+     * result rows will have keys of original array 
+     * @see Ac_Model_Relation::getDest()
+     * @see Ac_Model_Relation::getSrc()
+     */
+    const RESULT_ORIGINAL_KEYS = 2;
+    
+    /**
+     * results rows will have keys of original array and all keys from original array will be in result array.
+     * Values in places of missing result rows will have default value.
+     *  
+     * @see Ac_Model_Relation::getDest()
+     * @see Ac_Model_Relation::getSrc()
+     */
+    const RESULT_ALL_ORIGINAL_KEYS = 3;
+    
+    /**
+     * @var Ac_Application
+     */
+    protected $application = false;
+    
+    /**
+     * Describes cardinality of source table (true if source fields point to unique record)
+     * @var bool 
+     */
+    protected $srcIsUnique = null;
+    
+    /**
+     * Describes cardinality of destination table (true if destination fields point to unique record)
+     */    
     protected $debug = false;
+    
+    protected $immutable = false;
+
+    protected $destIsUnique = null;
+    
+    protected $srcImpl = false;
+    
+    protected $destImpl = false;
+    
+    /**
+     * @param array $prototype Array prototype of the object
+     */
+    function __construct (array $prototype = array()) {
+        
+        if (isset($prototype['immutable'])) {
+            $imm = $prototype['immutable'];
+            unset($prototype['immutable']);
+        }
+        else $imm = false;
+        
+        if (isset($prototype['application']) && $prototype['application']) {
+            $this->setApplication($prototype['application']);
+            unset ($prototype['application']);
+        }
+        
+        $this->doConstruct($prototype);
+        
+        if ($imm) $this->immutable = true;            
+        
+    }
+    
+    protected function doConstruct(array $prototype = array()) {
+        
+        if (isset($prototype['db']) && $prototype['db']) {
+            $this->setDb($prototype['db']);
+            unset ($prototype['db']);
+        }
+        
+        parent::__construct($prototype);
+        
+        if (($this->srcTableName === false) && strlen($this->srcMapperClass)) {
+            $this->setSrcMapper(Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->application? $this->application : null));
+        }
+        if (($this->destTableName === false) && strlen($this->destMapperClass)) {
+            $this->setDestMapper(Ac_Model_Mapper::getMapper($this->destMapperClass, $this->application? $this->application : null));
+        }
+        
+    }
+    
+    function hasPublicVars() {
+        return false;
+    }
+    
+    function setDebug($debug) {
+        $this->debug = (bool) $debug;
+    }
+
+    function getDebug() {
+        return $this->debug;
+    }
+
+    function setApplication(Ac_Application $application) {
+        if ($application !== ($oldApplication = $this->application)) {
+            if ($this->immutable) throw self::immutableException();
+            $this->application = $application;
+            $this->doOnSetApplication($oldApplication);
+            $this->reset();
+        }
+    }
+    
+    /**
+     * @return Ac_Application
+     */
+    function getApplication() {
+        return $this->application;
+    }
+    
+    protected function doOnSetApplication($oldApplication) {
+    }
+    
+    /**
+     * Assigns whether source records are uniquely identified by their foreign keys
+     * 
+     * If keys in $fieldLinks is enough, this must be set to TRUE.
+     * Used to determine whether SRC items will be arrays' or single objects.
+     * 
+     * @param bool $srcIsUnique
+     */
+    function setSrcIsUnique($srcIsUnique) {
+        $srcIsUnique = (bool) $srcIsUnique;
+        if ($srcIsUnique !== ($oldSrcIsUnique = $this->srcIsUnique)) {
+            if ($this->immutable) throw self::immutableException();
+            $this->srcIsUnique = $srcIsUnique;
+            $this->reset();
+        }
+    }
+
+    /**
+     * Returns whether source records are uniquely identified by their foreign keys
+     * 
+     * @return bool
+     */
+    function getSrcIsUnique() {
+        if ($this->srcIsUnique === null) {
+            $this->srcIsUnique = $this->doGetSrcIsUnique();
+        }
+        return $this->srcIsUnique;
+    }
+    
+    abstract protected function doGetSrcIsUnique();
+    
+    abstract protected function doGetDestIsUnique();
+
+    /**
+     * Assigns whether destination records are uniquely identified by their foreign keys
+     * 
+     * If values in $fieldLinks/$fieldLinks2 are enough to identify dest record(s), 
+     * this must be set to TRUE. 
+     * 
+     * Used to determine whether DEST items will be arrays' or single objects.
+     * 
+     * @param bool $destIsUnique
+     */
+    function setDestIsUnique($destIsUnique) {
+        $destIsUnique = (bool) $destIsUnique;
+        if ($destIsUnique !== ($oldDestIsUnique = $this->destIsUnique)) {
+            if ($this->immutable) throw self::immutableException();
+            $this->destIsUnique = $destIsUnique;
+            $this->reset();
+        }
+    }
+
+    /**
+     * Returns whether destination records are uniquely identified by their foreign keys
+     * @return bool
+     */
+    function getDestIsUnique() {
+        if ($this->destIsUnique === null) {
+            $this->destIsUnique = $this->doGetDestIsUnique();
+        }
+        return $this->destIsUnique;
+    }
+
+    /**
+     * Sets whether relation is immutable or not.
+     * 
+     * Immutable relation throws an Ac_E_InvalidUsage exception every time
+     * when attempt is being made to alter its' properties.
+     * 
+     * @param bool $immutable
+     */
+    function setImmutable($immutable) {
+        $this->immutable = $immutable;
+    }
+
+    /**
+     * Returns whether relation is immutable or not.
+     * 
+     * Immutable relation throws an Ac_E_InvalidUsage exception every time
+     * when attempt is being made to alter its' properties.
+     * 
+     * @return bool
+     */
+    function getImmutable() {
+        return $this->immutable;
+    }
+
+    /**
+     * Returns one or more destination objects for given source object
+     * @param Ac_Model_Data|object $srcData
+     * @param int $matchMode How keys of result array are composed (can be Ac_Model_Relation_Abstract::RESULT_PLAIN, Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS, Ac_Model_Relation_Abstract::RESULT_ORIGINAL_KEYS, Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS) -- only if srcData is array
+     * @param mixed $defaultValue Value to be returned for missing rows when $matchMode is Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS or when $srcData is an object. By default it is null if $this->destIsUnique and empty array() if not.
+     * @return Ac_Model_Data|array
+     */
+    function getDest ($srcData, $matchMode = Ac_Model_Relation_Abstract::RESULT_PLAIN, $defaultValue = null) {
+        $impl = $this->getDestImpl();
+        if (func_num_args() >= 3) $res = $impl->getDest($srcData, $matchMode, $defaultValue);
+            else $res = $impl->getDest($srcData, $matchMode);
+        return $res;
+    }
+    
+    /**
+     * Returns one or more source objects for given destination object
+     * @param Ac_Model_Data|object $destData
+     * @param int $matchMode How keys of result array are composed (can be Ac_Model_Relation_Abstract::RESULT_PLAIN, Ac_Model_Relation_Abstract::RESULT_RECORD_KEYS, Ac_Model_Relation_Abstract::RESULT_ORIGINAL_KEYS, Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS) -- only if srcData is array
+     * @param mixed $defaultValue Value to be returned for missing rows when $matchMode is Ac_Model_Relation_Abstract::RESULT_ALL_ORIGINAL_KEYS or when $srcData is an object. By default it is null if $this->destIsUnique and empty array() if not.
+     * @return Ac_Model_Data|array
+     */ 
+    function getSrc ($destData, $matchMode = Ac_Model_Relation_Abstract::RESULT_PLAIN, $defaultValue = null) {
+        $impl = $this->getSrcImpl();
+        if (func_num_args() >= 3) $res = $impl->getDest($srcData, $matchMode, $defaultValue);
+            else $res = $impl->getDest($destData, $matchMode);
+        return $res;
+    }
+    
+    function countDest ($srcData, $separate = true, $matchMode = Ac_Model_Relation_Abstract::RESULT_PLAIN) {
+        $impl = $this->getDestImpl();
+        $res = $impl->countDest($srcData, $separate, $matchMode);
+        return $res;
+    }
+    
+    function countSrc ($destData, $separate = true, $matchMode = Ac_Model_Relation_Abstract::RESULT_PLAIN) {
+        $impl = $this->getSrcImpl();
+        $res = $impl->countDest($destData, $separate, $matchMode);
+        return $res;
+    }
+    
+    function loadDest (& $srcData, $dontOverwriteLoaded = true, $biDirectional = true, $returnAll = true) {
+        $impl = $this->getDestImpl();
+        $res = $impl->loadDest($srcData, $dontOverwriteLoaded, $biDirectional, $returnAll);
+        return $res;
+    }
+    
+    function loadSrc (& $destData, $dontOverwriteLoaded = true, $biDirectional = true, $returnAll = true) {
+        $impl = $this->getSrcImpl();
+        $res = $impl->loadDest($destData, $dontOverwriteLoaded, $biDirectional, $returnAll);
+        return $res;
+    }
+    
+    /**
+     * Counts destination objects and stores result in $srcCountVarName of each corresponding $srcData object
+     */
+    function loadDestCount ($srcData, $dontOverwriteLoaded = true) {
+        $impl = $this->getDestImpl();
+        $res = $impl->loadDestCount($srcData, $dontOverwriteLoaded);
+        return $res;
+    }
+    
+    /**
+     * Counts source objects and stores result in $destCountVarName of each corresponding $destData object
+     */
+    function loadSrcCount ($destData, $dontOverwriteLoaded = true) {
+        $impl = $this->getSrcImpl();
+        $res = $impl->loadDestCount($srcData, $dontOverwriteLoaded);
+        return $res;
+    }
+    
+    function __clone() {
+        $this->immutable = false;
+        if ($this->srcImpl) $this->srcImpl = clone $this->srcImpl;
+        if ($this->destImpl) $this->destImpl = clone $this->destImpl;
+    }
 
     function __get($var) {
         if (method_exists($this, $m = 'get'.$var)) return $this->$m();
@@ -18,219 +300,45 @@ class Ac_Model_Relation_Abstract extends Ac_Prototyped {
         else throw Ac_E_InvalidCall::noSuchProperty ($this, $var);
     }
     
-    function setDebug($debug) {
-        $this->debug = (bool) $debug;
-    }
-
-    function getDebug() {
-        return $this->debug;
-    }
-
-
-    function hasPublicVars() {
-        return false;
-    }
+    protected static function immutableException() {
+        return new Ac_E_InvalidUsage("Cannot modify ".__CLASS__." with \$immutable == true");
+    }    
     
-    protected function setVal(& $dest, $varName, $val, $qualifier = false) {
-        if (!$varName) return;
-        if ($qualifier !== false && $qualifier !== null && is_array($val)) {
-            $val = Ac_Util::indexArray($val, $qualifier, true);
+    function getSrcImpl() {
+        if ($this->srcImpl === false) {
+            $this->srcImpl = Ac_Prototyped::factory($this->getSrcImplPrototype());
         }
-        if (is_array($dest)) {
-            $dest[$varName] = $val;
+        return $this->srcImpl;
+    }
+    
+    function getDestImpl() {
+        if ($this->destImpl === false) {
+            $this->destImpl = Ac_Prototyped::factory($this->getDestImplPrototype());
         }
-        elseif (method_exists($dest, $setter = 'set'.$varName)) $dest->$setter($val);
-        else $dest->$varName = $val;
+        return $this->destImpl;
     }
     
-    /**
-     * $linkTo->$varName = $linked or $linkTo[$varName] = $linked
-     *
-     * @param object|array $linkTo - object or array to which we are linking $linked object 
-     * @param object|array $linked - object that we are adding
-     * @param string $varName - name of $linkTo property or key (if it's an array)
-     * @param bool $toIsArray - if $linkTo is an array of an objects or an arrays
-     * @param bool $linkedIsUnique - whether we should replace $linkTo->varName or add to it ($linkTo->varName[]) 
-     */
-    protected function linkBack(& $linkTo, & $linked, $varName, $toIsArray, $linkedIsUnique, $qualifier = false, $qKey = null) {
-        if (!$varName) return;
-        if (is_null($qualifier)) $qualifier = false;
-        elseif ($qualifier !== false) {
-            if ($qKey === null) $qKey = Ac_Accessor::getObjectProperty ($linked, $qualifier, true);
-        }
-        if ($toIsArray) {
-            foreach (array_keys($linkTo) as $k) {
-                $this->linkBack($linkTo[$k], $linked, $varName, false, $linkedIsUnique, $qualifier, $qKey);
-            }
-        } else {
-            $lt = & $linkTo;
-            if (is_object($lt)) {
-                if ($linkedIsUnique) {
-                    $lt->$varName = $linked;
-                } else {
-                    $skip = false;
-                    if (isset($lt->$varName) && is_array($v = $lt->$varName)) {
-                        if ($lt instanceof Ac_Model_Object && $lt->hasFullPrimaryKey()) {
-                            $pk = $lt->getPrimaryKey();
-                            foreach ($v as $item) {
-                                if (is_object($item) && $item instanceof Ac_Model_Object 
-                                    && $item->hasFullPrimaryKey() && $item->getPrimaryKey() == $pk) {
-                                    $skip = true;
-                                    break;
-                                }
-                            }
-                        }
-                    } else {
-                        $lt->$varName = array();
-                    }
-                    if (!$skip) {
-                        if ($qKey !== null) {
-                            $lt->{$varName}[$qKey] = $linked;
-                        } else {
-                            $lt->{$varName}[] = $linked;
-                        }
-                    }
-                }
-            } elseif (is_array($lt)) {
-                if ($linkedIsUnique) {
-                    $lt[$varName] = $linked;
-                } else {
-                    if (isset($lt[$varName]) && is_array($lt[$varName])) {
-                        // TODO: check that record with same key not already there
-                        // PKs of array records is not supported yet
-                    } else {
-                        $lt[$varName] = array();
-                    }
-                    if ($qKey !== null) {
-                        $lt[$varName][$qKey] = $linked;
-                    } else {
-                        $lt[$varName][] = $linked;
-                    }
-                        
-                }
-            }
-        }
-    }
-    
-    protected function isFull($v) {
-        if (is_array($v)) foreach ($v as $vv) {
-            if (is_null($vv) || $vv === false) return false; 
-        } else {
-            if (is_null($v) || $v === false) return false;
-        }
-        return true;
-    }
-    
-    protected function putRowToArray(& $row, & $instance, & $array, $keys, $unique) {
-        foreach ($keys as $key) $path[] = $row[$key];
-        Ac_Util::simpleSetArrayByPathNoRef($array, $path, $instance, $unique);
-    }
-    
-    protected function putInstanceToArray(& $instance, & $array, $keys, $isDest, $unique) {
-        $path = $this->getValues($instance, $keys);
-        Ac_Util::simpleSetArrayByPathNoRef($array, $path, $instance, $unique);
-    }
-    
-    protected function getFromArray($src, $fieldName) {
-        return $src[$fieldName];
-    }
-    
-    protected function getFromMember($src, $fieldName) {
-        return $src->$fieldName;
-    }
-    
-    protected function getFromGetter($src, $fieldName) {
-        $m = 'get'.ucfirst($fieldName);
-        return $src->$m();
-    }
-    
-    protected function getFromAeData($src, $fieldName) {
-        return $src->$fieldName;
-    }
-    
-    /**
-     * Retrieves field value from source object or array. Caches retrieval strategy for different classes in static variable (as in Ac_Table_Column).
-     * Triggers error if retrieval is not possible.
-     */
-    protected function getValue($src, $fieldName) {
-        static $g = array();
-        if (is_array($src)) {
-            if (!array_key_exists($fieldName, $src)) trigger_error('Cannot extract field \''.$fieldName.'\' from an array', E_USER_ERROR);
-            $res = $src[$fieldName];
-        } else {
-            $cls = get_class($src);
-            if (isset($g[$cls]) && isset($g[$cls][$fieldName])) $getter = $g[$cls][$fieldName];
-            else {
-                switch(true) {
-                    case in_array($fieldName, array_keys(get_class_vars($cls))): $getter = 'getFromMember'; break;
-                    case method_exists($src, 'get'.$fieldName): $getter = 'getFromGetter'; break;
-                    case is_a($src, 'Ac_Model_Data'): $getter = 'getFromAeData'; break;
-                    default:
-                        trigger_error('Cannot extract field \''.$fieldName.'\' from an object', E_USER_ERROR);
-                }
-                $g[$cls][$fieldName] = $getter;
-            }
-            $res = $this->$getter($src, $fieldName);
-        }
+    protected function getSrcImplPrototype() {
+        $res = array(
+            'application' => $this->application,
+            'srcIsUnique' => $this->getDestIsUnique(),
+            'destIsUnique' => $this->getSrcIsUnique(),
+        );
         return $res;
     }
     
-    protected function mapValues($values, $fieldNames) {
-        $i = 0;
-        $res = array();
-        foreach ($values as $value) {
-            $res[$fieldNames[$i]] = $value;
-        }
+    protected function getDestImplPrototype() {
+        $res = array(
+            'application' => $this->application,
+            'srcIsUnique' => $this->getSrcIsUnique(),
+            'destIsUnique' => $this->getDestIsUnique(),
+        );
         return $res;
     }
     
-    /**
-     * Retrieves all values of given fields from source object or array. 
-     * 
-     * @param Ac_Model_Data|object|array $src Information source
-     * @param array|string $fieldNames Names of fields to retrieve (if $single is true, it should be single string)
-     * @param $originalKeys Whether keys of result fields should be taken from $fieldNames
-     * @param bool $single Whether $fieldNames is single string (single value will be returned) 
-     * @return array Field values
-     * @access private 
-     */
-    protected function getValues($src, $fieldNames, $originalKeys = false, $single = false) {
-        $res = array();
-        if ($single) {
-            $res = $this->getValue($src, $fieldNames);
-        } else {
-            $c = count($fieldNames);
-            if ($originalKeys)
-                for ($i = 0; $i < $c; $i++) {
-                    $res[$fieldNames[$i]] = $this->getValue($src, $fieldName);
-                }
-            else
-               foreach ($fieldNames as $fieldName) {
-                    $res[] = $this->getValue($src, $fieldName);
-                }
-        }
-        return $res;
-    }
-    
-    protected function isVarEmpty($srcItem, $var, & $value = false) {
-        if (!$var) return true;
-        $res = true;
-        $value = false;
-        if (is_array($srcItem)) {
-            if (array_key_exists($var, $srcItem)) {
-                if ($srcItem[$var] !== false) {
-                    $value = $srcItem[$var];
-                    $res = false;
-                }
-            }
-        } else {
-            if (Ac_Accessor::objectPropertyExists($srcItem, $var) 
-                && ($value = $this->getValue($srcItem, $var)) !== false) {
-                $res = false;
-            }
-        }
-        return $res;
+    protected function reset() {
+        $this->srcImpl = false;
+        $this->destImpl = false;
     }
     
 }
-    

@@ -172,6 +172,9 @@ class Ac_Cg_Frontend {
         $gen->clearOutputDir =  $cleanOutputDir;
         $gen->genEditable = $createEditableFiles;
         $gen->genNonEditable = $createNonEditableFiles;
+        $gen->deployEditable = $copyEditable;
+        $gen->deployNonEditable = $copyGen;
+        $gen->deployPath = $this->getGenDeployPath();
 
 ?>
     <p><i><?php echo $this->getTitle(); ?></i></p>
@@ -222,17 +225,6 @@ class Ac_Cg_Frontend {
 <?php         $gen->run(); ?>
 	  	</pre>
       	<h3>Generator run complete: <?php echo $gen->getOutputBytes(); ?> bytes in <?php echo $gen->getOutputFiles(); ?> files</h3>
-
-<?php   if ($copyGen && $createNonEditableFiles) { ?>
-<?php       $ds = DIRECTORY_SEPARATOR; ?>
-<?php 	    $err = implode("\n", Ac_Cg_Util::copyDirRecursive("output/gen", $this->getGenDeployPath(), true, true)); ?>
-<?php 	    if ($err) echo "<pre>".$err."</pre>"; else Ac_Cg_Util::cleanDir($gen->outputDir."/gen"); ?>
-<?php   } ?>
-<?php   if ($copyEditable && $createEditableFiles) { ?>
-<?php       $ds = DIRECTORY_SEPARATOR; ?>
-<?php 	    $err = implode("\n", Ac_Cg_Util::copyDirRecursive("output/classes", dirname($this->getGenDeployPath()).'/classes', false, false)); ?>
-<?php 	    if ($err) echo "<pre>".$err."</pre>"; else Ac_Cg_Util::cleanDir($gen->outputDir."/classes"); ?>
-<?php   } ?>
 
 <?php 
 

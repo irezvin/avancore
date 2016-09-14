@@ -16,8 +16,8 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
      */
     var $_parentRecord = false;
    
-    function Ac_Admin_Datalink_Subrecord($params = array()) {
-        parent::Ac_Admin_Datalink($params);
+    function __construct($params = array()) {
+        parent::__construct($params);
         if (
                isset($params['mapperClass']) && strlen($params['mapperClass'])
             && isset($params['relationId']) && strlen($params['relationId'])
@@ -84,9 +84,6 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     function setRecordDefaults($record) {
         if (($rec = $this->getRecord()) && ($rel = $this->getRelation())) {
             if (!$rel->midTableName) {
-/*                foreach ($rel->fieldLinks as $srcField => $destField) {
-                    $record->$destField = $rec->$srcField;
-                }*/
                 $def = array();
                 foreach ($rel->fieldLinks as $srcField => $destField) {
                     $def[$destField] = $rec->$srcField;
@@ -94,6 +91,7 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
                 $record->bind($def);
             } else {
                 // We would have some difficulties with mid-tables... 
+                throw new Ac_E_InvalidUsage(__CLASS__." does not support relations with \$midTableName");
             }
         }
     }
@@ -101,22 +99,16 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
     function doAfterBindRecord(& $record, $requestData) {
         $this->setRecordDefaults($record);
     }
-    
-    function getSqlCriteria() {
-        $res = false;
+
+    function getQueryPart() {
+        $res = array();
         if (($rel = $this->getRelation()) && ($rec = $this->getRecord()) ) {
-            $a = array(& $rec);
-            $res = $rel->getCritForDestOfSrc($a, 't');
-        } else {
+            if ($rel->getMidTableName() || $rel->getFieldLinks2())
+                throw new Ac_E_InvalidUsage(__CLASS__." does not support relations with \$midTableName");
+            $fl = $rel->getFieldLinks();
+            $fk = Ac_Accessor::getObjectProperty($rec, array_keys($fl));
+            foreach ($fl as $k => $v) $res[$v] = $fk[$k];
         }
-        return $res;
-    }
-   
-    function getSqlExtraJoins() {
-        $res = false;
-        /*if ($this->_relation) {
-            $res = $this->_relation->getDestJoin('t', 'sub');
-        }*/
         return $res;
     }
     

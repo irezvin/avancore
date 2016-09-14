@@ -4,12 +4,12 @@ class Ac_Legacy_Config_Joomla15 extends Ac_Legacy_Config_Joomla {
 
 	var $_jConfig = false;
 	
-    function Ac_Legacy_Config_Joomla15($configFilePath, $configOptions = array()) {
+    function __construct($configFilePath, $configOptions = array()) {
     	
     	$this->_jConfig = new JConfig();
     	$jUri = JURI::getInstance();
     	
-        parent::Ac_Legacy_Config($configFilePath, $configOptions);
+        Ac_Legacy_Config::__construct($configFilePath, $configOptions);
         
         $this->liveSite = rtrim($jUri->root(), '/');
         $this->absolutePath = JPATH_SITE;

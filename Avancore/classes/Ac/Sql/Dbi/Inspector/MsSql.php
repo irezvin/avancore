@@ -9,7 +9,7 @@ class Ac_Sql_Dbi_Inspector_MsSql extends Ac_Sql_Dbi_Inspector {
     
     var $defaultDatabaseName = false;
 
-    function Ac_Sql_Dbi_Inspector_MsSql($sqlDb, $defaultDatabaseName = false) {
+    function __construct($sqlDb, $defaultDatabaseName = false) {
     	if (is_a($sqlDb, 'Ac_Legacy_Database')) {
     		$this->_db = new Ac_Sql_Db_Ae($sqlDb);
     	} elseif (!is_a($sqlDb, 'Ac_Sql_Db')) trigger_error("\$sqlDb must be an instance of Ac_Sql_Db");

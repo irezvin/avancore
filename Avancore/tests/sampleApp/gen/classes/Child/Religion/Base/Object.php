@@ -26,11 +26,18 @@ class Child_Religion_Base_Object extends Sample_Religion {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'people' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
+            ),
+            'religionId' => array (
+                'caption' => 'Religion Id',
+            ),
+            'title' => array (
+                'caption' => 'Title',
             ),
         );
     
@@ -66,8 +73,8 @@ class Child_Religion_Base_Object extends Sample_Religion {
     /**
      * @return Child_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
-        return parent::createPerson($values, $isReference);
+    function createPerson($values = array()) {
+        return parent::createPerson($values);
     }
 
     

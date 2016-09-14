@@ -2,10 +2,14 @@
 
 class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $id = NULL;
-    public $title = '';
-    public $tag = NULL;
+
+    var $_hasDefaults = true;
+
+    var $id = NULL;
+
+    var $title = '';
+
+    var $tag = NULL;
     
     var $_mapperClass = 'Sample_Tree_Record_Mapper';
     
@@ -30,7 +34,7 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'id' => array (
                 'dataType' => 'int',
@@ -38,11 +42,11 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Id',
+                'caption' => new Ac_Lang_String('sample_tree_record_id'),
             ),
             'title' => array (
                 'maxLength' => '255',
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_tree_record_title'),
             ),
             'tag' => array (
                 'dataType' => 'int',
@@ -51,7 +55,7 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Tag',
+                'caption' => new Ac_Lang_String('sample_tree_record_tag'),
             ),
         );
     
@@ -61,8 +65,6 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
   
     
 }

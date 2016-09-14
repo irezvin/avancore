@@ -52,7 +52,7 @@ class Ac_Legacy_Config {
     
     var $useNativeDatabase = false;
     
-    function Ac_Legacy_Config($configFilePath, $configOptions = array()) {
+    function __construct($configFilePath, $configOptions = array()) {
         if (isset($configOptions['configFilePath']) && strlen($configOptions['configFilePath']))
             $configFilePath = $configOptions['configFilePath'];
         if (strtolower(get_class($this)) == 'ae_config') trigger_error ('Attempt to instantiate abstract class', E_USER_ERROR);

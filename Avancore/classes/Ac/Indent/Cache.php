@@ -39,6 +39,7 @@ abstract class Ac_Indent_Cache extends Ac_Prototyped {
 
     function __destruct() {
         $this->save(true);
+        parent::__destruct();
     }
 
 }

@@ -2,11 +2,19 @@
 
 class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
 
+
+    protected $preserveMetaCache = true;
     
     /**
      * @var Child_Publish_MapperMixable 
      */
     protected $mapperExtraTable = false;
+
+    protected $mixableId = 'Child_Publish';
+    
+    function hasPublicVars() {
+        return true;
+    }
 
     /**
      * @return Child 
@@ -22,25 +30,59 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
         if ($pi === false) $pi = array (
-            'authorAuthorPerson' => array (
+            'authorPerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
             ),
-            'editorEditorPerson' => array (
+            'editorPerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
+            ),
+            'id' => array (
+                'caption' => 'Id',
+            ),
+            'sharedObjectType' => array (
+                'caption' => 'Shared Object Type',
+            ),
+            'published' => array (
+                'caption' => 'Published',
+            ),
+            'deleted' => array (
+                'caption' => 'Deleted',
+            ),
+            'publishUp' => array (
+                'caption' => 'Publish Up',
+            ),
+            'publishDown' => array (
+                'caption' => 'Publish Down',
             ),
             'authorId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
+                'caption' => 'Author Id',
             ),
             'editorId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
+                'caption' => 'Editor Id',
+            ),
+            'pubChannelId' => array (
+                'caption' => 'Pub Channel Id',
+            ),
+            'dateCreated' => array (
+                'caption' => 'Date Created',
+            ),
+            'dateModified' => array (
+                'caption' => 'Date Modified',
+            ),
+            'dateDeleted' => array (
+                'caption' => 'Date Deleted',
             ),
         );
     
@@ -69,8 +111,8 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Child_Person  
      */
-    function createAuthorPerson($values = array(), $isReference = false) {
-        return parent::createAuthorPerson($values, $isReference);
+    function createAuthorPerson($values = array()) {
+        return parent::createAuthorPerson($values);
     }
 
     
@@ -95,8 +137,8 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Child_Person  
      */
-    function createEditorPerson($values = array(), $isReference = false) {
-        return parent::createEditorPerson($values, $isReference);
+    function createEditorPerson($values = array()) {
+        return parent::createEditorPerson($values);
     }
 
     

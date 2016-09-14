@@ -2,21 +2,36 @@
 
 class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_shopProducts = false;
-    public $_shopProductsCount = false;
-    public $_shopProductsLoaded = false;
-    public $_shopProductIds = false;
-    public $id = NULL;
-    public $title = NULL;
-    public $leftCol = 0;
-    public $rightCol = 0;
-    public $ignore = 0;
-    public $parentId = NULL;
-    public $ordering = 0;
-    public $depth = 0;
-    public $metaId = NULL;
-    public $pubId = NULL;
+
+    var $_hasDefaults = true;
+
+    var $_shopProducts = false;
+
+    var $_shopProductsCount = false;
+
+    var $_shopProductsLoaded = false;
+
+    var $_shopProductIds = false;
+
+    var $id = NULL;
+
+    var $title = NULL;
+
+    var $leftCol = 0;
+
+    var $rightCol = 0;
+
+    var $ignore = 0;
+
+    var $parentId = NULL;
+
+    var $ordering = 0;
+
+    var $depth = 0;
+
+    var $metaId = NULL;
+
+    var $pubId = NULL;
     
     var $_mapperClass = 'Sample_Shop_Category_Mapper';
     
@@ -56,12 +71,12 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'shopProducts' => array (
                 'className' => 'Sample_Shop_Product',
                 'mapperClass' => 'Sample_Shop_Product_Mapper',
-                'caption' => 'Shop products',
+                'caption' => new Ac_Lang_String('sample_shop_category_shop_products'),
                 'relationId' => '_shopProducts',
                 'countVarName' => '_shopProductsCount',
                 'nnIdsVarName' => '_shopProductIds',
@@ -72,7 +87,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'arrayValue' => true,
                 'controlType' => 'selectList',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ),
                 'showInTable' => false,
@@ -83,12 +98,12 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Id',
+                'caption' => new Ac_Lang_String('sample_shop_category_id'),
             ),
             'title' => array (
                 'maxLength' => '255',
                 'isNullable' => true,
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_shop_category_title'),
             ),
             'leftCol' => array (
                 'dataType' => 'int',
@@ -96,7 +111,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Left Col',
+                'caption' => new Ac_Lang_String('sample_shop_category_left_col'),
             ),
             'rightCol' => array (
                 'dataType' => 'int',
@@ -104,7 +119,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Right Col',
+                'caption' => new Ac_Lang_String('sample_shop_category_right_col'),
             ),
             'ignore' => array (
                 'dataType' => 'int',
@@ -112,7 +127,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Ignore',
+                'caption' => new Ac_Lang_String('sample_shop_category_ignore'),
             ),
             'parentId' => array (
                 'dataType' => 'int',
@@ -121,7 +136,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Parent Id',
+                'caption' => new Ac_Lang_String('sample_shop_category_parent_id'),
             ),
             'ordering' => array (
                 'dataType' => 'int',
@@ -129,7 +144,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Ordering',
+                'caption' => new Ac_Lang_String('sample_shop_category_ordering'),
             ),
             'depth' => array (
                 'dataType' => 'int',
@@ -137,7 +152,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Depth',
+                'caption' => new Ac_Lang_String('sample_shop_category_depth'),
             ),
             'metaId' => array (
                 'dataType' => 'int',
@@ -146,7 +161,7 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Meta Id',
+                'caption' => new Ac_Lang_String('sample_shop_category_meta_id'),
             ),
             'pubId' => array (
                 'dataType' => 'int',
@@ -154,11 +169,11 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Publish_ImplMapper',
                 ),
                 'isNullable' => true,
-                'caption' => 'Pub Id',
+                'caption' => new Ac_Lang_String('sample_shop_category_pub_id'),
             ),
         );
     
@@ -168,8 +183,6 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
 
     function countShopProducts() {
         if (is_array($this->_shopProducts)) return count($this->_shopProducts);
@@ -230,11 +243,10 @@ class Sample_Shop_Category_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Shop_Product  
      */
-    function createShopProduct($values = array(), $isReference = false) {
+    function createShopProduct($values = array()) {
         $m = $this->getMapper('Sample_Shop_Product_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addShopProduct($res);
         return $res;
     }

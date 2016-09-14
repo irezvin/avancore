@@ -1,6 +1,19 @@
 <?php
 
 class Sample_Person_Mapper extends Sample_Person_Base_Mapper {
+
+    protected function doGetUniqueIndexData() {
+        $res = Ac_Util::m(parent::doGetUniqueIndexData(), array('idxName' => array('name')));
+        return $res;
+    }
+    
+    function getTitleFieldName() {
+        return 'name';
+    }
+    
+    function getDefaultSort() {
+        return 'birthDate';
+    }
     
     /*
     
@@ -100,5 +113,24 @@ class Sample_Person_Mapper extends Sample_Person_Base_Mapper {
     }
     
     */
+    
+    protected function doGetSqlSelectPrototype($primaryAlias = 't') {
+        $res = Ac_Util::m(parent::doGetSqlSelectPrototype($primaryAlias), array(
+            'parts' => array(
+                'notTest' => array(
+                    'class' => 'Ac_Sql_Filter_Custom',
+                    'where' => "lcase(name) not like '%test%'",
+                ),
+                'birthYear' => array(
+                    'class' => 'Ac_Sql_Filter_Equals',
+                    'colName' => "DATE_FORMAT(t.birthDate, '%Y')",
+//                    'php' => function($object, $crit) {
+//                        return Ac_Util::date($object->birthDate, 'Y') == $crit->values[$value];
+//                    }
+                )
+            ),
+        ));
+        return $res;
+    }
     
 }

@@ -12,6 +12,12 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     
     var $mapperVars = array();
     
+    var $storageClass = false;
+    var $genStorageClass = false;
+    var $parentStorageClass = false;
+    
+    var $storageVars = array();
+    
     var $vars = array();
     var $ownPropInfo = false;
     var $ownProperties = false;
@@ -25,10 +31,10 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     var $uniqueIndexData = false;
     var $createAccessors = false;
     var $accessors = array();
-    var $nullableSqlColumns = array();
+    var $nullableColumns = array();
     var $associationPrototypes = array();
+    var $relationProviderPrototypes = array();
     var $hasUniformPropertiesInfo = false;
-    var $tracksChanges = false;
     var $modelCoreMixables = array();
     var $mapperCoreMixables = array();
     var $internalDefaults = false;
@@ -58,7 +64,17 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
                 'relPath' => 'gen/'.Ac_Cg_Util::className2fileName($this->genMapperClass), 
                 'isEditable' => false, 
                 'templatePart' => 'genMapper',
-            ), 
+            ),
+            'storage' => array(
+                'relPath' => Ac_Cg_Util::className2fileName($this->storageClass),
+                'isEditable' => true, 
+                'templatePart' => 'storage',
+            ),
+            'genStorage' => array(
+                'relPath' => 'gen/'.Ac_Cg_Util::className2fileName($this->genStorageClass),
+                'isEditable' => false, 
+                'templatePart' => 'genStorage',
+            ),
         );
     }
     
@@ -70,7 +86,12 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->mapperClass = $this->model->getMapperClass();
         $this->genMapperClass = $this->model->getGenMapperClass();
         $this->parentMapperClass = $this->model->parentMapperClassName;
+        
         $this->createAccessors = $this->model->createAccessors;
+        
+        $this->storageClass = $this->model->getStorageClass();
+        $this->genStorageClass = $this->model->getGenStorageClass();
+        $this->parentStorageClass = $this->model->parentStorageClassName;
         
         foreach ($this->model->listProperties() as $name) {
             $prop = $this->model->getProperty($name);
@@ -99,8 +120,8 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         
         $this->tableName = $this->model->tableObject->name;
         $this->associationPrototypes = $this->model->getAssociationPrototypes();
+        $this->relationProviderPrototypes = $this->model->getRelationProviderPrototypes();
         $this->hasUniformPropertiesInfo = $this->model->hasUniformPropertiesInfo;
-        $this->tracksChanges = $this->model->tracksChanges;
         $this->modelCoreMixables = $this->model->modelCoreMixables;
         $this->mapperCoreMixables = $this->model->mapperCoreMixables;
         $this->autoincFieldName = $this->calcAi($this->model);
@@ -114,24 +135,54 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
             $this->pkStr = $this->exportArray($pk, 0, false, true, true);
         }
         
+        $this->mapperVars = $this->model->mapperVars;
+        
         $this->mapperVars['pk'] = new Ac_Cg_Php_Expression($this->pkStr);
         $this->mapperVars['recordClass'] = $this->model->getMapperRecordClass();
         $this->mapperVars['tableName'] = $this->tableName;
         $this->mapperVars['id'] = $this->mapperClass;
+        $this->mapperVars['storage'] = $this->storageClass;
         $this->mapperVars['columnNames'] = new Ac_Cg_Php_Expression($this->exportArray(array_keys($this->getDefaults($this->model)), 0, false, true, true));
         
         $this->ownProperties = array_diff($this->ownProperties, $this->model->listUsedColumns());
-        if ($this->model->nullableSqlColumns) 
-            $this->mapperVars['nullableSqlColumns'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->nullableSqlColumns, 0, false, true, true));
+        if ($this->model->nullableColumns) 
+            $this->mapperVars['nullableColumns'] = new Ac_Cg_Php_Expression($this->exportArray($this->model->nullableColumns, 0, false, true, true));
         $this->mapperVars['defaults'] = $this->getDefaults($this->model);
         $this->mapperVars['defaults'] = new Ac_Cg_Php_Expression($this->exportArray($this->mapperVars['defaults'], 8, true, false, true));
         
         $this->relationPrototypes = $this->model->getRelationPrototypes();
         $this->assocProperties = $this->model->getAssocProperties();
-        
         $this->uniqueIndexData = $this->model->tableObject->getUniqueIndexData();
         
         $this->calcInheritance();
+        
+        $storageToMapperVars = array(
+            'tableName', 
+            'recordClass', 
+            'primaryKey' => 'pk',
+            'autoincFieldName',
+            'defaults',
+            'uniqueIndices',
+            'nullableColumns',
+        );
+        foreach ($storageToMapperVars as $k => $v) {
+            if (is_numeric($k)) $k = $v;
+            if (isset($this->mapperVars[$v])) 
+                $this->storageVars[$k] = $this->mapperVars[$v];
+        }
+        if ($this->autoincFieldName && !isset($this->ignoreMethods['autoincFieldName'])) {
+            $this->storageVars['autoincFieldName'] = $this->autoincFieldName;
+        }
+        if ($this->uniqueIndexData && array_diff(array_keys($this->uniqueIndexData), $this->inheritedIndice)) {
+            $this->storageVars['uniqueIndices'] = array_diff_key($this->uniqueIndexData, array_flip($this->inheritedIndice));
+        }
+        
+        if ($this->createAccessors) {
+            foreach ($this->vars as $k => $v) 
+                if (!$v instanceof Ac_Cg_Member) 
+                    $this->vars[$k] = Ac_Cg_Member::prot($v);
+        }
+        
     }
     
     function getModelClassMembers(Ac_Cg_Model $model) {
@@ -147,7 +198,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     function calcAi(Ac_Cg_Model $model) {
         
         $res = false;
-        foreach ($model->listUsedColumns() as $cn) {
+        foreach (array_intersect($model->listUsedColumns(), $model->tableObject->listColumns()) as $cn) {
             $col = $model->tableObject->getColumn($cn);
             if ($col->autoInc) {
                 $res = $cn;
@@ -193,8 +244,8 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
             unset($this->mapperVars['defaults']);
         }
         
-        if ($this->model->nullableSqlColumns == $parentModel->nullableSqlColumns) {
-            unset($this->mapperVars['nullableSqlColumns']);
+        if ($this->model->nullableColumns == $parentModel->nullableColumns) {
+            unset($this->mapperVars['nullableColumns']);
         }
         
         if ($this->calcAi($parentModel) == $this->autoincFieldName) {
@@ -223,10 +274,6 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         
         if ($parentModel->hasUniformPropertiesInfo == $this->model->hasUniformPropertiesInfo) {
             $this->ignoreMethods['hasUniformPropertiesInfo'] = true;
-        }
-        
-        if ($parentModel->tracksChanges == $this->model->tracksChanges) {
-            $this->ignoreMethods['tracksChanges'] = true;
         }
         
     }
@@ -312,8 +359,6 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     }
     
     function showModelGenObject() {  
-
-        $fieldVisibility = $this->createAccessors? 'protected' : 'public';
         
     // ------------------------------------------- modelGenObject -------------------------------------------    
         
@@ -323,9 +368,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 
 <?php if ($this->model->parentClassIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genModelClass); ?> extends <?php $this->d($this->parentClass); ?> {
 
-<?php foreach($this->vars as $var => $default) { ?>
-    <?php echo $fieldVisibility; ?> $<?php $this->d($var); ?> = <?php $this->export($default); ?>;
-<?php } ?>
+<?php $this->declareClassMembers ($this->vars, 4); ?>
     
     var $_mapperClass = <?php $this->str($this->mapperClass); ?>;
     
@@ -380,7 +423,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 <?php } ?>
 <?php if ($this->ownPropInfo) { ?>
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = <?php $this->exportArray($this->ownPropInfo, 8, true); ?>;
 <?php   if ($this->parentClass === $this->model->getDefaultParentClassName()) { ?>    
         return $pi;
@@ -392,10 +435,6 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 <?php if ($this->hasUniformPropertiesInfo && !isset($this->ignoreMethods['hasUniformPropertiesInfo'])) { ?>
 
     function hasUniformPropertiesInfo() { return true; }
-<?php } ?>
-<?php if ($this->tracksChanges && !isset($this->ignoreMethods['tracksChanges'])) { ?>
-
-    function tracksChanges() { return true; }
 <?php } ?>
 <?php if ($this->createAccessors) $this->_showModelAccessors(); ?>
 <?php foreach (array_keys($this->assocProperties) as $relId) { $this->_showModelMethodsForAssociation($relId, $this->assocProperties[$relId]); } ?>  
@@ -459,12 +498,11 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 ?>
 <?php $this->phpOpen(); ?>
 
-
+/**
+ * @method <?php echo $this->modelClass; ?>[] loadFromRows(array $rows, $keysToList = false)
+ */
 <?php if ($this->model->parentMapperIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genMapperClass); ?> extends <?php $this->d($this->parentMapperClass); ?> {
-<?php foreach ($this->mapperVars as $var => $default) { ?>
-
-    var $<?php echo $var; ?> = <?php $this->export($default); ?>; 
-<?php } ?> 
+<?php $this->declareClassMembers ($this->mapperVars); ?>
 <?php if ($this->autoincFieldName && !isset($this->ignoreMethods['autoincFieldName'])) { ?>
    
     protected $autoincFieldName = <?php $this->str($this->autoincFieldName) ?>;
@@ -477,11 +515,6 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
         return Ac_Util::m(parent::doGetCoreMixables(), <?php $this->exportArray($this->mapperCoreMixables, 8, true); ?>);
     }
     
-<?php } ?> 
-<?php if (!$this->model->getParentModel()) { ?>
-    function listSqlColumns() {
-        return $this->columnNames;
-    }
 <?php } ?> 
 <?php if ($this->internalDefaults) { ?>
     function doGetInternalDefaults() {
@@ -542,6 +575,83 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     function loadSingleRecord($where = '', $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
         return parent::loadSingleRecord($where, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
+    
+    /**
+     * Loads array of records.
+     * 
+     * @return <?php $this->d($this->modelClass); ?>[] Records in the same order as in $ids array
+     * @param array ids - Array of record identifiers
+     * @param bool $keysToList DOES NOT accept customary fields
+     */
+    function loadRecordsArray(array $ids, $keysToList = false) {
+        return parent::loadRecordsArray($ids, $keysToList);
+    }
+
+    /**
+     * @deprecated Will be removed in 0.4
+     * @return <?php $this->d($this->modelClass); ?>[]
+     */
+    function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        return parent::loadRecordsByCriteria($where, $keysToList, $order, $joins, $limitOffset, $limitCount, $tableAlias);
+    }
+    
+    /**
+     * Returns first matching record 
+     * 
+     * @param array $query
+     * @param mixed $sort
+     * @return <?php echo $this->modelClass; ?>
+     */
+    function findFirst (array $query = array(), $sort = false) {
+        return parent::findFirst($query, $sort);
+    }
+    
+    /**
+     * Returns the matching record only when resultset contains one record
+     * 
+     * @param array $query
+     * @return <?php echo $this->modelClass; ?>
+     */
+    function findOne (array $query = array()) {
+        return parent::findOne($query);
+    }
+    
+    /**
+     * @param array $query
+     * @param mixed $keysToList
+     * @param mixed $sort
+     * @param int $limit
+     * @param int $offset
+     * @param bool $forceStorage
+     * @return <?php echo $this->modelClass; ?>[]
+     */
+    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+        if (func_num_args() > 5) $remainingQuery = true;
+        return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
+    }
+    
+    /**
+     * Does partial search.
+     * 
+     * Objects are always returned by-identifiers.
+     * 
+     * @return <?php echo $this->modelClass; ?>[]
+     *
+     * @param array $inMemoryRecords - set of in-memory records to search in
+     * @param type $areByIdentifiers - whether $inMemoryRecords are already indexed by identifiers
+     * @param array $query - the query (set of criteria)
+     * @param mixed $sort - how to sort
+     * @param int $limit
+     * @param int $offset
+     * @param bool $canUseStorage - whether to ask storage to find missing items or apply storage-specific criteria first
+     * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
+     * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
+     */
+    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+        if (func_num_args() > 5) $remainingQuery = true;
+        return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
+    }
+    
 
 <?php if ($this->model->titleProp) { ?>
     
@@ -549,10 +659,15 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
         return <?php $this->str($this->model->titleProp); ?>;   
     }
 <?php } ?>
-<?php if ($this->model->orderingProp) { $ord = $this->model->orderingProp; if ($this->model->orderGroupProp) $ord = $this->model->orderGroupProp.', '.$ord;  ?>
+<?php if ($this->model->orderingProp) { 
     
-    function getDefaultOrdering() {
-        return <?php $this->str($ord); ?>;
+    $ord = $this->model->orderingProp; 
+    if ($this->model->orderGroupProp) 
+        $ord = array($this->model->orderGroupProp, $ord);  
+?>
+    
+    function getDefaultSort() {
+        return <?php $this->export($ord); ?>;
     }
 <?php } ?>
 <?php if ($this->relationPrototypes) { ?>
@@ -592,11 +707,10 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 <?php if ($this->uniqueIndexData && array_diff(array_keys($this->uniqueIndexData), $this->inheritedIndice)) { ?>
     
     protected function doGetUniqueIndexData() {
-    return <?php $this->exportArray(array_diff_key($this->uniqueIndexData, array_flip($this->inheritedIndice)), 8); ?>;
+        return <?php $this->exportArray(array_diff_key($this->uniqueIndexData, array_flip($this->inheritedIndice)), 8); ?>;
     }
 <?php } ?>
 <?php   $this->_showMapperLoaderMethods(); ?>
-    
 <?php   foreach (array_keys($this->assocProperties) as $relId) { $this->_showMapperMethodsForAssociation($relId, $this->assocProperties[$relId]); } ?>
     
 }
@@ -615,44 +729,44 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMapperClass); ?> {
 <?php if ($this->model->generateMethodPlaceholders) { ?>
 
-//	protected function doGetInfoParams() {
+//  protected function doGetInfoParams() {
 //        
-//		$res = Ac_Util::m(parent::doGetInfoParams(), array(
-//        	'singleCaption' => '',
-//        	'pluralCaption' => '',
-//		
-//        	'adminFeatures' => array(
-//        		'Ac_Admin_Feature_Default' => array(
-//		
-//         			'actionSettings' => array(
-//			            '' => array(
-//			                'id' => '',
-//			                'scope' => 'any',
-//			                'image' => 'stop_f2.png', 
-//			                'disabledImage' => 'stop.png',
-//			                'caption' => '',
-//			                'description' => '',
-//			                'managerProcessing' => 'procName',
-//			                'listOnly' => true,
-//			            ), 
-//			        ),
-//			        
-//			        'processingSettings' => array(
-//			        	'procName' => array(
-//			        		'class' => 'Proc_Class',
-//			        	),
-//			        ),
-//		
-//        			'columnSettings' => array(
-//		
+//      $res = Ac_Util::m(parent::doGetInfoParams(), array(
+//          'singleCaption' => '',
+//          'pluralCaption' => '',
+//      
+//          'adminFeatures' => array(
+//              'Ac_Admin_Feature_Default' => array(
+//      
+//                  'actionSettings' => array(
+//                      '' => array(
+//                          'id' => '',
+//                          'scope' => 'any',
+//                          'image' => 'stop_f2.png', 
+//                          'disabledImage' => 'stop.png',
+//                          'caption' => '',
+//                          'description' => '',
+//                          'managerProcessing' => 'procName',
+//                          'listOnly' => true,
+//                      ), 
+//                  ),
+//                  
+//                  'processingSettings' => array(
+//                      'procName' => array(
+//                          'class' => 'Proc_Class',
+//                      ),
+//                  ),
+//      
+//                  'columnSettings' => array(
+//      
 //                        'col1' => array(
 //                            'class' => '',
 //                            'order' => -10,
 //                            'title' => '',
 //                        ),
 //                        
-//        			),
-//        			
+//                  ),
+//                  
 //                    'formFieldDefaults' => array(
 //                    ),
 //                    
@@ -660,43 +774,43 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
 //                    
 //                    'displayOrderStep' => 10,
 //                    
-//			        'formSettings' => array(
-//			        	'controls' => array(
+//                  'formSettings' => array(
+//                      'controls' => array(
 //                            '' => array(
 //                            ),
-//				       	),
-//			        ),
-//			        
-//			        'filterPrototypes' => array(
-//			        ),
-//			        
-//			        'orderPrototypes' => array(
-//			        ),
-//			        
-//			        'filterFormSettings' => array(
-//			        	'controls' => array(
-//				        	'substring' => array(
-//			        			'class' => 'Ac_Form_Control_Text',
-//			        			'caption' => 'Filter',
-//			        			'htmlAttribs' => array(	
-//			        				'onchange' => 'document.aForm.submit();',
-//			        				'size' => 20,
-//			        			),
-//								'description' => '',			        			
-//				        	),
-//				        ),
-//			        ),
+//                      ),
+//                  ),
+//                  
+//                  'filterPrototypes' => array(
+//                  ),
+//                  
+//                  'orderPrototypes' => array(
+//                  ),
+//                  
+//                  'filterFormSettings' => array(
+//                      'controls' => array(
+//                          'substring' => array(
+//                              'class' => 'Ac_Form_Control_Text',
+//                              'caption' => 'Filter',
+//                              'htmlAttribs' => array( 
+//                                  'onchange' => 'document.aForm.submit();',
+//                                  'size' => 20,
+//                              ),
+//                              'description' => '',                                
+//                          ),
+//                      ),
+//                  ),
 //                    
 //                    'sqlSelectSettings' => array(
 //                        'tables' => array(
 //                        ),
 //                    ),
-//        			
-//        		),
-//        	),
-//		));
-//		return $res;
-//	}    
+//                  
+//              ),
+//          ),
+//      ));
+//      return $res;
+//  }    
 //    
 //    protected function doGetRelationPrototypes() {
 //        return Ac_Util::m(parent::doGetRelationPrototypes(), array(
@@ -709,12 +823,59 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
 //            ),
 //        ));
 //    }
+<?php } ?>  
     
 }
     
-<?php } ?>  
 <?php //$this->phpClose(); ?><?php
     }
+
+    function showGenStorage() {
+
+    // ------------------------------------------- genStorage -------------------------------------------    
+        
+?>
+<?php $this->phpOpen(); ?>
+
+
+<?php if ($this->model->parentStorageIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genStorageClass); ?> extends <?php $this->d($this->parentStorageClass); ?> {
+<?php foreach ($this->storageVars as $var => $default) { ?>
+
+    var $<?php echo $var; ?> = <?php $this->export($default); ?>; 
+<?php } ?> 
+<?php   if ($proto = $this->model->getSqlSelectPrototype()) { ?> 
+    
+    protected function doGetSqlSelectPrototype($primaryAlias = 't') {
+        $res = parent::doGetSqlSelectPrototype($primaryAlias);
+        Ac_Util::ms($res, <?php $this->exportArray($proto, 12); ?> 
+        );
+        return $res;
+    }
+<?php   } ?>
+    
+}
+
+<?php 
+
+    } // showGenStorage
+
+    function showStorage() {  
+
+    // ------------------------------------------- storage -------------------------------------------    
+        
+?>
+<?php $this->phpOpen(); ?>
+
+
+class <?php $this->d($this->storageClass); ?> extends <?php $this->d($this->genStorageClass); ?> {
+<?php if ($this->model->generateMethodPlaceholders) { ?>
+<?php } ?>  
+
+}
+<?php
+
+    } // showStorage
+    
     
 }
 

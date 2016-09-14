@@ -129,7 +129,7 @@ class Ac_Finder extends Ac_Prototyped {
     }
     
     /**
-     * @return Ac_Model_Collection
+     * @return Ac_Legacy_Collection
      */
     function createCollection(Ac_Sql_Db $sqlDb = null) {
         $sqlSelect = $this->createSqlSelect($sqlDb);
@@ -150,7 +150,7 @@ class Ac_Finder extends Ac_Prototyped {
             if (!is_array($keys)) $keys = array($keys);
         } else {
             $m = Ac_Model_Mapper::getMapper($this->mapperClass);
-            $keys = $m->listPkFields(); 
+            $keys = array($m->getStorage()->getPrimaryKey());
         }
         if (is_null($aeDb)) $sqlDb = Ac_Application::getDefaultInstance()->getDb();
         else $sqlDb = new Ac_Sql_Db_Ae($aeDb);

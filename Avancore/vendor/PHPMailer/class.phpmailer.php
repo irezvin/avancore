@@ -847,7 +847,7 @@ class PHPMailer
             if (defined(
                 'PCRE_VERSION'
             )
-            ) { //Check this instead of extension_loaded so it works when that function is disabled
+            ) { //Check this instead of extension_loaded so it works when that function __construct disabled
                 if (version_compare(PCRE_VERSION, '8.0') >= 0) {
                     $patternselect = 'pcre8';
                 } else {
@@ -2319,7 +2319,7 @@ class PHPMailer
     /**
      * Encode and wrap long multibyte strings for mail headers
      * without breaking lines within a character.
-     * Adapted from a function by paravoid at http://uk.php.net/manual/en/function.mb-encode-mimeheader.php
+     * Adapted from a function __construct paravoid at http://uk.php.net/manual/en/function.mb-encode-mimeheader.php
      * @access public
      * @param string $str multi-byte text to wrap encode
      * @param string $lf string to use as linefeed/end-of-line

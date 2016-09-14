@@ -324,11 +324,6 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
      */
     function bind($src, $ignore = false) {
         if (!is_array($src)) trigger_error ('$src must be an array', E_USER_ERROR);
-        if (!is_array($ignore) && strlen($ignore)) $ignore = explode(' ', $ignore);
-        if ($ignore)
-            foreach ($ignore as $ignorePath) if (strlen($ignorePath)) {
-                Ac_Util::unsetArrayByPath($src, Ac_Util::pathToArray($ignorePath));
-            }
         
         if ($ctob = $this->hasToConvertTypesOnBind()) $v = $this->_createValidator();
             else $v = false;
@@ -381,14 +376,14 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         
         $this->_checked = false;
         
-        $this->doOnBind($src, $ignore);
+        $this->doOnBind($src);
         
-        $this->triggerEvent(self::EVENT_ON_BIND, array(& $src, $ignore));
+        $this->triggerEvent(self::EVENT_ON_BIND, array(& $src));
         
         return true;
     }
     
-    function doOnBind($src, $ignore = false) {
+    function doOnBind($src) {
     }
     
     /**
@@ -422,6 +417,9 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         $this->_checked = false;
     }
     
+    /**
+     * @deprecated
+     */
     function getError() {
         if ($errors = $this->getErrors()) return Ac_Util::implode_r(";\n", $errors);
         else return false;
@@ -535,19 +533,25 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     // +--------------------------------  ACCESSOR METHODS  ------------------------------+
     // +----------------------------------------    --------------------------------------+
 
+    function getProperty($propName, $key = false) {
+        
+    }
+    
+    function setProperty($propName, $value, $key = false) {
+        
+    }
     
     // +-------------------------------------  getField  ---------------------------------+
     
     function getField($propName, $key = false) {
         
-        //return $this->_getSingleFieldItem($propName);
         list($head, $tail) = Ac_Util::pathHeadTail($propName);
         if (!in_array($head, $this->listProperties())) trigger_error (get_class($this).' does not have property "'.$propName.'"', E_USER_ERROR);
         if ($assocClass = $this->_getAssocClass($head)) { 
             if ($tail) {
                 $res = $this->_getAssociatedField($head, $tail, $key);
             }
-                else trigger_error ('Cannot retrieve associated object '.get_class($this).'::'.$propName.' with getField(); use getAssoc() instead', E_USER_ERROR);
+            else trigger_error ('Cannot retrieve associated object '.get_class($this).'::'.$propName.' with getField(); use getAssoc() instead', E_USER_ERROR);
         } else {
             if ($plural = $this->_getPlural($head)) {
                 if ($tail && $key === false) {
@@ -1393,25 +1397,19 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     function getPropertyInfo($propName, $onlyStatic = false) {
         if (substr($propName, -2) == '[]') 
             $propName = substr($propName, 0, strlen($propName)-2);
-        $arrPropInfo = $this->_getStaticPropertyInfoArr(Ac_Util::pathToArray($propName));
-        $arrPropInfo['srcClass'] = get_class($this);
+        $path = Ac_Util::pathToArray($propName);
+        $res = $this->intGetStaticPropertyInfo($path);
         if (!$onlyStatic) {
-            if (isset($arrPropInfo['isAbstract']) && $arrPropInfo['isAbstract']) 
-                trigger_error ('Only static info can be retrieved on abstract property '.get_class($this).'::'.$propName);
-            
-            if (isset($arrPropInfo['assocClass']) && $arrPropInfo['assocClass']) $arrPropInfo['value'] = $this->getAssoc($propName);
-                else $arrPropInfo['value'] = $this->getField($propName);
-            if ($errors = $this->getErrors($propName, false, false)) $arrPropInfo['error'] = $errors;
+            $res = $res->cloneToNonStatic($this, $propName);
         }
-        $res = new Ac_Model_Property($this, $propName, $onlyStatic, $arrPropInfo);
         return $res; 
     }
     
     function hasProperty($propName) {
-        return ($this->_getStaticPropertyInfoArr(Ac_Util::pathToArray($propName), false, false) !== false);
+        return ($this->intGetStaticPropertyInfo(Ac_Util::pathToArray($propName), false, false) !== false);
     }
     
-    function _getStaticPropertyInfoArr ($arrPath, $abstract = false, $trigger = true) {
+    protected function intGetStaticPropertyInfo ($arrPath, $abstract = false, $trigger = true) {
         $head = $arrPath[0];
         $arrTail = array_slice($arrPath, 1);
         if (!in_array($head, $this->listProperties())) {
@@ -1423,9 +1421,9 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         if ($c = count($arrTail)) {
             if (($c == 1) && ($plural = $this->_getPlural($head))) {
                 if (!strlen($arrTail[0])) { // We have 'wildcard' here: foo[] - it is allowed as last segment
-                    $res = $this->_getOwnStaticPropertyInfoArr($head, false, $plural, $abstract, $trigger);
+                    $res = $this->intGetOwnStaticPropertyInfo($head, false, $plural, $abstract, $trigger);
                 } else {
-                    $res = $this->_getOwnStaticPropertyInfoArr($head, $arrTail[0], $plural, $abstract, $trigger);
+                    $res = $this->intGetOwnStaticPropertyInfo($head, $arrTail[0], $plural, $abstract, $trigger);
                 }
             } else {
                 if (!strlen($arrTail[0])) {
@@ -1435,25 +1433,25 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
                     }
                     else {
                         $arrTail = array_slice($arrTail, 1);
-                        $res = $this->_getAssociatedStaticPropertyInfoArr($head, $arrTail, false, $plural, $abstract, $trigger);
+                        $res = $this->intGetAssociatedStaticPropertyInfo($head, $arrTail, false, $plural, $abstract, $trigger);
                     }
                 } else {
                     if ($plural = $this->_getPlural($head)) {
                         $key = $arrTail[0];
                         $arrTail = array_slice($arrTail, 1);
-                        $res = $this->_getAssociatedStaticPropertyInfoArr($head, $arrTail, $key, $plural, $abstract, $trigger);
+                        $res = $this->intGetAssociatedStaticPropertyInfo($head, $arrTail, $key, $plural, $abstract, $trigger);
                     } else {
-                        $res = $this->_getAssociatedStaticPropertyInfoArr($head, $arrTail, false, false, $abstract, $trigger);
+                        $res = $this->intGetAssociatedStaticPropertyInfo($head, $arrTail, false, false, $abstract, $trigger);
                     }
                 }
             }
         } else {
-            $res = $this->_getOwnStaticPropertyInfoArr($head, false, false, $abstract, $trigger);
+            $res = $this->intGetOwnStaticPropertyInfo($head, false, false, $abstract, $trigger);
         }
         return $res;
     }
     
-    function _getAssociatedStaticPropertyInfoArr($head, $arrTail, $key, $plural, $abstract, $trigger) {
+    protected function intGetAssociatedStaticPropertyInfo($head, $arrTail, $key, $plural, $abstract, $trigger) {
         if ($plural) {
             if (strlen($key)) {
                 if ($abstract) {
@@ -1469,12 +1467,26 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
              $target = $this->_getOwnAssoc($head, false, false);
              if (!$target) $target = $this->createAssociable($head);
         }
-        $info = $target->_getStaticPropertyInfoArr($arrTail, $abstract);
+        $info = $target->intGetStaticPropertyInfo($arrTail, $abstract);
         return $info;
     }
     
-    function _getOwnStaticPropertyInfoArr($head, $key, $plural, $abstract, $trigger) {
+    /**
+     * @return Ac_Model_Property
+     */
+    protected function intGetOwnStaticPropertyInfo($head, $key, $plural, $abstract, $trigger) {
         $opi = $this->getPropertiesInfo();
+        
+        $c = $this->metaCacheMode > self::META_CACHE_STRUCTURE;
+        
+        if ($c) {
+            if (
+                isset(self::$metaCache[$mc = $this->metaClassId]) 
+                && isset(self::$metaCache[$mc][__FUNCTION__])
+                && isset(self::$metaCache[$mc][__FUNCTION__][$head.' '.$key])
+            ) return (self::$metaCache[$mc][__FUNCTION__][$head.' '.$key]);
+        }
+        
         if (isset($opi[$head]) && is_array($opi[$head])) $arrInfo = $opi[$head];
             else $arrInfo = array();
         
@@ -1482,11 +1494,18 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         if ($assocClass = $this->_getAssocClass($head)) $arrInfo['assocClass'] = $assocClass;
         
         if ($abstract) $arrInfo['isAbstract'] = true;
-            else $arrInfo['implObject'] = $this;
         
-        $arrInfo['implClass'] = get_class($this);
+        $arrInfo['srcClass'] = $arrInfo['implClass'] = get_class($this);
+        $arrInfo['propName'] = $head;
+        $arrInfo['key'] = $key;
         
-        return $arrInfo; 
+        $res = new Ac_Model_Property($arrInfo);
+        
+        if ($c) {
+            self::$metaCache[$mc][__FUNCTION__][$head.' '.$key] = $res;
+        }
+        
+        return $res;
     }
     
     function getFormOptions($propName, $onlyStatic = true) {
@@ -1523,6 +1542,14 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     }
     
     function doOnWakeup() {
+    }
+    
+    function clearMetaCacheForMyClass() {
+        self::clearMetaCache($this->getMetaClassId());
+    }
+    
+    static function clearMetaCache($metaClassId) {
+        unset(self::$metaCache[$metaClassId]);
     }
     
     function beginUpdate() {
@@ -1575,14 +1602,6 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         } else {
             unset($this->extraData[$key]);
         }
-    }
-    
-    function clearMetaCacheForMyClass() {
-        self::clearMetaCache($this->getMetaClassId());
-    }
-    
-    static function clearMetaCache($metaClassId) {
-        unset(self::$metaCache[$metaClassId]);
     }
     
 }

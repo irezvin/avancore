@@ -135,6 +135,8 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
     
     protected $initsCoreMixables = false;
     
+    protected $components = array();
+    
     /**
      * @var array Properties that will be after deferred mixables are created
      */
@@ -258,7 +260,8 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
             $adapter = $this->getAdapter();
             if ($this->addIncludePaths) {
                 Ac_Util::addIncludePath($adapter->getClassPaths());
-                if (strlen($gp = $adapter->getGenPath()))Ac_Util::addIncludePath($adapter->getGenPath());
+                if (strlen($gp = $adapter->getGenPath()))
+                    Ac_Util::addIncludePath($adapter->getGenPath());
             }
             $this->initDeferredMixables();
             $this->doOnInitialize();
@@ -363,13 +366,15 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
         return in_array($id, $this->listMappers());
     }
     
-    function addMapper(Ac_Model_Mapper $mapper) {
+    function addMapper(Ac_Model_Mapper $mapper, $silent = false) {
         $id = $mapper->getId();
-        if (in_array($id, $this->listMappers())) 
-            throw Ac_E_InvalidCall::alreadySuchItem('Mapper', $id);
-        $this->mappers[$id] = $mapper;
-        $mapper->setApplication($this);
-        $this->triggerEvent(self::EVENT_ON_REGISTER_MAPPERS, array($id => $mapper));
+        if (in_array($id, $this->listMappers())) {
+            if (!$silent) throw Ac_E_InvalidCall::alreadySuchItem('Mapper', $id);
+        } else {
+            $this->mappers[$id] = $mapper;
+            $mapper->setApplication($this);
+            $this->triggerEvent(self::EVENT_ON_REGISTER_MAPPERS, array($id => $mapper));
+        }
     }
     
     function setMapperAliases(array $mapperAliases, $add = false) {
@@ -552,7 +557,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
             $res = $this->services[$id];
         } elseif ($this->adapter && $s = $this->adapter->getService($id, true)) {
             $res = $s;
-            Ac_Accessor::setObjectProperty($res, 'application', $this);
+            if (method_exists($res, 'setApplication')) $res->setApplication($this);
         } elseif (!$dontThrow) throw new Exception("No such service: '{$id}");
         return $res;
     }
@@ -688,6 +693,16 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
             $this->setMixables($this->deferredMixables, false);
             $this->deferredMixables = array();
         }
+    }
+    
+    /**
+     * @return Ac_Application_Component
+     */
+    protected function getComponent($class) {
+        if (!isset($this->components[$class])) {
+            $this->components[$class] = new $class(array('application' => $this));
+        }
+        return $this->components[$class];
     }
     
 }

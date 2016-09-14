@@ -182,7 +182,7 @@ abstract class Ac_Param_Source {
     /**
      * @param array $options Configuration array. Can contain keys 'parent', 'key' and 'data' to set respective properties.
      */
-    function Ac_Param_Source($options = array()) {
+    function __construct($options = array()) {
         if (strtolower(get_class($this)) === 'ae_param_source')
             trigger_error("Attempt to instantiate abstract class", E_USER_ERROR);
         if (isset($options['parent']) && array_key_exists('key', $options)) {

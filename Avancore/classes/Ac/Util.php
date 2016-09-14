@@ -13,6 +13,9 @@ if (!defined('AC_PHP_VERSION_MAJOR') && !defined('AC_PHP_VERSION_MINOR')) {
 
 if (!defined('AC_UTIL_DEFAULT_CHARSET')) define('AC_UTIL_DEFAULT_CHARSET', 'utf-8');
 
+/**
+ * @TODO optimize set/get by path for simple cases (length of path 1, 2, 3, 4)
+ */
 abstract class Ac_Util {
 
     protected static $autoLoadRegistered = null;
@@ -23,7 +26,7 @@ abstract class Ac_Util {
      * @param bool $prepend Add this path to beginning of include_path list (not the end)
      */
     static function addIncludePath($path = false, $prepend = false) {
-        if ($path === false) $path = dirname(dirname(__FILE__));
+        if ($path === false) $path = array(dirname(dirname(__FILE__)), dirname(dirname(dirname(__FILE__))).'/obsolete');
         $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
         if (!is_array($path)) $path = array($path);
         if ($prepend) $paths = array_merge($path, array_diff($paths, $path));
@@ -50,6 +53,7 @@ abstract class Ac_Util {
     } 
     
     static function loadClass($className) {        
+        $fileLoaded = false;
         if (!class_exists($className, false)) { // New behavior - use relative path to classDir
             $fileName = str_replace('\\', DIRECTORY_SEPARATOR, $className);
             $fileName = str_replace('_', DIRECTORY_SEPARATOR, $fileName).'.php';
@@ -61,18 +65,21 @@ abstract class Ac_Util {
                 $fileLoaded = true;
             } else {
                 $p = self::getSafeIncludePath();
-                foreach ($p as $dir) if (is_file($f = $dir.DIRECTORY_SEPARATOR.$fileName)) {
-                    require($f);
-                    $fileLoaded = true;
-                    break;
+                foreach ($p as $dir) {
+                    if (is_file($f = $dir.DIRECTORY_SEPARATOR.$fileName)) {
+                        require($f);
+                        $fileLoaded = true;
+                        break;
+                    }
                 }
             }
             //if ($fileLoaded && !class_exists($className) || interface_exists($className))
             //    trigger_error (__FILE__."::".__FUNCTION__." - class '$className' not found in the $fileName", E_USER_ERROR);
         }
+        return $fileLoaded;
     }
     
-    static function registerAutoload() {
+    static function registerAutoload($addIncludePath = false) {
         $res = false;
         if (self::$autoLoadRegistered === null) {
             if (function_exists('spl_autoload_register')) {
@@ -97,6 +104,7 @@ abstract class Ac_Util {
         } else {
             $res = self::$autoLoadRegistered;
         }
+        if ($addIncludePath) self::addIncludePath();
         return $res;
     }
     
@@ -262,15 +270,18 @@ abstract class Ac_Util {
         return $handle;
     }
 
-    static function listDirContents($dirPath, $recursive = false, $files = array(), $fileRegex = false, $dirRegex = false) {
+    static function listDirContents($dirPath, $recursive = false, $files = array(), $fileRegex = false, $dirRegex = false, $includeDirs = false) {
         if(!($res = opendir($dirPath))) trigger_error("$dirPath doesn't exist!", E_USER_ERROR);
         while($file = readdir($res)) {
             if($file != "." && $file != "..") {
-                if($recursive && is_dir("$dirPath/$file") && (!$dirRegex || preg_match($dirRegex, "$dirPath/$file"))) 
-                    $files=self::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex);
-                else {
-                    if (!$fileRegex || preg_match($fileRegex, "$dirPath/$file")) {
-                        array_push($files,"$dirPath/$file");
+                if(($dir = is_dir("$dirPath/$file")) && $recursive && (!$dirRegex || preg_match($dirRegex, "$dirPath/$file"))) {
+                    if ($includeDirs) array_push($files, "$dirPath/$file");
+                    $files = self::listDirContents("$dirPath/$file", $recursive, $files, $fileRegex, $dirRegex);
+                } else {
+                    if (!$dir || $includeDirs) {
+                        if (!$fileRegex || preg_match($fileRegex, "$dirPath/$file")) {
+                            array_push($files,"$dirPath/$file");
+                        }
                     }
                 } 
             }
@@ -442,19 +453,8 @@ abstract class Ac_Util {
      * @param mixed $defaultValue Value that will be returned when corresponding entry is not found
      */
     static function getArrayByPath($arr, $arrPath, $defaultValue = null, & $found = false) {
-        if (!is_array($arrPath)) $arrPath = array($arrPath);
-        $src = $arr;
-        $arrPath = array_reverse($arrPath);
-        while ($arrPath) {
-            $key = array_pop($arrPath);
-            if (is_array($src) && array_key_exists($key, $src)) $src = $src[$key];
-                else {
-                    $found = false;
-                    return $defaultValue;
-                }
-        }
-        $found = true;
-        return $src;
+        $res = Ac_Util::getArrayByPathRef($arr, $arrPath, $defaultValue, $found);
+        return $res;
     }
     
     /**
@@ -475,67 +475,10 @@ abstract class Ac_Util {
      * Sets element of nested arrays using specified set of keys.
      * 
      * If $arrPath is array('foo', 'bar'), $arr['foo']['bar'] will be set to $value. 
-     * 
-     * @param array $arr             Array which we are going to modify
-     * @param string|array $arrPath      Keys that we are interested in (string 'path' will be converted to array('path'))
-     * @param mixed $value           Value that we want to set
-     * @param bool|callback $overwriteNonArrays  If one of mid-segments of path points to non-array, how conflict should be resolved
-     * @param array $extraParams    Extra params to pass to callback static function
-     * @return bool              Whether operation succeeded or not (depends on $overwrite and current $arr values)
-     * 
-     * Example of how $overwriteNonArrays works:
-     * <code>
-     *      $arr = array('x' => array('x1' => 'valX1', 'x2' => 'valX2'));
-     *      $arrPath = array('x', 'x1', 'x11');
-     *      $overwrite = false;
-     *      var_dump(self::setArrayByPath($arr, $arrPath, 'foo', $overwrite)); // Will return false; $arr will remain unchanged
-     * 
-     *      $arr = array('x' => array('x1' => 'valX1', 'x2' => 'valX2'));
-     *      $arrPath = array('x', 'x1', 'x11');
-     *      $overwrite = false;
-     *      var_dump(self::setArrayByPath($arr, $arrPath, 'foo', $overwrite)); // Will return true; 
-     *      var_dump($arr); // array('x' => array('x1' => array('x11' => 'foo'), 'x2' => 'valX2'));
-     * 
-     *      static function overwriteCallback($currPath, & $element, $value) {
-     *          if ($element == 'valX1') {
-     *              $element = array($element);
-     *          } elseif ($element == 'valX2') {
-     *              return false;   
-     *          }
-     *      }
-     * 
-     *      $arr = array('x' => array('x1' => 'valX1', 'x2' => 'valX2'));
-     *      $overwrite = 'overwriteCallback';
-     *      var_dump(self::setArrayByPath($arr, array('x', 'x1', 'x11'), 'foo', $overwrite)); // Will return true
-     *      var_dump($arr); // array('x' => array('x1' => array('valX1', 'x11' => 'foo')), 'x2' => 'valX2');
-     * 
-     *      var_dump(self::setArrayByPath($arr, array('x2', 'x21'), 'foo', $overwrite)); // Will return false; $arr will remain unchanged
-     * </code> 
+     * If $arrPath is array('foo', 'bar', ''), $arr['foo']['bar'][] will be set to $value. 
      */
-    static function setArrayByPath(& $arr, $arrPath, $value, $overwrite = false, $extraParams = array()) {
-        if (!is_array($arrPath)) $arrPath = array($arrPath);
-        $src = & $arr;
-        if ($arrPath) {
-            $key = array_shift($arrPath);
-            while ($arrPath) {
-                if (!isset($src[$key])) $src[$key] = array();
-                elseif (!is_array($src[$key])) {
-                    if ($overwrite === false) return false;
-                    elseif ($overwrite === true) $src[$key] = array();
-                    elseif (is_callable($overwrite)) {
-                        $oRes = call_user_func_array($overwrite, array_merge(array(array_reverse(array_merge($arrPath, array($key))), & $src[$key], $value), $extraParams));
-                        if ($oRes === false) return false;
-                        if (!is_array($src[$key])) $src[$key] = array();
-                    }
-                }
-                $src = & $src[$key];
-                $key = array_shift($arrPath);
-            }
-            $src[$key] = $value;
-        } else {
-            $src = $value;
-        }
-        return true;
+    static function setArrayByPath(& $arr, $arrPath, $value, $unique = true) {
+        return Ac_Util::setArrayByPathRef($arr, $arrPath, $value, $unique);
     }
 
     /**
@@ -548,7 +491,71 @@ abstract class Ac_Util {
      * @return bool                Whether we have found (and unset) our element, or not 
      */
     static function unsetArrayByPath(& $arr, $arrPath) {
-        if (!is_array($arrPath)) $arrPath = array($arrPath);
+        if (!is_array($arrPath)) {
+            unset($arr[$arrPath]);
+            return true;
+        }
+        
+        if (!is_array($arr)) {
+            return false;
+        }
+        
+        if (($c = count($arrPath)) <= 5) {
+            if ($c === 1) {
+                unset($arr[$arrPath[0]]);
+                return true;
+            }
+            
+            if ($c === 2) {
+                if (isset($arr[$arrPath[0]]) 
+                && is_array($arr[$arrPath[0]]) 
+                ) {
+                    unset($arr[$arrPath[0]][$arrPath[1]]);
+                    return true;
+                } else return false;
+            }
+
+            if ($c === 3) {
+                if (isset($arr[$arrPath[0]]) 
+                    && is_array($arr[$arrPath[0]]) 
+                    && isset($arr[$arrPath[0]][$arrPath[1]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]])
+                ) {
+                    unset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]]);
+                    return true;
+                } else return false;
+            }
+            
+            if ($c === 4) {
+                if (isset($arr[$arrPath[0]]) 
+                    && is_array($arr[$arrPath[0]]) 
+                    && isset($arr[$arrPath[0]][$arrPath[1]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]])
+                    && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]])
+                    && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]])
+                ) {
+                    unset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]]);
+                    return true;
+                } else return false;
+            }
+            if ($c === 5) {
+                if (isset($arr[$arrPath[0]]) 
+                    && is_array($arr[$arrPath[0]]) 
+                    && isset($arr[$arrPath[0]][$arrPath[1]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]])
+                    && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]])
+                    && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]])
+                    && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]][$arrPath[4]])
+                ) {
+                    unset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]][$arrPath[4]]);
+                    return true;
+                } else return false;
+            }
+        }
+        
         $src = & $arr;
         while ($arrPath) {
             $key = array_shift($arrPath);
@@ -562,7 +569,32 @@ abstract class Ac_Util {
         return true;
     }
     
-    static function simpleSetArrayByPath(& $arr, $arrPath, & $value, $unique = true, $noRef = false) {
+    static function setArrayByPathRef(& $arr, $arrPath, & $value, $unique = true) {
+        if (!is_array($arrPath)) $arrPath = array($arrPath);
+        $c = count($arrPath);
+        if ($c && (($l = $arrPath[$c - 1]) === '' || $l === null)) {
+            $unique = false;
+            unset($arrPath[--$c]);
+        }
+        if ($c <= 5) {
+            if ($unique) {
+                if ($c === 0) $arr = $value;
+                if ($c === 1) $arr[$arrPath[0]] = & $value;
+                if ($c === 2) $arr[$arrPath[0]][$arrPath[1]] = & $value;
+                if ($c === 3) $arr[$arrPath[0]][$arrPath[1]][$arrPath[2]] = & $value;
+                if ($c === 4) $arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]] = & $value;
+                if ($c === 5) $arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]][$arrPath[4]] = & $value;
+                return;
+            } else {
+                if ($c === 0) $arr[] = & $value;
+                if ($c === 1) $arr[$arrPath[0]][] = & $value;
+                if ($c === 2) $arr[$arrPath[0]][$arrPath[1]][] = & $value;
+                if ($c === 3) $arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][] = & $value;
+                if ($c === 4) $arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]][] = & $value;
+                if ($c === 5) $arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]][$arrPath[4]][] = & $value;
+                return;
+            }
+        }
         if (!is_array($arrPath)) $arrPath = array($arrPath);
         $src = & $arr;
         $arrPath = array_reverse($arrPath);
@@ -587,19 +619,132 @@ abstract class Ac_Util {
         if ($unique) $src[$key] = & $value;        
             else $src[$key][] = & $value;
     }
-    
-    static function simpleSetArrayByPathNoRef(& $arr, $arrPath, $value, $unique = true) {
-    	return self::simpleSetArrayByPath($arr, $arrPath, $value, $unique);
+
+    /**
+     * @deprecated since version 0.3.4
+     * Use setArrayByPath() instead
+     */
+    static function simpleSetArrayByPath(& $arr, $arrPath, & $value, $unique = true) {
+        trigger_error(__METHOD__." is deprecated and will be removed in 0.3.5", E_USER_DEPRECATED);
+        $res = self::setArrayByPath($arr, $arrPath, $value);
+        return $res;
     }
     
-    static function & simpleGetArrayByPath($arr, $arrPath, $defaultValue = null) {
-        if (!is_array($arrPath)) $arrPath = array($arrPath);
+    /**
+     * @deprecated since version 0.3.4
+     * Use setArrayByPathRef() instead
+     */
+    static function simpleSetArrayByPathNoRef(& $arr, $arrPath, $value, $unique = true) {
+        trigger_error(__METHOD__." is deprecated and will be removed in 0.3.5", E_USER_DEPRECATED);
+    	return self::setArrayByPathRef($arr, $arrPath, $value, $unique);
+    }
+    
+    /**
+     * @deprecated since version 0.3.4
+     * Use getArrayByPathRef() instead
+     */
+    static function & simpleGetArrayByPath($arr, $arrPath, $defaultValue = null, & $found = false) {
+        trigger_error(__METHOD__." is deprecated and will be removed in 0.3.5", E_USER_DEPRECATED);
+        $res = self::getArrayByPathRef($arr, $arrPath, $defaultValue, $found);
+        return $res;
+    }
+    
+    static function & getArrayByPathRef(& $arr, $arrPath, $defaultValue = null, & $found = false) {
+        
+        $found = true;
+        
+        if (!is_array($arrPath)) {
+            if (isset($arr[$arrPath])) return $arr[$arrPath]; 
+            else {
+                $found = false;
+                return $defaultValue;
+            }
+        }
+        $c = count($arrPath);
+        
+        // optimize small-sized arrays
+        if ($c <= 5) {
+            if ($c === 0) return $arr;
+            
+            if (!is_array($arr)) {
+                $found = false;
+                return $defaultValue;
+            }
+            
+            if ($c === 1) {
+                if (isset($arr[$arrPath[0]])
+                ) return $arr[$arrPath[0]];
+                else {
+                    $found = false;
+                    return $defaultValue;
+                }
+            }
+            
+            if ($c === 2) {
+                if (isset($arr[$arrPath[0]]) 
+                && is_array($arr[$arrPath[0]]) 
+                && isset($arr[$arrPath[0]][$arrPath[1]])
+                ) return $arr[$arrPath[0]][$arrPath[1]];
+                else {
+                    $found = false;
+                    return $defaultValue;
+                }
+            }
+
+            if ($c === 3) {
+                if (isset($arr[$arrPath[0]]) 
+                    && is_array($arr[$arrPath[0]]) 
+                    && isset($arr[$arrPath[0]][$arrPath[1]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]])
+                    && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]])
+                ) return $arr[$arrPath[0]][$arrPath[1]][$arrPath[2]];
+                else {
+                    $found = false;
+                    return $defaultValue;
+                }
+            }
+            
+            if ($c === 4) {
+                if (isset($arr[$arrPath[0]]) 
+                    && is_array($arr[$arrPath[0]]) 
+                    && isset($arr[$arrPath[0]][$arrPath[1]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]])
+                    && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]])
+                    && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]])
+                ) return $arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]];
+                else {
+                    $found = false;
+                    return $defaultValue;
+                }
+            }
+            if ($c === 5) {
+                if (isset($arr[$arrPath[0]]) 
+                    && is_array($arr[$arrPath[0]]) 
+                    && isset($arr[$arrPath[0]][$arrPath[1]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]])
+                    && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]])
+                    && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]])
+                    && is_array($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]])
+                    && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]][$arrPath[4]])
+                ) return $arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]][$arrPath[4]];
+                else {
+                    $found = false;
+                    return $defaultValue;
+                }
+            }
+        }
+        
         $src = & $arr;
         $arrPath = array_reverse($arrPath);
         while ($arrPath) {
             $key = array_pop($arrPath);
             if (is_array($src) && isset($src[$key])) $src = & $src[$key];
-                else return $defaultValue;
+            else {
+                $found = false;
+                return $defaultValue;
+            }
         }
         return $src;
     }
@@ -904,7 +1049,7 @@ abstract class Ac_Util {
     				if ($unsetKeys) unset($item[$k]);
     			}
     		}
-    		if (count($path)) self::simpleSetArrayByPath($res, $path, $item, $unique);
+    		if (count($path)) self::setArrayByPathRef($res, $path, $item, $unique);
             }
     	return $res;
     }
@@ -1053,14 +1198,15 @@ abstract class Ac_Util {
      * @param false|scalar|array $valueKeys if provided, members will be replaced by extracted keys' or
      *      properties' values before placing into result array (scalar $valueKeys means sclar result member, 
      *      array $valueKeys means always array result member)
+     * @param bool $retainOriginalKey when $unique === false, elements on deepest level of result array will have keys of items in $flatArray
      * 
      */
-    static function indexArray(array $flatArray, $keyList, $unique = false, $valueKeys = false) {
+    static function indexArray(array $flatArray, $keyList, $unique = false, $valueKeys = false, $retainOriginalKey = false) {
         $res = array();
         if (is_array($keyList) && count($keyList) == 1) $keyList = array_shift($keyList);
         if (!is_array($keyList)) {
             // simple version
-            foreach ($flatArray as $v) {
+            foreach ($flatArray as $ok => $v) {
                 if (is_object($v)) {
                     $k = Ac_Accessor::getObjectProperty($v, $keyList);
                 }
@@ -1071,10 +1217,11 @@ abstract class Ac_Util {
                     $v = Ac_Accessor::getObjectProperty($v, $valueKeys, null, true);
                 
                 if ($unique) $res[$k] = $v;
+                elseif ($retainOriginalKey) $res[$k][$ok] = $v; 
                 else $res[$k][] = $v;
             }
         } else {
-            foreach ($flatArray as $v) {
+            foreach ($flatArray as $ok => $v) {
                 if (is_object($v)) {
                     $path = array_values(Ac_Accessor::getObjectProperty($v, $keyList));
                 }
@@ -1085,7 +1232,12 @@ abstract class Ac_Util {
                 }
                 if ($valueKeys !== false && !is_null($valueKeys))
                     $v = Ac_Accessor::getObjectProperty($v, $valueKeys, null, true);
-                Ac_Util::simpleSetArrayByPathNoRef ($res, $path, $v, $unique);
+                if (!$unique && $retainOriginalKey) {
+                    $path[] = $ok;
+                    Ac_Util::setArrayByPath ($res, $path, $v, true);
+                } else {
+                    Ac_Util::setArrayByPath ($res, $path, $v, $unique);
+                }
             }
         }
         return $res;
@@ -1121,5 +1273,5 @@ class _Ae_Util_ObjectVarGetter {
  * @param type $className 
  */
 function acUtilLoadClass($className) {
-    self::loadClass(self::fixClassName($className));
+    Ac_Util::loadClass(Ac_Util::fixClassName($className));
 }

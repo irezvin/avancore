@@ -26,11 +26,12 @@ class Child_Tag_Base_Object extends Sample_Tag {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'people' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
             ),
             'personIds' => array (
                 'values' => array (
@@ -40,11 +41,24 @@ class Child_Tag_Base_Object extends Sample_Tag {
             'perks' => array (
                 'className' => 'Child_Perk',
                 'mapperClass' => 'Child_Perk_Mapper',
+                'caption' => 'Perks',
             ),
             'perkIds' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Perk_Mapper',
                 ),
+            ),
+            'tagId' => array (
+                'caption' => 'Tag Id',
+            ),
+            'title' => array (
+                'caption' => 'Title',
+            ),
+            'titleM' => array (
+                'caption' => 'Title M',
+            ),
+            'titleF' => array (
+                'caption' => 'Title F',
             ),
         );
     
@@ -80,8 +94,8 @@ class Child_Tag_Base_Object extends Sample_Tag {
     /**
      * @return Child_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
-        return parent::createPerson($values, $isReference);
+    function createPerson($values = array()) {
+        return parent::createPerson($values);
     }
 
     
@@ -114,8 +128,8 @@ class Child_Tag_Base_Object extends Sample_Tag {
     /**
      * @return Child_Perk  
      */
-    function createPerk($values = array(), $isReference = false) {
-        return parent::createPerk($values, $isReference);
+    function createPerk($values = array()) {
+        return parent::createPerk($values);
     }
 
     

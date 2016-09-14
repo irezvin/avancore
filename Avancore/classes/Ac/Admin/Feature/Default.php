@@ -37,6 +37,8 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     
     var $sqlSelectSettings = array();
     
+    var $searchSettings = array();
+    
     var $processingSettings = array();
 
     var $addErrorList = true;
@@ -188,8 +190,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     function applyToFormSettings(& $formSettings) {
         $rec = $this->manager->getRecord();
         $mpr = $this->manager->getMapper();
-        if ($mpr) $aif = $mpr->getAutoincFieldName();
-            else $aif = false;
+        $gen = $mpr->listGeneratedFields();
         $conv = new Ac_Form_Converter();
         $do = $this->displayOrderStart;
         if ($this->addErrorList) {
@@ -200,13 +201,13 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
         foreach ($rec->listFields() as $p) {
             $prop = $rec->getPropertyInfo($p, true);
             if (isset($prop->showInForm) && !$prop->showInForm) continue;
-            $conf = Ac_Util::m($this->formFieldDefaults, $conv->getControlSettings($prop));
+            $conf = Ac_Util::m($this->formFieldDefaults, $conv->getControlSettings($prop, $rec));
             if ($do !== false) {
                 if (!isset($conf['displayOrder'])) 
                     $conf['displayOrder'] = $do;
                 $do += $this->displayOrderStep;
             }
-            if ($prop->propName === $aif) {
+            if (in_array($prop->propName, $gen)) {
                 $conf['readOnly'] = true;
                 $conf['emptyCaption'] = AC_ID_EMPTY_CAPTION;
             }
@@ -296,6 +297,10 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
     
     function getSqlSelectSettings() {
         return $this->sqlSelectSettings;
+    }
+    
+    function getSearchSettings() {
+        return $this->searchSettings;
     }
     
 }

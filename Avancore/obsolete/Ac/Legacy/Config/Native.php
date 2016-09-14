@@ -14,8 +14,8 @@ class Ac_Legacy_Config_Native extends Ac_Legacy_Config {
     var $dbClass = 'Ac_Legacy_Database_Native';
     var $dbSettings = array();
     
-    function Ac_Legacy_Config_Native($configFilePath, $configOptions = array()) {
-        parent::Ac_Legacy_Config($configFilePath, $configOptions);
+    function __construct($configFilePath, $configOptions = array()) {
+        parent::__construct($configFilePath, $configOptions);
     }
     
     function getFrontendDir() {

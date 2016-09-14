@@ -31,12 +31,6 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
     var $caption = false;
     
     /**
-     * ID of Joomla Component (without "com_" prefix; defaults to appName)
-     * @var string
-     */
-    var $josComId = false;
-    
-    /**
      * @var string Name of the database (is taken from the config). Defaults to the name of the domain.
      */
     var $dbName = false;
@@ -66,7 +60,8 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
     var $extraStripFromIds = false;
     
     /**
-     * @var array Names of tables (with prefixes) to create model configs automatically
+     * @var array|string|bool Names of tables or regular expression or TRUE to add all tables
+     * 
      */
     var $autoTables = array();
     
@@ -76,7 +71,8 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
     var $autoTablesAll = false;
 
     /**
-     * @var array Names of tables to ignore when creating auto models (using this var only has sense when $eachTableIsModel === true)  
+     * @var array|string Names of tables or regular expression 
+     * Which tables to ignore when creating models
      */
     var $autoTablesIgnore = array();
     
@@ -139,13 +135,13 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
      */
     var $_models = false;
     
-    var $strategySettings = array();
-    
     /**
      * Default name for model special properties auto-detection
      * @see Ac_Cg_Model::detectSpecialProperties  
      */
     var $defaultTitlePropName = false;
+    
+    var $autoDetectTitles = true;
     
     /**
      * Default name for model special properties auto-detection
@@ -231,6 +227,8 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
      */
     var $dontInheritProperties = array();
     
+    var $domainTemplates = false;
+    
     protected $parentDomain = false;
     
     protected $langStrings = array();
@@ -257,7 +255,6 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
         if (!$this->dbName) $this->dbName = $name;
         if (!$this->appName) $this->appName = $name;
         if (!$this->caption) $this->caption = $this->appName;
-        if (!$this->josComId) $this->josComId = $this->appName;
         
         if (isset($config['dictionary']) && is_array($config['dictionary'])) {
             $dicConf = $config['dictionary'];
@@ -393,17 +390,33 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
     }
     
     function _calculateModelsConfig() {
+        $res = array();
         if ($this->autoTablesAll || $this->autoTables) {
             $dbs = $this->getDatabase();
-            if ($this->autoTablesAll) $autoTables = $dbs->listTables();
-                else $autoTables = $this->autoTables;
+            if ($this->autoTablesAll) {
+                $autoTables = $dbs->listTables();
+                if (is_string($this->autoTablesAll)) {
+                    $autoTables = preg_grep($this->autoTablesAll, $autoTables);
+                }
+            } elseif (is_string($this->autoTables)) {
+                $autoTables = preg_grep($this->autoTables, $dbs->listTables());
+            } elseif (is_array($this->autoTables)) {
+                $autoTables = $this->autoTables;
+            } else {
+                $autoTables = array();
+            }
+            $ignoredTables = array();
+            if (is_array($this->autoTablesIgnore)) $ignoredTables = $this->autoTablesIgnore;
+            elseif (is_string($this->autoTablesIgnore) && strlen($this->autoTablesIgnore)) {
+                $ignoredTables = preg_grep($this->autoTablesIgnore, $this->autoTablesAll);
+            }
             if ($this->autoTablesIgnore) $autoTables = array_diff($autoTables, $this->autoTablesIgnore);
             $autoConf = array();
             foreach ($autoTables as $tName) {
                 $tbl = $dbs->getTable($tName);
                 if (!$tbl->isBiJunctionTable($this->getBiJunctionIgnore($tbl->name))) {
                     list ($name, $conf) = $this->getModelAutoConfig($tName);
-                    $autoConf[$name] = $conf;
+                    if ($conf) $autoConf[$name] = $conf;
                 }
             }
             $res = Ac_Util::m($autoConf, $this->models);
@@ -422,6 +435,16 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
         $conf = array('table' => $tableName);
         
         $coolName = $this->extractNameFromTableName($tableName);
+        
+        $table = $this->getDatabase()->getTable($tableName);
+        $pk = $table->listPkFields();
+        if (!$pk) {
+            $this->_gen->log("<strong>{$this->name}</strong>: table '{$tableName}' has no primary key and will be ignored.", true);
+            return false;
+        } elseif (count($pk) > 1) {
+            $this->_gen->log("<strong>{$this->name}</strong>: table '{$tableName}' has composite primary key: '".implode("', '", $pk)."'. Composite PKs are not supported yet and the table will be ignored.", true);
+            return false;
+        }
         
         $conf['table'] = $tableName;
         
@@ -573,20 +596,6 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
         return $res;
     }
     
-    /**
-     * This function is called by Ac_Cg_Generator when Ac_Cg_Strategy object is initialized for this Ac_Cg_Domain
-     * Function result is merged with prototype for strategy settings.
-     * @return array
-     */
-    function getStrategySettings() {
-        if (is_array($this->strategySettings)) $res = $this->strategySettings;
-            else $res = array();
-            
-        if ($this->needsLangStrings()) $res['domainTemplates'] = array('Ac_Cg_Template_Domain', 'Ac_Cg_Template_Languages');
-            
-        return $res;
-    }
-    
     function getBiJunctionIgnore($tableName) {
         $res = array();
         
@@ -712,7 +721,64 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
         }
         return $res;
     }
-
     
+    function getDomainTemplates() {
+        if ($this->domainTemplates === false) {
+            $res = array(
+                'domain' => 'Ac_Cg_Template_Domain',
+            );
+            if ($this->needsLangStrings()) $res['languages'] = 'Ac_Cg_Template_Languages';
+        } else {
+            $res = $this->domainTemplates;
+        }
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Cg_Template[]
+     */
+    function getCommonTemplateInstances() {
+        $res = array();
+        foreach ($this->getDomainTemplates() as $k => $v) {
+            $res[$k] = $this->createTemplate($v);
+        }
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Cg_Template[]
+     */
+    function getModelTemplateInstances($modelNames = false) {
+        if ($modelNames === false) $modelNames = $this->listModels ();
+        else $modelNames = Ac_Util::toArray($modelNames);
+        foreach ($modelNames as $m) {
+            $model = $this->getModel($m);
+            foreach ($model->getTemplates() as $k => $v) {
+                $res[$m.".".$k] = $this->createTemplate($v, $model);
+            }
+        }
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Cg_Template[]
+     */
+    function getAllTemplateInstances() {
+        $res = $this->getCommonTemplateInstances();
+        $res = array_merge($res, ($this->getModelTemplateInstances()));
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Cg_Template
+     */
+    function createTemplate($classOrPrototype, Ac_Cg_Model $model = null) {
+        $res = Ac_Prototyped::factory($classOrPrototype, 'Ac_Cg_Template', array(
+            'generator' => $this->_gen,
+            'domain' => $this,
+            'model' => $model,
+        ), true);
+        return $res;
+    }
+        
 }
-

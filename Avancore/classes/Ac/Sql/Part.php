@@ -44,7 +44,13 @@ class Ac_Sql_Part extends Ac_Prototyped {
     
     var $_idWithPrefix = false;
     
-    function Ac_Sql_Part($options = array()) {
+    /**
+     * The Select that current part is being applied to
+     * @var Ac_Sql_Select
+     */
+    protected $currentSelect = null;
+    
+    function __construct($options = array()) {
         if (isset($options['db'])) $this->setDb($options['db']);
         if (isset($options['parentPart'])) $this->setParentPart($options['parentPart']);
         foreach (array_intersect(array_keys(get_object_vars($this)), array_keys($options)) as $k)
@@ -125,12 +131,14 @@ class Ac_Sql_Part extends Ac_Prototyped {
      *
      * @param Ac_Sql_Select $select
      */
-    function applyToSelect($select) {
-        assert(is_a($select, 'Ac_Sql_Select'));
+    function applyToSelect(Ac_Sql_Select $select) {
+        $tmp = $this->currentSelect = null;
+        $this->currentSelect = $select;
         if (!$this->_db) $this->setDb($select->getDb());
         if ($this->doesApply()) {
             $this->_doApplyToSelect($select);
         }
+        $this->currentSelect = $tmp;
     }
     
     // ---------------------------------- template methods ------------------------------

@@ -13,7 +13,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
      * @param Ac_Legacy_Database$aeDb
      * @return Ac_Sql_Db_Ae
      */
-    function Ac_Sql_Db_Ae ($aeDb = null) {
+    function __construct ($aeDb = null) {
         if (!$aeDb) {
         	$aeDb = Ac_Legacy_Database::getDefaultInstance();
         }

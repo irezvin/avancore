@@ -4,6 +4,29 @@ class Ac_Test_Model extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
 
+    function _testGetPropertyInfoMemLeak() { // TODO: find proper test case
+        $sam = Sample::getInstance()->getSampleShopProductMapper();
+        $item0 = $sam->createRecord(); // load all necessary data
+        $mem = memory_get_usage();
+        $fields = array_merge($item0->listDataProperties(), array('authorPerson'));
+        Ac_Prototyped::$countInstances = true;
+        Ac_Debug::clear();
+        gc_enable();
+        for ($i = 0; $i < 1000; $i++) {
+            $item = $sam->createRecord();
+            $data = array();
+            //foreach ($fields as $field) $data[$field] = $item->$field;
+            $data = Ac_Accessor::getObjectProperty($item, $fields);
+            $item->cleanupMembers();
+            unset($item);
+            unset($prop);
+            gc_collect_cycles();
+        }
+        $mem1 = memory_get_usage();
+        var_dump($mem, $mem1, $mem1 - $mem, Ac_Debug::$instanceStats);
+        Ac_Prototyped::$countInstances = false;
+    }
+
     function testPartialValidateRelations() {
         $pm = Sample::getInstance()->getSamplePersonMapper();
         $rm = Sample::getInstance()->getSampleReligionMapper();
@@ -18,11 +41,11 @@ class Ac_Test_Model extends Ac_Test_Base {
         $e = $pers->getErrors();
         $this->assertTrue(is_null(Ac_Util::getArrayByPath($e, array('religionId', 'valueList'))));
        
-        $vList = Ac_Model_Values::factoryWithFormOptions($pers, 'religionId');
-        $this->assertTrue($vList instanceof Ac_Model_Values_Records);
+        $vList = Ac_Model_Values::factoryWithProperty($pers->getPropertyInfo('religionId'));
+        $this->assertTrue($vList instanceof Ac_Model_Values_Mapper);
         
         // order with best possible caching
-        if ($vList instanceof Ac_Model_Values_Records) {
+        if ($vList instanceof Ac_Model_Values_Mapper) {
             $this->assertEqual(count($va = $vList->filterValuesArray(array(1, 2, 3, 999))), 3);
             $this->assertEqual(count($vList->filterValuesArray(array(1, 2, 3))), 3);
             $this->assertTrue($vList->check(1));
@@ -31,9 +54,9 @@ class Ac_Test_Model extends Ac_Test_Base {
         }
         
         // reverse order
-        $vList = Ac_Model_Values::factoryWithFormOptions($pers, 'religionId');
-        $this->assertTrue($vList instanceof Ac_Model_Values_Records);
-        if ($vList instanceof Ac_Model_Values_Records) {
+        $vList = Ac_Model_Values::factoryWithProperty($pers->getPropertyInfo('religionId'));
+        $this->assertTrue($vList instanceof Ac_Model_Values_Mapper);
+        if ($vList instanceof Ac_Model_Values_Mapper) {
             $this->assertTrue($vList->check(1));
             $this->assertEqual(count($vList->filterValuesArray(array(1, 2, 3))), 3);
             $this->assertEqual(count($va = $vList->filterValuesArray(array(1, 2, 3, 999))), 3);
@@ -42,9 +65,9 @@ class Ac_Test_Model extends Ac_Test_Base {
         }
         
         // all in the cache
-        $vList = Ac_Model_Values::factoryWithFormOptions($pers, 'religionId');
-        $this->assertTrue($vList instanceof Ac_Model_Values_Records);
-        if ($vList instanceof Ac_Model_Values_Records) {
+        $vList = Ac_Model_Values::factoryWithProperty($pers->getPropertyInfo('religionId'));
+        $this->assertTrue($vList instanceof Ac_Model_Values_Mapper);
+        if ($vList instanceof Ac_Model_Values_Mapper) {
             $rm->getAllRecords(); // will populate all records
             $this->assertTrue($vList->check(1));
             $this->assertEqual(count($vList->filterValuesArray(array(1, 2, 3))), 3);

@@ -11,7 +11,7 @@ class Ac_Sql_Dbi_Inspector_Legacy extends Ac_Sql_Dbi_Inspector {
 	
 	var $_myPx = '';
 	
-	function Ac_Sql_Dbi_Inspector_Legacy($prefix = '') {
+	function __construct($prefix = '') {
 		$this->_db = ormDatabase::getInstance();
 		$this->prefix = $prefix;
 		if (strlen($this->prefix)) {

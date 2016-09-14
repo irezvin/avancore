@@ -97,7 +97,7 @@ class Ac_Legacy_Controller_Std_Submission_Sendout {
      * @param array $prototype Values to initialize $this object properties
      * @return Ac_Legacy_Controller_Std_Submission_Sendout 
      */
-    function Ac_Legacy_Controller_Std_Submission_Sendout ($submission, $modelObject, $template, $prototype = array()) {
+    function __construct ($submission, $modelObject, $template, $prototype = array()) {
         $this->_submission = $submission;
         $this->_modelObject = $modelObject;
         $this->_template = $template;

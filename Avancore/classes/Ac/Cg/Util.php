@@ -39,18 +39,25 @@ abstract class Ac_Cg_Util {
         return $files;
     }
 
-    static function cleanDir($dirName) {
+    static function cleanDir($dirName, & $numFiles = 0, & $numDirs = 0) {
+        $numFiles = 0;
+        $numDirs = 0;
         $dc = Ac_Cg_Util::listDirContents($dirName, true, array(), false, false, true);
         sort($dc);
         $dc = array_reverse($dc);
         foreach ($dc as $item) {
-            if (is_file($item)) unlink($item);
-                else rmdir($item);
+            if (is_file($item)) {
+                unlink($item);
+                $numFiles++;
+            } else {
+                rmdir($item);
+                $numDirs++;
+            }
         }
     }
     
     static function addSpacesBeforeCamelCase($string) {
-        $res = preg_replace('/\\B([A-Z])/', ' \\1', $string);
+        $res = preg_replace('/\\B([A-Z][a-z])/', ' \\1', $string);
         return $res;
     }
     

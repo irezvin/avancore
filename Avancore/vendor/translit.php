@@ -17,7 +17,7 @@
     );
     var $tbl = false;
     
-    function Transliterate($str, $encIn, $encOut){
+    function Transliterate($str, $encIn = "utf-8", $encOut = "utf-8"){
       if ($encIn != "utf-8") $str = iconv($encIn, "utf-8", $str);
       if ($this->tbl === false) {      
         $this->tbl = array();
@@ -29,7 +29,6 @@
       }
       $str = strtr($str, $this->tbl);
       $str = preg_replace("/([qwrtpsdfghklzxcvbnmQWRTPSDFGHKLZXCVBNM]+)[jJ]e/u", "\${1}e", $str);
-      //$str = preg_replace("/([qwrtpsdfghklzxcvbnmQWRTPSDFGHKLZXCVBNM]+)[jJ]/u", "\${1}'", $str);
       $str = preg_replace("/([eyuioaEYUIOA]+)[Kk]h/u", "\${1}h", $str);
       $str = preg_replace("/^kh/", "h", $str);
       $str = preg_replace("/^Kh/", "H", $str);

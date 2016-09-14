@@ -7,7 +7,7 @@ class Ac_Sql_Statement_Cache {
 	
 	var $_stmtCache = array();
 	
-	function Ac_Sql_Statement_Cache($options) {
+	function __construct($options) {
 		Ac_Util::bindAutoparams($this, $options);
 	}
 	

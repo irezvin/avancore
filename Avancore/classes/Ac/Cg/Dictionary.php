@@ -28,7 +28,7 @@ class Ac_Cg_Dictionary extends Ac_Cg_Base {
         'useInflector'
     );
     
-    function Ac_Cg_Dictionary ($config = array()) {
+    function __construct ($config = array()) {
         foreach ($this->configVars as $p) 
             if (isset($config[$p])) 
                 $this->$p = $config[$p];

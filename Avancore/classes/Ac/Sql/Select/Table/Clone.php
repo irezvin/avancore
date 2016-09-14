@@ -49,12 +49,12 @@ class Ac_Sql_Select_Table_Clone extends Ac_Sql_Select_Table {
         return $res;
     }
     
-    function getJoinClausePart($alias = false, $isFirst = false) {
+    function getJoinClausePart(array & $nestedAliases = array(), $alias = false, $isFirst = false) {
         $m = __FUNCTION__;
         if (!$this->configured) $this->configure();
         if ($this->original) {
             $myAlias = $this->alias;
-            $res = $this->original->$m($myAlias, $isFirst);
+            $res = $this->original->$m($nestedAliases, $myAlias, $isFirst);
         } else {
             $res = parent::$m();
         }

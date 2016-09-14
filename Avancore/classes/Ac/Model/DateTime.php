@@ -98,7 +98,7 @@ class Ac_Model_DateTime {
     function c4 ($v) {return str_pad($v, 4, '0', STR_PAD_LEFT);}
     function iv ($v) {return intval($v);}
         
-    function Ac_Model_DateTime() {
+    function __construct() {
         $this->debug = isset($_REQUEST['_debugDate']);
         $this->rxs = array();
         $this->subRegs = array();

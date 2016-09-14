@@ -2,15 +2,26 @@
 
 class Sample_Person_Post_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_person = false;
-    public $_personPhoto = false;
-    public $id = NULL;
-    public $personId = NULL;
-    public $photoId = NULL;
-    public $title = '';
-    public $content = NULL;
-    public $pubId = NULL;
+
+    var $_hasDefaults = true;
+
+    var $_publish = false;
+
+    var $_person = false;
+
+    var $_personPhoto = false;
+
+    var $id = NULL;
+
+    var $personId = NULL;
+
+    var $photoId = NULL;
+
+    var $title = '';
+
+    var $content = NULL;
+
+    var $pubId = NULL;
     
     var $_mapperClass = 'Sample_Person_Post_Mapper';
     
@@ -34,29 +45,36 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'person', 1 => 'personPhoto', )));
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'publish', 1 => 'person', 2 => 'personPhoto', )));
     }
     
     
  
     protected function listOwnAssociations() {
-        return array ( 'person' => 'Sample_Person', 'personPhoto' => 'Sample_Person_Photo', );
+        return array ( 'publish' => 'Sample_Publish', 'person' => 'Sample_Person', 'personPhoto' => 'Sample_Person_Photo', );
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
+            'publish' => array (
+                'className' => 'Sample_Publish',
+                'mapperClass' => 'Sample_Publish_ImplMapper',
+                'caption' => new Ac_Lang_String('sample_person_post_publish'),
+                'relationId' => '_publish',
+                'referenceVarName' => '_publish',
+            ),
             'person' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_person_post_person'),
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
             ),
             'personPhoto' => array (
                 'className' => 'Sample_Person_Photo',
                 'mapperClass' => 'Sample_Person_Photo_Mapper',
-                'caption' => 'Person photo',
+                'caption' => new Ac_Lang_String('sample_person_post_person_photo'),
                 'relationId' => '_personPhoto',
                 'referenceVarName' => '_personPhoto',
             ),
@@ -66,7 +84,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Id',
+                'caption' => new Ac_Lang_String('sample_person_post_id'),
             ),
             'personId' => array (
                 'dataType' => 'int',
@@ -75,7 +93,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                     'size' => '6',
                 ),
                 'isNullable' => true,
-                'caption' => 'Person Id',
+                'caption' => new Ac_Lang_String('sample_person_post_person_id'),
             ),
             'photoId' => array (
                 'dataType' => 'int',
@@ -83,22 +101,22 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Photo_Mapper',
                 ),
                 'objectPropertyName' => 'personPhoto',
                 'isNullable' => true,
-                'caption' => 'Photo Id',
+                'caption' => new Ac_Lang_String('sample_person_post_photo_id'),
             ),
             'title' => array (
                 'maxLength' => '255',
                 'isNullable' => true,
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_person_post_title'),
             ),
             'content' => array (
                 'controlType' => 'textArea',
                 'isNullable' => true,
-                'caption' => 'Content',
+                'caption' => new Ac_Lang_String('sample_person_post_content'),
             ),
             'pubId' => array (
                 'dataType' => 'int',
@@ -106,11 +124,12 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Publish_ImplMapper',
                 ),
+                'objectPropertyName' => 'publish',
                 'isNullable' => true,
-                'caption' => 'Pub Id',
+                'caption' => new Ac_Lang_String('sample_person_post_pub_id'),
             ),
         );
     
@@ -120,8 +139,49 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
+        
+    
+    /**
+     * @return Sample_Publish 
+     */
+    function getPublish() {
+        if ($this->_publish === false) {
+            $this->mapper->loadPublishFor($this);
+            
+        }
+        return $this->_publish;
+    }
+    
+    /**
+     * @param Sample_Publish $publish 
+     */
+    function setPublish($publish) {
+        if ($publish === false) $this->_publish = false;
+        elseif ($publish === null) $this->_publish = null;
+        else {
+            if (!is_a($publish, 'Sample_Publish')) trigger_error('$publish must be an instance of Sample_Publish', E_USER_ERROR);
+            if (!is_object($this->_publish) && !Ac_Util::sameObject($this->_publish, $publish)) { 
+                $this->_publish = $publish;
+            }
+        }
+    }
+    
+    function clearPublish() {
+        $this->publish = null;
+    }
 
-    function tracksChanges() { return true; }
+    /**
+     * @return Sample_Publish  
+     */
+    function createPublish($values = array()) {
+        $m = $this->getMapper('Sample_Publish_ImplMapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        $this->setPublish($res);
+        return $res;
+    }
+
+    
         
     
     /**
@@ -156,11 +216,10 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
+    function createPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPerson($res);
         return $res;
     }
@@ -200,11 +259,10 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Photo  
      */
-    function createPersonPhoto($values = array(), $isReference = false) {
+    function createPersonPhoto($values = array()) {
         $m = $this->getMapper('Sample_Person_Photo_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPersonPhoto($res);
         return $res;
     }

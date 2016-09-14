@@ -26,37 +26,82 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'shopCategories' => array (
                 'className' => 'Child_Shop_Category',
                 'mapperClass' => 'Child_Shop_Category_Mapper',
+                'caption' => 'Shop categories',
             ),
             'shopCategoryIds' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Shop_Category_Mapper',
                 ),
             ),
+            'referencedShopProducts' => array (
+                'className' => 'Child_Shop_Product',
+                'mapperClass' => 'Child_Shop_Product_Mapper',
+                'caption' => 'Shop products',
+            ),
+            'referencedShopProductIds' => array (
+                'values' => array (
+                    'mapperClass' => 'Child_Shop_Product_Mapper',
+                ),
+            ),
+            'referencingShopProducts' => array (
+                'className' => 'Child_Shop_Product',
+                'mapperClass' => 'Child_Shop_Product_Mapper',
+                'caption' => 'Shop products',
+            ),
+            'referencingShopProductIds' => array (
+                'values' => array (
+                    'mapperClass' => 'Child_Shop_Product_Mapper',
+                ),
+            ),
+            'shopSpec' => array (
+                'className' => 'Child_Shop_Spec',
+                'mapperClass' => 'Child_Shop_Spec_Mapper',
+                'caption' => 'Shop spec',
+            ),
+            'id' => array (
+                'caption' => 'Id',
+            ),
+            'sku' => array (
+                'caption' => 'Sku',
+            ),
+            'title' => array (
+                'caption' => 'Title',
+            ),
+            'metaId' => array (
+                'caption' => 'Meta Id',
+            ),
             'pubId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Publish_ImplMapper',
                 ),
+                'caption' => 'Pub Id',
             ),
-            'noteNotePerson' => array (
+            'notePerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
             ),
             'productId' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Shop_Product_Mapper',
                 ),
+                'caption' => 'Product Id',
+            ),
+            'note' => array (
+                'caption' => 'Note',
             ),
             'noteAuthorId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
+                'caption' => 'Note Author Id',
             ),
         );
     
@@ -92,12 +137,106 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
     /**
      * @return Child_Shop_Category  
      */
-    function createShopCategory($values = array(), $isReference = false) {
-        return parent::createShopCategory($values, $isReference);
+    function createShopCategory($values = array()) {
+        return parent::createShopCategory($values);
     }
 
     
 
+        
+    
+    /**
+     * @return Child_Shop_Product 
+     */
+    function getReferencedShopProduct($id) {
+        return parent::getReferencedShopProduct($id);
+    }
+    
+    /**
+     * @return Child_Shop_Product 
+     */
+    function getReferencedShopProductsItem($id) {
+        return parent::getReferencedShopProductsItem($id);
+    }
+    
+    /**
+     * @param Child_Shop_Product $referencedShopProduct 
+     */
+    function addReferencedShopProduct($referencedShopProduct) {
+        if (!is_a($referencedShopProduct, 'Child_Shop_Product'))
+            trigger_error('$referencedShopProduct must be an instance of Child_Shop_Product', E_USER_ERROR);
+        return parent::addReferencedShopProduct($referencedShopProduct);
+    }
+    
+    /**
+     * @return Child_Shop_Product  
+     */
+    function createReferencedShopProduct($values = array()) {
+        return parent::createReferencedShopProduct($values);
+    }
+
+    
+
+        
+    
+    /**
+     * @return Child_Shop_Product 
+     */
+    function getReferencingShopProduct($id) {
+        return parent::getReferencingShopProduct($id);
+    }
+    
+    /**
+     * @return Child_Shop_Product 
+     */
+    function getReferencingShopProductsItem($id) {
+        return parent::getReferencingShopProductsItem($id);
+    }
+    
+    /**
+     * @param Child_Shop_Product $referencingShopProduct 
+     */
+    function addReferencingShopProduct($referencingShopProduct) {
+        if (!is_a($referencingShopProduct, 'Child_Shop_Product'))
+            trigger_error('$referencingShopProduct must be an instance of Child_Shop_Product', E_USER_ERROR);
+        return parent::addReferencingShopProduct($referencingShopProduct);
+    }
+    
+    /**
+     * @return Child_Shop_Product  
+     */
+    function createReferencingShopProduct($values = array()) {
+        return parent::createReferencingShopProduct($values);
+    }
+
+    
+
+        
+    
+    /**
+     * @return Child_Shop_Spec 
+     */
+    function getShopSpec() {
+        return parent::getShopSpec();
+    }
+    
+    /**
+     * @param Child_Shop_Spec $shopSpec 
+     */
+    function setShopSpec($shopSpec) {
+        if ($shopSpec && !is_a($shopSpec, 'Child_Shop_Spec')) 
+            trigger_error('$shopSpec must be an instance of Child_Shop_Spec', E_USER_ERROR);
+        return parent::setShopSpec($shopSpec);
+    }
+    
+    /**
+     * @return Child_Shop_Spec  
+     */
+    function createShopSpec($values = array()) {
+        return parent::createShopSpec($values);
+    }
+
+    
         
     
     /**
@@ -119,8 +258,8 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
     /**
      * @return Child_Person  
      */
-    function createNotePerson($values = array(), $isReference = false) {
-        return parent::createNotePerson($values, $isReference);
+    function createNotePerson($values = array()) {
+        return parent::createNotePerson($values);
     }
 
     

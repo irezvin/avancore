@@ -17,7 +17,7 @@ class Ac_Sql_Dbi_Object {
     
     var $extensions = array();
     
-    function Ac_Sql_Dbi_Object ($inspector, $name) {
+    function __construct ($inspector, $name) {
         $this->_inspector = $inspector;
         $this->name = $name;
     }

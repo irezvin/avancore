@@ -2,6 +2,8 @@
 
 class Ac_Legacy_Output_Joomla extends Ac_Legacy_Output {
 
+    var $mergeGlobalResponse = true;
+    
     var $asModule = false;
     
     /**
@@ -44,7 +46,7 @@ class Ac_Legacy_Output_Joomla extends Ac_Legacy_Output {
             $asModule = $this->asModule;
         }
 
-        if (class_exists('Ac_Legacy_Controller_Response_Global', false)) {
+        if ($this->mergeGlobalResponse && class_exists('Ac_Legacy_Controller_Response_Global', false)) {
             $glob = Ac_Legacy_Controller_Response_Global::getInstance();
             if ($glob->hasResponse() && ($glob->getResponse() !== $response)) $response->mergeWithResponse($glob->getResponse());
         }

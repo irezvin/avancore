@@ -24,6 +24,7 @@ $config = array(
     ),
     'domains.Sample' => array(
         'strategyClass' => 'Ac_Cg_Strategy',
+        'useLangStrings' => true,
         'appName' => 'Sample',
         'dbName' => $dbConf['db'],
         'caption' => 'Avancore_Sample',
@@ -32,7 +33,10 @@ $config = array(
         'subsystemPrefixes' => array(),
         'dontLinkSubsystems' => array(
         ),
-        'autoTablesAll' => true,
+        'ignoredColumnsInJunctionTables' => array(
+            '#__shop_product_related' => array('ignore'),
+        ),
+        'autoTablesAll' => '/^#__/',
 		'autoTablesIgnore' => array(
             '#__tree_nested_sets',
             '#__shop_product_upc',
@@ -54,7 +58,6 @@ $config = array(
         'modelDefaults' => array(
             'generateMethodPlaceholders' => true,
             'noUi' => true,
-        	'tracksChanges' => true,
         	'hasUniformPropertiesInfo' => true,
         ),
         'models' => array(
@@ -91,7 +94,15 @@ $config = array(
                     'fkPostPublish',
                 ),
                 'skipMapperMixables' => array(
-                    'fkPostPublish',
+                    //'fkPostPublish',
+                ),
+                'objectTypeField' => 'sharedObjectType',
+                'perModelMapperMixableExtras' => array(
+                    'shopProducts' => array(
+                        'fieldNames' => array(
+                            'sharedObjectType' => false,
+                        ),
+                    ),
                 ),
             ),
             'shopProductExtraCodes' => array(
@@ -106,6 +117,29 @@ $config = array(
                 'masterFkIds' => array(
                     'fkProductNoteProduct',
                 ),
+            ),
+            'shopSpecFood' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'skipMapperMixables' => true,
+                /*'inline' => true,
+                'masterFkIds' => array(
+                    'fkSpecsFood',
+                ),*/
+            ),
+            'shopSpecComputer' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'skipMapperMixables' => true,
+                'masterFkIds' => array('fkMonitorSpec'),
+            ),
+            'shopSpecMonitor' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'skipMapperMixables' => true,
+                'masterFkIds' => array('fkMonitorSpec'),
+            ),
+            'shopSpecLaptop' => array(
+                'class' => 'Ac_Cg_Model_Part',
+                'skipMapperMixables' => true,
+                'masterFkIds' => array('fkMonitorSpec'),
             ),
         ),
     ),

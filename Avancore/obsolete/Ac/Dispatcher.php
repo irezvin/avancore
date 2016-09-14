@@ -118,7 +118,7 @@ class Ac_Dispatcher {
      * @param string appName name of the application (component). Defaults to the $GLOBALS['option'] is missing
      * @param bool isBackend whether the dispatcher is called from the backend or not
      */
-    function Ac_Dispatcher($appName = null, $isBackend = false, $language = false, $adapterClass = 'Ac_Joomla_Adapter', $adapterExtraSettings = array()) {
+    function __construct($appName = null, $isBackend = false, $language = false, $adapterClass = 'Ac_Joomla_Adapter', $adapterExtraSettings = array()) {
         if (is_null($appName)) {
             if (isset($GLOBALS['option']) && is_string($GLOBALS['option']) && preg_match('/^\w+$/', $GLOBALS['option'])) {
                 $appName = $GLOBALS['option'];  
@@ -248,10 +248,10 @@ class Ac_Dispatcher {
     }
     
     /**
-     * getInstance() function is a backbone of Singleton pattern. It's impletemented via GLOBALS (and not via static vars) since
+     * getInstance() function __construct a backbone of Singleton pattern. It's impletemented via GLOBALS (and not via static vars) since
      * this will allow to Ac_Dispatcher::getInstance() return descendants of Ac_Dispatcher class, not only it's direct instances.
      * 
-     * The function is static.
+     * The function __construct static.
      * 
      * @return Ac_Dispatcher 
      */

@@ -8,15 +8,22 @@ class Sample_Publish_Base_ExtraTable extends Ac_Model_Mapper_Mixable_ExtraTable 
     
     protected $implMapper = 'Sample_Publish_ImplMapper';
     
+    protected $objectTypeField = 'sharedObjectType';
     
-
+    protected $modelMixableId = 'Sample_Publish';
+    
+    
+    
     
     protected function doGetRelationPrototypes() {
         return array (
-            '_authorAuthorPerson' => array (
+            '_authorPerson' => array (
                 'srcMapperClass' => 'Sample_Publish_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
-                'srcVarName' => '_authorAuthorPerson',
+                'srcVarName' => '_authorPerson',
+                'destVarName' => '_authorPublish',
+                'destCountVarName' => '_authorPublishCount',
+                'destLoadedVarName' => '_authorPublishLoaded',
                 'fieldLinks' => array (
                     'authorId' => 'personId',
                 ),
@@ -24,10 +31,13 @@ class Sample_Publish_Base_ExtraTable extends Ac_Model_Mapper_Mixable_ExtraTable 
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
             ),
-            '_editorEditorPerson' => array (
+            '_editorPerson' => array (
                 'srcMapperClass' => 'Sample_Publish_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
-                'srcVarName' => '_editorEditorPerson',
+                'srcVarName' => '_editorPerson',
+                'destVarName' => '_editorPublish',
+                'destCountVarName' => '_editorPublishCount',
+                'destLoadedVarName' => '_editorPublishLoaded',
                 'fieldLinks' => array (
                     'editorId' => 'personId',
                 ),
@@ -41,8 +51,8 @@ class Sample_Publish_Base_ExtraTable extends Ac_Model_Mapper_Mixable_ExtraTable 
     
     protected function doGetAssociationPrototypes() {
         return array (
-            'authorAuthorPerson' => array (
-                'relationId' => '_authorAuthorPerson',
+            'authorPerson' => array (
+                'relationId' => '_authorPerson',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
                 'single' => 'authorPerson',
@@ -57,8 +67,8 @@ class Sample_Publish_Base_ExtraTable extends Ac_Model_Mapper_Mixable_ExtraTable 
                 'setDestObjectMethod' => 'setAuthorPerson',
                 'clearDestObjectMethod' => 'clearAuthorPerson',
             ),
-            'editorEditorPerson' => array (
-                'relationId' => '_editorEditorPerson',
+            'editorPerson' => array (
+                'relationId' => '_editorPerson',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
                 'single' => 'editorPerson',
@@ -82,7 +92,7 @@ class Sample_Publish_Base_ExtraTable extends Ac_Model_Mapper_Mixable_ExtraTable 
      * @param Sample_Publish|array $publish     
      */
     function loadAuthorPeopleFor($publish) {
-        $rel = $this->getRelation('_authorAuthorPerson');
+        $rel = $this->getRelation('_authorPerson');
         return $rel->loadDest($publish); 
     }
 
@@ -93,7 +103,7 @@ class Sample_Publish_Base_ExtraTable extends Ac_Model_Mapper_Mixable_ExtraTable 
      * @param Sample_Publish|array $publish     
      */
     function loadEditorPeopleFor($publish) {
-        $rel = $this->getRelation('_editorEditorPerson');
+        $rel = $this->getRelation('_editorPerson');
         return $rel->loadDest($publish); 
     }
 

@@ -2,19 +2,32 @@
 
 class Sample_Tag_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_people = false;
-    public $_peopleCount = false;
-    public $_peopleLoaded = false;
-    public $_personIds = false;
-    public $_perks = false;
-    public $_perksCount = false;
-    public $_perksLoaded = false;
-    public $_perkIds = false;
-    public $tagId = NULL;
-    public $title = '';
-    public $titleM = NULL;
-    public $titleF = NULL;
+
+    var $_hasDefaults = true;
+
+    var $_people = false;
+
+    var $_peopleCount = false;
+
+    var $_peopleLoaded = false;
+
+    var $_personIds = false;
+
+    var $_perks = false;
+
+    var $_perksCount = false;
+
+    var $_perksLoaded = false;
+
+    var $_perkIds = false;
+
+    var $tagId = NULL;
+
+    var $title = '';
+
+    var $titleM = NULL;
+
+    var $titleF = NULL;
     
     var $_mapperClass = 'Sample_Tag_Mapper';
     
@@ -54,12 +67,12 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'people' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_tag_people'),
                 'relationId' => '_people',
                 'countVarName' => '_peopleCount',
                 'nnIdsVarName' => '_personIds',
@@ -70,7 +83,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
                 'arrayValue' => true,
                 'controlType' => 'selectList',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'showInTable' => false,
@@ -78,7 +91,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
             'perks' => array (
                 'className' => 'Sample_Perk',
                 'mapperClass' => 'Sample_Perk_Mapper',
-                'caption' => 'Perks',
+                'caption' => new Ac_Lang_String('sample_tag_perks'),
                 'relationId' => '_perks',
                 'countVarName' => '_perksCount',
                 'nnIdsVarName' => '_perkIds',
@@ -89,7 +102,7 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
                 'arrayValue' => true,
                 'controlType' => 'selectList',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Perk_Mapper',
                 ),
                 'showInTable' => false,
@@ -100,21 +113,21 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Tag Id',
+                'caption' => new Ac_Lang_String('sample_tag_tag_id'),
             ),
             'title' => array (
                 'maxLength' => '45',
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_tag_title'),
             ),
             'titleM' => array (
                 'maxLength' => '45',
                 'isNullable' => true,
-                'caption' => 'Title M',
+                'caption' => new Ac_Lang_String('sample_tag_title_m'),
             ),
             'titleF' => array (
                 'maxLength' => '45',
                 'isNullable' => true,
-                'caption' => 'Title F',
+                'caption' => new Ac_Lang_String('sample_tag_title_f'),
             ),
         );
     
@@ -124,8 +137,6 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
 
     function countPeople() {
         if (is_array($this->_people)) return count($this->_people);
@@ -186,11 +197,10 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
+    function createPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPerson($res);
         return $res;
     }
@@ -275,11 +285,10 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Perk  
      */
-    function createPerk($values = array(), $isReference = false) {
+    function createPerk($values = array()) {
         $m = $this->getMapper('Sample_Perk_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPerk($res);
         return $res;
     }

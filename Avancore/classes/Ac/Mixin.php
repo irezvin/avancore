@@ -5,30 +5,30 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
     protected $mixables = array();
     
     /**
-     * @param array $methodName => mixableId
+     * @var array $methodName => mixableId
      */
     protected $mixMethodMap = false;
     
     /**
-     * @param array $propertyName => mixableId
+     * @var array $propertyName => mixableId
      */
     protected $mixPropertyMap = false;
-
+    
     /**
-     * @param array $id => $id IDs of 'core' mixables
+     * @var array $id => $id IDs of 'core' mixables
      */
     protected $coreMixableIds = array();
     
     /**
-     * @param array $id => $id IDs of Ac_I_Mixable_Shared
+     * @var array $id => $id IDs of Ac_I_Mixable_Shared
      */
     protected $sharedMixableIds = false;
-    
+
     const ACCESS_GET = 0;
     const ACCESS_SET = 1;
     const ACCESS_ISSET = 2;
     const ACCESS_UNSET = 3;
-
+    
     function __construct(array $prototype = array()) {
         $this->registerCoreMixables();
         // TODO: initialize while providing values to mixables
@@ -223,6 +223,13 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
     public function hasMethod($methodName) {
         if ($this->mixMethodMap === false) $this->fillMixMaps();
         $res = isset($this->mixMethodMap[strtolower($methodName)]);
+        // parse value like :mixableId:property
+        if (!$res) {
+            $path = explode('::', $methodName, 2);
+            if (isset($path[1]) && isset($this->mixables[$path[0]])) {
+                $res = Ac_Accessor::methodExists($this->mixables[$path[0]], $path[1]);
+            }
+        }
         return $res;
     }
     
@@ -236,7 +243,17 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
                 $res = & $this->mixables[$id]->$property;
             }
         } else {
-            $res = $this->doAccessMissingProperty($property, self::ACCESS_GET);
+            $path = explode('::', $property, 2);
+            if (isset($path[1]) && isset($this->mixables[$path[0]])) {
+                $mix = $this->mixables[$path[0]];
+                if ($mix instanceof Ac_I_Mixable_Shared) {
+                    $res = & $mix->getMixinProperty($this, $path[1]);
+                } else {
+                    $res = & $mix->{$path[1]};
+                }
+            } else {
+                $res = $this->doAccessMissingProperty($property, self::ACCESS_GET);
+            }
         }
         return $res;
     }
@@ -251,7 +268,17 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
                 $this->mixables[$id]->$property = $value;
             }
         } else {
-            $this->doAccessMissingProperty($property, self::ACCESS_SET, $value);
+            $path = explode('::', $property, 2);
+            if (isset($path[1]) && isset($this->mixables[$path[0]])) {
+                $mix = $this->mixables[$path[0]];
+                if ($mix instanceof Ac_I_Mixable_Shared) {
+                    $mix->setMixinProperty($this, $path[1], $value);
+                } else {
+                    $mix->{$path[1]} = $value;
+                }
+            } else {
+                $this->doAccessMissingProperty($property, self::ACCESS_SET, $value);
+            }
         }
     }
     
@@ -270,7 +297,17 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
                 $res = isset($this->mixables[$id]->$property);
             }
         } else {
-            $res = $this->doAccessMissingProperty($property, self::ACCESS_ISSET);
+            $path = explode('::', $property, 2);
+            if (isset($path[1]) && isset($this->mixables[$path[0]])) {
+                $mix = $this->mixables[$path[0]];
+                if ($mix instanceof Ac_I_Mixable_Shared) {
+                    $res = $mix->issetMixinProperty($this, $path[1]);
+                } else {
+                    $res = isset($mix->{$path[1]});
+                }
+            } else {
+                $res = $this->doAccessMissingProperty($property, self::ACCESS_ISSET);
+            }
         }
         return $res;
     }
@@ -285,6 +322,15 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
                 unset($this->mixables[$id]->$property);
             }
         } else {
+            $path = explode('::', $property, 2);
+            if (isset($path[1]) && isset($this->mixables[$path[0]])) {
+                $mix = $this->mixables[$path[0]];
+                if ($mix instanceof Ac_I_Mixable_Shared) {
+                    $mix->unsetMixinProperty($this, $path[1]);
+                } else {
+                    unset($mix->{$path[1]});
+                }
+            }
             $this->doAccessMissingProperty($property, self::ACCESS_UNSET);
         }
     }
@@ -303,7 +349,17 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
                 $res = call_user_func_array(array($this->mixables[$id], $method), $arguments);
             }
         } else {
-            $res = $this->doCallUnknownMethod($method, $arguments);
+            $path = explode('::', $method, 2);
+            if (isset($path[1]) && isset($this->mixables[$path[0]])) {
+                $mix = $this->mixables[$path[0]];
+                if ($mix instanceof Ac_I_Mixable_Shared) {
+                    $res = $mix->callMixinMetho($this, $path[1], $arguments);
+                } else {
+                    $res = call_user_func_array(array($mix, $path[1]), $arguments);
+                }
+            } else {
+                $res = $this->doCallUnknownMethod($method, $arguments);
+            }
         }
         return $res;
     }

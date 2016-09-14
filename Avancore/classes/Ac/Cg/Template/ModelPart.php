@@ -47,7 +47,6 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
     function doInit() {
         
         $this->hasUniformPropertiesInfo = false;
-        $this->tracksChanges = false;
         
         $this->extraTableClass = $this->model->getExtraTableClass();
         $this->genExtraTableClass = $this->model->getGenExtraTableClass();
@@ -59,6 +58,9 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
         $this->inline = $this->model->inline;
         
         parent::doInit();
+
+        if (!$this->model->inline)
+            $this->vars['preserveMetaCache'] = Ac_Cg_Member::prot(true);
     }
     
     protected function calcInheritance() {
@@ -105,7 +107,7 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
     protected $<?php echo $var; ?> = <?php $this->export($val); ?>;
     
 <?php   } ?>    
-
+    
 <?php if ($this->extraRelationPrototypes) { ?>
     
     protected function doGetRelationPrototypes() {
@@ -135,8 +137,6 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
     
     function showModelGenObject() {  
 
-        $fieldVisibility = $this->createAccessors? 'protected' : 'public';
-        
     // ------------------------------------------- modelGenObject -------------------------------------------    
         
 ?>
@@ -145,14 +145,18 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
 
 <?php if ($this->model->parentClassIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genModelClass); ?> extends <?php $this->d($this->parentClass); ?> {
 
-<?php foreach($this->vars as $var => $default) { ?>
-    <?php echo $fieldVisibility; ?> $<?php $this->d($var); ?> = <?php $this->export($default); ?>;
-<?php } ?>
+<?php $this->declareClassMembers ($this->vars, 4); ?>
     
     /**
      * @var <?php echo $this->extraTableClass; ?> 
      */
     protected $mapperExtraTable = false;
+
+    protected $mixableId = <?php $this->export($this->modelClass); ?>;
+    
+    function hasPublicVars() {
+        return true;
+    }
 
     /**
      * @return <?php echo $this->domain->getAppClass(); ?> 

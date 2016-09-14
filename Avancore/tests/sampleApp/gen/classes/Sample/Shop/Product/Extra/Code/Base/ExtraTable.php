@@ -8,15 +8,17 @@ class Sample_Shop_Product_Extra_Code_Base_ExtraTable extends Ac_Model_Mapper_Mix
     
     protected $implMapper = 'Sample_Shop_Product_Extra_Code_ImplMapper';
     
+    protected $modelMixableId = 'Sample_Shop_Product_Extra_Code';
     
-
+    
+    
     
     protected function doGetRelationPrototypes() {
         return array (
-            '_extraCodeExtraCodePerson' => array (
+            '_extraCodePerson' => array (
                 'srcMapperClass' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
-                'srcVarName' => '_extraCodeExtraCodePerson',
+                'srcVarName' => '_extraCodePerson',
                 'srcCountVarName' => '_extraCodeShopProductsCount',
                 'srcLoadedVarName' => '_extraCodeShopProductsLoaded',
                 'destVarName' => '_extraCodeShopProducts',
@@ -35,8 +37,8 @@ class Sample_Shop_Product_Extra_Code_Base_ExtraTable extends Ac_Model_Mapper_Mix
     
     protected function doGetAssociationPrototypes() {
         return array (
-            'extraCodeExtraCodePerson' => array (
-                'relationId' => '_extraCodeExtraCodePerson',
+            'extraCodePerson' => array (
+                'relationId' => '_extraCodePerson',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
                 'single' => 'extraCodePerson',
@@ -60,7 +62,7 @@ class Sample_Shop_Product_Extra_Code_Base_ExtraTable extends Ac_Model_Mapper_Mix
      * @param Sample_Shop_Product_Extra_Code|array $shopProductExtraCodes     
      */
     function loadExtraCodePeopleFor($shopProductExtraCodes) {
-        $rel = $this->getRelation('_extraCodeExtraCodePerson');
+        $rel = $this->getRelation('_extraCodePerson');
         return $rel->loadDest($shopProductExtraCodes); 
     }
 

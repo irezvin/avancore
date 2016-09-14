@@ -2,8 +2,10 @@
 
 class Child_Relation_Base_Object extends Sample_Relation {
 
-    public $_incomingPerson = false;
-    public $_outgoingPerson = false;
+
+    var $_incomingPerson = false;
+
+    var $_outgoingPerson = false;
     
     var $_mapperClass = 'Child_Relation_Mapper';
     
@@ -32,11 +34,12 @@ class Child_Relation_Base_Object extends Sample_Relation {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'relationType' => array (
                 'className' => 'Child_Relation_Type',
                 'mapperClass' => 'Child_Relation_Type_Mapper',
+                'caption' => 'Relation type',
             ),
             'incomingPerson' => array (
                 'className' => 'Child_Person',
@@ -54,22 +57,37 @@ class Child_Relation_Base_Object extends Sample_Relation {
                 'relationId' => '_outgoingPerson',
                 'referenceVarName' => '_outgoingPerson',
             ),
+            'relationId' => array (
+                'caption' => 'Relation Id',
+            ),
             'personId' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
                 'objectPropertyName' => 'outgoingPerson',
+                'caption' => 'Person Id',
             ),
             'otherPersonId' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
                 'objectPropertyName' => 'incomingPerson',
+                'caption' => 'Other Person Id',
             ),
             'relationTypeId' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Relation_Type_Mapper',
                 ),
+                'caption' => 'Relation Type Id',
+            ),
+            'relationBegin' => array (
+                'caption' => 'Relation Begin',
+            ),
+            'relationEnd' => array (
+                'caption' => 'Relation End',
+            ),
+            'notes' => array (
+                'caption' => 'Notes',
             ),
         );
     
@@ -98,8 +116,8 @@ class Child_Relation_Base_Object extends Sample_Relation {
     /**
      * @return Child_Relation_Type  
      */
-    function createRelationType($values = array(), $isReference = false) {
-        return parent::createRelationType($values, $isReference);
+    function createRelationType($values = array()) {
+        return parent::createRelationType($values);
     }
 
     
@@ -124,8 +142,8 @@ class Child_Relation_Base_Object extends Sample_Relation {
     /**
      * @return Child_Person  
      */
-    function createIncomingPerson($values = array(), $isReference = false) {
-        return parent::createIncomingPerson($values, $isReference);
+    function createIncomingPerson($values = array()) {
+        return parent::createIncomingPerson($values);
     }
 
     
@@ -150,8 +168,8 @@ class Child_Relation_Base_Object extends Sample_Relation {
     /**
      * @return Child_Person  
      */
-    function createOutgoingPerson($values = array(), $isReference = false) {
-        return parent::createOutgoingPerson($values, $isReference);
+    function createOutgoingPerson($values = array()) {
+        return parent::createOutgoingPerson($values);
     }
 
     

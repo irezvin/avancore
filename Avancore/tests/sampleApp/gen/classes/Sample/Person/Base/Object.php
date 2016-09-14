@@ -2,43 +2,88 @@
 
 class Sample_Person_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_portraitPersonPhoto = false;
-    public $_religion = false;
-    public $_tags = false;
-    public $_tagsCount = false;
-    public $_tagsLoaded = false;
-    public $_tagIds = false;
-    public $_personAlbums = false;
-    public $_personAlbumsCount = false;
-    public $_personAlbumsLoaded = false;
-    public $_personPhotos = false;
-    public $_personPhotosCount = false;
-    public $_personPhotosLoaded = false;
-    public $_personPosts = false;
-    public $_personPostsCount = false;
-    public $_personPostsLoaded = false;
-    public $_incomingRelations = false;
-    public $_incomingRelationsCount = false;
-    public $_incomingRelationsLoaded = false;
-    public $_outgoingRelations = false;
-    public $_outgoingRelationsCount = false;
-    public $_outgoingRelationsLoaded = false;
-    public $_extraCodeShopProducts = false;
-    public $_extraCodeShopProductsCount = false;
-    public $_extraCodeShopProductsLoaded = false;
-    public $_noteShopProducts = false;
-    public $_noteShopProductsCount = false;
-    public $_noteShopProductsLoaded = false;
-    public $personId = NULL;
-    public $name = '';
-    public $gender = 'F';
-    public $isSingle = 1;
-    public $birthDate = NULL;
-    public $lastUpdatedDatetime = NULL;
-    public $createdTs = false;
-    public $religionId = NULL;
-    public $portraitId = NULL;
+
+    var $_hasDefaults = true;
+
+    var $_portraitPersonPhoto = false;
+
+    var $_religion = false;
+
+    var $_tags = false;
+
+    var $_tagsCount = false;
+
+    var $_tagsLoaded = false;
+
+    var $_tagIds = false;
+
+    var $_personAlbums = false;
+
+    var $_personAlbumsCount = false;
+
+    var $_personAlbumsLoaded = false;
+
+    var $_personPhotos = false;
+
+    var $_personPhotosCount = false;
+
+    var $_personPhotosLoaded = false;
+
+    var $_personPosts = false;
+
+    var $_personPostsCount = false;
+
+    var $_personPostsLoaded = false;
+
+    var $_authorPublish = false;
+
+    var $_authorPublishCount = false;
+
+    var $_authorPublishLoaded = false;
+
+    var $_editorPublish = false;
+
+    var $_editorPublishCount = false;
+
+    var $_editorPublishLoaded = false;
+
+    var $_incomingRelations = false;
+
+    var $_incomingRelationsCount = false;
+
+    var $_incomingRelationsLoaded = false;
+
+    var $_outgoingRelations = false;
+
+    var $_outgoingRelationsCount = false;
+
+    var $_outgoingRelationsLoaded = false;
+
+    var $_extraCodeShopProducts = false;
+
+    var $_shopProductsCount = false;
+
+    var $_shopProductsLoaded = false;
+
+    var $_noteShopProducts = false;
+
+    var $personId = NULL;
+
+    var $name = '';
+
+    var $gender = 'F';
+
+    var $isSingle = 1;
+
+    var $birthDate = NULL;
+
+    var $lastUpdatedDatetime = NULL;
+
+    var $createdTs = false;
+
+    var $religionId = NULL;
+
+    var $portraitId = NULL;
     
     var $_mapperClass = 'Sample_Person_Mapper';
     
@@ -62,43 +107,43 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'portraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'personPosts', 7 => 'incomingRelations', 8 => 'outgoingRelations', 9 => 'extraCodeShopProducts', 10 => 'noteShopProducts', )));
+        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'portraitPersonPhoto', 1 => 'religion', 2 => 'tags', 3 => 'tagIds', 4 => 'personAlbums', 5 => 'personPhotos', 6 => 'personPosts', 7 => 'authorPublish', 8 => 'editorPublish', 9 => 'incomingRelations', 10 => 'outgoingRelations', 11 => 'extraCodeShopProducts', 12 => 'noteShopProducts', )));
     }
     
  
     protected function listOwnLists() {
         
-        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', 'extraCodeShopProducts' => 'extraCodeShopProducts', 'noteShopProducts' => 'noteShopProducts', );
+        return array ( 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'authorPublish' => 'authorPublish', 'editorPublish' => 'editorPublish', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', 'extraCodeShopProducts' => 'shopProducts', 'noteShopProducts' => 'shopProducts', );
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'portraitPersonPhoto' => 'Sample_Person_Photo', 'religion' => 'Sample_Religion', 'tags' => 'Sample_Tag', 'personAlbums' => 'Sample_Person_Album', 'personPhotos' => 'Sample_Person_Photo', 'personPosts' => 'Sample_Person_Post', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', 'extraCodeShopProducts' => 'Sample_Shop_Product', 'noteShopProducts' => 'Sample_Shop_Product', );
+        return array ( 'portraitPersonPhoto' => 'Sample_Person_Photo', 'religion' => 'Sample_Religion', 'tags' => 'Sample_Tag', 'personAlbums' => 'Sample_Person_Album', 'personPhotos' => 'Sample_Person_Photo', 'personPosts' => 'Sample_Person_Post', 'authorPublish' => 'Sample_Publish', 'editorPublish' => 'Sample_Publish', 'incomingRelations' => 'Sample_Relation', 'outgoingRelations' => 'Sample_Relation', 'extraCodeShopProducts' => 'Sample_Shop_Product', 'noteShopProducts' => 'Sample_Shop_Product', );
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'portraitPersonPhoto' => array (
                 'className' => 'Sample_Person_Photo',
                 'mapperClass' => 'Sample_Person_Photo_Mapper',
                 'otherModelIdInMethodsPrefix' => 'portrait',
-                'caption' => 'Person photo',
+                'caption' => new Ac_Lang_String('sample_person_portrait_person_photo'),
                 'relationId' => '_portraitPersonPhoto',
                 'referenceVarName' => '_portraitPersonPhoto',
             ),
             'religion' => array (
                 'className' => 'Sample_Religion',
                 'mapperClass' => 'Sample_Religion_Mapper',
-                'caption' => 'Religion',
+                'caption' => new Ac_Lang_String('sample_person_religion'),
                 'relationId' => '_religion',
                 'referenceVarName' => '_religion',
             ),
             'tags' => array (
                 'className' => 'Sample_Tag',
                 'mapperClass' => 'Sample_Tag_Mapper',
-                'caption' => 'Tags',
+                'caption' => new Ac_Lang_String('sample_person_tags'),
                 'relationId' => '_tags',
                 'countVarName' => '_tagsCount',
                 'nnIdsVarName' => '_tagIds',
@@ -109,7 +154,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'arrayValue' => true,
                 'controlType' => 'selectList',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Tag_Mapper',
                 ),
                 'showInTable' => false,
@@ -117,7 +162,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
             'personAlbums' => array (
                 'className' => 'Sample_Person_Album',
                 'mapperClass' => 'Sample_Person_Album_Mapper',
-                'caption' => 'Person albums',
+                'caption' => new Ac_Lang_String('sample_person_person_albums'),
                 'relationId' => '_personAlbums',
                 'countVarName' => '_personAlbumsCount',
                 'referenceVarName' => '_personAlbums',
@@ -125,7 +170,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
             'personPhotos' => array (
                 'className' => 'Sample_Person_Photo',
                 'mapperClass' => 'Sample_Person_Photo_Mapper',
-                'caption' => 'Person photos',
+                'caption' => new Ac_Lang_String('sample_person_person_photos'),
                 'relationId' => '_personPhotos',
                 'countVarName' => '_personPhotosCount',
                 'referenceVarName' => '_personPhotos',
@@ -133,17 +178,35 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
             'personPosts' => array (
                 'className' => 'Sample_Person_Post',
                 'mapperClass' => 'Sample_Person_Post_Mapper',
-                'caption' => 'Person posts',
+                'caption' => new Ac_Lang_String('sample_person_person_posts'),
                 'relationId' => '_personPosts',
                 'countVarName' => '_personPostsCount',
                 'referenceVarName' => '_personPosts',
+            ),
+            'authorPublish' => array (
+                'className' => 'Sample_Publish',
+                'mapperClass' => 'Sample_Publish_ImplMapper',
+                'otherModelIdInMethodsPrefix' => 'author',
+                'caption' => new Ac_Lang_String('sample_person_author_publish'),
+                'relationId' => '_authorPublish',
+                'countVarName' => '_authorPublishCount',
+                'referenceVarName' => '_authorPublish',
+            ),
+            'editorPublish' => array (
+                'className' => 'Sample_Publish',
+                'mapperClass' => 'Sample_Publish_ImplMapper',
+                'otherModelIdInMethodsPrefix' => 'editor',
+                'caption' => new Ac_Lang_String('sample_person_editor_publish'),
+                'relationId' => '_editorPublish',
+                'countVarName' => '_editorPublishCount',
+                'referenceVarName' => '_editorPublish',
             ),
             'incomingRelations' => array (
                 'className' => 'Sample_Relation',
                 'mapperClass' => 'Sample_Relation_Mapper',
                 'otherModelIdInMethodsSingle' => 'incomingRelation',
                 'otherModelIdInMethodsPlural' => 'incomingRelations',
-                'caption' => 'Relations',
+                'caption' => new Ac_Lang_String('sample_person_incoming_relations'),
                 'relationId' => '_incomingRelations',
                 'countVarName' => '_incomingRelationsCount',
                 'referenceVarName' => '_incomingRelations',
@@ -153,7 +216,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Relation_Mapper',
                 'otherModelIdInMethodsSingle' => 'outgoingRelation',
                 'otherModelIdInMethodsPlural' => 'outgoingRelations',
-                'caption' => 'Relations',
+                'caption' => new Ac_Lang_String('sample_person_outgoing_relations'),
                 'relationId' => '_outgoingRelations',
                 'countVarName' => '_outgoingRelationsCount',
                 'referenceVarName' => '_outgoingRelations',
@@ -162,18 +225,18 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'className' => 'Sample_Shop_Product',
                 'mapperClass' => 'Sample_Shop_Product_Mapper',
                 'otherModelIdInMethodsPrefix' => 'extraCode',
-                'caption' => 'Shop products',
+                'caption' => new Ac_Lang_String('sample_person_extra_code_shop_products'),
                 'relationId' => '_extraCodeShopProducts',
-                'countVarName' => '_extraCodeShopProductsCount',
+                'countVarName' => '_shopProductsCount',
                 'referenceVarName' => '_extraCodeShopProducts',
             ),
             'noteShopProducts' => array (
                 'className' => 'Sample_Shop_Product',
                 'mapperClass' => 'Sample_Shop_Product_Mapper',
                 'otherModelIdInMethodsPrefix' => 'note',
-                'caption' => 'Shop products',
+                'caption' => new Ac_Lang_String('sample_person_note_shop_products'),
                 'relationId' => '_noteShopProducts',
-                'countVarName' => '_noteShopProductsCount',
+                'countVarName' => '_shopProductsCount',
                 'referenceVarName' => '_noteShopProducts',
             ),
             'personId' => array (
@@ -182,11 +245,11 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Person Id',
+                'caption' => new Ac_Lang_String('sample_person_person_id'),
             ),
             'name' => array (
                 'maxLength' => '255',
-                'caption' => 'Name',
+                'caption' => new Ac_Lang_String('sample_person_name'),
             ),
             'gender' => array (
                 'controlType' => 'selectList',
@@ -194,7 +257,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                     'F' => 'F',
                     'M' => 'M',
                 ),
-                'caption' => 'Gender',
+                'caption' => new Ac_Lang_String('sample_person_gender'),
             ),
             'isSingle' => array (
                 'dataType' => 'bool',
@@ -204,12 +267,12 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                     0 => 'No',
                     1 => 'Yes',
                 ),
-                'caption' => 'Is Single',
+                'caption' => new Ac_Lang_String('sample_person_is_single'),
             ),
             'birthDate' => array (
                 'dataType' => 'date',
                 'controlType' => 'dateInput',
-                'caption' => 'Birth Date',
+                'caption' => new Ac_Lang_String('sample_person_birth_date'),
                 'internalDateFormat' => 'Y-m-d',
                 'outputDateFormat' => 'Y-m-d',
             ),
@@ -217,14 +280,14 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'dataType' => 'dateTime',
                 'controlType' => 'dateInput',
                 'isNullable' => true,
-                'caption' => 'Last Updated Datetime',
+                'caption' => new Ac_Lang_String('sample_person_last_updated_datetime'),
                 'internalDateFormat' => 'Y-m-d H:i:s',
                 'outputDateFormat' => 'Y-m-d H:i:s',
             ),
             'createdTs' => array (
                 'dataType' => 'timestamp',
                 'controlType' => 'dateInput',
-                'caption' => 'Created Ts',
+                'caption' => new Ac_Lang_String('sample_person_created_ts'),
                 'internalDateFormat' => 'YmdHis',
                 'outputDateFormat' => 'Y-m-d H:i:s',
             ),
@@ -234,12 +297,12 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Religion_Mapper',
                 ),
                 'objectPropertyName' => 'religion',
                 'isNullable' => true,
-                'caption' => 'Religion Id',
+                'caption' => new Ac_Lang_String('sample_person_religion_id'),
             ),
             'portraitId' => array (
                 'dataType' => 'int',
@@ -247,12 +310,12 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'maxLength' => '10',
                 'dummyCaption' => '',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Photo_Mapper',
                 ),
                 'objectPropertyName' => 'portraitPersonPhoto',
                 'isNullable' => true,
-                'caption' => 'Portrait Id',
+                'caption' => new Ac_Lang_String('sample_person_portrait_id'),
             ),
         );
     
@@ -262,8 +325,6 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
         
     
     /**
@@ -298,11 +359,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Photo  
      */
-    function createPortraitPersonPhoto($values = array(), $isReference = false) {
+    function createPortraitPersonPhoto($values = array()) {
         $m = $this->getMapper('Sample_Person_Photo_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPortraitPersonPhoto($res);
         return $res;
     }
@@ -342,11 +402,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Religion  
      */
-    function createReligion($values = array(), $isReference = false) {
+    function createReligion($values = array()) {
         $m = $this->getMapper('Sample_Religion_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setReligion($res);
         return $res;
     }
@@ -412,11 +471,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Tag  
      */
-    function createTag($values = array(), $isReference = false) {
+    function createTag($values = array()) {
         $m = $this->getMapper('Sample_Tag_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addTag($res);
         return $res;
     }
@@ -499,11 +557,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Album  
      */
-    function createPersonAlbum($values = array(), $isReference = false) {
+    function createPersonAlbum($values = array()) {
         $m = $this->getMapper('Sample_Person_Album_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPersonAlbum($res);
         return $res;
     }
@@ -566,11 +623,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Photo  
      */
-    function createPersonPhoto($values = array(), $isReference = false) {
+    function createPersonPhoto($values = array()) {
         $m = $this->getMapper('Sample_Person_Photo_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPersonPhoto($res);
         return $res;
     }
@@ -633,12 +689,143 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Post  
      */
-    function createPersonPost($values = array(), $isReference = false) {
+    function createPersonPost($values = array()) {
         $m = $this->getMapper('Sample_Person_Post_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPersonPost($res);
+        return $res;
+    }
+    
+
+    function countAuthorPublish() {
+        if (is_array($this->_authorPublish)) return count($this->_authorPublish);
+        if ($this->_authorPublishCount === false) {
+            $this->mapper->loadAssocCountFor($this, '_authorPublish');
+        }
+        return $this->_authorPublishCount;
+        
+    }
+
+    function listAuthorPublish() {
+        if (!$this->_authorPublishLoaded) {
+            $this->mapper->loadAuthorPublishFor($this);
+        }
+        return array_keys($this->_authorPublish);
+    }
+    
+    /**
+     * @return bool
+     */
+    function isAuthorPublishLoaded() {
+        return $this->_authorPublishLoaded;
+    }
+    
+    /**
+     * @return Sample_Publish 
+     */
+    function getAuthorPublish($id) {
+        if (!$this->_authorPublishLoaded) {
+            $this->mapper->loadAuthorPublishFor($this);
+        }
+        
+        if (!isset($this->_authorPublish[$id])) trigger_error ('No such Publish: \''.$id.'\'', E_USER_ERROR);
+        return $this->_authorPublish[$id];
+    }
+    
+    /**
+     * @return Sample_Publish 
+     */
+    function getAuthorPublishItem($id) {
+        return $this->getAuthorPublish($id);
+    }
+    
+    /**
+     * @param Sample_Publish $authorPublish 
+     */
+    function addAuthorPublish($authorPublish) {
+        if (!is_a($authorPublish, 'Sample_Publish')) trigger_error('$authorPublish must be an instance of Sample_Publish', E_USER_ERROR);
+        $this->listAuthorPublish();
+        $this->_authorPublish[] = $authorPublish;
+        
+        $authorPublish->_authorPerson = $this;
+        
+    }
+
+    /**
+     * @return Sample_Publish  
+     */
+    function createAuthorPublish($values = array()) {
+        $m = $this->getMapper('Sample_Publish_ImplMapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        $this->addAuthorPublish($res);
+        return $res;
+    }
+    
+
+    function countEditorPublish() {
+        if (is_array($this->_editorPublish)) return count($this->_editorPublish);
+        if ($this->_editorPublishCount === false) {
+            $this->mapper->loadAssocCountFor($this, '_editorPublish');
+        }
+        return $this->_editorPublishCount;
+        
+    }
+
+    function listEditorPublish() {
+        if (!$this->_editorPublishLoaded) {
+            $this->mapper->loadEditorPublishFor($this);
+        }
+        return array_keys($this->_editorPublish);
+    }
+    
+    /**
+     * @return bool
+     */
+    function isEditorPublishLoaded() {
+        return $this->_editorPublishLoaded;
+    }
+    
+    /**
+     * @return Sample_Publish 
+     */
+    function getEditorPublish($id) {
+        if (!$this->_editorPublishLoaded) {
+            $this->mapper->loadEditorPublishFor($this);
+        }
+        
+        if (!isset($this->_editorPublish[$id])) trigger_error ('No such Publish: \''.$id.'\'', E_USER_ERROR);
+        return $this->_editorPublish[$id];
+    }
+    
+    /**
+     * @return Sample_Publish 
+     */
+    function getEditorPublishItem($id) {
+        return $this->getEditorPublish($id);
+    }
+    
+    /**
+     * @param Sample_Publish $editorPublish 
+     */
+    function addEditorPublish($editorPublish) {
+        if (!is_a($editorPublish, 'Sample_Publish')) trigger_error('$editorPublish must be an instance of Sample_Publish', E_USER_ERROR);
+        $this->listEditorPublish();
+        $this->_editorPublish[] = $editorPublish;
+        
+        $editorPublish->_editorPerson = $this;
+        
+    }
+
+    /**
+     * @return Sample_Publish  
+     */
+    function createEditorPublish($values = array()) {
+        $m = $this->getMapper('Sample_Publish_ImplMapper');
+        $res = $m->createRecord();
+        if ($values) $res->bind($values);
+        $this->addEditorPublish($res);
         return $res;
     }
     
@@ -700,11 +887,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Relation  
      */
-    function createIncomingRelation($values = array(), $isReference = false) {
+    function createIncomingRelation($values = array()) {
         $m = $this->getMapper('Sample_Relation_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addIncomingRelation($res);
         return $res;
     }
@@ -767,11 +953,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Relation  
      */
-    function createOutgoingRelation($values = array(), $isReference = false) {
+    function createOutgoingRelation($values = array()) {
         $m = $this->getMapper('Sample_Relation_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addOutgoingRelation($res);
         return $res;
     }
@@ -792,7 +977,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      * @return bool
      */
     function isExtraCodeShopProductsLoaded() {
-        return $this->_extraCodeShopProductsLoaded;
+        return $this->_shopProductsLoaded;
     }
     
     /**
@@ -825,11 +1010,10 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Shop_Product  
      */
-    function createExtraCodeShopProduct($values = array(), $isReference = false) {
+    function createExtraCodeShopProduct($values = array()) {
         $m = $this->getMapper('Sample_Shop_Product_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addExtraCodeShopProduct($res);
         return $res;
     }
@@ -850,7 +1034,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      * @return bool
      */
     function isNoteShopProductsLoaded() {
-        return $this->_noteShopProductsLoaded;
+        return $this->_shopProductsLoaded;
     }
     
     /**
@@ -877,18 +1061,17 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
         $this->listNoteShopProducts();
         $this->_noteShopProducts[] = $noteShopProduct;
         
-        $noteShopProduct->_noteNotePerson = $this;
+        $noteShopProduct->_notePerson = $this;
         
     }
 
     /**
      * @return Sample_Shop_Product  
      */
-    function createNoteShopProduct($values = array(), $isReference = false) {
+    function createNoteShopProduct($values = array()) {
         $m = $this->getMapper('Sample_Shop_Product_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addNoteShopProduct($res);
         return $res;
     }

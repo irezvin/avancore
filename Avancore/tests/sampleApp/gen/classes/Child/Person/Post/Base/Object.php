@@ -26,33 +26,80 @@ class Child_Person_Post_Base_Object extends Sample_Person_Post {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
+            'publish' => array (
+                'className' => 'Child_Publish',
+                'mapperClass' => 'Child_Publish_ImplMapper',
+                'caption' => 'Publish',
+            ),
             'person' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
             ),
             'personPhoto' => array (
                 'className' => 'Child_Person_Photo',
                 'mapperClass' => 'Child_Person_Photo_Mapper',
+                'caption' => 'Person photo',
+            ),
+            'id' => array (
+                'caption' => 'Id',
+            ),
+            'personId' => array (
+                'caption' => 'Person Id',
             ),
             'photoId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Person_Photo_Mapper',
                 ),
+                'caption' => 'Photo Id',
+            ),
+            'title' => array (
+                'caption' => 'Title',
+            ),
+            'content' => array (
+                'caption' => 'Content',
             ),
             'pubId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Publish_ImplMapper',
                 ),
+                'caption' => 'Pub Id',
             ),
         );
     
         return $pi;
                 
     }
+    
+        
+    
+    /**
+     * @return Child_Publish 
+     */
+    function getPublish() {
+        return parent::getPublish();
+    }
+    
+    /**
+     * @param Child_Publish $publish 
+     */
+    function setPublish($publish) {
+        if ($publish && !is_a($publish, 'Child_Publish')) 
+            trigger_error('$publish must be an instance of Child_Publish', E_USER_ERROR);
+        return parent::setPublish($publish);
+    }
+    
+    /**
+     * @return Child_Publish  
+     */
+    function createPublish($values = array()) {
+        return parent::createPublish($values);
+    }
+
     
         
     
@@ -75,8 +122,8 @@ class Child_Person_Post_Base_Object extends Sample_Person_Post {
     /**
      * @return Child_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
-        return parent::createPerson($values, $isReference);
+    function createPerson($values = array()) {
+        return parent::createPerson($values);
     }
 
     
@@ -101,8 +148,8 @@ class Child_Person_Post_Base_Object extends Sample_Person_Post {
     /**
      * @return Child_Person_Photo  
      */
-    function createPersonPhoto($values = array(), $isReference = false) {
-        return parent::createPersonPhoto($values, $isReference);
+    function createPersonPhoto($values = array()) {
+        return parent::createPersonPhoto($values);
     }
 
     

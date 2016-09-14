@@ -2,7 +2,7 @@
 
 class Ac_Test_CgImport extends Ac_Test_Base {
     
-    var $write = true;
+    var $write = false;
     
     function getConfigPath() {
         return dirname(__FILE__).'/../../../codegen/codegen.config.php';
@@ -42,7 +42,12 @@ class Ac_Test_CgImport extends Ac_Test_Base {
         $gen1->lintify = false;
         $gen1->outputDir = $this->getOut2();
         $gen1->logFileName = $this->getLog2();
+        ob_start();
         $gen1->prepare();
+        $s = ob_get_clean();
+        if (!$this->assertTrue(preg_match('/#__cpk.*composite primary key/i', $s))) {
+            echo $s;
+        }
         $gen1->genEditable = 1;
         $gen1->genNonEditable = 1;
         $gen1->clearOutputDir = 1;
@@ -50,7 +55,7 @@ class Ac_Test_CgImport extends Ac_Test_Base {
         $gen1->run();
         
         $out1 = $w1->getOutput();
-        
+            
         $gen2 = new Ac_Cg_Generator(array());
         $gen2->lintify = false;
         $gen2->outputDir = $this->getOut3();

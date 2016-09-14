@@ -16,35 +16,38 @@ abstract class Ac_Util_Php {
         echo "?".">";
     }
     
-    protected static function replaceIndent($match) {
-        return "\n".str_repeat(" ", 4*strlen($match[1])/2);
-    }
+    protected static $dontFixIndent = 0;
     
-    static function export($foo, $return = false, $indent = 0) {
-        if (is_array($foo)) $res = self::exportArray($foo, $indent, true, true, true);
+    static function export($foo, $return = false, $indent = 0, $beginArrayWithIndent = false) {
+        if (is_array($foo)) {
+            $res = "";
+            if ($beginArrayWithIndent) $res .= str_repeat(" ", $indent);
+            $res .= self::exportArray($foo, $indent, true, null, true);
+        }
         elseif ($foo === 0) $res = '0';
-        else $res = self::myVarExport($foo, true);
+        else $res = self::myVarExport($foo, true, $indent);
         
         if ($return) return $res; 
             else echo $res;
     }
     
-    protected static function myVarExport($array, $return = false, $lvl=0)
+    protected static function myVarExport($array, $return = false, $indent = 0, $inner = false)
     {
         // Common output variables
-        $indent      = '  ';
+        $strIndent      = str_repeat(" ", $indent);
+        $strInnerIndent = str_repeat(" ", $indent + 4);
         $doublearrow = ' => ';
         $lineend     = ",\n";
         $stringdelim = '\'';
 
         // Check the export isn't a simple string / int
-        if (is_object($array) && is_a($array, 'Ac_Cg_Php_Expression')) {
+        if (is_object($array) && $array instanceof Ac_I_PhpExpression) {
             $out = $array->getExpression();
         } elseif (is_string($array)) {
             if (strpos($array, "\n")) {
                 $out = '"'.addcslashes($array, "\\\"\n").'"';
             } else {
-                $out = $stringdelim . str_replace('\'', '\\\'', str_replace('\\', '\\\\', $array)) . $stringdelim;
+                $out = $stringdelim . addcslashes($array, "\\'") . $stringdelim;
             }
         } elseif (is_int($array) || is_float($array)) {
             $out = (string)$array;
@@ -54,30 +57,43 @@ abstract class Ac_Util_Php {
             $out = 'NULL';
         } elseif (is_resource($array)) {
             $out = 'resource';
+        } elseif (!count($array)) {
+            $out = 'array()';
         } else {
             // Begin the array export
             // Start the string
-            $out = "array (\n";
+            
+            $out = "";
+            
+            //if (!$inner) $out .= $strIndent;
+            $out .= "array (\n";
 
             // Loop through each value in array
             foreach ($array as $key => $value) {
-                // If the key is a string, delimit it
-                if (is_string($key)) {
-                    $key = str_replace('\'', '\\\'', str_replace('\\', '\\\\', $key));
-                    $key = $stringdelim . $key . $stringdelim;
+
+                if (is_object($value) && $value instanceof Ac_I_PhpExpression_Extended) {
+         
+                    $out .= "\n".$value->export($key, $indent + 4).$lineend;
+                        
+                } else {
+                    
+                    $val = self::myVarExport($value, true, $indent + 4, true);
+
+                    // Piece together the line
+                    $out .= $strInnerIndent;
+
+                    // If the key is a string, delimit it
+                    if (!is_numeric($key)) {
+                        $key = addcslashes($key, "\\'");
+                        $key = $stringdelim . $key . $stringdelim;
+                    }
+
+                    $out .= $key . $doublearrow . $val . $lineend;
                 }
-
-                $val = self::myVarExport($value, true, $lvl+1);
-
-                // Piece together the line
-                for ($i = 0; $i <= $lvl; $i++)
-                    $out .= $indent;
-                $out .= $key . $doublearrow . $val . $lineend;
             }
 
             // End our string
-            for ($i = 0; $i < $lvl; $i++)
-                $out .= $indent;
+            $out .= $strIndent;
             $out .= ")";
         }
 
@@ -90,17 +106,23 @@ abstract class Ac_Util_Php {
         }
     }
     
+    
     /**
      * Returns code for initializing given PHP array
      */
-    static function exportArray($foo, $indent = 0, $withNumericKeys = false, $oneLine = false, $return = false) {
-        $vx = self::myVarExport($foo, 1);
-        $vx = preg_replace("/=> \n([ ]+)array \\(/", "=> array (\\1", $vx);
-        $vx = preg_replace_callback("/\n([ ]*)/", array('Ac_Util_Php', 'replaceIndent'), $vx);
-        if ($indent) {
-            $ind = str_repeat(" ", $indent);
-            $vx = preg_replace("/\n/", "\n".$ind, $vx);
+    static function exportArray($foo, $indent = 0, $withNumericKeys = false, $oneLine = null, $return = false) {
+        if (is_null($oneLine)) {
+            $oneLine = true;
+            foreach ($foo as $key => $item) {
+                if (!is_numeric($key) || !is_scalar($item) && !is_null($item)) {
+                    $oneLine = false;
+                    break;
+                }
+            }
         }
+        $vx = self::myVarExport($foo, 1, $indent);
+        $vx = preg_replace("/=> \n([ ]+)array \\(/", "=> array (\\1", $vx);
+        //$vx = preg_replace_callback("/\n([ ]*)/", array('Ac_Util_Php', 'replaceIndent'), $vx);
         if (!$withNumericKeys) $vx = preg_replace ("/(\n[ ]+)\\d+=>/", "\\1", $vx);
         if ($oneLine) {
             $vx = preg_replace("/\n[ ]*/", " ", $vx);

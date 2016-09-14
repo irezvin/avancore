@@ -242,7 +242,7 @@ class HTMLPurifier_Lexer
     }
 
     /**
-     * Callback function for escapeCDATA() that does the work.
+     * Callback function __construct escapeCDATA() that does the work.
      *
      * @warning Though this is public in order to let the callback happen,
      *          calling it directly is not recommended.

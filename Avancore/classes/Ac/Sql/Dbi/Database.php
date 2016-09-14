@@ -20,8 +20,8 @@ class Ac_Sql_Dbi_Database extends Ac_Sql_Dbi_Object {
      */
     var $_extras = array();
 
-    function Ac_Sql_Dbi_Database($inspector, $name, $tablePrefix = false, $replacePrefixWith = '#__', $extras = array()) {
-        parent::Ac_Sql_Dbi_Object($inspector, $name);
+    function __construct($inspector, $name, $tablePrefix = false, $replacePrefixWith = '#__', $extras = array()) {
+        parent::__construct($inspector, $name);
         $this->name = $name;
         $this->tablePrefix = $tablePrefix;
         $this->replacePrefixWith = $replacePrefixWith;

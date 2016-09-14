@@ -47,6 +47,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
     
     var $relationOverrides = array();
     var $associationOverrides = array();
+    var $relationProviderOverrides = array();
     
     /**
      * @var Ac_Cg_Model_Relation
@@ -212,13 +213,6 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         if (!strlen($res))
             $res = $this->getOtherEntityName(!$this->isList() || $forceSingle);
         if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
-        
-        if (strlen($this->otherModelIdInMethodsPrefix) && $this->_model instanceof Ac_Cg_Model_Part) {
-            //ini_set('html_errors', 1);
-            //var_dump('!'.$this->name.' '.$this->_model->name.' '.$this->otherModelIdInMethodsPrefix);
-            $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);        
-        }
-        
         return $res;
     }
     
@@ -278,7 +272,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         return $res;
     }
     
-    function getAeModelRelationPrototype() {
+    function computeRelationData() {
         $res = array();
         $res['srcMapperClass'] = $this->_model->getMapperClass();
         $res['destMapperClass'] = $this->_other->getMapperClass();
@@ -290,7 +284,9 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             $res['destVarName'] = $mirrorProp->getClassMemberName();
             if ($cmn  = $mirrorProp->getCountMemberName()) $res['destCountVarName'] = $cmn;
             if ($cmn  = $mirrorProp->getLoadedMemberName()) $res['destLoadedVarName'] = $cmn;
-            if ($this->isManyToMany()) $res['destNNIdsVarName'] = $mirrorProp->getIdsMemberName();
+            if ($this->isManyToMany()) {
+                $res['destNNIdsVarName'] = $mirrorProp->getIdsMemberName();
+            }
         }
         if ($this->isIncoming) {
             $res['fieldLinks'] = array_flip($this->_rel->columns);
@@ -301,6 +297,18 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             $res['srcIsUnique'] = $this->_rel->isThisRecordUnique();
             $res['destIsUnique'] = $this->_rel->isOtherRecordUnique();
             $res['srcOutgoing'] = true;
+        }
+        if ($this->isManyToMany()) {
+            $mem = $this->getIdsMemberName();
+            if (strlen ($mem)) {
+                $res['srcLoadNNIdsMethod'] = array(true, "load".ucfirst(preg_replace("/^_/", "", $mem))."For");
+            }
+            if ($mp = $this->getMirrorProperty()) {
+                $mem = $mp->getIdsMemberName();
+                if (strlen($mem)) {
+                    $res['destLoadNNIdsMethod'] = array(true, "load".ucfirst(preg_replace("/^_/", "", $mem))."For");
+                }
+            }
         }
         if ($this->_otherRel) {
             if ($this->isIncoming) {
@@ -318,16 +326,19 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             }
             
             // workaround for many-to-many relations
-            // TODO: figure why srcIsUnique and destIsUnique are true 
+            // TODO: figure why srcIsUnique and destIsUnique are true
             if (isset($res['midTableName']) && strlen($res['midTableName'])) {
                 $res['srcIsUnique'] = false;
                 $res['destIsUnique'] = false;
             }
         }
-        
-        if (is_array($this->relationOverrides)) 
+        return $res;
+    }
+    
+    function getAeModelRelationPrototype() {
+        $res = $this->computeRelationData();
+        if (is_array($this->relationOverrides))
             Ac_Util::ms($res, $this->relationOverrides);
-         
         return $res;
     }
     
@@ -367,7 +378,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
             if (strlen($this->otherModelIdInMethodsSingle)) 
                 $res = $this->otherModelIdInMethodsSingle.'Ids';
             else $res = $this->getOtherEntityName(true).'Ids';
-            if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);
+            if (strlen($this->otherModelIdInMethodsPrefix)) $res = $this->otherModelIdInMethodsPrefix.ucfirst($res);        
         } else $res = false;
         return $res;
     }
@@ -421,7 +432,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
                     //'caption' => $this->_other->pluralCaption,
                     'controlType' => 'selectList',
                     'values' => array(
-                        'class' => 'Ac_Model_Values_Records',
+                        'class' => 'Ac_Model_Values_Mapper',
                         'mapperClass' => $this->_other->getMapperClass(),
                     ),
                     'showInTable' => false,
@@ -433,6 +444,7 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         }
         $relation = $this->modelRelation;
         if ($relation) {
+            //var_dump($relation);
             $prot = $this->_model->getAeModelRelationPrototype($relation);
             if (isset($prot['srcVarName'])) {
                 if ($many) {
@@ -501,6 +513,36 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         
         if (is_array($this->associationOverrides))
             Ac_Util::ms($res, $this->associationOverrides);
+        
+        return $res;
+    }
+    
+    function getRelationProviderPrototype() {
+        $rel = $this->computeRelationData();
+        $res = array(); // by default return nothing
+        $links = isset($rel['fieldLinks2'])? $rel['fieldLinks2'] : $rel['fieldLinks'];
+        
+        // study the relation structure
+        
+        $right = array_values($links);
+        $rightPk = $this->_other->tableObject->listPkFields();
+
+        $rightIsSingle = count($right) == 1;
+        $rightMatchesPk = !array_diff($right, $rightPk) && count($right) == count($rightPk);
+        $hasMidTable = isset($rel['midTableName']) && strlen($rel['midTableName']);
+        
+        // now let's produce providers
+        if ($hasMidTable) {
+            if ($rightMatchesPk) {
+                $res = array(
+                    'class' => 'Ac_Model_Relation_Provider_Sql_NN_Pk',
+//                    ''
+                );
+            } elseif ($rightIsSingle) {
+            } else {
+                
+            }
+        }
         
         return $res;
     }
@@ -579,6 +621,40 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
         }
         if (isset($array['_otherRel'])) $this->_otherRel = $this->unrefRelation($array['_otherRel']);
     }
+    
+    function applyToSqlSelectPrototype(array & $prototype) {
+        $rd = $this->computeRelationData();
+        if ($this->isManyToMany()) {
+            if (isset($rd['midTableName']) && $rd['midTableName'] && isset($rd['fieldLinks2']) && count($rd['fieldLinks2'])) {
+                if (isset($rd['srcNNIdsVarName']) && $rd['srcNNIdsVarName']) {
+                    $critName = preg_replace('/^_/', '', $rd['srcNNIdsVarName']);
+                    $midTableAlias = 'mid__'.preg_replace('/^_/', '', $this->getClassMemberName());
+                    $srcCols = array_values($rd['fieldLinks']);
+                    $destCols = array_keys($rd['fieldLinks2']);
+                    $tableKeys = array_values($rd['fieldLinks2']);
+                    if (count($srcCols) == 1 && count($tableKeys) == 1) {
+                        $proto = array(
+                            'class' => 'Ac_Sql_Filter_NNCriterion_Simple',
+                            'midSrcKey' => $srcCols[0],
+                            'midDestKey' => $destCols[0],
+                            'tableKey' => $tableKeys[0],
+                        );
+                    } else {
+                        $proto = array(
+                            'class' => 'Ac_Sql_Filter_NNCriterion_Omni',
+                            'midSrcKeys' => $srcCols,
+                            'midDestKeys' => $destCols,
+                            'tableKeys' => $tableKeys,
+                        );
+                    }
+                    $proto['midTableAlias'] = $midTableAlias;
+                    $prototype['parts'][$critName] = $proto;
+                }
+            }
+            
+        }
+    }
+    
     
 }
 

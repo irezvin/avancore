@@ -26,11 +26,21 @@ class Child_Relation_Type_Base_Object extends Sample_Relation_Type {
     
     
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'relations' => array (
                 'className' => 'Child_Relation',
                 'mapperClass' => 'Child_Relation_Mapper',
+                'caption' => 'Relations',
+            ),
+            'relationTypeId' => array (
+                'caption' => 'Relation Type Id',
+            ),
+            'title' => array (
+                'caption' => 'Title',
+            ),
+            'isSymmetrical' => array (
+                'caption' => 'Is Symmetrical',
             ),
         );
     
@@ -66,8 +76,8 @@ class Child_Relation_Type_Base_Object extends Sample_Relation_Type {
     /**
      * @return Child_Relation  
      */
-    function createRelation($values = array(), $isReference = false) {
-        return parent::createRelation($values, $isReference);
+    function createRelation($values = array()) {
+        return parent::createRelation($values);
     }
 
     

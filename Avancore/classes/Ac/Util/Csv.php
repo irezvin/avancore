@@ -84,6 +84,7 @@ class Ac_Util_Csv extends Ac_Prototyped {
     }
     
     function pushLine($line) {
+        $res = false;
         $data = $this->decodeLine($line, $this->prevLine);
         if ($data === false && $this->multiline) return;
         $skip = false;
@@ -94,7 +95,7 @@ class Ac_Util_Csv extends Ac_Prototyped {
             } else {
                 $this->header = array();
             }
-            $this->result = array();
+            if ($this->result === false) $this->result = array();
         }
         if (!$skip) {
             $r = array();
@@ -103,7 +104,9 @@ class Ac_Util_Csv extends Ac_Prototyped {
                 $r[$k] = $v;
             }
             $this->result[] = $r;
+            $res = $r;
         }
+        return $res;
     }
     
     function reset() {

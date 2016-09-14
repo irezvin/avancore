@@ -34,6 +34,16 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     
     var $objectPropertiesPrefix = false;
     
+    var $mapperMixableExtra = array();
+    
+    /**
+     * Prototype overrides for different models' mapper mixins
+     * @var array ($otherModelNameOrRelationName => array($mapperMixableExtras)
+     */
+    var $perModelMapperMixableExtras = array();
+    
+    var $objectTypeField = false;
+    
     /**
      * @var Ac_Cg_Model
      */
@@ -81,7 +91,9 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     }
     
     function getTemplates() {
-        return array('Ac_Cg_Template_ModelPart');
+        return array(
+            'modelAndMapper' => 'Ac_Cg_Template_ModelPart',
+        );
     }
     
     function getGenModelClass() {
@@ -134,9 +146,13 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
                     $this->masterFkIds[] = $fkId;
                 }
             }
-            foreach ($parentModel->skipMapperMixables as $sm) {
-                if (!in_array($sm, $this->skipMapperMixables))
-                    $this->skipMapperMixables[] = $sm;
+            if (is_array($parentModel->skipMapperMixables)) {
+                foreach ($parentModel->skipMapperMixables as $sm) {
+                    if (!in_array($sm, $this->skipMapperMixables))
+                        $this->skipMapperMixables[] = $sm;
+                }
+            } else {
+                $this->skipMapperMixables = true;
             }
             
             if ($this->parentExtraTableClass === 'Ac_Model_Mapper_Mixable_ExtraTable') {
@@ -210,8 +226,8 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
             $prop->pluralForList = $prop->getDefaultPluralForList();
         }
 
-        // incoming associations are disabled at the moment
-        if ($other) {
+        // incoming associations that cannot be loaded using the Typer are disabled
+        if ($other && !$this->canUseTyperMixable()) {
             $other->enabled = false;
             $other->ignoreInDescendants = true;
         }
@@ -237,6 +253,13 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     
     function beforeGenerate() {
         parent::beforeGenerate();
+        
+        // add typer mixable if appropriate
+        if ($this->canUseTyperMixable()) {
+            $this->mapperCoreMixables['Ac_Model_Typer_Abstract'] = $this->getTyperMixablePrototype();
+            $this->mapperVars['identifierField'] = Ac_Cg_Member::prot(null);
+        }
+        
         // adjust relations
         foreach ($this->listProperties() as $i) {
             $prop = $this->getProperty($i);
@@ -247,6 +270,7 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
                 }
             }
         }
+        
         if ($this->skipMapperMixables !== true) {
             $skip = Ac_Util::toArray($this->skipMapperMixables);
             foreach ($this->masterProperties as $fkId => $propName) {
@@ -297,6 +321,17 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
             'class' => $this->getExtraTableClass(),
             'colMap' => $rel['fieldLinks'],
         );
+        $otherModel = $prop->getOtherModel();
+        if (isset($this->perModelMapperMixableExtras[$otherModel->name]) && 
+            is_array($this->perModelMapperMixableExtras[$otherModel->name])) {
+            Ac_Util::ms($res, $this->perModelMapperMixableExtras[$otherModel->name]);
+        }
+        if ($otherModel->name !== ($relName = $prop->getRelation()->name)) {
+            if (isset($this->perModelMapperMixableExtras[$relName]) && 
+                is_array($this->perModelMapperMixableExtras[$relName])) {
+                Ac_Util::ms($res, $this->perModelMapperMixableExtras[$relName]);
+            }
+        }
         return $res;
     }
     
@@ -311,6 +346,16 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
             $res['implMapper'] = $this->getMapperClass();
             unset($res['tableName']);
         }
+        if (strlen($this->objectTypeField)) {
+            $res['objectTypeField'] = $this->objectTypeField;
+        }
+        if ($this->mapperMixableExtra) 
+            Ac_Util::ms($res, $this->mapperMixableExtra);
+        
+        if (!$this->inline) {
+            $res['modelMixableId'] = $this->className;
+        }
+        
         return $res;
     }
     
@@ -337,6 +382,26 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
             $this->masterModelName = false;
         }
         foreach ($this->_properties as $p) $p->init();
+    }
+    
+    function canUseTyperMixable() {
+        return (!$this->isReferenced && $this->masterModel) || strlen($this->objectTypeField);
+    }
+    
+    function getTyperMixablePrototype() {
+        $res = false;
+        if ($this->canUseTyperMixable()) {
+            $res = array(
+                'class' => 'Ac_Model_Typer_ExtraTable',
+                'tableName' => $this->table,
+            );
+            if (!$this->isReferenced && $this->masterModel) {
+                $res['uniformTypeId'] = $this->masterModel->getMapperClass ();
+            } else {
+                $res['objectTypeField'] = $this->objectTypeField;
+            }
+        }
+        return $res;
     }
    
 }

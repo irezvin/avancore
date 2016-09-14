@@ -11,9 +11,20 @@ class Sample_Person extends Sample_Person_Base_Object {
     // override default value for testing purposes
     var $isSingle = 0;
     
+    function listOwnProperties() {
+        return array_merge(parent::listOwnProperties(), array('birthYear'));
+    }
+    
+    function getBirthYear() {
+        return Ac_Util::date($this->birthDate, 'Y');
+    }
+    
+    function setBirthYear() {
+    }
+    
     function __construct($mapperOrMapperClass = null) {
         parent::__construct($mapperOrMapperClass);
-        $this->instanceIf = self::$lastInstanceId++;
+        $this->instanceId = self::$lastInstanceId++;
     }
     
     function intResetReferences() {
@@ -21,6 +32,7 @@ class Sample_Person extends Sample_Person_Base_Object {
     }
     
     function __destruct() {
+        parent::__destruct();
         self::$destructed[$this->instanceId] = true;
     }
     

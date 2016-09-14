@@ -2,17 +2,28 @@
 
 class Sample_Relation_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_relationType = false;
-    public $_otherPerson = false;
-    public $_person = false;
-    public $relationId = NULL;
-    public $personId = 0;
-    public $otherPersonId = 0;
-    public $relationTypeId = 0;
-    public $relationBegin = NULL;
-    public $relationEnd = NULL;
-    public $notes = '';
+
+    var $_hasDefaults = true;
+
+    var $_relationType = false;
+
+    var $_otherPerson = false;
+
+    var $_person = false;
+
+    var $relationId = NULL;
+
+    var $personId = 0;
+
+    var $otherPersonId = 0;
+
+    var $relationTypeId = 0;
+
+    var $relationBegin = NULL;
+
+    var $relationEnd = NULL;
+
+    var $notes = '';
     
     var $_mapperClass = 'Sample_Relation_Mapper';
     
@@ -46,12 +57,12 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'relationType' => array (
                 'className' => 'Sample_Relation_Type',
                 'mapperClass' => 'Sample_Relation_Type_Mapper',
-                'caption' => 'Relation type',
+                'caption' => new Ac_Lang_String('sample_relation_relation_type'),
                 'relationId' => '_relationType',
                 'referenceVarName' => '_relationType',
             ),
@@ -60,7 +71,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsSingle' => 'otherPerson',
                 'otherModelIdInMethodsPlural' => 'otherPeople',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_relation_other_person'),
                 'relationId' => '_otherPerson',
                 'referenceVarName' => '_otherPerson',
             ),
@@ -69,7 +80,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsSingle' => 'person',
                 'otherModelIdInMethodsPlural' => 'people',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_relation_person'),
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
             ),
@@ -79,46 +90,46 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Relation Id',
+                'caption' => new Ac_Lang_String('sample_relation_relation_id'),
             ),
             'personId' => array (
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'objectPropertyName' => 'person',
-                'caption' => 'Person Id',
+                'caption' => new Ac_Lang_String('sample_relation_person_id'),
             ),
             'otherPersonId' => array (
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'objectPropertyName' => 'otherPerson',
-                'caption' => 'Other Person Id',
+                'caption' => new Ac_Lang_String('sample_relation_other_person_id'),
             ),
             'relationTypeId' => array (
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Relation_Type_Mapper',
                 ),
                 'objectPropertyName' => 'relationType',
-                'caption' => 'Relation Type Id',
+                'caption' => new Ac_Lang_String('sample_relation_relation_type_id'),
             ),
             'relationBegin' => array (
                 'dataType' => 'dateTime',
                 'controlType' => 'dateInput',
                 'isNullable' => true,
-                'caption' => 'Relation Begin',
+                'caption' => new Ac_Lang_String('sample_relation_relation_begin'),
                 'internalDateFormat' => 'Y-m-d H:i:s',
                 'outputDateFormat' => 'Y-m-d H:i:s',
             ),
@@ -126,13 +137,13 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'dataType' => 'dateTime',
                 'controlType' => 'dateInput',
                 'isNullable' => true,
-                'caption' => 'Relation End',
+                'caption' => new Ac_Lang_String('sample_relation_relation_end'),
                 'internalDateFormat' => 'Y-m-d H:i:s',
                 'outputDateFormat' => 'Y-m-d H:i:s',
             ),
             'notes' => array (
                 'controlType' => 'textArea',
-                'caption' => 'Notes',
+                'caption' => new Ac_Lang_String('sample_relation_notes'),
             ),
         );
     
@@ -142,8 +153,6 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
         
     
     /**
@@ -178,11 +187,10 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Relation_Type  
      */
-    function createRelationType($values = array(), $isReference = false) {
+    function createRelationType($values = array()) {
         $m = $this->getMapper('Sample_Relation_Type_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setRelationType($res);
         return $res;
     }
@@ -222,11 +230,10 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createOtherPerson($values = array(), $isReference = false) {
+    function createOtherPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setOtherPerson($res);
         return $res;
     }
@@ -266,11 +273,10 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
+    function createPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPerson($res);
         return $res;
     }

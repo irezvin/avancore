@@ -23,7 +23,7 @@ class Ac_Table_Column_Checked extends Ac_Table_Column {
         return $res;
     }
     
-    function getData($record, $rowNo) {
+    function getData($record, $rowNo, $fieldName = null) {
         $id = parent::getData($record, $rowNo, $this->getIdPropName());
         $res = $this->getIdBox ($rowNo, $id);  
         

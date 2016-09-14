@@ -64,9 +64,13 @@ class Ac_Cg_Model extends Ac_Cg_Base {
      */    
     var $parentMapperClassName = false;
     
+    var $parentStorageClassName = false;
+    
     var $parentClassIsAbstract = false;
     
     var $parentMapperIsAbstract = false;
+    
+    var $parentStorageIsAbstract = false;
     
     var $parentFinderClassName = false;
     
@@ -76,12 +80,6 @@ class Ac_Cg_Model extends Ac_Cg_Base {
      * @var array User-specified property settings
      */
     var $properties = array();
-    
-    /**
-     * Whether Ac_Model_Object should track it's changes (and it's trackChanges() function should return true)
-     * @var bool
-     */
-    var $tracksChanges = false;
     
     var $fixMapperMethodNames = false;
     
@@ -100,11 +98,15 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     
     var $createAccessors = false;
     
-    var $nullableSqlColumns = false;
+    var $nullableColumns = false;
+    
+    var $mapperVars = array();
     
     protected $relationPrototypes = false;
     
     protected $assocProperties = false;
+    
+    protected $sqlSelectPrototype = false;
 
     // ---------------------------------------------------------------------
     
@@ -186,8 +188,6 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     var $modelCoreMixables = array();
     
     var $mapperCoreMixables = array();
-    
-    var $noUi = true;
     
     /**
      * Null or empty string - force NO parent model
@@ -307,6 +307,26 @@ class Ac_Cg_Model extends Ac_Cg_Base {
                 }
             }
         }
+        if (!strlen($this->titleProp) && $this->_domain->autoDetectTitles) {
+            $titleCol = false;
+            
+            // search for first char/varchar column with length > 1, 
+            // but prefer unique index char/varchar if found later
+            
+            foreach ($this->tableObject->listColumns() as $i) { $col = $this->tableObject->getColumn($i);
+                if (in_array(strtolower($col->type), array('char', 'varchar')) && $col->width > 1) {
+                    if ($col->isUnique()) {
+                        $titleCol = $col->name;
+                        break;
+                    } elseif ($titleCol === false) {
+                        $titleCol = $col->name;
+                    }
+                }
+            }
+            
+            if (strlen($titleCol)) $this->titleProp = $titleCol;
+            
+        }
     }
     
     function getModelBaseName() {
@@ -326,8 +346,7 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         if (($pm = $this->getParentModel())) {
             $res = $pm->className;
         } else {
-            if (count($this->tableObject->listPkFields()) == 1) $res = 'Ac_Model_Object';
-                else $res = 'Ac_Model_CpkObject'; 
+            $res = 'Ac_Model_Object';
         }
         return $res;
     }
@@ -414,12 +433,13 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         if (!$this->className) $this->className = $this->getDefaultClassName();
         if (!$this->parentClassName) $this->parentClassName = $this->getDefaultParentClassName();
         if (!$this->parentMapperClassName) $this->parentMapperClassName = $this->getDefaultParentMapperClassName();
+        if (!$this->parentStorageClassName) $this->parentStorageClassName = $this->getDefaultParentStorageClassName();
         
-        if ($this->nullableSqlColumns === false) {
-            $this->nullableSqlColumns = array();
+        if ($this->nullableColumns === false) {
+            $this->nullableColumns = array();
             foreach ($this->listUsedColumns() as $i) {
                 $col = $this->tableObject->getColumn($i);
-                if ($col->nullable) $this->nullableSqlColumns[] = $i;
+                if ($col->nullable) $this->nullableColumns[] = $i;
             }
         }
         
@@ -626,6 +646,16 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         return $this->assocProperties;
     }
     
+    function getSqlSelectPrototype() {
+        if ($this->sqlSelectPrototype === false) {
+            $this->sqlSelectPrototype = array();
+            foreach ($this->listProperties() as $i) {
+                $this->getProperty($i)->applyToSqlSelectPrototype($this->sqlSelectPrototype);
+            }
+        }
+        return $this->sqlSelectPrototype;
+    }
+    
     /**
      * @return array|false
      */
@@ -679,8 +709,16 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         return $this->className.'_Base_Mapper';
     }
     
+    function getGenStorageClass() {
+        return $this->className.'_Base_Storage';
+    }
+    
     function getMapperClass() {
         return $this->className.'_Mapper';
+    }
+    
+    function getStorageClass() {
+        return $this->className.'_Storage';
     }
     
     function getMapperRecordClass() {
@@ -704,10 +742,17 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     function getDefaultParentMapperClassName() {
         if ($pm = $this->getParentModel()) {
             $res = $pm->getMapperClass();
-        } elseif (count($this->tableObject->listPkFields()) == 1) {
-            $res = 'Ac_Model_Mapper';
         } else {
-            $res = 'Ac_Model_CpkMapper'; 
+            $res = 'Ac_Model_Mapper';
+        }
+        return $res;
+    }
+    
+    function getDefaultParentStorageClassName() {
+        if ($pm = $this->getParentModel()) {
+            $res = $pm->getStorageClass();
+        } else {
+            $res = 'Ac_Model_Storage_MonoTable';
         }
         return $res;
     }
@@ -896,8 +941,25 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         return $res;
     }
     
+    function getRelationProviderPrototypes() {
+        $res = array();
+        foreach ($this->listProperties() as $p) {
+            $prop = $this->getProperty($p);
+            if ($prop instanceof Ac_Cg_Property_Object && $prop->isEnabled()) {
+                if ($prop->modelRelation && $prop->modelRelation->createRelationObject) {
+                    if ($proto = $prop->getRelationProviderPrototype()) {
+                        $res[$prop->varName] = $proto;
+                    }
+                }
+            }
+        }
+        return $res;
+    }
+        
     function getTemplates() {
-        return array('Ac_Cg_Template_ModelAndMapper');
+        return array(
+            'modelAndMapper' => 'Ac_Cg_Template_ModelAndMapper'
+        );
     }
     
     /**

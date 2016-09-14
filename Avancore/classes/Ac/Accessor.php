@@ -188,8 +188,10 @@ class Ac_Accessor implements Ac_I_Accessor {
                 $res = call_user_func_array(array($item, $g), $args); 
             } elseif ($item instanceof Ac_Model_Data && $item->hasProperty($propertyName)) {
                 $pi = $item->getPropertyInfo($propertyName, true);
-                if ($pi->assocClass) $res = $item->getAssoc($propertyName);              
-                    else $res = $item->getField($propertyName);
+                if ($pi->assocClass) {
+                    $res = $item->getAssoc($propertyName);              
+                }
+                else $res = $item->getField($propertyName);
             } elseif ($item instanceof Ac_I_Accessor) {
                 if ($item->hasProperty($propertyName)) $res = $item->getProperty($propertyName);
                 else $res = $defaultValue;

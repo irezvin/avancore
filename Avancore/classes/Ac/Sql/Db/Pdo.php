@@ -14,20 +14,56 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     
     protected $dbPrefix = false;
     
+    protected $dbName = false;
+    
     protected $returnsLastInsertId = false;
     
     protected $throwExceptions = true;
     
     protected $affectedRows = false;
     
+    static function arrayToDsn(array $arr) {
+        $res = '';
+        $schema = '';
+        foreach($arr as $k => $v) {
+            if ($k == 'schema') $schema = $v;
+            else $res.= ";{$k}={$v}";
+        }
+        $res = ltrim($res, ';');
+        if (strlen($schema)) $res = "{$schema}:".$res;
+        return $res;
+    }
+    
+    /**
+     * @return array
+     */
+    static function parseDsn($dsn) {
+        $items = preg_split('/;/', trim($dsn), -1, PREG_SPLIT_NO_EMPTY);
+        $schema = false;
+        if (isset($items[0])) {
+            $first = explode(':', $items[0], 2);
+            if (isset($first[1])) {
+                $schema = $first[0];
+                $items[0] = $first[1];
+            }
+        }
+        $res = array();
+        if ($schema !== false) $res['schema'] = $schema;
+        foreach ($items as $item) {
+            $kv = explode('=', $item, 2);
+            $kv[] = '';
+            $res[$kv[0]] = $kv[1];
+        }
+        return $res;
+    }
+    
     function __construct($pdo, Ac_Sql_Dialect $dialect = null) {
-        
         if (is_array($pdo) && array_key_exists('pdo', $pdo) && func_num_args() == 1) { // Ac_Prototyped style init
             $proto = $pdo;
             parent::initFromPrototype($proto);
         } else {
             $this->setPdo($pdo);
-            $this->dialect = $dialect;
+            if (!is_null($dialect)) $this->dialect = $dialect;
         }
         
         if (is_null($dialect)) {
@@ -61,14 +97,27 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     }
     
     function setDbName($dbName) {
-        return $this->query("USE ".$this->n($dbName));
+        if ($this->pdo && $this->getDialect()) {
+            $this->dbName = false;
+            return $this->query("USE ".$this->n($dbName));
+        } else {
+            $this->dbName = $dbName;
+            return true;
+        }
+    }
+    
+    protected $pdoPrototype = false;
+    
+    function hasPdoPrototype() {
+        return is_array($this->pdoPrototype);
     }
     
     protected function setPdo($pdo) {
         if (is_array($pdo)) {
+            if (is_array($pdo['dsn'])) $pdo['dsn'] = self::arrayToDsn($pdo['dsn']);
+            $this->pdoPrototype = $pdo;
             $pdoParams = $pdo;
             $rc = new ReflectionClass('PDO');
-            $params = array();
             $badParams = array_diff(array_keys($pdoParams), array('dsn', 'username', 'password', 'driver_options'));
             if ($badParams) throw new Exception("Disallowed key(s) '".implode("', '", $badParams)
                     ."' in array argument \$pdo,  accepted keys are: 'dsn', 'username', 'password', 'driver_options'");
@@ -83,8 +132,10 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
             $pdo = $rc->newInstanceArgs($args);
         } else {
             if (!$pdo instanceof PDO) throw new Exception("Only array or PDO instance are accepted as \$pdo argument");
+            $this->pdoPrototype = false;
         }
         $this->pdo = $pdo;
+        if ($this->dbName && $this->getDialect()) $this->setDbName ($this->dbName);
     }
     
     /**
@@ -241,6 +292,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
         if ($this->dialect !== false) throw new Exception("Can setDialect() only once!");
         $this->dialect = $dialect;
         $this->returnsLastInsertId = $dialect->returnsLastInsertId();
+        if ($this->dbName && $this->getDialect()) $this->setDbName ($this->dbName);
     }
 
     /**
@@ -303,5 +355,10 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
         return $this->affectedRows;
     }
     
+    function __clone() {
+        if ($this->hasPdoPrototype()) {
+            $this->setPdo($this->pdoPrototype);
+        }
+    }
     
 }

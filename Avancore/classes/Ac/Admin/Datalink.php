@@ -29,7 +29,7 @@ class Ac_Admin_Datalink {
        return $res; 
    }
    
-   function Ac_Admin_Datalink($params = array()) {
+   function __construct($params = array()) {
        Ac_Util::simpleBind($params, $this);
    }
    
@@ -99,18 +99,7 @@ class Ac_Admin_Datalink {
     *
     * @return string|bool
     */
-   function getSqlCriteria() {
-       return false;
-   }
-   
-   /**
-    * Returns extra joins that _always_ are applied to the SQL statements used to select records for
-    * processing or displayed in the list. Should return FALSE if no such joins should be added.
-    * This method is intended to be used in connection with getSqlCriteria() one. 
-    *
-    * @return string|bool
-    */
-   function getSqlExtraJoins() {
+   function getQueryPart() {
        return false;
    }
    

@@ -8,6 +8,13 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
     
     static $strictParams = true;
     
+    /**
+     * Whether to count number of __construct and __destruct calls
+     * Provide TRUE or array with class names to monitor
+     * @var bool|array
+     */
+    static $countInstances = false;
+    
     public static $factoryOnceInstances = array();
 
     function hasPublicVars() {
@@ -15,7 +22,16 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
     }
     
     function __construct (array $prototype = array()) {
+        if (self::$countInstances) {
+            Ac_Debug::reportConstruct($this, self::$countInstances);
+        }
         $this->initFromPrototype($prototype);
+    }
+    
+    function __destruct() {
+        if (self::$countInstances) {
+            Ac_Debug::reportDestruct($this, self::$countInstances);
+        }
     }
     
     protected function initFromPrototype(array $prototype = array(), $strictParams = null) {
@@ -176,8 +192,11 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
 		                if (!is_null($resArray)) $resArray[$collectionKey] = $item;
 			            if ($keyToCollection !== false) $collectionKey = Ac_Accessor::getObjectProperty($item, $keyToCollection, $k, $strictParams);
 			                else $collectionKey = $k;
-                        if ($setObjectPropertiesToDefaults) 
-                            Ac_Accessor::setObjectProperty($item, $defaults, null, $strictParams);
+                        if ($setObjectPropertiesToDefaults) {
+                            $tmp = $defaults;
+                            unset($tmp['class']);
+                            Ac_Accessor::setObjectProperty($item, $tmp, null, $strictParams);
+                        }
 			            $res[$collectionKey] = $item;
                     }
                 }

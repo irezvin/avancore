@@ -2,7 +2,7 @@
 
 class Ac_Legacy_Session {
 
-    function Ac_Legacy_Session() {
+    function __construct() {
         trigger_error ('Attempt to instantiate abstract class', E_USER_ERROR);
     }
     

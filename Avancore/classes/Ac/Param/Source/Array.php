@@ -36,7 +36,7 @@ class Ac_Param_Source_Array extends Ac_Prototyped implements Ac_I_Param_Destinat
     }
     
     function setParamValue(array $path, $value) {
-        Ac_Util::simpleSetArrayByPath($this->data, $path, $value);
+        Ac_Util::setArrayByPathRef($this->data, $path, $value);
     }
     
     function deleteParamValue(array $path) {

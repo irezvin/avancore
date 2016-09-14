@@ -56,7 +56,7 @@ if(!class_exists('FirePHP')) {
  * @return true
  * @throws Exception
  */
-function fb()
+function __construct()
 {
     $instance = FirePHP::getInstance(true);
   

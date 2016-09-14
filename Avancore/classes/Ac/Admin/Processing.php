@@ -54,14 +54,14 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     var $_records = false;
     
     /**
-     * @var Ac_Model_Collection
+     * @var Ac_Legacy_Collection
      */
     var $_recordsCollection = false;
     
     /**
      * @var array|false
      */
-    var $_recordKeys = false;
+    var $_recordIdentifiers = false;
     
     /**
      * @var string|false
@@ -171,7 +171,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     // ------------------------------ record access ------------------------------
 
     function setNoRecords() {
-        $this->_records = $this->_recordsCollection = $this->_recordKeys = $this->_mapperClass = false;
+        $this->_records = $this->_recordsCollection = $this->_recordIdentifiers = $this->_mapperClass = false;
         $this->_noRecords = true;
         $this->_extRecords = true;
     }
@@ -180,7 +180,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
         $this->setNoRecords();
         $this->_noRecords = false;
         if ($mapperClass !== false) $this->_mapperClass = $mapperClass;
-        $this->_recordKeys = $recordKeys;
+        $this->_recordIdentifiers = $recordKeys;
     }
     
     function setRecords($records = array()) {
@@ -204,30 +204,26 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     
     /**
      * Returns record source that will actually be used to access records 
-     * @return Ac_Model_Collection
+     * @return Ac_Model_Collection_Abstract
      */
     function _doGetRecordsCollection() {
         if ($this->_recordsCollection === false) {
-            if (!$this->_extRecords) $this->_recordKeys = $this->_getRecordKeysFromRequest();
-            if ($this->_noRecords || ($this->defaultToAllRecords == self::DEFAULT_RECORDS_NONE && is_array($this->_recordKeys) && !count($this->_recordKeys))) $this->_records = array();
+            if (!$this->_extRecords) $this->_recordIdentifiers = $this->_getIdentifiersFromRequest();
+            if ($this->_noRecords || ($this->defaultToAllRecords == self::DEFAULT_RECORDS_NONE && is_array($this->_recordIdentifiers) && !count($this->_recordIdentifiers))) $this->_records = array();
             if (!$this->_recordsCollection) {
-                if ($this->defaultToAllRecords == self::DEFAULT_RECORDS_BY_FILTERS) {
-                    $this->_recordsCollection = clone $this->manager->getRecordsCollection ($this->manager->mapperClass);
-                } else {
-                    $this->_recordsCollection = new Ac_Model_Collection();
-                    $this->_recordsCollection->setDatabase($this->application->getDb());
-                }
-                // Most straightforward way
                 if (is_array($this->_records)) {
-                    $this->_recordsCollection->setRecords($this->_records);
-                } elseif (is_array($this->_recordKeys) && $this->_recordKeys) {
-                    $this->_getMapper();
-                    $this->_recordsCollection->setKeys($this->_recordKeys, $this->_mapperClass);
-                    $this->_applyDatalinkToCollection();
+                    $this->_recordsCollection = new Ac_Model_Collection_Array(array('items' => $this->_records));
                 } else {
-                    $this->_getMapper();
-                    $this->_recordsCollection->useMapper($this->_mapperClass);
-                    $this->_applyDatalinkToCollection();
+                    if ($this->defaultToAllRecords == self::DEFAULT_RECORDS_BY_FILTERS) {
+                        $this->_recordsCollection = clone $this->manager->getRecordsCollection ($this->manager->mapperClass);
+                    } else {
+                        $this->_recordsCollection = $this->manager->createBareCollection();
+                    }
+                    // Filter to selected records, if applicable
+                    if (is_array($this->_recordIdentifiers) && $this->_recordIdentifiers) {
+                        $this->_recordsCollection->setKeys($this->_recordIdentifiers, $this->_mapperClass);
+                        $this->_applyDatalinkToCollection();
+                    }
                 }
             }
         }
@@ -246,20 +242,11 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
         return $this->_mapper;
     }
     
-    function _getRecordKeysFromRequest() {
+    function _getIdentifiersFromRequest() {
         $res = array();
         if (isset($this->_rqWithState['keys']) && is_array($this->_rqWithState['keys'])) {
             $mapper = $this->_getMapper();
-            $pkl = count($mapper->listPkFields());
-            foreach ($this->_rqWithState['keys'] as $key) {
-                if (is_string($key)) {
-                    if ($pkl === 1) $res[] = $key;
-                    else {
-                        $u = @unserialize($key);
-                        if (($u !== false) && is_array($u) && (count($u) === $pkl)) $res[] = $u;
-                    }
-                }
-            }
+            $res = array_unique($this->_rqWithState['keys']);
         }
         return $res;
     }
@@ -312,9 +299,9 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
         elseif ($record->hasProperty('title') && ($p = $record->getPropertyInfo('title')) && !$p->assocClass && !$p->plural) 
             $title = $record->getField('title');
         else $title = false;
-        if (is_a($record, 'Ac_Model_Object')) $key = $record->getPrimaryKey();
-            else $key = false; 
-        $e = new Ac_Admin_ReportEntry($description, $type, $dateTime, $key, $title, $isAvailable && $key !== false);
+        if (is_a($record, 'Ac_Model_Object')) $id = $record->getPrimaryKey();
+            else $id = false; 
+        $e = new Ac_Admin_ReportEntry($description, $type, $dateTime, $id, $title, $isAvailable && $id !== false);
         $this->addToReport($e);
     }
     

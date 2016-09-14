@@ -54,7 +54,7 @@ class Ac_Admin_Action {
         return $res;
     }
     
-    function Ac_Admin_Action ($options) {
+    function __construct ($options) {
         if (isset($options['manager'])) $this->setManager($options['manager']);
         Ac_Util::simpleBind($options, $this);
     }

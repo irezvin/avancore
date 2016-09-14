@@ -91,7 +91,12 @@ class Ac_E_InvalidCall extends Exception {
      * @return Ac_E_InvalidCall 
      */
     static function alreadySuchItem($title, $key, $removeFn = false) {
-        $msg = "$title '{$key}' already exists";
+        $plural = false;
+        if (is_array($key)) {
+            $plural = (count($key) > 1);
+            $key = implode("', '", $key);
+        }
+        $msg = $plural? "$title '{$key}' already exist" : "$title '{$key}' already exist";
         if ($removeFn) $msg .= "; remove with {$removeFn}() first";
         return new Ac_E_InvalidCall($msg);
     }

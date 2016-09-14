@@ -39,6 +39,17 @@ class Ac_Test_Mixin extends Ac_Test_Base {
         $this->assertEqual($b->listMixables(), array(0, 1));
         $this->assertEqual($b->listMixables('Weight'), array(0));
         $this->assertEqual($b->listMixables('Dimensions'), array(1));
+
+        //  access mixables by prefixes
+        $this->assertEqual($b->{'0::weight'}, 60);
+        $this->assertEqual($b->{'1::height'}, 2);
+        $this->assertEqual($b->{'1::getVolume'}(), 6);
+        $this->assertTrue($b->hasMethod('1::getVolume'));
+        $this->assertTrue(isset($b->{'0::weight'}));
+        $this->assertTrue(!isset($b->{'0::xxx'}));
+        
+        $b->{'0::weight'} = 80;
+        $this->assertEqual($b->weight, 80);
     }
     
     function testModelMixin() {

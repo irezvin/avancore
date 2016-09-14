@@ -20,9 +20,9 @@ class Ac_Sql_Dbi_Index extends Ac_Sql_Dbi_Object {
         return $res;
     }
     
-    function Ac_Sql_Dbi_Index(& $inspector, $name, $table, $data) {
+    function __construct(& $inspector, $name, $table, $data) {
         //Ac_Util::simpleBind($data, $this);
-        parent::Ac_Sql_Dbi_Object($inspector, $name);
+        parent::__construct($inspector, $name);
     	$data['name'] = $name;
         $this->_assignProperties($data);
         $this->_table = $table;

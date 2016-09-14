@@ -2,12 +2,18 @@
 
 class Sample_Religion_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_people = false;
-    public $_peopleCount = false;
-    public $_peopleLoaded = false;
-    public $religionId = NULL;
-    public $title = '';
+
+    var $_hasDefaults = true;
+
+    var $_people = false;
+
+    var $_peopleCount = false;
+
+    var $_peopleLoaded = false;
+
+    var $religionId = NULL;
+
+    var $title = '';
     
     var $_mapperClass = 'Sample_Religion_Mapper';
     
@@ -47,12 +53,12 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'people' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_religion_people'),
                 'relationId' => '_people',
                 'countVarName' => '_peopleCount',
                 'referenceVarName' => '_people',
@@ -63,11 +69,11 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Religion Id',
+                'caption' => new Ac_Lang_String('sample_religion_religion_id'),
             ),
             'title' => array (
                 'maxLength' => '45',
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_religion_title'),
             ),
         );
     
@@ -77,8 +83,6 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
 
     function countPeople() {
         if (is_array($this->_people)) return count($this->_people);
@@ -137,11 +141,10 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
+    function createPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPerson($res);
         return $res;
     }

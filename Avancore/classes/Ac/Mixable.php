@@ -119,4 +119,11 @@ class Ac_Mixable extends Ac_Prototyped implements Ac_I_Mixable {
         }
     }
     
+    /**
+     * @return Ac_I_Mixin
+     */
+    function getMixin() {
+        return $this->mixin;
+    }
+    
 }

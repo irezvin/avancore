@@ -22,13 +22,13 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     protected $fieldNames = array();
 
     /**
-     * Reference mapping: slaveColName => ownerColName
+     * Reference mapping: extraTableColName => modelObjectColName
      * @var array
      */
     protected $colMap = array();
 
     /**
-     * If slave records should be deleted when owners are deleted
+     * If extra records should be deleted when owners are deleted
      * @var bool
      */
     protected $deleteWithOwner = true;
@@ -44,6 +44,12 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * @var type 
      */
     protected $modelMixable = false;
+
+    /**
+     * ID of model mixable to prefix conflicting properties during hydration
+     * (will be used when $overwriteModelFields === false)
+     */
+    protected $modelMixableId = false;
     
     /**
      * @var Ac_Model_Relation
@@ -67,11 +73,36 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * @var array SQL column => value
      */
     protected $restrictions = array();
+
+    /**
+     * pre-populated rows from the extra table - in case when we already have them before loading main records
+     */
+    protected $preloadedRows = array();
+    
+    /**
+     * old values of $preloadedRows (saved between pushPreloadedRows() and popPreloadedRows() calls
+     */
+    protected $prStack = array();
+    
+    /**
+     * Number of hits of \$preloadedRows
+     * @var int
+     */
+    protected $preloadedHits = 0;
+    
+    protected $lastPreloadedHits = 0;
     
     /**
      * @var bool
      */
     protected $overwriteModelFields = false;
+    
+    protected $objectTypeField = false;
+    /**
+     * name of mapper criterion that links to the extra table
+     * @var string
+     */
+    protected $extraLinkCrit = false;
 
     function setTableName($tableName) {
         if ($tableName !== $this->tableName) {
@@ -85,7 +116,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     }
 
     function getTableName() {
-        if ($this->implMapper) return $this->implMapper->tableName;
+        if ($this->implMapper) return $this->getImplMapper()->tableName;
         return $this->tableName;
     }
 
@@ -132,6 +163,22 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     function getModelMixable() {
         return $this->modelMixable;
     }    
+    
+    /**
+     * Sets ID of model mixable to prefix conflicting properties during hydration
+     * (will be used when $overwriteModelFields === false)
+     */
+    function setModelMixableId($modelMixableId) {
+        $this->modelMixableId = $modelMixableId;
+    }
+
+    /**
+     * Returns ID of model mixable to prefix conflicting properties during hydration
+     * (will be used when $overwriteModelFields === false)
+     */
+    function getModelMixableId() {
+        return $this->modelMixableId;
+    }    
  
     function setMapperBaseClass($mapperBaseClass) {
         $this->mapperBaseClass = $mapperBaseClass;
@@ -149,7 +196,11 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
      * @return array
      */
     function getRestrictions() {
-        return $this->restrictions;
+        $res = $this->restrictions;
+        if (strlen($this->objectTypeField) && $this->mixin) {
+            $res[$this->objectTypeField] = $this->mixin->getId();
+        }
+        return $res;
     }    
 
     /**
@@ -165,6 +216,23 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     function getExtraIsReferenced() {
         return $this->extraIsReferenced;
     }    
+    
+    /**
+     * Field in restrictions that will be set to mapper Id (FALSE to ignore this feature)
+     * @param string $objectTypeField
+     */
+    function setObjectTypeField($objectTypeField) {
+        $this->objectTypeField = $objectTypeField;
+    }
+
+    /**
+     * Field in restrictions that will be set to mapper Id (FALSE to ignore this feature)
+     * @return string
+     */
+    function getObjectTypeField() {
+        return $this->objectTypeField;
+    }    
+    
     
     /**
      * @return Ac_Model_Relation
@@ -217,11 +285,86 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         return $this->implMapper;
     }
     
+    function pushPreloadedRows(array $rows) {
+        array_push($this->prStack, array($this->preloadedRows, $this->preloadedHits));
+        $this->lastPreloadedHits = $this->preloadedHits;
+        $this->preloadedHits = 0;
+        $this->preloadedRows = $rows;
+    }
+    
+    function popPreloadedRows() {
+        $this->lastPreloadedHits = $this->preloadedHits;
+        list($this->preloadedRows, $this->preloadedHits) = array_pop($this->prStack);
+    }
+    
+    /**
+     * @return int
+     */
+    function getPreloadedHits($last = false) {
+        return $last? $this->lastPreloadedHits : $this->preloadedHits;
+    }
+    
+    protected function pickPreloaded($recordRows) {
+        $myKeys = array_keys($this->colMap);
+        $otherKeys = array_values($this->colMap);
+        // num(colMap) == 1
+        if (count($myKeys) == 1) {
+            $a = Ac_Util::indexArray($this->preloadedRows, $myKeys[0], true);
+            $b = Ac_Util::indexArray($recordRows, $otherKeys[0], false, false, true);
+        }
+        // num(colMap) > 1
+        if (count($myKeys) > 1) { // crude and not 100% accurate, but I'm almost sure composite FKs won't be used
+            $a = array();
+            $b = array();
+            $myKeys1 = array_flip($myKeys);
+            $otherKeys1 = array_flip($otherKeys);
+            foreach ($this->preloadedRows as $v) {
+                $a[implode('___', array_intersect_key($v, $myKeys1))] = $v;
+            }
+            foreach ($recordRows as $k => $r) {
+                $b[implode('___', array_intersect_key($r, $otherKeys1))][$k] = $r;
+            }
+        }
+        $res = array();
+        foreach (array_intersect_key($a, $b) as $aKey => $preloadedRow) {
+            foreach (array_keys($b[$aKey]) as $bk) $res[$bk] = $preloadedRow;
+        }
+        $this->preloadedHits += count($res);
+        return $res;
+    }
+    
     protected function getMappedData(array $recordRows) {
-        $rel = $this->getImplRelation();
-        $data = $rel->getSrc($recordRows, AMR_ORIGINAL_KEYS);
-        if ($this->fieldNames)
-            $data = Ac_Model_Mapper::mapRows($data, $this->fieldNames);
+        
+        // only part of the rows may be preloaded
+        
+        if ($this->preloadedRows) {
+            $preloaded = $this->pickPreloaded($recordRows);
+            if ($preloaded) {
+                $recordRows = array_diff_key($recordRows, array_flip(array_keys($preloaded)));
+                Ac_Model_Mapper::mapRows($preloaded, $this->fieldNames);
+            }
+        } else {
+            $preloaded = array();
+        }
+        
+        if ($recordRows) {
+
+            // now get mapped data for $recordRows that didn't had preloaded rows
+
+            $rel = $this->getImplRelation();
+            $data = $rel->getSrc($recordRows, Ac_Model_Relation_Abstract::RESULT_ORIGINAL_KEYS);
+            if ($this->fieldNames)
+                $data = Ac_Model_Mapper::mapRows($data, $this->fieldNames);
+            
+            if ($preloaded) {
+                foreach ($preloaded as $k => $v) {
+                    $data[$k] = $v;
+                }
+            }
+            
+        } else {
+            $data = $preloaded;
+        }
         return $data;
     }
     
@@ -247,7 +390,17 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
             if ($this->overwriteModelFields) 
                 $rows[$k] = array_merge($rows[$k], $extra);
             else {
-                $rows[$k] = array_merge($rows[$k], array_diff_key($extra, $rows[$k]));
+                if (strlen($this->modelMixableId)) {
+                    foreach (array_intersect_key($extra, $rows[$k]) as $key => $value) {
+                        $extra[$this->modelMixableId.'::'.$key] = $value;
+                        unset($extra[$key]);
+                    }
+                    $rows[$k] = array_merge($rows[$k], $extra);
+                } else {
+                    // here we need to prefix the model with mixable ID
+                    $rows[$k] = array_merge($rows[$k], array_diff_key($extra, $rows[$k]));
+                }
+                
             }
         }
     }
@@ -260,7 +413,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         $data = array_merge($data, $md);
     }
     
-    protected function getExtraRecord($data, & $bindData = array()) {
+    protected function getExtraRecord($data, & $bindData = array(), $loadNotBind = false) {
         $bindData = array();
         $colMap = array_merge(array_combine($def = array_keys($this->getDefaults()), $def), $this->fieldNames);
         foreach (array_intersect_key($colMap, $data) as $colName => $fieldName) {
@@ -268,15 +421,18 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
                 $bindData[$colName] = $data[$fieldName];
             }
         }
-        if ($this->restrictions) 
-            $bindData = array_merge($bindData, $this->restrictions);
+        if ($restrictions = $this->getRestrictions()) 
+            $bindData = array_merge($bindData, $this->getRestrictions());
         
         foreach ($this->colMap as $slaveCol => $ownerCol) {
             $bindData[$slaveCol] = $data[$ownerCol];
         }
-        
         $record = $this->getImplMapper()->createRecord();
-        $record->bind($bindData);
+        if ($loadNotBind) {
+            $record->load($bindData, true);
+        } else {
+            $record->bind($bindData);
+        }
         return $record;
     }
     
@@ -286,25 +442,27 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
             $data = array_merge($data, $newData);
         
         $record = $this->getExtraRecord($data, $myData);
-        
-        if ($record->hasFullPrimaryKey()) {
+
+        if ($record->isPersistent() || !is_null($cpk = $record->getMapper()->calcIdentifier($record))) {
             $record->load();
             $record->bind($myData);
         }
+
         if ($record->store()) {
             $res = $record;
             foreach ($this->colMap as $slaveCol => $ownerCol) {
                 $val = $record->$slaveCol;
                 if ($val !== $myData[$slaveCol]) {
                     if (!is_array($newData)) $newData = array();
-                    if ($this->extraIsReferenced) 
+                    if ($this->extraIsReferenced) {
                         $hyData[$ownerCol] = $val;
-                    $newData[$ownerCol] = $val;
+                        $newData[$ownerCol] = $val;
+                    }
                 }
             }
         } else {
             $res = false;
-            $error = $res->getError();
+            $error = $res->getErrors(false, true);
         }
         return $res;
     }
@@ -325,8 +483,8 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
     
     function onAfterDeleteRecord($record, array & $hyData, & $error, & $result) {
         if ($result) {
-            $extraRecord = $this->getExtraRecord($hyData);
-            if ($extraRecord->hasFullPrimaryKey()) {
+            $extraRecord = $this->getExtraRecord($hyData, $bindData, true);
+            if ($extraRecord->isPersistent()) {
                 if (!$extraRecord->delete()) { // there may be the case when extra record does not exist
                     if ($xError = $extraRecord->getError()) {
                         $result = false;
@@ -341,6 +499,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         if ($this->modelMixable) {
             $mix = Ac_Prototyped::factory($this->modelMixable, 'Ac_I_Mixable');
             if ($mix instanceof Ac_Model_Mixable_ExtraTable) $mix->setMapperExtraTable($this);
+            if (!$mix->getMixableId() && strlen($this->mixableId)) $mix->setMixableId ($this->getMixableId());
             $record->addMixable($mix);
         }
     }
@@ -407,5 +566,22 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
             $dataProperties = array_unique(array_merge($dataProperties, array_keys($this->getDefaults())));
         }
     }
+
+    /**
+     * Sets name of mapper criterion that links to the extra table
+     * @param string $extraLinkCrit
+     */
+    function setExtraLinkCrit($extraLinkCrit) {
+        $this->extraLinkCrit = $extraLinkCrit;
+    }
+
+    /**
+     * Returns name of mapper criterion that links to the extra table
+     * @return string
+     */
+    function getExtraLinkCrit() {
+        return $this->extraLinkCrit;
+    }    
+    
     
 }

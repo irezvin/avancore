@@ -10,7 +10,10 @@ class Ac_Table_Sequential extends Ac_Table {
     var $_eof = false;
     var $_ptr = 0;
 
-    function Ac_Table_Sequential ($columnSettings, $collection, $pageNav, $tableAttribs = array(), $recordClass = false) {
+    /**
+     * @param Ac_Model_Collection_Abstract $collection
+     */
+    function __construct ($columnSettings, Ac_Model_Collection_Abstract $collection, $pageNav, $tableAttribs = array(), $recordClass = false) {
         $this->_columnSettings = $columnSettings;
         $this->_collection = $collection;
         $this->_pageNav = $pageNav;
@@ -21,8 +24,7 @@ class Ac_Table_Sequential extends Ac_Table {
  
     function resetState() {
         parent::resetState();
-        $coll = $this->_collection;
-        $coll->rewind();
+        $this->_collection->reopen();
     }
     
     /**
@@ -32,7 +34,7 @@ class Ac_Table_Sequential extends Ac_Table {
         if ($this->_ptr >= count($this->_records)) {
             $res = false;
             if (!$this->_eof) {
-		        $res = $this->_collection->getNext();
+		        $res = $this->_collection->fetchItem();
 		        if ($res) $this->_records[] = $res;
 		            else $this->_eof = true;
             }            
@@ -46,16 +48,17 @@ class Ac_Table_Sequential extends Ac_Table {
     
     function _fetchAll() {
         if (!$this->_eof) {
-            while ($rec = $this->_collection->getNext()) {
+            while ($rec = $this->_collection->fetchNext()) {
                 $this->_records[] = $rec;
                 unset($rec);
-            }            
+            }
             $this->_eof = true;
         }
     }
     
     function countRecords() {
-        return $this->_collection->countRecords();
+        $this->_collection->setIsOpen(true);
+        return $this->_collection->getCount();
     }
 
     function listRecords() {

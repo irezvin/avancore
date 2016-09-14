@@ -53,6 +53,8 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     var $jsConstructor = false;
     
+    var $jsObjectId = false;
+    
     var $jsPropMap = array();
     
     var $assetLibs = array();
@@ -1076,8 +1078,15 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
     
     function getJsObjectId() {
-        if ($this->jsConstructor !== false) $res = 'js_'.$this->_context->mapIdentifier('');
-            else $res = false;
+        if ($this->jsConstructor !== false) {
+            if ($this->jsObjectId !== false) {
+                $res = $this->jsObjectId;
+            } else {
+                $res = 'js_'.$this->_context->mapIdentifier('');
+            }
+        } else {
+            $res = false;
+        }
         return $res;
     }
     

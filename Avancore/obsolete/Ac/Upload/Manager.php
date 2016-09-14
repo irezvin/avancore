@@ -30,7 +30,7 @@ class Ac_Upload_Manager {
     
     var $showDownloadAndViewLinks = true;
     
-    function Ac_Upload_Manager ($options = array()) {
+    function __construct ($options = array()) {
         Ac_Util::bindAutoparams($this, $options);
     }
     

@@ -27,19 +27,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     var $_stayOnProcessing = false;
     
     /**
-     * @var Ac_Sql_Filter
-     */
-    var $_sqlFilter = false;
-    
-    /**
-     * @var Ac_Sql_Order
-     */
-    var $_sqlOrder = false;
-
-    /**
      * @var Ac_Sql_Select
      */
-    var $_sqlSelect = false;
+    protected $sqlSelect = false;
     
     /**
      * Datalink that is injected when Manager is created...
@@ -82,9 +72,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     var $_recordClass = false;
     
     /**
-     * @var Ac_Model_Collection
+     * @var Ac_Model_Collection_Mapper
      */
-    var $_recordsCollection = false;
+    protected $collection = false;
     
     /**
      * Prototypes of table columns
@@ -115,7 +105,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     var $_defaultMethodName = 'list';
     
-    var $_primaryKeys = false;
+    var $_recordIdentifiers = false;
     
     /**
      * @var Ac_Model_Object
@@ -259,7 +249,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $record = $this->getRecord();
             $form->updateModel();
         }
-
+        
         $template = $this->getTemplate();
         if (!$this->_processSubManagers()) return true;
         
@@ -274,7 +264,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if (!(isset($this->_response->hasToRedirect) && $this->_response->hasToRedirect)) 
             $this->_response->content = $template->fetch('managerWrapper', array('managerDetails', true));
     }
-    
+        
     function executeRefreshDetails() {
         return $this->executeDetails(true);
     }
@@ -334,7 +324,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if ($redir && isset($this->_response->hasToRedirect)) $redir = false;
 
         if ($redir) {
-            $this->_primaryKeys = array();
+            $this->_recordIdentifiers = array();
             $this->_record = null;
             $u = $this->getManagerUrl('list');
             $this->_response->hasToRedirect = $u->toString();
@@ -424,12 +414,16 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     // ------------------------------------------- form related methods -----------------------------------------------
     
     function isNewRecord() {
-        return !$this->onlyRecord && ($this->getPrimaryKey() === false) && !$this->_recordStored && (isset($this->_rqData['new']) && $this->_rqData['new'] || $this->_isNewRecord);
+        return !$this->onlyRecord && ($this->getRecordIdentifier() === false) && !$this->_recordStored && (isset($this->_rqData['new']) && $this->_rqData['new'] || $this->_isNewRecord);
     }
     
     protected function callFeatures($method, $_ = null) {
         $args = func_get_args();
         array_shift($args);
+        return $this->callFeaturesA($method, $args);
+    }
+    
+    protected function callFeaturesA($method, array $args = array()) {
         foreach ($this->listFeatures() as $id) {
             $feat = $this->getFeature($id);
             if (method_exists($feat, $method)) call_user_func_array(array($feat, $method), $args);
@@ -448,11 +442,11 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $this->_record = $m->createRecord();
                 $this->callFeatures('onCreate', $this->_record);
                 if ($this->_datalink) $this->_datalink->setRecordDefaults($this->_record);
-            } elseif (($pk = $this->getPrimaryKey()) !== false) {
+            } elseif (($id = $this->getRecordIdentifier()) !== false) {
                 if ($this->onlyRecord) $this->_record = $this->onlyRecord;
                 else {
                     $m = $this->getMapper();
-                    $this->_record = $m->loadRecord($pk);
+                    $this->_record = $m->loadRecord($id);
                     $this->callFeatures('onLoad', $this->_record);
                     if (!$this->_record) $this->_record = null; else {
                         if ($this->_datalink && !$this->_datalink->canProcessRecord($this->_record))
@@ -482,9 +476,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * Returns first primary key provided or FALSE if no one is provided
      * @return mixed|bool
      */
-    function getPrimaryKey() {
-        $pks = $this->getPrimaryKeys();
-        if (count($pks)) $res = $pks[0];
+    function getRecordIdentifier() {
+        $ids = $this->getRecordIdentifiers();
+        if (count($ids)) $res = $ids[0];
             else $res = false;
         if ($this->_isNewRecord && !$this->_recordStored) $res = false;
         return $res;
@@ -494,25 +488,15 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * Returns all primary keys provided
      * @return array
      */
-    function getPrimaryKeys() {
-        if ($this->_primaryKeys === false) {
+    function getRecordIdentifiers() {
+        if ($this->_recordIdentifiers === false) {
             $res = array();
             if (isset($this->_rqData['keys']) && is_array($this->_rqData['keys'])) {
-                $pkl = $this->getPrimaryKeyLength();
-                foreach ($this->_rqData['keys'] as $key) {
-                    if (is_string($key)) {
-                        if ($pkl === 1) $res[$key] = $key;
-                        else {
-                            $u = @unserialize($key);
-                            if (($u !== false) && is_array($u) && (count($u) === $pkl)) $res[$key] = $u;
+                $res = array_unique($this->_rqData['keys']);
                         }
+            $this->_recordIdentifiers = $res;
                     }
-                }
-                $res = array_values($res);
-            }
-            $this->_primaryKeys = $res;
-        } 
-        return $this->_primaryKeys;
+        return $this->_recordIdentifiers;
     }
 
     // -------------------------------------- request related methods -------------------------------------------------
@@ -525,15 +509,14 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $res;
     }
     
-    
     /**
      * @param Ac_Model_Object & $record
      * @return Ac_Url
      */
     function getDetailsUrl($record) {
         $ctx = $this->_context->cloneObject();
-        $key = $this->getStrPk($record);
-        $ctx->setData(array('keys' => array($key), 'action' => 'details'));
+        $id = $this->getIdentifierOf($record);
+        $ctx->setData(array('keys' => array($id), 'action' => 'details'));
         $res = $ctx->getUrl();
         return $res;
     }
@@ -549,7 +532,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         
         if ($this->isNewRecord()) $d['new'] = 1;
         elseif ($rec = $this->getRecord()) {
-            $d['keys'][] = $this->getStrPk($rec);
+            $d['keys'][] = $this->getIdentifierOf($rec);
         }
         */
         $s = $this->getStateData();
@@ -560,7 +543,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $u;
     }
     
-    function getStateData() {
+    function getStateData($withFilterForm = null) {
         $res = array();
         if ($this->_stayOnProcessing) {
             $res['action'] = 'processing';
@@ -569,11 +552,11 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $res['action'] = $this->isForm()? 'details' : 'list';
         }
         if ($this->isNewRecord()) $res['new'] = 1;
-        elseif (($res['action'] !== 'form') && $keys = $this->getPrimaryKeys()) {
+        elseif (($res['action'] !== 'form') && $keys = $this->getRecordIdentifiers()) {
             $res['keys'] = $keys; 
         }
         elseif ($rec = $this->getRecord()) {
-            $res['keys'] = array($this->getStrPk($rec)); 
+            $res['keys'][] = $this->getIdentifierOf($rec);
         }
         if ($this->_isForm && isset($this->_rqData['form']) && !$this->_recordStored) {
             $res['form'] = $this->_rqData['form'];
@@ -585,14 +568,20 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $res['returnUrl64'] = base64_encode($u);
         }
         
-        if (isset($this->_rqData['filterForm'])) {
-            $ff = $this->_rqData['filterForm'];
-            if (is_array($ff)) {
-                foreach ($ff as $k => $v) {
-                    if (is_array($v)? !count($v) : !strlen($v)) unset($ff[$k]);
+        if ($withFilterForm === null) {
+            $withFilterForm = $res['action'] !== 'list';
+        }
+        
+        if ($withFilterForm) {
+            if (isset($this->_rqData['filterForm'])) {
+                $ff = $this->_rqData['filterForm'];
+                if (is_array($ff)) {
+                    foreach ($ff as $k => $v) {
+                        if (is_array($v)? !count($v) : !strlen($v)) unset($ff[$k]);
+                    }
                 }
+                $res['filterForm'] = $ff;
             }
-            $res['filterForm'] = $ff;
         }
         
         //if (isset($this->_rqData['pagination'])) $res['pagination'] = $this->_rqData['pagination'];
@@ -665,7 +654,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     
     // -------------------------------------- associations related methods -------------------------------------------- 
-
+    
     /**
      * @return Ac_Model_Datalink
      */
@@ -779,17 +768,13 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      */
     function getTable() {
         if ($this->_table === false) {
-            if ($this->_collectionCanBeUsed()) {
-                $this->_table = new Ac_Table_Sequential($this->_getColumnSettings(), $this->_getRecordsCollection(), $this->getPagination(), array(), $this->_getRecordClass());
-                //var_dump($this->_getRecordsCollection()->getStatementTail(), $this->_getRecordsCollection()->_extraColumns);
-            } else {
-                $records = array($this->onlyRecord);
-                $this->_table = new Ac_Table ($this->_getColumnSettings(), $records, $this->_getCompatPagenav(), array(), $this->_getRecordClass());
-            }
+            $this->_table = new Ac_Table_Sequential($this->_getColumnSettings(), $this->getRecordsCollection(), $this->getPagination(), array(), $this->_getRecordClass());
             $this->_table->_manager = $this;
             $p = $this->getPagination();
-            $c = $this->_getRecordsCollection();
-            $c->setLimits($p->getOffset(), $p->getNumberOfRecordsPerPage());
+            $c = $this->getRecordsCollection();
+            $c->close();
+            $c->setOffset($p->getOffset());
+            $c->setLimit($p->getNumberOfRecordsPerPage());
             $this->_preloadRelations();            
         }
         return $this->_table;
@@ -890,9 +875,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $context = $this->getContext();
             $pgContext = $context->spawn('pagination');
             $this->_pagination = new Ac_Admin_Pagination($pgContext, array(), $this->_instanceId.'_pagination');
-            if ($coll = $this->_getRecordsCollection()) {
+            if ($coll = $this->getRecordsCollection()) {
                 if (!$this->dontCount)
-                    $this->_pagination->totalRecords = $coll->countRecords();
+                    $this->_pagination->totalRecords = $coll->getCount();
             } else {
                 $this->_pagination->totalRecords = 1;
             }
@@ -922,7 +907,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $this->_subManagers = array();
             if ($this->allowSubManagers && $this->getRecord() && $this->getRecord()->isPersistent()) {
                 foreach ($this->listFeatures() as $f) {
-
                     $feat = $this->getFeature($f);
                     $smc = $feat->getSubManagersConfig();
                     if (is_array($this->allowSubManagers)) {
@@ -1013,21 +997,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      *
      * @param Ac_Model_Record $record
      */
-    function getStrPk($record) {
+    function getIdentifierOf($record) {
         if ($this->onlyRecord) $res = '1';
-        else {
-            if (is_array($pk = $record->getPrimaryKey())) $res = serialize($pk);
-                else $res = $pk;
-        }
-        return $res;
-    }
-    
-    function getPrimaryKeyLength() {
-        if ($this->onlyRecord) $res = 1; 
-        else {
-            $mapper = $this->getMapper();
-            $res = count($mapper->listPkFields());
-        }
+            else $res = $this->getMapper()->getIdentifier($record);
         return $res;
     }
     
@@ -1195,7 +1167,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $url = $this->getManagerUrl('processing', array('processing' => $processingId));
         $d = $ctx->getData();
         if (!isset($d['keys'])) {
-            if ($keys = $this->getPrimaryKeys()) {
+            if ($keys = $this->getRecordIdentifiers()) {
                 $d['keys'] = $keys;
             }
         }
@@ -1236,157 +1208,145 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
 
     /**
-     * @return bool
-     */
-    function _collectionCanBeUsed() {
-        return !$this->onlyRecord;
-    }
-    
-    /**
-     * @return Ac_Sql_Filter
-     * @access protected
-     */
-    function _getSqlFilter() {
-        if ($this->_sqlFilter === false) {
-            $allFilters = array();
-            foreach ($this->listFeatures() as $i) {
-                $f = $this->getFeature($i);
-                $allFilters = array_merge($allFilters, $f->getFilterPrototypes());
-            }
-            if (!count($allFilters)) $this->_sqlFilter = null;
-            else {
-                if (0 && (count($allFilters) == 1)) {
-                    $filterSettings = Ac_Util::array_values(array_slice($allFilters, 0, 1));
-                    $filterSettings = $allFilters[0];
-                } else {
-                    $filterSettings = array(
-                        'class' => 'Ac_Sql_Filter_Multiple',
-                        'filters' => $allFilters, 
-                        'applied' => true,
-                    );
-                }
-                $this->_sqlFilter = Ac_Sql_Part::factory($filterSettings, 'Ac_Sql_Filter');
-            }
-        }
-        return $this->_sqlFilter;
-    }
-    
-    /**
-     * @return Ac_Sql_Order
-     * @access protected
-     */
-    function _getSqlOrder() {
-        if ($this->_sqlOrder === false) {
-            $allOrders = array();
-            foreach ($this->listFeatures() as $i) {
-                $f = $this->getFeature($i);
-                $allOrders = array_merge($allOrders, $f->getOrderPrototypes());
-            }
-            if (!count($allOrders)) $this->_sqlOrder = null;
-            else {
-                if (0 && (count($allOrders) == 1)) {
-                    $orderSettings = Ac_Util::array_values(array_slice($allOrders, 0, 1));
-                    $orderSettings = $orderSettings[0];
-                } else {
-                    $orderSettings = array(
-                        'class' => 'Ac_Sql_Order_Multiple',
-                        'orders' => $allOrders, 
-                        'applied' => 1,
-                    );
-                }
-                $this->_sqlOrder = Ac_Sql_Part::factory($orderSettings, 'Ac_Sql_Order');
-            }
-        }
-        return $this->_sqlOrder;
-    }
-    
-    /**
      * @return Ac_Sql_Select
      * @access protected
-     */
-    function _getSqlSelect() {
-        if ($this->_sqlSelect === false) {
-            $options = array();
-            foreach ($this->listFeatures() as $i) {
-                $feat = $this->getFeature($i);
-                Ac_Util::ms($options, $feat->getSqlSelectSettings());
-            }
-            $f = $this->_getSqlFilter();
-            $o = $this->_getSqlOrder();
-            $ff = $this->getFilterForm();
-            $sqlDb = $this->application->getDb();
-            $options = Ac_Util::m($this->getMapper()->getSqlSelectPrototype('t'), $options);
-            $this->_sqlSelect = new Ac_Sql_Select($sqlDb, $options);
-            if ($ff) {
-                $fVal = $ff->getValue();
-            } else {
-                $fVal = array();
-            }
-            if ($f) {
-                $f->bind($fVal);
-                $f->applyToSelect($this->_sqlSelect);
-            }
-            if ($o) {
-                $o->bind($fVal);
-                $o->applyToSelect($this->_sqlSelect);
-            }
-            // find missing filters and apply them to respective parts
-            $filtersInManager = $f? $f->listFilters() : array();
-            $filtersInForm = array_keys($fVal);
-            $filtersInMapper = $this->_sqlSelect->listParts();
-            $filtersToSet = array_diff(array_intersect($filtersInForm, $filtersInMapper), $filtersInManager);
-            foreach ($filtersToSet as $partName) {
-                $this->_sqlSelect->getPart($partName)->bind($fVal[$partName]);
-            }
-            if (strlen($w = $this->_getWhere())) {
-                $this->_sqlSelect->where['_adminManagerWhere'] = $w;
-            }
-            $this->callFeatures('onCreateSqlSelect', $this->_sqlSelect);
-        }
-        return $this->_sqlSelect;
-    }
-    
-    /**
-     * @return Ac_Sql_Select
      */
     function getSqlSelect() {
-        return $this->_getSqlSelect();
+        if ($this->sqlSelect === false) {
+            $proto = array(
+                'parts' => array(),
+            );
+            $usesSqlSelect = false;
+            foreach ($this->listFeatures() as $i) {
+                $feat = $this->getFeature($i);
+                if ($feat->usesSqlSelect()) {
+                    $usesSqlSelect = true;
+                    Ac_Util::ms($proto, $feat->getSqlSelectSettings());
+                    Ac_Util::ms($proto['parts'], $feat->getFilterPrototypes());
+                    Ac_Util::ms($proto['parts'], $feat->getOrderPrototypes());
+                }
+            }
+            if (!$proto['parts']) unset($proto['parts']);
+            if ($usesSqlSelect) {
+                $this->sqlSelect = $this->getMapper()->createSqlSelect($proto);
+                $this->callFeatures('onCreateSqlSelect', $this->sqlSelect);
+            } else {
+                $this->sqlSelect = null;
+            }
+        }
+        return $this->sqlSelect;
+    }
+    
+    /**
+     * @deprecated - use getSqlSelect()
+     * @return Ac_Sql_Select
+     */
+    function _getSqlSelect() {
+        return $this->getSqlSelect();
     }
     
     function _preloadRelations() {
         if ($pr = $this->getPreloadRelations()) {
-            $myRecs = array();
-            while ($rec = $this->_recordsCollection->getNext()) {
-                $myRecs[] = $rec;
-            }
+            $myRecs = $this->collection->fetchGroup();
             $this->getMapper()->preloadRelations($myRecs, $pr);
         }
     }
     
     /**
-     * @return Ac_Model_Collection
-     */
-    function _getRecordsCollection() {
-        return $this->getRecordsCollection();
-    }
-    
-    /**
-     * @return Ac_Model_Collection
+     * @deprecated - use getCollection()
+     * @return Ac_Model_Collection_Mapper
      */
     function getRecordsCollection() {
-        if ($this->_recordsCollection === false) {
-            if ($this->_collectionCanBeUsed()) {
-                $this->_recordsCollection = new Ac_Model_Collection($this->mapperClass, false, $this->_getWhere(), $this->_getOrder(), $this->_getJoins(), $this->_getExtraColumns());
-                    if (strlen($h = $this->_getHaving())) $this->_recordsCollection->setHaving ($h);
-                $this->_recordsCollection->setDistinct();
-                $this->_recordsCollection->setGroupBy($this->_getGroupBy());
-                foreach ($this->listFeatures() as $i) $this->getFeature($i)->onCollectionCreated ($this->_recordsCollection);
+        return $this->getCollection();
+    }
+        
+    /**
+     * @return Ac_Model_Collection_Mapper
+     */
+    function getCollection() {
+        if ($this->collection === false) {
+
+            if ($this->onlyRecord) {
+                $proto = array(
+                    'class' => 'Ac_Model_Collection_Array',
+                    'items' => array($this->onlyRecord),
+                );
             } else {
-                $this->_recordsCollection = null;
+                $this->collection = $this->createBareCollection();
+                foreach ($this->listFeatures() as $i) $this->getFeature($i)->onCollectionCreated ($this->collection);
+                list($query, $sort) = $this->getQueryAndSort($this->collection);
+                if ($query) $this->collection->setQuery(Ac_Util::m($this->collection->getQuery(), $query));
+                if ($sort !== null) $this->collection->setSort($sort);
             }
         }
+        return $this->collection;
+    }
+
+    /**
+     * Creates Tthe collection without applied filters
+     * @return Ac_Model_Collection_Mapper
+     */
+    function createBareCollection() {
+        $proto = array(
+            'class' => 'Ac_Model_Collection_Mapper',
+            'application' => $this->getApplication(),
+            'mapper' => $this->getMapper(),
+            'query' => array(),
+            'autoOpen' => true,
+        );
+
+        $searchPrototype = array();
+
+        foreach ($this->listFeatures() as $i) {
+            Ac_Util::ms($searchPrototype, $this->getFeature($i)->getSearchSettings());
+        }
+
+        if ($searchPrototype) {
+            $proto['searchPrototype'] = $searchPrototype;
+        }
+
+        if ($s = $this->getSqlSelect()) {
+            $proto['class'] = 'Ac_Model_Collection_SqlMapper';
+            $proto['sqlSelect'] = $s;
+        }
+
+        if ($this->_datalink && $qp = $this->_datalink->getQueryPart()) {
+            $proto['query'] = $qp;
+        }
+                
+        $this->callFeaturesA('onBeforeCreateCollection', array(& $proto));
+        $res = Ac_Prototyped::factory($proto, 'Ac_Model_Collection_Abstract');
+        return $res;
         
-        return $this->_recordsCollection;
+    }
+    
+    protected function filterNonEmpty($v) {
+        if (is_array($v)) return (bool) array_filter($v, array($this, 'filterNonEmpty'));
+        return $v !== null && $v !== false && $v !== '';
+    }
+    
+    protected function getQueryAndSort(Ac_Model_Collection_Mapper $collection) {
+        $f = $this->getFilterForm();
+        $query = array();
+        $sort = false;
+        $val = array();
+        $sort = null;
+        if ($f) {
+            $val = $f->getValue();
+            $val = array_filter($val, array($this, 'filterNonEmpty'));
+            // TODO: improve this ugly kludge with criteria enumeration
+            $searchCrit = $collection->listPossibleCriteria();
+            $sortCrit = $collection->listPossibleSortCriteria();
+            $query = array_intersect_key($val, array_flip($searchCrit));
+            if (isset($val['sort']) && in_array($val['sort'], $sortCrit) && !isset($query['sort'])) {
+                $sort = $val['sort'];
+            }
+        } else {
+            $searchCrit = array();
+            $sortCrit = array();
+        }
+        $this->callFeaturesA('onGetQueryAndSort', array(& $query, & $sort, $val, $searchCrit, $sortCrit));
+        return array($query, $sort);
     }
     
     function _getRecordClass() {
@@ -1400,66 +1360,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             }
         }
         return $this->_recordClass;
-    }
-    
-    function _getWhere() {
-        if ($this->_datalink && ($c = $this->_datalink->getSqlCriteria())) {
-            $res = $c;
-        } else {
-            $res = false;
-        }
-        if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getWhereClause(false)))) {
-            $res = strlen($res)? "($res) AND ($w)" : $w;
-        }
-        return $res;
-    }
-    
-    function _getOrder() {
-        $s = $this->_getSqlSelect();
-        if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getOrderByClause(false)))) {
-            $res = $w;
-        } else {
-            $res = false;
-        }
-        return $res;
-    }
-    
-    function _getHaving() {
-        $s = $this->_getSqlSelect();
-        if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getHavingClause(false)))) {
-            $res = $w;
-        } else {
-            $res = false;
-        }
-        return $res;
-    }
-    
-    function _getGroupBy() {
-        if (($s = $this->_getSqlSelect()) && (strlen($w = $s->getGroupByClause(false)))) {
-            $res = $w;
-        } else {
-            $res = false;
-        }
-        return $res;
-    }
-    
-    function _getJoins() {
-        if ($this->_datalink && $j = $this->_datalink->getSqlExtraJoins()) {
-            $res = $j;
-        } else {
-            $res = false;
-        }
-        if (($sel = $this->_getSqlSelect()) && (strlen($s = $sel->getFromClause(false, array('t'))))) {
-            if (strlen($res)) $res = $res . ' '. $s;
-                else $res = $s;
-        }
-        return $res;
-    }
-    
-    function _getExtraColumns() {
-        $res = array();
-        if (($s = $this->_getSqlSelect())) $res = array_merge($res, $s->getColumnsList(false, false, true));
-        return $res;
     }
     
     function setConfigService(Ac_Admin_ManagerConfigService $configService) {
@@ -1488,7 +1388,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             }
         }
         return $this->_returnUrl;
-    }
+    }    
     
 }
 

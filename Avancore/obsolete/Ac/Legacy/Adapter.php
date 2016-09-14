@@ -55,7 +55,7 @@ class Ac_Legacy_Adapter {
     
     protected $toolbarImagesMap = false;
     
-    function Ac_Legacy_Adapter($extraSettings = array()) {
+    function __construct($extraSettings = array()) {
         if (strtolower(get_class($this)) === 'ae_adapter') trigger_error ('Attempt to instantiate abstract class', E_USER_ERROR);
         $this->_processExtraSettings($extraSettings);
         $this->config = $this->_instantiateConfig($this->configClass);  

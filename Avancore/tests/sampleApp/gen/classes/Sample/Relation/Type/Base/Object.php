@@ -2,13 +2,20 @@
 
 class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_relations = false;
-    public $_relationsCount = false;
-    public $_relationsLoaded = false;
-    public $relationTypeId = NULL;
-    public $title = '';
-    public $isSymmetrical = 0;
+
+    var $_hasDefaults = true;
+
+    var $_relations = false;
+
+    var $_relationsCount = false;
+
+    var $_relationsLoaded = false;
+
+    var $relationTypeId = NULL;
+
+    var $title = '';
+
+    var $isSymmetrical = 0;
     
     var $_mapperClass = 'Sample_Relation_Type_Mapper';
     
@@ -48,12 +55,12 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'relations' => array (
                 'className' => 'Sample_Relation',
                 'mapperClass' => 'Sample_Relation_Mapper',
-                'caption' => 'Relations',
+                'caption' => new Ac_Lang_String('sample_relation_type_relations'),
                 'relationId' => '_relations',
                 'countVarName' => '_relationsCount',
                 'referenceVarName' => '_relations',
@@ -64,11 +71,11 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Relation Type Id',
+                'caption' => new Ac_Lang_String('sample_relation_type_relation_type_id'),
             ),
             'title' => array (
                 'maxLength' => '45',
-                'caption' => 'Title',
+                'caption' => new Ac_Lang_String('sample_relation_type_title'),
             ),
             'isSymmetrical' => array (
                 'dataType' => 'bool',
@@ -78,7 +85,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
                     0 => 'No',
                     1 => 'Yes',
                 ),
-                'caption' => 'Is Symmetrical',
+                'caption' => new Ac_Lang_String('sample_relation_type_is_symmetrical'),
             ),
         );
     
@@ -88,8 +95,6 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
 
     function countRelations() {
         if (is_array($this->_relations)) return count($this->_relations);
@@ -148,11 +153,10 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Relation  
      */
-    function createRelation($values = array(), $isReference = false) {
+    function createRelation($values = array()) {
         $m = $this->getMapper('Sample_Relation_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addRelation($res);
         return $res;
     }

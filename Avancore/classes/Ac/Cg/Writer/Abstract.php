@@ -72,13 +72,20 @@ abstract class Ac_Cg_Writer_Abstract extends Ac_Prototyped {
         if ($this->nextWriter) $this->nextWriter->end();
     }
     
-    function writeContent($reativePath, $content) {
-        $this->fileCount++;
-        $this->totalSize += strlen($content);
-        $this->doWriteContent($reativePath, $content);
-        if ($this->nextWriter) $this->nextWriter->writeContent($reativePath, $content);
+    function writeContent($reativePath, $content, $overwrite = false) {
+        if ($this->doWriteContent($reativePath, $content, $overwrite)) {
+            $this->fileCount++;
+            $this->totalSize += strlen($content);
+        }
+        if ($this->nextWriter) $this->nextWriter->writeContent($reativePath, $content, $overwrite);
     }
     
-    abstract protected function doWriteContent($relativePath, $content);
+    abstract protected function doWriteContent($relativePath, $content, $overwrite = false);
+    
+    function deploy($srcDir, $destDir, $editable, & $err, $deleteSrc = false) {
+        $err = false;
+        $res = true;
+        return $res;
+    }
     
 }

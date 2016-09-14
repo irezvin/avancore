@@ -89,12 +89,20 @@ class Ac_Cg_DirSync extends Ac_Prototyped {
         return $ok;
     }
     
+    static function identical($a, $b) {
+        $res = filesize($a) === filesize($b) 
+            && (fileperms($a) & 0777) === (fileperms($b) & 0777)
+            && md5_file($a) === md5_file($b);
+        return $res;
+    }
+    
     protected function copy($srcBase, $path) {
         $fullSrc = rtrim($srcBase, "/")."/".ltrim($path, "/");
         $fullDest = rtrim($this->workBase, "/")."/".ltrim($path, "/");
         if (!$this->dryRun) {
-            if (!is_file($fullDest) || filesize($fullSrc) !== filesize($fullDest) || md5_file($fullSrc) !== md5_file($fullDest)) {
+            if (!is_file($fullDest) || !self::identical($fullSrc, $fullDest)) {
                 $ok = copy($fullSrc, $fullDest) !== false;
+                if ($ok) @chmod($fullDest, fileperms($fullSrc) & 0777);
             } else {
                 $ok = true;
             }

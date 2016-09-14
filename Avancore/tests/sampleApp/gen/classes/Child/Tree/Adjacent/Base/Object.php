@@ -25,6 +25,29 @@ class Child_Tree_Adjacent_Base_Object extends Sample_Tree_Adjacent {
     }
     
     
+    protected function getOwnPropertiesInfo() {
+        static $pi = false; 
+        if ($pi === false) $pi = array (
+            'id' => array (
+                'caption' => 'Id',
+            ),
+            'parentId' => array (
+                'caption' => 'Parent Id',
+            ),
+            'ordering' => array (
+                'caption' => 'Ordering',
+            ),
+            'title' => array (
+                'caption' => 'Title',
+            ),
+            'tag' => array (
+                'caption' => 'Tag',
+            ),
+        );
+    
+        return $pi;
+                
+    }
     
   
     

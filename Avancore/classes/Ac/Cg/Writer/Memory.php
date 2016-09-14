@@ -13,8 +13,13 @@ class Ac_Cg_Writer_Memory extends Ac_Cg_Writer_Abstract {
         return $this->output;
     }
 
-    protected function doWriteContent($reativePath, $content) {
+    protected function doWriteContent($reativePath, $content, $overwrite = false) {
+        if ($content === Ac_Cg_Generator::CONTENT_DIR) {
+            $this->output[$reativePath] = array();
+            return true;
+        }
         $this->output[$reativePath] = $content;
+        return true;
     }
 
 }

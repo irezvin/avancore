@@ -1,8 +1,10 @@
 <?php
 
-class Ac_Model_Property {
+class Ac_Model_Property implements Ac_I_Prototyped {
     
     var $propName = null;
+    
+    var $key = null;
     
     /**
      * @var Ac_Model_Data
@@ -10,21 +12,12 @@ class Ac_Model_Property {
     var $srcObject = null;
     var $srcClass = null;
     
-    /**
-     * @var Ac_Model_Data
-     */
-    var $implObject = null; 
-    var $implClass = null;
-    
-    var $isStatic = null;
+    var $isStatic = true;
     var $isAbstract = null;
     
     var $plural = null;
     var $arrayValue = null;
     var $assocClass = null;
-    
-    var $value = null;
-    var $error = null;
     
     var $required = null;
     var $readOnly = null;
@@ -74,45 +67,72 @@ class Ac_Model_Property {
     
     var $skipValidation = false;
     
-    function Ac_Model_Property ($srcObject, $propName, $isStatic, $formOptions = array()) {
-        foreach (array_keys($formOptions) as $optionName) $this->$optionName = $formOptions[$optionName];
-
-        $this->srcObject = $srcObject;
-        $this->propName = $propName;
-        $this->isStatic = $isStatic;
+    function hasPublicVars() {
+        return true;
     }
     
-    function _updateData($formOptions = array()) {
-        foreach (array_diff(array_keys($formOptions), array('srcObject', 'implObject', 'propName', 'isStatic')) as $optionName) $this->$optionName = $formOptions[$optionValue];
+    function __construct (array $prototype = array()) {
+        if (Ac_Prototyped::$countInstances) Ac_Debug::reportConstruct($this, Ac_Prototyped::$countInstances);
+        foreach ($prototype as $k => $v) $this->$k = $v;
     }
     
+    function __clone() {
+        if (Ac_Prototyped::$countInstances) Ac_Debug::reportConstruct($this, Ac_Prototyped::$countInstances);
+    }
+    
+    function __get($name) {
+        $m = 'get'.$name;
+        if ($name == 'value' || $name == 'errors' || method_exists($this, $m)) {
+            $res = $this->$m();
+        } else {
+            echo trigger_error("Undefined property: ".get_class($this)."::\$name", E_USER_NOTICE);
+            $res = null;
+        }
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Model_Property
+     */
+    function cloneToNonStatic($srcObject, $propertyName = null) {
+        $res = clone $this;
+        $res->isStatic = false;
+        $res->srcObject = $srcObject;
+        if(!is_null($propertyName)) $res->propName = $propertyName;
+        return $res;
+    }
+    
+    function __destruct () {
+        if (Ac_Prototyped::$countInstances) Ac_Debug::reportDestruct($this, Ac_Prototyped::$countInstances);
+    }
+    
+    /**
+     * @return array
+     */
     function toFormOptions() {
         $res = array();
-        foreach (array_keys(get_object_vars($this)) as $varName) {
-            if ($varName{0} != '_' && $varName != 'srcObject' && $varName != 'implObject' && !is_null($this->$varName)) $res[$varName] = $this->$varName;  
+        foreach (get_object_vars($this) as $k => $v) {
+            if ($k{0} != '_' && $k != 'srcObject' && !is_null($v)) $res[$k] = $v;  
         }
         return $res;
     }
     
     function getValue() {
-        trigger_error (__FUNCTION__.' is not implemented yet', E_USER_ERROR);
-    }
-    
-    function getAssoc() {
-        trigger_error (__FUNCTION__.' is not implemented yet', E_USER_ERROR);
-    }
-    
-    function getErrors() {
-        trigger_error (__FUNCTION__.' is not implemented yet', E_USER_ERROR);
-    }
-    
-    function getDynamicInfo() {
-        if ($this->isAbstract) trigger_error('Cannot retrieve dynamic info from abstract property info '.$this->srcClass.'::'.$this->$propName, E_USER_ERROR);
         if ($this->isStatic) {
-            $dynFormOptions = $this->srcObject->getFormOptions($this->propName, false);
-            $this->_updateData($dynFormOptions);
+            trigger_error (__FUNCTION__.' has no effect when \$isStatic == true', E_USER_NOTICE);
+            return false;
         }
-        return true;
+        $res = strlen($this->assocClass)? $this->srcObject->getAssoc($this->propName) : $this->srcObject->getField($propName);
+        return $res;
+    }
+    
+    function getErrors($concat = false, $forceCheck = false) {
+        if ($this->isStatic) {
+            trigger_error (__FUNCTION__.' has no effect when \$isStatic == true', E_USER_NOTICE);
+            return false;
+        }
+        $res = $this->srcObject->getErrors($this->propName, $concat, $forceCheck);
+        return $res;
     }
     
 }

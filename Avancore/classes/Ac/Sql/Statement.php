@@ -43,7 +43,7 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
         return $res;
     }
     
-    function Ac_Sql_Statement($options = array()) {
+    function __construct($options = array()) {
         if (is_string($options)) {
             $this->parts['expression'] = $options;
             if (func_num_args() > 1) {

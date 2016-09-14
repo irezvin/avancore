@@ -147,12 +147,14 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         $dir = $this->detectClassesDir();
         if (strlen($dir)) {
             $dir = dirname($dir);
-            $deployDirName = 'deploy';
             if (isset($this->configFromInit['deployDirPath'])) {
                 $res = $this->configFromInit['deployDirPath'];
                 if (!is_dir($res)) trigger_error("Warning: directory mentioned in 'deployDirPath' init-provided property, '{$res}', does not exist", E_USER_WARNING);
             } elseif (strlen($dir)) {
-                if (is_dir($n = $dir.'/deploy')) {
+                if (is_dir($n = $dir.'/config')) {
+                    $res = $n;
+                    if (strlen($this->appClass) && is_dir($n = $dir.'/'.$this->appClass)) $res = $n;
+                } elseif (is_dir($n = $dir.'/deploy')) {
                     $res = $n;
                     if (strlen($this->appClass) && is_dir($n = $dir.'/'.$this->appClass)) $res = $n;
                 }
@@ -321,13 +323,20 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     
     protected function intGetConfigValue($option, $fromFun = true) {
         $res = null;
+        // if $option below is passed-by-copy (''.$option), the bug below won't happen
         if (array_key_exists($option, $this->overrides)) return $this->overrides[$option];
         if ($fromFun) $option{0} = strtolower($option{0});
         if (method_exists($this, $m = 'doGet'.$option)) $res = $this->$m();
         if (is_null($res)) {
             $conf = $this->intGetArrConfig();
+            // comment this to find PHP7 bug (PHP 7.0.1, apache module)
+            $option = ''.$option; // Some real PHP7 WTFery goes here - can't write a reliable test case!!
             if (isset($conf[$option])) $res = $conf[$option];
             elseif (method_exists($this, $m = 'doGetDefault'.$option)) $res = $this->$m();
+            // uncomment to find PHP7 bug
+            //if (isset($conf[$option]) !== isset($conf[''.$option])) {
+            //    die('cookadodie PHP7 rocks');
+            //}
         }
         return $res;
     }
@@ -493,7 +502,9 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     protected function doGetDefaultServices() {
         return array(
             'managerConfigService' => 'Ac_Admin_ManagerConfigService',
-            'flags' => array('class' => 'Ac_Flags')
+            'flags' => array('class' => 'Ac_Flags'),
+            'Ac_Model_Relation_Provider_Evaluator' => 'Ac_Model_Relation_Provider_Evaluator',
+            'Ac_Model_Relation_Accessor_Evaluator' => 'Ac_Model_Relation_Accessor_Evaluator',
         );
     }
     

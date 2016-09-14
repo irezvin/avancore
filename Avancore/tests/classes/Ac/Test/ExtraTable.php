@@ -4,8 +4,66 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
     
     protected $bootSampleApp = true;
     
-    function testExtraTable() {
+    var $t = 0;
+    
+    function testExtraTableFields() {
+        // all extra table fields must be loaded that are listed in object mixable' listDataProperties, 
+        // especially its' primary key
+        
+       //$rows = $this->getAeDb()->fetchArray("SELECT * FROM #__publish WHERE id IN (118, 117, 1) ORDER BY id DESC", 'id');
+       $ob = Sample::getInstance()->getSamplePersonPostMapper()->find(array('pubId' => array(117, 118)), 'pubId');
+       $ids = array();
+       foreach ($ob as $o) {
+           $ids[$o->pubId] = $o->getMixable('Sample_Publish')->id;
+       }
+       if (!$this->assertArraysMatch($ids, array(
+           117 => 117,
+           118 => 118
+       ))) var_dump($ids);
+    }
+    
+    function testPreloadedRows() {
+        
+        // test with referenced Extra Table
+        
+        $items = $this->getAeDb()->fetchArray("SELECT * FROM #__publish");
+        
         $mapper = Sample::getInstance()->getSampleShopProductMapper();
+        $mapper->reset();
+        $extra = $mapper->getMixable('publish');
+        $extra->pushPreloadedRows($items);
+        $mapper->loadRecord(1);
+        $this->assertEqual($extra->getPreloadedHits(), 1);
+        $extra->popPreloadedRows();
+
+        $mapper = Sample::getInstance()->getSamplePersonPostMapper();
+        $extra = $mapper->getMixable('publish');
+        $extra->pushPreloadedRows($items);
+        $posts = $mapper->find(array(new Ac_Sql_Expression('pubId IS NOT NULL')));
+        $this->assertEqual($extra->getPreloadedHits(), 2);
+        $extra->popPreloadedRows();
+        
+        // test with inline
+        
+        $items = $this->getAeDb()->fetchArray("SELECT * FROM #__shop_product_notes");
+        $mapper = Sample::getInstance()->getSampleShopProductMapper();
+        $mapper->reset();
+        $extra = $mapper->getMixable('note');
+        $extra->pushPreloadedRows($items);
+        $prod = $mapper->loadRecord(1);
+        $this->assertEqual($extra->getPreloadedHits(), 1);
+        $this->assertEqual($prod->note, 'xxx');
+        
+    }
+    
+    function testExtraTable() {
+        $this->t = microtime(true);
+        
+        $mapper = Sample::getInstance()->getSampleShopProductMapper();
+        $mapper->reset();
+        
+        $this->resetAi('#__shop_meta');
+        $this->resetAi('#__publish');
         
         // Not directly related to the ExtraTable... but saw that bug when running the tests
         $mixable = $mapper->getMixable('upc');
@@ -20,8 +78,6 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         // Works when loading two objects (loadFromRows)
         $twoProds = $mapper->loadRecordsArray(array(1, 2), true);
         
-        //Ac_Debug::drr($twoProds);
-        
         $this->assertEqual($twoProds[1]->metaDescription, 'Страница товара 1');
         $this->assertEqual($twoProds[1]->upcCode, '1234');
         
@@ -35,6 +91,11 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         $metaId = $this->resetAi('#__shop_meta');
         
         $newProd = $mapper->createRecord();
+        $dp = $newProd->listDataProperties();
+        if (!$this->assertTrue(count($dp) == count(array_unique($dp)), 
+            "Mixin ModelObject listDataProperties() should not have repeating values")) {
+            var_dump($dp);
+        }
         $data = array(
             'id' => $prodId,
             'title' => 'Product3',
@@ -42,10 +103,13 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             'pageTitle' => '-=product-03-title=-',
             'upcCode' => '5678',
         );
+        $db = $mapper->getDb();
+        $db->args($data['pageTitle'])->query("DELETE FROM #__shop_meta WHERE pageTitle = ?");
+        $db->args($data['upcCode'])->query("DELETE FROM #__shop_product_upc WHERE upcCode = ?");
         $newProd->bind($data);
         $res = $newProd->store();
-        $db = $mapper->getDb();
         if ($this->assertTrue($res, 'Owner record row must report it is saved')) {
+            $this->assertTrue($newProd->isPersistent());
             $this->assertEqual($newProd->metaId, $metaId);
             $prodRow = $db->args($prodId)->fetchRow('SELECT * FROM #__shop_products WHERE id = ?');
             if ($this->assertTrue(is_array($prodRow), 'Owner record row must appear in the primary table')) {
@@ -61,7 +125,21 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             if ($this->assertTrue(is_array($upcRow), 'Extra row must appear in referencing extra table')) {
                 $this->assertEqual($upcRow['upcCode'], $data['upcCode']);
             }
-
+            
+            // Now change the records
+            $newProd->pageTitle = $newPageTitle = 'Foo';
+            $newProd->upcCode = $newUpcCode = '1234';
+            $this->assertTrue((bool) $newProd->save());
+            $metaRow = $db->args($metaId)->fetchRow('SELECT * FROM #__shop_meta WHERE id = ?');
+            if ($this->assertTrue(is_array($metaRow), 'Extra row must appear in referenced extra table')) {
+                $this->assertEqual($metaRow['pageTitle'], $newPageTitle);
+            }
+            $upcRow = $db->args($prodId)->fetchRow('SELECT * FROM #__shop_product_upc WHERE productId = ?');
+            if ($this->assertTrue(is_array($upcRow), 'Extra row must appear in referencing extra table')) {
+                $this->assertEqual($upcRow['upcCode'], $newUpcCode);
+            }
+            
+            
             $res = $newProd->delete();
             $this->assertTrue($res);
             $this->assertEqual(
@@ -76,8 +154,6 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             );
             // clean up
         }
-        $db->args($data['pageTitle'])->query("DELETE FROM #__shop_meta WHERE pageTitle = ?");
-        $db->args($data['upcCode'])->query("DELETE FROM #__shop_product_upc WHERE upcCode = ?");
     }
     
     function testMixableExtraTable() {
@@ -92,8 +168,8 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             $this->assertEqual($editor->personId, $prod->editorId);
         }
         
-        $prodId = $this->resetAi('#__shop_products');
-        $this->getAeDb()->query("DELETE FROM #__shop_products WHERE title LIKE '%test%'");
+        $this->resetAi('#__shop_products');
+        $this->deleteProducts("p.title LIKE '%test%'");
         $this->getAeDb()->query("DELETE FROM #__people WHERE name LIKE '%test%'");
         $this->resetAi('#__people');
         
@@ -106,9 +182,31 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         $editor = $testProd->createEditorPerson();
         $editor->bind(array('name' => 'test editor', 'birthDate' => date('1990-02-02')));
         
-        $this->assertTrue(!!$testProd->store());
-        
-        $eo = $testProd->getMixable('Sample_Publish');
+        if ($this->assertTrue(!!$testProd->store())) {
+            $row = $this->getAeDb()->args($testProd->id)->fetchRow("SELECT * FROM #__shop_products WHERE id = ?");
+            if ($this->assertTrue(is_array($row))) {
+                $pubId = $row['pubId'];
+                $this->assertEqual($testProd->pubId, $pubId, 'Master object field that stores reference '
+                    . 'to an extra table field must contain valid extra table key after save');
+                if ($pubId) {
+                    $pubRow = $this->getAeDb()->args($pubId)->fetchRow("SELECT * FROM #__publish WHERE id = ?");
+                    if ($this->assertTrue(is_array($pubRow))) {
+                        // actually, that shouldn't work at the moment
+                        $this->assertEqual($pubRow['sharedObjectType'], 'Sample_Shop_Product_Mapper');
+                    }
+                }
+                $metaId = $row['metaId'];
+                $this->assertEqual($testProd->metaId, $metaId, 'Master object field that stores reference '
+                    . 'to an extra table field must contain valid extra table key after save');
+                if ($metaId) {
+                    $metaRow = $this->getAeDb()->args($metaId)->fetchRow("SELECT * FROM #__shop_meta WHERE id = ?");
+                    if ($this->assertTrue(is_array($metaRow))) {
+                        // actually, that shouldn't work at the moment
+                        $this->assertEqual($metaRow['sharedObjectType'], 'product');
+                    }
+                }
+            }
+        }
         
     }
     
@@ -138,7 +236,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
     function testReferencingAssoc() {
         $db = $this->getSampleApp()->getDb();
         
-        $db->query("DELETE FROM #__shop_products WHERE title = 'test prod 2'");
+        $this->getAeDb()->query("DELETE p.*, pub.* FROM #__shop_products p LEFT JOIN #__publish pub ON pub.id = p.pubId WHERE p.title = 'test prod 2'");
         $db->query("DELETE FROM #__people WHERE name = 'test prod author'");
         
         // We can create the record that is referenced by the extra table and it will 
@@ -172,7 +270,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             . 'WHERE p.title = ?');
         $this->assertEqual($prodRow, array_merge($a, $b));
         
-        $db->query("DELETE FROM #__shop_products WHERE title = 'test prod 3'");
+        $this->deleteProducts("p.title = 'test prod 3'");
         $db->query("DELETE FROM #__people WHERE name = 'test prod author 2'");
 
         // We cannot load product through extra table, but we can successfully save it from referencing record
@@ -220,8 +318,8 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
     function testInlineGenExtraTable() {
         $prodMap = $this->getSampleApp()->getSampleShopProductMapper();
         $db = $this->getAeDb();
-        $db->query("DELETE FROM #__shop_products WHERE sku = 'PROD_NOTE'");
-        $db->query("DELETE FROM #__people WHERE name = 'Author of a note'");
+        $this->deleteProducts("p.sku = 'PROD_NOTE'");
+        $db->query("DELETE FROM #__people WHERE name = 'Test author of a note'");
         $prod = $prodMap->createRecord();
         $prod->bind($a = array(
             'sku' => 'PROD_NOTE',
@@ -230,7 +328,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         ));
         $author = $prod->createNotePerson();
         $author->bind($b = array(
-            'name' => 'Author of a note', 
+            'name' => 'Test author of a note', 
             'gender' => 'M',
             'birthDate' => '2014-02-14',
         ));

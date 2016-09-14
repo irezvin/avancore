@@ -2,11 +2,19 @@
 
 class Child_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
 
+
+    protected $preserveMetaCache = true;
     
     /**
      * @var Child_Shop_Product_Extra_Code_MapperMixable 
      */
     protected $mapperExtraTable = false;
+
+    protected $mixableId = 'Child_Shop_Product_Extra_Code';
+    
+    function hasPublicVars() {
+        return true;
+    }
 
     /**
      * @return Child 
@@ -22,20 +30,32 @@ class Child_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable_
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
         if ($pi === false) $pi = array (
-            'extraCodeExtraCodePerson' => array (
+            'extraCodePerson' => array (
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
+                'caption' => 'People',
             ),
             'productId' => array (
                 'values' => array (
                     'mapperClass' => 'Child_Shop_Product_Mapper',
                 ),
+                'caption' => 'Product Id',
+            ),
+            'ean' => array (
+                'caption' => 'Ean',
+            ),
+            'asin' => array (
+                'caption' => 'Asin',
+            ),
+            'gtin' => array (
+                'caption' => 'Gtin',
             ),
             'responsiblePersonId' => array (
                 'dummyCaption' => '',
                 'values' => array (
                     'mapperClass' => 'Child_Person_Mapper',
                 ),
+                'caption' => 'Responsible Person Id',
             ),
         );
     
@@ -64,8 +84,8 @@ class Child_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable_
     /**
      * @return Child_Person  
      */
-    function createExtraCodePerson($values = array(), $isReference = false) {
-        return parent::createExtraCodePerson($values, $isReference);
+    function createExtraCodePerson($values = array()) {
+        return parent::createExtraCodePerson($values);
     }
 
     

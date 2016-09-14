@@ -76,15 +76,22 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
      */
     function _getValuesProvider() {
         if ($this->_valuesProvider === false) {
+            $proto = false;
             if ($this->_valuesProviderPrototype) {
-                $this->_valuesProvider = Ac_Model_Values::factoryIndependent($this->_valuesProviderPrototype, $this->valuesProviderOverride, $this->valuesProviderOverride);
+                $proto = Ac_Util::m($this->_valuesProviderPrototype, $this->valuesProviderOverride);
             }
             elseif ($p = $this->getModelProperty()) {
                 if (isset($p->values) && $p->values) {
-                    $this->_valuesProvider = Ac_Model_Values::factoryWithProperty($p);
+                    $ovr = array();
+                    if ($p->isStatic) {
+                        $ovr['data'] = $this->_model;
+                    }
+                    $proto = Ac_Model_Values::getPrototypeFromProperty($p, $ovr);
                 }
             }
-            else $this->_valuesProvider = null;
+            if ($proto !== false) {
+                $this->_valuesProvider = Ac_Prototyped::factory($proto, 'Ac_Model_Values');
+            } else $this->_valuesProvider = null;
         }
         return $this->_valuesProvider;
     }
@@ -129,9 +136,9 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
                  }
              }
              elseif ($vp = $this->_getValuesProvider()) {
-                 $res = $vp->getValueList();
+                $res = $vp->getValueList();
              } elseif ($p = $this->getModelProperty()) {
-                 if (isset($p->valueList) && is_array($p->valueList))
+                if (isset($p->valueList) && is_array($p->valueList))
                     $res = $p->valueList;
              }
          } else {

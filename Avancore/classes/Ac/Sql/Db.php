@@ -99,21 +99,35 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
      * @param array $colMap ('col1' => 'val1', 'col2' => 'val2', ...)
      * @param string|bool $tableAlias Optional table name or alias to add before each column's name
      * @param bool $asArray Don't concat 'colN = valN' pairs with AND and return them as array instead
+     * @param bool $twoDimensional $colMap is two dimensional array and resulting criterion will be something like
+     *          ('col1' => 'val1', 'col2' => 'val2') OR ('col1' => 'val1.1', 'col2' => 'val2.2')...
      * @return string|array
      */
-    function valueCriterion($colMap, $tableAlias = false, $asArray = false) {
-        $r = array();
-        foreach ($colMap as $col => $value) {
-            $col = $this->n($col);
-            if ($tableAlias) $col = $this->n($tableAlias).'.'.$col;
-            $r[] = $col.' '.$this->eqCriterion($value);
-        }
-        if ($asArray) {
-            $res = $r;
+    function valueCriterion($colMap, $tableAlias = false, $asArray = false, $twoDimensional = false) {
+        if ($twoDimensional) {
+            $r = array();
+            foreach ($colMap as $item) {
+                $r[] = $this->valueCriterion($item, $tableAlias, false);
+            }
+            if ($asArray) $res = $r;
+            else {
+                $res = implode(" OR ", $r);
+                if (count($r) > 1) $res = "({$res})";
+            }
         } else {
-            $res = implode(" AND ", $r);
-            if (count($r) > 1) $res = "($res)";
-        } 
+            $r = array();
+            foreach ($colMap as $col => $value) {
+                $col = $this->n($col);
+                if ($tableAlias) $col = $this->n($tableAlias).'.'.$col;
+                $r[] = $col.' '.$this->eqCriterion($value);
+            }
+            if ($asArray) {
+                $res = $r;
+            } else {
+                $res = implode(" AND ", $r);
+                if (count($r) > 1) $res = "({$res})";
+            } 
+        }
         return $res;
     }
   
@@ -190,18 +204,24 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     function updateStatement($tableName, $fieldValues, $keysList, $allowPartialKey = false) {
         $tableName = $this->n($tableName);
-        $keys = array();
-        $res = false;
-        $keysList = Ac_Util::toArray($keysList);
-        foreach ($keysList as $keyName) 
-            if (isset($fieldValues[$keyName])) { 
-                $keys[$keyName] = $fieldValues[$keyName];
-                unset($fieldValues[$keyName]);
-            }
-        if (count($fieldValues) && ($allowPartialKey || (count($keys) == count($keysList)))) {
+            $keys = array();
+            $res = false;
+            $keysList = Ac_Util::toArray($keysList);
+            foreach ($keysList as $keyName) 
+                if (isset($fieldValues[$keyName])) { 
+                    $keys[$keyName] = $fieldValues[$keyName];
+                    unset($fieldValues[$keyName]);
+                }
+            if (count($fieldValues) && ($allowPartialKey || (count($keys) == count($keysList)))) {
             $res = "UPDATE {$tableName} SET ".implode(", ", $this->valueCriterion($fieldValues, false, true));
             if (count($keys)) $res .= " WHERE ".$this->valueCriterion($keys); 
         }
+        return $res;
+    }
+    
+    function updateWithKeys($tableName, $fieldValues, array $keysCriterion) {
+        $res = "UPDATE {$tableName} SET ".implode(", ", $this->valueCriterion($fieldValues, false, true));
+        if (count($keysCriterion)) $res .= " WHERE ".$this->valueCriterion($keysCriterion); 
         return $res;
     }
     
@@ -387,6 +407,9 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
         return $this;
     }
     
+    /**
+     * @return Ac_Sql_Db
+     */
     function argsArray(array $args) {
         $this->nextQueryArgs = $args;
         return $this;

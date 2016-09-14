@@ -2,19 +2,32 @@
 
 class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
 
-    public $_hasDefaults = true;
-    public $_person = false;
-    public $_personAlbums = false;
-    public $_personAlbumsCount = false;
-    public $_personAlbumsLoaded = false;
-    public $_personAlbumIds = false;
-    public $_portraitPerson = false;
-    public $_personPosts = false;
-    public $_personPostsCount = false;
-    public $_personPostsLoaded = false;
-    public $photoId = NULL;
-    public $personId = 0;
-    public $filename = '';
+
+    var $_hasDefaults = true;
+
+    var $_person = false;
+
+    var $_personAlbums = false;
+
+    var $_personAlbumsCount = false;
+
+    var $_personAlbumsLoaded = false;
+
+    var $_personAlbumIds = false;
+
+    var $_portraitPerson = false;
+
+    var $_personPosts = false;
+
+    var $_personPostsCount = false;
+
+    var $_personPostsLoaded = false;
+
+    var $photoId = NULL;
+
+    var $personId = 0;
+
+    var $filename = '';
     
     var $_mapperClass = 'Sample_Person_Photo_Mapper';
     
@@ -54,19 +67,19 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     }
 
     protected function getOwnPropertiesInfo() {
-    	static $pi = false; 
+        static $pi = false; 
         if ($pi === false) $pi = array (
             'person' => array (
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_person_photo_person'),
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
             ),
             'personAlbums' => array (
                 'className' => 'Sample_Person_Album',
                 'mapperClass' => 'Sample_Person_Album_Mapper',
-                'caption' => 'Person albums',
+                'caption' => new Ac_Lang_String('sample_person_photo_person_albums'),
                 'relationId' => '_personAlbums',
                 'countVarName' => '_personAlbumsCount',
                 'nnIdsVarName' => '_personAlbumIds',
@@ -77,7 +90,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
                 'arrayValue' => true,
                 'controlType' => 'selectList',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Album_Mapper',
                 ),
                 'showInTable' => false,
@@ -86,14 +99,14 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'portrait',
-                'caption' => 'People',
+                'caption' => new Ac_Lang_String('sample_person_photo_portrait_person'),
                 'relationId' => '_portraitPerson',
                 'referenceVarName' => '_portraitPerson',
             ),
             'personPosts' => array (
                 'className' => 'Sample_Person_Post',
                 'mapperClass' => 'Sample_Person_Post_Mapper',
-                'caption' => 'Person posts',
+                'caption' => new Ac_Lang_String('sample_person_photo_person_posts'),
                 'relationId' => '_personPosts',
                 'countVarName' => '_personPostsCount',
                 'referenceVarName' => '_personPosts',
@@ -104,22 +117,22 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
                 'attribs' => array (
                     'size' => '6',
                 ),
-                'caption' => 'Photo Id',
+                'caption' => new Ac_Lang_String('sample_person_photo_photo_id'),
             ),
             'personId' => array (
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
                 'values' => array (
-                    'class' => 'Ac_Model_Values_Records',
+                    'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ),
                 'objectPropertyName' => 'person',
-                'caption' => 'Person Id',
+                'caption' => new Ac_Lang_String('sample_person_photo_person_id'),
             ),
             'filename' => array (
                 'maxLength' => '45',
-                'caption' => 'Filename',
+                'caption' => new Ac_Lang_String('sample_person_photo_filename'),
             ),
         );
     
@@ -129,8 +142,6 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     
 
     function hasUniformPropertiesInfo() { return true; }
-
-    function tracksChanges() { return true; }
         
     
     /**
@@ -165,11 +176,10 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createPerson($values = array(), $isReference = false) {
+    function createPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPerson($res);
         return $res;
     }
@@ -235,11 +245,10 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Album  
      */
-    function createPersonAlbum($values = array(), $isReference = false) {
+    function createPersonAlbum($values = array()) {
         $m = $this->getMapper('Sample_Person_Album_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPersonAlbum($res);
         return $res;
     }
@@ -298,11 +307,10 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person  
      */
-    function createPortraitPerson($values = array(), $isReference = false) {
+    function createPortraitPerson($values = array()) {
         $m = $this->getMapper('Sample_Person_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->setPortraitPerson($res);
         return $res;
     }
@@ -366,11 +374,10 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample_Person_Post  
      */
-    function createPersonPost($values = array(), $isReference = false) {
+    function createPersonPost($values = array()) {
         $m = $this->getMapper('Sample_Person_Post_Mapper');
         $res = $m->createRecord();
         if ($values) $res->bind($values);
-        if ($isReference) $res->_setIsReference(true);
         $this->addPersonPost($res);
         return $res;
     }

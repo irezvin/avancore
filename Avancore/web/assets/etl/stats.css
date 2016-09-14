@@ -1,0 +1,42 @@
+.logStats {border-collapse: collapse; border: 2px solid silver}
+.logStats td, .logStats th {padding: 5px}
+.logStats tr.header th {background-color: silver}
+.logStats tr td, .logStats tr th {border-bottom: 1px solid silver; border-right: 1px dotted #BBB}
+.logStats tr.item td, .logStats tr.item th {font-size: 0.6em}
+.logStats tr.tag td {text-align: center}
+.logStats tr.item td.time, .logStats tr.item td.memory {text-align: center}
+.logStats tr.tag th.tagName {white-space: nowrap; text-align: left}
+.logStats tr.tag th.tagName span.indent {display: inline-block; width: 10px}
+
+input.notFound {
+    color: red;
+}
+
+.logStats tr.item td.details {
+    font-family: monospace;
+    font-size: 9px;
+    white-space: pre-line;
+}
+
+td.details .content {
+    max-height: 3em;
+    overflow-y: hidden;
+    transition: 0s max-height;
+    transition-delay: 1s;
+}
+
+td.details:hover .content {
+    max-height: 100000px;
+}
+
+
+td.details:hover {
+    background-color: #eee;
+}
+
+.logStats tr.item td table td, .logStats tr.item th table td {font-size: 1em}
+
+.logStats {
+    background-color: #f5f5f5;
+    color: black;
+}

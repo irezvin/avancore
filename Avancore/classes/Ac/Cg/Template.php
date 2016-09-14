@@ -22,15 +22,6 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
     var $domain = false;
     
     /**
-     * @var Ac_Cg_Strategy
-     */
-    var $strategy = false;
-    
-    var $plugins = array();
-    
-    var $language = 'en';
-    
-    /**
      * Should return info on files that are generated with this template.
      * Keys of return array are:
      * - relPath - path to file relative to output root , 
@@ -53,7 +44,7 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
     
     function fileIsUserEditable($id) {
        if (!in_array($id, $this->listFiles())) trigger_error ("No such file: '$id' in template ".get_class($this), E_USER_ERROR);
-       $res = $this->_filesList[$id]['isEditable'];
+       $res = isset($this->_filesList[$id]['isEditable']) && $this->_filesList[$id]['isEditable'];
        return $res; 
     }
     
@@ -63,16 +54,26 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
        return $res; 
     }
     
-    function outputFile($id, Ac_Cg_Writer_Abstract $writer) {
-        if (!in_array($id, $this->listFiles())) trigger_error ("No such file: '$id' in template ".get_class($this), E_USER_ERROR);
-        $partName = $this->_filesList[$id]['templatePart'];
+    function outputFile($id, Ac_Cg_Writer_Abstract $writer, $overwrite = false) {
+        $content = $this->fetchFileContent($id);
         $path = $this->getFilePath($id);
-        if (method_exists($this, $mtdName = 'show'.$partName)) {
-            $content = $this->fetch($partName);
-            $writer->writeContent($path, $content);
+        $writer->writeContent($path, $content, $overwrite);
+    }
+    
+    function fetchFileContent($id) {
+        if (!in_array($id, $this->listFiles())) trigger_error ("No such file: '$id' in template ".get_class($this), E_USER_ERROR);
+        if (isset($this->_filesList[$id]['content'])) {
+            $res = $this->_filesList[$id]['content'];
         } else {
-            trigger_error ("No template part '{$partName}' for file '".basename($path)."' is not defined in tempalte ".get_class($this), E_USER_ERROR);
+            $partName = $this->_filesList[$id]['templatePart'];
+            $path = $this->getFilePath($id);
+            if (method_exists($this, $mtdName = 'show'.$partName)) {
+                $res = $this->fetch($partName);
+            } else {
+                trigger_error ("No template part '{$partName}' for file '".basename($path)."' is not defined in tempalte ".get_class($this), E_USER_ERROR);
+            }
         }
+        return $res;
     }
     
     // here should come some useful functions for php output
@@ -87,7 +88,6 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
     function doInit() {
         
     }
-    
     
     /**
      * Shows php open tag
@@ -125,27 +125,15 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
         return Ac_Util_Php::str($string, $return);
     }
     
-    /**
-     * Returns twice-escaped-and-quoted string (useful for strings in generated PHP code that runs SQL operators) 
-     */
-    function str2 ($string, $return = false) {
-        return Ac_Util_Php::str2($string, $return);
+    function declareClassMember($var, $default, $indent = 4) {
+        if (!$default instanceof Ac_Cg_Member) $default = Ac_Cg_Member::va($default);
+        $default->export($var, $indent);
     }
     
-    /**
-     * Shows language string stored in the Strategy
-     */
-
-    function lng($strName, $default = '(Language string missing: ~)') {
-        echo $this->strategy->getLanguageString($strName, $default);
-    }
-    
-    function dict ($string, $return = false) {
-        $str = $this->domain->dictionary->translate($string, $this->language);
-        if ($this->domain->dictionary->isConstant($str)) $out = $str;
-           else $out = "'".addcslashes($str, "'")."'";
-        if ($return) return $out;
-           else echo $out;
+    function declareClassMembers($arr, $indent = 4) {
+        foreach ($arr as $var => $default) {
+            $this->declareClassMember($var, $default, $indent);
+        }
     }
     
     function showDenyHtaccess() {
@@ -165,7 +153,30 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
         Deny from All
     </IfModule>
 <?php
+
+    }
+
+    function showLocalHtaccess() {
+?>
+    <IfModule mod_version.c>
+        <IfVersion < 2.4>
+            Order Deny,Allow
+            Deny from All
+            Allow from 127.0.0.1
+            Allow from ::1
+        </IfVersion>
+
+        <IfVersion >= 2.4>
+            Require local
+        </IfVersion>
+    </IfModule>
+    <IfModule !mod_version.c>
+        Order Deny,Allow
+        Deny from All
+        Allow from 127.0.0.1
+        Allow from ::1
+    </IfModule>
+<?php
     }
     
 }
-
