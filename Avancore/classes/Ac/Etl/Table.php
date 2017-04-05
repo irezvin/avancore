@@ -60,6 +60,7 @@ class Ac_Etl_Table extends Ac_Prototyped {
     }
     
     function appendRecord($record, $lineNo = false) {
+        if (!$this->loadData) $this->beginLoadData();
         if ($lineNo !== false && !isset($record['lineNo']))
             $record['lineNo'] = $lineNo;
         if (!$this->hasLineNo()) unset($record['lineNo']);

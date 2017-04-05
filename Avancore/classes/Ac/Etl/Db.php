@@ -233,5 +233,32 @@ class Ac_Etl_Db extends Ac_Sql_Db {
     public function resultGetFieldsInfo($resultResource) {
         return $this->db->resultGetFieldsInfo($resultResource);
     }
+        
+    /**
+     * @param mixed $args
+     * @return Ac_Sql_Db
+     */
+    function args($args = array()) {
+        $f = __FUNCTION__;
+        $args = func_get_args();
+        return call_user_func_array(array($this->db, $f), $args);
+    }
+    
+    /**
+     * @return Ac_Sql_Db
+     */
+    function argsArray(array $args) {
+        $f = __FUNCTION__;
+        $args = func_get_args();
+        return call_user_func_array(array($this->db, $f), $args);
+    }
+    
+    function dumpNext($options = self::DUMP_OB_STOP) {
+        $f = __FUNCTION__;
+        $args = func_get_args();
+        return call_user_func_array(array($this->db, $f), $args);
+    }
+
+    
 
 }
