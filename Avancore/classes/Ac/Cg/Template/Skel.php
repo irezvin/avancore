@@ -77,7 +77,8 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
             '{pathClasses}/{App}/Controller.php' => 'classesAppControllerPhp',
             '{pathClasses}/{App}/Frontend.php' => 'classesAppFrontendPhp',
             '{pathClasses}/{App}/FrontendTemplate.php' => 'classesAppFrontendtemplatePhp',
-            '{pathConfig}/app.config.local.php' => 'configAppConfigLocalPhp',
+            '{pathConfig}/app.config.local.pre.php' => 'configAppConfigLocalPrePhp',
+            '{pathConfig}/app.config.local.post.php' => 'configAppConfigLocalPostPhp',
             '{pathConfig}/app.config.php' => 'configAppConfigPhp',
             '{pathConfig}/codegen.config.php' => 'configCodegenConfigPhp',
             '{pathGen}/classes/{App}/DomainBase.php' => 'genClassesAppDomainbasePhp',
@@ -96,7 +97,7 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
     
     function _generateFilesList() {
         $map = $this->getFileMap();
-        $tr = $this->layout->getMapTr(true);
+        $tr = $this->layout->getMapTr();
         $res = array();
         foreach ($map as $path => $part) {
             if (is_array($part)) {
@@ -354,24 +355,32 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
     <?php
     }
 
-    // --- config/app.config.local.php ---------------------------------------------
+    // --- config/app.config.local.pre.php ---------------------------------------------
 
-    function showConfigAppConfigLocalPhp () {
+    function showConfigAppConfigLocalPrePhp () {
 
         $this->phpOpen();
 
     ?>        
-
             $avancorePath = '[[AVANCORE_PATH]]';
             if (!is_dir($avancorePath)) $avancorePath = dirname(__FILE__).'/../vendor/Avancore';
-
-            $config['dbName'] = '[[DBNAME]]';
-            
-            $config['dbPrototype'] = <?php $this->exportArray($this->dbPrototype, $this->deIndent, true) ?>;
             
     <?php
     }
 
+    // --- config/app.config.local.post.php ---------------------------------------------
+
+    function showConfigAppConfigLocalPostPhp () {
+
+        $this->phpOpen();
+
+    ?>        
+            $config['dbName'] = '[[DBNAME]]';
+            $config['dbPrototype'] = <?php $this->exportArray($this->dbPrototype, $this->deIndent, true) ?>;
+            
+    <?php
+    }
+    
     // --- config/app.config.php ---------------------------------------------------
 
     function showConfigAppConfigPhp () {
@@ -380,6 +389,10 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
 
     ?>        
 
+            if (is_file(dirname(__FILE__).'/app.config.local.pre.php')) {
+                require(dirname(__FILE__).'/app.config.local.pre.php');
+            }
+            
             if (isset($_SERVER) && isset($_SERVER['SERVER_NAME']) && isset($_SERVER['REQUEST_URI'])) {
                 $scheme = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] == 'on'? 'https://' : 'http://';
                 $url = $scheme.$_SERVER['SERVER_NAME'].$_SERVER['REQUEST_URI'];
@@ -411,7 +424,9 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
                 ),
             );
 
-            require(dirname(__FILE__).'/app.config.local.php');
+            if (is_file(dirname(__FILE__).'/app.config.local.post.php')) {
+                require(dirname(__FILE__).'/app.config.local.post.php');
+            }
 
     <?php
     }

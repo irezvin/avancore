@@ -62,6 +62,7 @@ class Ac_Cg_App extends Ac_Prototyped {
         if (is_object($this->layout)) {
             $this->type = $this->layout->getAppType();
             if (!strlen($this->name)) $this->name = $this->layout->appName;
+            elseif (!strlen($this->layout->appName)) $this->layout->appName = $this->name;
         }
     }
 

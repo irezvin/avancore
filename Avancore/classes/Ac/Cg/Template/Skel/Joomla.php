@@ -57,9 +57,9 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
     }
 
     
-    // --- config/app.config.local.php ---------------------------------------------
+    // --- config/app.config.local.pre.php ---------------------------------------------
 
-    function showConfigAppConfigLocalPhp () {
+    function showConfigAppConfigLocalPrePhp () {
 
         $this->phpOpen();
 
@@ -70,6 +70,16 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
             
     <?php
     }
+    
+    // --- config/app.config.local.post.php ---------------------------------------------
+
+    function showConfigAppConfigLocalPostPhp () {
+
+        $this->phpOpen();
+
+    ?>        
+    <?php
+    }
 
     // --- config/app.config.php ---------------------------------------------------
 
@@ -78,6 +88,9 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
         $this->phpOpen();
 
     ?>        
+            if (is_file(dirname(__FILE__).'/app.config.local.pre.php')) {
+                require(dirname(__FILE__).'/app.config.local.pre.php');
+            }
 
             if (class_exists('JUri', false)) {
                 // use Joomla class to get current URL
@@ -164,8 +177,8 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
                 }
             }
 
-            if (is_file(dirname(__FILE__).'/app.config.local.php')) {
-                require(dirname(__FILE__).'/app.config.local.php');
+            if (is_file(dirname(__FILE__).'/app.config.local.post.php')) {
+                require(dirname(__FILE__).'/app.config.local.post.php');
             }
 
     <?php

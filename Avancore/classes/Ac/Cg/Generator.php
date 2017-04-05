@@ -422,7 +422,7 @@ class Ac_Cg_Generator {
     
     function __destruct() {
         if ($this->hasBegan()) {
-            trigger_error("Destroying Generator that had begin() without end() called", E_USER_NOTICE);
+            //trigger_error("Destroying Generator that had begin() without end() called", E_USER_NOTICE);
             $this->end();
         }
     }
@@ -532,7 +532,7 @@ class Ac_Cg_Generator {
             'srcDir' => $srcDir,
             'destDir' => $destDir,
         ));
-        $sync->ensureDirsNotNested();
+        //$sync->ensureDirsNotNested();
             
         $copy = array(
             'bin', 'classes', 'languages', 'obsolete', 'vendor', 'web/assets' => $destWebDir

@@ -557,7 +557,9 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
         }
         $nameParts = Ac_Cg_Inflector::explode($aName);
         $ssPrefixes = array();
-        foreach ($this->subsystemPrefixes as $p) $ssPrefixes[strtolower($p)] = 1;
+        if (is_array($this->subsystemPrefixes)) {
+            foreach ($this->subsystemPrefixes as $p) $ssPrefixes[strtolower($p)] = 1;
+        }
         $res['subsystemPrefixes'] = array();
         
         $found = true;

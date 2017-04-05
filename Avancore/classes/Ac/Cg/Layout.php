@@ -21,7 +21,7 @@ abstract class Ac_Cg_Layout extends Ac_Prototyped {
     var $pathAssets = 'web/assets';
     var $pathVendor = 'vendor';
     var $pathAvancore = 'vendor/Avancore';
-    var $pathAvancoreAssets = 'web/avancore';
+    var $pathAvancoreAssets = '../../web/avancore';
     var $pathCodegenWeb = 'web/codegen';
     var $pathBootstrap = '';
 
