@@ -82,11 +82,11 @@ class Ac_Test_Controller extends Ac_Test_Base {
         
         $c->reset();
         $c->setAction('withTemplate');
-        var_dump($c->getResult());
+        $this->assertEqual($c->getResult()->getContent(), "xxx\ndetails");
         
         $c->reset();
         $c->setAction('resultTemplateAccess');
-        var_dump($c->getResult());
+        $this->assertEqual($c->getResult()->getContent().'', '<p>The result</p>');
         
     }    
 }

@@ -54,28 +54,26 @@ abstract class Ac_Util {
     
     static function loadClass($className) {        
         $fileLoaded = false;
-        if (!class_exists($className, false)) { // New behavior - use relative path to classDir
-            $fileName = str_replace('\\', DIRECTORY_SEPARATOR, $className);
-            $fileName = str_replace('_', DIRECTORY_SEPARATOR, $fileName).'.php';
-            $classDir = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
-            $f = $classDir.$fileName;
-            $fileLoaded = false;
-            if (is_file($f)) {
-                require($f);
-                $fileLoaded = true;
-            } else {
-                $p = self::getSafeIncludePath();
-                foreach ($p as $dir) {
-                    if (is_file($f = $dir.DIRECTORY_SEPARATOR.$fileName)) {
-                        require($f);
-                        $fileLoaded = true;
-                        break;
-                    }
+        $fileName = str_replace('\\', DIRECTORY_SEPARATOR, $className);
+        $fileName = str_replace('_', DIRECTORY_SEPARATOR, $fileName).'.php';
+        $classDir = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
+        $f = $classDir.$fileName;
+        $fileLoaded = false;
+        if (is_file($f)) {
+            require($f);
+            $fileLoaded = true;
+        } else {
+            $p = self::getSafeIncludePath();
+            foreach ($p as $dir) {
+                if (is_file($f = $dir.DIRECTORY_SEPARATOR.$fileName)) {
+                    require($f);
+                    $fileLoaded = true;
+                    break;
                 }
             }
-            //if ($fileLoaded && !class_exists($className) || interface_exists($className))
-            //    trigger_error (__FILE__."::".__FUNCTION__." - class '$className' not found in the $fileName", E_USER_ERROR);
         }
+        //if ($fileLoaded && !class_exists($className) || interface_exists($className))
+        //    trigger_error (__FILE__."::".__FUNCTION__." - class '$className' not found in the $fileName", E_USER_ERROR);
         return $fileLoaded;
     }
     
@@ -216,9 +214,9 @@ abstract class Ac_Util {
             if (!$glue) $glue = $impl;
         } else $impl = $glue;
         $return = array();
-        while(list($key,$value) = each($array)) {
+        foreach ($array as $key => $value) {
             if(is_array($value)) $return[] = self::implodeRecursive($glue, $value, (string) $key);
-            else 
+            else
                 $return[] = $value;
         }
         return(is_array($return)? implode($impl, $return) : $return);
@@ -306,7 +304,7 @@ abstract class Ac_Util {
      * Transforms array('foo', 'bar', 'baz') into foo[bar][baz]
      */
     static function arrayToPath($array) {
-        if ($c = count($array)) {
+        if (is_array($array) && $c = count($array)) {
             $res = $array[0];
             for ($i = 1; $i < $c; $i++) $res .= '['.$array[$i].']';
         } else $res = '';
@@ -1274,4 +1272,12 @@ class _Ae_Util_ObjectVarGetter {
  */
 function acUtilLoadClass($className) {
     Ac_Util::loadClass(Ac_Util::fixClassName($className));
+}
+
+if (!function_exists('is_countable')) {
+    
+    function is_countable($foo) {
+        return is_array($foo) || is_object($foo) && $foo instanceof Countable;
+    }
+    
 }

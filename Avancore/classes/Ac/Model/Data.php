@@ -527,20 +527,6 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
             }
         }
     }
-    
-    
-    // +----------------------------------------    --------------------------------------+
-    // +--------------------------------  ACCESSOR METHODS  ------------------------------+
-    // +----------------------------------------    --------------------------------------+
-
-    function getProperty($propName, $key = false) {
-        
-    }
-    
-    function setProperty($propName, $value, $key = false) {
-        
-    }
-    
     // +-------------------------------------  getField  ---------------------------------+
     
     function getField($propName, $key = false) {

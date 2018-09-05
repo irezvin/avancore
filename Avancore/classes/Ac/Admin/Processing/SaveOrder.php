@@ -4,7 +4,8 @@
 class Ac_Admin_Processing_SaveOrder extends Ac_Admin_Processing {
 	
 	var $fieldName = 'ordering';
-	var $paramName = 'ordering';
+	
+    var $paramName = 'ordering';
 	
 	/**
 	 * @var Ac_Admin_Manager
@@ -20,6 +21,8 @@ class Ac_Admin_Processing_SaveOrder extends Ac_Admin_Processing {
 	
 	function _doProcessRecord($record) {
 		
+        if ($this->manager->getMapper() instanceof Ac_I_BatchAwareMapper) $this->manager->getMapper()->beginBatchChange(array($this->fieldName));
+        
 		$value = $record->getField($this->fieldName);
 		$newValue = $this->getOrderingValue($record);
 		if ($newValue !== false && $newValue != $value) {
@@ -30,6 +33,8 @@ class Ac_Admin_Processing_SaveOrder extends Ac_Admin_Processing {
 				$this->reportRecord($record, 'Не удалось переместить запись', 'error', false, false);
 			}
 		}
+		
+        if ($this->manager->getMapper() instanceof Ac_I_BatchAwareMapper) $this->manager->getMapper()->endBatchChange();
 		
 	}
 	

@@ -49,7 +49,14 @@ class Ac_Debug {
     static function ddd($_ = null) {
         self::savageMode();
         $a = func_get_args();
-        call_user_func_array('var_dump', $a);
+        ob_start();
+        call_user_func_array('var_dump', $a); $l = __LINE__;
+        $d = ob_get_clean();
+        if (strpos($d, $str = __FILE__.':'.$l) !== false) {
+            $s = debug_backtrace();
+            $d = str_replace($str, $s[0]['file'].':'.$s[0]['line'], $d);
+        }
+        echo($d);
         die();
     }
     
@@ -59,7 +66,14 @@ class Ac_Debug {
     static function dd($_ = null) {
         self::savageMode();
         $a = func_get_args();
-        call_user_func_array('var_dump', $a);
+        ob_start();
+        call_user_func_array('var_dump', $a); $l = __LINE__;
+        $d = ob_get_clean();
+        if (strpos($d, $str = __FILE__.':'.$l) !== false) {
+            $s = debug_backtrace();
+            $d = str_replace($str, $s[0]['file'].':'.$s[0]['line'], $d);
+        }
+        echo ($d);
     }
     
     static function log($_ = null) {

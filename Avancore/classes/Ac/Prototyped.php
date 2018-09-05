@@ -3,7 +3,8 @@
 /**
  * @TODO: move code to call __initialize to some common method? 
  */
-if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/I/Prototyped.php');
+if (!class_exists('Ac_I_Prototyped', false)) require_once(dirname(__FILE__).'/I/Prototyped.php');
+
 abstract class Ac_Prototyped implements Ac_I_Prototyped {
     
     static $strictParams = true;

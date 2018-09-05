@@ -21,7 +21,7 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
     
     $classes = explode(',', $_GET['class']);
 	
-    $ts = new TestSuite("Ac {$v} Test".(count($classes == 1)? '' : 's').": {$_GET['class']}");
+    $ts = new TestSuite("Ac {$v} Test".(count($classes) == 1? '' : 's').": {$_GET['class']}");
     
     foreach ($classes as $class) {
 

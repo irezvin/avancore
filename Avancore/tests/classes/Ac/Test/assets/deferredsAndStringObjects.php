@@ -89,7 +89,7 @@ class ExampleEvaluator extends Ac_Prototyped implements Ac_I_Deferred_Evaluator 
     
 }
 
-class ExampleEvaluator2 implements Ac_I_Deferred_Evaluator {
+class ExampleEvaluator22 implements Ac_I_Deferred_Evaluator {
 
     static $sfx = '';
     
@@ -116,7 +116,7 @@ class ExampleDeferred2 extends Ac_Deferred {
     }
     
     function getEvaluatorPrototype() {
-        if (!$this->evaluatorPrototype) return array('class' => 'ExampleEvaluator2');
+        if (!$this->evaluatorPrototype) return array('class' => 'ExampleEvaluator22');
         else return $this->evaluatorPrototype;
     }
     

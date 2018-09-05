@@ -12,13 +12,13 @@ class Ac_Test_Template extends Ac_Test_Base {
         $missing = array();
         $e = null;
         try {
-            var_dump($t1->getArgs('partObjects', array('foo' => 'bar'), $missing));
+            var_dump($t1->getArgs($t1, 'partObjects', array('foo' => 'bar'), $missing));
         } catch (Ac_E_Template $e) {
         }
         $this->assertNotNull($e);
         
         $this->assertEqual(
-            $t1->getArgs('partObjects', $args = array('object1' => new TestObject1_1, 'object2' => new TestObject1_2), $missing), 
+            $t1->getArgs($t1, 'partObjects', $args = array('object1' => new TestObject1_1, 'object2' => new TestObject1_2), $missing), 
             array_values($args)
         );
         $this->assertEqual($missing, array());
@@ -26,14 +26,14 @@ class Ac_Test_Template extends Ac_Test_Base {
         $t1->setField('object1', $object1 = new TestObject1_1);
         $object2 = new TestObject1_2;
         if (!$this->assertEqual(
-            $a = $t1->getArgs('partObjects', $args = array('object2' => $object2), $missing), 
+            $a = $t1->getArgs($t1, 'partObjects', $args = array('object2' => $object2), $missing), 
             array($object1, $object2)
         )) var_dump($a);
         $this->assertEqual($missing, array());
         
         $t1->deleteField('object1');
         $this->assertEqual(
-            $t1->getArgs('partSomeObjects', $args = array(), $missing), 
+            $t1->getArgs($t1, 'partSomeObjects', $args = array(), $missing), 
             array(1 => null)
         );
         $this->assertEqual($missing, array('object1'));
@@ -42,12 +42,12 @@ class Ac_Test_Template extends Ac_Test_Base {
         $t1->object2 = $object2 = new TestObject1_2;
         $t1->foo = array();
         $this->assertEqual(
-            $t1->getArgs('partObjects', array(), $missing), 
+            $t1->getArgs($t1, 'partObjects', array(), $missing), 
             array($object1, $object2)
         );
         $this->assertEqual($missing, array());
         $this->assertEqual(
-            $t1->getArgs('partArray', array(), $missing), 
+            $t1->getArgs($t1, 'partArray', array(), $missing), 
             array(array())
         );
         $this->assertEqual($missing, array());

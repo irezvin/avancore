@@ -4,6 +4,8 @@ class Ac_Param_Filter_String extends Ac_Param_Filter implements Ac_I_Decorator {
     
     var $stripTags = true;
     
+    var $allowedTags = "";
+    
     /**
      * @var bool|string TRUE - default trim , string - use charlist from $trim
      */
@@ -71,7 +73,7 @@ class Ac_Param_Filter_String extends Ac_Param_Filter implements Ac_I_Decorator {
             $value = addcslashes($value, $cs);
         }
         
-        if ($this->stripTags) $value = strip_tags($value);
+        if ($this->stripTags) $value = strip_tags($value, $this->allowedTags);
         
         if ($this->removeDoubleSpaces) {
             $ds = $this->removeDoubleSpaces === true? '\s' : (string) $this->removeDoubleSpaces;

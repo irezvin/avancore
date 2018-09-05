@@ -31,8 +31,9 @@ class Ac_Model_Relation_Provider_Evaluator {
             
                 
             // todo: fix this when mapper provider will support several fields
-            $hasMultiField = (isset($relationProps['fieldLinks']) && count($relationProps['fieldLinks']) > 1)
-                || (isset($relationProps['fieldLinks2']) && count($relationProps['fieldLinks2']) > 1);
+            
+            $hasMultiField = (isset($relationProps['fieldLinks']) && is_array($relationProps['fieldLinks']) && count($relationProps['fieldLinks']) > 1)
+                || (isset($relationProps['fieldLinks2']) && is_array($relationProps['fieldLinks2']) && count($relationProps['fieldLinks2']) > 1);
 
             $hasSqlWhere = isset($relationProps['destWhere']) && is_string($relationProps['destWhere']);
             $hasSqlOrdering = isset($relationProps['destOrdering']) && 

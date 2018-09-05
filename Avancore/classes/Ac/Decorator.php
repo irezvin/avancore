@@ -70,6 +70,11 @@ class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
         return $value;
     }
     
+    static final function idec(& $decorator, $value, $model = false) {
+        if (!$decorator) return $value;
+        return self::decorate($decorator, $value, $decorator, $model);
+    }
+    
     /**
      * @param $decorator
      * @return Ac_I_Decorator
@@ -79,6 +84,11 @@ class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
             $res = $decorator;
         } elseif ($decorator) {
             if (!is_array($decorator)) $decorator = array('class' => $decorator);
+            if (!isset($decorator['class']))
+                $decorator = array(
+                    'class' => 'Ac_Decorator_Multi',
+                    'decorators' => $decorator
+                );
             $res = Ac_Prototyped::factory($decorator, 'Ac_I_Decorator');
         } else {
             $res = $decorator;

@@ -393,7 +393,7 @@ class Ac_Test_Model extends Ac_Test_Base {
         $this->assertTrue(is_array($ids = $p4->getTagIds()));
         $this->assertTrue(is_array($tagsList = $p4->listTags()));
         $this->assertEqual(count($ids), count($tagsList));
-        if (count($tags)) {
+        if (count($tagsList)) {
             $found = false;
             $first = $p4->getTag(0);
             foreach ($first->listPeople() as $i) {

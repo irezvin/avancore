@@ -141,13 +141,9 @@ class Ac_Table_Column {
     function getRecordProperty($record, $fieldName, $noDecorate = false) {
         static $getters = array();
         $rc = get_class($record);
-        $s = serialize($this->methodParams);
-        /*if (!(isset($getters[$rc]) && isset($getters[$rc][$fieldName]) && isset($getters[$rc][$fieldName][$s])))
-            $getters[$rc][$fieldName][$s] = $this->determineGetter($record, $fieldName);
-        $g = $getters[$rc][$fieldName][$s];*/
         $g = $this->determineGetter($record, $fieldName);
-        $res = $this->{$g[0]} ($record, $fieldName, $g[1]);
-        
+        $m = $g[0];
+        $res = $this->$m ($record, $fieldName, $g[1]);
         if ($this->decorator) $res = Ac_Decorator::decorate($this->decorator, $res, $this->decorator, $record);
         return $res;
     }

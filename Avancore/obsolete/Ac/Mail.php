@@ -101,6 +101,10 @@ class Ac_Mail {
     var $dontSaveErrors = false;
     
     var $_emailFileContent = false;
+    
+    var $debugSmtp = false;
+    
+    var $debugOutput = false;
 
     /**
      * @return Ac_Mail
@@ -111,7 +115,7 @@ class Ac_Mail {
         return $res;
     }
     
-    function __construct ($templateName, $to = false, $defaultSubject = false, $from = false, $data = array(), $textTemplate = false) {
+    function Ac_Mail ($templateName, $to = false, $defaultSubject = false, $from = false, $data = array(), $textTemplate = false) {
         $this->_htmlTemplate = $templateName;
         $this->_textTemplate = $textTemplate;
         $this->_to = $to;
@@ -157,6 +161,8 @@ class Ac_Mail {
         $mailer->Port = $smtpPort;
         $mailer->SMTPAuth = $smtpAuth;
         $mailer->SMTPSecure = $smtpSecure;
+        if (!$mailer->SMTPSecure) $mailer->SMTPSecure = 'none';
+        if (isset($mailer->SMTPAutoTLS)) $mailer->SMTPAutoTLS = false;
         
     }
     
@@ -295,15 +301,13 @@ class Ac_Mail {
                 } else {
                     if (!strlen($this->_subject))
                         $this->setSubject($this->defaultSubject);
-
+                    
+                    if (method_exists($m, 'isHTML')) $m->isHTML(true);
                     $htmlBody = $this->getPreparedHtmlBody();
                     $textBody = $this->getPreparedTextBody();
                     
                     if (strlen($htmlBody)) $m->Body = $htmlBody; 
                     if (strlen($textBody)) $m->AltBody = $textBody;
-                    
-                    //var_dump($m->Body);
-                    //var_dump($m->AltBody);
                     
                     if ($this->charset === false && defined('_ISO')) {
                         $iso = explode('=', _ISO, 2);
@@ -375,6 +379,8 @@ class Ac_Mail {
         }
         $res = new PHPMailer();
         $res->SetLanguage('en', $langDir = $this->getMailerDir().'/language/');
+        if ($this->debugSmtp) $res->SMTPDebug = $this->debugSmtp;
+        if ($this->debugOutput !== false) $res->debugOutput = $this->debugOutput;
         return $res;
     }
     

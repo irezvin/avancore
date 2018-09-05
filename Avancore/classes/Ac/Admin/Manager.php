@@ -64,8 +64,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      */
     var $featureSettings = array();
     
-    var $debugSql = false;
-    
     /**
      * @var string
      */
@@ -1265,7 +1263,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      */
     function getCollection() {
         if ($this->collection === false) {
-
             if ($this->onlyRecord) {
                 $proto = array(
                     'class' => 'Ac_Model_Collection_Array',
@@ -1276,7 +1273,11 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 foreach ($this->listFeatures() as $i) $this->getFeature($i)->onCollectionCreated ($this->collection);
                 list($query, $sort) = $this->getQueryAndSort($this->collection);
                 if ($query) $this->collection->setQuery(Ac_Util::m($this->collection->getQuery(), $query));
-                if ($sort !== null) $this->collection->setSort($sort);
+                if ($sort === null) {
+                    $sort = $this->getMapper()->getDefaultSort();
+                    if ($sort) $this->collection->setSort($sort);
+                }
+                else if ($sort !== null) $this->collection->setSort($sort);
             }
         }
         return $this->collection;

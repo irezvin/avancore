@@ -169,7 +169,7 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
         var _f = <?php echo $fcr; ?> = new AvanControllers.FormController();
         _m.setFormController(_f);
 <?php   if (($r = $this->manager->getRecord()) && $r->isPersistent()) { ?>
-        _f.addRecords(<?php echo new Ac_Js_Val(new Ac_Js_Hash(array(array('key' => $this->manager->getStrPk($r))))); ?>);
+        _f.addRecords(<?php echo new Ac_Js_Val(new Ac_Js_Hash(array(array('key' => $this->manager->getIdentifierOf($r))))); ?>);
 <?php   } ?>
 <?php $this->d($this->manager->getJsFormControllerRef(), true); ?>.setActionsController(_a);
         

@@ -850,6 +850,14 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
 				),
 			),
         );
+        $sort = $this->mapper->getDefaultSort();
+        $clause = false;
+        
+//      TODO: when I add lines below, some tests are failing - need to check
+//      
+//        if ($clause = $this->canSimpleSort($sort)) {
+//            $res['orderBy']['default'] = $clause;
+//        }
         if ($this->mapper) {
 			$res['tableProviders']['model'] = array(
                 'class' => 'Ac_Model_Sql_TableProvider',

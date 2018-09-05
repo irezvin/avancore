@@ -14,6 +14,8 @@ class Ac_Admin_Feature_Reorder extends Ac_Admin_Feature {
     
     var $saveOrderProcessing = array();
     
+    var $groupProperty = false;
+    
     function doCanBeApplied() {
         return (bool) strlen($this->colName);
     }
@@ -35,10 +37,12 @@ class Ac_Admin_Feature_Reorder extends Ac_Admin_Feature {
                 'class' => 'Ac_Admin_Column_Reorder',
                 'orderUpTask' => $orderUpTask,
                 'orderDownTask' => $orderDownTask,
+                'orderProperty' => $this->groupProperty
             ),
             $this->colName.'SaveOrder' => array(
                 'class' => 'Ac_Admin_Column_SaveOrder',
                 'taskName' => $this->colName.'SaveOrder',
+                'orderProperty' => $this->groupProperty
             ),
         );
         if (is_array($this->columnPrototype)) {
@@ -47,7 +51,7 @@ class Ac_Admin_Feature_Reorder extends Ac_Admin_Feature {
             unset($res[$this->colName]);
         }
         if (is_array($this->saveOrderColumnPrototype)) {
-            Ac_Util::ms($res[$this->colName], $this->saveOrderColumnPrototype);
+            Ac_Util::ms($res[$this->colName.'SaveOrder'], $this->saveOrderColumnPrototype);
         } else {
             unset($res[$this->colName.'SaveOrder']);
         }
