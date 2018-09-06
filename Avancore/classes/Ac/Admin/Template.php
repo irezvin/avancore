@@ -114,6 +114,7 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
             managerActionElement: <?php $this->d($h->jsQuote($aId), true) ?>,
             managerProcessingElement: <?php $this->d($h->jsQuote($pId), true) ?>,
             processingParamsPrefix: <?php $this->d($h->jsQuote($this->manager->getProcessingParamsParamName()), true); ?>, 
+            managerParamsPrefix: <?php $this->d($h->jsQuote($this->manager->getManagerParamsParamName()), true); ?>,
             containerElementId: <?php $this->d($h->jsQuote($this->manager->getContext()->mapIdentifier('_container')), true); ?>
         });
     // -->

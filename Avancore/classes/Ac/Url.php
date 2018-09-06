@@ -237,6 +237,15 @@ class Ac_Url implements Ac_I_RedirectTarget {
         $res = "<form ".Ac_Util::mkAttribs($formAttribs).">".$this->getHidden()."<input ".Ac_Util::mkAttribs($buttonAttribs)." /></form>";
         return $res;
     }
+    
+    /**
+     * @return Ac_Url
+     */
+    function stripFilename() {
+        $res = clone $this;
+        if (strlen($res->path) && substr($res->path, -1) !== '/') $res->path = dirname($res->path).'/';
+        return $res;
+    }
 
     /**
      * @param string $formName

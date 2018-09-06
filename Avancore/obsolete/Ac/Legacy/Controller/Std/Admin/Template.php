@@ -54,7 +54,9 @@ class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Legacy_Template_Html {
         if ($this->managerResponse && isset($this->managerResponse->hasToRedirect) && ($redir = $this->managerResponse->hasToRedirect)) {
             $bu = $ctx->getUrl();
             $u = new Ac_Url($redir);
-            $bu->query = Ac_Util::m($allState, $u->query, true);
+            $bu->query = $u->query;
+            // this creates weird issues i.e. when we try to save the record
+            // $bu->query = Ac_Util::m($allState, $u->query, true);
             $this->htmlResponse->redirectUrl = $bu;
         } else {
             $bu = $this->controller->getUrl(array($this->controller->_methodParamName => 'manager', 'mapper' => $this->context->getData('mapper')));

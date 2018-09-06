@@ -320,6 +320,14 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         }
         
         if ($redir && isset($this->_response->hasToRedirect)) $redir = false;
+        
+        if (($u = $this->getReturnUrl()) && !isset($this->_response->hasToRedirect)) {
+            $this->_context->setData('returnUrl', null);
+            $this->_context->setData('returnUrl64', null);
+            $this->_returnUrl = null;
+            $this->_response->hasToRedirect = $u;
+            $redir = false;
+        }
 
         if ($redir) {
             $this->_recordIdentifiers = array();
@@ -367,7 +375,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             } elseif ($stayOnDetails) {
                 $u = $this->getManagerUrl('details', array('keys' => array($pk)))->toString();
             } else {
-                $u = $this->getManagerUrl('list')->toString();
+                $u = $this->getManagerUrl('list', array('keys' => null))->toString();
             }
             $this->_response->hasToRedirect = $u;
             
@@ -533,7 +541,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $d['keys'][] = $this->getIdentifierOf($rec);
         }
         */
-        $s = $this->getStateData();
+        $skipKeys = (($this->stayOnProcessing && $action === false) || $action === 'list');
+        $s = $this->getStateData(false, $skipKeys);
         $d = Ac_Util::m($s, $d, true);
         if (strlen($action)) $d[$this->_methodParamName] = $action;
         $c->setData($d);
@@ -541,7 +550,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $u;
     }
     
-    function getStateData($withFilterForm = null) {
+    function getStateData($withFilterForm = null, $skipKeys = false) {
         $res = array();
         if ($this->_stayOnProcessing) {
             $res['action'] = 'processing';
@@ -559,7 +568,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if ($this->_isForm && isset($this->_rqData['form']) && !$this->_recordStored) {
             $res['form'] = $this->_rqData['form'];
         }
-        if ($res['action'] === 'list') {
+        if ($res['action'] === 'list' || $skipKeys) {
             unset($res['keys']);
         }
         if (($u = $this->getReturnUrl()) !== null) {
@@ -607,6 +616,10 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     function getProcessingParamsParamName() {
         return $this->_context->mapParam('processingParams');
+    }
+    
+    function getManagerParamsParamName() {
+        return $this->_context->mapParam('');
     }
     
     function getJsListControllerRef($onlyId = false) {

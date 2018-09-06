@@ -955,27 +955,30 @@ AvanControllers.ManagerController.prototype = {
     	
         var managerActionElement = AvanControllers.getElement(this.managerActionElement);
         if (managerActionElement) managerActionElement.value = actionName;
-        this.submitForm.call(this);
+        this.submitForm();
     },
     
     /**
      * @param {String} processingName Name of manager processing (is passed to PHP backend)
      * @param recordsOrKeys Optional array of records of their keys to select before the form will be submitted 
      */
-    executeProcessing: function(processingName, recordsOrKeys, params, override) {
+    executeProcessing: function(processingName, recordsOrKeys, params, override, managerParams) {
+        
         var managerProcessingElement = AvanControllers.getElement(this.managerProcessingElement);
         if (managerProcessingElement) managerProcessingElement.value = processingName;
         
+        var queryArgs, bogusItems, items, f, i, item, elem, n;
+        
         if (params && typeof params === 'object') {
-            var f = this.getFormElement();
+            f = this.getFormElement();
             if (!f) throw 'No form element';
-            var queryArgs = Ajs_Util.makeQuery(params, this.processingParamsPrefix, false, true);
-            var bogusItems = [];
-            var items = window.AvanControllers.findInputs(f, this.processingParamsPrefix);
+            queryArgs = Ajs_Util.makeQuery(params, this.processingParamsPrefix, false, true);
+            bogusItems = [];
+            items = window.AvanControllers.findInputs(f, this.processingParamsPrefix);
             
             // set existing element' values
-            for (var i = 0; i < items.length; i++) {
-                var item = items[i], name = item.getAttribute('name') + '';
+            for (i = 0; i < items.length; i++) {
+                item = items[i], name = item.getAttribute('name') + '';
                 if (queryArgs[name] !== undefined) {
                     item.value = queryArgs[name];
                     delete queryArgs[name];
@@ -985,8 +988,8 @@ AvanControllers.ManagerController.prototype = {
             }
             
             // create missing parameters
-            for (var n in queryArgs) if (queryArgs.hasOwnProperty(n)) {
-                var elem = document.createElement('input');
+            for (n in queryArgs) if (queryArgs.hasOwnProperty(n)) {
+                elem = document.createElement('input');
                 elem.setAttribute('type', 'hidden');
                 elem.setAttribute('name', n);
                 elem.setAttribute('value', queryArgs[n]);
@@ -994,10 +997,39 @@ AvanControllers.ManagerController.prototype = {
             }
             
             if (override) {
-                for (var i = 0; i < bogusItems.length; i++) {
+                for (i = 0; i < bogusItems.length; i++) {
                     bogusItems[i].parentNode.removeChild(bogusItems[i]);
                 }
             }
+        }
+        
+        if (managerParams && typeof managerParams === 'object') {
+            f = this.getFormElement();
+            if (!f) throw 'No form element';
+            queryArgs = Ajs_Util.makeQuery(managerParams, this.managerParamsPrefix, false, true);
+            bogusItems = [];
+            items = window.AvanControllers.findInputs(f, this.managerParamsPrefix);
+            
+            // set existing element' values
+            for (i = 0; i < items.length; i++) {
+                item = items[i], name = item.getAttribute('name') + '';
+                if (queryArgs[name] !== undefined) {
+                    item.value = queryArgs[name];
+                    delete queryArgs[name];
+                } else {
+                    bogusItems.push(item);
+                }
+            }
+            
+            // create missing parameters
+            for (n in queryArgs) if (queryArgs.hasOwnProperty(n)) {
+                elem = document.createElement('input');
+                elem.setAttribute('type', 'hidden');
+                elem.setAttribute('name', n);
+                elem.setAttribute('value', queryArgs[n]);
+                f.appendChild(elem);
+            }
+            
         }
             
         this.executeManagerAction('processing', recordsOrKeys);
@@ -1009,7 +1041,7 @@ AvanControllers.ManagerController.prototype = {
     
     invokeAction: function(action) {
         if (action.isAllowed()) {
-            if (action.managerProcessing) this.executeProcessing(action.managerProcessing);
+            if (action.managerProcessing) this.executeProcessing(action.managerProcessing, null, action.processingParams, false, action.managerParams);
             else {
                 if (action.managerAction) this.executeManagerAction(action.managerAction);
             }
