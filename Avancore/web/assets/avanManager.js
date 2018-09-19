@@ -924,11 +924,20 @@ AvanControllers.ManagerController.prototype = {
     managerProcessingElement: false,
     processingParamsPrefix: false,
     containerElementId: false,
+    managerParamsPrefix: false,
     
     submitForm: function() {
         if (this.parentManager) this.parentManager.submitFormByChildManager(this); 
         else {
             var formElement = AvanControllers.getElement(this.formElement);
+            window.theForm = formElement;
+            var inp = document.createElement('input');
+            inp.setAttribute('type', 'hidden');
+            inp.setAttribute('name', this.managerParamsPrefix + '[_fragment]');
+            inp.setAttribute('value', this.containerElementId);            
+            formElement.appendChild(inp);
+            var action = formElement.getAttribute('action').split('#')[0];
+            formElement.setAttribute('action', action + '#' + this.containerElementId);
             if (formElement) formElement.submit(); else throw 'No Form Element';
         }
     },
