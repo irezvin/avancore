@@ -296,7 +296,15 @@ class Ac_Url implements Ac_I_RedirectTarget {
         } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
             $scheme = 'https';
         }
-        $res = new Ac_Url($scheme.'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+        
+        if (isset($_SERVER['HTTP_HOST'])) $host = $_SERVER['HTTP_HOST'];
+        elseif (isset($_SERVER['HTTPS_HOST'])) $host = $_SERVER['HTTPS_HOST'];
+        else $host = 'localhost';
+        
+        if (isset($_SERVER['REQUEST_URI'])) $uri = $_SERVER['REQUEST_URI'];
+            else $uri = '/';
+        
+        $res = new Ac_Url($scheme.'://'.$host.$uri);
         if ($withPathInfo) {
             if (isset($_SERVER['PATH_INFO'])) {
                 $myPathInfo = $_SERVER['PATH_INFO'];

@@ -80,23 +80,14 @@ abstract class Ac_Util {
     static function registerAutoload($addIncludePath = false) {
         $res = false;
         if (self::$autoLoadRegistered === null) {
-            if (function_exists('spl_autoload_register')) {
-                $f = spl_autoload_functions();
-                $cb = array('Ac_Util', 'loadClass');
-                if (!is_array($f) || !in_array($cb, $f)) { 
-                    spl_autoload_register($cb);
-                    $res = true;                
-                    if (function_exists('__autoload')) {
-                        spl_autoload_register('__autoload');
-                    }
+            $f = spl_autoload_functions();
+            $cb = array('Ac_Util', 'loadClass');
+            if (!is_array($f) || !in_array($cb, $f)) { 
+                spl_autoload_register($cb);
+                $res = true;                
+                if (function_exists('__autoload')) {
+                    spl_autoload_register('__autoload');
                 }
-            } elseif (!function_exists('__autoload')) {
-
-                function __autoload($className) {
-                    return self::loadClass($className);
-                }
-                $res = true;
-
             }
             self::$autoLoadRegistered = $res;
         } else {

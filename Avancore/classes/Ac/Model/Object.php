@@ -42,6 +42,11 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     const EVENT_ON_ACTUAL = 'onActual';
 
     /**
+     * function onBeforeBeforeSave(& $result)
+     */
+    const EVENT_BEFORE_BEFORE_SAVE = 'onBeforeBeforeSave';
+
+    /**
      * function onBeforeSave(& $result)
      */
     const EVENT_BEFORE_SAVE = 'onBeforeSave';
@@ -485,6 +490,9 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
         if (!$this->_isBeingStored) { // we have to prevent recursion while saving complex in-memory record graphs
             $this->_isBeingStored = true;
             $this->intResetReferences();
+            
+            $this->triggerEvent(self::EVENT_BEFORE_BEFORE_SAVE);
+            
             $beforeSaveResult = $this->doBeforeSave();
             $isNew = !$this->isPersistent();
             

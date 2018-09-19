@@ -325,7 +325,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $this->_context->setData('returnUrl', null);
             $this->_context->setData('returnUrl64', null);
             $this->_returnUrl = null;
-            $this->_response->hasToRedirect = $u;
+            $this->_response->hasToRedirect = $this->preserveFragment($u);
             $redir = false;
         }
 
@@ -333,9 +333,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $this->_recordIdentifiers = array();
             $this->_record = null;
             $u = $this->getManagerUrl('list');
-            $this->_response->hasToRedirect = $u->toString();
+            $this->_response->hasToRedirect = $this->preserveFragment($u->toString());
         }
-        
             
     }
     
@@ -377,7 +376,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             } else {
                 $u = $this->getManagerUrl('list', array('keys' => null))->toString();
             }
-            $this->_response->hasToRedirect = $u;
+            $this->_response->hasToRedirect = $this->preserveFragment($u);
             
         } else {
         
@@ -401,12 +400,19 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         $this->_stayOnProcessing = false;
         $u = $this->getReturnUrl();
         if (strlen($u)) {
-            $this->_response->redirectUrl = ''.$u;
+            $this->_response->redirectUrl = $this->preserveFragment(''.$u);
         } else {
             $u = $this->getManagerUrl('list');
-            $this->_response->hasToRedirect = ''.$u;
+            $this->_response->hasToRedirect = $this->preserveFragment(''.$u);
         }
     }
+    
+    protected function preserveFragment($u) {
+        if ($f = $this->_context->getData('_fragment')) {
+            $u .= '#'.$f;
+        }
+        return $u;
+     }
     
     function executeGoBack() {
     }
@@ -541,7 +547,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $d['keys'][] = $this->getIdentifierOf($rec);
         }
         */
-        $skipKeys = (($this->stayOnProcessing && $action === false) || $action === 'list');
+        $skipKeys = (($this->_stayOnProcessing && $action === false) || $action === 'list');
         $s = $this->getStateData(false, $skipKeys);
         $d = Ac_Util::m($s, $d, true);
         if (strlen($action)) $d[$this->_methodParamName] = $action;
@@ -573,6 +579,10 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         }
         if (($u = $this->getReturnUrl()) !== null) {
             $res['returnUrl64'] = base64_encode($u);
+        }
+        
+        if ($this->_context->getData('_fragment')) {
+            $res['_fragment'] = $this->_context->getData('_fragment');
         }
         
         if ($withFilterForm === null) {
@@ -1156,6 +1166,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $u = new Ac_Url($subRedirect);
             $mu = $this->getManagerUrl('details', $allState);
             $mu->query = Ac_Util::m($mu->query, $u->query, true);
+            if ($u->fragment) $mu->fragment = $u->fragment;
             $this->_response->hasToRedirect = $mu->toString();
         }
         return $res;
@@ -1297,7 +1308,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
 
     /**
-     * Creates Tthe collection without applied filters
+     * Creates the collection without applied filters
      * @return Ac_Model_Collection_Mapper
      */
     function createBareCollection() {
@@ -1318,7 +1329,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if ($searchPrototype) {
             $proto['searchPrototype'] = $searchPrototype;
         }
-
         if ($s = $this->getSqlSelect()) {
             $proto['class'] = 'Ac_Model_Collection_SqlMapper';
             $proto['sqlSelect'] = $s;

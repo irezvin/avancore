@@ -76,7 +76,7 @@ class Ac_Admin_Action {
         if ($this->manager->getMethodName() === 'executeDetails' && $this->managerProcessing) {
             $proc = $this->manager->getProcessing($this->managerProcessing);
             if ($proc->returnToDetails) {
-                $res['managerParams']['returnUrl'] = ''.$this->manager->getManagerUrl();
+                $res['managerParams']['returnUrl'] = ''.$this->manager->getManagerUrl().'#'.$this->manager->getContext()->mapIdentifier('_container');
             }
         }
         

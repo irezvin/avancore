@@ -63,4 +63,3 @@ class Ac_Sql_Filter_Switcher extends Ac_Sql_Filter {
     }
     
 }
-

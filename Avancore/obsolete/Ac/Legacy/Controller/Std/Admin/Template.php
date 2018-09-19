@@ -55,6 +55,7 @@ class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Legacy_Template_Html {
             $bu = $ctx->getUrl();
             $u = new Ac_Url($redir);
             $bu->query = $u->query;
+            $bu->fragment = $u->fragment;
             // this creates weird issues i.e. when we try to save the record
             // $bu->query = Ac_Util::m($allState, $u->query, true);
             $this->htmlResponse->redirectUrl = $bu;

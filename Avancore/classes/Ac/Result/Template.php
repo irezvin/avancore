@@ -116,8 +116,10 @@ class Ac_Result_Template extends Ac_Result {
      */
     function render() {
         $pn = $this->getPartName();
-        if (!strlen($pn)) throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() without PartName set");
-        $res = $this->getTemplateInstance()->renderResultWithArgs($pn, $this->partArgs);
+        if (!strlen($pn)) throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() without partName set");
+        $tpl = $this->getTemplateInstance();
+        if (!($tpl)) throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() without template or templateInstance set");
+        $res = $tpl->renderResultWithArgs($pn, $this->partArgs);
         if ($w = $this->getRenderedResultWriter()) {
             $w = Ac_Prototyped::factory($w, 'Ac_Result_Writer');
             $res->setWriter($w);
