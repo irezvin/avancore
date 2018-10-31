@@ -295,7 +295,7 @@ abstract class Ac_Util {
      * Transforms array('foo', 'bar', 'baz') into foo[bar][baz]
      */
     static function arrayToPath($array) {
-        if ($c = count($array)) {
+        if (is_array($array) && $c = count($array)) {
             $res = $array[0];
             for ($i = 1; $i < $c; $i++) $res .= '['.$array[$i].']';
         } else $res = '';

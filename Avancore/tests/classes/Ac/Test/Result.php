@@ -640,7 +640,7 @@ EOD
     function testResultHtmlHttpOut() {
         $inner = new Ac_Result_Html(array('content' => 'Some text', 'charset' => 'utf-8', 'charsetUsage' => Ac_I_Result_WithCharset::CHARSET_PROPAGATE));
         $outer = new Ac_Result_Html(array('content' => $inner));
-        $env = new Ac_Response_Environment_Dummy;
+        $env = new Ac_Result_Environment_Dummy;
         $outer->setWriter(new Ac_Result_Writer_RenderHtml(array('environment' => $env)));
         $stage = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => true));
         $stage->invoke();
@@ -794,8 +794,8 @@ EOD
         $i = new Ac_Result(array('content' => "<{$js}>"));
         $o = new Ac_Result(array('content' => "*{$i}*"));
         
-        $d = new Ac_Response_Environment_Dummy();
-        Ac_Response_Environment::setDefault($d);
+        $d = new Ac_Result_Environment_Dummy();
+        Ac_Result_Environment::setDefault($d);
         
         $o->write();
         if (!$this->assertEqual($str = $d->responseText, $js->getContent()))
@@ -811,8 +811,8 @@ EOD
         $i = new Ac_Result(array('content' => "<{$js}>"));
         $o = new Ac_Result(array('content' => "*{$i}*"));
         
-        $d = new Ac_Response_Environment_Dummy();
-        Ac_Response_Environment::setDefault($d);
+        $d = new Ac_Result_Environment_Dummy();
+        Ac_Result_Environment::setDefault($d);
         
         $o->write();
         if (!$this->assertEqual($str = $d->responseText, $js->getContent()))
@@ -867,8 +867,8 @@ EOD
         $h = new Ac_Result_Http();
         $h->setStatusCode(404, "not found");
         $this->assertEqual($h->getReasonPhrase(), "not found");
-        $d = new Ac_Response_Environment_Dummy();
-        Ac_Response_Environment::setDefault($d);
+        $d = new Ac_Result_Environment_Dummy();
+        Ac_Result_Environment::setDefault($d);
         $h->write();
         $this->assertEqual($d->httpStatus, "404 not found");
     }
@@ -876,15 +876,15 @@ EOD
     function testRedirect() {
         $h = new Ac_Result_Redirect();
         $h->setUrl('http://example.com', Ac_Result_Redirect::REDIR_PERMANENT);
-        $d = new Ac_Response_Environment_Dummy();
-        Ac_Response_Environment::setDefault($d);
+        $d = new Ac_Result_Environment_Dummy();
+        Ac_Result_Environment::setDefault($d);
         $h->write();
         $this->assertEqual($d->headers, array('location: http://example.com'));
         $this->assertEqual($d->httpStatus, '301 Moved Permanently');
         
         $h = new Ac_Result_Redirect();
-        $d = new Ac_Response_Environment_Dummy();
-        Ac_Response_Environment::setDefault($d);
+        $d = new Ac_Result_Environment_Dummy();
+        Ac_Result_Environment::setDefault($d);
         $h->setUrl('http://example.com/another/page', Ac_Result_Redirect::REDIR_PERMANENT);
         $h2 = new Ac_Result_Html();
         $h2->put('Something');

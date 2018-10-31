@@ -26,8 +26,11 @@ class Ac_Test_CgImport extends Ac_Test_Base {
     
     function setUp() {
         if ($this->write) {
-            if (is_dir($this->getOut2())) Ac_Cg_Util::cleanDir ($this->getOut2());
-            if (is_dir($this->getOut3())) Ac_Cg_Util::cleanDir ($this->getOut3());
+            if (is_dir($p = $this->getOut2())) Ac_Cg_Util::cleanDir ($this->getOut2());
+            else mkdir($p, 0775, true);
+            
+            if (is_dir($p = $this->getOut3())) Ac_Cg_Util::cleanDir ($this->getOut3());
+            else mkdir($p, 0775, true);
         }
     }
     
@@ -50,6 +53,8 @@ class Ac_Test_CgImport extends Ac_Test_Base {
         $gen1->run();
         
         $out1 = $w1->getOutput();
+        
+        //die('Bar');
         
         $gen2 = new Ac_Cg_Generator(array());
         $gen2->lintify = false;

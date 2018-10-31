@@ -3,19 +3,19 @@
 class Ac_Result_Writer_HttpOut extends Ac_Result_Writer_WithCharset {
     
     /**
-     * @var Ac_I_Response_Environment
+     * @var Ac_I_Result_Environment
      */
     protected $environment = false;
 
-    function setEnvironment(Ac_I_Response_Environment $environment = null) {
+    function setEnvironment(Ac_I_Result_Environment $environment = null) {
         $this->environment = $environment;
     }
 
     /**
-     * @return Ac_I_Response_Environment
+     * @return Ac_I_Result_Environment
      */
     function getEnvironment() {
-        if ($this->environment === false) return Ac_Response_Environment::getDefault();
+        if ($this->environment === false) return Ac_Result_Environment::getDefault();
         return $this->environment;
     }        
     

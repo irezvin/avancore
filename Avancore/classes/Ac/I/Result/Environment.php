@@ -1,6 +1,6 @@
 <?php
 
-interface Ac_I_Response_Environment {
+interface Ac_I_Result_Environment {
     
     function begin();
     

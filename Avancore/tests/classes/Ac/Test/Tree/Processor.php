@@ -28,7 +28,7 @@ class Ac_Test_Tree_Processor {
             $node->parentTitle = $parent->data['title'];
         }
         $node->canOrderUp = $i > 0;
-        $node->canOrderDown = $parent && $i < count($parent->getChildren());
+        $node->canOrderDown = $parent && is_array($parent->getChildren()) && $i < count($parent->getChildren());
     }
     
     function getTitleToIdMap(Ac_Test_Tree_Node $node, array $link) {
