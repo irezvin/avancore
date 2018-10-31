@@ -17,7 +17,6 @@ abstract class Ac_Param_Filter extends Ac_Prototyped implements Ac_I_Param_Filte
     }
     
     /**
-     * (non-PHPdoc)
      * @see Ac_I_Decorator::apply()
      */
     function apply($value) {

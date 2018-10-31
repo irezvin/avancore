@@ -64,7 +64,8 @@ class Ac_Accessor_Path implements Ac_I_Param_Source {
      * Short-form alias for getValue()
      * @return type 
      */
-    function value() {
+    function value($default = null) {
+        if (func_num_args()) return $this->getValue($default);
         return $this->getValue();
     }
     
@@ -81,14 +82,20 @@ class Ac_Accessor_Path implements Ac_I_Param_Source {
         return Ac_Accessor::getObjectPropertyByPath($src, $this->path, $default);
     }
     
-    function getValue() {
+    function getValue($default = null) {
         if ($this->gotValue === false) {
             $src = $this->src;
+            
+            if (func_num_args()) $def = $default;
+            else $def = $this->default;
+
             if (is_object($src) && $src instanceof Ac_Accessor_Path) $src = $src->getValue();
             if ($this->path) {
-                if (is_array($src)) $res = Ac_Util::getArrayByPath($src, $this->path, $this->default);
-                elseif (is_object($src)) $res = $this->doGetFromObject($src, $this->default);
-                else $res = $this->default;
+                if (is_array($src)) $res = Ac_Util::getArrayByPath($src, $this->path, $def);
+                elseif (is_object($src)) $res = $this->doGetFromObject($src, $def);
+                else {
+                    $res = $def;
+                }
             } else {
                 $res = $this->src;
             }

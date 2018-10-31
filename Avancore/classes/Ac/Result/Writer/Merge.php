@@ -8,13 +8,17 @@ class Ac_Result_Writer_Merge extends Ac_Result_Writer_WithCharset {
         // listPlaceholders() does not instantiate default placeholders
         if ($t) {
             $tp = $t->listPlaceholders(); 
-        
             // getPlaceholders(true) returns only instantiated placeholders
             $usedPlaceholders = $r->getPlaceholders(true);
-            foreach (array_intersect_key($usedPlaceholders, array_flip($tp)) as $id => $placeholder) { 
-               $t->getPlaceholder($id)->mergeWith($placeholder);
+            $targetPlaceholders = $t->listPlaceholders();
+            foreach ($usedPlaceholders as $id => $placeholder) {
+                if (in_array($id, $targetPlaceholders)) {
+                    $t->getPlaceholder($id)->mergeWith($placeholder);
+                } else {
+                    $t->addPlaceholder(clone $placeholder, $id);
+                }
             }
-            if ($t && $t instanceof Ac_Result_Http_Abstract) {
+            if ($t && $t instanceof Ac_Result_Http_Abstract && $r instanceof Ac_Result_Http_Abstract) {
                 if ($t->getContentType() === false) 
                     $t->setContentType($r->getContentType());
             }

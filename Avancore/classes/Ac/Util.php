@@ -1121,5 +1121,5 @@ class _Ae_Util_ObjectVarGetter {
  * @param type $className 
  */
 function acUtilLoadClass($className) {
-    self::loadClass(self::fixClassName($className));
+    Ac_Util::loadClass(Ac_Util::fixClassName($className));
 }

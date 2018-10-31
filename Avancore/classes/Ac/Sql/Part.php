@@ -42,6 +42,8 @@ class Ac_Sql_Part extends Ac_Prototyped {
     
     var $appliedOnEmptyInput = false;
     
+    var $inputDecorator = null;
+    
     var $_idWithPrefix = false;
     
     function Ac_Sql_Part($options = array()) {
@@ -88,6 +90,9 @@ class Ac_Sql_Part extends Ac_Prototyped {
     }
     
     function bind($input) {
+        if ($this->inputDecorator) {
+            $input = Ac_Decorator::decorate ($this->inputDecorator, $input, $this->inputDecorator);
+        }
         if (!$this->appliedOnEmptyInput && empty($input) && $input !== 0 && $input !== '0') {
             if (empty($input) && $input !== 0 && $input !== '0') {
                 $this->applied = false;

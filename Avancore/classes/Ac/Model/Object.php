@@ -183,13 +183,16 @@ abstract class Ac_Model_Object extends Ac_Model_Data {
     }
     
     /**
-     * @return Ae_Sql_Db
+     * @return Ac_Sql_Db
      * @deprecated 
      */
     function getSqlDb() {
         return $this->getDb();
     }
     
+    /**
+     * @return Ac_Sql_Db
+     */
     function getDb() {
         return $this->mapper->getDb();
     }

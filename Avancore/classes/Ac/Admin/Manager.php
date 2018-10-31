@@ -336,7 +336,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if ($redir) {
             $this->_primaryKeys = array();
             $this->_record = null;
-            $u = $this->getManagerUrl('list');
+            $u = $this->getManagerUrl('list', array(), true);
             $this->_response->hasToRedirect = $u->toString();
         }
         
@@ -541,7 +541,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     /**
      * @return Ac_Url
      */
-    function getManagerUrl($action = false, $extraParams = array()) {
+    function getManagerUrl($action = false, $extraParams = array(), $withFilterForm = false) {
         $c = $this->_context->cloneObject();
         $d = $extraParams;
         /*
@@ -552,7 +552,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $d['keys'][] = $this->getStrPk($rec);
         }
         */
-        $s = $this->getStateData();
+        $s = $this->getStateData($withFilterForm);
         $d = Ac_Util::m($s, $d, true);
         if (strlen($action)) $d[$this->_methodParamName] = $action;
         $c->setData($d);
@@ -560,7 +560,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         return $u;
     }
     
-    function getStateData() {
+    function getStateData($withFilterForm = null) {
         $res = array();
         if ($this->_stayOnProcessing) {
             $res['action'] = 'processing';
@@ -570,10 +570,11 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         }
         if ($this->isNewRecord()) $res['new'] = 1;
         elseif (($res['action'] !== 'form') && $keys = $this->getPrimaryKeys()) {
+
             $res['keys'] = $keys; 
         }
         elseif ($rec = $this->getRecord()) {
-            $res['keys'] = array($this->getStrPk($rec)); 
+            $res['keys'] = array($this->getStrPk($rec));
         }
         if ($this->_isForm && isset($this->_rqData['form']) && !$this->_recordStored) {
             $res['form'] = $this->_rqData['form'];
@@ -585,14 +586,20 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $res['returnUrl64'] = base64_encode($u);
         }
         
-        if (isset($this->_rqData['filterForm'])) {
-            $ff = $this->_rqData['filterForm'];
-            if (is_array($ff)) {
-                foreach ($ff as $k => $v) {
-                    if (is_array($v)? !count($v) : !strlen($v)) unset($ff[$k]);
+        if ($withFilterForm === null) {
+            $withFilterForm = $res['action'] !== 'list';
+        }
+        
+        if ($withFilterForm) {
+            if (isset($this->_rqData['filterForm'])) {
+                $ff = $this->_rqData['filterForm'];
+                if (is_array($ff)) {
+                    foreach ($ff as $k => $v) {
+                        if (is_array($v)? !count($v) : !strlen($v)) unset($ff[$k]);
+                    }
                 }
+                $res['filterForm'] = $ff;
             }
-            $res['filterForm'] = $ff;
         }
         
         //if (isset($this->_rqData['pagination'])) $res['pagination'] = $this->_rqData['pagination'];

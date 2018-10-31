@@ -146,7 +146,7 @@ class Ac_Table_Column {
             $getters[$rc][$fieldName][$s] = $this->determineGetter($record, $fieldName);
         $g = $getters[$rc][$fieldName][$s];*/
         $g = $this->determineGetter($record, $fieldName);
-        $res = $this->$g[0] ($record, $fieldName, $g[1]);
+        $res = $this->{$g[0]} ($record, $fieldName, $g[1]);
         
         if ($this->decorator) $res = Ac_Decorator::decorate($this->decorator, $res, $this->decorator, $record);
         return $res;
@@ -234,7 +234,7 @@ class Ac_Table_Column {
      * @param object record Database record
      * @param int rowNo number of current row in the table
      */
-    function getData($record, $rowNo, $fieldName) {
+    function getData($record, $rowNo, $fieldName = null) {
         if (is_null($fieldName)) $fieldName = $this->fieldName;
         $res = $this->getRecordProperty($record, $fieldName);
         return $res;

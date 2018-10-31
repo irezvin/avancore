@@ -29,7 +29,6 @@ class Ac_Sql_Filter_Substring extends Ac_Sql_Filter {
     var $discardPatsPrefix = false;
     
     function _colCriteria($colNames, $value = false) {
-        
         if ($value === false) $value = $this->value;
         if (is_array($value)) {
             

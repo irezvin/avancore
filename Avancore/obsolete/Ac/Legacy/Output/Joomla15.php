@@ -52,7 +52,6 @@ class Ac_Legacy_Output_Joomla15 extends Ac_Legacy_Output_Joomla {
         }
     }
     
-    
     function appendMetaTag($name, $value) {
         $doc = JFactory::getDocument();
         if ($name == 'description' && !$this->replaceMetaDescription || $name == 'keywords' && !$this->replaceMetaKeywords) {

@@ -64,6 +64,11 @@ abstract class Ac_Result_Writer extends Ac_Prototyped {
         return false;
     }
     
+    function writeResult(Ac_Result $result, $return = false) {
+        $this->setSource($result);
+        $this->write();
+    }
+    
     /**
      * Does necessary merging operation.
      * ECHOs string output (usually to replace $target in the content).

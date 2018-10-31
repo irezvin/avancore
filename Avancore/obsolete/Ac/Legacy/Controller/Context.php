@@ -85,7 +85,7 @@ class Ac_Legacy_Controller_Context {
     }
     
     function setStateVariable($path, $value) {
-        if (!strlen($path) || !count($path)) trigger_error('$path must be specified', E_USER_ERROR);
+        if (!strlen($path) || (is_array($path) && !count($path))) trigger_error('$path must be specified', E_USER_ERROR);
         if (!is_array($path)) $path = Ac_Util::pathToArray($path);
         Ac_Util::setArrayByPath($this->_state, $path, $value, true);
         $this->doAfterSetState();

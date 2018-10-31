@@ -58,7 +58,7 @@ class Ac_Facet_Sql_SetImpl extends Ac_Facet_SetImpl {
      */
     function createSelectForItem(Ac_Facet_Sql_I_ItemImpl $currValuesImpl = null) {
         $proto = $this->getSelectPrototypeWithFacets($currValuesImpl);
-        $select = new Ac_Sql_Select(new Ac_Sql_Db_Ae(), $proto);
+        $select = Ac_Prototyped::factory($proto, 'Ac_Sql_Select', array('db' => new Ac_Sql_Db_Ae));
         $this->applyFacetsToSelectInstance($select, $currValuesImpl);
         return $select;
     }

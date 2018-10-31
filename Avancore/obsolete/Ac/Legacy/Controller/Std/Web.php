@@ -253,7 +253,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
 
     function executeError() {
         $this->_response->addExtraHeader('HTTP/1.0 404 Not Found', 404);
-        JError::raiseError(404, 'Not found');
+        if (class_exists(JError)) JError::raiseError(404, 'Not found');
         //header('HTTP/1.1 500 Internal Server Error');
         $this->cacheSkip = true;
         $this->_templatePart = 'error';
@@ -307,6 +307,9 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
         return $this->aeCache;
     }
     
-
+    function setCache(Ac_Cache $cache = null) {
+        $this->aeCache = $cache;
+        if (!$this->aeCache) $this->aeCache = false;
+    }
 
 }

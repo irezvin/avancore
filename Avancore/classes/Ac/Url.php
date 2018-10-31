@@ -83,8 +83,10 @@ class Ac_Url implements Ac_I_RedirectTarget {
         static $defs = array('scheme' => false, 'host' => false, 'port' => false, 'user' => false, 'pass' => false, 'path' => false, 'query' => array(), 'fragment' => false);
         if (is_string($strUrl) && strlen($strUrl)) {
             $u = parse_url($strUrl);
-            if (is_array($u)) $props = array_merge($defs, $u);
-            else $props = $defs;
+            if (!is_array($u)) {
+                $u = array();
+            }
+            $props = array_merge($defs, $u);
             if (!$props['query']) $props['query'] = array(); else parse_str($props['query'], $props['query']);
             foreach($props as $propName=>$propValue) $this->$propName = $propValue;
         }
@@ -289,6 +291,7 @@ class Ac_Url implements Ac_I_RedirectTarget {
             $scheme = 'https';
         }
         $res = new Ac_Url($scheme.'://'.$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI']);
+
         if ($withPathInfo) {
             if (isset($_SERVER['PATH_INFO'])) {
                 $myPathInfo = $_SERVER['PATH_INFO'];
@@ -313,7 +316,9 @@ class Ac_Url implements Ac_I_RedirectTarget {
                 }
             }
         }
+
         return $res;
+
     }
     
 }

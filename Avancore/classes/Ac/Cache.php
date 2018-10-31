@@ -164,7 +164,7 @@ class Ac_Cache {
 	}
 	
 	function put($id, $content, $group = false) {
-        
+            
         if ($this->enabled) {
 
             if (!$this->triedCleanup) $this->tryCleanup();

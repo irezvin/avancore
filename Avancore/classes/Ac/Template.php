@@ -31,6 +31,10 @@ class Ac_Template extends Ac_Prototyped {
     
     protected $defaultWrapper = false;
     
+    function hasPublicVars() {
+        return true;
+    }
+    
     function setComponent($component = null) {
         $this->component = $component;
     }
@@ -85,7 +89,8 @@ class Ac_Template extends Ac_Prototyped {
     protected function missingArguments($methodName, array $missingArgs) {
         $descr = $this->getDescription();
         $signature = $this->getSignature($methodName);
-        $missing = $this->getSignature(array_intersect_key($signature, array_flip($missingArgs)));
+        $missing = implode("', '", array_intersect(array_keys($signature), $missingArgs));
+        $signs = implode(", ", array_keys($signature));
         $cl = get_class($this);
         return new Ac_E_Template("Missing argument(s) '{$missing}' in method {$cl}::{$methodName}({$signs}) of template '{$descr}'");
     }
