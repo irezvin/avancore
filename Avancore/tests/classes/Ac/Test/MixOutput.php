@@ -62,19 +62,23 @@ class Ac_Test_MixOutput extends Ac_Test_Base {
         $pg->htmlResponse = $resp;
         ob_start();
         $pg->show();
-        echo '<pre>'.htmlspecialchars(ob_get_clean()).'</pre>';
+        $resp = ob_get_clean();
+        //echo '<pre>'.htmlspecialchars(ob_get_clean()).'</pre>';
+        // TODO: check
         
         $r2 = new Ac_Result_Redirect(array('url' => 'http://www.example.com/', 'statusCode' => 301));
         $resp = new Ac_Legacy_Controller_Response_Html;
         $resp->content = "<p>First</p>\n\n{$r2}\n\n<p>Last</p>";
         $resp->replaceResultsInContent();
-        var_dump($resp->redirectUrl, $resp->redirectType);
+        //var_dump($resp->redirectUrl, $resp->redirectType);
+        // TODO: check
         
         $json = new Ac_Result_Json(array('data' => array('foo' => array(1, 2, 3), 'bar' => array('john' => 'doe', 'not true' => false, 'dig' => 123.456), 'baz')));
         $resp = new Ac_Legacy_Controller_Response_Html;
         $resp->content = "AAA {$json} BBB";
         $resp->replaceResultsInContent();
-        var_dump($resp->content, $resp->contentType, $resp->noHtml, $resp->noWrap);
+        //var_dump($resp->content, $resp->contentType, $resp->noHtml, $resp->noWrap);
+        // TODO: check
         
     }
     
@@ -91,7 +95,8 @@ class Ac_Test_MixOutput extends Ac_Test_Base {
         $r->put(''.$resp);
         $r->setWriter($rh);
         $r->write();
-        echo '<pre>'.htmlspecialchars($e->responseText).'</pre>';        
+        // TODO: check
+        //echo '<pre>'.htmlspecialchars($e->responseText).'</pre>';        
     }
     
     function testResponseToResponse() {
@@ -117,7 +122,9 @@ class Ac_Test_MixOutput extends Ac_Test_Base {
         $pg->htmlResponse = $resp;
         ob_start();
         $pg->show();
-        echo '<pre>'.htmlspecialchars(ob_get_clean()).'</pre>';
+        $resp = ob_get_clean();
+        // TODO: check
+        //echo '<pre>'.htmlspecialchars(ob_get_clean()).'</pre>';
     }
     
     

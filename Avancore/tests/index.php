@@ -7,6 +7,17 @@ require_once(dirname(__FILE__).'/app.config.php');
 define('AC_TESTS_TMP_PATH', dirname(__FILE__).'/var');
 Ac_Test_Base::$config = $config;
 
+?>
+<html>
+    <head>
+        <style type="text/css">
+        .fail { background-color: inherit; color: red; }
+        .pass { background-color: inherit; color: green; }
+        pre { background-color: lightgray; color: inherit; }
+            
+        </style>
+<?php
+
 if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
     
     $classes = explode(',', $_GET['class']);
@@ -34,14 +45,13 @@ if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
     
     $time = microtime(true);
     foreach ($classes as $class) {
-        
-        // TODO: Ac_Cg_Domain::listModels() runs in infinite loop
-        if ($class === 'Ac_Test_CgImport') continue;
-        
-        $t = new TestSuite($class);
+        echo "<title>Avancore 0.3 tests</title>";
+        $head = "<a href='?class={$class}'>{$class}</a>";
+        $t = new TestSuite($head);
         $t->add($class);
         $t->run(new Ac_Test_Reporter('UTF-8'));
-        var_dump(microtime(true) - $time);
+        ini_set('html_errors', 1);
+        var_dump(round(microtime(true) - $time, 3));
         $time = microtime(true);
     }
     

@@ -49,7 +49,7 @@ class Ac_Cg_Strategy {
      * @param Ac_Cg_Generator $generator
      * @param string $domainName
      */
-    function Ac_Cg_Strategy($generator, $domainName, $outputDir, $genEditable, $overwriteEditable, $extraOptions = array()) {
+    function __construct ($generator, $domainName, $outputDir, $genEditable, $overwriteEditable, $extraOptions = array()) {
         Ac_Util::simpleBind($extraOptions, $this);
         $this->_gen = $generator;
         $this->_dom = $generator->getDomain($domainName);

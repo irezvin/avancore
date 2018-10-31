@@ -1235,7 +1235,8 @@ EOD
         
         $s = trim($s);
         $s = preg_replace('/O:[0-9]+:"[^"]+"/', 'a', $s);
-        var_dump(unserialize($s));
+        // TODO: test results
+        //var_dump(unserialize($s));
        
         //echo(htmlspecialchars(serialize($outer)));
         

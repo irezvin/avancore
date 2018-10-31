@@ -2,6 +2,11 @@
 
 class Ac_Test_Reporter extends HtmlReporter {
     
+    function paintHeader($test_name) {
+        $this->sendNoCacheHeaders();
+        print "<h1>$test_name</h1>\n";
+        flush();
+    }
 
     /**
      *    Paints a PHP error.

@@ -89,6 +89,8 @@ abstract class Ac_Cg_Util {
     
     static function findCommonPrefix(array $strings, $roundToWordBoundary = true) {
         $res = '';
+        $n = 0;
+        $maxResultLength = min(array_map('strlen', $strings));
         if (count($strings)) {
             do {
                 $match = true;
@@ -102,7 +104,7 @@ abstract class Ac_Cg_Util {
                     }
                 }
                 if ($match) $res = $s;
-            } while ($match);
+            } while ($match && strlen($res) < $maxResultLength);
         }
         
         // Now we should handle the cases when 'TheCoolRelation' and 'TheCookRelation' 
