@@ -57,6 +57,12 @@ class Ac_Result_Placeholder_Template extends Ac_Prototyped implements Ac_I_Resul
         }
     }
     
+    function renderPlaceholder(Ac_Result_Placeholder $placeholder, Ac_Result_Writer $writer) {
+        ob_start();
+        $this->writePlaceholder($placeholder, $writer);
+        return ob_get_clean();
+    }
+    
     
     
 }

@@ -4,7 +4,7 @@
  * Holds controller response data
  */
 class Ac_Legacy_Controller_Response {
-    
+
     /**
      * Textual content of the response
      * 

@@ -182,6 +182,83 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
         return $jsOrCssLib;
     }
     
+    function replaceResultsInContent() {
+        if (strpos($this->content, '##[') !== false) {
+            $buf = Ac_StringObject::sliceStringWithObjects($this->content);
+            $w = new Ac_Legacy_ResultWriter();
+            $w->setResponse($this);
+            foreach ($buf as $k => $v) {
+                if (is_object($v) && $v instanceof Ac_Result_Http_Abstract) {
+                    $v->setWriter($w);
+                    $cnt = $v->writeAndReturn();
+                    if ($v instanceof Ac_Result_Http || $v->getOverrideMode() !== Ac_Result::OVERRIDE_NONE) {
+                        $buf = array($cnt);
+                        break;
+                    }
+                    $buf[$k] = $cnt;
+                }
+            }
+            $this->content = implode('', $buf);
+        }
+    }
+    
+    /**
+     * @return Ac_Result_Http_Abstract
+     */
+    function createResult() {
+        if (strlen($u = $this->redirectUrl)) {
+            $res = new Ac_Result_Redirect(array('url' => $u));
+            if ($this->redirectType) $res->setStatusCode ($this->redirectType);
+        } else {
+            if ($this->noHtml) {
+                $res = new Ac_Result_Http();
+            } else {
+                $res = new Ac_Result_Html();
+                if ($this->noWrap) $res->setOverrideMode(Ac_Result::OVERRIDE_ALL);
+                if (isset($this->metas['description'])) $res->meta['description'] = $this->metas['description'];
+                if (isset($this->metas['keywords'])) $res->meta['keywords'] = $this->metas['keywords'];
+                foreach ($this->metas as $k => $v) {
+                    if (is_array($v)) {
+                        if ($v[1]) $this->metas['http'][$k] = $v[0];
+                            else $this->metas[$k] = $v[0];
+                    } else {
+                        $this->metas[$k] = $v;
+                    }
+                }
+                if ($this->pageTitle) {
+                    foreach (Ac_Util::toArray($this->pageTitle) as $t) $res->title[] = $t;
+                }
+                if ($this->pathway) {
+                    $pw = $res->getPlaceholder('pathway', true);
+                    if (!$pw) $pw = $res->addPlaceholder (new Ac_Result_Placeholder, 'pathway');
+                    foreach ($this->pathway as $p) $pw[] = $p;
+                }
+                
+                foreach ($this->jsLibs as $l) $res->assets[] = $l[0];
+                foreach ($this->cssLibs as $l) $res->assets[] = $l[0];
+                foreach ($this->headTags as $t) $res->headTags[] = $t;
+            }
+            
+            if ($this->contentType) {
+                $res->setContentType($this->contentType);
+                if (preg_match('/([^;]+)\s*;\s*charset\s*=\s*(.+)$/', $this->contentType, $matches)) {
+                    $res->setCharset($matches[2]);
+                }
+            }
+            
+            foreach ($this->extraHeaders as $h) {
+                $res->headers[] = ''.$h;
+            }
+            
+            // TODO: placeholders compatibility???
+            $res->setContent($this->replacePlaceholders(false, true));
+        }
+        return $res;
+    }
+    
+    function __toString() {
+        return ''.$this->createResult();
+    }
     
 }
 

@@ -8,12 +8,12 @@ class TestTemplate1 extends Ac_Template {
         return $this->stack;
     }
     
-    function getSignature($methodName) {
-        return parent::getSignature($methodName);
+    function getSignature($class, $method) {
+        return parent::getSignature($class, $method);
     }
     
-    function getArgs($methodName, array $args, & $missingArgs = array()) {
-        return parent::getArgs($methodName, $args, $missingArgs);
+    function getArgs($object, $method, array $args, & $missingArgs = array()) {
+        return parent::getArgs($object, $method, $args, $missingArgs);
     }
     
     protected function partPart1() {

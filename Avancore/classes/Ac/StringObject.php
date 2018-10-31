@@ -15,6 +15,7 @@ abstract class Ac_StringObject {
     static $issueNotices = true;
     
     protected static $pregExpr = '##\[[0-9a-z.]+\]##';
+    //protected static $pregExpr = '/##\[([0-9a-f]+\.[0-9a-f]+)(\\\\*)(&(amp;|quot;)+|")(\\\\+)\]##/';
     
     protected static $strings = array();
 
@@ -24,6 +25,7 @@ abstract class Ac_StringObject {
     
     static function updateMark(Ac_I_StringObject $stringObject, $register = false) {
         $stringObject->setStringObjectMark($m = '##['.uniqid('', true).']##');
+        //$stringObject->setStringObjectMark($m = '##['.uniqid('', true).'"\]##');
         if ($register) self::$strings[$m] = $stringObject;
         return $m;
     }

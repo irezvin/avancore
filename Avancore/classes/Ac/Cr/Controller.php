@@ -82,7 +82,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
             $this->action = $this->use->{$this->actionParam}->value();
         }
         return $this->action;
-    }    
+    }
     
     /**
      * @return Ac_Accessor_Path
@@ -187,10 +187,10 @@ class Ac_Cr_Controller extends Ac_Prototyped {
                     $res = $impl->getResult();
                 }
             } else {
-                $res = $this->invokeActionMethod('notFoundAction', $action, array($action));
+                $res = $this->invokeActionMethod('notFoundAction', array($action), $action);
             }
         } catch (Exception $e) {
-            $res = $this->invokeActionMethod($impl, array($e), 'exceptionAction');
+            $res = $this->invokeActionMethod('exceptionAction', array($e), $action);
         }
         return $res;
     }
@@ -348,12 +348,6 @@ class Ac_Cr_Controller extends Ac_Prototyped {
         } elseif ($action !== false) throw Ac_E_InvalidCall::wrongType ('action', $action, array('array', 'string'));
         return $res;
     }
-    
-    /**
-     * @return Ac_Cr_Response
-     */
-    function getResponse() {
-    }    
     
     function listActions() {
         $res = array();
