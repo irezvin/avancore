@@ -1242,4 +1242,18 @@ EOD
         
     }
     
+    function testHtmlInHtml() {
+        
+        $inner = new Ac_Result_Html();
+        $inner->title = "The Title";
+        $inner->setContent("<p>Inner</p>");
+        
+        
+        $outer = new Ac_Result_Html();
+        $outer->setContent("<div class='outer'>{$inner}</div>");
+        
+        var_dump($outer->writeAndReturn());
+                
+    }
+    
 }

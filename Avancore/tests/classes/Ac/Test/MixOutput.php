@@ -63,7 +63,7 @@ class Ac_Test_MixOutput extends Ac_Test_Base {
         ob_start();
         $pg->show();
         $resp = ob_get_clean();
-        //echo '<pre>'.htmlspecialchars(ob_get_clean()).'</pre>';
+        echo '<pre>'.htmlspecialchars($resp).'</pre>';
         // TODO: check
         
         $r2 = new Ac_Result_Redirect(array('url' => 'http://www.example.com/', 'statusCode' => 301));
@@ -124,7 +124,7 @@ class Ac_Test_MixOutput extends Ac_Test_Base {
         $pg->show();
         $resp = ob_get_clean();
         // TODO: check
-        //echo '<pre>'.htmlspecialchars(ob_get_clean()).'</pre>';
+        echo '<pre>'.htmlspecialchars($resp).'</pre>';
     }
     
     

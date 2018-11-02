@@ -75,10 +75,6 @@ class Ac_Result_Stage extends Ac_Prototyped {
         return $this->isComplete;
     }
 
-//    function setCurrent(Ac_Result $current) {
-//        $this->currentResult = $current;
-//    }
-
     // ---- result tree traversal ----
     
     protected function invokeHandlers(Ac_Result $result = null, $stageName, $args = null) {
@@ -95,7 +91,8 @@ class Ac_Result_Stage extends Ac_Prototyped {
             }
             
             $methodName2 = 'handleDefault';
-            $args2 = $args; array_splice($args2, 0, 0, array($stageName));
+            $args2 = $args;
+            array_splice($args2, 0, 0, array($stageName));
             
             foreach ($handlers as $handler) {
                 if (strlen($methodNameStage) && is_callable($call = array($handler, $methodNameStage)))
@@ -109,6 +106,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
     }
     
     protected function beginItem($item) {
+        // TOOD: think about removing these "invokeHandlers" - used in tests only
         if ($item instanceof Ac_Result) {
             $this->invokeHandlers($this->parent, self::HANDLER_BEFORE_CHILD, $item);
             $this->invokeHandlers($item, self::HANDLER_BEGIN_STAGE);
@@ -116,6 +114,7 @@ class Ac_Result_Stage extends Ac_Prototyped {
     }
     
     protected function endItem($item) {
+        // TOOD: think about removing these "invokeHandlers" - used in tests only
         if ($item instanceof Ac_Result) {
             $this->invokeHandlers($item, self::HANDLER_END_STAGE);
             $this->invokeHandlers($this->parent, self::HANDLER_AFTER_CHILD, $item);

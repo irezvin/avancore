@@ -16,6 +16,10 @@ class TestTemplate1 extends Ac_Template {
         return parent::getArgs($object, $method, $args, $missingArgs);
     }
     
+    protected function partInnerResult(Ac_Result $result, $prefix = '', $suffix = '') {
+        echo $prefix . $result . $suffix;
+    }
+    
     protected function partPart1() {
 ?>
         Part1: 

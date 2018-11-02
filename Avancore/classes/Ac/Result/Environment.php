@@ -1,6 +1,6 @@
 <?php
 
-abstract class Ac_Result_Environment implements Ac_I_Result_Environment {
+abstract class Ac_Result_Environment {
 
     protected static $default = null;
 

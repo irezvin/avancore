@@ -4,6 +4,67 @@ require(dirname(__FILE__).'/assets/Template_classes.php');
 
 class Ac_Test_Template extends Ac_Test_Base {
 
+    
+    function testResultTemplateWithInnerResult() {
+        
+        $t = new TestTemplate1;
+        
+        $r = new Ac_Result_Html;
+        
+        $r->title = 'Foo';
+        
+        $r->assets->addItems(array('foo.js', 'foo.css'));
+        
+        $r->content = "<h1>Bar</h1>\n<p>baz</p>";
+        
+        $templateResult = new Ac_Result_Template();
+        
+        $templateResult->setTemplateInstance($t);
+        
+        $templateResult->setPartName('innerResult');
+        
+        $templateResult->setPartArgs(array('result' => $r, 'prefix' => "<p>Before</p>\n", 'suffix' => "\n<p>After</p>"));
+        
+        $outerResult = new Ac_Result_Html();
+        
+        //$templateResult = "<p>Before</p>\n{$r}\n<p>After</p>";
+        
+        $outerResult->put("<p>Outer before</p>\n", $templateResult, "\n<p>Outer after</p>");
+        
+        var_dump($outerResult->writeAndReturn());
+        
+        $e = new Ac_Result_Environment_Dummy();
+        Ac_Result_Environment::setDefault($e);
+        
+        $writer = new Ac_Result_Writer_RenderHtml;
+        $writer->setEnvironment($e);
+        $writer->writeResult($outerResult);
+        
+        if (!$this->assertEqual($this->normalizeHtml($e->responseText), $this->normalizeHtml('
+            <!DOCTYPE html>
+            <html>
+            <head>
+            <title>Foo</title>
+            <link rel="stylesheet" type="text/css" href="foo.css" />
+            <script type="text/javascript" src="foo.js"></script>
+            </head>
+            <body>
+                <p>Outer before</p>
+                    <p>Before</p>
+                        <h1>Bar</h1>
+                        <p>baz</p>
+                    <p>After</p>
+                <p>Outer after</p>
+            </body>
+            </html>
+        '))) {
+            var_dump($e->responseText);
+        }
+        
+        //var_dump($templateResult->writeAndReturn());
+        
+    }    
+    
     function testInternals() {
 
         $t1 = new TestTemplate1;
