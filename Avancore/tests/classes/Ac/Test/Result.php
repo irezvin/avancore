@@ -90,34 +90,20 @@ class Ac_Test_Result extends Ac_Test_Base {
         
         if (!$this->assertEqual($stage->travLog, $rq = array(
                 'a beginStage', 
-                'a beforeChild a_1', 
                 'a_1 beginStage', 
-                'a_1 beforeChild a_1_1', 
                 'a_1_1 beginStage', 
                 'a_1_1 endStage', 
-                'a_1 afterChild a_1_1', 
-                'a_1 beforeChild a_1_2', 
                 'a_1_2 beginStage', 
                 'a_1_2 endStage', 
-                'a_1 afterChild a_1_2', 
                 'a_1 endStage', 
-                'a afterChild a_1', 
-                'a beforeChild a_2',
                 'a_2 beginStage', 
                 'a_2 endStage',
-                'a afterChild a_2', 
-                'a beforeChild a_3', 
                 'a_3 beginStage', 
-                'a_3 beforeChild a_3_1', 
                 'a_3_1 beginStage', 
                 'a_3_1 endStage', 
-                'a_3 afterChild a_3_1', 
-                'a_3 beforeChild a_3_2', 
                 'a_3_2 beginStage', 
                 'a_3_2 endStage', 
-                'a_3 afterChild a_3_2', 
                 'a_3 endStage', 
-                'a afterChild a_3', 
                 'a endStage', 
         ))) {
             echo "<table border='1'><tr>
@@ -633,6 +619,7 @@ EOD
         $inner = new Ac_Result_Html(array('content' => 'Some text'));
         $outer = new Ac_Result_Http(array('content' => $inner));
         $stage = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => false));
+        $inner->setContentType('text/html');
         $stage->invoke();
         if (!$this->assertTrue(in_array('Content-Type: text/html', $headers = $outer->getHeaders()->getItems()))) var_dump($headers);
     }
@@ -1235,15 +1222,14 @@ EOD
         
         $s = trim($s);
         $s = preg_replace('/O:[0-9]+:"[^"]+"/', 'a', $s);
+        
         // TODO: test results
         //var_dump(unserialize($s));
        
         //echo(htmlspecialchars(serialize($outer)));
-        
     }
     
     function testHtmlInHtml() {
-        
         $inner = new Ac_Result_Html();
         $inner->title = "The Title";
         $inner->setContent("<p>Inner</p>");
@@ -1252,8 +1238,19 @@ EOD
         $outer = new Ac_Result_Html();
         $outer->setContent("<div class='outer'>{$inner}</div>");
         
-        var_dump($outer->writeAndReturn());
-                
+        $ret = $outer->writeAndReturn(); 
+        if (!$this->assertEqual($this->normalizeHtml($ret), $this->normalizeHtml('
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>The Title</title></head>
+            <body>
+            <div class=\'outer\'><p>Inner</p></div> 
+            </body>
+            </html>
+        '))) {
+            var_dump($ret);
+        }
     }
     
 }

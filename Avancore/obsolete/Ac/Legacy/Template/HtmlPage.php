@@ -32,7 +32,7 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
      * @var bool
      */
     var $showQueries = false;
-
+    
     function getCharset() {
         if (strlen($this->charset)) $res = $this->charset;
         elseif (preg_match('/charset=(.*)$/i', $this->htmlResponse->contentType, $matches)) {
@@ -56,7 +56,7 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
 ?>
 <?php       if ($this->htmlResponse->jsLibs) { ?>
 <?php           foreach ($this->htmlResponse->jsLibs as $l) { ?>
-    <?php           echo $this->htmlResponse->getJsScriptTag($l[0], $l[1]); ?>
+<?php           echo "    ".$this->htmlResponse->getJsScriptTag($l[0], $l[1]); ?>
 
 <?php           } ?>
 <?php       } ?>
@@ -67,7 +67,7 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
 ?>
 <?php       if ($this->htmlResponse->cssLibs) { ?>
 <?php           foreach ($this->htmlResponse->cssLibs as $l) { ?>
-    <?php           echo $this->htmlResponse->getCssLibTag($l[0], $l[1]); ?>
+<?php           echo "    ".$this->htmlResponse->getCssLibTag($l[0], $l[1]); ?>
 
 <?php           } ?>
 <?php       } ?>
@@ -109,10 +109,9 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
 ?><head>
     <!-- powered by Avancore 0.3 -->
 <?php   if ($this->getTitle()) { ?>
-
     <title><?php echo $this->getTitle(); ?></title>
 <?php } ?>
-    <?php $this->showInsideHead(); ?>
+<?php     $this->showInsideHead(); ?>
 </head> 
 <?php
     }
@@ -125,6 +124,7 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
 ?><body<?php if ($ba) echo " ".Ac_Util::mkAttribs($ba); ?>>
 <?php echo $this->htmlResponse->replacePlaceholders(false, true); ?>
 
+<?php if ($this->htmlResponse->initScripts) $this->showInitScripts(); ?>
 <?php 
     if($this->showTimeIndex && function_exists('xdebug_time_index')) var_dump(xdebug_time_index()); 
     if($this->showTimeIndex && function_exists('memory_get_usage')) {
@@ -150,11 +150,27 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
             $nl = "\n"; 
         }
         echo $nl;
-?><html<?php if ($htmlAttribs) echo " ".Ac_Util::mkAttribs($htmlAttribs); ?>>
+?><html<?php if ($htmlAttribs) echo Ac_Util::mkAttribs($htmlAttribs); ?>>
 <?php $this->showHead(); ?>
 <?php $this->showBody(); ?>
-
 </html><?php        
+    }
+    
+    function showInitScripts() {
+        
+        $scripts = array();
+        
+        foreach (Ac_Util::toArray($this->htmlResponse->initScripts) as $s) {
+            if ($s instanceof Ac_Js_Script) $s = $s->toRawCode ();
+            $scripts[] = rtrim($s, "; ");
+        }
+        
+?>
+
+<script type="text/javascript">
+<?php   echo "    ".implode(";\n\n", $scripts).";\n"; ?>
+</script>
+<?php
     }
     
 }

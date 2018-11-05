@@ -63,23 +63,55 @@ class Ac_Test_MixOutput extends Ac_Test_Base {
         ob_start();
         $pg->show();
         $resp = ob_get_clean();
-        echo '<pre>'.htmlspecialchars($resp).'</pre>';
-        // TODO: check
+        
+        if (!$this->assertEqual($a = $this->normalizeHtml($resp), $b = $this->normalizeHtml('
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <!-- powered by Avancore 0.3 -->
+                <title>Parent - Sub</title>
+                <link rel="stylesheet" type="text/css" href="{FOO}/first.css" />
+                <link rel="stylesheet" type="text/css" href="{FOO}/second.css" />
+                <script type="text/javascript" src="{FOO}/first.js"> </script>
+                <script type="text/javascript" src="{FOO}/second.js"> </script>
+                <meta content="Some descr" name="description" />
+                <meta content="Some keyw" name="keywords" />
+            </head> 
+            <body>
+            <p>First</p>
+
+            <div><p>Widget 1</p><div>Widget 1 body</div></div> <div class=\'group\'><div><p>Widget 2</p><div>Widget 2 body</div></div> <div><p>Widget 3</p><div>Widget 3 body</div></div></div>
+
+            <p>Last</p>
+
+            <script type="text/javascript">
+                console.log(\'foo\');
+
+            console.log(\'bar\');
+            </script>
+            </body>
+            </html>            
+        '))) {
+            echo '<pre>'.htmlspecialchars($resp).'</pre>';
+            var_dump($a, $b);
+        }
         
         $r2 = new Ac_Result_Redirect(array('url' => 'http://www.example.com/', 'statusCode' => 301));
         $resp = new Ac_Legacy_Controller_Response_Html;
         $resp->content = "<p>First</p>\n\n{$r2}\n\n<p>Last</p>";
         $resp->replaceResultsInContent();
-        //var_dump($resp->redirectUrl, $resp->redirectType);
-        // TODO: check
+        
+        if (!$this->assertEqual($resp->redirectUrl, "http://www.example.com/")) var_dump($resp->redirectUrl);
+        if (!$this->assertEqual($resp->redirectType, 301)) var_dump($resp->redirectType);
         
         $json = new Ac_Result_Json(array('data' => array('foo' => array(1, 2, 3), 'bar' => array('john' => 'doe', 'not true' => false, 'dig' => 123.456), 'baz')));
         $resp = new Ac_Legacy_Controller_Response_Html;
         $resp->content = "AAA {$json} BBB";
         $resp->replaceResultsInContent();
-        //var_dump($resp->content, $resp->contentType, $resp->noHtml, $resp->noWrap);
-        // TODO: check
         
+        if (!$this->assertEqual($resp->content, json_encode($json->getData()))) var_dump($resp->content);
+        $this->assertTrue($resp->noHtml);
+        $this->assertTrue($resp->noWrap);
     }
     
     function testResponseToResult() {
@@ -95,8 +127,22 @@ class Ac_Test_MixOutput extends Ac_Test_Base {
         $r->put(''.$resp);
         $r->setWriter($rh);
         $r->write();
-        // TODO: check
-        //echo '<pre>'.htmlspecialchars($e->responseText).'</pre>';        
+        
+        if (!$this->assertEqual($a = $this->normalizeHtml($e->responseText), $b = $this->normalizeHtml('
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>xxx</title>
+                <link rel="stylesheet" type="text/css" href="{FOO}/foo.css" />
+                <script type="text/javascript" src="{BAR}/bar.js"> </script>
+            </head>
+            <body>
+            <p>The text</p> 
+            </body>
+            </html>            
+        '))) {
+            echo '<pre>'.htmlspecialchars($e->responseText).'</pre>';
+        }
     }
     
     function testResponseToResponse() {
@@ -112,6 +158,7 @@ class Ac_Test_MixOutput extends Ac_Test_Base {
         $resp2->appendPathway('http://www.example.com/foo.html', 'current');
         $resp2->appendPathway(false, 'this one');
         $resp2->content = "<p>More text</p>\n";
+        $resp2->initScripts[] = "console.log('foo');";
         
         $resp->content .= $resp2;
         $resp->content .= "<p>The end</p>";
@@ -123,7 +170,27 @@ class Ac_Test_MixOutput extends Ac_Test_Base {
         ob_start();
         $pg->show();
         $resp = ob_get_clean();
-        // TODO: check
+        
+        if (!$this->assertEqual($this->normalizeHtml($resp), $this->normalizeHtml('
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                <!-- powered by Avancore 0.3 -->
+                <title>xxx - yyy</title>
+                <link rel="stylesheet" type="text/css" href="{FOO}/foo.css" />
+                <script type="text/javascript" src="{BAR}/bar.js"> </script>
+            </head> 
+            <body>
+            <p>The text</p>
+            <p>More text</p>
+            <p>The end</p>
+
+            <script type="text/javascript">
+                console.log(\'foo\');
+            </script>
+            </body>
+            </html>            
+        '))) 
         echo '<pre>'.htmlspecialchars($resp).'</pre>';
     }
     

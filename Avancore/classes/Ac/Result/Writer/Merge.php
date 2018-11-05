@@ -19,8 +19,9 @@ class Ac_Result_Writer_Merge extends Ac_Result_Writer_WithCharset {
                 }
             }
             if ($t && $t instanceof Ac_Result_Http_Abstract && $r instanceof Ac_Result_Http_Abstract) {
-                if ($t->getContentType() === false) 
+                if ($t->getContentType() === false) {
                     $t->setContentType($r->getContentType());
+                }
             }
         }
         

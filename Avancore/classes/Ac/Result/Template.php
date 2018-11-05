@@ -33,6 +33,7 @@ class Ac_Result_Template extends Ac_Result {
         if ($template !== ($oldTemplate = $this->template)) {
             $this->template = $template;
             $this->templateInstance = false;
+            $this->replaceWith = null;
         }
     }
 
@@ -54,6 +55,8 @@ class Ac_Result_Template extends Ac_Result {
     }
     
     function setTemplateInstance(Ac_Template $templateInstance) {
+        if ($this->templateInstance === $templateInstance) return;
+        $this->replaceWith = null;
         $this->templateInstance = $templateInstance;
         if ($this->component) $this->templateInstance->setComponent($this->component);
         if ($this->fields) $this->templateInstance->setFields($this->fields, true);
@@ -112,6 +115,13 @@ class Ac_Result_Template extends Ac_Result {
     function getPartArgs() {
         return $this->partArgs;
     }    
+    
+    function getReplaceWith() {
+        if (!$this->replaceWith && $this->getPartName()) {
+            $this->replaceWith = $this->render();
+        }
+        return $this->replaceWith;
+    }
     
     /**
      * @return Ac_Result

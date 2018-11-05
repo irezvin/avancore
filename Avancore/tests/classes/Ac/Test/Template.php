@@ -11,6 +11,8 @@ class Ac_Test_Template extends Ac_Test_Base {
         
         $r = new Ac_Result_Html;
         
+        $r->setDebugData("inner");
+        
         $r->title = 'Foo';
         
         $r->assets->addItems(array('foo.js', 'foo.css'));
@@ -25,14 +27,46 @@ class Ac_Test_Template extends Ac_Test_Base {
         
         $templateResult->setPartArgs(array('result' => $r, 'prefix' => "<p>Before</p>\n", 'suffix' => "\n<p>After</p>"));
         
+        $templateResult->setDebugData("template");
+        
         $outerResult = new Ac_Result_Html();
+
+        //$templateResult = $templateResult->render();
         
         //$templateResult = "<p>Before</p>\n{$r}\n<p>After</p>";
         
         $outerResult->put("<p>Outer before</p>\n", $templateResult, "\n<p>Outer after</p>");
         
-        var_dump($outerResult->writeAndReturn());
+        $outerResult->setDebugData("outer");
+      
+        $f = function($result, Ac_Result_Stage $stage, $callbackType) {
+            $stack = $stage->getStack();
+            $r = "\n".str_repeat(" - ", count($stack));
+            $r .= $callbackType." ";
+            if (!$stack) $r .= "root";
+            else {
+                $curr = $stack[0];
+                $offset = $curr[0].":".$curr[1];
+                $r .= $offset;
+            }
+            $r .= ":".get_class($result);
+            if (strlen($dd = $result->getDebugData())) {
+                $r .= "[".$dd."]";
+            }
+            if ($result instanceof Ac_Result) $r .= json_encode($result->getContent(), JSON_UNESCAPED_UNICODE);
+            echo $r;
+        };
         
+        $cb = new Ac_Result_Stage_Write(array(
+            'beginItemCallback' => $f,
+            'endItemCallback' => $f
+        ));
+        
+        //ob_start();
+        //$cb->setRoot($outerResult);
+        //$cb->invoke();
+        //echo("<pre>".nl2br(htmlspecialchars(ob_get_clean()))."</pre>");
+            
         $e = new Ac_Result_Environment_Dummy();
         Ac_Result_Environment::setDefault($e);
         
@@ -46,7 +80,7 @@ class Ac_Test_Template extends Ac_Test_Base {
             <head>
             <title>Foo</title>
             <link rel="stylesheet" type="text/css" href="foo.css" />
-            <script type="text/javascript" src="foo.js"></script>
+            <script type="text/javascript" src="foo.js"> </script>
             </head>
             <body>
                 <p>Outer before</p>
@@ -60,8 +94,6 @@ class Ac_Test_Template extends Ac_Test_Base {
         '))) {
             var_dump($e->responseText);
         }
-        
-        //var_dump($templateResult->writeAndReturn());
         
     }    
     

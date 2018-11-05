@@ -88,6 +88,9 @@ class Ac_Legacy_ResultWriter extends Ac_Result_Writer_AbstractHtmlRenderer {
                 $resp->metas[$k] = $v;
             }
         }
+        if (isset($u['initScripts'])) {
+            $resp->initScripts = array_merge($resp->initScripts, $r->initScripts->getItemsForWrite($this));
+        }
         if (isset($u['headTags'])) {
             $resp->headTags = array_merge($resp->headTags, $r->headTags->getItemsForWrite($this));
         }

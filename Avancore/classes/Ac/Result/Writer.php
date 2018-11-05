@@ -29,7 +29,9 @@ abstract class Ac_Result_Writer extends Ac_Prototyped {
     }
     
     function setSource(Ac_Result $source) {
+        if ($this->source === $source) return;
         $this->source = $source;
+        $this->source->setWriter($this);
     }
 
     function setStage(Ac_Result_Stage $stage = null) {
@@ -92,7 +94,14 @@ abstract class Ac_Result_Writer extends Ac_Prototyped {
             throw new Ac_E_InvalidUsage("setStage() first");
         }
         if ($return) ob_start();
-        $this->implWrite($r, $t, $s);
+        if (!$this->stage) { // there is 0 sense in invoking write() w/o Stage
+            $this->source->setWriter($this);
+            $this->stage = new Ac_Result_Stage_Write();
+            $this->stage->setRoot($this->source);
+            $this->stage->invoke();
+        } else {
+            $this->implWrite($r, $t, $s);
+        }
         if ($return) {
             return ob_get_clean();
         }

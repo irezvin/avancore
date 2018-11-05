@@ -289,6 +289,7 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
      * @param Ac_Result_Writer $writer or its' prototype
      */
     function setWriter($writer) {
+        if ($writer === $this->writer) return;
         if (is_object($writer) && $writer instanceof Ac_Result_Writer)
             $writer->setSource ($this);
         $this->writer = $writer;
