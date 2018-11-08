@@ -466,7 +466,7 @@ class Ac_Legacy_Database {
 	
 	function _time() {
 	    if (function_exists('xdebug_time_index')) return xdebug_time_index();
-	       else return microtime();
+	       else return microtime(true);
 	}
 	
 	function _debugBeforeQuery($sql) {
@@ -483,7 +483,7 @@ class Ac_Legacy_Database {
 	    if ($this->debug) {
     	    $t = $this->_time();
     	    $md = md5($sql);
-    	    if (isset($this->_t[$md])) {
+    	    if (isset($this->_t[$md]) && is_numeric($this->_t[$md])) {
     	        $time = $t - $this->_t[$md];
     	        unset($this->_t[$md]);
     	    }
