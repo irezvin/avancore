@@ -31,7 +31,7 @@ class Ac_Sql_Order_Switcher extends Ac_Sql_Order {
      */
     function _doGetAppliedOrderBy () {
         if (($this->value !== false) && ($this->modeMap[$this->value] !== false)) {
-            $res = array($this->modeMap[$this->value]);
+            $res = $this->modeMap[$this->value];
         } else {
             $res = array();
         }

@@ -37,14 +37,13 @@ class Ac_Admin_Feature_Reorder extends Ac_Admin_Feature {
                 'class' => 'Ac_Admin_Column_Reorder',
                 'orderUpTask' => $orderUpTask,
                 'orderDownTask' => $orderDownTask,
-                'orderProperty' => $this->groupProperty
             ),
             $this->colName.'SaveOrder' => array(
                 'class' => 'Ac_Admin_Column_SaveOrder',
                 'taskName' => $this->colName.'SaveOrder',
-                'orderProperty' => $this->groupProperty
             ),
         );
+        
         if (is_array($this->columnPrototype)) {
             Ac_Util::ms($res[$this->colName], $this->columnPrototype);
         } else {

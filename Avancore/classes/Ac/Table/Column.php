@@ -132,7 +132,7 @@ class Ac_Table_Column {
     function getHeaderAttribs($rowCount, $rowNo = 1) {
         if (isset($this->settings['headerAttribs'])) $res = $this->settings['headerAttribs'];
             else $res = array();
-            
+        if (!isset($res['title'])) $res['title'] = $this->_name;
         $res['rowspan'] = $this->getHeaderRowspan($rowCount, $rowNo);        
        
         return $res;
@@ -255,7 +255,7 @@ class Ac_Table_Column {
      */
     function showHeader($rowCount, $rowNo = 1) {
         if ($this->staticAttribs) $this->updateAttribs();
-        if (!$this->hidden) echo "<th title='{$this->_name}' ".Ac_Util::mkAttribs($this->getHeaderAttribs($rowCount, $rowNo)).">".$this->getTitle()."</th>";
+        if (!$this->hidden) echo "<th ".Ac_Util::mkAttribs($this->getHeaderAttribs($rowCount, $rowNo)).">".$this->getTitle()."</th>";
     }
     
     /**

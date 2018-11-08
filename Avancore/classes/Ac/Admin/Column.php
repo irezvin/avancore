@@ -15,7 +15,7 @@ class Ac_Admin_Column extends Ac_Table_Column {
     
     function showHeader($rowCount, $rowNo = 1) {
         if ($this->staticAttribs) $this->updateAttribs();
-        echo "<th ".Ac_Util::mkAttribs($this->getHeaderAttribs($rowCount, $rowNo)).">";
+        echo "<th ".Ac_Util::mkAttribs($a = $this->getHeaderAttribs($rowCount, $rowNo)).">";
         $this->doShowHeader();
         echo "</th>";
     }

@@ -39,6 +39,7 @@ class Ac_Table_Column_Checked extends Ac_Table_Column {
         if (isset($this->settings['headerAttribs'])) $res = $this->settings['headerAttribs'];
             else $res = array('align' => 'left', 'width' => '10');
         $res['rowspan'] = $this->getHeaderRowspan($rowCount, $rowNo);
+        $res = array_merge(parent::getHeaderAttribs($rowCount, $rowNo), $res);
         return $res;
     }
     

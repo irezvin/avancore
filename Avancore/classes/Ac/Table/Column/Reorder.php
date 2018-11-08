@@ -20,6 +20,7 @@ class Ac_Table_Column_Reorder extends Ac_Table_Column {
     function getHeaderAttribs($rowCount, $rowNo = 1) {
         if (isset($this->settings['headerAttribs'])) $res = $this->settings['headerAttribs'];
             else $res = array('colspan' => '2', 'align' => 'center', 'width' => '5%');
+        $res = array_merge(parent::getHeaderAttribs($rowCount, $rowNo), $res);
         return $res;
     }
     
