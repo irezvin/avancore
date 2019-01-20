@@ -9,7 +9,7 @@ class Ac_Cr_Router {
         return $request;
     }
     
-    function getStrUrl(Ac_Cr_Url $url, $withQuery = false) {
+    function getStrUrl(Ac_Url $url, $withQuery = false) {
         return $url->toStringUnrouted($withQuery);
     }
     

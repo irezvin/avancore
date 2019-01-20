@@ -53,6 +53,11 @@ class Ac_Url implements Ac_I_RedirectTarget {
     var $fragment = false;
     
     /**
+     * @var Ac_UrlMapper_UrlMapper
+     */
+    protected $urlMapper = null;
+    
+    /**
      * @param string strUrl Ac_Url string to populate scheme, host, path etc...
      */
     function __construct($strUrl = false) {
@@ -134,20 +139,36 @@ class Ac_Url implements Ac_I_RedirectTarget {
         return $this->toString();
     }
     
+    function getPathWithPathInfo(& $remainingQuery = null) {
+        $remainingQuery = $this->query;
+        $pathInfo = $this->pathInfo;
+        if ($this->urlMapper) {
+            // TODO: check if this URL is applicable
+            $newPathInfo = $this->urlMapper->moveParamsToString($remainingQuery);
+            if (!is_null($newPathInfo)) $pathInfo = $newPathInfo;
+        }
+        if (strlen($pathInfo)) {
+            $res = rtrim($this->path, '/').'/'.ltrim($pathInfo, '/');
+        } else {
+            $res = $this->path;
+        }
+        return $res;
+    }
+    
     /**
      * @returns string representation of URL
      */
     function toString($withQuery = true) {
+        $pathWithPathInfo = $this->getPathWithPathInfo($query);
+        if (!$withQuery) $query = array();
         $uri  = strlen($this->scheme) ? $this->scheme.':'.((strtolower($this->scheme) == 'mailto') ? '':'//') : '';
         $uri .= strlen($this->user) ? $this->user.(strlen($this->pass)? ':'.$this->pass:'').'@':'';
         $uri .= strlen($this->host) ? $this->host : '';
         $uri .= strlen($this->port) ? ':'.$this->port : '';
-        $uri .= strlen($this->path) ? $this->path : '';
-        $uri .= strlen($this->pathInfo) ? $this->pathInfo : '';
-        if (!strlen($this->path) && !strlen($this->pathInfo) && (($withQuery && $this->query) || strlen($this->fragment)) && substr($uri, -1) !== '/') $uri .= '/';
-        //$uri .= $withQuery && strlen($this->query) ? '?'.(Ac_Url::array2queryString($this->query)) : '';
-        if ($withQuery && $this->query) {
-            $uri .= '?'.http_build_query($this->query);
+        $uri .= strlen($pathWithPathInfo) ? $pathWithPathInfo : '';
+        if (!strlen($pathWithPathInfo) && (($query) || strlen($this->fragment)) && substr($uri, -1) !== '/') $uri .= '/';
+        if ($query && strlen($q = http_build_query($query))) {
+            $uri .= '?'.$q;
         }
         $uri .= $this->fragment ? '#'.$this->fragment : '';
         
@@ -283,40 +304,42 @@ class Ac_Url implements Ac_I_RedirectTarget {
      * Guesses and returns URL of current script
      * Note that it takes $query part from REQUEST_URI (so it will ignore various manipulations with $_GET array)
      * 
+     * @TODO ability to accept Ac_Cr_Request->server as $server
+     * 
      * @return Ac_Url
      */
-    static function guess($withPathInfo = false) {
-        if (!isset($_SERVER)) {
-            // TODO: fix me
-            return new Ac_Url("http://localhost/");
+    static function guess($withPathInfo = false, array $server = null) {
+        if (!isset($server)) {            
+            if (!isset($_SERVER)) return new Ac_Url("http://localhost/");
+            else $server = $_SERVER;
         }
         $scheme = 'http';
-        if (isset($_SERVER['REQUEST_SCHEME']) && strlen($_SERVER['REQUEST_SCHEME'])) {
-            $scheme = $_SERVER['REQUEST_SCHEME'];
-        } elseif (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off') {
+        if (isset($server['REQUEST_SCHEME']) && strlen($server['REQUEST_SCHEME'])) {
+            $scheme = $server['REQUEST_SCHEME'];
+        } elseif (!empty($server['HTTPS']) && $server['HTTPS'] != 'off') {
             $scheme = 'https';
         }
         
-        if (isset($_SERVER['HTTP_HOST'])) $host = $_SERVER['HTTP_HOST'];
-        elseif (isset($_SERVER['HTTPS_HOST'])) $host = $_SERVER['HTTPS_HOST'];
+        if (isset($server['HTTP_HOST'])) $host = $server['HTTP_HOST'];
+        elseif (isset($server['HTTPS_HOST'])) $host = $server['HTTPS_HOST'];
+        elseif (isset($server['SERVER_NAME'])) $host = $server['SERVER_NAME'];
         else $host = 'localhost';
         
-        if (isset($_SERVER['REQUEST_URI'])) $uri = $_SERVER['REQUEST_URI'];
+        if (isset($server['REQUEST_URI'])) $uri = $server['REQUEST_URI'];
             else $uri = '/';
         
         $res = new Ac_Url($scheme.'://'.$host.$uri);
         if ($withPathInfo) {
-            if (isset($_SERVER['PATH_INFO'])) {
-                $myPathInfo = $_SERVER['PATH_INFO'];
-                $res->path = $_SERVER['SCRIPT_NAME'];
-                if (isset($_SERVER['PATH_INFO'])) $res->pathInfo = $_SERVER['PATH_INFO'];
+            if (isset($server['PATH_INFO'])) {
+                $myPathInfo = $server['PATH_INFO'];
+                $res->path = $server['SCRIPT_NAME'];
+                if (isset($server['PATH_INFO'])) $res->pathInfo = $server['PATH_INFO'];
             } else {
-                $sn = explode('/', $_SERVER['SCRIPT_NAME']);
-                $ru = $_SERVER['REQUEST_URI'];
-                if (isset($_SERVER['QUERY_STRING']) && ($l = strlen($_SERVER['QUERY_STRING']))) $ru = substr($ru, 0, strlen($ru) - $l - 1);
+                $sn = explode('/', $server['SCRIPT_NAME']);
+                $ru = $server['REQUEST_URI'];
+                if (isset($server['QUERY_STRING']) && ($l = strlen($server['QUERY_STRING']))) $ru = substr($ru, 0, strlen($ru) - $l - 1);
                 $ru = explode('/', $ru);
                 $path = array();
-                $pathInfo = array();
                 $maxLen = min(count($sn), count($ru));
                 for ($i = 0; $i < $maxLen && ($sn[$i] == $ru[$i]); $i++) {
                     $path[] = $sn[$i];
@@ -325,7 +348,13 @@ class Ac_Url implements Ac_I_RedirectTarget {
                 $res->path = implode('/', $path);
                 if (count($ru)) $res->pathInfo = implode('/', $ru);
                 if (substr($res->path, -1) !== '/' && ($res->pathInfo !== false && substr($res->pathInfo, 0, 1) !== '/')) {
-                    $res->path = $res->path. '/';
+                    // replace paths like 'http://example.com/foo' with '/foo/', but leave /index.php without trailing backslash
+                    $fileSpecified = basename($server['SCRIPT_NAME']) == basename($res->path);
+                    if (!$fileSpecified) {
+                        $res->path = $res->path.'/';
+                    } else {
+                        $res->pathInfo = '/'.$res->pathInfo;
+                    }
                 }
             }
         }
@@ -350,13 +379,17 @@ class Ac_Url implements Ac_I_RedirectTarget {
         $res = clone $this;
         if (!strlen($res->scheme)) $res->scheme = $b->scheme;
         if (!strlen($res->host)) $res->host = $b->host;
-        if (!strlen($res->path) || substr($res->path, 0, 1) === '/') {
+        if (substr($res->path, 0, 1) === '/') {
             // nothing to do
             return $res;
         }
         
         // resolve the path
         $path = $b->path;
+        if (!strlen($res->path)) {
+            $res->path = $path;
+            return $res;
+        }
         if (substr($path, -1) !== '/') $path = dirname($path);
         $path = str_replace('//', '/', rtrim($path, '/').'/'.ltrim($res->path, '/'));
         if (preg_match('#(^|/)\.\.?(/|$)#', $path)) { // have "/../" or "/.." in the path - must resolve
@@ -382,6 +415,64 @@ class Ac_Url implements Ac_I_RedirectTarget {
             if ($resPathAbsolute) $path = '/'.$path;
         }
         $res->path = $path;
+        return $res;
+    }
+    
+    function setUrlMapper(Ac_UrlMapper_UrlMapper $urlMapper) {
+        $this->urlMapper = $urlMapper;
+    }
+
+    /**
+     * @return Ac_UrlMapper_UrlMapper
+     */
+    function getUrlMapper() {
+        return $this->urlMapper;
+    }
+
+    function hasBase($baseUrl, & $pathInfo = null) {
+        $pathInfo = null;
+        if (!$this->isFullyQualified()) {
+            return $this->resolve($baseUrl)->hasBase($baseUrl, $pathInfo);
+        }
+        
+        if (!(is_object($baseUrl) && $baseUrl instanceof Ac_Url)) {
+            $baseUrl = new Ac_Url($baseUrl);
+        }
+        
+        // compare pre-path parts
+        $ok = !strcasecmp($baseUrl->scheme, $this->scheme);
+        $ok = $ok && !strcasecmp($baseUrl->port, $this->port);
+        $ok = $ok && !strcasecmp($baseUrl->host, $this->host);
+        if (!$ok) return false;
+        
+        // now compare paths
+        $myPath = $this->getPathWithPathInfo();
+        $basePath = $baseUrl->getPathWithPathInfo();
+        $baseLen = strlen($basePath);
+        if (strlen($myPath) < $baseLen) return false;
+        if (strncmp($myPath, $basePath, $baseLen)) return false;
+        
+        // common string must end with '/', or the paths must be completely identical
+        $lastChar = $myPath{$baseLen - 1};
+        if ($lastChar !== '/') {
+            $nextChar = substr($myPath, $baseLen, 1);
+            if (!($nextChar === '' || $nextChar === '/')) return false;
+        }
+        
+        $pathInfo = substr($myPath, $baseLen);
+        
+        return true;
+    }
+    
+    /**
+     * Tries to guess base URL (site root) from SCRIPT_NAME and REQUEST_URI
+     * 
+     * @return Ac_Url
+     */
+    static function guessBase(array $server = array()) {
+        $res = Ac_Url::guess(true, $server);
+        $res->setPathInfo('');
+        if (substr($res->path, -1) !== '/') $res->path = dirname($res->path).'/';
         return $res;
     }
     

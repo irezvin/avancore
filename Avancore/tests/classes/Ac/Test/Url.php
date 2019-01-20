@@ -1,6 +1,95 @@
 <?php
 
 class Ac_Test_Url extends Ac_Test_Base {
+
+    function testGuessBase() {
+        foreach (array(
+            'https://example.com/foo/' => array(
+                'HTTPS' => 'on',
+                'SERVER_NAME' => 'example.com',
+                'REQUEST_URI' => '/foo/',
+                'SCRIPT_NAME' => '/foo/index.php'
+            ),
+            'https://example.com/foo/' => array(
+                'HTTPS' => 'on',
+                'SERVER_NAME' => 'example.com',
+                'REQUEST_URI' => '/foo/index.php',
+                'SCRIPT_NAME' => '/foo/index.php'
+            ),
+            'https://example.com/foo/' => array(
+                'HTTPS' => 'on',
+                'SERVER_NAME' => 'example.com',
+                'REQUEST_URI' => '/foo/aaa/bbb',
+                'SCRIPT_NAME' => '/foo/index.php'
+            ),
+            'https://example.com/foo/' => array(
+                'HTTPS' => 'on',
+                'SERVER_NAME' => 'example.com',
+                'REQUEST_URI' => '/foo/index.php/aaa/bbb',
+                'SCRIPT_NAME' => '/foo/index.php'
+            )
+            
+        ) as $base => $server) {
+            $this->assertEqual(''.Ac_Url::guessBase($server), $base);
+        }
+    }
+    
+    function testHasBase() {
+        // base, url, pathInfo | false
+        $tests = array(
+            ['http://example.com/index.php', 'http://example.com/index.php/foo/bar', '/foo/bar'],
+            ['http://example.com/foo/', 'http://example.com/foo/bar/baz', 'bar/baz'],
+            ['http://example.com/foo/', '/foo/', ''],
+            ['http://example.com/foo/bar/baz/', '../baz/zzz', 'zzz'],
+            ['http://example.com/foo/', '//example.com/foo/baz', 'baz'],
+            ['hTTp://exAmpLe.cOm/foo/', 'httP://ExAmPle.com/foo/baz', 'baz'],
+            ['http://example.com/inDEx.php', 'http://example.com/index.php/foo/bar', null],
+        );
+        foreach ($tests as $test) {
+            $proper = isset($test[2]);
+            $u = new Ac_Url($test[1]);
+            $res = $u->hasBase($test[0], $pathInfo);
+            $this->assertEqual($res, $proper);
+            if ($proper) $this->assertEqual ($pathInfo, ($properPathInfo = $test[2]));
+        }
+    }
+    
+    function testPathInfo() {
+        $u = new Ac_Url('http://example.com/foo');
+        $u->pathInfo = 'xxx';
+        $this->assertEqual($u->toString(), 'http://example.com/foo/xxx', 'pathInfo always separated from path using "/"');
+        
+        $u = new Ac_Url('http://example.com/foo/');
+        $u->pathInfo = '/xxx';
+        $this->assertEqual($u->toString(), 'http://example.com/foo/xxx', 'extraneous "/" is always removed between pathInfo and path');
+    }
+    
+    function testGuessPathInfo() {
+        $u = Ac_Url::guess(true, array(
+            'HTTP_HOST' => 'example.com',
+            'REQUEST_URI' => '/foo/',
+            'SCRIPT_NAME' => '/foo/index.php',
+        ));
+        $this->assertEqual($u->path, '/foo/');
+        $this->assertEqual($u->pathInfo, '');
+        
+        $u = Ac_Url::guess(true, array(
+            'HTTP_HOST' => 'example.com',
+            'REQUEST_URI' => '/foo/bar/baz',
+            'SCRIPT_NAME' => '/foo/index.php',
+        ));
+        $this->assertEqual($u->path, '/foo/');
+        $this->assertEqual($u->pathInfo, 'bar/baz');
+        
+        $u = Ac_Url::guess(true, array(
+            'HTTP_HOST' => 'example.com',
+            'REQUEST_URI' => '/foo/index.php/bar/baz',
+            'SCRIPT_NAME' => '/foo/index.php',
+        ));
+        $this->assertEqual($u->path, '/foo/index.php');
+        $this->assertEqual($u->pathInfo, '/bar/baz');
+        
+    }
     
     function resolve($url, $baseUrl) {
         $a = new Ac_Url($url);
@@ -55,6 +144,14 @@ class Ac_Test_Url extends Ac_Test_Base {
                 $url = "http://zz.com/xx/yy", 
                 $base = "https://www.example.com/top/sub/index.php"),
                 $proper = "http://zz.com/xx/yy")) 
+        {
+            var_dump(compact('url', 'base', 'proper', 'result'));
+        }
+        
+        if (!$this->assertEqual($result = $this->resolve(
+                $url = "?foo=1", 
+                $base = "http://foo/bar/baz.html"),
+                $proper = "http://foo/bar/baz.html?foo=1")) 
         {
             var_dump(compact('url', 'base', 'proper', 'result'));
         }

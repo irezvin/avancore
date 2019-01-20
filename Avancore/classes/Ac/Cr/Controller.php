@@ -61,7 +61,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
      * Returns URL valid for the current moment of execution
      * 
      * @param array $params 
-     * @return Ac_Cr_Url
+     * @return Ac_Url
      */
     function getUrl($params = array(), $fullOverride = false) {
         return $this->getContext()->createUrl($params, $fullOverride);

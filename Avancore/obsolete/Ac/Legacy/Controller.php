@@ -291,24 +291,26 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped {
     /**
      * @return Ac_Url
      */
-    function getUrl($extraParams = array(), $preserveCurrentParams = true) {
-        $res = false;
-        if (is_a($this->_context, 'Ac_Legacy_Controller_Context_Http')) {
-            $ctx = $this->_context->cloneObject();
-            $ctx->setData();
-            $myParams = $this->_stateData;
+    function getUrl($extraParams = array(), $preserveCurrentParams = false) {
+        if (!$this->_context instanceof Ac_Legacy_Controller_Context_Http) return;
+        if ($this->_autoStateVars || $this->_stateData) {
+            $ctx = clone $this->_context;
+            if (!$preserveCurrentParams) $ctx->setData(array());
+            $state = $this->_stateData;
             foreach ($this->_autoStateVars as $vn) {
                 $vv = false;
                 if (is_callable($call = array($this, $cName = 'get'.ucfirst($vn)))) {
                     $vv = $this->$cName();
                 } elseif (isset($this->{$vn})) $vv = $this->$vn;
                 if (($vv !== false) && !is_null($vv)) {
-                    $myParams[$vn] = $vv;
+                    $state[$vn] = $vv;
                 }
             }
-            $extraParams = Ac_Util::m($myParams, $extraParams);
-            $res = $ctx->getUrl($extraParams);
+            $ctx->updateData($state);
+        } else {
+            $ctx = $this->_context;
         }
+        $res = $ctx->getUrl($extraParams, $preserveCurrentParams);
         return $res;
     }
     

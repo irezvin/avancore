@@ -34,12 +34,12 @@ class Ac_Cr_Context {
     protected $translatedRequest = false;
     
     /**
-     * @var Ac_Cr_Router
+     * @var Ac_UrlMapper_UrlMapper
      */
-    protected $router = false;
+    protected $urlMapper = false;
     
     /**
-     * @var Ac_Cr_Url
+     * @var Ac_Url
      */
     protected $baseUrl = false;
     
@@ -96,15 +96,16 @@ class Ac_Cr_Context {
     
     function setBaseUrl($baseUrl) {
         if ($this->baseUrl !== false) throw Ac_E_InvalidCall::canRunMethodOnce ($this, __FUNCTION__);
-        $this->baseUrl = is_object($baseUrl)? $baseUrl : new Ac_Cr_Url($baseUrl);
+        $this->baseUrl = is_object($baseUrl)? $baseUrl : new Ac_Url($baseUrl);
     }
     
     /**
-     * @return Ac_Cr_Url 
+     * @return Ac_Url 
      */
     function getBaseUrl() {
         if ($this->baseUrl === false) {
-            $this->baseUrl = Ac_Cr_Url::guess(true, $this->getRequest());
+            $server = $this->getRequest()->getValueFrom('server', array());
+            $this->baseUrl = Ac_Url::guess(true, $server);
             if ($this->pathPrefix) Ac_Util::unsetArrayByPath($this->baseUrl->query, $this->pathPrefix);
                 else $this->baseUrl->query = array();
         }
@@ -112,19 +113,19 @@ class Ac_Cr_Context {
     }
     
     /**
-     * @return Ac_Cr_Routers
+     * @return Ac_UrlMapper_UrlMappers
      */
-    function getRouter() {
-        if ($this->router === false) {
-            if ($this->topContext) $this->router = $this->topContext->getRouter();
-            else $this->router = null;
+    function getUrlMapper() {
+        if ($this->urlMapper === false) {
+            if ($this->topContext) $this->urlMapper = $this->topContext->getUrlMapper();
+            else $this->urlMapper = null;
         }
-        return $this->router;
+        return $this->urlMapper;
     }
     
-    function setRouter(Ac_Router $router = null) {
-        if ($this->router !== false) throw Ac_E_InvalidCall::canRunMethodOnce ($this, __FUNCTION__);
-        $this->router = $router;
+    function setUrlMapper(Ac_UrlMapper $urlMapper = null) {
+        if ($this->urlMapper !== false) throw Ac_E_InvalidCall::canRunMethodOnce ($this, __FUNCTION__);
+        $this->urlMapper = $urlMapper;
     }
     
     /**
@@ -150,7 +151,7 @@ class Ac_Cr_Context {
      */
     protected function getTranslatedRequest() {
         if ($this->translatedRequest === false) {
-            if ($this->getRouter()) $this->translatedRequest = $this->router->translateRequest($this->getRequest());
+            if ($this->getUrlMapper()) $this->translatedRequest = $this->urlMapper->translateRequest($this->getRequest());
                 else $this->translatedRequest = $this->getRequest();
         }
         return $this->translatedRequest;
@@ -253,7 +254,7 @@ class Ac_Cr_Context {
     }
     
     /**
-     * @return Ac_Cr_Url 
+     * @return Ac_Url 
      * @param bool $fullOverride Don't put used params to the context
      */
     function createUrl(array $params = array(), $fullOverride = false) {
@@ -262,7 +263,7 @@ class Ac_Cr_Context {
         } else {
             $res = $this->topContext->createUrl(array(), $fullOverride);
         }
-        if ($r = $this->getRouter()) $res->setRouter($r);
+        if ($r = $this->getUrlMapper()) $res->setUrlMapper($r);
         if (!$fullOverride) $this->updateUrlWithUsedParams($res);
         if ($params) $this->updateUrlWithParams ($res, $params);
         return $res;
