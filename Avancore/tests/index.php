@@ -7,8 +7,8 @@ require_once(dirname(__FILE__).'/app.config.php');
 define('AC_TESTS_TMP_PATH', dirname(__FILE__).'/var');
 Ac_Test_Base::$config = $config;
 
-ini_set('error_reporting', E_ALL);
-ini_set('display_errors', 1);
+$classes = array();
+$allTests = true;
 
 $ac = true;
 $etl = false;
@@ -17,45 +17,93 @@ if (isset($_GET['ac'])) $ac = (bool) ($_GET['ac']);
 
 $v = Ac_Avancore::version;
 
+$titlePrefix = "";
 if (isset($_GET['class']) && strlen($class = $_GET['class'])) {
-    
     $classes = explode(',', $_GET['class']);
-	
-    $ts = new TestSuite("Ac {$v} Test".(count($classes) == 1? '' : 's').": {$_GET['class']}");
-    
-    foreach ($classes as $class) {
-
-        if (strpos($class, '_Test_') === false)
-            $cn = 'Ac_Test_'.ucfirst($class);
-        else
-            $cn = $class;
-        $test = new $cn;
-        $ts->add($test);
-    }
-    $ts->run(new Ac_Test_Reporter('UTF-8'));
-    
+    $allTests = false;
+    $titlePrefix = str_replace("Ac_Test_", "", implode(", ", $classes))." - ";
 } else {
-    $title = "Avancore Framework {$v} Tests";
-    $t = new TestSuite($title);
-    $classes = array();
-    if ($ac) {
-        foreach ($files = glob(dirname(__FILE__).'/classes/Ac/Test/*.php') as $file) {
-            $class = 'Ac_Test_'.basename($file, '.php');
-            if ($class !== 'Ac_Test_Base' && $class !== 'Ac_Test_Reporter') $classes[] = $class;
-        }
+    $files = array();
+    $base = __DIR__.'/classes/';
+    if ($ac) $files = array_merge($files, glob($base.'Ac/Test/*.php'));
+    if ($etl) $files = array_merge($files, glob($base.'Etl/Test/*.php'));
+    foreach ($files as $file) {
+        $class = substr($file, strlen($base));
+        $class = str_replace('/', '_', $class);
+        $class = str_replace('.php', '', $class);
+        if ($class !== 'Ac_Test_Base' && $class !== 'Ac_Test_Reporter') $classes[] = $class;
     }
-    if ($etl) {
-        foreach ($files = glob(dirname(__FILE__).'/classes/Etl/Test/*.php') as $file) {
-            if (is_file($file)) $classes[] = "Etl_Test_".basename($file, '.php');
-        }
-    }
-    foreach ($classes as $class) $t->add($class);
-		
-	$t->run(new Ac_Test_Reporter('UTF-8'));
+}
 	
+$time = microtime(true);
+
+?>
+<!DOCTYPE html>
+<html>
+    <title><?php echo $titlePrefix; ?>Avancore <?php echo Ac_Avancore::version; ?> tests</title>
+    <head>
+        <style type="text/css">
+            .fail { background-color: inherit; color: red; }
+            .pass { background-color: inherit; color: green; }
+            pre { background-color: lightgray; color: inherit; }
+            h1 a, .fa {
+                font-size: 0.5em;
+                font-weight: normal;
+                display: block;
+                float: right;
+                text-shadow: none;
+            }
+            .xdebug-error td, .xdebug-error th {
+                color: black;
+            }
+            h1, h2, h3 {
+                font-weight: normal;
+                text-shadow: 2px 2px black;
+            }
+            html {
+                font-family: sans;
+                height: 100%;
+                background-color: #333;
+                background: linear-gradient(to bottom, #424242 0%,#9b9b9b 100%); /* W3C */
+                color: #eee;
+                background-attachment: fixed;
+            }
+            pre {
+                color: black;
+            }
+            span.fail {
+                background-color: red; color: white; padding: 1px 4px; border-radius: 5px; font-weight: bold;
+            }
+            body {
+                line-height: 1.8em;
+            }
+            div, pre {
+                border-radius: 5px;
+                padding: 5px;
+                line-height: 1em;
+            }
+        </style>
+    </head>
+    <body>
+<?php
+
+if (!$allTests) {
+    echo "<p><a href='?'>Back to all tests</a></p>";
 }
 
-if (function_exists('xdebug_time_index')) {
-    var_dump(xdebug_time_index(), round(memory_get_peak_usage()/1024/1024, 2).'M');
-}
+foreach ($classes as $class) {
 
+    if (strpos($class, '_Test_') === false) {
+        $class = 'Ac_Test_'.ucfirst($class); 
+    }
+    $head = "{$class} <a href='?class={$class}'>rerun</a>";
+    $t = new TestSuite($head);
+    $t->add($class);
+
+    ini_set('error_reporting', E_ALL);
+    ini_set('display_errors', 1);
+    $t->run(new Ac_Test_Reporter('UTF-8'));
+
+    var_dump(round(microtime(true) - $time, 3));
+    $time = microtime(true);
+}
