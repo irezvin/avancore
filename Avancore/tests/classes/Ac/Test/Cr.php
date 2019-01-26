@@ -201,8 +201,9 @@ class Ac_Test_Cr extends Ac_Test_Base {
         $this->assertEqual($rq->server->scriptName, '/index.php');
         $this->assertEqual($rq->server->queryString, 'foo=bar&baz=quux');
         
+        $server = $rq->getValueFrom('server', array());
         $this->assertEqual(
-            Ac_Cr_Url::guess(true, $rq).'',
+            Ac_Url::guess(true, $server).'',
             $url,
             'Guess URL with pathinfo'
         );
@@ -212,7 +213,7 @@ class Ac_Test_Cr extends Ac_Test_Base {
         $rq->server->pathInfo = null;
         
         $this->assertEqual(
-            Ac_Cr_Url::guess(true, $rq).'',
+            Ac_Url::guess(true, $server = $rq->getValueFrom('server', array())).'',
             $url,
             "Guess URL without \$_SERVER['PATHINFO']"
         );

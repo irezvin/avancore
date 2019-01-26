@@ -29,11 +29,6 @@ class Ac_Cr_Context {
     protected $request = false;
     
     /**
-     * @var Ac_Request
-     */
-    protected $translatedRequest = false;
-    
-    /**
      * @var Ac_UrlMapper_UrlMapper
      */
     protected $urlMapper = false;
@@ -144,17 +139,6 @@ class Ac_Cr_Context {
     function setRequest(Ac_Request $request) {
         if ($this->request !== false) throw Ac_E_InvalidCall::canRunMethodOnce($this, __FUNCTION__);
         $this->request = $request;
-    }
-    
-    /**
-     * @return Ac_Cr_Request
-     */
-    protected function getTranslatedRequest() {
-        if ($this->translatedRequest === false) {
-            if ($this->getUrlMapper()) $this->translatedRequest = $this->urlMapper->translateRequest($this->getRequest());
-                else $this->translatedRequest = $this->getRequest();
-        }
-        return $this->translatedRequest;
     }
     
     protected function translatePath($ownParamPath) {

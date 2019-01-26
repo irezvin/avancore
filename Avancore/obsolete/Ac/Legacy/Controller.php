@@ -1,9 +1,6 @@
 <?php
 
-/**
- * Controller for Avancore 0.2 -- presentation controller 
- */
-class Ac_Legacy_Controller implements Ac_I_Prototyped {
+class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
 
     /**
      * @var Ac_Application
