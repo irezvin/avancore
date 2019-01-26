@@ -553,9 +553,9 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             $name = $this->_mapNames($control, 'value');
             $attribs = $control->getHtmlAttribs();
             if (!isset($attribs['class'])) $attribs['class'] = 'readOnly';
-            
+            $disp = $control->getDisplayValue();
 ?>            
-            <<?php echo $control->tagName; ?> <?php echo Ac_Util::mkAttribs($attribs); ?>><?php if (strlen($control->getDisplayValue())) $this->d ($control->getDisplayValue(), $control->allowHtml); else $this->d($control->getEmptyCaption()); ?></<?php echo $control->tagName; ?>>       
+            <<?php echo $control->tagName; ?> <?php echo Ac_Util::mkAttribs($attribs); ?>><?php if (strlen($disp)) $this->d ($disp, $control->allowHtml); else $this->d($control->getEmptyCaption()); ?></<?php echo $control->tagName; ?>>
 <?php   
     }
     

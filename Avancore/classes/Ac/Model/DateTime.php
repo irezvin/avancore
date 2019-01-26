@@ -139,7 +139,7 @@ class Ac_Model_DateTime {
                 static $defaults = array ('mday' => 1, 'month' => 1, 'year' => 1970, 'hours' => 0, 'minutes' => 0, 'seconds' => 0);
                 $v = array_merge($defaults, $array);
                 $f = $useGmt? 'gmmktime' : 'mktime';
-                $timestamp = $f($v['hours'] + 12, $v['minutes'], $v['seconds'], $v['month'], $v['mday'], $v['year']) - 12*3600;                
+                $timestamp = $f($v['hours'], $v['minutes'], $v['seconds'], $v['month'], $v['mday'], $v['year']);
             } else {
                 $timestamp = $this->getZeroDateValue();
             }

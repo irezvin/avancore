@@ -27,7 +27,7 @@ class Ac_Decorator_Model_Template extends Ac_Decorator implements Ac_I_Decorator
     
     protected $model = false;
     
-    function setModel($model) {
+    /*function setModel($model) {
         $this->model = $model;
     }
 
@@ -35,7 +35,7 @@ class Ac_Decorator_Model_Template extends Ac_Decorator implements Ac_I_Decorator
         if ($this->model) $res = $this->model;
         else $res = Ac_Decorator::topModel ();
         return $res;
-    }
+    }*/
     
     function apply($value) {
         $model = $this->getModel();

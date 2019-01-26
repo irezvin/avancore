@@ -1,6 +1,6 @@
 <?php
 
-interface Ac_I_Mail_Sender_Smtp {
+interface Ac_I_Mail_Sender_Smtp  extends Ac_I_Mail_Sender {
 
     const SMTP_SECURE_NONE = '';
     const SMTP_SECURE_SSL = 'ssl';

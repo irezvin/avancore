@@ -20,6 +20,9 @@ class Ac_Etl_Import extends Ac_Prototyped {
     
     protected $importId = false;
     
+    /**
+     * @var Ac_Etl_Table[]
+     */
     protected $tables = array();
     
     protected $db = false;
@@ -157,8 +160,11 @@ class Ac_Etl_Import extends Ac_Prototyped {
         return $this->tables;
     }
     
-    function cleanTmpData($all = false) {
-        foreach ($this->tables as $table) $table->cleanTmpData($all, $all);
+    function cleanTmpData($all = false, $tableGroupId = null) {
+        foreach ($this->tables as $table) {
+            if (!(!is_null($tableGroupId) && $table->tableGroupId === $tableGroupId)) continue;
+            $table->cleanTmpData($all, $all);
+        }
     }
     
     function logItem(Ac_Etl_Log_Item $item) {

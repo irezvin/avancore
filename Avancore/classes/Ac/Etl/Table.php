@@ -8,6 +8,8 @@ class Ac_Etl_Table extends Ac_Prototyped {
     
     var $restriction = array();
     
+    var $tableGroupId = '';
+    
     /**
      * @var Ac_Etl_Import
      */
