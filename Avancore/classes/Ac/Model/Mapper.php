@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAwareCollection, Ac_I_Search_FilterProvider, Ac_I_Search_RecordProvider {
+class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAwareCollection, Ac_I_Search_FilterProvider, Ac_I_Search_RecordProvider, Ac_I_NamedApplicationComponent {
 
     static $collectGarbageAfterCountFind = true;
     
@@ -378,6 +378,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
 
     function setApplication(Ac_Application $application) {
         $this->application = $application;
+        if (!$this->db) $this->setDb($this->application->getDb());
         
         // buggy at the moment - works bad with Ac_Prototyped::factoryCollection()
         /*if (strlen($this->getId())) 
@@ -601,6 +602,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * @return Ac_Model_Object[]
      */
     function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
+        // "ob_flush()" here fixes segfault in tests ((
         $storage = $this->getStorage();
         if (!$storage instanceof Ac_Model_Storage_Sql) 
             throw new Ac_E_InvalidCall(get_class($storage)." of mapper '{$this->id}' is not Ac_Model_Storage_Sql");

@@ -68,6 +68,12 @@ class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
         return $this->config[$k];
     }
     
+    function getDefaultComponentPrototypes() {
+        return Ac_Util::m(parent::getDefaultComponentPrototypes(), array(
+            Ac_Application::CORE_COMPONENT_MANAGER_CONFIG_SERVICE => 'Ac_Admin_ManagerConfigService_J25',
+        ));
+    }
+    
     protected function doGetDefaultServices() {
         return Ac_Util::m(parent::doGetDefaultServices(), array(
             'managerConfigService' => 'Ac_Admin_ManagerConfigService_J25',

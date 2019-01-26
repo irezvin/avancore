@@ -272,8 +272,8 @@ class Ac_Test_Model extends Ac_Test_Base {
             'id' => 'Religion',
             'tableName' => '#__religion'
         ));
-        $sam->addMapper($people);
-        $sam->addMapper($religion);
+        $sam->addComponent($people);
+        $sam->addComponent($religion);
         
         $peopleReligion = new Ac_Model_Association_One(array(
             'id' => 'religion',
@@ -332,7 +332,7 @@ class Ac_Test_Model extends Ac_Test_Base {
             'id' => 'Tags',
             'tableName' => '#__tags'
         ));
-        $sam->addMapper($tags);
+        $sam->addComponent($tags);
         
         $peopleTags = new Ac_Model_Association_ManyToMany(array(
             'id' => 'tags',

@@ -1,10 +1,9 @@
 <?php
 
 if (!class_exists('Ac_Util', false)) require_once(dirname(__FILE__).'/Util.php');
-if (!class_exists('Ac_I_ServiceProvider', false)) require_once(dirname(__FILE__).'/I/ServiceProvider.php');
 if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/Prototyped.php');
 
-abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_ServiceProvider {
+abstract class Ac_Application extends Ac_Mixin_WithEvents {
 
     /**
      * onInitialize
@@ -12,38 +11,36 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
     const EVENT_ON_INITIALIZE = 'onInitialize';
     
     /**
-     * onGetMapperPrototypes (array & $mapperPrototypes)
+     * onGetCompronentPrototypes(array & $componentPrototypes)
      */
-    const EVENT_ON_GET_MAPPER_PROTOTYPES = 'onGetMapperPrototypes';
+    const EVENT_ON_GET_COMPONENT_PROTOTYPES = 'onGetComponentPrototypes';
     
     /**
-     * onRegisterMappers (array $mappers)
+     * onRegisterComponents (array $components)
      */
-    const EVENT_ON_REGISTER_MAPPERS = 'onRegisterMappers';
+    const EVENT_ON_REGISTER_COMPONENTS = 'onRegisterComponents';
     
     /**
-     * onGetControllerPrototypes(array & $controllerPrototypes)
+     * onComponentNotFound ($id, & $instance = null)
      */
-    const EVENT_ON_GET_CONTROLLER_PROTOTYPES = 'onGetControllerPrototypes';
+    const EVENT_ON_COMPONENT_NOT_FOUND = 'onComponentNotFound';
     
-    /**
-     * onRegisterControllers (array $controllers)
-     */
-    const EVENT_ON_REGISTER_CONTROLLERS = 'onRegisterControllers';
-    
-    /**
-     * onMapperNotFound ($id, & $instance = null)
-     */
-    const EVENT_ON_MAPPER_NOT_FOUND = 'onMapperNotFound';
-    
-    /**
-     * onControllerNotFound ($id, & $instance = null)
-     */
-    const EVENT_ON_CONTROLLER_NOT_FOUND = 'onControllerNotFound';
+    const CORE_COMPONENT_DB = 'core.db';
+    const CORE_COMPONENT_LEGACY_DB = 'core.legacyDb';
+    const CORE_COMPONENT_FLAGS = 'core.flags';
+    const CORE_COMPONENT_CACHE = 'core.cache';
+    const CORE_COMPONENT_MAIL_SENDER = 'core.mailSender';
+    const CORE_COMPONENT_RELATION_PROVIDER_EVALUATOR = 'core.relationProviderEvaluator';
+    //const CORE_COMPONENT_ACCESSOR_PROVIDER_EVALUATOR = 'core.accessorProviderEvaluator';
+    const CORE_COMPONENT_MANAGER_CONFIG_SERVICE = 'core.managerConfigService';
+    const CORE_COMPONENT_URL_MAPPER = 'core.urlMapper';
+
     
     const STAGE_CONSTRUCTING = 'constructing';
     const STAGE_INITIALIZING = 'initializing';
     const STAGE_INITIALIZED = 'initialized';    
+    
+    
     
     private static $instances = array();
     
@@ -72,26 +69,6 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
     
     protected $db = null;
     
-    protected $cache = null;
-    
-    protected $controllers = array();
-    
-    protected $defaultControllerId = false;
-    
-    protected $mappers = false;
-    
-    /**
-     * @var array
-     */
-    protected $mapperAliases = array();
-    
-    protected $services = array();
-    
-    /**
-     * @var Ac_Legacy_Controller_Context
-     */
-    protected $defaultLegacyContext = false;
-    
     /**
      * To be redefined in concrete subclasses.
      * Placeholder that will link to current application' assets dir by default
@@ -105,24 +82,9 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
     protected $extraAssetPlaceholders = array();
     
     /**
-     * @var Ac_Url
-     */
-    protected $frontControllerUrl = false;
-    
-    /**
-     * @var Ac_Url
-     */
-    protected $siteUrl = false;
-    
-    /**
      * @var Ac_I_User
      */
     protected $user = false;
-    
-    /**
-     * @var Ac_I_Mail_Sender
-     */
-    protected $mailSender = false;
     
     /**
      * @var array Mixables that will be initialized adter application has been init'
@@ -135,7 +97,14 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
     
     protected $initsCoreMixables = false;
     
-    protected $components = array();
+    protected $components = false;
+    
+    protected $componentListCache = array();
+    
+    /**
+     * @var array
+     */
+    protected $componentAliases = array();
     
     /**
      * @var array Properties that will be after deferred mixables are created
@@ -276,8 +245,8 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
     protected function doOnInitialize() {
     }
 
-    function setLegacyDatabase(Ac_Legacy_Database $database = null) {
-        $this->legacyDatabase = $database;
+    function setLegacyDatabase(Ac_Legacy_Database $database) {
+        $this->legacyDatabase = $this->addComponent($database, self::CORE_COMPONENT_LEGACY_DB);
     }
 
     /**
@@ -285,17 +254,13 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
      */
     function getLegacyDatabase() {
         if (!$this->legacyDatabase) {
-            $db = $this->adapter->getLegacyDatabasePrototype();
-            if (is_array($db) && $db) {
-                $db = Ac_Util::m(array('__construct' => array('options' => array('tmpDir' => $this->adapter->getVarTmpPath()))), $db);
-            }
-            if ($db) $this->legacyDatabase = Ac_Prototyped::factory ($db, 'Ac_Legacy_Database');
+            $this->legacyDatabase = $this->getComponent(self::CORE_COMPONENT_LEGACY_DB, 'Ac_Legacy_Database', true);
         }
         return $this->legacyDatabase;
-    }    
+    }
 
     function setDb(Ac_Sql_Db $db = null) {
-        $this->db = $db;
+        $this->addComponent($db, self::CORE_COMPONENT_DB);
     }
 
     /**
@@ -303,10 +268,10 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
      */
     function getDb() {
         if ($this->db === null) {
-            $this->db = false;
-            $db = $this->adapter->getDbPrototype();
-            if ($db) $this->db = Ac_Prototyped::factory ($db, 'Ac_Sql_Db');
-                elseif (($leg = $this->getLegacyDatabase())) $this->db = new Ac_Sql_Db_Ae($leg);
+            $this->db = $this->getComponent(self::CORE_COMPONENT_DB, 'Ac_Sql_Db', true);
+            if (!$this->db && $leg = $this->getLegacyDatabase()) {
+                $this->db = $this->addComponent(new Ac_Sql_Db_Ae($leg), self::CORE_COMPONENT_DB);
+            }
         }
         return $this->db;
     }
@@ -316,7 +281,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
     }
 
     function setCache(Ac_Cache $cache = null) {
-        $this->cache = $cache;
+        $this->addComponent($cache, self::CORE_COMPONENT_CACHE);
     }
 
     /**
@@ -326,160 +291,175 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
      * @return Ac_Cache
      */
     function getCache() {
-        if ($this->cache === null) {
-            $cache = $this->adapter->getCachePrototype();
-            if (is_array($cache) || strlen($cache)) $this->cache = Ac_Prototyped::factory ($cache, 'Ac_Cache');
-            else $this->cache = Ac_Prototyped::factory(array('class' => 'Ac_Cache', 'enabled' => false));
-        }
-        return $this->cache;
+        return $this->getComponent(self::CORE_COMPONENT_CACHE, 'Ac_Cache');
     }
 
     /**
      * @return array
      */
     function listMappers() {
-        if ($this->mappers === false) {
-            $this->initMappers();
-        }
-        return array_keys($this->mappers);
-    }
-    
-    protected function initMappers() {
-        $this->mappers = array();
-        $mappers = Ac_Util::toArray($this->doGetMapperPrototypes());
-        $this->triggerEvent(self::EVENT_ON_GET_MAPPER_PROTOTYPES, array(& $mappers));
-        $this->mappers = $mappers;
-        $reg = array();
-        foreach ($this->mappers as $id => $m) {
-            if (is_object($m)) {
-                if ($m instanceof Ac_Model_Mapper) $reg[$id] = $m;
-                else throw new Ac_E_InvalidImplementation("All items in \$mappers collection "
-                    . "must be Ac_Model_Mapper descendants, but \$mappers['{$id}'] is ".get_class($m));
-                $reg->setId($id);
-                $reg->setApplication($this);
-            }
-        }
-        if ($reg) $this->triggerEvent(self::EVENT_ON_REGISTER_MAPPERS($reg));
+        return $this->listComponents('Ac_Model_Mapper');
     }
     
     function hasMapper($id) {
         return in_array($id, $this->listMappers());
     }
     
-    function addMapper(Ac_Model_Mapper $mapper, $silent = false) {
-        $id = $mapper->getId();
-        if (in_array($id, $this->listMappers())) {
-            if (!$silent) throw Ac_E_InvalidCall::alreadySuchItem('Mapper', $id);
-        } else {
-            $this->mappers[$id] = $mapper;
-            $mapper->setApplication($this);
-            $this->triggerEvent(self::EVENT_ON_REGISTER_MAPPERS, array($id => $mapper));
-        }
-    }
-    
-    function setMapperAliases(array $mapperAliases, $add = false) {
-        if ($add) Ac_Util::ms($this->mapperAliases, $mapperAliases);
-            else $this->mapperAliases = $mapperAliases;
-    }
-
-    /**
-     * @return array
-     */
-    function getMapperAliases() {
-        return $this->mapperAliases;
-    }    
-    
-    protected function doGetMapperPrototypes() {
-        return array();
-    }
-    
     /**
      * @return Ac_Model_Mapper
      */
     function getMapper($id, $dontThrow = false) {
-        if (isset($this->mapperAliases[$id])) {
-            $res = $this->getMapper($this->mapperAliases[$id], $dontThrow);
-        } elseif (in_array($id, $this->listMappers())) {
-            if (!is_object($this->mappers[$id])) {
-                $defaults = $this->mappers[$id];
-                if (!is_array($defaults)) $defaults = array('class' => $defaults);
-                $defaults['application'] = $this;
-                $defaults['id'] = $id;
-                $this->mappers[$id] = Ac_Prototyped::factory($defaults, 'Ac_Model_Mapper');
-                $this->triggerEvent(self::EVENT_ON_REGISTER_MAPPERS, array($id => $this->mappers[$id]));
-            }
-            $res = $this->mappers[$id];
-        } else {
-            $res = null;
-            $this->triggerEvent(self::EVENT_ON_MAPPER_NOT_FOUND, array($id, & $res));
-            if ($res) {
-                $res->setId($id);
-                $this->addMapper($res);
-            } else {
-                if (!$dontThrow) throw new Exception("No such mapper '{$id}' in ".get_class($this));
-            }
-        }
-        return $res;
+        return $this->getComponent($id, 'Ac_Model_Mapper', $dontThrow);
     }
     
+    function setComponentAliases(array $componentAliases, $add = false) {
+        if ($add) Ac_Util::ms($this->componentAliases, $componentAliases);
+            else $this->componentAliases = $componentAliases;
+    }
+
     /**
      * @return array
      */
-    function listControllers() {
-        return array_keys($this->controllers);
-    }
-
-    function setDefaultLegacyContext(Ac_Legacy_Controller_Context $defaultLegacyContext) {
-        $this->defaultLegacyContext = $defaultLegacyContext;
-    }
-
-    /**
-     * @return Ac_Legacy_Controller_Context
-     */
-    function getDefaultLegacyContext() {
-        return $this->defaultLegacyContext;
+    function getComponentAliases() {
+        return $this->componentAliases;
     }    
-    
+
     /**
-     * @return Ac_Legacy_Controller
+     * @return array
      */
-    function getController($id) {
-        if (isset($this->controllers[$id])) {
-            if (!is_object($this->controllers[$id])) {
-                    $proto = $this->controllers[$id];
-                    if (!is_array($proto)) $proto = array('class' => $proto);
-                    if ($this->defaultLegacyContext && !isset($proto['context'])) $proto['context'] = $this->defaultLegacyContext->cloneObject();
-                    if (!isset($proto['application'])) $proto['application'] = $this;
-                    $this->controllers[$id] = Ac_Prototyped::factory($proto, 'Ac_Legacy_Controller');
-            }
-            $res = $this->controllers[$id];
-        } else {
-            throw new Exception("No such controller with id '$id' registered in ".get_class($this));
+    function listComponents($baseClass = null) {
+        if ($this->components === false) {
+            $this->initComponents();
         }
+        if ($baseClass === null) return array_keys($this->components);
+        if (isset($this->componentListCache[$baseClass])) return $this->componentListCache[$baseClass];
+        $res = array();
+        foreach ($this->components as $k => $item) {
+            if (is_object($item)) {
+                if ($item instanceof $baseClass) $res[] = $k;
+                continue;
+            }
+            if (is_string($item)) $componentClass = $item;
+            elseif (is_array($item) && isset($item['class'])) $componentClass = $item['class'];
+            if (
+                $baseClass === $componentClass 
+                || in_array($baseClass, class_implements($componentClass))
+                || in_array($baseClass, class_parents($componentClass))
+            ) $res[] = $k;
+        }
+        $this->componentListCache[$baseClass] = $res;
         return $res;
     }
     
-    function createOutput() {
-        $output = $this->getAdapter()->getOutputPrototype();
-        $output = Ac_Prototyped::factory($output, 'Ac_Legacy_Output');
-        // TODO: add asset placeholders to output
-        return $output;
+    protected function registerComponents(array $components) {
+        if (!$components) return;
+        foreach ($components as $id => $reg) {
+            if ($reg instanceof Ac_I_ApplicationComponent) $reg->setApplication($this);
+            if ($reg instanceof Ac_I_NamedApplicationComponent) $reg->setId($id);
+        }
+        $this->triggerEvent(self::EVENT_ON_REGISTER_COMPONENTS, $components);
     }
     
+    protected function initComponents() {
+        $this->components = array();
+        $components = Ac_Util::toArray($this->doGetComponentPrototypes());
+        Ac_Util::ms($components, $this->adapter->getComponentPrototypes());
+        $this->triggerEvent(self::EVENT_ON_GET_COMPONENT_PROTOTYPES, array(& $components));
+        $this->components = array_filter($components); // strip empty entries
+        $this->componentListCache = array();        
+        $reg = array_filter($this->components, 'is_object');
+        if ($reg) $this->registerComponents($reg);
+    }
+    
+    function hasComponent($id) {
+        return in_array($id, $this->listComponents());
+    }
+    
+    function addComponent($component, $id = null) {
+        if (is_null($id)) {
+            $class = null;
+            if (is_object($component)) {
+                if ($component instanceof Ac_I_NamedApplicationComponent) $id = $component->getId();
+                $class = get_class($component);
+            } elseif (is_array($component)) {
+                if (isset($component['id']) && is_string($component['id'])) {
+                    $id = $component['id'];
+                }
+                if (isset($component['class']) && is_string($component['class'])) {
+                    $id = $component['class'];
+                }
+            } elseif (is_string($component)) {
+                $class = $component;
+            }
+            if (!strlen($id)) $id = $class;
+            if (!strlen($id)) 
+                throw new Ac_E_InvalidCall(__METHOD__.": Cannot determine component id or class; provide \$id must be provided");
+        }
+        if (in_array($id, $this->listComponents())) {
+            throw Ac_E_InvalidCall::alreadySuchItem('Component', $id);
+        } else {
+            $this->components[$id] = $component;
+            if (is_object($component)) {
+                $this->registerComponents(array($id => $component));
+            }
+        }
+        $this->componentListCache = array();
+        return $this->components[$id];
+    }
+
     /**
-     * @return Ac_Legacy_Controller_Response
-     * @param bool $noOutput Just return the Response, don't try to output it
-     * @param Ac_Legacy_Output $output Or its prototype. If not provided, Adapter will be used to retrieve Output prototype
+     * @deprecated
      */
-    function processRequest($noOutput = false, Ac_Legacy_Output $output = null) {
-        if ($this->defaultControllerId === false) throw new Exception("\$defaultControllerId property not set");
-        $controller = $this->getController($this->defaultControllerId);
-        $response = $controller->getResponse();
-        $res = $response;
-        $res->setApplication($this);
-        if (!$noOutput) {
-            if (!$output) $output = $this->createOutput();
-            $output->outputResponse($res);
+    protected function doGetMapperPrototypes() {
+        return array();
+    }
+    
+    protected function doGetComponentPrototypes() {
+        $adapter = $this->getAdapter();
+        $cachePrototype = array('class' => 'Ac_Cache');
+        if ($cc = $this->adapter->getCachePrototype()) Ac_Util::ms($cachePrototype, $cc);
+        else $cachePrototype['enabled'] = false;
+
+        $res = array(
+            self::CORE_COMPONENT_DB => $adapter->getDbPrototype(),
+            self::CORE_COMPONENT_LEGACY_DB => $adapter->getLegacyDatabasePrototype(),
+            self::CORE_COMPONENT_FLAGS => array('class' => 'Ac_Flags'),
+            self::CORE_COMPONENT_CACHE => $cachePrototype,
+            self::CORE_COMPONENT_MAIL_SENDER => $adapter->getMailSenderPrototype(),
+            self::CORE_COMPONENT_RELATION_PROVIDER_EVALUATOR => array('class' => 'Ac_Model_Relation_Provider_Evaluator'),
+            //self::CORE_COMPONENT_ACCESSOR_PROVIDER_EVALUATOR => array('class' => 'Ac_Model_Relation_Accessor_Evaluator'),
+            self::CORE_COMPONENT_MANAGER_CONFIG_SERVICE => array('class' => 'Ac_Admin_ManagerConfigService')
+        );
+        
+        Ac_Util::ms($res, $this->doGetMapperPrototypes());
+        
+        return $res;
+    }
+    
+    function getComponent($id, $baseClass = null, $dontThrow = false) {
+        if ($baseClass === true && func_num_args() == 2) {
+            $dontThrow = true;
+            $baseClass = null;
+        }
+        if (isset($this->componentAliases[$id])) {
+            $res = $this->getComponent($this->componentAliases[$id], $dontThrow, $baseClass);
+        } elseif (in_array($id, $this->listComponents())) {
+            if (!is_object($this->components[$id])) {
+                $this->components[$id] = Ac_Prototyped::factory($this->components[$id]);
+                $this->registerComponents(array($id => $this->components[$id]));
+            }
+            $res = $this->components[$id];
+        } else {
+            $res = null;
+            $this->triggerEvent(self::EVENT_ON_COMPONENT_NOT_FOUND, array($id, & $res));
+            if ($res) {
+                $this->addComponent($res, $id);
+            } else {
+                if (!$dontThrow) throw new Exception("No such component '{$id}' in ".get_class($this));
+            }
+        }
+        if ($res && $baseClass && !($res instanceof $baseClass)) {
+            throw new Ac_E_InvalidCall (__METHOD__.": expected component '{$id}' to be '{$baseClass}' instance, got '".get_class($res)."' instead");
         }
         return $res;
     }
@@ -518,101 +498,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
     function getExtraAssetPlaceholders() {
         return $this->extraAssetPlaceholders;
     }    
-    function createDefaultContext(Ac_Cr_Controller $forController) {
-        return new Ac_Cr_Context();
-    }
     
-    
-    function listServices() {
-        return array_keys($this->services);
-    }
-    
-    function setServices(array $services, $removeExisting = false) {
-        if ($removeExisting) $this->services = $services;
-        else Ac_Util::ms($this->services, $services);
-    }
-    
-    function getServices() {
-        return $this->services;
-    }
-    
-    function setService($id, $prorotypeOrInstance, $overwrite = false) {
-        if (isset($this->services[$id]) && !$overwrite) throw new Exception("Service '\$id' is already registered");
-        $this->services[$id] = $prorotypeOrInstance;
-        if (is_object($this->services[$id])) Ac_Accessor::setObjectProperty($this->services[$id], 'application', $this);
-    }
-    
-    function deleteService($id, $dontThrow = false) {
-        if (isset($this->services[$id])) unset($this->services[$id]); 
-            elseif (!$dontThrow) throw new Exception("No such service: '\$id'");
-    }
-    
-    function getService($id, $dontThrow = false) {
-        $res = false;
-        if (isset($this->services[$id])) {
-            if (!is_object($this->services[$id])) {
-                $this->services[$id] = Ac_Prototyped::factory($this->services[$id]);
-                Ac_Accessor::setObjectProperty($this->services[$id], 'application', $this);
-            }
-            $res = $this->services[$id];
-        } elseif ($this->adapter && $s = $this->adapter->getService($id, true)) {
-            $res = $s;
-            if (method_exists($res, 'setApplication')) $res->setApplication($this);
-        } elseif (!$dontThrow) throw new Exception("No such service: '{$id}");
-        return $res;
-    }
-    
-    /**
-     * @return Ac_Flags
-     */
-    function getFlags() {
-        return $this->getService('flags');
-    }
-
-    /**
-     * Sets front controller URL
-     * @param Ac_Url $url
-     */
-    function setFrontControllerUrl(Ac_Url $url = null) {
-        $this->frontControllerUrl = $url? $url : false;
-    }
-
-    /**
-     * Returns front controller URL (defaults to Ac_Appliction_Adapter::getWebUrl())
-     * @return Ac_Url
-     */
-    function getFrontControllerUrl() {
-        if ($this->frontControllerUrl === false) {
-            $wu = $this->getAdapter()->getWebUrl();
-            if ($wu) $res = new Ac_Url($wu);
-            else $res = Ac_Url::guess ();
-        } else {
-            $res = clone $this->frontControllerUrl;
-        }
-        return $res;
-    }
-    
-    /**
-     * Returns website url (defaults to Ac_Application_Adapter::getWebUrl())
-     * @return Ac_Url
-     */
-    function getSiteUrl() {
-        if ($this->siteUrl === false) {
-            $res = new Ac_Url($this->getAdapter()->getSiteUrl());
-        } else {
-            $res = clone $this->siteUrl;
-        }
-        return $res;
-    }
-    
-    /**
-     * Sets website url (defaults to Ac_Application_Adapter::getSiteUrl())
-     * @param type $siteUrl
-     */
-    function setSiteUrl(Ac_Url $siteUrl = null) {
-        $this->siteUrl = $siteUrl? $siteUrl : false;
-    }
-
     function setUser(Ac_I_User $user) {
         $this->user = $user;
     }
@@ -625,22 +511,20 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
     }    
     
     function setMailSender(Ac_I_MailSender $mailSender) {
-        $this->mailSender = $mailSender;
+        $this->addComponent($mailSender, self::CORE_COMPONENT_MAIL_SENDER);
     }
 
     /**
      * @return Ac_I_MailSender
      */
     function getMailSender() {
-        if ($this->mailSender === false) {
-            $this->mailSender = Ac_Prototyped::factory($this->adapter->getMailSenderPrototype(), 'Ac_I_MailSender');
-            if ($this->mailSender instanceof Ac_I_Mail_Sender_WithDump) {
-                $dd = $this->mailSender->getDumpDir();
-                if ($dd === false || is_null($dd)) $this->mailSender->setDumpDir($this->adapter->getVarDumpsPath());
-            }
+        $res = $this->getComponent(self::CORE_COMPONENT_MAIL_SENDER, 'Ac_I_MailSender');
+        if ($res instanceof Ac_I_Mail_Sender_WithDump) {
+            $dd = $res->getDumpDir();
+            if (!strlen($dd)) $res->setDumpDir($this->adapter->getVarDumpsPath());
         }
-        return $this->mailSender;
-    }    
+        return $res;
+    }
 
     function setMixables(array $mixables, $addToExisting = false) {
         // Since Application instance registers directory with classes during initialization phase,
@@ -695,14 +579,55 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents implements Ac_I_Servic
         }
     }
     
-    /**
-     * @return Ac_Application_Component
-     */
-    protected function getComponent($class) {
-        if (!isset($this->components[$class])) {
-            $this->components[$class] = new $class(array('application' => $this));
-        }
-        return $this->components[$class];
+    function setControllerParam($controllerParam) {
+        $this->controllerParam = $controllerParam;
     }
+
+    function getControllerParam() {
+        return $this->controllerParam;
+    }
+
+    protected $defaultController = false;
+    
+    protected $defaultAdminController = false;
+    
+    protected $controllerParam = false;
+    
+    function handleRequest(Ac_Cr_Context $context = null) {
+
+        //  if context not provided, create one
+        //  get UrlMapper
+        //  if we have "controllerParam" set, retrieve it
+        //  get front controller (not found => exception)
+        //  if it's legacy, proceed with "handleRequestWithLegacyController"
+        //  if it's admin controller => exception
+        //  get response
+        //  get responseWriter
+        //  write response with responseWriter
+        
+    }
+    
+    protected function handleRequestWithLegacyController() {
+        
+    }
+    
+    function handleAdminRequest(Ac_Cr_Context $context = null) {
+        
+    }
+    
+    function handleCronJob() {
+        
+        //  process all components and all mappers
+        
+    }
+    
+    /**
+     * @return Ac_Flags
+     */
+    function getFlags() {
+        return $this->getComponent(self::CORE_COMPONENT_FLAGS, 'Ac_Flags', true);
+    }
+    
+    
     
 }

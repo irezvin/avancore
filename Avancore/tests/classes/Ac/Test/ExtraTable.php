@@ -215,7 +215,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         $prods =  $this->getSampleApp()->getSampleShopProductMapper();
         $persons->useRecordsCollection = true;
         
-        $p3 = $persons->loadByPersonId(3);
+        $p3 = $persons->loadByPersonId(3); // We DO segfault here
         $this->assertEqual($p3->_extraCodeShopProducts, false);
         $p3->listExtraCodeShopProducts();
         $this->assertEqual($p3->_extraCodeShopProducts, array());
@@ -301,7 +301,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
     }
     
     function testExtraTableSqlSelect() {
-        $prodMap = $this->getSampleApp()->getSampleShopProductMapper();
+       $prodMap = $this->getSampleApp()->getSampleShopProductMapper();
         $catMap = $this->getSampleApp()->getSampleShopCategoryMapper();
         $sql = $catMap->createSqlSelect();
         $this->assertTrue($sql->hasTable($alias = 'shopProducts[extra__upc]'));

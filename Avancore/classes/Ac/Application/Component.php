@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Application_Component extends Ac_Prototyped {
+class Ac_Application_Component extends Ac_Prototyped implements Ac_I_ApplicationComponent {
     
     /**
      * @var Ac_Sql_Db

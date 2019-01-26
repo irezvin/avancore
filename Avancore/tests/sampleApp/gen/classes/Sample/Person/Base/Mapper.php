@@ -136,7 +136,9 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      * @return Sample_Person[]
      */
     function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
-        return parent::loadRecordsByCriteria($where, $keysToList, $order, $joins, $limitOffset, $limitCount, $tableAlias);
+        $res = parent::loadRecordsByCriteria($where, $keysToList, $order, $joins, $limitOffset, $limitCount, $tableAlias);
+        return $res;
+        
     }
     
     /**
@@ -617,6 +619,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      */
     function loadByPersonId ($personId) {
         $recs = $this->loadRecordsByCriteria(''.$this->getDb()->n('personId').' = '.$this->getDb()->q($personId).'');
+        
         if (count($recs)) $res = $recs[0];
             else $res = null;
         return $res;

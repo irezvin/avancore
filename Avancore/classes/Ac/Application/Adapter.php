@@ -34,13 +34,14 @@ if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/../P
  * @property $logEnabled
  * @property $services
  * @property $mailSenderPrototype
+ * @property $componentPrototypes
  *
  * @property $managerImagesUrl
  * @property $joomlaComponentName
  * @property $cacheLifetime
  * @property $rteDefaultInstance
  */
-class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvider {
+class Ac_Application_Adapter extends Ac_Prototyped {
 
     protected $appClass = false;
     
@@ -125,7 +126,6 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
     }
     
     function __construct(array $options = array()) {
-        if ($s = $this->doGetDefaultServices()) $this->setServices($s);
         foreach ($gotKeys = $this->initFromPrototype($options, false) as $key) {
             unset($options[$key]);
         }
@@ -499,48 +499,20 @@ class Ac_Application_Adapter extends Ac_Prototyped implements Ac_I_ServiceProvid
         return (bool) $this->intGetConfigValue(substr(__FUNCTION__, 3));
     }
     
-    protected function doGetDefaultServices() {
+    function getDefaultComponentPrototypes() {
         return array(
-            'managerConfigService' => 'Ac_Admin_ManagerConfigService',
-            'flags' => array('class' => 'Ac_Flags'),
-            'Ac_Model_Relation_Provider_Evaluator' => 'Ac_Model_Relation_Provider_Evaluator',
-            'Ac_Model_Relation_Accessor_Evaluator' => 'Ac_Model_Relation_Accessor_Evaluator',
+            Ac_Application::CORE_COMPONENT_MANAGER_CONFIG_SERVICE => 'Ac_Admin_ManagerConfigService',
         );
     }
     
-    function listServices() {
-        return array_keys($this->services);
-    }
-    
-    function setServices(array $services, $removeExisting = false) {
-        if ($removeExisting) $this->services = $services;
-        else Ac_Util::ms($this->services, $services);
-    }
-    
-    function getServices() {
-        return $this->services;
-    }
-    
-    function setService($id, $prorotypeOrInstance, $overwrite = false) {
-        if (isset($this->services[$id]) && !$overwrite) throw new Exception("Service '\$id' is already registered");
-        $this->services[$id] = $prorotypeOrInstance;
-    }
-    
-    function deleteService($id, $dontThrow = false) {
-        if (isset($this->services[$id])) unset($this->services[$id]); 
-            elseif (!$dontThrow) throw new Exception("No such service: '\$id'");
-    }
-    
-    function getService($id, $dontThrow = false) {
-        $res = false;
-        if (isset($this->services[$id])) {
-            if (!is_object($this->services[$id])) $this->services[$id] = Ac_Prototyped::factory($this->services[$id]);
-            $res = $this->services[$id];
-        }
-        elseif (!$dontThrow) throw new Exception("No such service: '\$id'");
+    function getComponentPrototypes () {
+        $res = $this->getDefaultComponentPrototypes();
+        $conf = $this->getConfigValue('componentPrototypes', array());
+        if (!is_array($conf)) $conf = array();
+        Ac_Util::ms($res, $conf);
         return $res;
     }
-    
+
     function __get($varName) {
         return $this->getConfigValue($varName);
     }

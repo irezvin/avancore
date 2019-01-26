@@ -13,7 +13,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
     
     function testMapper() {
         $sam = Sample::getInstance();
-        $sam->addMapper(Ac_Prototyped::factory(array('id' => 'people', 'tableName' => '#__people'), 'Ac_Model_Mapper'));
+        $sam->addComponent(Ac_Prototyped::factory(array('id' => 'people', 'tableName' => '#__people'), 'Ac_Model_Mapper'));
         $m = $sam->getMapper('people');
         $this->assertEqual($m->pk, 'personId', 'Auto-detection of primary key by Ac_Model_Mapper');
         $found = false;

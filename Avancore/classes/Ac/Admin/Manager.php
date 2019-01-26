@@ -1394,13 +1394,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      * @return Ac_Admin_ManagerConfigService
      */
     function getConfigService() {
-        if ($this->configService === false) {
-            if (!$this->application || (!$this->configService = $this->application->getService('managerConfigService', true))) {
-                $this->configService = new Ac_Admin_ManagerConfigService($this->getApplication());
-            }
-        }
-        return $this->configService;
-    }    
+        return $this->application->getComponent(Ac_Application::CORE_COMPONENT_MANAGER_CONFIG_SERVICE);
+    }
     
     function getReturnUrl() {
         if ($this->_returnUrl === false) {

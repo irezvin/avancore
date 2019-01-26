@@ -2,7 +2,7 @@
 
 // Replaces some functions of Ac_Legacy_Adapter since it does not exist anymore
 
-class Ac_Admin_ManagerConfigService {
+class Ac_Admin_ManagerConfigService implements Ac_I_ApplicationComponent {
 
     protected $toolbarImagesMap = false;
     

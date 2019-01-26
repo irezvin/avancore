@@ -1114,10 +1114,9 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
                 'destIsUnique' => false,
             );
             // evaluate the provider
-            $app = $this->application? $this->application : Ac_Application::getDefaultInstance();
-            if ($app) {
-                $provider = $app->getService('Ac_Model_Relation_Provider_Evaluator')->evaluateProvider($res);
-                if ($provider) $res['provider'] = $provider;
+            $ev = $this->getProviderEvaluator();
+            if ($ev && ($provider = $ev->evaluateProvider($res))) {
+                $res['provider'] = $provider;
             }
         } else {
             $res = false;
@@ -1233,11 +1232,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
 
     function getDestProvider($asIs = false) {
         if (!$asIs && $this->destProvider === false) {
-            $app = $this->application? $this->application: Ac_Application::getDefaultInstance();
-            if ($app) {
-                $prototype = $app->getService('Ac_Model_Relation_Provider_Evaluator')->evaluateProvider($this->getFullDestProps());
-                if ($prototype) $this->destProvider = Ac_Prototyped::factory ($prototype, 'Ac_Model_Relation_Provider');
-            }
+            $this->destProvider = $this->createProvider($this->getFullDestProps());
         }
         return $this->destProvider;
     }
@@ -1256,12 +1251,30 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      */
     function getSrcProvider($asIs = false) {
         if (!$asIs && $this->srcProvider === false) {
-            $app = $this->application? $this->application: Ac_Application::getDefaultInstance();
-            $prototype = $app->getService('Ac_Model_Relation_Provider_Evaluator')->evaluateProvider($this->getFullSrcProps());
-            if ($prototype) $this->srcProvider = Ac_Prototyped::factory ($prototype, 'Ac_Model_Relation_Provider');
+            $this->srcProvider = $this->createProvider($this->getFullSrcProps());
         }
         return $this->srcProvider;
     }    
+
+    /**
+     * @return Ac_Model_Relation_Provider_Evaluator
+     */
+    protected function getProviderEvaluator() {
+        $res = null;
+        $app = $this->application? $this->application: Ac_Application::getDefaultInstance();
+        if ($app) $res = $app->getComponent(Ac_Application::CORE_COMPONENT_RELATION_PROVIDER_EVALUATOR);
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Model_Relation_Provider
+     */
+    protected function createProvider($props) {
+        $evaluator = $this->getProviderEvaluator();
+        if (!$evaluator) return;
+        $proto = $evaluator->evaluateProvider($props);
+        if ($proto) return Ac_Prototyped::factory($proto, 'Ac_Model_Relation_Provider');
+    }
 
     function __clone() {
         parent::__clone();

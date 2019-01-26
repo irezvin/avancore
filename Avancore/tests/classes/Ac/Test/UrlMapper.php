@@ -1,75 +1,153 @@
 <?php
 
-class Ac_Test_Url extends Ac_Test_Base {
+class Ac_Test_UrlMapper extends Ac_Test_Base {
     
-    function resolve($url, $baseUrl) {
-        $a = new Ac_Url($url);
-        return ''.$a->resolve($baseUrl);
+    function testUrlMapper() {
+        
+        $mpr = new Ac_UrlMapper_UrlMapper(array(
+            'patterns' => array(
+                array('definition' => '/', 'const' => array('action' => '')),
+                '/foo',
+                '/foo/{xx}',
+                '/bar/{bazId}'
+            ),
+        ));
+        $this->assertArraysMatch($mpr->listPatterns(), [
+            '/bar/{bazId}',
+            '/foo/{xx}',
+            '/',
+            '/foo',
+        ], '%s', true);
+        $this->assertEqual($mpr->stringToParams('/'), array('action' => ''));
+        $this->assertEqual($mpr->stringToParams('/foo'), array());
+        $this->assertEqual($mpr->stringToParams('/foo/15'), array('xx' => 15));
+        $this->assertEqual($mpr->stringToParams('/bar/10'), array('bazId' => 10));
+        $u = new Ac_Url('http://example.com/Foo/?action=');
+        $u->setUrlMapper($mpr);
+        $this->assertEqual($u->toString(), 'http://example.com/Foo/');
+        
+    }
+
+    function testPattern() {
+        
+        $patterns = [
+            
+            "/blog/{?'categoryId'[-\\w/]+}/{articleId}.html{?c}" => [
+                'params' => ['categoryId', 'articleId'], // must be in the definition
+                'samples' => [
+                    // sample => properResult or FALSE
+                    '/blog/computing/linux.html' => ['categoryId' => 'computing', 'articleId' => 'linux'],
+                    '/blog/stuff/literature/reading.html' => ['categoryId' => 'stuff/literature', 'articleId' => 'reading'],
+                    '/blog/stuff/moreStuff/etc' => ['/blog/stuff/moreStuff/etc.html', 'categoryId' => 'stuff/moreStuff', 'articleId' => 'etc'],
+                    '/blog/non allowed char/linux.html' => false,
+                    '/podkwpkdwpokdw' => false
+                ]
+            ],
+            "/{?c}something{}/{?nc}" => [
+                'extra' => ['const' => ['cr' => 'default']],
+                'params' => ['cr'],
+                'samples' => [
+                    '/something' => ['cr' => 'default'],
+                    '/something/' => ['/something', 'cr' => 'default'],
+                    'something' => ['/something', 'cr' => 'default'],
+                    'something/' => ['/something', 'cr' => 'default'],
+                ],
+            ],
+            
+            "/group/{?'etc'.*}" => [
+                'params' => ['etc'],
+                'samples' => [
+                    '/group/a/b/c/d/efgh.html' => ['etc' => 'a/b/c/d/efgh.html'],
+                    '/group/' => ['etc' => ''],
+                ]
+            ]
+            
+        ];
+        
+        foreach ($patterns as $pattern => $info) {
+            if (isset($info['extra'])) {
+                $proto = $info['extra'];
+                $proto['definition'] = $pattern;
+                $pat = Ac_Prototyped::factory($proto, 'Ac_UrlMapper_Pattern');
+            } else {
+                $pat = new Ac_UrlMapper_Pattern(['definition' => $pattern]);
+            }
+            $params = $pat->getParams();
+            $correctParams = $info['params'];
+            if (!$this->assertArraysMatch($params, $correctParams, '%s', true)) {
+                var_dump(compact('params', 'correctParams', 'pattern'));
+            }
+            if (isset($info['samples'])) {
+                foreach ($info['samples'] as $path => $correctResult) {
+                    if (isset($correctResult[0])) { // canonical version
+                        $correctPath = $correctResult[0];
+                        unset($correctResult[0]);
+                    } else {
+                        $correctPath = $path;
+                    }
+                    if ($correctResult === false) { // we don't expect pattern to match
+                        if (!$this->assertFalse($result = $pat->stringToParams($path), 'Path MUST NOT match pattern, but it does')) {
+                            var_dump(compact('path', 'pattern', 'result'));
+                        }
+                    } else {
+                        if (!$this->assertArraysMatch($actual = $pat->stringToParams($path), $correctResult, 'stringToParams: path MUST much pattern', true)) {
+                            var_dump(compact('path', 'pattern', 'correctResult', 'actual'));
+                        }
+                        $paramValues = $correctResult;
+                        if (!$this->assertEqual($builtString = $pat->paramsToString($paramValues), $correctPath, 'paramsToString: result params must produce same pattern', true)) {
+                            var_dump(compact('path', 'builtString', 'paramValues', 'pattern', 'correctPath'));
+                        }
+                        $modifiedParamsArray = $correctResult;
+                        if (!$this->assertEqual($builtString = $pat->moveParamsToString($modifiedParamsArray), $correctPath, 'moveParamsToString: result params must produce same pattern', true)) {
+                            var_dump(compact('path', 'builtString', 'pattern', 'correctPath'));
+                        }
+                        if (!$this->assertTrue(!count($modifiedParamsArray), 'moveParamsToString: params array must be empty')) {
+                            var_dump(compact('modifiedParamsArray'));
+                        }
+                    }
+                }
+            }
+        }
     }
     
-    function testRelativeResolve() {
-        if (!$this->assertEqual(
-            $result = $this->resolve(
-                $url = "foo/bar/baz.html", 
-                $base = "https://www.example.com/"), 
-                $proper = "https://www.example.com/foo/bar/baz.html")) 
-        { 
-            var_dump(compact('url', 'base', 'proper', 'result'));
-        }
-        if (!$this->assertEqual($result = $this->resolve(
-                $url = "../../foo/bar/baz.html", 
-                $base = "https://www.example.com/"), 
-                $proper = "https://www.example.com/foo/bar/baz.html")) 
-        {
-            var_dump(compact('url', 'base', 'proper', 'result'));
-        }
-        if (!$this->assertEqual($result = $this->resolve(
-                $url = "../../foo/bar/baz.html", 
-                $base = "https://www.example.com/top/sub/level3"),
-                $proper = "https://www.example.com/top/foo/bar/baz.html")) 
-        {
-            var_dump(compact('url', 'base', 'proper', 'result'));
-        }
-        if (!$this->assertEqual($result = $this->resolve(
-                $url = ".././foo/../bar/baz.html", 
-                $base = "https://www.example.com/top/sub/index.php"),
-                $proper = "https://www.example.com/top/bar/baz.html")) 
-        {
-            var_dump(compact('url', 'base', 'proper', 'result'));
-        }
-        if (!$this->assertEqual($result = $this->resolve(
-                $url = "/zz", 
-                $base = "https://www.example.com/top/sub/index.php"),
-                $proper = "https://www.example.com/zz")) 
-        {
-            var_dump(compact('url', 'base', 'proper', 'result'));
-        }
-        if (!$this->assertEqual($result = $this->resolve(
-                $url = "//zz.com/xx/yy", 
-                $base = "https://www.example.com/top/sub/index.php"),
-                $proper = "https://zz.com/xx/yy")) 
-        {
-            var_dump(compact('url', 'base', 'proper', 'result'));
-        }
-        if (!$this->assertEqual($result = $this->resolve(
-                $url = "http://zz.com/xx/yy", 
-                $base = "https://www.example.com/top/sub/index.php"),
-                $proper = "http://zz.com/xx/yy")) 
-        {
-            var_dump(compact('url', 'base', 'proper', 'result'));
-        }
+    function testUrlProcessing() {
         
-        $u = new Ac_Url('http://zz.com');
-        $this->assertTrue($u->isFullyQualified($u));
+        $m = new Ac_UrlMapper_UrlMapper(array(
+            'patterns' => array(
+                array('definition' => '/', 'const' => array('action' => '')),
+                '/{action}/{?c}',
+                "/{?'action'details}/{id}/{?c}"
+            ),
+            'baseUrl' => 'https://www.example.com/cms/',
+        ));
         
-        $u = new Ac_Url('//zz.com');
-        $this->assertFalse($u->isFullyQualified($u));
+        $this->assertEqual($res = $m->strPathToQuery($url = 'https://www.example.com/cms/list/'),
+            $proper = 'https://www.example.com/cms/?action=list');
+        $this->assertEqual($res = $m->strQueryToPath($proper), $url);
         
-        $u = new Ac_Url('xx');
-        $this->assertTrue($u->isRelative());
+        $this->assertEqual($res = $m->strPathToQuery($url = 'https://www.example.com/cms/details/5/'),
+            $proper = 'https://www.example.com/cms/?action=details&id=5');
+        $this->assertEqual($res = $m->strQueryToPath($proper), $url);
         
-        $u = new Ac_Url('/xx');
-        $this->assertFalse($u->isRelative());
+        $this->assertEqual($res = $m->strPathToQuery($url = 'http://example.com/cms/details/5/'),
+            $proper = $url);
+        $this->assertEqual($res = $m->strQueryToPath($proper), $url);
+        
     }
+    
+//    function testFoo() {
+//        var_dump($u = Ac_Url::guess(true, array(
+//            'SERVER_NAME' => 'localhost',
+//            'REQUEST_URI' => '/index.php/foo',
+//            'SCRIPT_NAME' => '/index.php',
+//            'PATH_INFO' => '/foo',
+//        )), ''.$u);
+//        var_dump($u = Ac_Url::guess(true, array(
+//            'SERVER_NAME' => 'localhost',
+//            'REQUEST_URI' => '/index.php/foo',
+//            'SCRIPT_NAME' => '/index.php',
+//            'PATH_INFO' => '/foo',
+//        )), ''.$u);
+//    }
     
 }

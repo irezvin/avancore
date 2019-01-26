@@ -17,7 +17,7 @@ class Sample_Plugin implements Ac_I_Mixable {
     public function registerMixin(Ac_I_Mixin $mixin) {
         if ($mixin instanceof Ac_Application) {
             $mixin->addEventListener($this, Ac_Application::EVENT_ON_INITIALIZE);
-            $mixin->addEventListener($this, Ac_Application::EVENT_ON_GET_MAPPER_PROTOTYPES);
+            $mixin->addEventListener($this, Ac_Application::EVENT_ON_GET_COMPONENT_PROTOTYPES);
         }
     }
     
@@ -28,8 +28,9 @@ class Sample_Plugin implements Ac_I_Mixable {
         }
     }
     
-    function onGetMapperPrototypes(& $prototypes) {
+    function onGetComponentPrototypes(& $prototypes) {
         Ac_Util::ms($prototypes, array('otherPeople' => array(
+            'class' => 'Ac_Model_Mapper',
             'tableName' => '#__people'
         )));
     }
