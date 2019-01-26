@@ -20,6 +20,8 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
     
     var $headTags = array();
     
+    var $initScripts = array();
+    
     protected $assetPlaceholders = false;
     
     function addPageTitle($title) {
@@ -131,6 +133,7 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
                 $this->bodyAttribs = array();
                 $this->headTags = array();
                 $this->data = array();
+                $this->initScripts = array();
         }
         
         if (!$this->contentType) $this->contentType = $subResponse->contentType;
@@ -152,6 +155,7 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
         $this->extraHeaders = Ac_Util::array_unique(array_merge($this->extraHeaders, $subResponse->extraHeaders));
         $this->bodyAttribs = Ac_Util::m($this->bodyAttribs, $subResponse->bodyAttribs);
         $this->headTags = Ac_Util::array_unique(array_merge($this->headTags, $subResponse->headTags));
+        $this->initScripts = Ac_Util::array_unique(array_merge(Ac_Util::toArray($this->initScripts), Ac_Util::toArray($subResponse->initScripts)));
         $this->parts = array_merge($this->parts, $subResponse->parts);
         $subResponse->parts = array();
         
@@ -237,6 +241,9 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
                 foreach ($this->jsLibs as $l) $res->assets[] = $l[0];
                 foreach ($this->cssLibs as $l) $res->assets[] = $l[0];
                 foreach ($this->headTags as $t) $res->headTags[] = $t;
+                if ($this->initScripts) {
+                    $res->initScripts = $this->initScripts;
+                }
             }
             
             if ($this->contentType) {

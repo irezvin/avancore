@@ -20,17 +20,20 @@ class Ac_Result_Template extends Ac_Result {
     /**
      * @var array
      */
-    protected $values = false;
+    protected $fields = false;
     
     /**
      * @var array
      */
     protected $partArgs = array();
-
+    
+    protected $templateProperties = array();
+    
     function setTemplate($template) {
         if ($template !== ($oldTemplate = $this->template)) {
             $this->template = $template;
             $this->templateInstance = false;
+            $this->replaceWith = null;
         }
     }
 
@@ -45,16 +48,18 @@ class Ac_Result_Template extends Ac_Result {
         if ($this->templateInstance === false) {
             $this->templateInstance = null;
             if ($this->template) {
-                $this->templateInstance = Ac_Prototyped::factory($this->template, 'Ac_Template');
-                
-                if ($this->values) 
-                    $this->templateInstance->setValues($this->values, true);
-                
-                if ($this->component !== false) 
-                    $this->templateInstance->setComponent($this->component);
+                $this->setTemplateInstance(Ac_Prototyped::factory($this->template, 'Ac_Template', $this->templateProperties));
             }
         }
         return $this->templateInstance;
+    }
+    
+    function setTemplateInstance(Ac_Template $templateInstance) {
+        if ($this->templateInstance === $templateInstance) return;
+        $this->replaceWith = null;
+        $this->templateInstance = $templateInstance;
+        if ($this->component) $this->templateInstance->setComponent($this->component);
+        if ($this->fields) $this->templateInstance->setFields($this->fields, true);
     }
 
     function setComponent($component) {
@@ -80,16 +85,16 @@ class Ac_Result_Template extends Ac_Result {
         return $this->partName;
     }
 
-    function setValues(array $values) {
-        $this->values = $values;
-        if ($this->templateInstance) $this->templateInstance->setValues($values, true);
+    function setFields(array $fields) {
+        $this->fields = $fields;
+        if ($this->templateInstance) $this->templateInstance->setFields($fields, true);
     }
 
     /**
      * @return array
      */
-    function getValues() {
-        return $this->values;
+    function getFields() {
+        return $this->fields;
     }    
 
     function setRenderedResultWriter($renderedResultWriter) {
@@ -111,6 +116,13 @@ class Ac_Result_Template extends Ac_Result {
         return $this->partArgs;
     }    
     
+    function getReplaceWith() {
+        if (!$this->replaceWith && $this->getPartName()) {
+            $this->replaceWith = $this->render();
+        }
+        return $this->replaceWith;
+    }
+    
     /**
      * @return Ac_Result
      */
@@ -131,5 +143,17 @@ class Ac_Result_Template extends Ac_Result {
         $res = new Ac_Result_Writer_Template(array('source' => $this));
         return $res;
     }
+    
+    function setTemplateProperties(array $templateProperties) {
+        $this->templateProperties = $templateProperties;
+        if ($this->templateInstance) Ac_Accessor::setObjectProperty ($this->templateInstance, $templateProperties);
+    }
+
+    /**
+     * @return array
+     */
+    function getTemplateProperties() {
+        return $this->templateProperties;
+    }    
     
 }

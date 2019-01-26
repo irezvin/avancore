@@ -552,6 +552,7 @@ class Ac_Model_Validator {
     }
     
     function _checkForList($fieldName, $fieldInfo) {
+        if (isset($fieldInfo['skipValidation']) && $fieldInfo['skipValidation']) return;
         $res = true;
         $valueList = null;
         if (isset($fieldInfo['valueList']) && is_array($fieldInfo['valueList'])) $valueList = $fieldInfo['valueList'];

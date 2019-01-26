@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Response_Environment_Dummy implements Ac_I_Response_Environment {
+class Ac_Result_Environment_Dummy implements Ac_I_Result_Environment {
 
     var $bufferingCancelled = false;
     

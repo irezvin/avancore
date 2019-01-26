@@ -3,16 +3,16 @@
 class Ac_Result_Writer_RenderHtml extends Ac_Result_Writer_AbstractHtmlRenderer {
     
     /**
-     * @var Ac_I_Response_Environment
+     * @var Ac_I_Result_Environment
      */
     protected $environment = null;
 
-    function setEnvironment(Ac_I_Response_Environment $environment = null) {
+    function setEnvironment(Ac_I_Result_Environment $environment = null) {
         $this->environment = $environment;
     }
 
     /**
-     * @return Ac_I_Response_Environment
+     * @return Ac_I_Result_Environment
      */
     function getEnvironment() {
         return $this->environment;

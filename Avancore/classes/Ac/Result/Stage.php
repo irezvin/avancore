@@ -4,11 +4,6 @@ class Ac_Result_Stage extends Ac_Prototyped {
     
     // is used to call special methods of the handlers
     protected $stageName = '';    
-
-    const HANDLER_BEFORE_CHILD = 'beforeChild';
-    const HANDLER_AFTER_CHILD = 'afterChild';
-    const HANDLER_BEGIN_STAGE = 'beginStage';
-    const HANDLER_END_STAGE = 'endStage';
     
     /**
      * @var Ac_Application
@@ -47,6 +42,10 @@ class Ac_Result_Stage extends Ac_Prototyped {
     
     protected $defaultTraverseClasses = 'Ac_Result';
     
+    protected $beginItemCallback = null;
+
+    protected $endItemCallback = null;
+    
     function setRoot(Ac_Result $root) {
         if ($root !== ($oldRoot = $this->root)) {
             $this->root = $root;
@@ -75,50 +74,45 @@ class Ac_Result_Stage extends Ac_Prototyped {
         return $this->isComplete;
     }
 
-//    function setCurrent(Ac_Result $current) {
-//        $this->currentResult = $current;
-//    }
-
     // ---- result tree traversal ----
     
-    protected function invokeHandlers(Ac_Result $result = null, $stageName, $args = null) {
-        if ($result && ($handlers = $result->getHandlers())) {
-            
-            $methodName = 'handle'.$stageName;
-            $args = func_get_args();
-            array_splice($args, 0, 2, array($this, $result));
-            
-            if (strlen($this->stageName)) {
-                $methodNameStage = 'handle'.$this->stageName.$stageName;
-            } else {
-                $methodNameStage = '';
-            }
-            
-            $methodName2 = 'handleDefault';
-            $args2 = $args; array_splice($args2, 0, 0, array($stageName));
-            
-            foreach ($handlers as $handler) {
-                if (strlen($methodNameStage) && is_callable($call = array($handler, $methodNameStage)))
-                    call_user_func_array($call, $args);
-                if (is_callable($call = array($handler, $methodName)))
-                    call_user_func_array($call, $args);
-                elseif (is_callable($call = array($handler, $methodName2)))
-                    call_user_func_array($call, $args2);
-            }
+    function setBeginItemCallback($beginItemCallback) {
+        if ($beginItemCallback) {
+            if (!is_callable($beginItemCallback)) 
+                throw Ac_E_InvalidCall::wrongType("beginItemCallback", $beginItemCallback, array("callable", "null"));
+        } else {
+            $beginItemCallback = null;
         }
+        $this->beginItemCallback = $beginItemCallback;
+    }
+
+    function getBeginItemCallback() {
+        return $this->beginItemCallback;
+    }
+
+    function setEndItemCallback($endItemCallback) {
+        if ($endItemCallback) {
+            if (!is_callable($endItemCallback)) 
+                throw Ac_E_InvalidCall::wrongType("endItemCallback", $endItemCallback, array("callable", "null"));
+        } else {
+            $endItemCallback = null;
+        }
+        $this->endItemCallback = $endItemCallback;
     }
     
+    function getEndItemCallback() {
+        return $this->endItemCallback;
+    }    
+    
     protected function beginItem($item) {
-        if ($item instanceof Ac_Result) {
-            $this->invokeHandlers($this->parent, self::HANDLER_BEFORE_CHILD, $item);
-            $this->invokeHandlers($item, self::HANDLER_BEGIN_STAGE);
+        if ($this->beginItemCallback) {
+            call_user_func($this->beginItemCallback, $item, $this, 'beginItem');
         }
     }
     
     protected function endItem($item) {
-        if ($item instanceof Ac_Result) {
-            $this->invokeHandlers($item, self::HANDLER_END_STAGE);
-            $this->invokeHandlers($this->parent, self::HANDLER_AFTER_CHILD, $item);
+        if ($this->endItemCallback) {
+            call_user_func($this->endItemCallback, $item, $this, 'endItem');
         }
     }
     
@@ -287,6 +281,16 @@ class Ac_Result_Stage extends Ac_Prototyped {
      */
     function getParentResult() {
         return $this->parent;
+    }
+    
+    function getStack() {
+        if (!$this->position) return array();
+        $res = array($this->position->getPosition(true));
+        foreach (array_reverse(array_keys($this->stack)) as $k) {
+            if (!$this->stack[$k]['position']) continue;
+            $res[] = $this->stack[$k]['position']->getPosition(true);
+        }
+        return $res;
     }
     
     /**

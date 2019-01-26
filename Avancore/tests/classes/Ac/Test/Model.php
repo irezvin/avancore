@@ -419,9 +419,10 @@ class Ac_Test_Model extends Ac_Test_Base {
         $s->distinct = true;
         $s->columns = '`person[religion]`.title';
         $stmt = $s->getStatement();
-        $this->assertTrue(strpos($stmt, '#__people_tags') !== false);
-        $this->assertTrue(strpos($stmt, '#__people') !== false);
-        $this->assertTrue(strpos($stmt, '#__religion') !== false);
+        $db = $s->getDb();
+        $this->assertTrue(strpos($stmt, $db->n('#__people_tags')) !== false);
+        $this->assertTrue(strpos($stmt, $db->n('#__people')) !== false);
+        $this->assertTrue(strpos($stmt, $db->n('#__religion')) !== false);
         
         // TODO: check un-binding of associations
         

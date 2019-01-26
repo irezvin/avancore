@@ -97,7 +97,10 @@ class Ac_Test_Dbi extends Ac_Test_Base {
 		$tested = $this->collectDbInfo($dbi);
 		$standard = $this->getSampleDbInfo();
 		$this->assertTrue(isset($tested['tables']));
-        $this->assertArraysMatch($standard, $tested, 'Default DBI info does not match: %s');
+        if (!$this->assertArraysMatch($standard, $tested, 'Default DBI info does not match: %s')) {
+            var_dump($tested);
+            var_dump($proper);
+        }
 	}
 	
     function testAvancoreLegacy() {

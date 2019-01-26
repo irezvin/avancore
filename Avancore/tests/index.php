@@ -102,8 +102,16 @@ foreach ($classes as $class) {
 
     ini_set('error_reporting', E_ALL);
     ini_set('display_errors', 1);
-    $t->run(new Ac_Test_Reporter('UTF-8'));
+    ob_start();
+    $status = $t->run(new Ac_Test_Reporter('UTF-8'));
+    $content = ob_get_clean();
+    $inContent = trim(preg_replace("#<!-- s -->.*<!-- /s -->#sUu", '', $content));
+    if (!$status || strlen($inContent) || count($classes) == 1) {
+        echo $content;
+        var_dump(round(microtime(true) - $time, 3));
+        $time = microtime(true);
+    }
 
-    var_dump(round(microtime(true) - $time, 3));
-    $time = microtime(true);
 }
+var_dump(round(microtime(true) - $time, 3));
+$time = microtime(true);

@@ -90,34 +90,20 @@ class Ac_Test_Result extends Ac_Test_Base {
         
         if (!$this->assertEqual($stage->travLog, $rq = array(
                 'a beginStage', 
-                'a beforeChild a_1', 
                 'a_1 beginStage', 
-                'a_1 beforeChild a_1_1', 
                 'a_1_1 beginStage', 
                 'a_1_1 endStage', 
-                'a_1 afterChild a_1_1', 
-                'a_1 beforeChild a_1_2', 
                 'a_1_2 beginStage', 
                 'a_1_2 endStage', 
-                'a_1 afterChild a_1_2', 
                 'a_1 endStage', 
-                'a afterChild a_1', 
-                'a beforeChild a_2',
                 'a_2 beginStage', 
                 'a_2 endStage',
-                'a afterChild a_2', 
-                'a beforeChild a_3', 
                 'a_3 beginStage', 
-                'a_3 beforeChild a_3_1', 
                 'a_3_1 beginStage', 
                 'a_3_1 endStage', 
-                'a_3 afterChild a_3_1', 
-                'a_3 beforeChild a_3_2', 
                 'a_3_2 beginStage', 
                 'a_3_2 endStage', 
-                'a_3 afterChild a_3_2', 
                 'a_3 endStage', 
-                'a afterChild a_3', 
                 'a endStage', 
         ))) {
             echo "<table border='1'><tr>
@@ -633,6 +619,7 @@ EOD
         $inner = new Ac_Result_Html(array('content' => 'Some text'));
         $outer = new Ac_Result_Http(array('content' => $inner));
         $stage = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => false));
+        $inner->setContentType('text/html');
         $stage->invoke();
         if (!$this->assertTrue(in_array('Content-Type: text/html', $headers = $outer->getHeaders()->getItems()))) var_dump($headers);
     }
@@ -640,7 +627,7 @@ EOD
     function testResultHtmlHttpOut() {
         $inner = new Ac_Result_Html(array('content' => 'Some text', 'charset' => 'utf-8', 'charsetUsage' => Ac_I_Result_WithCharset::CHARSET_PROPAGATE));
         $outer = new Ac_Result_Html(array('content' => $inner));
-        $env = new Ac_Response_Environment_Dummy;
+        $env = new Ac_Result_Environment_Dummy;
         $outer->setWriter(new Ac_Result_Writer_RenderHtml(array('environment' => $env)));
         $stage = new Ac_Result_Stage_Write(array('root' => $outer, 'writeRoot' => true));
         $stage->invoke();
@@ -795,8 +782,8 @@ EOD
         $i = new Ac_Result(array('content' => "<{$js}>"));
         $o = new Ac_Result(array('content' => "*{$i}*"));
         
-        $d = new Ac_Response_Environment_Dummy();
-        Ac_Response_Environment::setDefault($d);
+        $d = new Ac_Result_Environment_Dummy();
+        Ac_Result_Environment::setDefault($d);
         
         $o->write();
         if (!$this->assertEqual($str = $d->responseText, $js->getContent()))
@@ -812,8 +799,8 @@ EOD
         $i = new Ac_Result(array('content' => "<{$js}>"));
         $o = new Ac_Result(array('content' => "*{$i}*"));
         
-        $d = new Ac_Response_Environment_Dummy();
-        Ac_Response_Environment::setDefault($d);
+        $d = new Ac_Result_Environment_Dummy();
+        Ac_Result_Environment::setDefault($d);
         
         $o->write();
         if (!$this->assertEqual($str = $d->responseText, $js->getContent()))
@@ -868,8 +855,8 @@ EOD
         $h = new Ac_Result_Http();
         $h->setStatusCode(404, "not found");
         $this->assertEqual($h->getReasonPhrase(), "not found");
-        $d = new Ac_Response_Environment_Dummy();
-        Ac_Response_Environment::setDefault($d);
+        $d = new Ac_Result_Environment_Dummy();
+        Ac_Result_Environment::setDefault($d);
         $h->write();
         $this->assertEqual($d->httpStatus, "404 not found");
     }
@@ -877,15 +864,15 @@ EOD
     function testRedirect() {
         $h = new Ac_Result_Redirect();
         $h->setUrl('http://example.com', Ac_Result_Redirect::REDIR_PERMANENT);
-        $d = new Ac_Response_Environment_Dummy();
-        Ac_Response_Environment::setDefault($d);
+        $d = new Ac_Result_Environment_Dummy();
+        Ac_Result_Environment::setDefault($d);
         $h->write();
         $this->assertEqual($d->headers, array('location: http://example.com'));
         $this->assertEqual($d->httpStatus, '301 Moved Permanently');
         
         $h = new Ac_Result_Redirect();
-        $d = new Ac_Response_Environment_Dummy();
-        Ac_Response_Environment::setDefault($d);
+        $d = new Ac_Result_Environment_Dummy();
+        Ac_Result_Environment::setDefault($d);
         $h->setUrl('http://example.com/another/page', Ac_Result_Redirect::REDIR_PERMANENT);
         $h2 = new Ac_Result_Html();
         $h2->put('Something');
@@ -1222,9 +1209,7 @@ EOD
         $innerCached->put($defStat2.$defCached2);
         $outer->put($innerStat.$innerCached.$defStat3.$defCached3);
         
-        var_dump('before serialize');
         $s = serialize($outer);
-        var_dump('after serialize');
         
         $this->assertTrue(strpos($s, $defStat1->debData) === false);
         $this->assertTrue(strpos($s, $defStat2->debData) === false);
@@ -1235,10 +1220,35 @@ EOD
         
         $s = trim($s);
         $s = preg_replace('/O:[0-9]+:"[^"]+"/', 'a', $s);
-        var_dump(unserialize($s));
+        
+        // TODO: test results
+        //var_dump(unserialize($s));
        
         //echo(htmlspecialchars(serialize($outer)));
+    }
+    
+    function testHtmlInHtml() {
+        $inner = new Ac_Result_Html();
+        $inner->title = "The Title";
+        $inner->setContent("<p>Inner</p>");
         
+        
+        $outer = new Ac_Result_Html();
+        $outer->setContent("<div class='outer'>{$inner}</div>");
+        
+        $ret = $outer->writeAndReturn(); 
+        if (!$this->assertEqual($this->normalizeHtml($ret), $this->normalizeHtml('
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <title>The Title</title></head>
+            <body>
+            <div class=\'outer\'><p>Inner</p></div> 
+            </body>
+            </html>
+        '))) {
+            var_dump($ret);
+        }
     }
     
 }

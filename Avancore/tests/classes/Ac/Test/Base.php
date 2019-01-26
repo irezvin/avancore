@@ -185,6 +185,8 @@ class Ac_Test_Base extends UnitTestCase {
         $html = preg_replace("/\s*\n\r?\s*/", "\n", $html);
         $html = preg_replace("/ +/", " ", $html);
         $html = preg_replace("/\n+/", $stripBreaks? "" : "\n", $html);
+        $res = preg_replace('#/>\s+/#', '>', $html);
+        $res = preg_replace('#/\s+</#', '<', $html);
         return $html;
     }
     

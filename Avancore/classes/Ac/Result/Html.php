@@ -42,7 +42,7 @@ class Ac_Result_Html extends Ac_Result_Http_Abstract {
                         'class' => 'Ac_Result_Placeholder_Template',
                         'prefix' => "\n    <title>",
                         'glue' => ' - ',
-                        'suffix' => "</title>\n",
+                        'suffix' => "</title>",
                     ),
                 ),
                 'meta' => array(

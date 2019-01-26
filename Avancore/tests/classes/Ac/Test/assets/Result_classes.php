@@ -66,16 +66,19 @@ class StageIterator extends Ac_Result_Stage {
     function traverseNext() {
         return parent::traverseNext();
     }
-    
-    function invokeHandlers(Ac_Result $result = null, $stageName, $args = null) {
-        $args = func_get_args();
-        if ($result) {
-            $aa = $args;
-            foreach ($aa as $k => $v) 
-                if (is_object($v) && $v instanceof Ac_Result) $aa[$k] = $v->getDebugData();
-            $this->travLog[] = implode(' ',$aa);
+ 
+    function beginItem($item) {
+        parent::beginItem($item);
+        if ($item instanceof Ac_Result) {
+            $this->travLog[] = $item->getDebugData().' beginStage';
         }
-        return call_user_func_array(array('Ac_Result_Stage', 'invokeHandlers'), $args);
+    }
+    
+    function endItem($item) {
+        parent::endItem($item);
+        if ($item instanceof Ac_Result) {
+            $this->travLog[] = $item->getDebugData().' endStage';
+        }
     }
     
     function getIsAscend() {

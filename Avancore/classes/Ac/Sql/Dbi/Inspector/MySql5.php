@@ -15,10 +15,19 @@ class Ac_Sql_Dbi_Inspector_MySql5 extends Ac_Sql_Dbi_Inspector {
         foreach($al = $this->_db->fetchArray($q, 'COLUMN_NAME') as $colName => $colData) {
             if (isset($cols[$colName])) {
                 if ($colData['COLUMN_COMMENT']) $cols[$colName]['comment'] = $colData['COLUMN_COMMENT'];
-                $cols[$colName]['default'] = $colData['COLUMN_DEFAULT'];
+                
+                $def = $colData['COLUMN_DEFAULT'];
+                // FIXME
+//                // quick and ugly hack around mariaDb quoted default values
+//                if ($def === 'current_timestamp()') $def = 'CURRENT_TIMESTAMP';
+//                if ($def === "'NULL'") $def = 'NULL';
+//                if ($def === "NULL") $def = null;
+//                if (strlen($def) > 1 && $def{0} === "'" && substr($def, -1) === "'") {
+//                    $def = stripslashes(substr($def, 1, -1));
+//                }
+                $cols[$colName]['default'] = $def;
             }
         }
-        //var_dump($tableName, $cols);
         return $cols;
     }
     

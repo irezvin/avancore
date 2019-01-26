@@ -72,80 +72,93 @@ class Ac_Result_Stage_Write extends Ac_Result_Stage_Morph {
             } else {
                 $this->writeOut($item);
             }
-            $parent = $this->getParentResult();
-            if (!$parent) $parent = $this->getRootTarget();
-            if ($parent) {
-                $rId = ''.$item;
-                $sr = isset($this->slotRenderers[$rId])? $this->slotRenderers[$rId] : array();
-                foreach ($item->getSlotContent() as $slotId => $items) {
-                    if (!isset($sr[$slotId])) {
-                        foreach ($items as $item) $parent->addSlotContent ($item, $slotId);
-                        $item->setSlotContent(array(), $slotId);
-                    }
+            $this->addSlotsToParent($item);
+        } elseif (!($item instanceof Ac_I_Result_AfterWrite)) {
+            $this->renderIfNecessary ($item);
+        }
+    }
+    
+    protected function addSlotsToParent($item) {
+        $parent = $this->getParentResult();
+        if (!$parent) $parent = $this->getRootTarget();
+        if ($parent) {
+            $rId = ''.$item;
+            $sr = isset($this->slotRenderers[$rId])? $this->slotRenderers[$rId] : array();
+            foreach ($item->getSlotContent() as $slotId => $items) {
+                if (!isset($sr[$slotId])) {
+                    foreach ($items as $item) $parent->addSlotContent ($item, $slotId);
+                    $item->setSlotContent(array(), $slotId);
                 }
-                if ($sr) unset($this->slotRenderers[$rId]);
             }
-        } elseif ($item instanceof Ac_I_Result_AfterWrite) {
-            /*$this->afterWrite[$item->getStringObjectMark()] = array(
-                'position' => clone $this->position,
-                'item' => $item,
-            );*/
-        } else $this->renderIfNecessary ($item);
+            if ($sr) unset($this->slotRenderers[$rId]);
+        }
     }
     
     protected function writeOut($item) {
-        if ((bool) $this->parent || $this->writeRoot) {
-            $item->setMerged(true);
-            $writer = $item->getWriter();
-            $writer->setStage($this);
-            $writer->setSource($item);
-            $target = null;
-            if ($this->parent) {
-                $target = $this->parent;
-            } elseif ($this->writeRoot) {
-                $target = $this->rootTarget;
-            }
-            $writer->setTarget($target);
-            if ($item instanceof Ac_Result && $item->getIsObsolete()) {
-                trigger_error("Trying to echo an obsolete Result", E_USER_WARNING);
-            }
-            
-            if (isset($this->afterWrite[''.$item])) { // found any AfterWrite renderers
-                
-                $afterWrite = $this->afterWrite[''.$item];
-                $this->afterWrite[''.$item] = array();
-                
-                $this->pushStack();
-                
-                $myCurrent = $this->getCurrentResult();
-                
-                foreach ($afterWrite as $mark => $info) {
-                    
-                    $this->popStack($info['stack']);
-                
-                    $this->position = $info['position'];
-                    ob_start();
-                    $info['item']->render($this);
-                    $this->replaceCurrentObject(ob_get_clean());
-                    $this->position->advance();
-                    while ($this->getCurrentResult() !== $myCurrent) {
-                        $this->traverseNext();
-                    }
-                }
-                
-                $this->popStack();
-                
-            }
-            
-            $res = $writer->write((bool) $target);
-            if ($target) {
-                if ($target === $this->parent) {
-                    $target->replaceObjectInContent($item, $res);
-                } else {
-                    $target->put($res);
-                }
+        if (!$this->parent && !$this->writeRoot) return;
+        
+        if ($item instanceof Ac_Result && $item->getIsObsolete()) {
+            trigger_error("Trying to echo an obsolete Result", E_USER_WARNING);
+        }
+        
+        $writer = $item->getWriter();
+        $writer->setStage($this);
+        $writer->setSource($item);
+        
+        if ($this->parent) {
+            $target = $this->parent;
+        } else {
+            $target = $this->rootTarget;
+        }
+        
+        $writer->setTarget($target);
+        
+        $item->setMerged(true);
+        
+        if (isset($this->afterWrite[''.$item])) {
+            $this->applyAfterWriteRenderers($item);
+        }
+        
+        if (!$target) {
+            $writer->write();
+            return;
+        }
+
+        $buf = $writer->write(true);
+        
+        if ($target === $this->parent) {
+            $target->replaceObjectInContent($item, $buf);
+        } else {
+            $target->put($buf);
+        }
+        
+    }
+    
+    protected function applyAfterWriteRenderers($item) {
+
+        $afterWrite = $this->afterWrite[''.$item];
+        $this->afterWrite[''.$item] = array();
+
+        $this->pushStack();
+
+        $myCurrent = $this->getCurrentResult();
+
+        foreach ($afterWrite as $mark => $info) {
+
+            $this->popStack($info['stack']);
+
+            $this->position = $info['position'];
+            ob_start();
+            $info['item']->render($this);
+            $this->replaceCurrentObject(ob_get_clean());
+            $this->position->advance();
+            while ($this->getCurrentResult() !== $myCurrent) {
+                $this->traverseNext();
             }
         }
+
+        $this->popStack();
+        
     }
     
 }

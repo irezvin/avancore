@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Response_Environment_Native implements Ac_I_Response_Environment, Ac_I_Prototyped {
+class Ac_Result_Environment_Native implements Ac_I_Result_Environment, Ac_I_Prototyped {
 
 //    var $defaultCookieExpiration = false;
 //    

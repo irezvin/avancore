@@ -14,23 +14,24 @@ class Ac_Result_Writer_Auto extends Ac_Result_Writer {
         $writer->write();
     }
     
-    protected function implWrite(Ac_Result $r, Ac_Result $t = null, Ac_Result_Stage $s = null) {
+    function getWriterPrototype(Ac_Result $r, Ac_Result $t = null, Ac_Result_Stage $s = null) {
         $proto = array('class' => 'Ac_Result_Writer_Merge');
-        if ($r instanceof Ac_Result_Html) {
-            if ($t && $t instanceof Ac_Result_Html) {
-                $proto['class'] = 'Ac_Result_Writer_HtmlMerge';
-            } else {
-                $proto['class'] = 'Ac_Result_Writer_RenderHtml';
-            }
-        }
-        elseif ($r instanceof Ac_Result_Http) {
+        if ($r instanceof Ac_Result_Template) {
+            $proto['class'] = 'Ac_Result_Writer_Template';
+        } elseif ($r instanceof Ac_Result_Html && !$t) {
+            $proto['class'] = 'Ac_Result_Writer_RenderHtml';
+        } elseif ($r instanceof Ac_Result_Http) {
             if (!$t) $proto['class'] = 'Ac_Result_Writer_HttpOut';
             else { 
                 $proto['class'] = 'Ac_Result_Writer_Replace';
                 $proto['replaceAll'] = true;
             }
         }
-        
+        return $proto;
+    }
+    
+    protected function implWrite(Ac_Result $r, Ac_Result $t = null, Ac_Result_Stage $s = null) {
+        $proto = $this->getWriterPrototype($r, $t, $s);
         return $this->applyWriter($proto, $r, $t, $s);
     }
     

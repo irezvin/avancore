@@ -63,9 +63,11 @@ class Ac_Result_Position {
         $this->gotoPosition(false, false);
     }
     
-    function getPosition() {
+    function getPosition($withResult = false) {
         if (!$this->hasPosition()) $this->advance();
-        return array($this->propertyName, $this->offset);
+        $res = array($this->propertyName, $this->offset);
+        if ($withResult) $res[] = $this->getResult ();
+        return $res;
     }
 
     protected function advanceInProperty($bunch, & $context = null) {
