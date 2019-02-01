@@ -162,7 +162,9 @@ class Ac_Etl_Import extends Ac_Prototyped {
     
     function cleanTmpData($all = false, $tableGroupId = null) {
         foreach ($this->tables as $table) {
-            if (!(!is_null($tableGroupId) && $table->tableGroupId === $tableGroupId)) continue;
+            if (!is_null($tableGroupId) && $table->tableGroupId !== $tableGroupId) {
+                continue;
+            }
             $table->cleanTmpData($all, $all);
         }
     }
