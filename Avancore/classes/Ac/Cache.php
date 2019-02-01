@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Cache {
+class Ac_Cache extends Ac_Prototyped {
     
     protected $cacheDir = false;
     
@@ -44,6 +44,10 @@ class Ac_Cache {
      * @var Ac_Cache_Util
      */
     protected $util = null;
+    
+    function hasPublicVars() {
+        return true;
+    }
 
     static function getDefaultCacheDir() {
         if (Ac_Application::getDefaultInstance()) {
@@ -78,8 +82,9 @@ class Ac_Cache {
         return $res;
     }
     
-    function __construct() {
+    function __construct(array $options = array()) {
         $this->cacheDir = self::getDefaultCacheDir();
+        parent::__construct($options);
     }
     
     function setCacheDir($cacheDir) {
@@ -172,7 +177,7 @@ class Ac_Cache {
             $fn = $this->getFilename($id, $group);
 
             $this->getUtil()->mkDirRecursive(dirname($fn));
-
+            
             if ($this->useLocking) {
                 if (is_file($lock = $fn.'.lock')) return false;
                 else touch($lock); 
