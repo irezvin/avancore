@@ -15,16 +15,7 @@ class Ac_Sql_Dbi_Inspector_MySql5 extends Ac_Sql_Dbi_Inspector {
         foreach($al = $this->_db->fetchArray($q, 'COLUMN_NAME') as $colName => $colData) {
             if (isset($cols[$colName])) {
                 if ($colData['COLUMN_COMMENT']) $cols[$colName]['comment'] = $colData['COLUMN_COMMENT'];
-                
-                $def = $colData['COLUMN_DEFAULT'];
-                // FIXME
-//                // quick and ugly hack around mariaDb quoted default values
-//                if ($def === 'current_timestamp()') $def = 'CURRENT_TIMESTAMP';
-//                if ($def === "'NULL'") $def = 'NULL';
-//                if ($def === "NULL") $def = null;
-//                if (strlen($def) > 1 && $def{0} === "'" && substr($def, -1) === "'") {
-//                    $def = stripslashes(substr($def, 1, -1));
-//                }
+                $def = $this->processDefault($colData['COLUMN_DEFAULT'], true);
                 $cols[$colName]['default'] = $def;
             }
         }
@@ -54,6 +45,25 @@ class Ac_Sql_Dbi_Inspector_MySql5 extends Ac_Sql_Dbi_Inspector {
             $res[$cName]['columns'][$relData['col']] = $relData['refcol'];
         }
         return $res;
+    }
+    
+    protected function processDefault($default, $fromTableSchema = false) {
+        if (!$fromTableSchema) return parent::processDefault ($default);
+        $original = $default;
+        if (!$this->getIsMariaDb102plus()) return $default;
+        if ($default === 'current_timestamp()') $default = 'CURRENT_TIMESTAMP';
+        elseif (strlen($default) > 1 && $default[0] === "'" && substr($default, -1) === "'") {
+            $default = stripslashes(substr($default, 1, -1));
+        } elseif (is_null($default) || $default === 'NULL') {
+            $default = null;
+        } elseif (is_numeric($default)) {
+            if (round($default) == $default) $default = (int) $default;
+                else $default = (float) $default;
+        } else {
+            trigger_error("Expression default value found: '{$original}'", E_USER_NOTICE);
+            $default = new Ac_Sql_Expression($default);
+        }
+        return $default;
     }
 
 }
