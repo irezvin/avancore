@@ -53,7 +53,8 @@ class Ac_Sql_Dbi_Inspector_MySql5 extends Ac_Sql_Dbi_Inspector {
         if (!$this->getIsMariaDb102plus()) return $default;
         if ($default === 'current_timestamp()') $default = 'CURRENT_TIMESTAMP';
         elseif (strlen($default) > 1 && $default[0] === "'" && substr($default, -1) === "'") {
-            $default = stripslashes(substr($default, 1, -1));
+            $default = str_replace("''", "'", substr($default, 1, -1)); // mariadb escapes quotes by doubling them
+            $default = stripslashes($default);
         } elseif (is_null($default) || $default === 'NULL') {
             $default = null;
         } elseif (is_numeric($default)) {

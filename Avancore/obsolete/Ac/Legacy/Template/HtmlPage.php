@@ -7,13 +7,13 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
     const doctypeHtml5 = '<!DOCTYPE html>';
     const doctypeNone = "";
     
-    var $addXmlTag = true;
+    var $addXmlTag = false;
     
     var $htmlAttribs = array();
     
     var $bodyAttribs = array();
     
-    var $doctypeTag = self::doctypeStrict;
+    var $doctypeTag = self::doctypeHtml5;
     
     var $titleConcatenator = ' - ';
     

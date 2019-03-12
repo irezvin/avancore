@@ -332,8 +332,8 @@ abstract class Ac_Util {
     }
     
     static function concatPaths ($path1, $path2) {
-        if (!strlen($path2)) return $path1;
-        if (!strlen($path1)) return $path2;
+        if (is_array($path2)? !count($path2) : !strlen($path2)) return $path1;
+        if (is_array($path1)? !count($path1) : !strlen($path1)) return $path2;
         $arr2 = self::pathToArray($path2);
         $res = $path1.'['.implode('][', $arr2).']';
         return $res; 

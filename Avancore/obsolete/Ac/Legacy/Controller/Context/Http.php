@@ -8,7 +8,7 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
     var $isInForm = false;
     
     /**
-     * Preferred request method
+     * Request method
      *
      * @var string get|post|put|delete...
      */
@@ -91,32 +91,37 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
     function getDataPath($asArray = false) {
         return $asArray? $this->_arrDataPath : $this->_dataPath;
     }
+
+    function populateFromRequestObj(Ac_Request $request, $dataPath = false) {
+        
+        $data = array();
+        foreach (array('get', 'post') as $v) {
+            Ac_Util::ms($data, $request->getValueFrom($v, []));
+        }
+        $this->setData($data, $dataPath);
+        $this->requestMethod = strtolower($request->server->requestMethod);
+        $this->setDataPath($dataPath);
+        
+    }
     
     function populate($varName, $dataPath = false) {
-        if (is_array($varName)) {
-            $src = array();
-            foreach ($varName as $v) {
-                switch($v) {
-                    case 'get': $s = $_GET; break;
-                    case 'post': $s = $_POST; break;
-                    case 'cookie': $s = $_COOKIE; break;
-                    case 'request': $s = $_REQUEST; break;
-                }
-                $src = Ac_Util::m($src, $s);
-            }
-        } else {
-            switch ($varName) {
-                case 'get': $src = $_GET; break;
-                case 'post': $src = $_POST; break;
-                case 'cookie': $src = $_COOKIE; break;
-                case 'request': $src = $_REQUEST; break;
+        $varName = Ac_Util::toArray($varName);
+        $src = array();
+        foreach ($varName as $v) {
+            switch($v) {
+                case 'get': $s = $_GET; break;
+                case 'post': $s = $_POST; break;
+                case 'cookie': $s = $_COOKIE; break;
+                case 'request': $s = $_REQUEST; break;
                 default: trigger_error ("Unknown request variable '$varName'; use 'get', 'post', 'cookie' or 'request'", E_USER_ERROR);
             }
+            $src = Ac_Util::m($src, $s);
         }
         $this->setDataPath($dataPath);
         $data = Ac_Util::getArrayByPath($src, $this->_arrDataPath, array());
         if (get_magic_quotes_gpc()) $data = Ac_Util::stripSlashes($data);
         $this->setData($data);
+        if (isset($_SERVER) && $_SERVER['REQUEST_METHOD'] === 'POST') $this->requestMethod = 'post';
     }
     
     /**
@@ -218,7 +223,6 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
         Ac_Util::setArrayByPath($d, $this->_arrDataPath, $data);
         Ac_Util::ms($res->query, $d, true);
         return $res;
-        
     }
     
     function getStringUrl() {
@@ -246,6 +250,20 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
             $values = $v;
         }
         return parent::updateData($values);
+    }
+    
+    /**
+     * @param Ac_Cr_Context $context
+     * @return Ac_Legacy_Controller_Context_Http
+     */
+    static function createFromContext(Ac_Cr_Context $context) {
+        $res = new Ac_Legacy_Controller_Context_Http;
+        $res->populateFromRequestObj($context->getRequest());
+        $res->setDataPath($context->getPathPrefix());
+        $res->setBaseUrl($context->createUrl());
+        $m = strtolower ($context->getRequest()->server->requestMethod);
+        if (strlen($m)) $res->requestMethod = $m;
+        return $res;
     }
     
 }

@@ -89,6 +89,14 @@ class Ac_Test_Url extends Ac_Test_Base {
         $this->assertEqual($u->path, '/foo/index.php');
         $this->assertEqual($u->pathInfo, '/bar/baz');
         
+        $u = Ac_Url::guess(true, array(
+            'HTTP_HOST' => 'example.com',
+            'REQUEST_URI' => '/foo/bar/baz',
+            'SCRIPT_NAME' => '/index.php',
+        ));
+        $this->assertEqual($u->path, '/');
+        $this->assertEqual($u->pathInfo, 'foo/bar/baz');
+        
     }
     
     function resolve($url, $baseUrl) {

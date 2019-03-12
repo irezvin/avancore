@@ -12,8 +12,24 @@ class Ac_Legacy_Output_Native extends Ac_Legacy_Output {
 
     var $templateClass = 'Ac_Legacy_Template_HtmlPage';
     
+    function headersSent() {
+        return headers_sent();
+    }
+    
+    function header($header, $replace = true, $httpResponseCode = null) {
+        return header($header, $replace, $httpResponseCode);
+    }
+    
+    function cancelBuffering() {
+        while(ob_get_level()) ob_end_clean();
+    }
+    
     function Ac_Output_Native($options = array()) {
         Ac_Util::bindAutoparams($this, $options);
+    }
+    
+    function exitPhp() {
+        die();
     }
     
     /**
@@ -35,43 +51,44 @@ class Ac_Legacy_Output_Native extends Ac_Legacy_Output {
         $redir = false;
         if ($r->redirectUrl) {
             if (strlen(''.$r->redirectUrl) > 2000) {
-                while(ob_get_level()) ob_end_clean ();
+                if ($this->allowCleanBufferAndDie) $this->cancelBuffering();
                 $au = new Ac_Url($r->redirectUrl);
                 echo $au->getJsPostRedirect();
-                die();
+                if ($this->allowCleanBufferAndDie) $this->exitPhp();
             }
             $redir = $r->redirectUrl;
             if (is_a($redir, 'Ac_Url')) $redir = $redir->toString();
         }
-        if (!headers_sent()) {
-            if ($r->contentType) header('Content-type: '.$r->contentType);
+        if (!$this->headersSent()) {
+            if ($r->contentType) $this->header('Content-type: '.$r->contentType);
             if ($redir) {
-                header( 'Pragma: no-cache' );
-                header('Location: '. $redir, TRUE, 302);
+                $this->header('Pragma: no-cache');
+                $this->header('Location: '. $redir, TRUE, 302);
             }
             foreach ($r->extraHeaders as $eh) {
                 if (is_array($eh)) {
-                    header($eh[0], true, $eh[1]);
+                    $this->header($eh[0], true, $eh[1]);
                 }
                 else {
-                    header($eh);
+                    $this->header($eh);
                 }
             }
         }
         
         if ($r->noHtml || $r->noWrap) {
-            if ($this->allowCleanBufferAndDie) while(ob_get_level()) ob_end_clean();
+            if ($this->allowCleanBufferAndDie) $this->cancelBuffering ();
         }
         $showHtml = !$r->noHtml && $this->showOuterHtml;
         
         if (headers_sent() && $redir) {
             ob_start();
 ?> 
+            <meta http-equiv="refresh" content="1;<?php echo htmlspecialchars($redir); ?>" />
             <script type='text/javascript'>
                 document.location = '<?php echo addslashes($redir); ?>';
             </script>
 <?php
-            $r->content .= ob_get_clean();           
+            $r->headTags[] = ob_get_clean();
         }
         
         if ($showHtml) {
@@ -83,7 +100,7 @@ class Ac_Legacy_Output_Native extends Ac_Legacy_Output {
             echo $c;
         }
         if ($r->noHtml || $r->noWrap) {
-            if ($this->allowCleanBufferAndDie) die();
+            if ($this->allowCleanBufferAndDie) $this->exitPhp();
         }
     }
     

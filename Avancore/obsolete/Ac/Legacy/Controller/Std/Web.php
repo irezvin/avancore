@@ -15,7 +15,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
     var $cacheGroup = false;
 
     /**
-     * @var false|true|string|array FALSE not to use Ac_Cache; TRUE to use Ac_Cache with default prototype; string - class of custom Ac_Cache implemetation; array with prototype 
+     * @var false|true|string|array FALSE not to use Ac_Cache_Abstract; TRUE to use Ac_Cache_Abstract with default prototype; string - class of custom Ac_Cache_Abstract implemetation; array with prototype 
      */
     var $aeCache = false;
     
@@ -221,7 +221,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
              
             if ($this->_response === false) {
                 if ($this->isJson || $this->forceJson) {
-                    $this->_defaultResponseClass = 'Ac_Legacy_Controller_Response_Json';
+                    $this->_responseClass = 'Ac_Legacy_Controller_Response_Json';
                 }
                 parent::getResponse();
                 if ($this->isJson || $this->forceJson) {
@@ -268,47 +268,5 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
         $this->cacheSkip = true;
         $this->_response->content = "No such method: '{$methodParamValue}' :(";
     }
-
-    /**
-     * @param bool|string $createNewResponse
-     *          - TRUE to create new response of default class;
-     *          - FALSE to empty response object (useful if next call will be getResponse());
-     *          - name of class to specify class of next response
-     *
-     * Multiple response support:
-     * - pushes current response to the response list;
-     * - creates blank response object and sets it current - if $createNewResponse isn't false
-     */
-    function pushResponse($createNewResponse = true, $fetchTemplate = true) {
-        if ($fetchTemplate && $this->_response->content === false) {
-            $this->getTemplate();
-            if (strlen($this->_templatePart) && $this->_template) {
-                $this->_response->content .= $this->_template->fetch($this->_templatePart);
-            }
-        }
-        $this->responses[] = $this->_response;
-        $this->_response = false;
-        if ($this->_template) $this->_template = false;
-        if ($createNewResponse !== false) {
-            if (is_bool($createNewResponse)) $createNewResponse = $this->getResponseClass();
-            $this->_response = new $createNewResponse();
-        }
-    }
-    
-    /**
-     * @return Ac_Cache
-     */
-    function getCache() {
-        if (!is_object($this->aeCache)) {
-            if ($this->aeCache !== false) {
-                if ($this->aeCache === true) $this->aeCache = $this->getApplication()->getCache();
-                elseif (is_array($this->aeCache)) $this->aeCache = Ac_Util::m(Ac_Cache::getDefaultPrototype(), $this->aeCache);
-                $this->aeCache = Ac_Prototyped::factory($this->aeCache, 'Ac_Cache');
-            }
-        }
-        return $this->aeCache;
-    }
-    
-
 
 }

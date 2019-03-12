@@ -195,7 +195,6 @@ class Ac_Application_Adapter extends Ac_Prototyped {
      * @param type $autoValue 
      */
     protected function detectDir($configKey, $autoValue) {
-        if (isset($this->overrides['varFlagsPath']) && $configKey == 'varFlagsPath') Ac_Debug::dd(''.new Exception);
         if (!isset($this->config[$configKey])) {
             if (!$this->checkDirs || is_dir($autoValue)) $this->config[$configKey] = $autoValue;
         } else {
@@ -261,7 +260,7 @@ class Ac_Application_Adapter extends Ac_Prototyped {
     
     protected function guessUrls() {
         if (!isset($this->config['webUrl'])) {
-            $u = Ac_Url::guess();
+            $u = Ac_Url::guessBase();
             $u->query = array();
             $this->config['webUrl'] = $u->toString();
         }
@@ -530,6 +529,46 @@ class Ac_Application_Adapter extends Ac_Prototyped {
     
     function __unset($varName) {
         $this->unsetOverrideValue($varName);
+    }
+    
+    /**
+     * @return Ac_Cr_Context
+     */
+    function createDefaultContext() {
+        $request = new Ac_Request;
+        $url = Ac_Url::guess(true);
+        $request->populate($url, $_SERVER['PHP_SELF'], $_POST, true);
+        
+        // TODO: fix $request->server->pathInfo
+        $request->server->pathInfo = $url->pathInfo;
+        
+        $context = new Ac_Cr_Context;
+        $context->setRequest($request);
+        $context->setBaseUrl($this->getWebUrl());
+        $context->getBaseUrl()->guessBase();
+        return $context;
+    }
+    
+    /**
+     * @return Ac_Result_Writer
+     */
+    function createDefaultResultWriter(Ac_Result_Environment $environment = null) {
+        $res = new Ac_Result_Writer_RenderHtml;
+        if (!$environment) $environment = $this->createDefaultEnvironment();
+        $res->setEnvironment($environment);
+        return $res;
+    }
+    
+    function createDefaultResultEnvironment() {
+        $res = new Ac_Result_Environment_Native;
+        return $res;
+    }
+ 
+    /**
+     * @return Ac_Legacy_Output
+     */
+    function createDefaultLegacyOutput() {
+        return new Ac_Legacy_Output_Native;
     }
     
 }

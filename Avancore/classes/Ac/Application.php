@@ -25,22 +25,24 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
      */
     const EVENT_ON_COMPONENT_NOT_FOUND = 'onComponentNotFound';
     
+    /**
+     * onComponentDeleted ($id, $instance)
+     */
+    const EVENT_ON_COMPONENT_DELETED = 'onComponentDeleted';
+    
     const CORE_COMPONENT_DB = 'core.db';
     const CORE_COMPONENT_LEGACY_DB = 'core.legacyDb';
     const CORE_COMPONENT_FLAGS = 'core.flags';
     const CORE_COMPONENT_CACHE = 'core.cache';
     const CORE_COMPONENT_MAIL_SENDER = 'core.mailSender';
     const CORE_COMPONENT_RELATION_PROVIDER_EVALUATOR = 'core.relationProviderEvaluator';
-    //const CORE_COMPONENT_ACCESSOR_PROVIDER_EVALUATOR = 'core.accessorProviderEvaluator';
     const CORE_COMPONENT_MANAGER_CONFIG_SERVICE = 'core.managerConfigService';
     const CORE_COMPONENT_URL_MAPPER = 'core.urlMapper';
-
+    const CORE_COMPONENT_FRONT_CONTROLLER = 'core.frontController';
     
     const STAGE_CONSTRUCTING = 'constructing';
     const STAGE_INITIALIZING = 'initializing';
     const STAGE_INITIALIZED = 'initialized';    
-    
-    
     
     private static $instances = array();
     
@@ -280,18 +282,18 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
         return $this->adapter->getAppRootDir();
     }
 
-    function setCache(Ac_Cache $cache = null) {
+    function setCache(Ac_Cache_Abstract $cache = null) {
         $this->addComponent($cache, self::CORE_COMPONENT_CACHE);
     }
 
     /**
-     * Returns Ac_Cache object. If no cache is injected by setCache or Adapter does not provides any
+     * Returns Ac_Cache_Abstract object. If no cache is injected by setCache or Adapter does not provides any
      * cache prototype, creates disabled (dummy) cache instance.
      * 
-     * @return Ac_Cache
+     * @return Ac_Cache_Abstract
      */
     function getCache() {
-        return $this->getComponent(self::CORE_COMPONENT_CACHE, 'Ac_Cache');
+        return $this->getComponent(self::CORE_COMPONENT_CACHE, 'Ac_Cache_Abstract');
     }
 
     /**
@@ -351,6 +353,16 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
         return $res;
     }
     
+    function getComponentClass($id) {
+        if (isset($this->components[$id]) && !is_object($this->components[$id])) {
+            if (is_scalar($this->components[$id])) return $this->components[$id];
+            if (isset($this->components[$id]['class'])) return $this->components[$id]['class'];
+        }
+        $component = $this->getComponent($id, null, true);
+        if (!$component) return;
+        return get_class($component);
+    }
+    
     protected function registerComponents(array $components) {
         if (!$components) return;
         foreach ($components as $id => $reg) {
@@ -373,7 +385,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     
     function hasComponent($id) {
         return in_array($id, $this->listComponents());
-    }
+    }    
     
     function addComponent($component, $id = null) {
         if (is_null($id)) {
@@ -406,6 +418,14 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
         $this->componentListCache = array();
         return $this->components[$id];
     }
+    
+    function deleteComponent($id) {
+        $component = $this->components[$id];
+        $this->componentListCache = array();
+        $this->components[$id] = null;
+        if (is_object($component))
+            $this->triggerEvent (self::EVENT_ON_COMPONENT_DELETED, $id, $component);
+    }
 
     /**
      * @deprecated
@@ -427,8 +447,9 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
             self::CORE_COMPONENT_CACHE => $cachePrototype,
             self::CORE_COMPONENT_MAIL_SENDER => $adapter->getMailSenderPrototype(),
             self::CORE_COMPONENT_RELATION_PROVIDER_EVALUATOR => array('class' => 'Ac_Model_Relation_Provider_Evaluator'),
-            //self::CORE_COMPONENT_ACCESSOR_PROVIDER_EVALUATOR => array('class' => 'Ac_Model_Relation_Accessor_Evaluator'),
-            self::CORE_COMPONENT_MANAGER_CONFIG_SERVICE => array('class' => 'Ac_Admin_ManagerConfigService')
+            self::CORE_COMPONENT_MANAGER_CONFIG_SERVICE => array('class' => 'Ac_Admin_ManagerConfigService'),
+            self::CORE_COMPONENT_FRONT_CONTROLLER => array('class' => 'Ac_Application_FrontController'),
+            self::CORE_COMPONENT_URL_MAPPER => array('class' => 'Ac_Application_FrontUrlMapper'),
         );
         
         Ac_Util::ms($res, $this->doGetMapperPrototypes());
@@ -595,16 +616,37 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     
     function handleRequest(Ac_Cr_Context $context = null) {
 
-        //  if context not provided, create one
-        //  get UrlMapper
-        //  if we have "controllerParam" set, retrieve it
-        //  get front controller (not found => exception)
-        //  if it's legacy, proceed with "handleRequestWithLegacyController"
-        //  if it's admin controller => exception
-        //  get response
-        //  get responseWriter
-        //  write response with responseWriter
+        $c = $this->getFrontController();
+        $c->handleRequest($context);
         
+    }
+
+    /**
+     * @return Ac_Application_FrontController
+     */
+    function getFrontController() {
+        return $this->getComponent(self::CORE_COMPONENT_FRONT_CONTROLLER, 'Ac_Application_FrontController');
+    }
+
+    /**
+     * @return Ac_UrlMapper_UrlMapper
+     */
+    function getUrlMapper() {
+        return $this->getComponent(self::CORE_COMPONENT_URL_MAPPER, 'Ac_UrlMapper_UrlMapper');
+    }
+    
+    /**
+     * @return Ac_Legacy_Controller
+     */
+    function getLegacyController($id, $dontThrow = false) {
+        return $this->getComponent($id, 'Ac_Legacy_Controller', $dontThrow);
+    }
+    
+    /**
+     * @return Ac_Cr_Controller
+     */
+    function getController($id, $dontThrow = false) {
+        return $this->getComponent($id, 'Ac_Cr_Controller', $dontThrow);
     }
     
     protected function handleRequestWithLegacyController() {
@@ -627,7 +669,5 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     function getFlags() {
         return $this->getComponent(self::CORE_COMPONENT_FLAGS, 'Ac_Flags', true);
     }
-    
-    
     
 }

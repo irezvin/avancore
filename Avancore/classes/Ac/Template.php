@@ -8,8 +8,6 @@ class Ac_Template extends Ac_Prototyped {
     
     protected $fields = array();
     
-    protected static $methodSignatures = array();
-    
     /**
      * @var Ac_Result
      */
@@ -158,29 +156,7 @@ class Ac_Template extends Ac_Prototyped {
     }
     
     protected function getSignature($class, $method) {
-        if (!isset(self::$methodSignatures[$key = $class.'::'.$method])) {
-            self::$methodSignatures[$key] = array();
-            $m = new ReflectionMethod($class, $method);
-            foreach ($m->getParameters() as $param) {
-                $s = $param.'';
-                $class = false;
-                if (!$param->isArray()) {
-                    $ss = explode(">", $s, 2);
-                    $s1 = explode(" ", ltrim($ss[1], ' '), 2);
-                    if ($s1[0]{0} !== '$') $class = $s1{0};
-                }
-                /* @var $param ReflectionParameter */
-                self::$methodSignatures[$key][$param->getName()] = array(
-                    'class' => $class,
-                    'isArray' => $param->isArray(),
-                    'optional' => $param->isOptional(),
-                    'defaultValue' => $param->isOptional()? $param->getDefaultValue() : null,
-                    'string' => $s,
-                    'readable' => preg_replace('/^[^>]+> /', '', rtrim($s, ' ]')),
-                );
-            }
-        }
-        return self::$methodSignatures[$key];
+        return Ac_Accessor::getMethodSignature($class, $method);
     }
     
     protected function invokeMethod($object, $method, array $args) {

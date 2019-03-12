@@ -20,6 +20,13 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
     protected $baseUrl = false;
     
     /**
+     * @var Ac_UrlMapper_UrlMapper
+     */
+    protected $parentMapper = false;
+    
+    protected $parentPathInfoParam = '_pathInfo';
+    
+    /**
      * $patterns is array of patterns or pattern definitions.
      * When numeric key is provided, key will be pattern definition.
      */
@@ -34,6 +41,10 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
         }
         $this->sortPatterns();
     }
+    
+    protected function rebuildPatterns() {
+        $this->patterns = array();
+    }
 
     // sort by: number of params DESC, definition length DESC
     protected function sortPatterns() {
@@ -45,6 +56,7 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
     }
     
     function listPatterns() {
+        if ($this->patterns === false) $this->rebuildPatterns();
         return array_keys($this->patterns);
     }
     
@@ -52,6 +64,7 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
      * @return Ac_UrlMapper_Pattern
      */
     function getPattern($definition, $dontThrow) {
+        if ($this->patterns === false) $this->rebuildPatterns();
         if (isset($this->patterns[$definition])) {
             return $this->patterns[$definition];
         }
@@ -59,23 +72,47 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
         throw Ac_E_InvalidCall::noSuchItem('pattern', $definition);
     }
     
+    /**
+     * @return Ac_UrlMapper_Pattern[]
+     */
+    
+    function getPatterns() {
+        if ($this->patterns === false) $this->rebuildPatterns();
+        return $this->patterns;
+    }
+    
     function paramsToString(array $params) {
         return $this->moveParamsToString($params);
     }
     
     function moveParamsToString(array & $params) {
+        if ($this->patterns === false) $this->rebuildPatterns();
         $this->lastMatch = null;
         foreach ($this->patterns as $i => $pat) {
             $res = $pat->moveParamsToString($params);
             if (!is_null($res)) {
                 $this->lastMatch = $i;
                 $res = $this->handleLeadlingSlash($res);
+                if ($this->parentMapper) break; 
                 return $res;
             }
+        }
+        if (is_null($res)) return;
+        if ($this->parentMapper) {
+            if ($res !== null && strlen($this->parentPathInfoParam)) {
+                $params[$this->parentPathInfoParam] = $res;
+            }
+            $parentRes = $this->parentMapper->moveParamsToString($params);
+            if ($parentRes === null) {
+                if ($res !== null && strlen($this->parentPathInfoParam))
+                    unset($params[$this->parentPathInfoParam]);
+            }
+            return $parentRes;
         }
     }
     
     function stringToParams($string) {
+        if ($this->patterns === false) $this->rebuildPatterns ();
         $string = $this->handleLeadlingSlash($string);
         $this->lastMatch = null;
         foreach ($this->patterns as $i => $pat) {
@@ -222,5 +259,16 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
         }
         return $string;
     }
+
+    function setParentMapper(Ac_UrlMapper_UrlMapper $parentMapper = null) {
+        $this->parentMapper = $parentMapper;
+    }
+
+    /**
+     * @return Ac_UrlMapper_UrlMapper
+     */
+    function getParentMapper() {
+        return $this->parentMapper;
+    }    
     
 }

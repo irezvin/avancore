@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
+class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_NamedApplicationComponent {
 
     /**
      * @var Ac_Application
@@ -12,10 +12,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
      */
     var $_instanceId = false;
     
-    /**
-     * @access protected 
-     */
-    var $_defaultResponseClass = 'Ac_Legacy_Controller_Response_Html';
+    var $_responseClass = 'Ac_Legacy_Controller_Response_Html';
     
     /**
      * @access protected 
@@ -50,27 +47,21 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
     var $_rqWithState = false;
     
     /**
-     * @var bool|array
-     */
-    var $_errors = false;
-    
-    /**
-     * @var Ac_Legacy_Controller_Context_Info 
-     */
-    var $_contextInfo = false;
-    
-    /**
      * @var Ac_Legacy_Controller_Response
      */
     var $_response = false;
     
-    var $_bound = false;
+    const OUTPUT_RESPONSE_PREPEND = 1;
+    
+    const OUTPUT_RESPONSE_APPEND = 2;
+    
+    const OUTPUT_RESPONSE_DROP = 0;
     
     /**
-     * Prepend response content with controller methods' text output 
+     * Prepend response content with controller methods' text output (only if _outputToTemplate === false or template not set)
      * @var bool|string
      */
-    var $_outputToResponse = false;
+    var $_outputToResponse = self::OUTPUT_RESPONSE_PREPEND;
     
     /**
      * Add method' output to a template variable (provide name here)
@@ -96,8 +87,6 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
      */
     var $_defaultMethodName = '';
     
-    var $_errorMethodName = '';
-    
     var $_methodParamValue = false;
     
     var $_methodName = false;
@@ -108,9 +97,29 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
     
     var $_stateData = array();
     
-    var $_autoStateVars = array();
-    
     var $templateExtraVars = array();
+    
+    var $simpleCaching = null;
+    
+    /**
+     * @var array Names of controller properties (i.e. userId -> getUserId() will be called) to add to cache Id
+     */
+    var $simpleCacheExtra = array();
+    
+    /**
+     * @var Ac_Cache_Abstract
+     */
+    protected $cache = true;
+    
+    protected $hitCache = false;
+    
+    function setId($id) {
+        $this->_instanceId = $id;
+    }
+    
+    function getId() {
+        return $this->_instanceId;
+    }
     
     function hasPublicVars() {
         return true;
@@ -141,16 +150,16 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
                 elseif (is_string($context)) $path = Ac_Util::pathToArray($context);
             $context = new Ac_Legacy_Controller_Context_Http();
             $context->setBaseUrl($url);
-            $context->populate(array('cookie', 'get', 'post'), $path);
+            $context->populate(array('get', 'post'), $path);
 	    }
-
-        $this->_context = $context;
-        Ac_Util::bindAutoparams($this, $options);
+        
         if ($instanceId !== false) $this->_instanceId = $instanceId;
             else $this->_instanceId = strtolower(get_class($this));
+
+        Ac_Util::bindAutoparams($this, $options);
         $this->doInitProperties($options);
-        if ($this->doesBindOnCreate()) $this->bindFromRequest();
-	    
+
+        $this->setContext($context);
     }
     
     /**
@@ -176,74 +185,45 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
     function doBindFromRequest() {
     }
     
-    /**
-     * Should validate bound parameters
-     */
-    function doValidateRequest() {
-    }
-    
-    /**
-     * Should populate $this->_contextInfo properties 
-     */
-    function doInitializeRequestInfo() {
-    }
-    
-    /**
-     * Should set $this->_template properties
-     */
-    function doPopulateTemplate() {
-    }
-    
-    /**
-     * Should set $this->_response properties
-     */
-    function doPopulateResponse() {
-    }
-    
     function doBeforeExecute() {
     }
     
     function doAfterExecute() {
     }
     
-    function doBeforeGetTemplate() {
-    }
-    
-    /**
-     * Template method that should return true if controller should call $this->bindFromRequest() immediately after initialisation.
-     * Can be overridden in descendant classes.
-     * @return bool
-     */
-    function doesBindOnCreate() {
-        return false;
-    }
-    
     // --------------------- context-related methods ---------------------
 
     function bindFromRequest() {
-        if ($this->_bound === false) {
-            $this->_bound = true;
-            $this->_rqData = $this->_context->getData();
-            $this->_state = $this->_context->getState();
-            $this->_rqWithState = Ac_Util::m($this->_state, $this->_rqData, true);
-            $this->doBindFromRequest();
-        }
+        $this->_rqData = $this->_context->getData();
+        $this->_state = $this->_context->getState();
+        $this->_rqWithState = Ac_Util::m($this->_state, $this->_rqData, true);
+        $this->doBindFromRequest();
     }
     
     function isRequestValid() {
-        if ($this->_errors === false) {
-            $this->_errors = array();
-            $this->bindFromRequest();
-            $this->doValidateRequest();
-        }
-        return !count($this->_errors);
+        return true;
     }
     
-    function getRequestErrors($key = false) {
-        $this->isRequestValid();
-        if ($key !== false) $res = isset($this->_errors[$key])? $this->_errors[$key] : false;
-            else $res = $this->_errors;
-        return $res; 
+    function resetState() {
+        if ($this instanceof Ac_Form_Control) var_dump('rs', ''.(new Exception));
+        // reset controller state on setContext()
+        $this->_methodName = false;
+        $this->_methodParamValue = false;
+        $this->_response = false;
+        $this->_state = array();
+        $this->_stateData = false;
+        $this->_rqData = false;
+        $this->_rqWithState = false;
+        $this->_tplData = array();
+        $this->_templatePart = false;
+    }
+    
+    function setContext(Ac_Legacy_Controller_Context $context) {
+        if ($this->_context === $context) return;
+        $hadOldContext = (bool) $this->_context;
+        $this->_context = $context;
+        if ($hadOldContext) $this->resetState();
+        $this->bindFromRequest();
     }
     
     /**
@@ -259,7 +239,6 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
      */
     function getMethodParamValue() {
         if ($this->_methodParamValue === false) {
-            $this->bindFromRequest();
             $this->_methodParamValue = null;
             $mp = $this->_methodParamName;
             if (isset($this->_rqData[$mp])) {
@@ -290,20 +269,10 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
      */
     function getUrl($extraParams = array(), $preserveCurrentParams = false) {
         if (!$this->_context instanceof Ac_Legacy_Controller_Context_Http) return;
-        if ($this->_autoStateVars || $this->_stateData) {
+        if ($this->_stateData) {
             $ctx = clone $this->_context;
             if (!$preserveCurrentParams) $ctx->setData(array());
-            $state = $this->_stateData;
-            foreach ($this->_autoStateVars as $vn) {
-                $vv = false;
-                if (is_callable($call = array($this, $cName = 'get'.ucfirst($vn)))) {
-                    $vv = $this->$cName();
-                } elseif (isset($this->{$vn})) $vv = $this->$vn;
-                if (($vv !== false) && !is_null($vv)) {
-                    $state[$vn] = $vv;
-                }
-            }
-            $ctx->updateData($state);
+            $ctx->updateData($this->_stateData);
         } else {
             $ctx = $this->_context;
         }
@@ -313,65 +282,152 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
     
     // --------------------- response-related methods ---------------------
     
-    function getResponseClass() {
-        $this->bindFromRequest();
-        return $this->_defaultResponseClass;
-    }
-    
     function execute() {
     }
     
     function execFallback($methodParamValue = null) {
     }
     
+    
+    // TODO: add mixin support
+    protected function calcAndValidateMethodArgs($methodName, array $positionalArgs = array()) {
+        $signature = Ac_Accessor::getMethodSignature(get_class($this), $methodName);
+        $pos = 0;
+        $numPositional = count($positionalArgs);
+        $res = array();
+        foreach ($signature as $arg => $info) {
+            $hasValue = false;
+            $value = false;
+            if ($pos < $numPositional) {
+                $hasValue = true;
+                $value = $positionalArgs[$pos];
+            } else {
+                $value = $this->_context->getData($arg, false);
+                $hasValue = $value !== false;
+            }
+            if ($hasValue) {
+                $res[] = $value;
+            } else {
+                if (!$info['optional']) {
+                    throw new Ac_E_ControllerException("Bad request: required parameter '{$arg}' is missing", 400);
+                }
+                $res[] = $info['defaultValue'];
+            }
+            $pos++;
+        }
+        return $res;
+    }
+    
+    function calcUrlMapperConfig() {
+        $res = array('class' => 'Ac_UrlMapper_StaticSignatures', 'controllerClass' => get_class($this));
+        return $res;
+    }
+    
+    /**
+     * @return Ac_Cache_Abstract
+     */
+    function getCache() {
+        if (is_object($this->cache)) return $this->cache;
+        if ($this->cache === false) return null;
+        if ($this->cache === true) $this->cache = $this->getApplication()->getCache();
+        elseif (is_array($this->cache)) $this->cache = Ac_Util::m(Ac_Cache_Abstract::getDefaultPrototype(), $this->cache);
+        $this->cache = Ac_Prototyped::factory($this->cache, 'Ac_Cache_Abstract');
+        return $this->cache;
+    }
+    
+    function setCache($cache) {
+        $this->cache = $cache;
+    }
+    
+    /**
+     * @return Ac_Cache_Accessor
+     */
+    protected function getSimpleCachingAccessor(array $getResponseMethodArgs) {
+        if (!$this->simpleCaching || $this->_context->requestMethod !== 'get') return new Ac_Cache_Accessor('');
+        $id['responseMethodArgs'] = $getResponseMethodArgs;
+        $id['baseUrl'] = (string) $this->_context->getBaseUrl();
+        $id['contextData'] = $this->_context->getData();
+        if ($this->simpleCacheExtra) $id['simpleCacheExtra'] = Ac_Util::getObjectProperty($this, $this->simpleCacheExtra);
+        $c = $this->getCache();
+        return new Ac_Cache_Accessor($id, $c, $this->_instanceId);
+    }
+    
+    /**
+     * @return Ac_Legacy_Controller_Response_Html
+     */
+    function getLastResponse() {
+        return $this->_response;
+    }
+    
     /**
      * @return Ac_Legacy_Controller_Response_Html
      */
     function getResponse($methodName = false) {
+        $this->hitCache = false;
+        if ($methodName !== false && strncmp($methodName, ($s = 'execute'), strlen($s))) {
+            $methodName = 'execute'.ucfirst($methodName);
+        }
+        
+        if ($this->_response) return $this->_response;
+        
+        $simpleCachingAccessor = $this->getSimpleCachingAccessor(func_get_args());
+        if ($resp = $simpleCachingAccessor->getData()) {
+            $this->hitCache = true;
+            $this->_response = $resp;
+            return $this->_response;
+        }
+            
         if ($methodName !== false) $this->_methodName = $methodName;
-        $validRequest = $this->isRequestValid();
-        if (!$validRequest && $this->_errorMethodName) {
-            $this->_methodName = $this->_errorMethodName;
+        $validRequest = $this->isRequestValid(); // TODO: makes no sense since we don't know if request is valid at this moment
+        if (!$validRequest) {
+            throw new Ac_E_ControllerException("Bad request", 400);
         }
-        if ($validRequest || $this->_errorMethodName) {
-            if ($this->_response === false) {
-                if ($this->_outputToResponse || ($this->_outputToTemplate !== false)) {
-                    ob_start();
-                }
-                $rc = $this->getResponseClass();
-                $this->_response = new $rc;
-                if ($this->doBeforeExecute($methodName) !== false) {
-                    if ($m = $this->getMethodName()) {
-                        $result = $this->$m();
-                        if ($this->_resultToResponseVar) $this->_response->{$this->_resultToResponseVar} = $result;
-                    } else {
-                        $this->execFallback($this->getMethodParamValue());
-                    }
-                }
-                $this->doAfterExecute();
-                if ($this->_outputToTemplate !== false) {
-                    $this->_tplData[$this->_outputToTemplate] = ob_get_contents();
-                    if (!$this->_outputToResponse) ob_end_clean();
-                }
-                                    
-                $this->getTemplate();
-                if (strlen($this->_templatePart) && $this->_template) {
-                    $this->_response->content .= $this->_template->fetch($this->_templatePart);
-                }
-                $this->doPopulateResponse();
-                if ($this->_outputToResponse) {
-                    if (is_string($this->_outputToResponse)) $v = $this->_outputToResponse;
-                        else $v = 'content';
-                    $this->_response->$v = ob_get_clean().$this->_response->content;
-                }
-                $res = $this->_response;
+        ob_start();
+        if (!strlen($this->_responseClass)) {
+            throw Ac_E_InvalidUsage(__CLASS__.': _responseClass not set');
+        }
+        $this->_response = new $this->_responseClass;
+        if ($this->doBeforeExecute($methodName) !== false) {
+            if ($m = $this->getMethodName()) {
+                if (func_num_args() > 1) {
+                    $posArgs = func_get_args();
+                    array_shift($posArgs);
+                } else $posArgs = array();
+                $methodArgs = $this->calcAndValidateMethodArgs($m, $posArgs);
+                if ($methodArgs) $result = call_user_func_array(array($this, $m), $methodArgs);
+                else $result = $this->$m();
+                // TODO: improve magic result handling here
+                if ($this->_resultToResponseVar) $this->_response->{$this->_resultToResponseVar} = $result;
             } else {
-                $res = $this->_response;
+                $this->execFallback($this->getMethodParamValue());
             }
-        } else {
-            $res = false;
         }
-        return $res;
+        $this->doAfterExecute();
+        $outputBuffer = ob_get_clean();
+        $handledOutput = !strlen($outputBuffer);
+        // TODO: automatically detect template class and template part
+        $template = $this->getTemplate();
+        $willRenderTemplate = $template && strlen($this->_templatePart);
+        if (!$handledOutput && $willRenderTemplate) {
+            if ($this->_outputToTemplate !== false) {
+                $this->_tplData[$this->_outputToTemplate] = $outputBuffer;
+                $handledOutput = true;
+            }
+        }
+        if (!$handledOutput) {
+            if ($this->_outputToResponse === self::OUTPUT_RESPONSE_PREPEND) {
+                $this->_response->content = $outputBuffer.$this->_response->content;
+            } elseif ($this->_outputToResponse === self::OUTPUT_RESPONSE_APPEND) {
+                $this->_response->content .= $outputBuffer;
+            } else {
+            }
+            $handledOutput = true;
+        }
+        if ($willRenderTemplate) {
+            $this->_response->content .= $template->fetch($this->_templatePart);
+        }
+        if ($this->simpleCaching) $simpleCachingAccessor->put($this->_response);
+        return $this->_response;
     }
     
     /**
@@ -379,7 +435,6 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
      */
     function getTemplate() {
         if ($this->_template === false) {
-            $this->doBeforeGetTemplate();
             if ($tc = $this->_templateClass) {
                 $this->_template = new $tc();
                 if ($this->_response === false) {
@@ -389,7 +444,6 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
                 }
                 $this->_template->htmlResponse = $this->_response;
                 $this->_template->setVars($this->_getTplData());
-                $this->doPopulateTemplate();
             }
         }
         return $this->_template;
@@ -399,17 +453,13 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
         return $this->_instanceId;
     }
 
-    function _listAutoTplVars() {
-        return $this->_autoTplVars;
-    }
-    
     function _getTplData() {
         $res = Ac_Util::m($this->templateExtraVars, $this->_tplData);
         $res['controller'] = $this;
         $res['context'] = $this->getContext();
         $res['newUi'] = true;
         $myVars = array_keys(get_object_vars($this));
-        foreach ($this->_listAutoTplVars() as $myVar => $tplVar) {
+        foreach ($this->_autoTplVars as $myVar => $tplVar) {
             if (is_numeric($myVar)) $myVar = $tplVar;
             if (!isset($res[$tplVar])) {
                 $val = false;
@@ -438,6 +488,10 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller {
     function getApplication() {
         if (!$this->application) return Ac_Application::getDefaultInstance();
         return $this->application;
-    }    
+    }
+    
+    function getHitCache() {
+        return $this->hitCache;
+    }
     
 }

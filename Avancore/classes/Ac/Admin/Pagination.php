@@ -169,8 +169,10 @@ class Ac_Admin_Pagination extends Ac_Legacy_Controller {
     
     // ------------------------------ template methods ---------------------------------
 
-    function doPopulateTemplate() {
-        $this->_template->populate($this, $this->_context, $this->_getNumPages(), $this->_getRecordsPerPageValues());
+    function getTemplate() {
+        if (is_object($this->_template)) return $this->_template;
+        $res = parent::getTemplate();
+        $res->populate($this, $this->_context, $this->_getNumPages(), $this->_getRecordsPerPageValues());
     }
     
     function doPopulateResponse() {

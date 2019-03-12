@@ -600,22 +600,20 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $res['filterForm'] = $ff;
             }
         }
-        
-        //if (isset($this->_rqData['pagination'])) $res['pagination'] = $this->_rqData['pagination'];
-        //if (isset($this->_rqData['order'])) $res['order'] = $this->_rqData['order'];
         return $res;
     }
     
     // -------------------------------------- response generation methods ---------------------------------------------
     
     
-    function doPopulateTemplate() {
-        $this->_template->setManager($this);
-    }
-    
-    function doPopulateResponse() {
-        //$template = $this->getTemplate();
-        //$this->_response->content = $template->fetch('manager');
+    /**
+     * @return Ac_Admin_Template
+     */
+    function getTemplate() {
+        if (is_object($this->_template)) return $this->_template;
+        $res = parent::getTemplate();
+        $res->setManager($this);
+        return $res;
     }
     
     function getProcessingParamName($mapped = false) {
@@ -742,14 +740,6 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             }
         }
         return $this->_filterForm;
-    }
-    
-    /**
-     * @return Ac_Admin_Template
-     */
-    function getTemplate() {
-        $res = parent::getTemplate();
-        return $res;
     }
     
     function listAllFeatureClasses() {

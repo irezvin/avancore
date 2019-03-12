@@ -281,7 +281,7 @@ class Ac_Test_Cr extends Ac_Test_Base {
             'getUsedParams() should return used params in their order, including NULLs for inexistent ones'
         );
         $this->assertEqual(
-            urldecode($ctx->createUrl().''),
+            $r = urldecode($ctx->createUrl().''),
             'http://example.com/some/long/path?foo[fooKey2]=fooVal2',
             'createUrl() for context without path prefix but with used params'
         );

@@ -1,18 +1,16 @@
 <?php
 
-class Ac_Cache extends Ac_Prototyped {
+class Ac_Cache extends Ac_Cache_Abstract {
     
     protected $cacheDir = false;
-    
-    var $enabled = true;
-    
-    var $lifetime = 3600;
     
     var $ignoreUserAbort = true;
     
     var $useLocking = true;
     
     var $globalPrefix = 'ae_';
+    
+    var $autoCleanup = true;
     
     /**
      * Number of subdirectories that cache files reside in (subdirectory names are created by first letters of hash.
@@ -30,8 +28,6 @@ class Ac_Cache extends Ac_Prototyped {
      */
     var $groupsToDirs = true;
     
-    var $defaultGroup = 'default';
-    
     /**
      * Cache will be cleaned every $cleanupInterval seconds
      * @var int
@@ -47,6 +43,13 @@ class Ac_Cache extends Ac_Prototyped {
     
     function hasPublicVars() {
         return true;
+    }
+
+    /**
+     * @return Ac_Cache_Accessor
+     */
+    function accessor($id, $group = false) {
+        return new Ac_Cache_Accessor($id, $this, $group);
     }
 
     static function getDefaultCacheDir() {
@@ -118,23 +121,19 @@ class Ac_Cache extends Ac_Prototyped {
         return $this->util;
     }
     
-    function has($id, $group = false, & $howOld = null, $lifetime = false, & $filename = null) {
+    protected function implHas($id, $group, & $howOld, $lifetime, & $filename) {
         $res = false;
-        $howOld = false;
-        if ($lifetime === false) $lifetime = $this->lifetime;
-        if ($this->enabled) {
-            $filename = $this->getFilename($id, $group);
-            if (file_exists($filename)) {
-                $howOld = time() - filemtime($filename);
-                if (!$lifetime || $howOld <= $lifetime) $res = true;
-            }
+        $filename = $this->getFilename($id, $group);
+        if (file_exists($filename)) {
+            $howOld = time() - filemtime($filename);
+            if (!$lifetime || $howOld <= $lifetime) $res = true;
         }
         return $res;
     }
     
-    function get($id, $group = false, $default = null, $evenOld = false) {
+    protected function implGet($id, $group, $default, $evenOld) {
         
-        if (!$this->triedCleanup) $this->tryCleanup();
+        if ($this->autoCleanup && !$this->triedCleanup) $this->tryCleanup();
         
         if ($this->has($id, $group, $howOld, $evenOld? $this->lifetime : 0, $filename)) {
             $res = file_get_contents($filename);
@@ -168,69 +167,71 @@ class Ac_Cache extends Ac_Prototyped {
         return $fn;
     }
     
-    function put($id, $content, $group = false) {
+    function implPut($id, $content, $group) {
         
-        if ($this->enabled) {
+        $res = false;
 
-            if (!$this->triedCleanup) $this->tryCleanup();
+        if (!$this->triedCleanup) $this->tryCleanup();
 
-            $fn = $this->getFilename($id, $group);
+        $fn = $this->getFilename($id, $group);
 
-            $this->getUtil()->mkDirRecursive(dirname($fn));
-            
-            if ($this->useLocking) {
-                if (is_file($lock = $fn.'.lock')) return false;
-                else touch($lock); 
-            }
+        $this->getUtil()->mkDirRecursive(dirname($fn));
 
-            if ($this->ignoreUserAbort) {
-                $ia = ini_get('ignore_user_abort');
-                if (!$ia) ini_set('ignore_user_abort', true);
-            }
-
-            if (file_put_contents($fn, $content)) 
-                $res = $fn;
-            else
-                $res = false;
-
-            if ($this->ignoreUserAbort && !$ia) ini_set('ignore_user_abort', false);
-            if ($this->useLocking) unlink($lock);
-            
-        } else {
-            $res = false;
+        if ($this->useLocking) {
+            if (is_file($lock = $fn.'.lock')) return false;
+            else touch($lock); 
         }
+
+        if ($this->ignoreUserAbort) {
+            $ia = ini_get('ignore_user_abort');
+            if (!$ia) ini_set('ignore_user_abort', true);
+        }
+
+        if (file_put_contents($fn, $content)) 
+            $res = $fn;
+        else
+            $res = false;
+
+        if ($this->ignoreUserAbort && !$ia) ini_set('ignore_user_abort', false);
+        if ($this->useLocking) unlink($lock);
             
         return $res;
     }
     
-    function delete($id, $group = false) {
+    protected function implDelete($id, $group) {
         
-        if ($this->enabled) {
+        $res = false;
+        if (!$this->triedCleanup) $this->tryCleanup();
 
-            if (!$this->triedCleanup) $this->tryCleanup();
-
-            $fn = $this->getFilename($id, $group);
-            if (is_file($fn)) {
-                $res = unlink($fn);
-            } else {
-                $res = false;
-            }
-        } else {
-            $res = false;
+        $fn = $this->getFilename($id, $group);
+        if (is_file($fn)) {
+            $res = unlink($fn);
         }
         return $res;
+    }
+
+    protected function getCleanupFileName() {
+        $fn = $this->cacheDir.DIRECTORY_SEPARATOR.$this->globalPrefix.'.cleanup';
+        return $fn;
     }
     
     function hasToCleanup() {
         $res = false;
         if (is_dir($this->cacheDir)) {
-            $fn = $this->cacheDir.DIRECTORY_SEPARATOR.$this->globalPrefix.'.cleanup';
+            $fn = $this->getCleanupFileName();
             if (is_file($fn)) { 
                 $t = filemtime($fn);
                 if ((time() - $t) >= $this->cleanupInterval) $res = $fn;   
             } else touch($fn);
         }
         return $res;
+    }
+
+    function cleanup() {
+        if (is_dir($this->cacheDir)) {
+            $this->getUtil()->purgeRecursive($this->cacheDir, $this->lifetime);
+            touch($this->getCleanupFileName());
+        }
     }
     
     function tryCleanup($force = false) {

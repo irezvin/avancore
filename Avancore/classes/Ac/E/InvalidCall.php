@@ -96,7 +96,7 @@ class Ac_E_InvalidCall extends Exception {
             $plural = (count($key) > 1);
             $key = implode("', '", $key);
         }
-        $msg = $plural? "$title '{$key}' already exist" : "$title '{$key}' already exist";
+        $msg = $plural? "$title '{$key}' already exists" : "$title '{$key}' already exists";
         if ($removeFn) $msg .= "; remove with {$removeFn}() first";
         return new Ac_E_InvalidCall($msg);
     }

@@ -475,6 +475,16 @@ class Ac_Result extends Ac_Prototyped implements Ac_I_StringObject_Container, Ac
         $this->touchStringObjects();
     }
     
+    function prepend($content, $_ = null) {
+        $args = func_get_args();
+        foreach (array_reverse($args) as $cnt) {
+            if (is_object($cnt) && ! $cnt instanceof Ac_I_StringObject && $cnt instanceof Ac_I_WithOutput)
+                $cnt = new Ac_StringObject_Wrapper($cnt);
+            $this->content = $cnt.$this->content;
+        }
+        $this->touchStringObjects();
+    }
+    
     function insertAtPosition($position, $content) {
         $this->content = substr($this->content, 0, $position).$content.substr($this->content, $position);
         $this->touchStringObjects();

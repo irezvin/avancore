@@ -309,8 +309,8 @@ class Ac_Url implements Ac_I_RedirectTarget {
      * @return Ac_Url
      */
     static function guess($withPathInfo = false, array $server = null) {
-        if (!isset($server)) {            
-            if (!isset($_SERVER)) return new Ac_Url("http://localhost/");
+        if (!isset($server)) {
+            if (!isset($_SERVER) || !isset($_SERVER['REQUEST_URI'])) return new Ac_Url("http://localhost/");
             else $server = $_SERVER;
         }
         $scheme = 'http';
@@ -329,36 +329,38 @@ class Ac_Url implements Ac_I_RedirectTarget {
             else $uri = '/';
         
         $res = new Ac_Url($scheme.'://'.$host.$uri);
+        
         if ($withPathInfo) {
-            if (isset($server['PATH_INFO'])) {
-                $myPathInfo = $server['PATH_INFO'];
-                $res->path = $server['SCRIPT_NAME'];
-                if (isset($server['PATH_INFO'])) $res->pathInfo = $server['PATH_INFO'];
+            $res->pathInfo = self::guessPathInfo($server['REQUEST_URI'], $server['SCRIPT_NAME'], $res->path);
+        }
+        return $res;
+    }
+    
+    static function guessPathInfo($requestUri, $scriptName, & $resultPath = null) {
+        $scriptPath = explode('/', $scriptName);
+        $requestPath = explode('?', $requestUri, 2); // strip everything after '?'
+        $requestPath = explode('/', $requestPath[0]);
+        $path = array();
+        $maxLen = min(count($scriptPath), count($requestPath));
+        for ($i = 0; $i < $maxLen && ($scriptPath[$i] == $requestPath[$i]); $i++) {
+            $path[] = $scriptPath[$i];
+            unset($requestPath[$i]);
+        }
+        $resultPath = implode('/', $path);
+        if (count($requestPath)) $pathInfo = implode('/', $requestPath);
+        else $pathInfo = '';
+        if (substr($resultPath, -1) !== '/' && ($pathInfo !== false && substr($pathInfo, 0, 1) !== '/')) {
+            // replace paths like 'http://example.com/foo' with '/foo/', but leave /index.php without trailing backslash
+            $fileSpecified = basename($scriptName) == basename($resultPath);
+            if (!$fileSpecified) {
+                $resultPath = $resultPath.'/';
             } else {
-                $sn = explode('/', $server['SCRIPT_NAME']);
-                $ru = $server['REQUEST_URI'];
-                if (isset($server['QUERY_STRING']) && ($l = strlen($server['QUERY_STRING']))) $ru = substr($ru, 0, strlen($ru) - $l - 1);
-                $ru = explode('/', $ru);
-                $path = array();
-                $maxLen = min(count($sn), count($ru));
-                for ($i = 0; $i < $maxLen && ($sn[$i] == $ru[$i]); $i++) {
-                    $path[] = $sn[$i];
-                    unset($ru[$i]);
-                }
-                $res->path = implode('/', $path);
-                if (count($ru)) $res->pathInfo = implode('/', $ru);
-                if (substr($res->path, -1) !== '/' && ($res->pathInfo !== false && substr($res->pathInfo, 0, 1) !== '/')) {
-                    // replace paths like 'http://example.com/foo' with '/foo/', but leave /index.php without trailing backslash
-                    $fileSpecified = basename($server['SCRIPT_NAME']) == basename($res->path);
-                    if (!$fileSpecified) {
-                        $res->path = $res->path.'/';
-                    } else {
-                        $res->pathInfo = '/'.$res->pathInfo;
-                    }
+                if (strlen($pathInfo)) {
+                    $pathInfo = '/'.$pathInfo;
                 }
             }
         }
-        return $res;
+        return $pathInfo;
     }
     
     function isFullyQualified() {
@@ -469,7 +471,7 @@ class Ac_Url implements Ac_I_RedirectTarget {
      * 
      * @return Ac_Url
      */
-    static function guessBase(array $server = array()) {
+    static function guessBase(array $server = null) {
         $res = Ac_Url::guess(true, $server);
         $res->setPathInfo('');
         if (substr($res->path, -1) !== '/') $res->path = dirname($res->path).'/';

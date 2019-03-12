@@ -22,6 +22,8 @@ class Ac_Accessor implements Ac_I_Accessor {
      */
     protected $errors = array();
     
+    protected static $methodSignatures = array();
+    
     function getSrc() {
         return $this->src;
     }
@@ -459,5 +461,32 @@ class Ac_Accessor implements Ac_I_Accessor {
             return self::methodExists($name[0], $name[1]);
         } else return is_callable ($name);
     }
+    
+    static function getMethodSignature($class, $method) {
+        if (!isset(self::$methodSignatures[$key = $class.'::'.$method])) {
+            self::$methodSignatures[$key] = array();
+            $m = new ReflectionMethod($class, $method);
+            foreach ($m->getParameters() as $param) {
+                $s = $param.'';
+                $class = false;
+                if (!$param->isArray()) {
+                    $ss = explode(">", $s, 2);
+                    $s1 = explode(" ", ltrim($ss[1], ' '), 2);
+                    if ($s1[0]{0} !== '$') $class = $s1{0};
+                }
+                /* @var $param ReflectionParameter */
+                self::$methodSignatures[$key][$paramName = $param->getName()] = array(
+                    'name' => $param->getName(),
+                    'class' => $class,
+                    'isArray' => $param->isArray(),
+                    'optional' => $param->isOptional(),
+                    'defaultValue' => $param->isOptional()? $param->getDefaultValue() : null,
+                    'string' => $s,
+                    'readable' => preg_replace('/^[^>]+> /', '', rtrim($s, ' ]')),
+                );
+            }
+        }
+        return self::$methodSignatures[$key];
+    }    
     
 }

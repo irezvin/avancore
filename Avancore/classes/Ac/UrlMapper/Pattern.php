@@ -20,7 +20,7 @@ class Ac_UrlMapper_Pattern extends Ac_Prototyped {
     
     function __construct(array $prototype = array()) {
         parent::__construct($prototype);
-        if ($this->definition === null) throw Ac_E_InvalidCall("\$options['definition'] is required");
+        if ($this->definition === null) throw new Ac_E_InvalidCall("\$options['definition'] is required");
     }
     
     /**
@@ -211,13 +211,19 @@ class Ac_UrlMapper_Pattern extends Ac_Prototyped {
     function moveParamsToString(array & $params) {
         foreach ($this->params as $param => $condition) {
             // missing paramument
-            if (!array_key_exists($param, $params)) return;
             if (is_string($condition)) { // check that param matches regex
+                if (!array_key_exists($param, $params)) return;
                 if (!preg_match($condition, $params[$param])) return;
             } elseif ($condition === true) {
+                if (!array_key_exists($param, $params)) return;
                 if (!strlen($params[$param])) return;
             } elseif ($condition === false) {
-                if ((string) $params[$param] !== (string) $this->const[$param]) return;
+                if ($this->const[$param] === null) {
+                     if (isset($params[$param]) && strlen($params[$param])) return;
+                } else {
+                    if (!array_key_exists($param, $params)) return;
+                    if ((string) $params[$param] !== (string) $this->const[$param]) return;
+                }
             }
         }
         $res = '';

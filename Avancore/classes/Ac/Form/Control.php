@@ -306,7 +306,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     // ------------------------------ dataflow methods -----------------------------
     
     function isSubmitted() {
-        $this->bindFromRequest();
         if ($this->_submitted === '?') {
             if ($this->_parent) $this->_submitted = $this->_parent->isSubmitted();
                 else $this->_submitted = $this->_doIsSubmitted();
@@ -320,7 +319,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     function getValue() {
         if (!$this->_gotValue) {
-            $this->bindFromRequest();   
             if (!$this->isReadOnly()) {
                 $this->_value = $this->_doGetValue();
             } else {
@@ -331,7 +329,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
     
     function setValue($value) {
-        $this->bindFromRequest();
         $this->_rqData['value'] = $value;
     }
     
@@ -534,10 +531,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
     
     // ----------------------------- presentation-related methods --------------------
-    
-    function doPopulateResponse() {
-        
-    }
     
     /**
      * @param bool $refresh Whether presentation should be re-rendered even if it already has been calculated before. 
@@ -856,7 +849,6 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         if ($this->decodeHtmlEntitiesOnInput !== false) {
             $c = $this->decodeHtmlEntitiesOnInput === true? null : $this->decodeHtmlEntitiesOnInput;
             $this->_rqData = Ac_Util::htmlEntityDecode($this->_rqData, ENT_QUOTES, $c);
-            //echo('<p>'.'111'.Ac_Util::implode_r('<br />', $this->_rqData).'</p>');
         }
     }
     
@@ -992,7 +984,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     }
 
     function updateFromRequest() {
-        $this->_bound = false;
+        $this->bindFromRequest();
     }
     
     function updateFromModel() {

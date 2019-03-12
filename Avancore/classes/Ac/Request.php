@@ -47,6 +47,8 @@ class Ac_Request {
     const env = 'env';
     
     protected $accessors = array();
+    
+    protected $defaultSrc = array('post', 'get', 'cookie');
 
     /**
      * @param bool|null $stripSlashesGPC Strip slashes from global arrays GET, COOKIE & REQUEST
@@ -69,8 +71,6 @@ class Ac_Request {
         } else throw Ac_E_InvalidCall::noSuchProperty ($this, $name, array_keys(self::$map));
     }
     
-    protected $defaultSrc = array('post', 'get', 'cookie');
-    
     function getFullOverride($src) {
         if (!isset(self::$map[$src])) throw Ac_E_InvalidCall::outOfSet('src', $src, array_keys(self::$map));
         return isset($this->fullOverrides[$src]);
@@ -86,6 +86,18 @@ class Ac_Request {
         if (!isset(self::$map[$src])) throw Ac_E_InvalidCall::outOfSet('src', $src, array_keys(self::$map));
         $this->$src = $values;
         $this->setIsOverride($src, $isOverride);
+    }
+    
+    function updateValues($src, array $values, $noPriority = false) {
+        if ($this->$src === false) {
+            // TODO: fix this ugly mess
+            if ($noPriority) {
+                $this->$src = Ac_Util::m($values, $this->getValueFrom($src, []));
+            } else {
+                $this->$src = Ac_Util::m($this->getValueFrom($src, []), $values);
+            }
+        }
+        else Ac_Util::ms($this->$src, $values);
     }
     
     function setValueByPath($src, $path, $value) {
@@ -249,7 +261,9 @@ class Ac_Request {
      * @return array ('get' => array(), 'post' => array(), 'env' => array(), 'server' => array() -- what have (should have) been changed
      */
     function populate($url, $scriptName = false, $postData = false, $dontChange = false) {
-        $u = parse_url($url);
+        
+        // TODO: needs a lot of fixing (add cookies, postData; make pathInfo compatible with Ac_Url)
+
         if (is_array($postData)) {
             $post = $postData;
             $rm = 'POST';
@@ -257,22 +271,22 @@ class Ac_Request {
             $post = array();
             $rm = 'GET';
         }
+        $u = parse_url($url);
         $q = isset($u['query'])? $u['query'] : null;
         $serverData = array(
-            'SERVER_PROTOCOL' => strtoupper($u['scheme']),
+            'SERVER_PROTOCOL' => ($scheme = strtoupper($u['scheme'])),
             'HTTP_HOST' => $u['host'].(isset($u['port'])? ':'.$u['port'] : ''),
-            'PATH_INFO' => NULL,
             'REQUEST_METHOD' => $rm,
-            'REQUEST_URI' => $u['path'].(strlen($q)? '?'.$q : ''),
+            'REQUEST_URI' => ($requestUri = $u['path'].(strlen($q)? '?'.$q : '')),
             'QUERY_STRING' => $q,
         );
+        $pathInfo = Ac_Url::guessPathInfo($requestUri, $scriptName, $remainingPath);
+        if (strlen($pathInfo)) $serverData['PATH_INFO'] = $pathInfo;
+        if ($scheme === 'HTTPS') $serverData['HTTPS'] = 'ON';
         if (strlen($scriptName)) {
             $serverData['SCRIPT_NAME'] = $scriptName;
         } elseif ($scriptName === false) { 
             $scriptName = $this->getValueFrom(self::server, 'SCRIPT_NAME');
-        }
-        if (($l = strlen($scriptName)) && !strncmp($scriptName, $u['path'], $l)) {
-            $serverData['PATH_INFO'] = substr($u['path'], $l);
         }
         if (isset($u['query'])) {
             parse_str($u['query'], $get);
