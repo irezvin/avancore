@@ -52,6 +52,7 @@ class Ac_Table_Column_Published extends Ac_Table_Column {
         if (isset($this->settings['headerAttribs'])) $res = $this->settings['headerAttribs'];
             else $res = array('align' => 'center'/*, 'width' => '20'*/);
         $res['rowspan'] = $this->getHeaderRowspan($rowCount, $rowNo);
+        $res = array_merge(parent::getHeaderAttribs($rowCount, $rowNo), $res);
         return $res;
     }
     

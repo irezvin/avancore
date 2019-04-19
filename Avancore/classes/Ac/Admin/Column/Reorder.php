@@ -40,7 +40,7 @@ class Ac_Admin_Column_Reorder extends Ac_Table_Column_Reorder {
     }
     
     function orderUpIcon($condition=true, $javascript, $alt='Move up' ) {
-        $orderUpIcon = $this->orderUpIcon === false? $this->manager->getConfigService()->getImagePrefix().'../admin/uparrow.png' : $this->orderUpIcon;
+        $orderUpIcon = $this->orderUpIcon === false? $this->manager->getConfigService()->getImagePrefix().'/uparrow.png' : $this->orderUpIcon;
         if ($condition) {
             return '<a href="#reorder" onClick="'.$javascript.'" title="'.$alt.'">
                 <img src="'.$orderUpIcon.'" width="12" height="12" border="0" alt="'.$alt.'" />
@@ -51,7 +51,7 @@ class Ac_Admin_Column_Reorder extends Ac_Table_Column_Reorder {
     }
     
     function orderDownIcon($condition=true, $javascript, $alt='Move down' ) {
-        $orderDownIcon = $this->orderDownIcon === false? $this->manager->getConfigService()->getImagePrefix().'../admin/downarrow.png' : $this->orderDownIcon;
+        $orderDownIcon = $this->orderDownIcon === false? $this->manager->getConfigService()->getImagePrefix().'/downarrow.png' : $this->orderDownIcon;
         if ($condition) {
             return '<a href="#reorder" onClick="'.$javascript.'" title="'.$alt.'">
                 <img src="'.$orderDownIcon.'" width="12" height="12" border="0" alt="'.$alt.'" />

@@ -187,13 +187,17 @@ class Ac_Sql_Part extends Ac_Prototyped {
     /**
      * @access protected
      */
-    function _applyPrefix($array) {
+    function _applyPrefix($value) {
         $px = $this->getIdWithPrefix();
         if (strlen($px)) {
-            $res = array();
-            foreach (array_keys($array) as $k) $res[$px.'.'.$k] = & $array[$k];
+            if (is_array($value)) {
+                $res = array();
+                foreach (array_keys($value) as $k) $res[$px.'.'.$k] = & $value[$k];
+            } else {
+                $res = array($px => $value);
+            }
         } else {
-            $res = $array;
+            $res = $value;
         }
         return $res;
     }

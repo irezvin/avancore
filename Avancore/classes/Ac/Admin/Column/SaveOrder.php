@@ -21,7 +21,7 @@ class Ac_Admin_Column_SaveOrder extends Ac_Table_Column_SaveOrder {
             $this->getTaskName(), true
         ));
         
-        $saveOrderIcon = $this->saveOrderIcon === false? $this->manager->getConfigService()->getImagePrefix().'../admin/tick.png' : $this->saveOrderIcon;
+        $saveOrderIcon = $this->saveOrderIcon === false? $this->manager->getConfigService()->getImagePrefix().'tick.png' : $this->saveOrderIcon;
         
         ?>
         <th <?php echo Ac_Util::mkAttribs($this->getHeaderAttribs($rowCount, $rowNo)); ?> > 
