@@ -15,10 +15,10 @@ class Ac_Sql_Dbi_Inspector_MySql5 extends Ac_Sql_Dbi_Inspector {
         foreach($al = $this->_db->fetchArray($q, 'COLUMN_NAME') as $colName => $colData) {
             if (isset($cols[$colName])) {
                 if ($colData['COLUMN_COMMENT']) $cols[$colName]['comment'] = $colData['COLUMN_COMMENT'];
-                $cols[$colName]['default'] = $colData['COLUMN_DEFAULT'];
+                $def = $this->processDefault($colData['COLUMN_DEFAULT'], true);
+                $cols[$colName]['default'] = $def;
             }
         }
-        //var_dump($tableName, $cols);
         return $cols;
     }
     
@@ -45,6 +45,26 @@ class Ac_Sql_Dbi_Inspector_MySql5 extends Ac_Sql_Dbi_Inspector {
             $res[$cName]['columns'][$relData['col']] = $relData['refcol'];
         }
         return $res;
+    }
+    
+    protected function processDefault($default, $fromTableSchema = false) {
+        if (!$fromTableSchema) return parent::processDefault ($default);
+        $original = $default;
+        if (!$this->getIsMariaDb102plus()) return $default;
+        if ($default === 'current_timestamp()') $default = 'CURRENT_TIMESTAMP';
+        elseif (strlen($default) > 1 && $default[0] === "'" && substr($default, -1) === "'") {
+            $default = str_replace("''", "'", substr($default, 1, -1)); // mariadb escapes quotes by doubling them
+            $default = stripslashes($default);
+        } elseif (is_null($default) || $default === 'NULL') {
+            $default = null;
+        } elseif (is_numeric($default)) {
+            /*if (round($default) == $default) $default = (int) $default;
+                else $default = (float) $default;*/
+        } else {
+            trigger_error("Expression default value found: '{$original}'", E_USER_NOTICE);
+            $default = new Ac_Sql_Expression($default);
+        }
+        return $default;
     }
 
 }

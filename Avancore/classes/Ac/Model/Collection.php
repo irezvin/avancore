@@ -343,6 +343,7 @@ class Ac_Model_Collection {
     }
     
     function setLimits($offset = false, $count = false) {
+        if ($this->_limitOffset === $offset && $this->_limitCount === $count) return;
         if (!$this->_canSetLimits) trigger_error ("Can't change params of collection that is already open", E_USER_ERROR);
         $this->_limitOffset = $offset;
         $this->_limitCount = $count;
@@ -588,6 +589,17 @@ class Ac_Model_Collection {
     
     function getPkName() {
         return $this->_pkName;
+    }
+    
+    function __clone() {
+        $this->_sqlTail = false;
+        $this->_open = false;
+        $this->_currPos = false;
+        $this->_currKey = false;
+        $this->_dbResult = false;
+        $this->_records = false;
+        $this->_keys = false;
+        $this->_canSetLimits = true;
     }
         
 }

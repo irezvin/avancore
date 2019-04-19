@@ -1,6 +1,10 @@
 <?php
 
 class Ac_Result_Template extends Ac_Result {
+
+    const CONTENT_MERGE_DROP = 0;
+    const CONTENT_MERGE_PREPEND = 1;
+    const CONTENT_MERGE_APPEND = 2;
     
     protected $writeOnStore = true;
 
@@ -28,6 +32,16 @@ class Ac_Result_Template extends Ac_Result {
     protected $partArgs = array();
     
     protected $templateProperties = array();
+    
+    protected $contentMergeMode = Ac_Result_Template::CONTENT_MERGE_PREPEND;
+
+    function setContentMergeMode($contentMergeMode) {
+        $this->contentMergeMode = $contentMergeMode;
+    }
+
+    function getContentMergeMode() {
+        return $this->contentMergeMode;
+    }    
     
     function setTemplate($template) {
         if ($template !== ($oldTemplate = $this->template)) {
@@ -132,6 +146,10 @@ class Ac_Result_Template extends Ac_Result {
         $tpl = $this->getTemplateInstance();
         if (!($tpl)) throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() without template or templateInstance set");
         $res = $tpl->renderResultWithArgs($pn, $this->partArgs);
+        if ($this->contentMergeMode !== self::CONTENT_MERGE_DROP && strlen($ownContent = $this->getContent())) {
+            if ($this->contentMergeMode === self::CONTENT_MERGE_APPEND) $res->put($this->getContent());
+            if ($this->contentMergeMode === self::CONTENT_MERGE_PREPEND) $res->prepend($this->getContent());
+        }
         if ($w = $this->getRenderedResultWriter()) {
             $w = Ac_Prototyped::factory($w, 'Ac_Result_Writer');
             $res->setWriter($w);

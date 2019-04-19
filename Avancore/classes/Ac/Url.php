@@ -321,4 +321,58 @@ class Ac_Url implements Ac_I_RedirectTarget {
 
     }
     
+    
+    function isFullyQualified() {
+        return strlen($this->scheme) && strlen($this->host);
+    }
+    
+    /**
+     * @return Ac_Url
+     */
+    function resolve($baseUrl) {
+        if ($this->isFullyQualified()) return clone $this;
+        if ($baseUrl instanceof Ac_Url) $b = $baseUrl;
+        else $b = new Ac_Url($baseUrl);
+        $res = clone $this;
+        if (!strlen($res->scheme)) $res->scheme = $b->scheme;
+        if (!strlen($res->host)) $res->host = $b->host;
+        if (substr($res->path, 0, 1) === '/') {
+            // nothing to do
+            return $res;
+        }
+        
+        // resolve the path
+        $path = $b->path;
+        if (!strlen($res->path)) {
+            $res->path = $path;
+            return $res;
+        }
+        if (substr($path, -1) !== '/') $path = dirname($path);
+        $path = str_replace('//', '/', rtrim($path, '/').'/'.ltrim($res->path, '/'));
+        if (preg_match('#(^|/)\.\.?(/|$)#', $path)) { // have "/../" or "/.." in the path - must resolve
+            $resPathAbsolute = strlen($path) || substr($path, 0, 1) === '/';
+            $path = explode('/', $path);
+            $i = 0;
+            while ($i < count($path)) {
+                $curr = $path[$i];
+                if ($curr === '.' || $curr === '') {
+                    array_splice($path, $i, 1);
+                } elseif ($curr === '..') {
+                    if ($i > 1) {
+                        array_splice($path, $i - 1, 2);
+                        $i--;
+                    } else {
+                        array_splice($path, $i, 1);
+                    }
+                } else {
+                    $i++;
+                }
+            }
+            $path = implode('/', $path);
+            if ($resPathAbsolute) $path = '/'.$path;
+        }
+        $res->path = $path;
+        return $res;
+    }
+    
 }

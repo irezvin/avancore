@@ -98,7 +98,7 @@ class Ac_Model_DateTime {
     function c4 ($v) {return str_pad($v, 4, '0', STR_PAD_LEFT);}
     function iv ($v) {return intval($v);}
         
-    function Ac_Model_DateTime() {
+    function __construct() {
         $this->debug = isset($_REQUEST['_debugDate']);
         $this->rxs = array();
         $this->subRegs = array();
@@ -139,7 +139,7 @@ class Ac_Model_DateTime {
                 static $defaults = array ('mday' => 1, 'month' => 1, 'year' => 1970, 'hours' => 0, 'minutes' => 0, 'seconds' => 0);
                 $v = array_merge($defaults, $array);
                 $f = $useGmt? 'gmmktime' : 'mktime';
-                $timestamp = $f($v['hours'] + 12, $v['minutes'], $v['seconds'], $v['month'], $v['mday'], $v['year']) - 12*3600;                
+                $timestamp = $f($v['hours'], $v['minutes'], $v['seconds'], $v['month'], $v['mday'], $v['year']);
             } else {
                 $timestamp = $this->getZeroDateValue();
             }

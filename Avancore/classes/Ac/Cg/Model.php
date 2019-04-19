@@ -102,6 +102,8 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     
     var $nullableSqlColumns = false;
     
+    var $modelBaseNameDecorator = false;
+    
     protected $relationPrototypes = false;
     
     protected $assocProperties = false;
@@ -315,6 +317,9 @@ class Ac_Cg_Model extends Ac_Cg_Base {
         if ($this->altDomainPrefix) $res = $this->altDomainPrefix.' '.$res;
             elseif ($this->_domain->appName && !$this->_domain->dontPrefixClassesWithAppName) $res = $this->_domain->appName.' '.$res;
         $res = Ac_Cg_Inflector::pearize($res);
+        if ($this->modelBaseNameDecorator) {
+            $res = Ac_Decorator::decorate ($this->modelBaseNameDecorator, $res);
+        }
         return $res;
     }
     
@@ -373,7 +378,7 @@ class Ac_Cg_Model extends Ac_Cg_Base {
             'single', 'plural', 'singleCaption', 'pluralCaption', 
             'fixMapperMethodNames', 
             'useLangStrings', 'langStringPrefix', 'tableLangStringPrefix',
-            'createAccessors'
+            'createAccessors', 'modelBaseNameDecorator'
         );
     }
     

@@ -72,6 +72,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
             } else {
                 if (method_exists($this, $m = 'get'.$propName)) $val = $this->$m();
                 else $val = $this->$propName;
+                if (is_null($val)) $val = $this->_context->getData($propName, null);
             }
             if ($forCache && $val instanceof Ac_Model_Object) $val = $val->getDataFields();
             $res[$propName] = $val;

@@ -6,6 +6,16 @@
 
 class Ac_Table_Column_Number extends Ac_Table_Column {
     
+    function setOffset($offset) {
+        $this->settings['offset'] = $offset;
+    }
+    
+    function getOffset() {
+        if (isset($this->settings['offset'])) $res = $this->settings['offset'];
+            else $res = 0;
+        return $res;
+    }
+    
     function getTitle() {
         if (isset($this->settings['title'])) $res = $this->settings['title'];
             else $res = "#";
@@ -13,7 +23,11 @@ class Ac_Table_Column_Number extends Ac_Table_Column {
     }
     
     function getData($record, $rowNo, $fieldName = null) {
-        $res = $this->_table->_pageNav->rowNumber($rowNo);
+        if ($this->_table->_pageNav) {
+            $res = $this->_table->_pageNav->rowNumber($rowNo);
+        } else {
+            $res = $this->getOffset() + $rowNo + 1;
+        }
         return $res;
     }    
     

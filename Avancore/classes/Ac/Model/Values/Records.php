@@ -42,6 +42,10 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
      */
     var $md5pk = true;
     
+    var $extraValuesBefore = array();
+    
+    var $extraValuesAfter = array();
+    
     protected $cachedExistingValues = array();
     
     function __construct ($data, $propName = false, $options = true, $isStatic = false, array $optionsOverride = array()) {
@@ -82,7 +86,7 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
             }
         }
         $ttls = $this->_mapper->getRecordTitles($where, $this->ordering, $this->extraJoins, $this->titleFieldName, $this->titleIsProperty, $this->valueFieldName, $this->valueIsProperty);
-        $res = array();
+        $res = $this->extraValuesBefore;
         if (is_array($ttls)) {
             if ($this->_cpk) {
                 if ($this->md5pk) {
@@ -100,7 +104,7 @@ class Ac_Model_Values_Records extends Ac_Model_Values {
                 }
             }
         }
-        
+        foreach ($this->extraValuesAfter as $k => $v) $res[$k] = $v;
         if ($this->cache) $this->_cachedValueList = $res;
         return $res;
     }

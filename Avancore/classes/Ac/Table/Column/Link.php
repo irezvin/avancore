@@ -17,6 +17,7 @@ class Ac_Table_Column_Link extends Ac_Table_Column {
     var $taskName = 'edit';
     var $linkTitle = 'Edit';
     var $staticLinkText = false;
+    var $linkTextField = false;
     var $hideMainMenu = true;
     var $urlExtraParams = array();
 
@@ -27,6 +28,7 @@ class Ac_Table_Column_Link extends Ac_Table_Column {
     }
     
     function getLinkText($record, $rowNo) {
+        if ($this->linkTextField) return parent::getData($record, $rowNo, $this->linkTextField);
         if ($this->staticLinkText) return $this->staticLinkText;
             else return parent::getData($record, $rowNo, $this->fieldName);
     }

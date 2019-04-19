@@ -33,9 +33,11 @@ class Ac_Table {
     var $_pageNav = null;
     
     /**
-     * @var array TABLE tag attribs array (to pass to the ormAe_Util::mkAttribs)
+     * @var array TABLE tag attribs array (to pass to the Ac_Util::mkAttribs)
      */
     var $tableAttribs = array();
+    
+    var $headerRowAttribs = array();
     
     /**
      * Prototype of record to retrieve static property info
@@ -186,7 +188,7 @@ class Ac_Table {
      * @return Ac_Model_Object
      */
     function _fetchNextRecord() {
-        $items = array_slice($this->records, $this->currentRecordNo, 1);
+        $items = array_slice($this->_records, $this->currentRecordNo, 1);
         if (count($items)) $res = $items[0];
             else $res = null;
         return $res;
@@ -199,9 +201,15 @@ class Ac_Table {
         
         $this->resetState();
         
-        echo "<table class='adminlist' ".Ac_Util::mkAttribs($this->tableAttribs)." >";
+        $attribs = $this->tableAttribs;
+        
+        if (!isset($attribs['class'])) $attribs['class'] = 'adminList';
+        
+        echo "<table ".Ac_Util::mkAttribs($this->tableAttribs).">";
         
         $headerRowCount = $this->getHeaderRowCount();
+        
+        $this->currentRowAttribs = $this->headerRowAttribs;
         
         foreach(range(0, $headerRowCount - 1) as $headerRowNo) {
             ob_start();
@@ -222,9 +230,7 @@ class Ac_Table {
         
         $this->currentRecordNo = 0;
         $this->currentRowNo = 0;
-        
         while($this->currentRecord = $this->_fetchNextRecord()) {
-            
             $rMod = $this->currentRowNo % 2;
             Ac_Decorator::pushModel($this->currentRecord);
             

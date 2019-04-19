@@ -552,7 +552,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $d['keys'][] = $this->getStrPk($rec);
         }
         */
-        $s = $this->getStateData($withFilterForm);
+        $s = $this->getStateData();
         $d = Ac_Util::m($s, $d, true);
         if (strlen($action)) $d[$this->_methodParamName] = $action;
         $c->setData($d);

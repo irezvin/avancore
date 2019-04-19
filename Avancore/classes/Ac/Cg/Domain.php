@@ -226,6 +226,11 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
     var $parentTableMap = array();
     
     /**
+     * Decorator to modify model names
+     */
+    var $modelNameDecorator = array();
+    
+    /**
      * If parent domain is set, list of the properties that shouldn't
      * be inherited from it
      */
@@ -426,6 +431,10 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
         $conf['table'] = $tableName;
         
         $name = Ac_Cg_Util::makeIdentifier($coolName);
+        
+        if ($this->modelNameDecorator) {
+            $name = Ac_Decorator::decorate($this->modelNameDecorator, $name);
+        }
         
         $overConf = array();
         

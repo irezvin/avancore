@@ -1,5 +1,3 @@
-.avantravel {text-align: left}
-
 .avanadmin .manager td.headingTd {vertical-align: middle}
 
 .avanadmin .toolbarTd {text-align: right}
@@ -230,4 +228,13 @@ table.actions td, .avanadmin .details table.actions td {
 
 .avanadmin ul.shadetabs > li.withErrors a {
     color: red
+}
+
+.avanadmin button, .avanadmin input[type=submit], .avanadmin input[type=reset] {
+    padding: 5px 10px;
+    line-height: 1.5em;
+    border-radius: 4px;
+    box-shadow: none;
+    border-width: 1px;
+    min-width: 100px;
 }

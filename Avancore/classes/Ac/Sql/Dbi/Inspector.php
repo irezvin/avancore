@@ -11,9 +11,13 @@ class Ac_Sql_Dbi_Inspector {
      */
     var $_db = false;
     
+    protected $dbVersion = false;
+    
+    protected $isMariaDb102plus = null;
+    
     var $defaultDatabaseName = false;
 
-    function Ac_Sql_Dbi_Inspector($sqlDb, $defaultDatabaseName = false) {
+    function __construct($sqlDb, $defaultDatabaseName = false) {
         if (is_a($sqlDb, 'Ac_Legacy_Database')) {
             $this->_db = new Ac_Sql_Db_Ae($sqlDb);
         } else {
@@ -37,6 +41,26 @@ class Ac_Sql_Dbi_Inspector {
         return $res;
     }
     
+    function getDbVersion() {
+        if ($this->dbVersion === false)
+            $this->dbVersion = $this->_db->fetchValue("SELECT VERSION()");
+        return $this->dbVersion;
+    }
+    
+    function getIsMariaDb102plus() {
+        if ($this->isMariaDb102plus !== null) 
+            return $this->isMariaDb102plus;
+        
+        $this->isMariaDb102plus = false;
+        
+        $v = strtolower($this->getDbVersion());
+        if (strpos($v, '-mariadb') !== false) {
+            $vv = explode('-', $v, 2);
+            $this->isMariaDb102plus = (version_compare($vv[0], '10.2') >= 0);
+        }
+        return $this->isMariaDb102plus;
+    }
+    
     // ----------------------- TABLE-RELATED METHODS ------------------------
     
     /**
@@ -49,7 +73,7 @@ class Ac_Sql_Dbi_Inspector {
         foreach ($this->_db->fetchArray('SHOW COLUMNS FROM '.$this->_getQTableName($databaseName, $tableName), 'Field') as $fieldName => $fieldData)  {
             $fi = array_merge($this->_parseType($fieldData['Type']));
             $fi['nullable'] = !strcasecmp($fieldData['Null'], 'yes');
-            $fi['default'] = $fieldData['Default'];
+            $fi['default'] = $this->processDefault($fieldData['Default']);
             if (strpos($fieldData['Extra'],'auto_increment') !== false) {
                 $fi['autoInc'] = true;
             }
@@ -82,6 +106,14 @@ class Ac_Sql_Dbi_Inspector {
     function getRelationsForTable($tableName, $databaseName = false) {
         return array(); // returning information about relations is not implemented in this class 
     }
+    
+
+    // converts default value returned by DB engine
+    protected function processDefault($default) {
+        if ($this->getIsMariaDb102plus() && $default === 'current_timestamp()') $default = 'CURRENT_TIMESTAMP';
+        return $default;
+    }
+    
     
     // --------------------------- PRIVATE METHODS --------------------------
     

@@ -153,7 +153,9 @@ class Ac_Table_Column {
     }
 
     function determineGetter($record, $fn) {
-        if (is_a($record, 'Ac_Model_Data') && $this->useAeDataFacilities && $this->_staticMeta) {
+        if (is_array($record) && array_key_exists($fn, $record)) {
+            $res = array('getArrayMember', null);
+        } elseif (is_a($record, 'Ac_Model_Data') && $this->useAeDataFacilities && $this->_staticMeta) {
             $res = array('getWithGetField', null);
         } elseif (Ac_Accessor::methodExists($record, $getterName = 'get'.$fn)) {
             if ($fn == $this->fieldName && is_array($this->methodParams) && count($this->methodParams))
@@ -165,11 +167,14 @@ class Ac_Table_Column {
             $res = array('getWithObjectVar', null);
         } elseif (isset($record->_otherValues[$fn])) {
             $res = array('getWithOtherValues', null);
-        }
-        else {
+        } else {
             $res = array('getWithNull', null);
         }
         return $res;
+    }
+    
+    function getArrayMember($record, $fn) {
+        return $record[$fn];
     }
 
     function getWithGetField($record, $fn, $p) {
