@@ -30,20 +30,24 @@ class Ac_Admin_Action {
     
     var $kind = false;
     
+    var $processingParams = null;
+    
+    var $managerParams = null;
+    
     /**
      * @var Ac_Admin_Manager
      */
     protected $manager = false;
 
     function setManager(Ac_Admin_Manager $manager) {
-        $this->_manager = $manager;
+        $this->manager = $manager;
     }
 
     /**
      * @return Ac_Admin_Manager
      */
     function getManager() {
-        return $this->_manager;
+        return $this->manager;
     }
     
     static function factory($options = array()) {
@@ -61,12 +65,19 @@ class Ac_Admin_Action {
     
     function getJson() {
         
-        $cs = $this->_manager->getConfigService();
+        $cs = $this->manager->getConfigService();
         
         $res = array();
         $imagePrefix = $cs->getImagePrefix();
         foreach (array_keys(Ac_Util::getPublicVars($this)) as $k) {
             if ($k{0} != '_' && is_object($this->$k) || is_array($this->$k) || is_scalar($this->$k) && strlen($this->$k)) $res[$k] = $this->$k;
+        }
+        
+        if ($this->manager->getMethodName() === 'executeDetails' && $this->managerProcessing) {
+            $proc = $this->manager->getProcessing($this->managerProcessing);
+            if ($proc->returnToDetails) {
+                $res['managerParams']['returnUrl'] = ''.$this->manager->getManagerUrl();
+            }
         }
         
         $kind = $this->kind === false? $this->id : $this->kind;
@@ -85,7 +96,7 @@ class Ac_Admin_Action {
     
     function unfoldAssetString($string) {
         // Ugly...
-        return Ac_Legacy_Controller_Response_Html::unfoldAssetString($string, $this->_manager->getApplication()->getAssetPlaceholders());
+        return Ac_Legacy_Controller_Response_Html::unfoldAssetString($string, $this->manager->getApplication()->getAssetPlaceholders());
     }
     
 }

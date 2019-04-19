@@ -44,6 +44,12 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
     var $stayOn = false;
     
     /**
+     * @var bool
+     * Return to record details if processing was called from record details
+     */
+    var $returnToDetails = true;
+    
+    /**
      * @var Ac_Admin_ReportEntry
      */
     var $_report = false;

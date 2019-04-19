@@ -48,6 +48,8 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
 	            if (!is_array($state)) $state = array();
 	            if (!count($data)) $state = array();
                 if ($c->getData('filterForm')) $state['filterForm'] = array();
+                $state['returnUrl'] = null;
+                $state['returnUrl64'] = null;
                 
 	            Ac_Util::ms($state, $c->getData(), true);
 	            $c->setData($state);
