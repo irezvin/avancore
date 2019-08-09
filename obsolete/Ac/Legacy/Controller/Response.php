@@ -163,7 +163,7 @@ class Ac_Legacy_Controller_Response {
     function replacePlaceholders($cachedOnly = false, $dontChangeContent = false, $content = false) {
         $res = $content !== false? $content : $this->content;
         $list = array();
-        foreach ($this->parts as $i => $ph) {
+        if (is_array($this->parts)) foreach ($this->parts as $i => $ph) {
             if (!$cachedOnly || $ph->isCacheable()) {
                 $ph->response = $this;
                 $res = $ph->replacePlaceholders($res);

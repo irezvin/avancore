@@ -12,7 +12,7 @@
  * @property Ac_Accessor param
  * @property Ac_Accessor used
  */
-class Ac_Cr_Context {
+class Ac_Cr_Context extends Ac_Prototyped {
     
     protected $usedParams = array();
     

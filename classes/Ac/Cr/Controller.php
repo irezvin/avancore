@@ -29,6 +29,12 @@ class Ac_Cr_Controller extends Ac_Prototyped {
     protected $application = false;
     
     protected $accessors = array();
+    
+    protected $templateClass = false;
+    
+    protected $calculatedTemplateClass = false;
+    
+    protected $actionParam = 'action';
 
     /**
      * Lazy-got action (name of method to be executed or aggregate action controller)
@@ -73,7 +79,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
 
     function getAction() {
         if ($this->action === false) {
-            $this->action = $this->use->action->value();
+            $this->action = $this->use->{$this->actionParam}->value();
         }
         return $this->action;
     }
@@ -375,6 +381,53 @@ class Ac_Cr_Controller extends Ac_Prototyped {
     
     function getController($id) {
         throw Ac_E_InvalidCall::noSuchItem('controller', $id, 'listControllers');
+    }
+    
+    function setTemplateClass($templateClass) {
+        $this->templateClass = $templateClass;
+    }
+
+    function getTemplateClass() {
+        return $this->templateClass;
+    }    
+    
+    protected function calcTemplateClass() {
+        if ($this->templateClass) return $this->templateClass;
+        if ($this->calculatedTemplateClass !== false) return $this->calculatedTemplateClass;
+        
+        // Replaces last instance of "Controller" with "Template" if there's "Controller"
+        
+        // for Foo_Bar_Controller will try Foo_Bar_Template
+        // for Foo_BarController will try Foo_BarTemplate
+        // for Foo_Controller_Bar will try Foo_Template_Bar
+        
+        $c = get_class($this);
+        $p = strrpos($c, 'Controller');
+        
+        $this->calculatedTemplateClass = null;
+        if ($p !== false) {
+            $this->calculatedTemplateClass = substr($c, 0, $p).'Template'.substr($c, $p + strlen('Controller'));
+        }
+        
+        if (!class_exists($this->calculatedTemplateClass)) $this->calculatedTemplateClass = null;
+        
+        return $this->calculatedTemplateClass;
+        
+    }
+    
+    /**
+     * @return Ac_Result_Template
+     */
+    protected function templateResult(array $params = array(), $templatePart = false) {
+        $partName = $templatePart;
+        if (!$partName) $partName = $this->action;
+        $res = new Ac_Result_Template(array(
+            'template' => $this->calcTemplateClass(),
+            'partName' => $partName,
+            'component' => $this,
+            'partArgs' => $params
+        ));
+        return $res;
     }
     
 }
