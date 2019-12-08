@@ -2055,11 +2055,21 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      * 
      * @return array (idxId1 => array(id1, id2...), idxId2 => array(id1, id2)) Per-index lists of identifiers
      */
-    function findByIndicesInArray($object, array $searchIn, array $indices, $areByIdentifiers = false, $strict = false) {
+    function findByIndicesInArray($object, array $searchIn, array $indices, $areByIdentifiers = false, $strict = false, $ignoreIndicesWithNullValues = false) {
         $res = array();
         foreach ($indices as $idxName => $fields) {
             // TODO: replace Ac_Util, Ac_Accessor with someting faster (specific for current mapper)
             $pattern = Ac_Util::getObjectProperty($object, Ac_Util::toArray($fields));
+            
+            if ($ignoreIndicesWithNullValues) {
+                // ignore unique indices with null fields
+                foreach ($pattern as $v) {
+                    if (is_null($v)) {
+                        continue 2;
+                    }
+                }
+            }
+            
             $matches = Ac_Accessor::findItems($searchIn, $pattern, $strict, true);
             if ($areByIdentifiers) $res[$idxName] = array_keys($matches);
             else {

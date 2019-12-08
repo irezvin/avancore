@@ -63,7 +63,7 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
     function __construct($strUrl = false) {
         if ($strUrl !== false) {
             if ($strUrl instanceof Ac_Url) {
-                foreach (array_keys(get_class_vars(get_class($this))) as $f) if ($f{0} != '_') {
+                foreach (array_keys(get_class_vars(get_class($this))) as $f) if ($f[0] != '_') {
                     if (isset($strUrl->$f)) $this->$f = $strUrl->$f;
                 }
             } else {
@@ -77,7 +77,7 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
      */
     function cloneObject() {
         $res = new Ac_Url();
-        foreach (get_object_vars($this) as $f => $v) if ($f{0} != '_') $res->$f = $v;
+        foreach (get_object_vars($this) as $f => $v) if ($f[0] != '_') $res->$f = $v;
         return $res;
     }
     
@@ -396,7 +396,7 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
         if (substr($path, -1) !== '/') $path = dirname($path);
         $path = str_replace('//', '/', rtrim($path, '/').'/'.ltrim($res->path, '/'));
         if (preg_match('#(^|/)\.\.?(/|$)#', $path)) { // have "/../" or "/.." in the path - must resolve
-            $resPathAbsolute = strlen($path) || substr($path, 0, 1) === '/';
+            $resPathAbsolute = !strlen($path) || substr($path, 0, 1) === '/';
             $path = explode('/', $path);
             $i = 0;
             while ($i < count($path)) {
@@ -456,7 +456,7 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
         if (strncmp($myPath, $basePath, $baseLen)) return false;
         
         // common string must end with '/', or the paths must be completely identical
-        $lastChar = $myPath{$baseLen - 1};
+        $lastChar = $myPath[$baseLen - 1];
         if ($lastChar !== '/') {
             $nextChar = substr($myPath, $baseLen, 1);
             if (!($nextChar === '' || $nextChar === '/')) return false;

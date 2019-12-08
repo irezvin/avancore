@@ -55,7 +55,7 @@ class Ac_Model_Collection_Mapper extends Ac_Model_Collection_Abstract {
     protected $keyProperty = false;
     
     protected $appliedQuery = false;
-
+    
     /**
      * Sets query to restrict items returned by the Mapper
      */

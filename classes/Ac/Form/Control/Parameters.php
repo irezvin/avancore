@@ -85,7 +85,7 @@ class Ac_Form_Control_Parameters extends Ac_Form_Control {
             if (!strlen($this->xml)) {
                 $dir = $this->getAppRootDir();
                 $xfp = $this->getXmlFilePath();
-                if (strlen($xfp) && !in_array($xfp{0}, array('/', '\\'))) $xfp = $dir.'/'.$xfp;
+                if (strlen($xfp) && !in_array($xfp[0], array('/', '\\'))) $xfp = $dir.'/'.$xfp;
                 $this->jForm->loadFile($xfp, true, $this->xpath);
             } else {
                 $this->jForm->load($this->xml, true, $this->xpath);

@@ -62,7 +62,7 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
                     $shorter = substr($this->single, strlen($entity));
                     if (strlen($shorter)) {
                         $res = $shorter;
-                        $res{0} = strtolower($res{0});
+                        $res[0] = strtolower($res[0]);
                     }
                 }
             }

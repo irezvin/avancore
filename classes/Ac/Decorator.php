@@ -41,6 +41,10 @@ class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
         return $value;
     }
     
+    function __invoke($value) {
+        return $this->apply($value);
+    }
+    
     static function pushModel($model) {
         array_push(self::$modelStack, $model);
     }

@@ -38,6 +38,11 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
      */
     protected $selectPrototypeForOtherValues = false;
 
+    protected $valuesWhere = array();
+
+    protected $valuesHaving = array();
+    
+    
     function setSelectForValues(Ac_Sql_Select $selectForValues) {
         $this->selectForValues = $selectForValues;
     }
@@ -47,6 +52,22 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
      */
     function getSelectForValues() {
         return $this->selectForValues;
+    }
+
+    function setValuesWhere(array $valuesWhere = array()) {
+        $this->valuesWhere = $valuesWhere;
+    }
+
+    function getValuesWhere() {
+        return $this->valuesWhere;
+    }
+
+    function setValuesHaving(array $valuesHaving = array()) {
+        $this->valuesHaving = $valuesHaving;
+    }
+
+    function getValuesHaving() {
+        return $this->valuesHaving;
     }    
     
     /**
@@ -99,12 +120,21 @@ class Ac_Facet_Sql_ItemImpl extends Ac_Facet_ItemImpl implements Ac_Facet_Sql_I_
                 Ac_Util::ms($select->columns, $this->selectExtra['columns']);
             }
         }
+        if ($this->valuesWhere) Ac_Util::ms($select->where, $this->valuesWhere);
+        if ($this->valuesHaving) {
+            Ac_Util::ms($select->having, $this->valuesHaving);
+        }
         $t0 = microtime(true);
-        $res = $select->getDb()->fetchArray($select, 'value');
+        $res = $this->fetchValues($select);
         if ($this->item->getDebug()) {
             $t1 = microtime(true) - $t0;
             $this->item->setDebugData('impl', array('time' => round($t1, 4), 'query' => $select->getDb()->replacePrefix(''.$select)));
         }
+        return $res;
+    }
+    
+    protected function fetchValues($select) {
+        $res = $select->getDb()->fetchArray($select, 'value');
         return $res;
     }
 

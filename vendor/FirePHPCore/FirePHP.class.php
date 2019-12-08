@@ -1323,7 +1323,7 @@ class FirePHP {
     
                 $name = $raw_name;
               
-                if ($name{0} == "\0") {
+                if ($name[0] == "\0") {
                     $parts = explode("\0", $name);
                     $name = $parts[2];
                 }
@@ -1502,17 +1502,17 @@ class FirePHP {
             case 2:
                 // return a UTF-16 character from a 2-byte UTF-8 char
                 // see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-                return chr(0x07 & (ord($utf8{0}) >> 2))
-                       . chr((0xC0 & (ord($utf8{0}) << 6))
-                       | (0x3F & ord($utf8{1})));
+                return chr(0x07 & (ord($utf8[0]) >> 2))
+                       . chr((0xC0 & (ord($utf8[0]) << 6))
+                       | (0x3F & ord($utf8[1])));
 
             case 3:
                 // return a UTF-16 character from a 3-byte UTF-8 char
                 // see: http://www.cl.cam.ac.uk/~mgk25/unicode.html#utf-8
-                return chr((0xF0 & (ord($utf8{0}) << 4))
-                       | (0x0F & (ord($utf8{1}) >> 2)))
-                       . chr((0xC0 & (ord($utf8{1}) << 6))
-                       | (0x7F & ord($utf8{2})));
+                return chr((0xF0 & (ord($utf8[0]) << 4))
+                       | (0x0F & (ord($utf8[1]) >> 2)))
+                       . chr((0xC0 & (ord($utf8[1]) << 6))
+                       | (0x7F & ord($utf8[2])));
         }
 
         // ignoring UTF-32 for now, sorry

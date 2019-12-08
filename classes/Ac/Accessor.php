@@ -262,7 +262,7 @@ class Ac_Accessor implements Ac_I_Accessor {
                     if ($m->getNumberOfRequiredParameters() == $nArgs) { // Should we use == or <= ? Can setter have all-default params?
                         if ($stripPrefixAndLcFirst) {
                             $acc = substr($acc ,$l);
-                            $acc{0} = strtolower($acc{0});
+                            $acc[0] = strtolower($acc[0]);
                         }
                         self::$apListAccessorsCache[$hash][] = $acc;
                     }
@@ -407,7 +407,6 @@ class Ac_Accessor implements Ac_I_Accessor {
     static function mapFunctionArgs(ReflectionFunctionAbstract $reflectionMethod, array $argsArray, $useDefaults = true) {
         ksort($argsArray);
         $posParams = array();
-        $matching = 0;
         $maxIdx = -1;
         foreach ($reflectionMethod->getParameters() as $param) {
             $pName = $param->getName();
@@ -423,7 +422,7 @@ class Ac_Accessor implements Ac_I_Accessor {
         if ($argsArray) { // all parameters with non-matching names will be by-position
             $i = 0;
             foreach ($argsArray as $idx => $value) {
-                if (($ch = substr($idx[0], 0, 1)) >= '0' && ($ch <= '9')) $idx = (int) $idx;
+                if (is_int($idx) || is_string($idx) && is_numeric($idx[0])) $idx = (int) $idx;
                 else $idx = $i;
                 // pad array with empty values
                 while (count($posParams) < ($idx + 1)) $posParams[] = null;
@@ -472,7 +471,7 @@ class Ac_Accessor implements Ac_I_Accessor {
                 if (!$param->isArray()) {
                     $ss = explode(">", $s, 2);
                     $s1 = explode(" ", ltrim($ss[1], ' '), 2);
-                    if ($s1[0]{0} !== '$') $class = $s1{0};
+                    if ($s1[0][0] !== '$') $class = $s1[0];
                 }
                 /* @var $param ReflectionParameter */
                 self::$methodSignatures[$key][$paramName = $param->getName()] = array(

@@ -583,7 +583,7 @@ tinymce.create('tinymce.util.Dispatcher', {
 
 			// Strange app protocol that isn't http/https or local anchor
 			// For example: mailto,skype,tel etc.
-			if (/^([\w\-]+):([^\/]{2})/i.test(u) || /^\s*#/.test(u)) {
+			if (/^([\w\-]+):([^\/][2])/i.test(u) || /^\s*#/.test(u)) {
 				t.source = u;
 				return;
 			}
@@ -6157,7 +6157,7 @@ tinymce.dom.TreeWalker = function(start_node, root_node) {
 
 		/*
 		toRGB : function(s) {
-			var c = /^\s*?#([0-9A-F]{2})([0-9A-F]{1,2})([0-9A-F]{2})?\s*?$/.exec(s);
+			var c = /^\s*?#([0-9A-F][2])([0-9A-F]{1,2})([0-9A-F][2])?\s*?$/.exec(s);
 
 			if (c) {
 				// #FFF -> #FFFFFF

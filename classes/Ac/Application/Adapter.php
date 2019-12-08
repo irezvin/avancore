@@ -324,7 +324,7 @@ class Ac_Application_Adapter extends Ac_Prototyped {
         $res = null;
         // if $option below is passed-by-copy (''.$option), the bug below won't happen
         if (array_key_exists($option, $this->overrides)) return $this->overrides[$option];
-        if ($fromFun) $option{0} = strtolower($option{0});
+        if ($fromFun) $option[0] = strtolower($option[0]);
         if (method_exists($this, $m = 'doGet'.$option)) $res = $this->$m();
         if (is_null($res)) {
             $conf = $this->intGetArrConfig();

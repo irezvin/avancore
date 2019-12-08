@@ -1027,7 +1027,8 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 $class = 'Ac_Admin_Processing';
             }
             $ctx = $this->_createProcessingContext($p);
-            $prc = new $class ($ctx, $prot, 'processing.'.$p);
+            $prot['context'] = $ctx;
+            $prc = new $class ($prot);
             if ($this->onlyRecord) $prc->setRecords(array(& $this->onlyRecord));
                 else $prc->setMapperClass($this->mapperClass);
             $this->_processings[$p] = $prc;

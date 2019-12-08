@@ -66,7 +66,7 @@ class Ac_Legacy_Controller_Response {
         $vars = array_intersect(array_keys($data), array_keys(Ac_Util::getClassVars(get_class($this))));
         $vars = array_diff($vars, $this->listArrayIgnore());
         foreach ($vars as $varName) {
-            if ($varName{0} != '_') $this->$varName = $def;
+            if ($varName[0] != '_') $this->$varName = $def;
         }
         
     }
@@ -81,7 +81,7 @@ class Ac_Legacy_Controller_Response {
         $vars1 = get_object_vars($this);
         foreach ($this->listArrayIgnore() as $varName) unset($vars[$varName]);
         foreach ($vars as $varName => $def) {
-            if (array_key_exists($varName, $vars1) && $varName{0} != '_' && ($this->$varName !== $def)) $res[$varName] = $this->$varName;
+            if (array_key_exists($varName, $vars1) && $varName[0] != '_' && ($this->$varName !== $def)) $res[$varName] = $this->$varName;
         }
         return $res;
     }

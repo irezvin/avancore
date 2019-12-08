@@ -55,7 +55,7 @@ class Ac_Legacy_Template {
      */
     function getVars() {
         $res = array();
-        foreach (array_keys($vars = get_object_vars($this)) as $k) if ($k{0} != '_') $res[$k] = $vars[$k];
+        foreach (array_keys($vars = get_object_vars($this)) as $k) if ($k[0] != '_') $res[$k] = $vars[$k];
         return $res;
     }
     

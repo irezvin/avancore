@@ -117,7 +117,7 @@ class Ac_Cg_Inflector {
         $parts = array();  
         foreach (Ac_Cg_Inflector::explode($identifier) as $part) $parts[] = ucfirst($part);
         $res = implode("", $parts);
-        if (!$ucFirst && strlen($res)) $res{0} = strtolower($res{0});
+        if (!$ucFirst && strlen($res)) $res[0] = strtolower($res[0]);
         return $res;
     }
     

@@ -108,7 +108,7 @@ class Ac_Legacy_Template_Html extends Ac_Legacy_Template {
         if (is_array($jsLib)) {
             foreach ($jsLib as $l) $this->addJsLib($l, $isLocal, $atBeginning);
         } else {
-            if ($jsLib{0} === '{') $isLocal = false;
+            if ($jsLib[0] === '{') $isLocal = false;
             if (is_a($this->htmlResponse, 'Ac_Legacy_Controller_Response_Html')) {
                 $this->htmlResponse->addJsLib($jsLib, $isLocal, $atBeginning);
             }
@@ -122,7 +122,7 @@ class Ac_Legacy_Template_Html extends Ac_Legacy_Template {
         if (is_array($cssLib)) {
             foreach ($cssLib as $l) $this->addCssLib($l, $isLocal);
         } else {
-            if ($cssLib{0} === '{') $isLocal = false;
+            if ($cssLib[0] === '{') $isLocal = false;
             if (is_a($this->htmlResponse, 'Ac_Legacy_Controller_Response_Html')) $this->htmlResponse->addCssLib($cssLib, $isLocal);
             else {
                 echo Ac_Legacy_Controller_Response_Html::getCssLibTag($cssLib, $isLocal);

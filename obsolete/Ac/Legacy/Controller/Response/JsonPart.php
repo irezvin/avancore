@@ -25,7 +25,7 @@ class Ac_Legacy_Controller_Response_JsonPart extends Ac_Legacy_Controller_Respon
     
     protected function doReplacePlaceholders($content) {
         if ($this->evaluateAllBeforeReplace) $this->ev = array_merge($this->ev, $this->evaluateAllPlaceholders());
-        $content = preg_replace_callback("#(\\{[a-z0-9]{64})([\\\\]+)\\.\\}#", array($this, 'replacePlaceholder'), $content);
+        $content = preg_replace_callback("#(\\{[a-z0-9][64])([\\\\]+)\\.\\}#", array($this, 'replacePlaceholder'), $content);
         return $content;
     }
     

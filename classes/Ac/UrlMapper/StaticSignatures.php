@@ -88,7 +88,7 @@ class Ac_UrlMapper_StaticSignatures extends Ac_UrlMapper_UrlMapper {
         foreach (get_class_methods($this->controllerClass) as $m) {
             if (strncmp($m, $s, $l)) continue;
             $methodValue = substr($m, $l);
-            if (strlen($methodValue)) $methodValue{0} = strtolower($methodValue{0});
+            if (strlen($methodValue)) $methodValue[0] = strtolower($methodValue[0]);
             $patterns = array_merge($patterns, $this->calcMethodPatterns($methodValue));
         }
         return $patterns;

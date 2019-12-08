@@ -36,7 +36,7 @@ class Ac_Form_Control_Text_Autocomplete extends Ac_Form_Control_Text {
      */
     var $url = false;
     
-    function doInitProperties($options = array()) {
+    function doInitProperties(array $options = array()) {
         parent::doInitProperties($options);
         if (isset($options['valuesProvider'])) $this->setValuesProvider($options['valuesProvider']);
         elseif (isset($options['valuesProviderPrototype'])) $this->setValuesProviderPrototype($options['valuesProviderPrototype']);
@@ -107,7 +107,7 @@ class Ac_Form_Control_Text_Autocomplete extends Ac_Form_Control_Text {
         $res['fullSearch'] = $this->fullSearch;
         $res['partialSearch'] = $this->partialSearch;
         if (strlen($sep = $this->getListSeparator())) {
-            if ($sep{0} != ' ') $sep = trim($sep, ' ');
+            if ($sep[0] != ' ') $sep = trim($sep, ' ');
             $res['tokens'] = array($sep);
         }
         if (strlen($this->paramName)) $res['paramName'] = $this->paramName;

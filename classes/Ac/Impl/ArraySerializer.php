@@ -33,7 +33,7 @@ abstract class Ac_Impl_ArraySerializer {
             $res['__class'] = $className;
         }
         foreach ($propsAndVals as $k => $v) {
-            if ($all || $k{0} !== '_') {
+            if ($all || $k[0] !== '_') {
                 if ($withDefs || !(array_key_exists($k, $defs) && $defs[$k] === $v)) {
                     if (is_object($v)) {
                         if ($v instanceof Ac_I_ArraySerializable) {

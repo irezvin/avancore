@@ -334,7 +334,7 @@ class Ac_Legacy_Database_MsSql extends Ac_Legacy_Database {
     }
 
     function isNameQuoted($name) {
-        return ($l = strlen($name)) > 2 && $name{0} == '[' && $name{$l-1} == ']';
+        return ($l = strlen($name)) > 2 && $name[0] == '[' && $name{$l-1} == ']';
     }
 	
 	function applyLimits($statement, $count, $offset, $orderBy = false) {

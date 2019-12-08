@@ -86,7 +86,6 @@ class Ac_Legacy_Controller_Filter {
     
     function filterRequestArray($array, $stripTags = true) {
         $res = array();
-        $hasToStripSlashes = get_magic_quotes_gpc();
         foreach ($array as $k => $v) {
             if (is_scalar($v)) {
                 $res[$k] = $stripTags? strip_tags($res) : true;

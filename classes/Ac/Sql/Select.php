@@ -263,7 +263,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
                 $jcp = $this->getTable($a)->getJoinClausePart($na, false, $first);
             }
             if (strlen($jcp)) {
-            	if ($jcp{0} == ',') $res = $res.",\n".substr($jcp, 1);
+            	if ($jcp[0] == ',') $res = $res.",\n".substr($jcp, 1);
             	else {
             		if (strlen($res)) $res .= "\n";
             		$res .= $jcp;

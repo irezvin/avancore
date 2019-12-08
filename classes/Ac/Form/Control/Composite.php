@@ -27,7 +27,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     
     protected $modelUpdated = false;
     
-    function doInitProperties($options = array()) {
+    function doInitProperties(array $options = array()) {
         $this->_iid = round(rand()*100);
         parent::doInitProperties($options);
         if (!isset($options['controls'])) $options['controls'] = array();

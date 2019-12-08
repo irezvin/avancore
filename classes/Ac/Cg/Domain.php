@@ -463,7 +463,7 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
         
         if ($this->extraConfigByTables) {
             foreach ($this->extraConfigByTables as $k => $extraConfig) {
-                if (is_array($extraConfig) && ($k === $tableName || ($k{0} == '/' && preg_match($k, $tableName)))) {
+                if (is_array($extraConfig) && ($k === $tableName || ($k[0] == '/' && preg_match($k, $tableName)))) {
                     Ac_Util::ms($overConf, $extraConfig);
                 }
             }
@@ -502,7 +502,7 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
 	            if (!strncmp($coolName, $this->replaceTablePrefixWith, $l)) $coolName = substr($coolName, $l);
 	        }
 	        if (strlen($this->extraStripFromIds)) {
-                if ($this->extraStripFromIds{0} == '/') $coolName = preg_replace ($this->extraStripFromIds, '', $coolName);
+                if ($this->extraStripFromIds[0] == '/') $coolName = preg_replace ($this->extraStripFromIds, '', $coolName);
                 else {
                     $l = strlen($this->extraStripFromIds);
                     if (!strncmp($coolName, $this->extraStripFromIds, $l)) $coolName = substr($coolName, $l);

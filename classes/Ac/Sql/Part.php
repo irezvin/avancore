@@ -56,7 +56,7 @@ class Ac_Sql_Part extends Ac_Prototyped {
         if (isset($options['db'])) $this->setDb($options['db']);
         if (isset($options['parentPart'])) $this->setParentPart($options['parentPart']);
         foreach (array_intersect(array_keys(get_object_vars($this)), array_keys($options)) as $k)
-            if ($k{0} != '_') $this->$k = $options[$k];
+            if ($k[0] != '_') $this->$k = $options[$k];
         $this->_doOnInitialize($options);
         if (isset($options['value'])) {
             $this->bind($options['value']);

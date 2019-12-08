@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Test_CgImport extends Ac_Test_Base {
+class Ac_Test_Codegen extends Ac_Test_Base {
     
     var $write = false;
     
@@ -76,6 +76,10 @@ class Ac_Test_CgImport extends Ac_Test_Base {
         $gen2->run();
         
         $this->assertEqual($out1, $out2 = $w2->getOutput(), 'Imported domain(s) must produce strictly equal output');
+    }
+    
+    function testBogusRegenFiles() {
+        
     }
     
 }

@@ -45,14 +45,6 @@ class Ac_Table_Column {
      */
     var $_staticMeta = false;
     
-    /**
-     * Whether get{$fieldName} funtion call is preferred over Ac_Model_Data::getFoo()
-     * @var bool|string
-     */
-    var $useGetter = false;
-    
-    var $takeField = false;
-    
     var $useAeDataFacilities = true;
     
     var $staticAttribs = true;
@@ -88,7 +80,7 @@ class Ac_Table_Column {
         $this->settings = $settings;
         
         foreach (array_diff(array_keys(get_object_vars($this)), array('settings', 'defaultHint', 'nullText')) as $propName) {
-            if (($propName{0} != '_')  && isset($settings[$propName])) $this->$propName = $settings[$propName];
+            if (($propName[0] != '_')  && isset($settings[$propName])) $this->$propName = $settings[$propName];
         }
 
         if (!$this->fieldName) $this->fieldName = $this->_name;
@@ -154,7 +146,9 @@ class Ac_Table_Column {
         } elseif (Ac_Accessor::methodExists($record, $getterName = 'get'.$fn)) {
             if ($fn == $this->fieldName && is_array($this->methodParams) && count($this->methodParams))
             $res = array('getWithGetterParams', array($getterName, $this->methodParams));
-            else $res = array('getWithGetter', $getterName);
+            else {
+                $res = array('getWithGetter', $getterName);
+            }
         } elseif (method_exists($record, 'getProperty')) {
             $res = array('getWithGetProperty', null);
         } elseif (isset($record->$fn)) {

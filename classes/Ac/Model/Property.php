@@ -112,7 +112,7 @@ class Ac_Model_Property implements Ac_I_Prototyped {
     function toFormOptions() {
         $res = array();
         foreach (get_object_vars($this) as $k => $v) {
-            if ($k{0} != '_' && $k != 'srcObject' && !is_null($v)) $res[$k] = $v;  
+            if ($k[0] != '_' && $k != 'srcObject' && !is_null($v)) $res[$k] = $v;  
         }
         return $res;
     }

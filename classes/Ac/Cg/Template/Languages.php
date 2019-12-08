@@ -50,7 +50,7 @@ class Ac_Cg_Template_Languages extends Ac_Cg_Template {
         $this->phpOpen();
 ?>
     
-    require(dirname(__FILE__).'/../../languages/en.php');
+    require(dirname(__FILE__).'/../../gen/languages/en.php');
     Ac_Util::ms($lang, array(
     
 //  'lang_string_1' => 'caption_1',

@@ -66,7 +66,7 @@ abstract class Ac_Cg_Util {
             $res = preg_replace('/ +/', '_', ucwords($string));
         } else {
             $res = str_replace(' ', '', ucwords($string));
-            if (strlen($res)) $res{0} = strtolower($res{0});
+            if (strlen($res)) $res[0] = strtolower($res[0]);
         }
         return $res;
     }
@@ -115,7 +115,7 @@ abstract class Ac_Cg_Util {
             $startingWithLowercase = false;
             foreach ($strings as $s) {
                 $remainder = substr($s, strlen($res));
-                if (strlen($remainder) && preg_match('/^[a-z]/', $remainder{0})) {
+                if (strlen($remainder) && preg_match('/^[a-z]/', $remainder[0])) {
                     $startingWithLowercase = true;
                     break;
                 }

@@ -162,13 +162,13 @@ abstract class Ac_Util {
     /**
      * Important: tagBody and attribs can be swapped (for better, HTML-like readability)
      */
-    static function mkElement($tagName, $tagBody = false, $attribs = array(), $quote='"', $quoteStyle = ENT_QUOTES, $charset = false, $doubleEncode = true) {
+    static function mkElement($tagName, $tagBody = false, $attribs = null, $quote='"', $quoteStyle = ENT_QUOTES, $charset = false, $doubleEncode = true) {
         $res = '<'.$tagName;
         if (is_array($tagBody) && !is_array($attribs)) {
             list($attribs, $tagBody) = array($tagBody, $attribs);
         }
         if ($attribs) $res .= self::mkAttribs($attribs, $quote, $quoteStyle, $charset, $doubleEncode = true);
-        if ($tagBody !== false) $res .= '>'.$tagBody.'</'.$tagName.'>';
+        if ($tagBody !== false && $tagBody !== null) $res .= '>'.$tagBody.'</'.$tagName.'>';
             else $res .= ' />';
         return $res;
     }
@@ -188,7 +188,7 @@ abstract class Ac_Util {
         $res = "";
         $len = strlen($str);
         for ($i=$len-1; $i >= 0; $i--) 
-            $res .= (ord($str{$i}) + $rnd).($i > 0? "," : "");
+            $res .= (ord($str[$i]) + $rnd).($i > 0? "," : "");
         $jsRes = "<script type='text/javascript'>";
             $jsRes .= "var a = new Array($res);";
             $jsRes .= "for (var i = a.length; i >= 0; i--) {";
@@ -377,9 +377,8 @@ abstract class Ac_Util {
     static function bindArrayToObject ($array, $obj, $ignore='', $prefix=NULL, $checkSlashes=false) {
         if (!is_array($array) || !is_object($obj)) return (false);
         if (!is_array($ignore)) $ignore = explode(" ", $ignore);
-        $gmq = get_magic_quotes_gpc();
         foreach (array_keys(get_object_vars($obj)) as $k) {
-            if ($k{0} != '_') {
+            if ($k[0] != '_') {
                 if (!in_array($k, $ignore)) {
                     if ($prefix) {
                         $ak = $prefix . $k;
@@ -387,7 +386,7 @@ abstract class Ac_Util {
                         $ak = $k;
                     }
                     if (isset($array[$ak])) {
-                        $obj->$k = ($checkSlashes && $gmq) ? self::stripSlashes($array[$ak]) : $array[$ak];
+                        $obj->$k = $array[$ak];
                     }
                 }
             }
@@ -396,7 +395,7 @@ abstract class Ac_Util {
     }
     
     static function simpleBind ($array, $obj) {
-        foreach (array_keys($array) as $k) if (($k{0} !== '_') && isset($obj->$k)) {
+        foreach (array_keys($array) as $k) if (($k[0] !== '_') && isset($obj->$k)) {
             $obj->$k = $array[$k];
         }
     }
@@ -404,7 +403,7 @@ abstract class Ac_Util {
     static function simpleBindAll ($array, $obj, $onlyKeys = false) {
         if (is_array($onlyKeys)) $keys = array_intersect(array_keys($array), $onlyKeys);
             else $keys = array_keys($array);
-        foreach ($keys as $k) if (($k{0} !== '_')) {
+        foreach ($keys as $k) if (($k[0] !== '_')) {
             $obj->$k = $array[$k];
         }
     }
@@ -418,7 +417,7 @@ abstract class Ac_Util {
     }
     
     static function smartBind ($array, $obj) {
-        foreach (array_keys($array) as $k) if ($k{0} !== '_') {
+        foreach (array_keys($array) as $k) if ($k[0] !== '_') {
             if (method_exists($obj, $setter = 'set'.$k)) $obj->$setter($array[$k]);
             elseif (isset($obj->$k)) $obj->$k = $array[$k];
         }
@@ -426,7 +425,6 @@ abstract class Ac_Util {
     
     static function filterValue($value, $noTrim = false, $allowHtml = false) {
         if (!is_scalar($value)) return false;
-        if (get_magic_quotes_gpc()) $value = stripslashes($value);
         if (!$allowHtml) $value = strip_tags($value);
         if (!$noTrim) $value = trim($value);
         return $value;
@@ -785,6 +783,7 @@ abstract class Ac_Util {
     }
     
     static function flattenArray($array, $level = -1, $keyGlue = false, $key = '') {
+        //if (!is_array($array)) return array($array);
         $res = array();
         foreach ($array as $k => $v) {
             if (strlen($keyGlue)) {
@@ -851,7 +850,7 @@ abstract class Ac_Util {
                 if (is_callable($call = array($obj, 'set'.ucfirst($k))) || is_callable($call = array($obj, '_set'.ucfirst($k)))) { 
                     call_user_func($call, $options[$k]);
                 }
-                elseif ($alsoSimpleBind && ($k{0} !== '_') && array_key_exists ($k, $ov)) $obj->{$k} = $options[$k]; 
+                elseif ($alsoSimpleBind && ($k[0] !== '_') && array_key_exists ($k, $ov)) $obj->{$k} = $options[$k]; 
             }
         }
     }
@@ -1233,8 +1232,15 @@ abstract class Ac_Util {
     }
     
     static function lcFirst($string) {
-        if (strlen($string)) $string{0} = strtolower($string{0});
+        if (strlen($string)) $string[0] = strtolower($string[0]);
         return $string;
+    }
+    
+    /**
+     * Note: detects slash-based ("/") regexes onlyt
+     */
+    static function isRegex($string) {
+        return strlen($string) > 2 && $string[0] == '/' && preg_match("#^/.+/\\w*$#", $string);
     }
     
 }

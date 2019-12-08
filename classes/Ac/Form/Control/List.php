@@ -38,7 +38,7 @@ class Ac_Form_Control_List extends Ac_Form_Control_Listable {
     
     var $singleArrayValueToScalarValue = true;
 
-    function doInitProperties($options = array()) {
+    function doInitProperties(array $options = array()) {
         parent::doInitProperties($options);
         if (isset($options['valuesProvider'])) $this->setValuesProvider($options['valuesProvider']);
         elseif (isset($options['valuesProviderPrototype'])) $this->setValuesProviderPrototype($options['valuesProviderPrototype']);

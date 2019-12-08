@@ -273,7 +273,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     var $debug = false;
     
-    function doInitProperties($options = array()) {
+    function doInitProperties(array $options = array()) {
         if (isset($options['default'])) $this->setDefault($options['default']);
         if (isset($options['parent']) && is_a($options['parent'], 'Ac_Form_Control')) $this->_parent = $options['parent'];
         //if (isset($options['displayParent'])) $this->setDisplayParent($options['displayParent']);
@@ -990,6 +990,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
 
     function updateFromRequest() {
         $this->bindFromRequest();
+        if ($this->name === 'mc_gross') Ac_Debug::dd(get_class($this->_context), $this->_context, $this->_rqData, $this->_context->_data, $this->_context->getData());
     }
     
     function updateFromModel() {

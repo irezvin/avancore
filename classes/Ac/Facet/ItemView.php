@@ -32,6 +32,19 @@ abstract class Ac_Facet_ItemView extends Ac_Prototyped {
         return $res;
     }
     
+    function getExpandedPossibleValues() {
+        $vv = $this->item->getPossibleValues();
+        $res = array();
+        foreach ($vv as $k => $item) {
+            if (!is_array($item)) {
+                $item = array('title' => $item, 'value' => is_numeric($k)? $item : $k);
+            }
+            if (!array_key_exists('title', $item)) $item['title'] = $item['value'];
+            $res[$item['value']] = $item;
+        }
+        return $res;
+    }
+    
     function filterValue($value) {
         if (is_scalar($value)) {
             if ($this->item->getEmptyValue() !== false && $value == $this->item->getEmptyValue()) {

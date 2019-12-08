@@ -82,7 +82,7 @@ class Ac_Admin_Action extends Ac_Prototyped {
         $res = array();
         $imagePrefix = $cs->getImagePrefix();
         foreach (array_keys(Ac_Util::getPublicVars($this)) as $k) {
-            if ($k{0} != '_' && is_object($this->$k) || is_array($this->$k) || is_scalar($this->$k) && strlen($this->$k)) $res[$k] = $this->$k;
+            if ($k[0] != '_' && is_object($this->$k) || is_array($this->$k) || is_scalar($this->$k) && strlen($this->$k)) $res[$k] = $this->$k;
         }
         
         if ($this->manager->getMethodName() === 'executeDetails' && $this->managerProcessing) {

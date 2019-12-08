@@ -35,7 +35,7 @@ abstract class Ac_Sql_Dialect {
     }
     
     function isNameQuoted($name) {
-        return $name{0} == $this->nameQuoteChar && $name{strlen($name) - 1} == $this->nameQuoteChar;
+        return $name[0] == $this->nameQuoteChar && $name[strlen($name) - 1] == $this->nameQuoteChar;
     }
     
     function returnsLastInsertId() {
@@ -184,7 +184,7 @@ abstract class Ac_Sql_Dialect {
                         }
                     }
                 }
-            } elseif ($hasArgs && $token{0} == ':' && $qChar === false && strlen($token) > 1 && preg_match('/^:\w+$/', $token)) {
+            } elseif ($hasArgs && $token[0] == ':' && $qChar === false && strlen($token) > 1 && preg_match('/^:\w+$/', $token)) {
                 if (array_key_exists($argName = substr($token, 1), $quotedNamedArgs)) {
                     $token = $quotedNamedArgs[$argName];
                 } else throw new Ac_E_InvalidUsage("No such named argument: {$argName}");

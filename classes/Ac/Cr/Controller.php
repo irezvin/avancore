@@ -355,7 +355,7 @@ class Ac_Cr_Controller extends Ac_Prototyped {
         foreach ($cm as $m) {
             if (!strncmp($m, $s = 'execute', $l = strlen($s)) && strlen($m) > $l) {
                 $a = substr($m, $l);
-                $a{0} = strtolower($a{0});
+                $a[0] = strtolower($a[0]);
                 $res[] = $a;
             }
         }

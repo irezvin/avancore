@@ -97,6 +97,12 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
      */
     protected $manager = false;
     
+    function setId($id) {
+        // because setId() is already present in Ac_Controller which we inherit
+        parent::setId($id);
+        $this->id = $id;
+    }
+    
     function doInitProperties($options = array()) {
         if (!strcasecmp(get_class($this), 'ae_admin_processing'))
             trigger_error ("Attempt to instantiate abstract class", E_USER_ERROR);

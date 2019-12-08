@@ -119,7 +119,7 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
         }
         $this->setDataPath($dataPath);
         $data = Ac_Util::getArrayByPath($src, $this->_arrDataPath, array());
-        if (get_magic_quotes_gpc()) $data = Ac_Util::stripSlashes($data);
+        if (ini_get('magic_quotes_gpc')) $data = Ac_Util::stripSlashes($data);
         $this->setData($data);
         if (isset($_SERVER) && $_SERVER['REQUEST_METHOD'] === 'POST') $this->requestMethod = 'post';
     }

@@ -122,6 +122,14 @@ class Ac_Facet_Item extends Ac_Prototyped {
             if ($this->emptyCaption !== false) {
                 $r = array();
                 foreach ($res as $k => $v) {
+                    if (!is_array($v)) {
+                        if (!strlen($v) && is_numeric($k) || !strlen($k)) {
+                            $k = $this->getEmptyValue();
+                            $v = $this->getEmptyCaption();
+                        }
+                        $r[$k] = $v;
+                        continue;
+                    }
                     if (!strlen($v['title']) || is_null($v['title'])) {
                         $k = $this->getEmptyValue();
                         $v['title'] = $this->getEmptyCaption();

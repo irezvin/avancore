@@ -392,11 +392,11 @@ class Ac_Test_Util extends Ac_Test_Base {
         $dir = $base;
         foreach ($items as $filename) {
             $old = false;
-            if ($filename{0} == '+') {
+            if ($filename[0] == '+') {
                 $old = true;
                 $filename = substr($filename, 1);
             }
-            if ($filename{0} == ' ') {
+            if ($filename[0] == ' ') {
             } else {
                 $dir = $base;
             }

@@ -71,7 +71,6 @@ class Ac_Form_Control_Text extends Ac_Form_Control_Listable {
     function _doProcessInputValue(& $val) {
         $ml = $this->getMaxLength();
         if (is_numeric($ml) && intval($ml)) $val = substr($val, 0, intval($ml));
-        if (get_magic_quotes_gpc()) $val = stripslashes($val);
         if (!$this->isHtmlAllowed()) $val = strip_tags($val);
     }
     

@@ -238,7 +238,7 @@ class Ac_Legacy_Database_Pg extends Ac_Legacy_Database {
     }
 
     function isNameQuoted($name) {
-        return strlen($name) > 2 && $name{0} == '"';
+        return strlen($name) > 2 && $name[0] == '"';
     }
     
     function getMysqlArgs($withDbName = false) {

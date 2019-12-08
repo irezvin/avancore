@@ -82,7 +82,7 @@ class Ac_Legacy_Config {
     
     function getConfigArray() {
         $res = $this->_configOptions;
-        foreach (get_object_vars($this) as $p => $v) if ($p{0} != '_') $res[$p] = $v;
+        foreach (get_object_vars($this) as $p => $v) if ($p[0] != '_') $res[$p] = $v;
         return $res;
     }
     

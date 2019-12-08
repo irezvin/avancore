@@ -76,7 +76,7 @@ Ajs_Util = {
     },
 
     extend: function(subClass, baseClass) {
-    	for (var i in baseClass.prototype) if (!subClass.prototype[i]) subClass.prototype[i] = baseClass.prototype[i];
+    	for (var i in baseClass.prototype) if (!(i in subClass.prototype)) subClass.prototype[i] = baseClass.prototype[i];
     },
     
     initFromOptions: function(object, proto) {

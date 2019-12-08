@@ -22,6 +22,9 @@ class Ac_Decorator_Map extends Ac_Decorator {
     
     var $useDefault = false;
     
+    // map keys beginning with "/" are treated as Regexes (to ease matching)
+    var $useRegexes = false;
+    
     protected $default = false;
     
     var $keyDecorator = false;
@@ -40,6 +43,14 @@ class Ac_Decorator_Map extends Ac_Decorator {
             $key = Ac_Decorator::decorate($this->keyDecorator, $value, $this->keyDecorator);
         } else {
             $key = (string) $value;
+        }
+        if ($this->useRegexes) {
+            foreach ($this->map as $k => $v) {
+                if (Ac_Util::isRegex($k) && preg_match($k, $value)) return $v;
+                elseif ($k == $value) return $v;
+            }
+            if ($this->useDefault) return $this->default;
+            return $value;
         }
         if (array_key_exists($key, $this->map)) $value = $this->map[$key];
         elseif ($this->useDefault) $value = $this->default;

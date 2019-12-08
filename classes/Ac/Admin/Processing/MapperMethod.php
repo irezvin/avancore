@@ -11,18 +11,18 @@ class Ac_Admin_Processing_MapperMethod extends Ac_Admin_Processing {
             $args = array($this->_getIdentifiersFromRequest());
             if (!$args[0] && $this->defaultToAllRecords) {
                 $coll = $this->_doGetRecordsCollection();
-                $kk = $coll->getPkName();
-                $db = $this->getApplication()->getDb();
-                if (count($kk) == 1) {
-                    $k = $kk[0];
-                    $keys = $db->fetchColumn("SELECT DISTINCT {$k} ".$coll->getStatementTail(true));
-                } else {
-                    $k = $db->n($kk, true);
-                    $keys = array();
-                    foreach ($db->fetchColumn("SELECT DISTINCT {$k} ".$coll->getStatementTail(true)) as $row) {
-                        $keys[] = array_keys($row);
-                    }
+                if (!$coll instanceof Ac_Model_Collection_SqlMapper) {
+                    throw new Exception("provideRecordKeys() doesn't work currently for collections other than Ac_Model_Collection_SqlMapper");
                 }
+                    
+                // new version of framework
+                /** @TODO: Ac_Model_Collection_Abstract::getRecordKeys() */
+                /** @TODO: Won't work with composite PKs */
+                $k = $coll->getMapper()->pk;
+                $s = $coll->createSqlSelect();
+                $s->columns = [$k];
+                $s->distinct = true;
+                $keys = $s->getDb()->fetchColumn($s);
                 $args = array($keys);
             }
         } else {

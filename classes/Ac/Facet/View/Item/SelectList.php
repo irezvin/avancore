@@ -7,6 +7,8 @@ class Ac_Facet_View_Item_SelectList extends Ac_Facet_ItemView {
     protected $size = null;
     
     protected $maxSize = false;
+    
+    protected $submitOnSelectChange = true;
 
     function setAutoHeight($autoHeight) {
         $this->autoHeight = $autoHeight;
@@ -25,13 +27,15 @@ class Ac_Facet_View_Item_SelectList extends Ac_Facet_ItemView {
     }
     
     function renderItem(Ac_Legacy_Controller_Response_Html $response) {
-        $v = $this->item->getPossibleValues();
+        $v = $this->getExpandedPossibleValues();
         $size = $this->getSize();
         $a = array(
             'size' => $size? $size : 1,
             'name' => $this->getHtmlName(),
-            'onchange' => 'if (this.form) this.form.submit();',
         );
+        if ($this->submitOnSelectChange) {
+            $a['onchange'] = 'if (this.form) this.form.submit();';
+        }
         if ($multiple = $this->getItem()->getMultiple()) {
             $a['multiple'] = true;
             $a['name'] .= '[]';

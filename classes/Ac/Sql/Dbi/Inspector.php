@@ -151,7 +151,7 @@ class Ac_Sql_Dbi_Inspector {
             $res['type'] = $typeDetails[1];
             if (isset($typeDetails[2]) && strlen($td = $typeDetails[2]) > 2) { // '(foo,bar)'
                 $td =  substr($td, 1, strlen($td) - 2); // get rid of parenthesis
-                if ($td{0} == '\'') { // with enum values are started with single quote... 
+                if ($td[0] == '\'') { // with enum values are started with single quote... 
                     $td = substr($td, 1, strlen($td) - 2); // get rid of outer quotes
                     foreach(preg_split('/(?<!\\\\)\',\'/', $td) as $enumVal) $enumVals[] = stripslashes($enumVal);
                     $res['enumValues'] = $enumVals;

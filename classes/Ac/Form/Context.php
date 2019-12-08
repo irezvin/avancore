@@ -37,12 +37,11 @@ class Ac_Form_Context extends Ac_Legacy_Controller_Context_Http {
             $vf = false;
             if (is_a($context, 'Ac_Form_Context')) $vf = $context->valueFirst;
             if ($vf) {
-                if (is_array($det = Ac_Util::getArrayByPath($d, Ac_Util::concatPaths('_data', $controlName), null))) {
+                if (!is_null($det = Ac_Util::getArrayByPath($d, Ac_Util::pathToArray(Ac_Util::concatPaths('value', $controlName)), null))) {
                     $details = $det;
                     if (is_array($det) && isset($det['value'])) unset($det['value']);
                     $subData = $details;
-                }
-                if (!is_null($val = Ac_Util::getArrayByPath($d, $controlName, null))) $subData = $val;
+                } elseif (!is_null($val = Ac_Util::getArrayByPath($d, $controlName, null))) $subData = $val;
             } else {
                 if (!is_null($val = Ac_Util::getArrayByPath($d, $controlName, null))) $subData = $val;
             }

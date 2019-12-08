@@ -132,7 +132,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_Nam
      * @param Ac_Legacy_Controller_Context $context
      */
     function __construct ($context = null, $options = array(), $instanceId = false) {
-
+        
         // Make the call Ac_Prototyped::factory compatible 
         if (is_array($context) && func_num_args() == 1) {
             $options = $context;
@@ -147,7 +147,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_Nam
 
         Ac_Util::bindAutoparams($this, $options);
         $this->doInitProperties($options);
-
+        
         $contextParam = $context;
     	if (!(is_object($contextParam) && $contextParam instanceof Ac_Legacy_Controller_Context)) {
             $context = null;

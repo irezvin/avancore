@@ -6,6 +6,8 @@
  */
 class Ac_Decorator_Text_UrlFriendly extends Ac_Decorator {
     
+    var $delimiter = "-";
+    
     function apply($value) {
         if (class_exists('Transliterator', false) && ($t = Transliterator::create("latin"))) {
             $value = $t->transliterate($value);
@@ -14,8 +16,8 @@ class Ac_Decorator_Text_UrlFriendly extends Ac_Decorator {
             $value = $t->Transliterate($value);
         }
         $value = strtolower($value);
-        $value = preg_replace("/[^a-z0-9-_ ]+/", "", $value);
-        $value = preg_replace("/[- _]+/", "-", trim($value));
+        $value = preg_replace("/[^a-z0-9-\\/_ ]+/", "", $value);
+        $value = preg_replace("/[- \\/_]+/", $this->delimiter, trim($value));
         return $value;
     }
    
