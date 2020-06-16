@@ -6,6 +6,8 @@ class Ac_Result_Json extends Ac_Result_Http implements Ac_I_Jsable {
     
     protected $contentType = 'text/json';
     
+    protected $strict = true;
+    
     function setData($data) {
         $this->data = $data;
     }
@@ -18,8 +20,8 @@ class Ac_Result_Json extends Ac_Result_Http implements Ac_I_Jsable {
         Ac_Util::ms($data, $this->data);
     }
     
-    
     function getContent() {
+        if ($this->strict) return json_encode($this->data);
         $v = new Ac_Js_Val($this);
         return $v->__toString();
     }

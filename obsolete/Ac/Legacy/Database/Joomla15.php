@@ -42,8 +42,9 @@ class Ac_Legacy_Database_Joomla15 extends Ac_Legacy_Database_Joomla {
     }
     
     function fetchAssoc($resultResource) {
-        if ($this->useMysqli) return mysqli_fetch_assoc($resultResource);
-        return mysql_fetch_assoc($resultResource);
+        if ($this->useMysqli) $res = mysqli_fetch_assoc($resultResource);
+        else $res = mysql_fetch_assoc($resultResource);
+        return $res;
     }
     
     function fetchObject($resultResource, $className = null) {

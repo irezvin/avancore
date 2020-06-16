@@ -74,7 +74,7 @@ class Ac_Util_Csv extends Ac_Prototyped {
      * @throws type
      */
     function setHeader($header) {
-        if (!is_array($header) || $header === false) 
+        if (!is_array($header) && $header !== false) 
             throw Ac_E_InvalidCall::wrongType ('header', $header, array('boolean (FALSE)', 'array'));
         $this->header = $header;
     }

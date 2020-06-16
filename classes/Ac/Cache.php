@@ -38,6 +38,8 @@ class Ac_Cache extends Ac_Cache_Abstract {
      */
     var $cleanupInterval = 3600;
     
+    var $lastFilename = false;
+    
     protected $triedCleanup = false;
     
     /**
@@ -166,6 +168,8 @@ class Ac_Cache extends Ac_Cache_Abstract {
         $id = str_replace('/\\', '-', $id);
             
         $fn .= $id;
+        
+        $this->lastFilename = $fn;
         
         return $fn;
     }

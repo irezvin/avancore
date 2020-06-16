@@ -88,10 +88,8 @@ class Ac_Lang_Resource {
 	}
 	
 	protected function reloadStringsFromProviders() {
-		if (!$this->stringsLoaded) {
-			$this->strings = array();
-			$this->stringsLoaded = false;
-		}
+        $this->strings = array();
+        $this->stringsLoaded = false;
 	}
 	
 	protected function actualizeStrings() {

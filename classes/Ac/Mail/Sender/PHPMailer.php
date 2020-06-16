@@ -111,7 +111,7 @@ abstract class Ac_Mail_Sender_PHPMailer extends Ac_Prototyped implements Ac_I_Ma
                         register_shutdown_function(array(__CLASS__, 'cleanTmp'));
                         self::$tmp = array();
                     }
-                    $tmp = tmpfile($item);
+                    $tmp = tempnam(Ac_Avancore::getInstance()->getAdapter()->getVarTmpPath(), "attach-");
                     self::$tmp[] = $tmp;
                     file_put_contents($tmp, $item->getAttachmentContent());
                     $mailer->addAttachment($tmp, $item->getAttachmentFilename(), 

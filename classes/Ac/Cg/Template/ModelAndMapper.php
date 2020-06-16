@@ -10,15 +10,15 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     var $genMapperClass = false;
     var $parentMapperClass = false;
     
-    var $mapperVars = array();
+    var $mapperVars = [];
     
     var $storageClass = false;
     var $genStorageClass = false;
     var $parentStorageClass = false;
     
-    var $storageVars = array();
+    var $storageVars = [];
     
-    var $vars = array();
+    var $vars = [];
     var $ownPropInfo = false;
     var $ownProperties = false;
     var $ownLists = false;
@@ -26,22 +26,22 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     var $tableName = false;
     var $pkStr = false; // "null" / "'id'" / "array('foo', 'bar')" - PK param for Ac_Model_Object as it will be inserted into PHP code
     var $autoincFieldName = false;
-    var $assocProperties = array();
+    var $assocProperties = [];
     var $relationPrototypes = false;
     var $uniqueIndexData = false;
     var $createAccessors = false;
-    var $accessors = array();
-    var $nullableColumns = array();
-    var $associationPrototypes = array();
-    var $relationProviderPrototypes = array();
+    var $accessors = [];
+    var $nullableColumns = [];
+    var $associationPrototypes = [];
+    var $relationProviderPrototypes = [];
     var $hasUniformPropertiesInfo = false;
-    var $modelCoreMixables = array();
-    var $mapperCoreMixables = array();
+    var $modelCoreMixables = [];
+    var $mapperCoreMixables = [];
     var $internalDefaults = false;
     
-    var $ignoreVars = array();
-    var $ignoreMethods = array();
-    var $inheritedIndice = array();
+    var $ignoreVars = [];
+    var $ignoreMethods = [];
+    var $inheritedIndice = [];
     
     function _generateFilesList() {
         return array(
@@ -210,7 +210,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     }
     
     function getDefaults(Ac_Cg_Model $model) {
-        $res = array();
+        $res = [];
         $tc = $model->tableObject->listColumns();
         foreach (array_intersect($model->listUsedColumns(), $tc) as $nm) {
             $col = $model->tableObject->getColumn($nm);
@@ -326,7 +326,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
                 else $funcSfx = str_replace(" ", "", ucwords(implode(" ", $idxFields)));
             $funcSfx = ucfirst($funcSfx);
             $params = '$'.implode(', $', $idxFields);
-            $sqlCrit = array();
+            $sqlCrit = [];
             foreach ($idxFields as $f) {
                 $sqlCrit[] = "'.\$this->getDb()->n('$f').' = '.\$this->getDb()->q(\${$f}).'";
             }
@@ -457,31 +457,31 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     
     /*
     protected function getOwnPropertiesInfo() {
-        return Ac_Util::m(parent::getOwnPropertiesInfo(), array(
-            '' => array(
+        return Ac_Util::m(parent::getOwnPropertiesInfo(), [
+            '' => [
                 'caption' => '',
                 'dataType' => '',
                 'controlType' => '',
-            ),
-        ));
+            ],
+        ]);
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array(
+        return array_merge(parent::listOwnProperties(), [
             '', '',
-        ));
+        ]);
     }
     
     protected function listOwnLists() {
-        return array_merge(parent::listOwnLists(), array(
+        return array_merge(parent::listOwnLists(), [
             '' => '', '' => '',
-        ));
+        ]);
     }
     
     protected function listOwnAssociations() {
-        return array_merge(parent::listOwnAssociations(), array(
+        return array_merge(parent::listOwnAssociations(), [
             '' => '', '' => '',
-        ));
+        ]);
     }
     
     */
@@ -536,7 +536,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
      * @return <?php $this->d($this->modelClass); ?> 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper(<?php $this->str($this->mapperClass); ?>)->createRecord($className);
@@ -561,7 +561,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     /**
      * @return <?php $this->d($this->modelClass); ?> 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -615,7 +615,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
      * @param mixed $sort
      * @return <?php echo $this->modelClass; ?>
      */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -625,7 +625,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
      * @param array $query
      * @return <?php echo $this->modelClass; ?>
      */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -638,7 +638,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
      * @param bool $forceStorage
      * @return <?php echo $this->modelClass; ?>[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -660,7 +660,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -742,99 +742,103 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMapperClass); ?> {
 <?php if ($this->model->generateMethodPlaceholders) { ?>
 
-//  protected function doGetInfoParams() {
+//    protected function doGetInfoParams() {
 //        
-//      $res = Ac_Util::m(parent::doGetInfoParams(), array(
-//          'singleCaption' => '',
-//          'pluralCaption' => '',
+//        $res = Ac_Util::m(parent::doGetInfoParams(), [
+//            'singleCaption' => '',
+//            'pluralCaption' => '',
 //      
-//          'adminFeatures' => array(
-//              'Ac_Admin_Feature_Default' => array(
+//            'adminFeatures' => [
+//                'Ac_Admin_Feature_Default' => [
 //      
-//                  'actionSettings' => array(
-//                      '' => array(
-//                          'id' => '',
-//                          'scope' => 'any',
-//                          'image' => 'stop_f2.png', 
-//                          'disabledImage' => 'stop.png',
-//                          'caption' => '',
-//                          'description' => '',
-//                          'managerProcessing' => 'procName',
-//                          'listOnly' => true,
-//                      ), 
-//                  ),
+//                    'actionSettings' => [
+//                        '' => [
+//                            'scope' => 'any',
+//                            'image' => 'stop_f2.png', 
+//                            'disabledImage' => 'stop.png',
+//                            'caption' => '',
+//                            'description' => '',
+//                            'processingPrototype' => [
+//                                'class' => 'Ac_Admin_Processing_Method',
+//                            ],
+//                            'listOnly' => true,
+//                        ], 
+//                    ],
 //                  
-//                  'processingSettings' => array(
-//                      'procName' => array(
-//                          'class' => 'Proc_Class',
-//                      ),
-//                  ),
+//                    'processingSettings' => [
+//                        'procName' => [
+//                            'class' => 'Ac_Admin_Processing_Method',
+//                        ],
+//                    ],
 //      
-//                  'columnSettings' => array(
+//                    'columnSettings' => [
 //      
-//                        'col1' => array(
+//                        'col1' => [
 //                            'class' => '',
 //                            'order' => -10,
 //                            'title' => '',
-//                        ),
+//                        ],
 //                        
-//                  ),
+//                    ],
 //                  
-//                    'formFieldDefaults' => array(
-//                    ),
+//                    'formFieldDefaults' => [
+//                    ],
 //                    
 //                    'displayOrderStart' => 0,
 //                    
 //                    'displayOrderStep' => 10,
 //                    
-//                  'formSettings' => array(
-//                      'controls' => array(
-//                            '' => array(
-//                            ),
-//                      ),
-//                  ),
+//                    'formSettings' => [
+//                        'controls' => [
+//                            '' => [
+//                            ],
+//                        ],
+//                    ],
 //                  
-//                  'filterPrototypes' => array(
-//                  ),
-//                  
-//                  'orderPrototypes' => array(
-//                  ),
-//                  
-//                  'filterFormSettings' => array(
-//                      'controls' => array(
-//                          'substring' => array(
-//                              'class' => 'Ac_Form_Control_Text',
-//                              'caption' => 'Filter',
-//                              'htmlAttribs' => array( 
-//                                  'onchange' => 'document.aForm.submit();',
-//                                  'size' => 20,
-//                              ),
-//                              'description' => '',                                
-//                          ),
-//                      ),
-//                  ),
+//                    'filterFormSettings' => [
+//                        'controls' => [
+//                            'substring' => [
+//                                'class' => 'Ac_Form_Control_Text',
+//                                'caption' => 'Filter',
+//                                'htmlAttribs' => [ 
+//                                    'placeholder' => 'Filter',
+//                                    'onchange' => 'document.aForm.submit();',
+//                                    'size' => 20,
+//                                ],
+//                                'description' => '',                                
+//                            ],
+//                        ],
+//                    ],
 //                    
-//                    'sqlSelectSettings' => array(
-//                        'tables' => array(
-//                        ),
-//                    ),
+//                    'sqlSelectSettings' => [
+//                        'tables' => [
+//                        ],
+//                    ],
 //                  
-//              ),
-//          ),
-//      ));
-//      return $res;
-//  }    
+//                ],
+//            ],
+//        ]);
+//        return $res;
+//    }    
+//
+//    protected function doGetSqlSelectPrototype($primaryAlias = 't') {
+//        return Ac_Util::m(parent::doGetSqlSelectPrototype($primaryAlias), [
+//            'parts' => [
+//            ],
+//        ]);
+//    }
+//
 //    
 //    protected function doGetRelationPrototypes() {
-//        return Ac_Util::m(parent::doGetRelationPrototypes(), array(
-//            '' => array(
+//        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+//            '' => [
 //                'srcMapperClass' => <?php $this->str($this->mapperClass); ?>,
 //                'destMapperClass' => '',
-//                'fieldLinks' => array(),
+//                'fieldLinks' => [],
 //                'srcIsUnique' => false,
 //                'destIsUnique' => false,
-//            ),
-//        ));
+//            ],
+//        ]);
 //    }
 <?php } ?>  
     

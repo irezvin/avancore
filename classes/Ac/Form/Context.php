@@ -13,7 +13,7 @@
 
 class Ac_Form_Context extends Ac_Legacy_Controller_Context_Http {  
     
-    var $_controlName = false;
+    var $controlName = false;
     var $idPrefix = false;
     var $valueFirst = true;    
     
@@ -30,7 +30,7 @@ class Ac_Form_Context extends Ac_Legacy_Controller_Context_Http {
         /*if (count($dp)) $controlName = $dp[count($dp) - 1];
             else $controlName = false;*/
         $controlName = Ac_Util::pathToArray($subPath);
-        $res->_controlName = $dp;
+        $res->controlName = $dp;
         $d = $context->getData();
         $subData = array();
         if ($controlName) {

@@ -172,7 +172,8 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     
     function getResultResource($query) {
         $this->_aeDb->setQuery($this->intPreProcessQuery($query));
-        return $this->_aeDb->getResultResource();
+        $res = $this->_aeDb->getResultResource();
+        return $res;
     }
     
     function resultGetFieldsInfo($resultResource) {

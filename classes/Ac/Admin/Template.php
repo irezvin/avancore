@@ -23,7 +23,12 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
     var $actionParam = 'action';
     var $processingParam = 'processing';
     var $recordKeyParam = 'key';
+    
+    /**
+     * @var Ac_Admin_Action[]
+     */
     var $actions = array();
+    
     var $htmlIdsPrefix = false;
     
     var $assets = array();
@@ -286,6 +291,7 @@ class Ac_Admin_Template extends Ac_Legacy_Template_Html {
         } ?>
 
     <div class='manager' data-managerid='<?php $this->d($this->manager->getJsManagerControllerRef(true)); ?>' id='<?php $this->d($this->manager->getContext()->mapIdentifier('_container')); ?>'>
+        <div class='managerBookmark' id='<?php $this->d($this->manager->getContext()->mapIdentifier('_container')); ?>_bookmark'></div>
 <?php if ($this->manager->separateToolbar) ob_start(); ?>    
 <?php   $this->manager->toolbarHeader = $this->manager->isForm()? $this->manager->getFormTitle() : $this->manager->getPluralCaption(); ?>
 <?php   $this->showToolbar(); ?>

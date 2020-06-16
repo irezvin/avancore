@@ -196,8 +196,8 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_Nam
     // --------------------- context-related methods ---------------------
 
     function bindFromRequest() {
-        $this->_rqData = $this->_context->getData();
-        $this->_state = $this->_context->getState();
+        $this->_rqData = $this->getContext()->getData();
+        $this->_state = $this->getContext()->getState();
         $this->_rqWithState = Ac_Util::m($this->_state, $this->_rqData, true);
         $this->doBindFromRequest();
     }
@@ -243,9 +243,6 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_Nam
      */
     protected function guessContext() {
         $url = Ac_Url::guess(true);
-        $context = null;
-        if (is_array($context)) $path = $context;
-            elseif (is_string($context)) $path = Ac_Util::pathToArray($context);
         $context = new Ac_Legacy_Controller_Context_Http();
         $context->setBaseUrl($url);
         $context->populate(array('get', 'post'));
@@ -286,7 +283,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_Nam
      * @return Ac_Url
      */
     function getUrl($extraParams = array(), $preserveCurrentParams = false) {
-        if (!$this->_context instanceof Ac_Legacy_Controller_Context_Http) return;
+        if (!($this->_context instanceof Ac_Legacy_Controller_Context_Http)) return;
         if ($this->_stateData) {
             $ctx = clone $this->_context;
             if (!$preserveCurrentParams) $ctx->setData(array());
@@ -428,7 +425,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_Nam
         $handledOutput = !strlen($outputBuffer);
         // TODO: automatically detect template class and template part
         $template = $this->getTemplate();
-        $willRenderTemplate = $template && strlen($this->_templatePart);
+        $willRenderTemplate = $template && $this->_templatePart;
         if (!$handledOutput && $willRenderTemplate) {
             if ($this->_outputToTemplate !== false) {
                 $this->_tplData[$this->_outputToTemplate] = $outputBuffer;
@@ -445,7 +442,12 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_Nam
             $handledOutput = true;
         }
         if ($willRenderTemplate) {
-            $this->_response->content .= $template->fetch($this->_templatePart);
+            if ($this->_templatePart === true) {
+                $templatePart = preg_replace('/^execute/', '', $this->_methodName);
+            } else {
+                $templatePart = $this->_templatePart;
+            }
+            $this->_response->content .= $template->fetch($templatePart);
         }
         if ($this->simpleCaching && !$this->cacheSkip) {
             $simpleCachingAccessor->put($this->_response);

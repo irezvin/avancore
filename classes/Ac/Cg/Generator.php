@@ -126,11 +126,15 @@ class Ac_Cg_Generator {
      */
     var $_outputFiles = false;
     
+    var $_outputTime = false;
+    
     var $lintify = true;
     
     var $lintCommand = "php -l %s 2>&1";
     
     var $importantLog = array();
+    
+    protected $startTime = null;
     
     /**
      * @param string $configOrFileName name of file with static configuration of project
@@ -292,6 +296,8 @@ class Ac_Cg_Generator {
     
     function log($message, $important = false) {
         if ($this->logFileName) {
+            $dir = dirname($this->logFileName);
+            if (!is_dir($dir)) mkdir($dir, 0775, true);
             if ($this->_logFile === false) {
                 if ($this->overwriteLog) $this->_logFile = fopen($this->logFileName, "w");
                     else $this->_logFile = fopen($this->logFileName, "a");
@@ -329,6 +335,8 @@ class Ac_Cg_Generator {
         if ($this->runData !== false) throw new Ac_E_InvalidUsage("Cannot ".__METHOD__." when hasBegan(); call end() first");
         
         $this->runData = array();
+        
+        $this->startTime = microtime(true);
         
         $settings = array(
             'error_reporting' => E_ALL, 
@@ -372,8 +380,9 @@ class Ac_Cg_Generator {
         
         $this->_outputBytes = $writer->getTotalSize();
         $this->_outputFiles = $writer->getFileCount();
+        $this->_outputTime = round(microtime(true) - $this->startTime, 2);
         
-        $this->log('Generator finished: '.$this->getOutputBytes().' bytes in '.$this->getOutputFiles().' files ----------------');
+        $this->log('Generator finished in '.$this->getOutputTime().' sec: '.$this->getOutputBytes().' bytes in '.$this->getOutputFiles().' files  ----------------');
         
         $oldSettings = $this->runData['oldSettings'];
         
@@ -399,6 +408,10 @@ class Ac_Cg_Generator {
         if ($this->deployEditable && $this->genEditable) {
             if (!strlen($this->deployPath)) throw new Ac_E_InvalidUsage("Cannot \$deployEditable without \$deployPath!");
             $this->writer->deploy($this->outputDir.'/'.$this->classesDir, dirname($this->deployPath).'/'.$this->classesDir, true, $err, true);
+            // ugly hack
+            if (is_dir($this->outputDir.'/languages')) {
+                $this->writer->deploy($this->outputDir.'/languages', dirname($this->deployPath).'/languages', true, $err, true);
+            }
             if ($err) $this->log ($err, true);
         }
         
@@ -464,6 +477,10 @@ class Ac_Cg_Generator {
     
     function getOutputFiles() {
         return $this->_outputFiles;
+    }
+    
+    function getOutputTime() {
+        return $this->_outputTime;
     }
     
     function closeLog() {

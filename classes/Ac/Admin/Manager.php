@@ -156,7 +156,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
      */
     protected $configService = false;
     
-    function doInitProperties($options = array()) {
+    function doInitProperties(array $options = array()) {
         Ac_Util::bindAutoparams($this, $options);
     }
     
@@ -1037,6 +1037,14 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
     
     /**
+     * Alias of Ac_Admin_Manager::getIdentifierOf()
+     * @deprecated since 0.3.4
+     */
+    function getStrPk($record) {    
+        return $this->getIdentifierOf($record);
+    }
+    
+    /**
      * Returns string representation of record's primary key
      *
      * @param Ac_Model_Record $record
@@ -1242,7 +1250,9 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                     // subsequent features CAN override columns of previous ones
                     if (!isset($this->_columnSettings[$c])) {
                         $this->_columnSettings[$c] = $s;
-                        $this->_columnSettings[$c]['manager'] = $this;
+                        if (is_array($this->_columnSettings[$c])) {
+                            $this->_columnSettings[$c]['manager'] = $this;
+                        }
                     }
                     else Ac_Util::ms($this->_columnSettings[$c], $s);
                 }
@@ -1326,6 +1336,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
                 }
                 else if ($sort !== null) $this->collection->setSort($sort);
             }
+            $this->callFeatures('onAfterCreateCollection', $this->collection);
         }
         return $this->collection;
     }

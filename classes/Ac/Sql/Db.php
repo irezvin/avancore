@@ -154,22 +154,9 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
      * 
      * @param array $rows Two-dimensional associative array with insert data
      */
-    function unifyInsertData($rows) {
-        $allKeys = array();
-        foreach ($rows as $row) {
-            $allKeys = array_unique(array_merge($allKeys, array_keys($row)));
-        }
-        $res = array();
-        $def = new Ac_Sql_Expression('DEFAULT');
-        foreach ($rows as $row) {
-            $newRow = array();
-            foreach ($allKeys as $key) {
-                if (array_key_exists($key, $row)) $newRow[$key] = $row[$key];
-                    else $newRow[$key] = $def;
-            }
-            $res[] = $newRow;
-        }
-        return $res;
+    function unifyInsertData($rows, $defaultValue = null) {
+        if (func_num_args() == 1) $defaultValue = new Ac_Sql_Expression('DEFAULT');
+        return array_values(Ac_Util::unifyArray($rows, $defaultValue));
     }
     
     function insertStatement($tableName, $fieldValues, $multipleInserts = false, $useReplace = false) {

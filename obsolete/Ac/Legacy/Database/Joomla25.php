@@ -1,7 +1,11 @@
 <?php
 
 class Ac_Legacy_Database_Joomla25 extends Ac_Legacy_Database_Joomla15 {
-	
+
+    function __construct($options = array()) {
+        parent::__construct($options);
+    }
+    
     function loadResult() {
         $this->_debugBeforeQuery($this->_db->getQuery());
         $res = $this->_db->loadResult();

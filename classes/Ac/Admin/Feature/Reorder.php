@@ -4,113 +4,106 @@ class Ac_Admin_Feature_Reorder extends Ac_Admin_Feature {
     
     var $colName = false;
     
-    var $columnPrototype = array();
+    var $fieldName = false;
     
-    var $saveOrderColumnPrototype = array();
+    var $saveOrderColName = false;
     
-    var $orderUpProcessing = array();
+    var $columnPrototype = [];
     
-    var $orderDownProcessing = array();
+    var $saveOrderColumnPrototype = [];
     
-    var $saveOrderProcessing = array();
+    var $orderUpProcessing = [];
+    
+    var $orderDownProcessing = [];
+    
+    var $saveOrderProcessing = [];
     
     var $groupProperty = false;
     
     function doCanBeApplied() {
-        return (bool) strlen($this->colName);
+        return strlen($this->colName) || strlen($this->saveOrderColName);
+    }
+    
+    function getFieldName() {
+        if ($this->fieldName) return $this->fieldName;
+        if ($this->colName) return $this->colName;
+        return $this->saveOrderColName;
+    }
+    
+    function getColName() {
+        if ($this->colName) return $this->colName;
+        return $this->fieldName;
+    }
+    
+    function getSaveOrderColName() {
+        $res = $this->saveOrderColName;
+        if (!$res && ($c = $this->getColName())) {
+            $res = $c.'SaveOrder';
+        }
+        return $res;
     }
     
     function getColumnSettings() {
-        $orderUpTask = $this->colName.'OrderUp';
-        $orderDownTask = $this->colName.'OrderDown';
+        $c = $this->getColName();
+        $f = $this->getFieldName();
         
-        if (!is_array($this->orderUpProcessing)) {
-            $orderUpTask = false;
+        $orderUpTask = false;
+        $orderDownTask = false;
+        
+        if ($c && is_array($this->orderUpProcessing)) {
+            $orderUpTask = $c.'OrderUp';
         }
         
-        if (!is_array($this->orderDownProcessing)) {
-            $orderDownTask = false;
+        if ($c && is_array($this->orderDownProcessing)) {
+            $orderUpTask = $c.'OrderDown';
         }
         
-        $res = array(
-            $this->colName => array(
+        $res = [];
+        
+        $colName = $this->getColName();
+        
+        if ($colName && is_array($this->columnPrototype)) {
+            $res[$colName] = Ac_Util::m([
                 'class' => 'Ac_Admin_Column_Reorder',
                 'orderUpTask' => $orderUpTask,
                 'orderDownTask' => $orderDownTask,
-            ),
-            $this->colName.'SaveOrder' => array(
-                'class' => 'Ac_Admin_Column_SaveOrder',
-                'taskName' => $this->colName.'SaveOrder',
-            ),
-        );
-        
-        if (is_array($this->columnPrototype)) {
-            Ac_Util::ms($res[$this->colName], $this->columnPrototype);
-        } else {
-            unset($res[$this->colName]);
+            ], $this->columnPrototype);
         }
-        if (is_array($this->saveOrderColumnPrototype)) {
-            Ac_Util::ms($res[$this->colName.'SaveOrder'], $this->saveOrderColumnPrototype);
-        } else {
-            unset($res[$this->colName.'SaveOrder']);
+        
+        if (($sc = $this->getSaveOrderColName()) && is_array($this->columnPrototype)) {
+            $res[$sc] = Ac_Util::m([
+                    'class' => 'Ac_Admin_Column_SaveOrder',
+                    'taskName' => $sc.'SaveOrder',
+            ], $this->saveOrderColumnPrototype);
         }
         return $res;
     }
     
-    /*function getActions() {
-        $res = array();
-        $res = array(
-            ($pc = $this->colName.'OrderUp') => array(
-                'id' => $pc,
-                'scope' => 'some',
-                'image' => 'icon-32-orderup.png', 
-                'caption' => 'Включить',
-                'managerProcessing' => $pc,
-                'listOnly' => true,
-            ), 
-            ($upc = $this->colName.'OrderDown') => array(
-                'id' => $upc,
-                'scope' => $this->colName.'some',
-                'image' => 'icon-32-unorderup.png', 
-                'caption' => 'Выключить',
-                'managerProcessing' => $upc,
-                'listOnly' => true,
-            ),
-        );
-        if (is_array($this->orderupAction)) Ac_Util::ms($res[$pc], $this->orderupAction);
-        if (!is_array($this->orderupProcessing) || !is_array($this->orderupAction))
-            unset($res[$pc]);
-        if (is_array($this->unorderupAction)) Ac_Util::ms($res[$upc], $this->unorderupAction);
-        if (!is_array($this->unorderupProcessing) || !is_array($this->unorderupAction))
-            unset($res[$upc]);
-        return $res;
-    }*/
-    
     function getProcessings() {
-        $res = array();
-        $res = array(
-            ($pc = $this->colName.'OrderUp') => array(
-                'class' => 'Ac_Admin_Processing_Reorder',
-                'fieldName' => $this->colName,
-                'direction' => 'up',
-            ), 
-            ($upc = $this->colName.'OrderDown') => array(
-                'class' => 'Ac_Admin_Processing_Reorder',
-                'fieldName' => $this->colName,
-                'direction' => 'down',
-            ),
-            ($so = $this->colName.'SaveOrder') => array(
+        $res = [];
+        if (($f = $this->getFieldName()) && ($c = $this->getColName())) {
+            if (is_array($this->orderUpProcessing)) {
+                $res[$c.'OrderUp'] = Ac_Util::m([
+                    'class' => 'Ac_Admin_Processing_Reorder',
+                    'fieldName' => $this->getFieldName(),
+                    'direction' => 'up',
+                ], $this->orderUpProcessing);
+            }
+            if (is_array($this->orderDownProcessing)) {
+                $res[$c.'OrderDown'] = Ac_Util::m([
+                    'class' => 'Ac_Admin_Processing_Reorder',
+                    'fieldName' => $this->getFieldName(),
+                    'direction' => 'down',
+                ], $this->orderDownProcessing);
+            }
+        }
+        if (($so = $this->getSaveOrderColName()) && is_array($this->saveOrderProcessing)) {
+            $res[$so.'SaveOrder'] = Ac_Util::m([
                 'class' => 'Ac_Admin_Processing_SaveOrder',
-                'fieldName' => $this->colName,
+                'fieldName' => $this->getFieldName(),
                 'mode' => 'save',
-            ),
-        );
-        if (is_array($this->orderUpProcessing)) Ac_Util::ms($res[$pc], $this->orderUpProcessing);
-            else unset($res[$pc]);
-        if (is_array($this->orderDownProcessing)) Ac_Util::ms($res[$upc], $this->orderDownProcessing);
-            else unset($res[$upc]);
-        if (is_array($this->saveOrderProcessing)) Ac_Util::ms($res[$so], $this->saveOrderProcessing);
-            else unset($res[$so]);
+            ], $this->saveOrderProcessing);
+        }
         return $res;
     }
     

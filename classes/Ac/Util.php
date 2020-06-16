@@ -219,23 +219,6 @@ abstract class Ac_Util {
     static function implode_r($glue, $array, $array_name = NULL) {
         return self::implodeRecursive($glue, $array, $array_name);
     }
-    
-    static function getCsvLine($line,$delimiter=",",$enclosure="\"") {
-        // Build the string
-        $string = "";
-         
-        $writeDelimiter = FALSE;
-        
-        foreach($line as $dataElement){ 
-            $dataElement=str_replace($enclosure, $enclosure.$enclosure, $dataElement);
-            if($writeDelimiter) $string .= $delimiter;
-            $string .= $enclosure . $dataElement . $enclosure;
-            $writeDelimiter = TRUE;
-        }
-        $string .= "\n";
-        
-        return $string;
-    }
 
     static function date ($src, $format = null, $useGmt = false, & $wasZeroDate = false) {
         return Ac_Model_DateTime::date($src, $format, $useGmt, $wasZeroDate);
@@ -395,7 +378,7 @@ abstract class Ac_Util {
     }
     
     static function simpleBind ($array, $obj) {
-        foreach (array_keys($array) as $k) if (($k[0] !== '_') && isset($obj->$k)) {
+        foreach (array_keys($array) as $k) if (($k[0] !== '_') && isset($obj->$k) || property_exists(get_class($obj), $k)) {
             $obj->$k = $array[$k];
         }
     }
@@ -564,6 +547,32 @@ abstract class Ac_Util {
             unset($arrPath[--$c]);
         }
         if ($c <= 5) {
+            
+            // PHP will throw fatal error if we will try to do $foo[$bar][$baz] = & $quux when $foo[$bar] is a string. 
+            // So we need to convert it to array first.
+            
+            if ($c > 0) {
+                if (!is_array($arr)) {
+                    $arr = array();
+                } else if ($c > 1 && isset($arr[$arrPath[0]])) {
+                    if (!is_array($arr[$arrPath[0]])) {
+                        $arr = array();
+                    } elseif ($c > 2 && isset($arr[$arrPath[0]][$arrPath[1]])) {
+                        if (!is_array($arr[$arrPath[0]][$arrPath[1]])) {
+                            $arr[$arrPath[0]][$arrPath[1]] = array();
+                        } elseif ($c > 3 && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]])) {
+                            if (!is_array($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]])) {
+                                $arr[$arrPath[0]][$arrPath[1]][$arrPath[2]] = array();
+                            } elseif ($c > 4 && isset($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]])) {
+                                if (!is_array($arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]])) {
+                                    $arr[$arrPath[0]][$arrPath[1]][$arrPath[2]][$arrPath[3]] = array();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
             if ($unique) {
                 if ($c === 0) $arr = $value;
                 if ($c === 1) $arr[$arrPath[0]] = & $value;
@@ -582,6 +591,7 @@ abstract class Ac_Util {
                 return;
             }
         }
+        
         if (!is_array($arrPath)) $arrPath = array($arrPath);
         $src = & $arr;
         $arrPath = array_reverse($arrPath);
@@ -746,7 +756,14 @@ abstract class Ac_Util {
         return $res;
     }
 
-    static function makeCsvLine($line,$delimiter=";",$enclosure="\"", $addNewLine = true, $forceText = false) {
+    /**
+     * @deprecated Use Ac_Util::makeCsvLine
+     */
+    static function getCsvLine($line, $delimiter=",", $enclosure="\"", $addNewLine = true, $forceText = false) {
+        return self::makeCsvLine($line, $delimiter, $enclosure, $addNewLine,  $forceText);
+    }
+    
+    static function makeCsvLine($line, $delimiter=";", $enclosure="\"", $addNewLine = true, $forceText = false) {
         $string = "";
         $writeDelimiter = FALSE;
         foreach($line as $dataElement){
@@ -758,6 +775,15 @@ abstract class Ac_Util {
         }
         if ($addNewLine) $string .= "\n";
         return $string;
+    }
+    
+    static function makeCsvTable(array $twoDim, $delimiter = ";", $enclosure = "\"", $newLineChar = PHP_EOL) {
+        $res = '';
+        if (!$twoDim) return $res;
+        $twoDim = array_values(Ac_Util::unifyArray($twoDim, ''));
+        $res .= self::makeCsvLine(array_keys($twoDim[0]), $delimiter, $enclosure, $newLineChar);
+        foreach ($twoDim as $row) $res .= self::makeCsvLine($row, $delimiter, $enclosure, $newLineChar);
+        return $res;
     }
     
     static function d($s) {
@@ -1237,10 +1263,33 @@ abstract class Ac_Util {
     }
     
     /**
-     * Note: detects slash-based ("/") regexes onlyt
+     * Note: detects slash-based ("/") regexes only!
      */
     static function isRegex($string) {
         return strlen($string) > 2 && $string[0] == '/' && preg_match("#^/.+/\\w*$#", $string);
+    }
+    
+    /**
+     * Makes all keys in 2-dimensional array present and go in the same order. Sets missing values to $defaultValue
+     */
+    static function unifyArray($rows, $defaultValue = null, array $perColumnDefaults = null) {
+        $allKeys = array();
+        foreach ($rows as $row) {
+            foreach (array_keys($row) as $k) $allKeys[$k] = $k;
+        }
+        $res = array();
+        foreach ($rows as $k => $row) {
+            $newRow = array();
+            foreach ($allKeys as $key) {
+                if (array_key_exists($key, $row)) $newRow[$key] = $row[$key];
+                    elseif ($perColumnDefaults && array_key_exists($key, $perColumnDefaults)) {
+                        $newRow[$key] = $perColumnDefaults[$key];
+                    }
+                    else $newRow[$key] = $defaultValue;
+            }
+            $res[$k] = $newRow;
+        }
+        return $res;
     }
     
 }

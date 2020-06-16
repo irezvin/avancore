@@ -598,7 +598,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             $controlId = $control->getId();
         }
         
-        if (/*!$control->getMultiSelect() &&*/ !$control->isReadOnly() && (($cap = $control->getDummyCaption()) !== false)) {
+        if (!$control->isReadOnly() && (($cap = $control->getDummyCaption()) !== false)) {
             $items[] = array('value' => (string) $control->getDummyValue(), 'caption' => $cap, 'selected' => $control->isItemSelected(''));
         }
         

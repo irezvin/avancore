@@ -12,9 +12,11 @@ class Ac_Admin_Processing_SaveOrder extends Ac_Admin_Processing {
 	 */
 	var $manager = false;
 	
-	function getOrderingValue($record) {
+	function getOrderingValue(Ac_Model_Data $record) {
 		$res = $this->getContext()->getData(array($this->paramName, $this->manager->getIdentifierOf($record)), false);
-		if (is_numeric($res)) $res = (int) $res;
+        $meta = $record->getPropertyInfo($this->paramName);
+        $allowFloat = $meta->dataType === 'float';
+		if (is_numeric($res)) $res = $allowFloat? (float) $res : (int) $res;
 			else $res = false;
 		return $res;
 	}
@@ -22,7 +24,6 @@ class Ac_Admin_Processing_SaveOrder extends Ac_Admin_Processing {
 	function _doProcessRecord($record) {
 		
         if ($this->manager->getMapper() instanceof Ac_I_BatchAwareMapper) $this->manager->getMapper()->beginBatchChange(array($this->fieldName));
-        
 		$value = $record->getField($this->fieldName);
 		$newValue = $this->getOrderingValue($record);
 		if ($newValue !== false && $newValue != $value) {

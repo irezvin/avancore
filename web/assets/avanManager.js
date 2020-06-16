@@ -934,10 +934,10 @@ AvanControllers.ManagerController.prototype = {
             var inp = document.createElement('input');
             inp.setAttribute('type', 'hidden');
             inp.setAttribute('name', this.managerParamsPrefix + '[_fragment]');
-            inp.setAttribute('value', this.containerElementId);            
+            inp.setAttribute('value', this.containerElementId + '_bookmark');            
             formElement.appendChild(inp);
             var action = formElement.getAttribute('action').split('#')[0];
-            formElement.setAttribute('action', action + '#' + this.containerElementId);
+            formElement.setAttribute('action', action + '#' + this.containerElementId + '_bookmark');
             if (formElement) formElement.submit(); else throw 'No Form Element';
         }
     },

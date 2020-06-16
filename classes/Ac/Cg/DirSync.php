@@ -29,7 +29,8 @@ class Ac_Cg_DirSync extends Ac_Prototyped {
     }
     
     /**
-     * Lists directory. Adds "/" after dir names. Dir names are AFTER file names. Doesn't prefix with dir path.
+     * Lists directory. Adds "/" after dir names. Dir names are AFTER file names. 
+     * Doesn't prefix with dir path.
      */
     protected function recDir($prefix, $path = '', $files = array(), $pattern = false) { 
         clearstatcache();

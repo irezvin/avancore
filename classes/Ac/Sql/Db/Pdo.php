@@ -356,7 +356,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     }
     
     function __clone() {
-        if ($this->hasPdoPrototype()) {
+       if ($this->hasPdoPrototype()) {
             $this->setPdo($this->pdoPrototype);
         }
     }

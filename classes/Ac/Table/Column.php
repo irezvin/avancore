@@ -234,13 +234,14 @@ class Ac_Table_Column {
      * @return string cell title
      */
     function getTitle() {
-        $res = $this->_name;
+        $res = null;
         if (isset($this->settings['title'])) $res = $this->settings['title'];
         elseif ($pi = $this->getStaticPropertyInfo()) {
              if (isset($pi->colCaption) && strlen($pi->colCaption))
                  $res = $pi->colCaption;
              elseif (strlen($pi->caption)) $res = $pi->caption;
         }
+        if (is_null($res)) $res = Ac_Cg_Inflector::humanize($this->_name);
         return $res;
     }    
     

@@ -1,15 +1,7 @@
 <?php
 
-class Ac_Legacy_Controller_Context {
+class Ac_Legacy_Controller_Context extends Ac_Prototyped {
 
-    /**
-     * This request is intended to retrieve direct response from the terminal controller of processing chain.
-     * This parameter isn't mandatory for the controllers that process this request!
-     *
-     * @var bool
-     */
-    var $directRequest = false;
-    
     /**
      * Whether state of the controller is stored by the environment
      * @var bool
@@ -23,19 +15,13 @@ class Ac_Legacy_Controller_Context {
     
     var $_state = array();
     
-    function __construct($options = array()) {
-        if (!is_array($options)) trigger_error("\$options must be an array", E_USER_ERROR);
-        $this->initialize($options);
+    function hasPublicVars() {
+        return true;
     }
     
-    /**
-     * @access protected
-     */
-    function initialize($options) {
-        if (isset($options['directRequest'])) $this->direct = $options['direct'];
-        if (isset($options['stateIsManaged'])) $this->stateIsManaged = $options['stateIsManaged'];
-        if (isset($options['data'])) $this->setData($options['data']);
-        if (isset($options['state'])) $this->setState($options['state']);
+    function initFromPrototype(array $prototype = array(), $strictParams = null) {
+        if ($strictParams === null) $strictParams = false;
+        parent::initFromPrototype($prototype, $strictParams);
     }
     
     /**

@@ -271,6 +271,9 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     function getDb() {
         if ($this->db === null) {
             $this->db = $this->getComponent(self::CORE_COMPONENT_DB, 'Ac_Sql_Db', true);
+            if (!$this->db && ($proto = $this->adapter->getDbPrototype())) {
+                $this->db = $this->addComponent(Ac_Prototyped::factory($this->adapter->getDbPrototype(), 'Ac_Sql_Db'), self::CORE_COMPONENT_DB);
+            }
             if (!$this->db && $leg = $this->getLegacyDatabase()) {
                 $this->db = $this->addComponent(new Ac_Sql_Db_Ae($leg), self::CORE_COMPONENT_DB);
             }

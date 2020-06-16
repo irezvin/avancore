@@ -20,7 +20,7 @@ class Ac_Admin_Processing_MapperMethod extends Ac_Admin_Processing {
                 /** @TODO: Won't work with composite PKs */
                 $k = $coll->getMapper()->pk;
                 $s = $coll->createSqlSelect();
-                $s->columns = [$k];
+                $s->columns = ['t.'.$k];
                 $s->distinct = true;
                 $keys = $s->getDb()->fetchColumn($s);
                 $args = array($keys);

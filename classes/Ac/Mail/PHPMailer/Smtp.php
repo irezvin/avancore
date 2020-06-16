@@ -15,6 +15,15 @@ class Ac_Mail_PHPMailer_Smtp extends Ac_Mail_Sender_PHPMailer implements Ac_I_Ma
     protected $smtpPassword = '';
     
     protected $smtpAuthType = '';
+    
+    /**
+     * Properties => values of SMTP class' instance (of PHPMailer's class.smtp.php)
+     * Most useful ones are 
+     * 'do_debug' => 1..4
+     * 'Debugoutput' => 'echo', 'html' or 'error_log'
+     * @var array
+     */
+    protected $stmpInstanceVars = []; 
 
     function setSmtpHost($smtpHost) {
         $this->smtpHost = $smtpHost;
@@ -68,6 +77,17 @@ class Ac_Mail_PHPMailer_Smtp extends Ac_Mail_Sender_PHPMailer implements Ac_I_Ma
         return $this->smtpPassword;
     }    
     
+    function setSmtpInstanceVars(array $smtpInstanceVars) {
+        $this->smtpInstanceVars = $smtpInstanceVars;
+    }
+
+    /**
+     * @return array
+     */
+    function getSmtpInstanceVars() {
+        return $this->smtpInstanceVars;
+    }    
+    
     protected function doConfigureSender(PHPMailer $mailer) {
         $mailer->Mailer = 'smtp';
         $mailer->SMTPAuth = $this->smtpAuth;
@@ -77,6 +97,7 @@ class Ac_Mail_PHPMailer_Smtp extends Ac_Mail_Sender_PHPMailer implements Ac_I_Ma
         $mailer->Username = $this->smtpUser;
         $mailer->Password = $this->smtpPassword;
         $mailer->AuthType = $this->smtpAuthType;
+        if ($this->smtpInstanceVars) Ac_Accessor::setObjectProperty($mailer->getSMTPInstance(), $this->smtpInstanceVars);
     }
 
     function setSmtpAuthType($smtpAuthType) {

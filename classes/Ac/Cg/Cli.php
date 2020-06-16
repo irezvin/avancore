@@ -373,7 +373,9 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
     
     
     protected function genStats(Ac_Cg_Generator $gen) {
-        echo "Generator run complete: ".$gen->getOutputBytes()." bytes in ".$gen->getOutputFiles()." files\n";
+        echo "Generator run complete in ".$gen->getOutputTime()." sec: "
+            .$gen->getOutputBytes()." bytes in "
+            .$gen->getOutputFiles()." files\n";
     }
     
 }

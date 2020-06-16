@@ -13,9 +13,13 @@ class Ac_Admin_Feature_DebugSql extends Ac_Admin_Feature {
         return $this->sqlSelectSettings;
     }
     
-    public function onCreateSqlSelect(Ac_Sql_Select $select) {
-        var_dump($select.'');
-        if ($this->die) die();
+    function onAfterCreateCollection(Ac_Model_Collection_Abstract $collection) {
+        if ($collection instanceof Ac_Model_Collection_Mapper) {
+            $select = $collection->createSqlSelect();
+            var_dump(''.($select));
+            if ($this->die) die();
+        }
     }
+    
     
 }

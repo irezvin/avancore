@@ -289,6 +289,19 @@ class Ac_Model_Collection_Mapper extends Ac_Model_Collection_Abstract {
         }
     }
     
+    /**
+     * @return Ac_Sql_Select
+     */
+    function createSqlSelect() {
+        $storage = $this->getMapper()->getStorage();
+        if ($storage instanceof Ac_Model_Storage_Sql) {
+            $res = $storage->createSqlSelect(array(), $this->query, $this->sort, $this->limit, $this->offset);
+        } else {
+            $res = null;
+        }
+        return $res;
+    }
+    
     protected function resetState() {
         parent::resetState();
         if ($this->cleanGroupOnAdvance && function_exists('gc_enable')) gc_enable();

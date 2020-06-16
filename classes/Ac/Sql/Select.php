@@ -221,7 +221,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     	if ($asArray) {
     	    $res = $columns;
     	} else {
-	        $res = implode(", ", $columns);
+	        $res = "\n    ".implode(",\n    ", $columns);
 	        if ($addAsteriskIfNoColumns && !strlen($res)) $res = '*';
 	        if ($this->distinct) $res = 'DISTINCT '.$res;
 	        if ($withSelectKeyword && strlen($res)) $res = "SELECT ".$res;

@@ -273,6 +273,18 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     var $debug = false;
     
+    /**
+     * @return Ac_Legacy_Controller_Context
+     */
+    protected function guessContext() {
+        $url = Ac_Url::guess(true);
+        $context = new Ac_Form_Context();
+        if ($this->name) $context->setDataPath($this->name);
+        $context->setBaseUrl($url);
+        $context->populate(array('get', 'post'), $context->getDataPath());
+        return $context;
+    }
+    
     function doInitProperties(array $options = array()) {
         if (isset($options['default'])) $this->setDefault($options['default']);
         if (isset($options['parent']) && is_a($options['parent'], 'Ac_Form_Control')) $this->_parent = $options['parent'];

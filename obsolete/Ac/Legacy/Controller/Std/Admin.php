@@ -2,6 +2,11 @@
 
 class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
 
+    /**
+     * @var M_App
+     */
+    protected $application = null;
+
     var $resetStateOnNoArgs = false;
     
     var $separateToolbar = false;
@@ -34,31 +39,45 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
 	    else $res = $this->stateVarName;
 	    return $res;
 	}
+    
+    // @TODO: move persistent state handling to the adapter
+    
+    protected function loadState(array $path) {
+        $sv = $this->getStateVarName();
+        if (!$sv || !isset($_SESSION[$sv]) || !is_array($_SESSION[$sv])) return;
+        return Ac_Util::getArrayByPath($_SESSION[$sv], $path);
+    }
+    
+    protected function saveState(array $state, array $path) {
+        $sv = $this->getStateVarName();
+        if (!$sv) return;
+        if (!isset($_SESSION[$sv])) $_SESSION[$sv] = array();
+        Ac_Util::setArrayByPath($_SESSION[$sv], $path, $state);
+    }
 	
 	function applyState(Ac_Legacy_Controller_Context_Http $c) {
-        $p = $c->getDataPath(true);
-        if (strlen($sv = $this->getStateVarName())) {
-            if (!isset($_SESSION[$sv])) $_SESSION[$sv] = array();
-            $state = Ac_Util::getArrayByPath($_SESSION[$sv], $p);
-            
-            // Workaround for case when sometimes Cancel button saves ID of record into the state and 
-            // all subsequent actions are related only to that record
-            Ac_Util::unsetArrayByPath($state, array('keys'));
-            
-            $data = $c->getData();
-            if (!isset($data[$this->_methodParamName]) || $data[$this->_methodParamName] == 'list') {
-	            if (!is_array($state)) $state = array();
-	            if ($this->resetStateOnNoArgs && !count($data)) $state = array();
-                if ($c->getData('filterForm')) $state['filterForm'] = array();
-                $state['returnUrl'] = null;
-                $state['returnUrl64'] = null;
-                
-                $state = Ac_Util::ms($state, $c->getData(), true);
-                
-	            $c->setData($state);
-	            Ac_Util::setArrayByPath($_SESSION[$sv], $p, $state);
-            }
+        $dataPath = $c->getDataPath(true);
+        $state = $this->loadState($dataPath);
+        
+        // Workaround for case when sometimes Cancel button saves ID of record into the state and 
+        // all subsequent actions are related only to that record
+        Ac_Util::unsetArrayByPath($state, array('keys'));
+
+        $data = $c->getData();
+        if (isset($data[$this->_methodParamName]) && $data[$this->_methodParamName] !== 'list') {
+            return;
         }
+        
+        if (!is_array($state)) $state = array();
+        if ($this->resetStateOnNoArgs && !count($data)) $state = array();
+        if ($c->getData('filterForm')) $state['filterForm'] = array();
+        $state['returnUrl'] = null;
+        $state['returnUrl64'] = null;
+
+        $state = Ac_Util::ms($state, $c->getData(), true);
+
+        $c->setData($state);
+        $this->saveState($state, $dataPath);
 	}
 	
 	function executeManager() {

@@ -103,7 +103,7 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
         $this->id = $id;
     }
     
-    function doInitProperties($options = array()) {
+    function doInitProperties(array $options = array()) {
         if (!strcasecmp(get_class($this), 'ae_admin_processing'))
             trigger_error ("Attempt to instantiate abstract class", E_USER_ERROR);
         
@@ -254,6 +254,14 @@ class Ac_Admin_Processing extends Ac_Legacy_Controller {
             $this->_mapper = Ac_Model_Mapper::getMapper($this->_mapperClass);
         }
         return $this->_mapper;
+    }
+    
+    /**
+     * Deprecated in favor of _getIdentifiersFromRequest
+     * @deprecated
+     */
+    function _getRecordKeysFromRequest() {
+        return $this->_getIdentifiersFromRequest();
     }
     
     function _getIdentifiersFromRequest() {

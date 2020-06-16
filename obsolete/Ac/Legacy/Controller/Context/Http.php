@@ -56,20 +56,6 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
         }
     }
 
-    function initialize($options) {
-        parent::initialize($options);
-        if (isset($options['baseUrl'])) {
-            if (is_string($options['baseUrl']) && strlen($options['baseUrl'])) {
-                $url = new Ac_Url($options['baseUrl']);
-                $this->setBaseUrl($url);
-            } 
-            elseif (is_a($options['baseUrl'], 'Ac_Url')) {
-                $this->setBaseUrl($options['baseUrl']);
-            }
-        }
-        Ac_Util::simpleBindAll($options, $this, array('stateVarName', 'isInForm', 'form'));
-    }
-    
     /**
      * @param string|array $dataPath
      */
@@ -185,6 +171,9 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
      * @param Ac_Url $url
      */
     function setBaseUrl($url) {
+        if (!(is_object($url) && $url instanceof Ac_Url)) {
+            $url = new Ac_Url(''.$url);
+        }
         $this->_baseUrl = $url;
         $this->_url = false;
     }
@@ -201,7 +190,7 @@ class Ac_Legacy_Controller_Context_Http extends Ac_Legacy_Controller_Context {
      */
     function getUrl($extraParams = array(), $withData = true) {
         if (!is_object($this->_baseUrl)) {
-            trigger_error ("Base Url is not set - call setBaseUrl() first", E_USER_ERROR);
+            throw new Ac_E_InvalidUsage ("Base URL is not set - call setBaseUrl() first");
         }
         $res = $this->_baseUrl->cloneObject();
         if (strlen($this->pathInfo)) $res->pathInfo .= $this->pathInfo;

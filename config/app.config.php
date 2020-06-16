@@ -12,17 +12,23 @@ if (is_dir('/home/nivzer')) {
     throw new Exception ("Unknown machine");
 }
 
+if (isset($_SERVER) && isset ($_SERVER['REQUEST_SCHEME'])) {
+    $protocol = strtolower($_SERVER['REQUEST_SCHEME']);
+} else {
+    $protocol = 'https';
+}
+
 if (is_dir('/home/nivzer')) {
 
     $config = array(
-        'webUrl' => 'http://crimson/ac3/',
+        'webUrl' => $protocol.'://crimson/ac3/',
         'useFirePHP' => true,
     );
 
 } elseif (is_dir('/home/i1ya/')) {
 
     $config = array(
-        'webUrl' => 'http://gunsam/nextAvancore/',
+        'webUrl' => $protocol.'://akita/nextAvancore/',
         'useFirePHP' => true,
     );
 

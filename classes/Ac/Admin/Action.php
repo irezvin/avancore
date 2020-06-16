@@ -84,6 +84,7 @@ class Ac_Admin_Action extends Ac_Prototyped {
         foreach (array_keys(Ac_Util::getPublicVars($this)) as $k) {
             if ($k[0] != '_' && is_object($this->$k) || is_array($this->$k) || is_scalar($this->$k) && strlen($this->$k)) $res[$k] = $this->$k;
         }
+        $res['caption'] = $this->getCaption();
         
         if ($this->manager->getMethodName() === 'executeDetails' && $this->managerProcessing) {
             $proc = $this->manager->getProcessing($this->managerProcessing);
@@ -109,6 +110,11 @@ class Ac_Admin_Action extends Ac_Prototyped {
     function unfoldAssetString($string) {
         // Ugly...
         return Ac_Legacy_Controller_Response_Html::unfoldAssetString($string, $this->manager->getApplication()->getAssetPlaceholders());
+    }
+    
+    function getCaption() {
+        if (!$this->caption) return Ac_Cg_Inflector::humanize($this->id, true, false);
+        return $this->caption;
     }
     
 }

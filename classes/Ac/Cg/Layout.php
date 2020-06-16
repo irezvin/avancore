@@ -118,7 +118,7 @@ abstract class Ac_Cg_Layout extends Ac_Prototyped {
      */
     function getDetectDirs($dir = false) {
         $res = array_intersect_key($this->getPathVars($dir), array_flip($this->listDetectPaths()));
-        $res['pathConfig'] = $this->expandPlaceholders(array($this->pathConfig, str_replace('/config', '/deploy', $this->pathConfig)), $this->getMapTr());
+        $res['pathConfig'] = $this->expandPlaceholders(array($this->pathConfig, str_replace('config', 'deploy', $this->pathConfig)), $this->getMapTr());
         return $res;
     }
     
@@ -170,18 +170,44 @@ abstract class Ac_Cg_Layout extends Ac_Prototyped {
         return $res;
     }
     
+    protected function detectManifests($dir, $setToFound = false, array & $foundItems = array()) {
+        $jsonFiles = glob($dir."/*.avancore.json");
+        foreach ($jsonFiles as $file) {
+            $json = json_decode(file_get_contents($file), true);
+            if (!$json || !is_array($json)) {
+                trigger_error ("Cannot parse JSON in '{$file}'`", E_USER_WARNING);
+                continue;
+            }
+            if (isset($json['pathRoot'])) {
+                $appName = preg_replace("/\.avancore\.json$/", "", ltrim(basename($file)));
+                if (isset($json['name'])) $appName = $json['name'];
+                $appRoot = rtrim($dir, "/")."/".ltrim($json['pathRoot'], "/");
+                $layout = clone $this; // @TODO: ability to specify layout class/options in JSON
+                $layout->appName = $appName;
+                if ($layout->detect($appRoot, $setToFound, $foundItems)) {
+                    //Ac_Debug::ddd($appRoot, $setToFound, $foundItems);
+                    $this->appName = $appName;
+                    return $this->detect($appRoot, $setToFound, $foundItems);
+                }
+            }
+        }
+    }
+    
     /**
      * Items with dots in the names may be the files
      * @param bool $setToFound In case of positive result, set local $path{Name} vars to found alternatives
      * @return bool
      */
     function detect($dir, $setToFound = false, array & $foundItems = array()) {
-        $detectDirs = $this->getDetectDirs();
-        $res = $this->detectDirsOrFiles($dir, $detectDirs, $foundItems);
-        if ($res) {
-            $this->detectedAppName = $this->detectAppName($dir);
-        } else {
-            $this->detectedAppName = false;
+        if ($res = $this->detectManifests($dir, $setToFound, $foundItems)) {
+            return $res;
+        }
+        if (!$res) {
+            $detectDirs = $this->getDetectDirs();
+            $res = $this->detectDirsOrFiles($dir, $detectDirs, $foundItems) || $res;
+            if ($res) {
+                $this->detectedAppName = $this->detectAppName($dir);
+            }
         }
         if ($res && $setToFound) {
             if (!strlen($this->appName)) $this->appName = $this->detectedAppName;
@@ -218,7 +244,8 @@ abstract class Ac_Cg_Layout extends Ac_Prototyped {
     abstract protected function detectAppName($dir);
     
     function getCliInfo() {
-        return array();
+        if ($this->foundApps) return ['foundApps' => $this->foundApps];
+        else return [];
     }
     
     function hasDefaultCopyTarget() {

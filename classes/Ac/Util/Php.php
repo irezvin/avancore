@@ -58,7 +58,7 @@ abstract class Ac_Util_Php {
         } elseif (is_resource($array)) {
             $out = 'resource';
         } elseif (!count($array)) {
-            $out = 'array()';
+            $out = '[]';
         } else {
             // Begin the array export
             // Start the string
@@ -66,7 +66,7 @@ abstract class Ac_Util_Php {
             $out = "";
             
             //if (!$inner) $out .= $strIndent;
-            $out .= "array (\n";
+            $out .= "[\n";
 
             // Loop through each value in array
             foreach ($array as $key => $value) {
@@ -94,7 +94,7 @@ abstract class Ac_Util_Php {
 
             // End our string
             $out .= $strIndent;
-            $out .= ")";
+            $out .= "]";
         }
 
         // Decide method of output
@@ -121,7 +121,7 @@ abstract class Ac_Util_Php {
             }
         }
         $vx = self::myVarExport($foo, 1, $indent);
-        $vx = preg_replace("/=> \n([ ]+)array \\(/", "=> array (\\1", $vx);
+        $vx = preg_replace("/=> \n([ ]+)\[ \\(/", "=> [ (\\1", $vx);
         //$vx = preg_replace_callback("/\n([ ]*)/", array('Ac_Util_Php', 'replaceIndent'), $vx);
         if (!$withNumericKeys) $vx = preg_replace ("/(\n[ ]+)\\d+=>/", "\\1", $vx);
         if ($oneLine) {

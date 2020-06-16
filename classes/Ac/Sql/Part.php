@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Sql_Part extends Ac_Prototyped {
+abstract class Ac_Sql_Part extends Ac_Prototyped {
     
     /**
      * @var Ac_Sql_Part
