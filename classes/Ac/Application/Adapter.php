@@ -501,6 +501,9 @@ class Ac_Application_Adapter extends Ac_Prototyped {
     function getDefaultComponentPrototypes() {
         return array(
             Ac_Application::CORE_COMPONENT_MANAGER_CONFIG_SERVICE => 'Ac_Admin_ManagerConfigService',
+            Ac_Application::CORE_COMPONENT_FLAGS => [
+                'dir' => $this->getVarFlagsPath()
+            ]
         );
     }
     

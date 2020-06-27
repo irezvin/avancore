@@ -42,6 +42,31 @@ class Ac_Util_AssetRenderer {
         return $res;
     }
     
+    /**
+     * Replaces placeholders in the asset paths using asset placeholders gathered 
+     * from all registered Ac_Application instances. 
+     *
+     * If scalar is provided, returns single string; 
+     * if $assets array, returns array, unless $glue is set to some string.
+     *
+     * @param string|array $assets
+     * @param string $implode If array is provided, will implode result using $glue
+     * @return string|array Passed value with replaced placeholders
+     */
+    static function replacePlaceholders($assets, $glue = false) {
+        $isArray = is_array($assets);
+        if (!$isArray) $assets = [$assets];
+        $assetPlaceholders = Ac_Application::getDefaultInstance()->getAssetPlaceholders(true);
+        $res = [];
+        foreach ($assets as $string) {
+            $res[] = self::unfoldAssetString($string, $assetPlaceholders); 
+        }
+        if ($glue) return implode($glue, $res);
+        if ($isArray) return $res;
+        $res = array_values($res);
+        return array_pop($res);
+    }
+    
     static function unfoldAssetString($jsOrCssLib, array $assetPlaceholders) {
         $i = 0;
         for ($i = 0; $i < 10; $i++) {

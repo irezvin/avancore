@@ -44,6 +44,10 @@ class Ac_Legacy_Controller_Response_Global {
         return $res;
     }
     
+    function setResponse(Ac_Legacy_Controller_Response_Html $response) {
+        $this->response = $response;
+    }
+    
     function hasResponse() {
         $res = (bool) $this->response;
         return $res;

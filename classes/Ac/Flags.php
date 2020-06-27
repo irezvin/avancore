@@ -37,4 +37,9 @@ class Ac_Flags extends Ac_Prototyped {
         return $res;
     }
     
+    function delete($flag) {
+        $f = $this->dir.'/'.$flag;
+        if (is_file($f)) return unlink($f);
+    }
+    
 }

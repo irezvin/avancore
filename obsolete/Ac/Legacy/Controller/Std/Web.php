@@ -50,8 +50,6 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
      */
     var $_response = false;
 
-    var $_outputToResponse = true;
-
     /**
      * We don't have default method (to see 'not found' messages)
      */

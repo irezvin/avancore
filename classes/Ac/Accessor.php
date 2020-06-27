@@ -345,7 +345,9 @@ class Ac_Accessor implements Ac_I_Accessor {
     static function itemMatchesPattern($item, array $pattern, $strict = false, $className = false, $treatArraysAsObjects = false) {
         if ($className !== false && !($item instanceof $className)) return false;
         if ($strict) {
-            foreach ($pattern as $propName => $propValue) if (self::getObjectProperty($item, $propName, null, $treatArraysAsObjects) !== $propValue) return false;
+            foreach ($pattern as $propName => $propValue) {
+                if (self::getObjectProperty($item, $propName, null, $treatArraysAsObjects) !== $propValue) return false;
+            }
         } else {
             foreach ($pattern as $propName => $propValue) {
                 if (self::getObjectProperty($item, $propName, null, $treatArraysAsObjects) != $propValue) {

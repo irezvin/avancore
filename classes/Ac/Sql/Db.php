@@ -80,6 +80,22 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
         return $name;
     }
     
+    /**
+     * Produces SQL comparison crierion "$expr = '$value'" 
+     * or "$expr IN ('$value[0]', '$value[1]'...)
+     *
+     * Returns SQL criterion that $expr is either equal to scalar $value
+     * or equal to one of members is array $value. (Usually it is either 
+     * "$expr = '$value'" or "$expr IN ('$value[0]', '$value[1]'...)
+     * 
+     * @param string|Ac_I_Sql_Expression $expr SQL expression being compared
+     * @param array|mixed $value Scalar or array of values to compare to
+     */
+    function oneOf($expr, $value) {
+        if ($expr instanceof Ac_I_Sql_Expression) $expr = $expr->getExpression($this);
+        return $expr." ".$this->eqCriterion($value);
+    }
+    
     function eqCriterion($value) {
         if (is_array($value)) {
             if (count($value) === 1) {
