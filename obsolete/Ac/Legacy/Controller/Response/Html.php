@@ -166,12 +166,14 @@ class Ac_Legacy_Controller_Response_Html extends Ac_Legacy_Controller_Response_H
     }
     
     function __sleep() {
-        if (class_exists('Ac_Legacy_Controller_Response_Global', false)) {
-            // We have to save global response data when response is serialized 
-            if ($this !== Ac_Legacy_Controller_Response_Global::r()) {
-                Ac_Legacy_Controller_Response_Global::i()->pourToResponse($this);
-            }
-        }
+        // TODO: find workaround for this!
+        
+//        if (class_exists('Ac_Legacy_Controller_Response_Global', false)) {
+//            // We have to save global response data when response is serialized 
+//            if ($this !== Ac_Legacy_Controller_Response_Global::r()) {
+//                Ac_Legacy_Controller_Response_Global::i()->pourToResponse($this);
+//            }
+//        }
         $res = parent::__sleep();
         return $res;
     }

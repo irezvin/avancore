@@ -315,7 +315,7 @@ Ajs_Util = {
     		var nameVal = pairs[i].split(eq, 2), path = nameVal[0].replace(']', '');
     		path = path.replace(/\]/g, '').split('[');
     		if (nameVal.length < 2) nameVal.push('');
-    		res = Ajs_Util.setByPath(res, path, nameVal[1]);
+    		res = Ajs_Util.setByPath(res, path, decodeURIComponent(nameVal[1]));
     	}
     	return res;
     },
@@ -719,7 +719,7 @@ Ajs_Util.Uri.prototype = {
     parse: function(str) {
         
         // Credit for regular expression and keys length: JSURI project - http://code.google.com/p/jsuri/
-        var regex = /^(?:(?![^:@]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/;
+        var regex = /^(?:(?![^:@\/]+:[^:@\/]*@)([^:\/?#.]+):)?(?:\/\/)?((?:(([^:@/]*)(?::([^:@]*))?)?@)?([^:\/?#]*)(?::(\d*))?)(((\/(?:[^?#](?![^?#\/]*\.[^?#\/.]+(?:[?#]|$)))*\/?)?([^?#\/]*))(?:\?([^#]*))?(?:#(.*))?)/;
         var keys = [
             ".source",
             "scheme",

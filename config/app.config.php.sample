@@ -1,5 +1,24 @@
 <?php
 
-$config = array(
+$config = [
     'webUrl' => 'http://localhost/avancore/',
-);
+    
+    'assetPlaceholders' => [
+        '{TOOLBAR}' => '{AC}/vendor/images/'
+    ],
+
+    'dbPrototype' => [
+        'class' => 'Ac_Sql_Db_Pdo',
+        'dbPrefix' => 'ac_',
+        'pdo' => [
+            'dsn' => "mysql:dbname=DB_NAME;socket=/var/run/mysql/mysqld.sock",
+            'username' => '**USER**',
+            'password' => '**PASSWORD**',
+            'driver_options' => [
+                PDO::MYSQL_ATTR_INIT_COMMAND => 'set names utf8;',
+                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+            ]
+        ],
+    ]
+];
+

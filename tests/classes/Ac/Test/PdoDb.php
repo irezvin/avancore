@@ -13,13 +13,22 @@ class Ac_Test_PdoDb extends Ac_Test_Base {
             'dsn' => "mysql:dbname=".$config['db'].";host=127.0.0.1",
             'username' => $config['user'],
             'password' => $config['password'],
-            'driver_options' => array(PDO::MYSQL_ATTR_INIT_COMMAND => 'set names utf8;')
         );
-        $db = new Ac_Sql_Db_Pdo($pdoParams, new Ac_Sql_Dialect_Mysql());
+        $db = new Ac_Sql_Db_Pdo([
+            'dialect' => new Ac_Sql_Dialect_Mysql(),
+            'pdo' => $pdoParams, 
+            'initCommands' => [
+                "set names utf8",
+                "set @foo := 'bar'",
+                "set @baz := 'quux'"
+            ],
+        ]);
         $pdo = $db->getPdo();
         
         $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
+        $this->assertEqual($v = $db->fetchRow('select @foo a, @baz b'), ['a' => 'bar', 'b' => 'quux'],
+            'Init commands were called');
         $this->assertTrue(is_array($db->fetchColumn('SHOW TABLES')));
         $this->assertEqual($db->nameQuote('Foo'), "`Foo`");
         $this->assertEqual($db->nameUnqote("`Foo`"), "Foo");

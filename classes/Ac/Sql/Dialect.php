@@ -8,9 +8,9 @@ abstract class Ac_Sql_Dialect {
     
     protected $ifNullFunction = 'COALESCE';
     
-    protected $dateStoreFormats = array('date' => 'Y-m-d', 'time' => 'H:i:s', 'dateTime' => 'Y-m-d H:i:s');
+    protected $dateStoreFormats = array('date' => 'Y-m-d', 'time' => 'H:i:s', 'dateTime' => 'Y-m-d H:i:s', 'timestamp' => 'YmdHis');
     
-    protected $zeroDates = array('date' => '0000-00-00', 'time' => '00:00', 'dateTime' => '0000-00-00 00:00:00');
+    protected $zeroDates = array('date' => '0000-00-00', 'time' => '00:00', 'dateTime' => '0000-00-00 00:00:00', 'timestamp' => false);
     
     protected $inspectorClass = false;
     
@@ -85,8 +85,7 @@ abstract class Ac_Sql_Dialect {
 	        }
 	    }
 	    else {
-            $res = Ac_Util::date($date, $type);
-	        //throw new Ac_E_InvalidCall("\$type should be of ".implode('|', array_keys($dsf)));
+                $res = Ac_Util::date($date, $type);
 	    }
 	    return $res;
 	}

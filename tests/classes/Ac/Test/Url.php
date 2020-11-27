@@ -177,4 +177,21 @@ class Ac_Test_Url extends Ac_Test_Base {
         $this->assertFalse($u->isRelative());
     }
     
+    function testTrickyUrls() {
+        $tricky = [
+            'simple url' => 'https://example.com/?foo=bar&baz=quux',
+            'https://example.com/?foo',
+            'https://example.com/?foo=bar&baz[quux]&quuxDoo&abc[def]=1'
+        ];
+        foreach ($tricky as $k => $v) {
+            if (is_numeric($k)) $comment = '';
+                else $comment = ': '.$k;
+            $r = ''.($u = new Ac_Url($v));
+            $r = strtr($r, ['%5B' => '[', '%5D' => ']']);
+            if (!$this->assertEqual($v, $r, "parse tricky url '{$v}'{$comment}")) {
+                var_dump($r, $u->query);
+            }
+        }
+    }
+    
 }

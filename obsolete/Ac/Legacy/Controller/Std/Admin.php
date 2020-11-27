@@ -3,7 +3,7 @@
 class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
 
     /**
-     * @var M_App
+     * @var Ac_Application
      */
     protected $application = null;
 

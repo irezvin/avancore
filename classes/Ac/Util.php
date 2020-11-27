@@ -808,16 +808,16 @@ abstract class Ac_Util {
         return self::removeTrailingSlash($string, $slash);
     }
     
-    static function flattenArray($array, $level = -1, $keyGlue = false, $key = '') {
+    static function flattenArray($array, $level = -1, $keyGlue = false, $key = '', $keySuffix = '') {
         //if (!is_array($array)) return array($array);
         $res = array();
         foreach ($array as $k => $v) {
             if (strlen($keyGlue)) {
-                $tk = strlen($key)? $key.$keyGlue.$k : $k;
+                $tk = strlen($key)? $key.$keyGlue.$k.$keySuffix : $k;
             } else {
                 $tk = false;
             }
-            if (is_array($v) && ($level != 0)) $res = array_merge($res, self::flattenArray($v, $level-1, $keyGlue, $tk));
+            if (is_array($v) && ($level != 0)) $res = array_merge($res, self::flattenArray($v, $level-1, $keyGlue, $tk, $keySuffix));
             elseif (strlen($tk)) {
                 $res[$tk] = & $array[$k];
             } else {
@@ -966,7 +966,7 @@ abstract class Ac_Util {
      */
     static function getPublicVars($object) {
         // Workaround to change scope to skip using Reflection
-        $g = new _Ae_Util_ObjectVarGetter();
+        $g = new _Ac_Util_ObjectVarGetter();
         return $g->getObjectVars($object);
     }
     
@@ -976,7 +976,7 @@ abstract class Ac_Util {
      */
     static function getPublicMethods($object) {
         // Workaround to change scope to skip using Reflection
-        $g = new _Ae_Util_ObjectVarGetter();
+        $g = new _Ac_Util_ObjectVarGetter();
         return $g->getObjectMethods($object);
     }
     
@@ -1294,7 +1294,7 @@ abstract class Ac_Util {
     
 }
 
-class _Ae_Util_ObjectVarGetter {
+class _Ac_Util_ObjectVarGetter {
     
     function getObjectVars($foo) {
         if (is_object($foo)) {

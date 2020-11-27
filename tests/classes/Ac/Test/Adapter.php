@@ -8,7 +8,7 @@ class Ac_Test_Adapter extends Ac_Test_Base {
     function testAdapter() {
         
         $appClassFile = dirname(dirname(dirname(dirname(__FILE__)))).'/sampleApp/classes/Sample/App.php';
-        $deployDir = dirname(dirname(dirname(dirname(__FILE__)))).'/sampleApp/deploy/';
+        $deployDir = dirname(dirname(dirname(dirname(__FILE__)))).'/sampleApp/config/';
         $configFilesToLoad = array(
             realpath($deployDir.'/app.config.php'),
             realpath($deployDir.'/test.env.config.php'),

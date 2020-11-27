@@ -65,8 +65,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
             $this->setPdo($pdo);
             if (!is_null($dialect)) $this->dialect = $dialect;
         }
-        
-        if (is_null($dialect)) {
+        if (is_null($dialect) && !$this->dialect) {
             $driverName = $this->pdo->getAttribute(PDO::ATTR_DRIVER_NAME);            
             $map = array(
                 'mysql' => 'Ac_Sql_Dialect_Mysql',
@@ -112,6 +111,8 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
         return is_array($this->pdoPrototype);
     }
     
+    protected $wasInit = false;
+    
     protected function setPdo($pdo) {
         if (is_array($pdo)) {
             if (is_array($pdo['dsn'])) $pdo['dsn'] = self::arrayToDsn($pdo['dsn']);
@@ -135,6 +136,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
             $this->pdoPrototype = false;
         }
         $this->pdo = $pdo;
+        $this->wasInit = false;
         if ($this->dbName && $this->getDialect()) $this->setDbName ($this->dbName);
     }
     
@@ -253,6 +255,10 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
      * @throws Ac_E_Database
      */
     protected function queryPdo($query, $exec = false) {
+        if (!$this->wasInit) {
+            $this->wasInit = true;
+            $this->runInitCommands();
+        }
         $query = $this->intPreProcessQuery($query);
         $x = $exec? "exec" : "query";
         $this->affectedRows = false;
@@ -325,7 +331,7 @@ class Ac_Sql_Db_Pdo extends Ac_Sql_Db {
     /**
      * @param PDOStatement $resultResource
      */
-    function resultFetchAssocByTables($resultResource, array & $fieldsInfo = array()) {
+    function resultFetchAssocByTables($resultResource, array & $fieldsInfo = null) {
         $row = $resultResource->fetch(PDO::FETCH_NUM);
         if ($row === false) $res = $row;
         else {

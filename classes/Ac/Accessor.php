@@ -342,18 +342,14 @@ class Ac_Accessor implements Ac_I_Accessor {
         }
     }
 
+    
     static function itemMatchesPattern($item, array $pattern, $strict = false, $className = false, $treatArraysAsObjects = false) {
         if ($className !== false && !($item instanceof $className)) return false;
-        if ($strict) {
-            foreach ($pattern as $propName => $propValue) {
-                if (self::getObjectProperty($item, $propName, null, $treatArraysAsObjects) !== $propValue) return false;
-            }
-        } else {
-            foreach ($pattern as $propName => $propValue) {
-                if (self::getObjectProperty($item, $propName, null, $treatArraysAsObjects) != $propValue) {
-                    return false;
-                }
-            }
+        foreach ($pattern as $propName => $propValue) {
+            $val = self::getObjectProperty($item, $propName, null, $treatArraysAsObjects);
+            if (is_array($propValue)) {
+                if (!in_array($val, $propValue, $strict)) return false;
+            } elseif ($strict? ($val !== $propValue) : ($val != $propValue)) return false;
         }
         return true;
     }
@@ -446,8 +442,9 @@ class Ac_Accessor implements Ac_I_Accessor {
      * @return bool
      */
     static function methodExists($object, $methodName) {
-        if ($object instanceof Ac_I_WithMethods) return $object->hasMethod($methodName);
-        else return method_exists($object, $methodName);
+        if (method_exists($object, $methodName)) return true;
+        if (method_exists($object, 'hasMethod')) return $object->hasMethod($methodName);
+        return false;
     }
     
     /**

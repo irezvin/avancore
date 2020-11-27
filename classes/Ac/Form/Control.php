@@ -1134,6 +1134,9 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         return $res;
     }
     
+    function setId($id) {
+        $this->id = $id;
+    }
     
 }
 

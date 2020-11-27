@@ -4,7 +4,7 @@ class Ac_Legacy_Controller_Response_Global {
 
     protected $response = null;
     
-    private static $instance = null;    
+    private static $instance = null;
     
     /**
      * @return Ac_Legacy_Controller_Response_Global

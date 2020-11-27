@@ -35,7 +35,7 @@ class Ac_Test_Util extends Ac_Test_Base {
     
     function makePath($a, $s, $open = false) {
         $res = array();
-        for ($i = 0; $i < strlen($s); $i++) $res[] = $a.'-'.$s{$i};
+        for ($i = 0; $i < strlen($s); $i++) $res[] = $a.'-'.$s[$i];
         if ($open) $res[] = '';
         return $res;
     }
@@ -408,7 +408,15 @@ class Ac_Test_Util extends Ac_Test_Base {
             $t = time();
             if ($old) $t -= $ttl + 1;
             $f = $dir.'/'.basename($filename);
-            touch($f, $t);
+            
+            // ugly hack since PHP's touch() allows to change mtime for files which match current owner
+            if (!@touch($f, $t)) {
+                $tmp = file_get_contents($f);
+                unlink($f);
+                file_put_contents($f, $tmp);
+                chmod($f, 0775);
+                touch ($f, $t);
+            }
         }
     }
     

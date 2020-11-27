@@ -26,6 +26,8 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     abstract function getDbName();
     
+    protected $initCommands = [];
+    
     /**
      * @return Ac_Sql_Dialect 
      */
@@ -92,6 +94,9 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
      * @param array|mixed $value Scalar or array of values to compare to
      */
     function oneOf($expr, $value) {
+        if (is_null($value)) {
+            return $expr." IS NULL";
+        }
         if ($expr instanceof Ac_I_Sql_Expression) $expr = $expr->getExpression($this);
         return $expr." ".$this->eqCriterion($value);
     }
@@ -104,8 +109,11 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
             } else {
                 $res = 'IN ('.$this->q($value).')';
             }
+        } elseif (is_null($value)) {
+            $res = ' IS NULL';
+        } else {
+            $res = '= '.$this->q($value);
         }
-        else $res = '= '.$this->q($value);
         return $res;
     }
     
@@ -146,6 +154,17 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
         }
         return $res;
     }
+    
+    function updateColumnsClause($colMap, $tableAlias = false, $asArray = false) {
+        $res = [];
+        foreach ($colMap as $col => $value) {
+            if ($tableAlias) $col = $this->n($tableAlias).'.'.$this->n($col);
+            $res[] = $this->n($col).' = '.$this->q($value);
+        }
+        if (!$asArray) $res = implode(", ", $res);
+        return $res;
+    }
+    
   
     /**
      * @param array|string $string
@@ -223,7 +242,7 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     }
     
     function updateWithKeys($tableName, $fieldValues, array $keysCriterion) {
-        $res = "UPDATE {$tableName} SET ".implode(", ", $this->valueCriterion($fieldValues, false, true));
+        $res = "UPDATE {$tableName} SET ".$this->updateColumnsClause($fieldValues);
         if (count($keysCriterion)) $res .= " WHERE ".$this->valueCriterion($keysCriterion); 
         return $res;
     }
@@ -270,7 +289,7 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     abstract function resultGetFieldsInfo($resultResource);
     
-    abstract function resultFetchAssocByTables($resultResource, array & $fieldsInfo = array());
+    abstract function resultFetchAssocByTables($resultResource, array & $fieldsInfo = null);
     
     abstract function resultFetchAssoc($resultResource);
     
@@ -451,6 +470,23 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
             $unique = false;
         }
         return Ac_Util::indexArray($rows, $keys, $unique, $valueToInsert);
+    }
+
+    function setInitCommands($initCommands) {
+        $this->initCommands = Ac_Util::toArray($initCommands);
+    }
+
+    /**
+     * @return array
+     */
+    function getInitCommands() {
+        return $this->initCommands;
+    }    
+    
+    protected function runInitCommands() {
+        if ($this->initCommands) foreach ($this->initCommands as $cmd) {
+            $this->query($cmd);
+        }
     }
     
 }

@@ -128,7 +128,7 @@ class Ac_Legacy_Output_Joomla extends Ac_Legacy_Output {
         echo $response->replacePlaceholders(false, true);
         
         if ($response->noHtml) {
-            die();
+            $this->exitPhp();
         }
         
     }

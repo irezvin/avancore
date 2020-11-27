@@ -5,7 +5,7 @@ class Sample_Shop_Product extends Sample_Shop_Product_Base_Object {
     var $pageTitle = '';
     var $metaDescription = '';
     var $metaKeywords = '';
-    var $metaNoindex = '';
+    var $metaNoindex = 0;
     var $upcCode = '';
 
     protected function listOwnProperties() {

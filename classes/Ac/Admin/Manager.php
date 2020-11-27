@@ -245,13 +245,12 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if ($refresh) {
             $form = $this->getForm();
             $form->setSubmitted(true);
-            $record = $this->getRecord();
             $form->updateModel();
         }
         
         if (isset($this->_rqData['form'])) {
             $form = $this->getForm();
-            $form->setSubmitted(true);
+            if ($form) $form->setSubmitted(true);
         }
         
         $template = $this->getTemplate();

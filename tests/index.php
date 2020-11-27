@@ -45,6 +45,8 @@ $time = microtime(true);
         <style type="text/css">
             .fail { background-color: inherit; color: red; }
             .pass { background-color: inherit; color: green; }
+            a, a:visited { color: gold }
+            pre a, pre a:visited { color: darkblue }
             pre { background-color: lightgray; color: inherit; }
             h1 a, .fa {
                 font-size: 0.5em;

@@ -7,7 +7,7 @@ class Ac_Js_Script extends Ac_Js_Code {
     function __toString() {
         $a = array('type' => 'text/javascript');
         if (strlen($this->src)) $a['src'] = $this->src;
-        $res = Ac_Util::mkElement('script', $this->toRawCode(), $a);
+        $res = Ac_Util::mkElement('script', "//<![CDATA[\n".$this->toRawCode()."\n//]]>", $a);
         return $res;
     }
     

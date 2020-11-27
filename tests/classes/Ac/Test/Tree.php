@@ -162,7 +162,6 @@ class Ac_Test_Tree extends Ac_Test_Base {
             $child1 = $mapper->createRecord();
             $child1->title = 'child1';
             $child1->tag = 1;
-
             $child1->store();
             
             $currRows = $this->fetchComboData();

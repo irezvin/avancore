@@ -9,6 +9,8 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     
     protected $dialect = false;
     
+    protected $isInit = false;
+    
     /**
      * @param Ac_Legacy_Database$aeDb
      * @return Ac_Sql_Db_Ae
@@ -20,6 +22,13 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     	assert(is_a($aeDb, 'Ac_Legacy_Database'));
         $this->_aeDb = $aeDb;
         $this->dialect = new $this->_aeDb->dialectClass;
+    }
+    
+    protected function init() {
+        if ($this->isInit) {
+            $this->isInit = true;
+            $this->runInitCommands();
+        }
     }
     
     protected function implValueQuote($value) {
@@ -64,6 +73,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
 
     function fetchArray($query, $keyColumn = false, $withNumericKeys = false) {
+        $this->init();
         $res = array();
         $this->_aeDb->setQuery($this->intPreProcessQuery($query));
         if (!$withNumericKeys) $res = $this->_aeDb->loadAssocList($keyColumn);
@@ -83,6 +93,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
     
     function fetchObjects($query, $keyColumn = false) {
+        $this->init();
         $res = array();
         $this->_aeDb->setQuery($this->intPreProcessQuery($query));
         $res = $this->_aeDb->loadObjectList();
@@ -91,6 +102,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
     
     function fetchColumn($query, $colNo = 0, $keyColumn = false) {
+        $this->init();
         $this->_aeDb->setQuery($this->intPreProcessQuery($query));
         $res = array();
         if (!is_array($keyColumn)) {
@@ -106,6 +118,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
     
     function fetchValue($query, $colNo = 0, $default = null) {
+        $this->init();
         $this->_aeDb->setQuery($this->intPreProcessQuery($query));
         $res = $default;
         foreach ($this->_aeDb->loadAssocList() as $ass) {
@@ -117,6 +130,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
     
     function query($query) {
+        $this->init();
         $this->_aeDb->setQuery($this->intPreProcessQuery($query));
         $res = $this->_aeDb->query();
         return $res;
@@ -171,6 +185,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
     }
     
     function getResultResource($query) {
+        $this->init();
         $this->_aeDb->setQuery($this->intPreProcessQuery($query));
         $res = $this->_aeDb->getResultResource();
         return $res;
@@ -180,7 +195,7 @@ class Ac_Sql_Db_Ae extends Ac_Sql_Db {
         return $this->_aeDb->getFieldsInfo($resultResource);
     }
     
-    function resultFetchAssocByTables($resultResource, array & $fieldsInfo = array()) {
+    function resultFetchAssocByTables($resultResource, array & $fieldsInfo = null) {
         if (!$fieldsInfo) $fieldsInfo = $this->resultGetFieldsInfo ($resultResource);
         return $this->_aeDb->fetchAssocByTables($resultResource, $fieldsInfo);
     }

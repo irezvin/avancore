@@ -27,11 +27,6 @@ class Ac_Legacy_Output_Native extends Ac_Legacy_Output {
     function Ac_Output_Native($options = array()) {
         Ac_Util::bindAutoparams($this, $options);
     }
-    
-    function exitPhp() {
-        die();
-    }
-    
     /**
      * @param Ac_Legacy_Controller_Response_Html $r
      */

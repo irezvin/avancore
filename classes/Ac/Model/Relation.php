@@ -1086,6 +1086,15 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
     function getMidWhere() {
         return $this->midWhere;
     }
+    
+    /**
+     * @deprecated
+     */
+    function getStrMidWhere($alias = false) {
+        if (is_array($this->midWhere)) $res = $this->db->valueCriterion($this->midWhere, $alias);
+        else $res = $this->midWhere;
+        return $res;
+    }    
 
     // ----------------------- Payload methods ---------------------
     

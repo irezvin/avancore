@@ -1,6 +1,6 @@
 <?php
 
-require(dirname(__FILE__).'/../sampleApp/deploy/app.config.php');
+require(dirname(__FILE__).'/../sampleApp/config/app.config.php');
 
 $dbConf = $config['legacyDatabasePrototype']['__construct'][0];
 

@@ -1000,14 +1000,19 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     }
     
     function _setOwnSingleFieldItem($head, $value) {
-        if ($this->_magicSetLock === $head) return Ac_Mixin::__set($head, $value);
+        if ($this->_magicSetLock === $head) {
+            if (Ac_Accessor::methodExists($this, $m = 'set'.$head)) return $this->$m($value);
+            return Ac_Mixin::__set($head, $value);
+        }
         return parent::_setOwnSingleFieldItem($head, $value);
     }
     
     function __set($name, $value) {
-        $tmp = $this->_magicGetLock;
+        $tmp = $this->_magicSetLock;
         $this->_magicSetLock = $name;
-        if (in_array($name, $this->listFields()) || strpos($name, '[') !== false) $this->setField($name, $value);
+        if (in_array($name, $this->listFields()) || strpos($name, '[') !== false) {
+            $this->setField($name, $value);
+        }
         else {
             parent::__set($name, $value);
         }

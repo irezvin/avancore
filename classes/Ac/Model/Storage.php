@@ -220,7 +220,7 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
             foreach ($p->listFields(true) as $f) {
                 $pi = $p->getPropertyInfo($f, true);
                 if (!$dataTypes) {
-                    static $a = array('date', 'time', 'dateTime');
+                    static $a = array('date', 'time', 'dateTime', 'timestamp');
                     if (in_array($pi->dataType, $a)) $this->dateFormats[$dataTypes][$f] = $pi->dataType;
                 } else {
                     if (strlen($pi->internalDateFormat)) {

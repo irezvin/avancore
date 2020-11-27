@@ -90,11 +90,71 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
             $u = parse_url($strUrl);
             if (is_array($u)) $props = array_merge($defs, $u);
             else $props = $defs;
-            if (!$props['query']) $props['query'] = array(); else parse_str($props['query'], $props['query']);
-            foreach($props as $propName=>$propValue) $this->$propName = $propValue;
+            $props['query'] = self::parseTrickyQuery($props['query']);
+            foreach($props as $propName => $propValue) $this->$propName = $propValue;
         }
     }
-
+    
+    /**
+     * Extends parse_str by saving ?foo&bar (args without '=') as ['foo' => FALSE, 'bar' => FALSE].
+     * Falls back fully to parse_str when no such query arguments exist.
+     * Reverse composition is done using Ac_Url::buildTrickyQuery
+     */
+    static function parseTrickyQuery($query) {
+        if (is_array($query)) return $query;
+        if (!strlen($query)) return [];
+        //$segments = $origSegments = preg_split('/(?:^|&)([^&=]+)(?:&|$)/', $query, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $segments = $origSegments = explode('&', $query);
+        
+        $res = [];
+        
+        // we save query parameters without '=' as FALSE, so isset() will still detect them
+        while(($curr = array_shift($segments)) !== null) {
+            if (!strlen($curr)) continue;
+            if (strpos($curr, '=') !== false) {
+                // fragment of query string without segments that need special handling
+                parse_str($curr, $currParsed);
+                Ac_Util::ms($res, $currParsed);
+                continue;
+            }
+            // parse the tricky part (without '=')
+            
+            // not a path?
+            if (substr($curr, -1) !== ']') {
+                $res[$curr] = false;
+                continue;
+            }
+            
+            $firstSecond = explode('[', $curr, 2);
+            if (count($firstSecond) == 1) {
+                $res[$firstSecond[0]] = false;
+                continue;
+            }
+            
+            // substr($firstSecond[1], 0, -1) is needed to strip ']' from last segment
+            $path = explode('][', substr($firstSecond[1], 0, -1));
+            array_unshift($path, $firstSecond[0]);
+            Ac_Util::setArrayByPath($res, $path, false);
+        }
+        //Ac_Debug::dd(compact('query', 'origSegments', 'res'));
+        return $res;
+    }
+    
+    static function buildTrickyQuery(array $query) {
+        $res = http_build_query($query);
+        
+        // our Ac_Url extension parses args w/o '=' as FALSE
+        // http_build_query encodes FALSE as 0
+        if (strpos($res, '=0') === false) return $res; // nothing to fix
+        $vv = Ac_Util::flattenArray($query, -1, '[', '', ']');
+        ksort($vv, SORT_DESC);
+        foreach ($vv as $key => $item) if ($item === false) {
+            $path = urlencode($key);
+            $res = str_replace($path.'=0', $path, $res);
+        }
+        return $res;
+    }
+    
     /**
      * @returns string queryString part of URL in string format (using $this->query array as a source)
      */
@@ -167,7 +227,7 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
         $uri .= strlen($this->port) ? ':'.$this->port : '';
         $uri .= strlen($pathWithPathInfo) ? $pathWithPathInfo : '';
         if (!strlen($pathWithPathInfo) && (($query) || strlen($this->fragment)) && substr($uri, -1) !== '/') $uri .= '/';
-        if ($query && strlen($q = http_build_query($query))) {
+        if ($query && strlen($q = self::buildTrickyQuery($query))) {
             $uri .= '?'.$q;
         }
         $uri .= $this->fragment ? '#'.$this->fragment : '';
@@ -176,7 +236,7 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
     }
 
     /**
-     * Converts array representation of the query string to array
+     * Converts array representation of the query string to string
      * This function can be called statically
      * 
      * @copyright  roberlamerma at gmail dot com, linus at flowingcreativity dot net and me

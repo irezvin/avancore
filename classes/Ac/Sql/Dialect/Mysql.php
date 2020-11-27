@@ -6,10 +6,6 @@ class Ac_Sql_Dialect_Mysql extends Ac_Sql_Dialect {
     
     protected $ifNullFunction = 'IFNULL';
     
-    protected $dateStoreFormats = array('date' => 'Y-m-d', 'time' => 'H:i:s', 'dateTime' => 'Y-m-d H:i:s');
-    
-    protected $zeroDates = array('date' => '0000-00-00', 'time' => '00:00', 'dateTime' => '0000-00-00 00:00:00');
-    
     protected $inspectorClass = 'Ac_Sql_Dbi_Inspector_MySql5';
     
     function getConcatExpression(array $expressions) {
@@ -34,14 +30,6 @@ class Ac_Sql_Dialect_Mysql extends Ac_Sql_Dialect {
 	
 	function hasToConvertDatesOnStore() {
 	    return false;
-	}
-	
-	function getDateStoreFormats() {
-	    return array('date' => 'Y-m-d', 'time' => 'H:i:s', 'dateTime' => 'Y-m-d H:i:s');
-	}
-	
-	function getZeroDates() {
-	    return array('date' => '0000-00-00', 'time' => '00:00', 'dateTime' => '0000-00-00 00:00:00');
 	}
 	
 	function convertDates($row, $columnFormats) {

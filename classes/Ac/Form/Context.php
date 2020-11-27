@@ -15,7 +15,7 @@ class Ac_Form_Context extends Ac_Legacy_Controller_Context_Http {
     
     var $controlName = false;
     var $idPrefix = false;
-    var $valueFirst = true;    
+    var $valueFirst = true;
     
     /**
      * @param Ac_Legacy_Controller_Context_Http $context

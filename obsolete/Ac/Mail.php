@@ -115,7 +115,7 @@ class Ac_Mail {
         return $res;
     }
     
-    function Ac_Mail ($templateName, $to = false, $defaultSubject = false, $from = false, $data = array(), $textTemplate = false) {
+    function __construct ($templateName, $to = false, $defaultSubject = false, $from = false, $data = array(), $textTemplate = false) {
         $this->_htmlTemplate = $templateName;
         $this->_textTemplate = $textTemplate;
         $this->_to = $to;
@@ -402,7 +402,7 @@ class Ac_Mail {
         foreach (array_keys($src) as $k) {
             $entry = $src[$k];
             $address = $this->_getAddress($entry);
-            if ($address[0]) 
+            if (is_array($address) && $address[0]) 
                 $res[] = $address;
         }
         

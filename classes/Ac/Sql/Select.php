@@ -372,7 +372,6 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     function _getOrderedAliases($usedAliases) {
         $allRequiredAliases = array($this->getEffectivePrimaryAlias());
         if (!count($usedAliases)) {
-            $aliases = array_keys($this->_tables);
             $usedAliases = array($this->getEffectivePrimaryAlias());
         }
         foreach ($usedAliases as $alias) {

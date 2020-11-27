@@ -19,23 +19,18 @@ class Ac_Test_Base extends UnitTestCase {
     
     protected $bootSampleApp = false;
 
-//    function setUp() {
-//        parent::setUp();
-//        restore_error_handler();
-//    }
-    
     function __construct($label = false) {
         parent::__construct($label);
         if ($this->bootSampleApp) $this->getSampleApp();
     }
     
-	/**
-	 * @return Ac_Sql_Db
-	 */
-	function getAeDb() {
-		if ($this->aeDb === false) $this->aeDb = Ac_Prototyped::factory (self::$config['dbPrototype'], 'Ac_Sql_Db');
-		return $this->aeDb;
-	}
+    /**
+     * @return Ac_Sql_Db
+     */
+    function getAeDb() {
+            if ($this->aeDb === false) $this->aeDb = Ac_Prototyped::factory (self::$config['dbPrototype'], 'Ac_Sql_Db');
+            return $this->aeDb;
+    }
     
     /**
      * @return Ac_Sql_Db
@@ -69,22 +64,30 @@ class Ac_Test_Base extends UnitTestCase {
         if ($this->legacyDb === false) $this->legacyDb = new Ac_Legacy_Database_Native(self::$config);
         return $this->legacyDb;
     }
-	
-	function normalizeStatement($sql, $replacePrefix = true) {
-		$res = preg_replace('/\s+/', ' ', trim($sql));
-		if ($replacePrefix) {
-			$res = $this->getAeDb()->replacePrefix($res);			
-		}
-		return $res;
-	}
-	
-	function getDbName() {
-		return self::$config['db'];
-	}
-	
-	function getTablePrefix() {
-		return self::$config['prefix'];
-	}
+
+    function normalizeStatement($sql, $replacePrefix = true) {
+        $res = preg_replace('/-- .*$/um', '', $sql);
+        $res = preg_replace('/\s+/', ' ', trim($res));
+        if ($replacePrefix) {
+            $res = $this->getAeDb()->replacePrefix($res);			
+        }
+        return $res;
+    }
+    
+    function assertSqlMatch($sql1, $sql2, $description = "%s") {
+        $res = $this->assertEqual($this->normalizeStatement($sql1), $this->normalizeStatement($sql2), $description);
+        if (!$res) var_dump($sql1);
+        return;
+        
+    }
+
+    function getDbName() {
+        return self::$config['db'];
+    }
+
+    function getTablePrefix() {
+        return self::$config['prefix'];
+    }
 	
     function _replaceIndent($match) {
         return "\n".str_repeat(" ", strlen($match[0])/2*4);
@@ -118,25 +121,25 @@ class Ac_Test_Base extends UnitTestCase {
             else return $vx;
     }
     
-	function stripRightArrayToLeft($left, $right, $pathsToProtectRx = false, $basePath = '') {
-		$r = $right;
-		foreach (array_keys($r) as $key) {
-			$path = $basePath.'/'.$key;
-			//if ($pathsToProtectRx && preg_match($pathsToProtectRx, $path)) var_dump($path);
-			if (!array_key_exists($key, $left) && !($pathsToProtectRx && preg_match($pathsToProtectRx, $path))) {
-				unset($r[$key]);
-			} elseif (is_array($r[$key]) && is_array($left[$key])) {
-                $r[$key] = $this->stripRightArrayToLeft($left[$key], $r[$key], $pathsToProtectRx, $path);
-            } elseif (is_array($left[$key]) && is_object($right[$key])) {
-                $r[$key] = Ac_Accessor::getObjectProperty($right[$key], array_keys($left[$key]));
-                $r[$key]['__class'] = get_class($right[$key]);
+    function stripRightArrayToLeft($left, $right, $pathsToProtectRx = false, $basePath = '') {
+            $r = $right;
+            foreach (array_keys($r) as $key) {
+                    $path = $basePath.'/'.$key;
+                    //if ($pathsToProtectRx && preg_match($pathsToProtectRx, $path)) var_dump($path);
+                    if (!array_key_exists($key, $left) && !($pathsToProtectRx && preg_match($pathsToProtectRx, $path))) {
+                            unset($r[$key]);
+                    } elseif (is_array($r[$key]) && is_array($left[$key])) {
+            $r[$key] = $this->stripRightArrayToLeft($left[$key], $r[$key], $pathsToProtectRx, $path);
+        } elseif (is_array($left[$key]) && is_object($right[$key])) {
+            $r[$key] = Ac_Accessor::getObjectProperty($right[$key], array_keys($left[$key]));
+            $r[$key]['__class'] = get_class($right[$key]);
+        }
+
             }
-            
-		}
-		return $r;
-	}
-	
-	static function sortArrayItems($array) {
+            return $r;
+    }
+
+    static function sortArrayItems($array) {
         $res = $array;
         $tmp = array();
         foreach ($res as $k => $v) {
@@ -166,22 +169,22 @@ class Ac_Test_Base extends UnitTestCase {
     }
     
     function assertArraysMatch($left, $right, $message = '%s', $exactItems = false) {
-		if ($exactItems === 'sort') {
+        if ($exactItems === 'sort') {
             $left = self::sortArrayItems($left);
             $right = self::sortArrayItems($right);
-//            echo '<hr />';
-//            var_dump($left, $right);
-//            echo '<hr />';
         }
         if ($exactItems === false) {
             $right = $this->stripRightArrayToLeft($left, $right, $exactItems); 
         }
-		$res = $this->assertEqual($left, $right, $message);
+        $res = $this->assertEqual($left, $right, $message);
         return $res;
-	}
+    }
     
     function normalizeHtml($html, $stripBreaks = true) {
-        $html = str_replace("'", '"', trim($html));
+        /**
+         * @TODO: convert quotes inside attribute values when converting quotes of attributes
+         */
+        $html = str_replace("'", '"', trim($html)); 
         $html = preg_replace("/\s*\n\r?\s*/", "\n", $html);
         $html = preg_replace("/ +/", " ", $html);
         $html = preg_replace("/\n+/", $stripBreaks? "" : "\n", $html);

@@ -23,6 +23,7 @@ class Ac_Legacy_Output_Joomla15 extends Ac_Legacy_Output_Joomla {
                 while(ob_get_level()) ob_end_clean ();
                 $au = new Ac_Url($response->redirectUrl);
                 echo $au->getJsPostRedirect();
+                if (isset($_SESSION)) session_write_close();
                 die();
             }
             $permanent = ($response->redirectType == Ac_Legacy_Controller_Response_Http::redirPermanent);

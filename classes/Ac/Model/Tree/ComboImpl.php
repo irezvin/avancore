@@ -35,11 +35,10 @@ class Ac_Model_Tree_ComboImpl extends Ac_Model_Tree_AdjacencyListImpl {
     protected function beginStore() {
         $res = parent::beginStore();
         if ($res && !$this->isPersistent() && $this->container) {
-            
             // restore left, right, level values if they were altered
-            $this->container->{$this->mapper->leftCol} = $this->origLeftCol;
-            $this->container->{$this->mapper->rightCol} = $this->origRightCol;
-            if (strlen($lc = $this->mapper->levelCol)) {
+            if ($this->origLeftCol !== false) $this->container->{$this->mapper->leftCol} = $this->origLeftCol;
+            if ($this->origRightCol !== false) $this->container->{$this->mapper->rightCol} = $this->origRightCol;
+            if ($this->origLevelCol !== false) if (strlen($lc = $this->mapper->levelCol)) {
                 $this->container->$lc = $this->origLevelCol;
             }
         }

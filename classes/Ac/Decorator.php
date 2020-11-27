@@ -2,6 +2,20 @@
 
 class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
     
+    /**
+     * @var int
+     * 
+     * Allows to retrieve model that is deeper in the model stack if $this->model === false.
+     * 0: use own or topmost model (added by last Ac_Decorator::pushModel)
+     * 1: use model that was added by previous Ac_Decorator::pushModel
+     * 2: use model that was added by Ac_Decorator::pushModel before previous
+     * and so on
+     * 
+     * If required depth exceeds stack size, first added model (at bottom of the stack) is returned
+     */
+    
+    var $modelDepth = 0;
+    
     protected $model = false;
     
     protected static $modelStack = array();
@@ -33,8 +47,13 @@ class Ac_Decorator extends Ac_Prototyped implements Ac_I_Decorator_Model {
     }
 
     function getModel() {
-        if ($this->model === false) return self::topModel();
-        return $this->model;
+        if ($this->model !== false) return $this->model;
+        
+        if (!$this->modelDepth) return self::topModel();
+        
+        $offset = count(self::$modelStack) - ($this->modelDepth + 1);
+        if (isset(self::$modelStack[$offset])) return self::$modelStack[$offset];
+        elseif (isset(self::$modelStack[0])) return self::$modelStack[0];
     }
 
     function apply($value) {
