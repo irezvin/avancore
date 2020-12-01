@@ -8,9 +8,9 @@ abstract class Ac_Sql_Dialect {
     
     protected $ifNullFunction = 'COALESCE';
     
-    protected $dateStoreFormats = array('date' => 'Y-m-d', 'time' => 'H:i:s', 'dateTime' => 'Y-m-d H:i:s', 'timestamp' => 'YmdHis');
+    protected $dateStoreFormats = array('date' => 'Y-m-d', 'time' => 'H:i:s', 'dateTime' => 'Y-m-d H:i:s', 'timestamp' => 'Y-m-d H:i:s');
     
-    protected $zeroDates = array('date' => '0000-00-00', 'time' => '00:00', 'dateTime' => '0000-00-00 00:00:00', 'timestamp' => false);
+    protected $zeroDates = array('date' => '0000-00-00', 'time' => '00:00', 'dateTime' => '0000-00-00 00:00:00', 'timestamp' => '0000-00-00 00:00:00');
     
     protected $inspectorClass = false;
     

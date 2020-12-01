@@ -135,7 +135,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
                 $dataType = 'timestamp';
                 $controlType = 'dateInput';
                 if (!isset($this->extraPropertyInfo['internalDateFormat']))
-                    $this->extraPropertyInfo['internalDateFormat'] = 'YmdHis';
+                    $this->extraPropertyInfo['internalDateFormat'] = 'Y-m-d H:i:s';
                 if (!isset($this->extraPropertyInfo['outputDateFormat']))
                     $this->extraPropertyInfo['outputDateFormat'] = 'Y-m-d H:i:s';
                 if ($default == 'CURRENT_TIMESTAMP') $default = false;

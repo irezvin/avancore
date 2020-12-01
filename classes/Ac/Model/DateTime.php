@@ -83,7 +83,9 @@ class Ac_Model_DateTime {
         'my' => '%m%-%y34',
         'dm' => '%d%-%m',
         
+        '_mysqlts4' => '%y4%m2%d2%h2%i2%s2',
         '_mysqlts' => '%y2%m2%d2%h2%i2%s2',
+        
         'iso' => '%y4%m2%d2T#hms',
         'germanFcukingDate' => array('%d\.\s*%m\s+%y4'), 
     	'anydate' => array ('#my', '#dm', '#dmy', '#ymd', '#mdy', '#germanFcukingDate'),
@@ -298,7 +300,11 @@ class Ac_Model_DateTime {
     	if (is_a($src, 'DateTime')) {
     		$srcTs = (int) $src->format('U');
     	} else {
-	        if (!is_numeric($src)) { 
+            
+            // we don't interpret 12- and 14-character strings as timestamps because
+            // there are mysql-compatible formats YYYYMMDDHHIISS and YYMMDDHHIISS
+            // also it is unlikely we will need 12-digit timestamps in the nearest time
+	        if (!is_numeric($src) || (is_string($src) && (strlen($src) == 14 || strlen($src) == 12))) { 
 	            $dtp = Ac_Model_DateTime::getInstance();
 	            $srcTs = $dtp->fromString($src, false, $useGmt, $wasZeroDate); 
 	        } else $srcTs = (int) $src;
