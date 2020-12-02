@@ -35,7 +35,7 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
     function actionHelp() {
         ob_start();
 ?>
-    Usage: avan ACTION [arguments...]
+    Usage: {avan} ACTION [arguments...]
     Avancore CLI tool that performs various tasks related to Avancore code generation.    
 
     Possible ACTION values are (case-insensitive):
@@ -49,21 +49,21 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
             
     Synopsis:
     
-        avan [--action=]create [--app=]APP_NAME [--skip-copy=true] 
+        {avan} [--action=]create [--app=]APP_NAME [--skip-copy=true] 
              [--db=DB_NAME] [--tables=REGEX|true] [--cg[=true]]
              [--type=auto|native|joomla] [--dir=DIR] 
 
-        avan [--action=]copy [--avancore-path=DIR]
+        {avan} [--action=]copy [--avancore-path=DIR]
              [--type=auto|native|joomla] [--dir=DIR]
     
-        avan [--action=]gen [--mode=all|editable|non-editable] [--skip-deploy[=true]]
+        {avan} [--action=]gen [--mode=all|editable|non-editable] [--skip-deploy[=true]]
              [--type=auto|native|joomla] [--dir=DIR] [--skip-lint[=true]]
              
-        avan [--action=]clean
+        {avan} [--action=]clean
         
-        avan [--action=]info
+        {avan} [--action=]info
              
-        avan [--[action=]]help
+        {avan} [--[action=]]help
 
     Common arguments:
 

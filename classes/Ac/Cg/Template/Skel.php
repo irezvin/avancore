@@ -168,10 +168,18 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
                 }
 
                 /**
+                 * @deprecated
                  * @return [[CLASS_APP]]
                  */
                 static function getInstance($id = null) {
-                    return Ac_Application::getApplicationInstance(__CLASS__, $id);
+                    return static::i($id);
+                }
+
+                /**
+                 * @return [[CLASS_APP]]
+                 */
+                static function i($id = null) {
+                    return Ac_Avancore::getApplicationInstance(get_called_class(), $id);
                 }
 
             }

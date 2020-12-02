@@ -166,6 +166,17 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
         return $res;
     }
     
+    /**
+     * @deprecated since version 0.3.5
+     */
+    static function getInstance($id = null) {
+        return static::i($id);
+    }
+    
+    static function i($id = null) {
+        return Ac_Avancore::getApplicationInstance(get_called_class(), $id);
+    }
+    
     static function getApplicationInstance($className, $id = null) {
         if (!isset($className)) throw new Exception("\$className not provided");
         $res = self::findInstance($className, $id);

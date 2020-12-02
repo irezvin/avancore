@@ -77,12 +77,20 @@ class <?php $this->d($this->domainClass); ?> extends <?php $this->d($this->domai
     }
 
     /**
+     * @deperecated
      * @return <?php echo $this->domainClass; ?> 
      */
     static function getInstance($id = null) {
         return Ac_Application::getApplicationInstance(<?php $this->export($this->domainClass); ?>, $id);
     }
 
+    /**
+     * @return <?php echo $this->domainClass; ?> 
+     */
+    static function i($id = null) {
+        return Ac_Application::getApplicationInstance(<?php $this->export($this->domainClass); ?>, $id);
+    }
+    
 }
 <?php //$this->phpClose(); ?>
 <?php } 
