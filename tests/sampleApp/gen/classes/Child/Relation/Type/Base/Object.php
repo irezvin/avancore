@@ -27,22 +27,22 @@ class Child_Relation_Type_Base_Object extends Sample_Relation_Type {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'relations' => array (
+        if ($pi === false) $pi = [
+            'relations' => [
                 'className' => 'Child_Relation',
                 'mapperClass' => 'Child_Relation_Mapper',
                 'caption' => 'Relations',
-            ),
-            'relationTypeId' => array (
+            ],
+            'relationTypeId' => [
                 'caption' => 'Relation Type Id',
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'caption' => 'Title',
-            ),
-            'isSymmetrical' => array (
+            ],
+            'isSymmetrical' => [
                 'caption' => 'Is Symmetrical',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

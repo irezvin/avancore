@@ -27,25 +27,25 @@ class Child_Shop_Spec_Base_Object extends Sample_Shop_Spec {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopProduct' => array (
+        if ($pi === false) $pi = [
+            'shopProduct' => [
                 'className' => 'Child_Shop_Product',
                 'mapperClass' => 'Child_Shop_Product_Mapper',
                 'caption' => 'Shop product',
-            ),
-            'productId' => array (
-                'values' => array (
+            ],
+            'productId' => [
+                'values' => [
                     'mapperClass' => 'Child_Shop_Product_Mapper',
-                ),
+                ],
                 'caption' => 'Product Id',
-            ),
-            'detailsUrl' => array (
+            ],
+            'detailsUrl' => [
                 'caption' => 'Details Url',
-            ),
-            'specsType' => array (
+            ],
+            'specsType' => [
                 'caption' => 'Specs Type',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

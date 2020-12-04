@@ -27,35 +27,35 @@ class Child_Tree_Combo_Base_Object extends Sample_Tree_Combo {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'id' => array (
+        if ($pi === false) $pi = [
+            'id' => [
                 'caption' => 'Id',
-            ),
-            'leftCol' => array (
+            ],
+            'leftCol' => [
                 'caption' => 'Left Col',
-            ),
-            'rightCol' => array (
+            ],
+            'rightCol' => [
                 'caption' => 'Right Col',
-            ),
-            'parentId' => array (
+            ],
+            'parentId' => [
                 'caption' => 'Parent Id',
-            ),
-            'ordering' => array (
+            ],
+            'ordering' => [
                 'caption' => 'Ordering',
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'caption' => 'Title',
-            ),
-            'tag' => array (
+            ],
+            'tag' => [
                 'caption' => 'Tag',
-            ),
-            'ignore' => array (
+            ],
+            'ignore' => [
                 'caption' => 'Ignore',
-            ),
-            'depth' => array (
+            ],
+            'depth' => [
                 'caption' => 'Depth',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

@@ -36,57 +36,62 @@ class Sample_Shop_Spec_Computer_Base_ObjectMixable extends Ac_Model_Mixable_Extr
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array ( 0 => 'shopSpecComputerShopSpec', ));
+        return array_merge(parent::listOwnProperties(), [ 0 => 'shopSpecComputerShopSpec', ]);
     }
     
  
     protected function listOwnAssociations() {
-        return array ( 'shopSpecComputerShopSpec' => 'Sample_Shop_Spec', );
+        return [ 'shopSpecComputerShopSpec' => 'Sample_Shop_Spec', ];
     }
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopSpecComputerShopSpec' => array (
+        if ($pi === false) $pi = [
+            'shopSpecComputerShopSpec' => [
                 'className' => 'Sample_Shop_Spec',
                 'mapperClass' => 'Sample_Shop_Spec_Mapper',
                 'otherModelIdInMethodsPrefix' => 'shopSpecComputer',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_computer_shop_spec_computer_shop_spec'),
                 'relationId' => '_shopSpecComputerShopSpec',
                 'referenceVarName' => '_shopSpecComputerShopSpec',
-            ),
-            'productId' => array (
+            ],
+            'productId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Spec_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'shopSpecComputerShopSpec',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_computer_product_id'),
-            ),
-            'hdd' => array (
+            ],
+            'hdd' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_computer_hdd'),
-            ),
-            'ram' => array (
+            ],
+            'ram' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_computer_ram'),
-            ),
-            'os' => array (
+            ],
+            'os' => [
                 'maxLength' => '255',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_computer_os'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

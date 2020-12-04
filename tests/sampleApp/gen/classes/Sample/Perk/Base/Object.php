@@ -39,57 +39,60 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'tags', 1 => 'tagIds', )));
+        return array_unique(array_merge(parent::listOwnProperties(), [ 0 => 'tags', 1 => 'tagIds', ]));
     }
     
  
     protected function listOwnLists() {
         
-        return array ( 'tags' => 'tags', );
+        return [ 'tags' => 'tags', ];
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'tags' => 'Sample_Tag', );
+        return [ 'tags' => 'Sample_Tag', ];
     }
 
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'tags' => array (
+        if ($pi === false) $pi = [
+            'tags' => [
                 'className' => 'Sample_Tag',
                 'mapperClass' => 'Sample_Tag_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_perk_tags'),
                 'relationId' => '_tags',
                 'countVarName' => '_tagsCount',
                 'nnIdsVarName' => '_tagIds',
                 'referenceVarName' => '_tags',
-            ),
-            'tagIds' => array (
+            ],
+            'tagIds' => [
                 'dataType' => 'int',
                 'arrayValue' => true,
                 'controlType' => 'selectList',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Tag_Mapper',
-                ),
+                ],
                 'showInTable' => false,
-            ),
-            'perkId' => array (
+            ],
+            'perkId' => [
                 'dataType' => 'int',
                 'maxLength' => '11',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_perk_perk_id'),
-            ),
-            'name' => array (
+            ],
+            'name' => [
                 'maxLength' => '45',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_perk_name'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 
@@ -138,6 +141,16 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
      */
     function getTagsItem($id) {
         return $this->getTag($id);
+    }
+    
+    /**
+     * @return Sample_Tag[] 
+     */
+    function getAllTags() {
+        $res = [];
+        foreach ($this->listTags() as $id)
+            $res[] = $this->getTag($id);
+        return $res;
     }
     
     /**

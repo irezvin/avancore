@@ -27,16 +27,16 @@ class Child_Shop_Classifier_Type_Base_Object extends Sample_Shop_Classifier_Type
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopClassifier' => array (
+        if ($pi === false) $pi = [
+            'shopClassifier' => [
                 'className' => 'Child_Shop_Classifier',
                 'mapperClass' => 'Child_Shop_Classifier_Mapper',
                 'caption' => 'Shop classifier',
-            ),
-            'type' => array (
+            ],
+            'type' => [
                 'caption' => 'Type',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

@@ -8,7 +8,7 @@ class Sample_Shop_Category_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'id'; 
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'title' => NULL,
             'leftCol' => NULL,
@@ -19,29 +19,36 @@ class Sample_Shop_Category_Base_Storage extends Ac_Model_Storage_MonoTable {
             'depth' => NULL,
             'metaId' => NULL,
             'pubId' => NULL,
-        ); 
+        ]; 
 
-    var $nullableColumns = array ( 0 => 'title', 1 => 'parentId', 2 => 'metaId', 3 => 'pubId', ); 
+    var $nullableColumns = [ 0 => 'title', 1 => 'parentId', 2 => 'metaId', 3 => 'pubId', ]; 
 
     var $autoincFieldName = 'id'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'id', ), 'idxPubId' => array ( 0 => 'pubId', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'id',
+    ],
+    'idxPubId' => [
+        0 => 'pubId',
+    ],
+]; 
  
  
     
     protected function doGetSqlSelectPrototype($primaryAlias = 't') {
         $res = parent::doGetSqlSelectPrototype($primaryAlias);
-        Ac_Util::ms($res, array (
-                'parts' => array (
-                    'shopProductIds' => array (
+        Ac_Util::ms($res, [
+                'parts' => [
+                    'shopProductIds' => [
                         'class' => 'Ac_Sql_Filter_NNCriterion_Simple',
                         'midSrcKey' => 'categoryId',
                         'midDestKey' => 'productId',
                         'tableKey' => 'id',
                         'midTableAlias' => 'mid__shopProducts',
-                    ),
-                ),
-            ) 
+                    ],
+                ],
+            ] 
         );
         return $res;
     }

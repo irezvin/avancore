@@ -42,68 +42,75 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array ( 0 => 'extraCodePerson', ));
+        return array_merge(parent::listOwnProperties(), [ 0 => 'extraCodePerson', ]);
     }
  
     protected function listOwnLists() {
         
-        return array ( 'extraCodePerson' => 'extraCodeShopProducts', );
+        return [ 'extraCodePerson' => 'extraCodeShopProducts', ];
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'extraCodePerson' => 'Sample_Person', );
+        return [ 'extraCodePerson' => 'Sample_Person', ];
     }
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
-        if ($pi === false) $pi = array (
-            'extraCodePerson' => array (
+        if ($pi === false) $pi = [
+            'extraCodePerson' => [
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'extraCode',
+
                 'caption' => new Ac_Lang_String('sample_shop_product_extra_code_extra_code_person'),
                 'relationId' => '_extraCodePerson',
                 'countVarName' => '_extraCodeShopProductsCount',
                 'referenceVarName' => '_extraCodePerson',
-            ),
-            'productId' => array (
+            ],
+            'productId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_shop_product_extra_code_product_id'),
-            ),
-            'ean' => array (
+            ],
+            'ean' => [
                 'maxLength' => '255',
+
                 'caption' => new Ac_Lang_String('sample_shop_product_extra_code_ean'),
-            ),
-            'asin' => array (
+            ],
+            'asin' => [
                 'maxLength' => '255',
+
                 'caption' => new Ac_Lang_String('sample_shop_product_extra_code_asin'),
-            ),
-            'gtin' => array (
+            ],
+            'gtin' => [
                 'maxLength' => '255',
+
                 'caption' => new Ac_Lang_String('sample_shop_product_extra_code_gtin'),
-            ),
-            'responsiblePersonId' => array (
+            ],
+            'responsiblePersonId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'extraCodePerson',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_shop_product_extra_code_responsible_person_id'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

@@ -51,85 +51,91 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'people', 1 => 'personIds', 2 => 'perks', 3 => 'perkIds', )));
+        return array_unique(array_merge(parent::listOwnProperties(), [ 0 => 'people', 1 => 'personIds', 2 => 'perks', 3 => 'perkIds', ]));
     }
     
  
     protected function listOwnLists() {
         
-        return array ( 'people' => 'people', 'perks' => 'perks', );
+        return [ 'people' => 'people', 'perks' => 'perks', ];
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'people' => 'Sample_Person', 'perks' => 'Sample_Perk', );
+        return [ 'people' => 'Sample_Person', 'perks' => 'Sample_Perk', ];
     }
 
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'people' => array (
+        if ($pi === false) $pi = [
+            'people' => [
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_tag_people'),
                 'relationId' => '_people',
                 'countVarName' => '_peopleCount',
                 'nnIdsVarName' => '_personIds',
                 'referenceVarName' => '_people',
-            ),
-            'personIds' => array (
+            ],
+            'personIds' => [
                 'dataType' => 'int',
                 'arrayValue' => true,
                 'controlType' => 'selectList',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
-                ),
+                ],
                 'showInTable' => false,
-            ),
-            'perks' => array (
+            ],
+            'perks' => [
                 'className' => 'Sample_Perk',
                 'mapperClass' => 'Sample_Perk_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_tag_perks'),
                 'relationId' => '_perks',
                 'countVarName' => '_perksCount',
                 'nnIdsVarName' => '_perkIds',
                 'referenceVarName' => '_perks',
-            ),
-            'perkIds' => array (
+            ],
+            'perkIds' => [
                 'dataType' => 'int',
                 'arrayValue' => true,
                 'controlType' => 'selectList',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Perk_Mapper',
-                ),
+                ],
                 'showInTable' => false,
-            ),
-            'tagId' => array (
+            ],
+            'tagId' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_tag_tag_id'),
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'maxLength' => '45',
+
                 'caption' => new Ac_Lang_String('sample_tag_title'),
-            ),
-            'titleM' => array (
+            ],
+            'titleM' => [
                 'maxLength' => '45',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_tag_title_m'),
-            ),
-            'titleF' => array (
+            ],
+            'titleF' => [
                 'maxLength' => '45',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_tag_title_f'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 
@@ -178,6 +184,16 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
      */
     function getPeopleItem($id) {
         return $this->getPerson($id);
+    }
+    
+    /**
+     * @return Sample_Person[] 
+     */
+    function getAllPeople() {
+        $res = [];
+        foreach ($this->listPeople() as $id)
+            $res[] = $this->getPerson($id);
+        return $res;
     }
     
     /**
@@ -266,6 +282,16 @@ class Sample_Tag_Base_Object extends Ac_Model_Object {
      */
     function getPerksItem($id) {
         return $this->getPerk($id);
+    }
+    
+    /**
+     * @return Sample_Perk[] 
+     */
+    function getAllPerks() {
+        $res = [];
+        foreach ($this->listPerks() as $id)
+            $res[] = $this->getPerk($id);
+        return $res;
     }
     
     /**

@@ -35,29 +35,32 @@ class Sample_Tree_Record_Base_Object extends Ac_Model_Object {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'id' => array (
+        if ($pi === false) $pi = [
+            'id' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_tree_record_id'),
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'maxLength' => '255',
+
                 'caption' => new Ac_Lang_String('sample_tree_record_title'),
-            ),
-            'tag' => array (
+            ],
+            'tag' => [
                 'dataType' => 'int',
                 'maxLength' => '11',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_tree_record_tag'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

@@ -10,8 +10,8 @@ class Sample_Shop_Product_Note_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
     
     
     protected function doGetRelationPrototypes() {
-        return array (
-            '_notePerson' => array (
+        return [
+            '_notePerson' => [
                 'srcMapperClass' => 'Sample_Shop_Product_Note_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_notePerson',
@@ -20,20 +20,20 @@ class Sample_Shop_Product_Note_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
                 'destVarName' => '_noteShopProducts',
                 'destCountVarName' => '_shopProductsCount',
                 'destLoadedVarName' => '_shopProductsLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'noteAuthorId' => 'personId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-        );
+            ],
+        ];
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return array (
-            'notePerson' => array (
+        return [
+            'notePerson' => [
                 'relationId' => '_notePerson',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -48,8 +48,8 @@ class Sample_Shop_Product_Note_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
                 'getDestObjectMethod' => 'getNotePerson',
                 'setDestObjectMethod' => 'setNotePerson',
                 'clearDestObjectMethod' => 'clearNotePerson',
-            ),
-        );
+            ],
+        ];
     }
     
     

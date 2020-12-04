@@ -45,93 +45,104 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'publish', 1 => 'person', 2 => 'personPhoto', )));
+        return array_unique(array_merge(parent::listOwnProperties(), [ 0 => 'publish', 1 => 'person', 2 => 'personPhoto', ]));
     }
     
     
  
     protected function listOwnAssociations() {
-        return array ( 'publish' => 'Sample_Publish', 'person' => 'Sample_Person', 'personPhoto' => 'Sample_Person_Photo', );
+        return [ 'publish' => 'Sample_Publish', 'person' => 'Sample_Person', 'personPhoto' => 'Sample_Person_Photo', ];
     }
 
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'publish' => array (
+        if ($pi === false) $pi = [
+            'publish' => [
                 'className' => 'Sample_Publish',
                 'mapperClass' => 'Sample_Publish_ImplMapper',
+
                 'caption' => new Ac_Lang_String('sample_person_post_publish'),
                 'relationId' => '_publish',
                 'referenceVarName' => '_publish',
-            ),
-            'person' => array (
+            ],
+            'person' => [
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_person_post_person'),
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
-            ),
-            'personPhoto' => array (
+            ],
+            'personPhoto' => [
                 'className' => 'Sample_Person_Photo',
                 'mapperClass' => 'Sample_Person_Photo_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_person_post_person_photo'),
                 'relationId' => '_personPhoto',
                 'referenceVarName' => '_personPhoto',
-            ),
-            'id' => array (
+            ],
+            'id' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_person_post_id'),
-            ),
-            'personId' => array (
+            ],
+            'personId' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_person_post_person_id'),
-            ),
-            'photoId' => array (
+            ],
+            'photoId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Photo_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'personPhoto',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_person_post_photo_id'),
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'maxLength' => '255',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_person_post_title'),
-            ),
-            'content' => array (
+            ],
+            'content' => [
                 'controlType' => 'textArea',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_person_post_content'),
-            ),
-            'pubId' => array (
+            ],
+            'pubId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Publish_ImplMapper',
-                ),
+                ],
                 'objectPropertyName' => 'publish',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_person_post_pub_id'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

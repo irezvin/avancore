@@ -8,15 +8,19 @@ class Sample_Relation_Type_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'relationTypeId'; 
 
-    var $defaults = array (
+    var $defaults = [
             'relationTypeId' => NULL,
             'title' => NULL,
-            'isSymmetrical' => '0',
-        ); 
+            'isSymmetrical' => 0,
+        ]; 
 
     var $autoincFieldName = 'relationTypeId'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'relationTypeId', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'relationTypeId',
+    ],
+]; 
  
     
 }

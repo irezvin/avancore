@@ -8,11 +8,11 @@ class Sample_Publish_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'id'; 
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'sharedObjectType' => NULL,
-            'published' => '1',
-            'deleted' => '0',
+            'published' => 1,
+            'deleted' => 0,
             'publishUp' => '0000-00-00 00:00:00',
             'publishDown' => '0000-00-00 00:00:00',
             'authorId' => NULL,
@@ -21,13 +21,20 @@ class Sample_Publish_Base_Storage extends Ac_Model_Storage_MonoTable {
             'dateCreated' => '0000-00-00 00:00:00',
             'dateModified' => '0000-00-00 00:00:00',
             'dateDeleted' => '0000-00-00 00:00:00',
-        ); 
+        ]; 
 
-    var $nullableColumns = array ( 0 => 'published', 1 => 'deleted', 2 => 'publishUp', 3 => 'publishDown', 4 => 'authorId', 5 => 'editorId', 6 => 'pubChannelId', ); 
+    var $nullableColumns = [ 0 => 'published', 1 => 'deleted', 2 => 'publishUp', 3 => 'publishDown', 4 => 'authorId', 5 => 'editorId', 6 => 'pubChannelId', ]; 
 
     var $autoincFieldName = 'id'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'id', ), 'idxPubChannelId' => array ( 0 => 'pubChannelId', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'id',
+    ],
+    'idxPubChannelId' => [
+        0 => 'pubChannelId',
+    ],
+]; 
  
     
 }

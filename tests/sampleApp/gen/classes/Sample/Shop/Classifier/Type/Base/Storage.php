@@ -8,11 +8,15 @@ class Sample_Shop_Classifier_Type_Base_Storage extends Ac_Model_Storage_MonoTabl
 
     var $primaryKey = 'type'; 
 
-    var $defaults = array (
+    var $defaults = [
             'type' => NULL,
-        ); 
+        ]; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'type', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'type',
+    ],
+]; 
  
     
 }

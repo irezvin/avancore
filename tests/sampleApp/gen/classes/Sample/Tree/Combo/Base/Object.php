@@ -47,80 +47,89 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'id' => array (
+        if ($pi === false) $pi = [
+            'id' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_tree_combo_id'),
-            ),
-            'leftCol' => array (
+            ],
+            'leftCol' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_tree_combo_left_col'),
-            ),
-            'rightCol' => array (
+            ],
+            'rightCol' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_tree_combo_right_col'),
-            ),
-            'parentId' => array (
+            ],
+            'parentId' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_tree_combo_parent_id'),
-            ),
-            'ordering' => array (
+            ],
+            'ordering' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_tree_combo_ordering'),
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'maxLength' => '255',
+
                 'caption' => new Ac_Lang_String('sample_tree_combo_title'),
-            ),
-            'tag' => array (
+            ],
+            'tag' => [
                 'dataType' => 'int',
                 'maxLength' => '11',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_tree_combo_tag'),
-            ),
-            'ignore' => array (
+            ],
+            'ignore' => [
                 'dataType' => 'bool',
                 'controlType' => 'selectList',
                 'maxLength' => '1',
-                'valueList' => array (
+                'valueList' => [
                     0 => 'No',
                     1 => 'Yes',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_tree_combo_ignore'),
-            ),
-            'depth' => array (
+            ],
+            'depth' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_tree_combo_depth'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

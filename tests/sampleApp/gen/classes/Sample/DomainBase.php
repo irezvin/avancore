@@ -8,80 +8,80 @@ abstract class Sample_DomainBase extends Ac_Application {
 
 
     protected function doGetMapperPrototypes() {
-        return array (
-            'Sample_Person_Mapper' => array (
+        return [
+            'Sample_Person_Mapper' => [
                 'class' => 'Sample_Person_Mapper',
-            ),
-            'Sample_Perk_Mapper' => array (
+            ],
+            'Sample_Perk_Mapper' => [
                 'class' => 'Sample_Perk_Mapper',
-            ),
-            'Sample_Person_Album_Mapper' => array (
+            ],
+            'Sample_Person_Album_Mapper' => [
                 'class' => 'Sample_Person_Album_Mapper',
-            ),
-            'Sample_Person_Photo_Mapper' => array (
+            ],
+            'Sample_Person_Photo_Mapper' => [
                 'class' => 'Sample_Person_Photo_Mapper',
-            ),
-            'Sample_Person_Post_Mapper' => array (
+            ],
+            'Sample_Person_Post_Mapper' => [
                 'class' => 'Sample_Person_Post_Mapper',
-            ),
-            'Sample_Publish_ImplMapper' => array (
+            ],
+            'Sample_Publish_ImplMapper' => [
                 'class' => 'Sample_Publish_ImplMapper',
-            ),
-            'Sample_Relation_Type_Mapper' => array (
+            ],
+            'Sample_Relation_Type_Mapper' => [
                 'class' => 'Sample_Relation_Type_Mapper',
-            ),
-            'Sample_Relation_Mapper' => array (
+            ],
+            'Sample_Relation_Mapper' => [
                 'class' => 'Sample_Relation_Mapper',
-            ),
-            'Sample_Religion_Mapper' => array (
+            ],
+            'Sample_Religion_Mapper' => [
                 'class' => 'Sample_Religion_Mapper',
-            ),
-            'Sample_Shop_Category_Mapper' => array (
+            ],
+            'Sample_Shop_Category_Mapper' => [
                 'class' => 'Sample_Shop_Category_Mapper',
-            ),
-            'Sample_Shop_Classifier_Mapper' => array (
+            ],
+            'Sample_Shop_Classifier_Mapper' => [
                 'class' => 'Sample_Shop_Classifier_Mapper',
-            ),
-            'Sample_Shop_Classifier_Type_Mapper' => array (
+            ],
+            'Sample_Shop_Classifier_Type_Mapper' => [
                 'class' => 'Sample_Shop_Classifier_Type_Mapper',
-            ),
-            'Sample_Shop_Product_Extra_Code_ImplMapper' => array (
+            ],
+            'Sample_Shop_Product_Extra_Code_ImplMapper' => [
                 'class' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
-            ),
-            'Sample_Shop_Product_Note_ImplMapper' => array (
+            ],
+            'Sample_Shop_Product_Note_ImplMapper' => [
                 'class' => 'Sample_Shop_Product_Note_ImplMapper',
-            ),
-            'Sample_Shop_Product_Mapper' => array (
+            ],
+            'Sample_Shop_Product_Mapper' => [
                 'class' => 'Sample_Shop_Product_Mapper',
-            ),
-            'Sample_Shop_Spec_Computer_ImplMapper' => array (
+            ],
+            'Sample_Shop_Spec_Computer_ImplMapper' => [
                 'class' => 'Sample_Shop_Spec_Computer_ImplMapper',
-            ),
-            'Sample_Shop_Spec_Food_ImplMapper' => array (
+            ],
+            'Sample_Shop_Spec_Food_ImplMapper' => [
                 'class' => 'Sample_Shop_Spec_Food_ImplMapper',
-            ),
-            'Sample_Shop_Spec_Laptop_ImplMapper' => array (
+            ],
+            'Sample_Shop_Spec_Laptop_ImplMapper' => [
                 'class' => 'Sample_Shop_Spec_Laptop_ImplMapper',
-            ),
-            'Sample_Shop_Spec_Monitor_ImplMapper' => array (
+            ],
+            'Sample_Shop_Spec_Monitor_ImplMapper' => [
                 'class' => 'Sample_Shop_Spec_Monitor_ImplMapper',
-            ),
-            'Sample_Shop_Spec_Mapper' => array (
+            ],
+            'Sample_Shop_Spec_Mapper' => [
                 'class' => 'Sample_Shop_Spec_Mapper',
-            ),
-            'Sample_Tag_Mapper' => array (
+            ],
+            'Sample_Tag_Mapper' => [
                 'class' => 'Sample_Tag_Mapper',
-            ),
-            'Sample_Tree_Adjacent_Mapper' => array (
+            ],
+            'Sample_Tree_Adjacent_Mapper' => [
                 'class' => 'Sample_Tree_Adjacent_Mapper',
-            ),
-            'Sample_Tree_Combo_Mapper' => array (
+            ],
+            'Sample_Tree_Combo_Mapper' => [
                 'class' => 'Sample_Tree_Combo_Mapper',
-            ),
-            'Sample_Tree_Record_Mapper' => array (
+            ],
+            'Sample_Tree_Record_Mapper' => [
                 'class' => 'Sample_Tree_Record_Mapper',
-            ),
-        );
+            ],
+        ];
     }
     
     /**

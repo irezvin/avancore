@@ -27,52 +27,53 @@ class Child_Shop_Category_Base_Object extends Sample_Shop_Category {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopProducts' => array (
+        if ($pi === false) $pi = [
+            'shopProducts' => [
                 'className' => 'Child_Shop_Product',
                 'mapperClass' => 'Child_Shop_Product_Mapper',
                 'caption' => 'Shop products',
-            ),
-            'shopProductIds' => array (
-                'values' => array (
+            ],
+            'shopProductIds' => [
+                'values' => [
                     'mapperClass' => 'Child_Shop_Product_Mapper',
-                ),
-            ),
-            'id' => array (
+                ],
+            ],
+            'id' => [
                 'caption' => 'Id',
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'caption' => 'Title',
-            ),
-            'leftCol' => array (
+            ],
+            'leftCol' => [
                 'caption' => 'Left Col',
-            ),
-            'rightCol' => array (
+            ],
+            'rightCol' => [
                 'caption' => 'Right Col',
-            ),
-            'ignore' => array (
+            ],
+            'ignore' => [
                 'caption' => 'Ignore',
-            ),
-            'parentId' => array (
+            ],
+            'parentId' => [
                 'caption' => 'Parent Id',
-            ),
-            'ordering' => array (
+            ],
+            'ordering' => [
                 'caption' => 'Ordering',
-            ),
-            'depth' => array (
+            ],
+            'depth' => [
                 'caption' => 'Depth',
-            ),
-            'metaId' => array (
+            ],
+            'metaId' => [
                 'caption' => 'Meta Id',
-            ),
-            'pubId' => array (
+            ],
+            'pubId' => [
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'mapperClass' => 'Child_Publish_ImplMapper',
-                ),
+                ],
                 'caption' => 'Pub Id',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

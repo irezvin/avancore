@@ -27,30 +27,30 @@ class Child_Shop_Classifier_Base_Object extends Sample_Shop_Classifier {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopClassifierType' => array (
+        if ($pi === false) $pi = [
+            'shopClassifierType' => [
                 'className' => 'Child_Shop_Classifier_Type',
                 'mapperClass' => 'Child_Shop_Classifier_Type_Mapper',
                 'caption' => 'Shop classifier type',
-            ),
-            'monitorShopSpecs' => array (
+            ],
+            'monitorShopSpecs' => [
                 'className' => 'Child_Shop_Spec',
                 'mapperClass' => 'Child_Shop_Spec_Mapper',
                 'caption' => 'Shop specs',
-            ),
-            'id' => array (
+            ],
+            'id' => [
                 'caption' => 'Id',
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'caption' => 'Title',
-            ),
-            'type' => array (
-                'values' => array (
+            ],
+            'type' => [
+                'values' => [
                     'mapperClass' => 'Child_Shop_Classifier_Type_Mapper',
-                ),
+                ],
                 'caption' => 'Type',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

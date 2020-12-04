@@ -12,12 +12,12 @@ class Child_Shop_Spec_Laptop_Base_ExtraTable extends Sample_Shop_Spec_Laptop_Map
     
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_shopSpecLaptopShopSpec' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_shopSpecLaptopShopSpec' => [
                 'srcMapperClass' => 'Child_Shop_Spec_Laptop_ImplMapper',
                 'destMapperClass' => 'Child_Shop_Spec_Mapper',
-            ),
-        ));
+            ],
+        ]);
         
     }
 }

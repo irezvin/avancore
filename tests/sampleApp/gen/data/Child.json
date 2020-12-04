@@ -25,7 +25,6 @@
     "subsystemPrefixAppearsOnlyOnce": true,
     "tableNameFixes": [],
     "dontPrefixClassesWithAppName": false,
-    "strategySettings": [],
     "defaultTitlePropName": "title",
     "autoDetectTitles": true,
     "defaultPublishedPropName": "published",
@@ -62,6 +61,7 @@
     "parentDomainName": "Sample",
     "autoParentModels": true,
     "parentTableMap": [],
+    "modelNameDecorator": [],
     "dontInheritProperties": [],
     "domainTemplates": false,
     "inspector": {
@@ -199,7 +199,7 @@
                             "unsigned": true,
                             "width": "1",
                             "nullable": false,
-                            "default": "1"
+                            "default": 1
                         },
                         "birthDate": {
                             "type": "date",
@@ -369,7 +369,7 @@
                             "unsigned": true,
                             "width": "10",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         },
                         "albumName": {
                             "type": "varchar",
@@ -569,14 +569,14 @@
                             "unsigned": true,
                             "width": "1",
                             "nullable": true,
-                            "default": "1"
+                            "default": 1
                         },
                         "deleted": {
                             "type": "int",
                             "unsigned": true,
                             "width": "1",
                             "nullable": true,
-                            "default": "0"
+                            "default": 0
                         },
                         "publishUp": {
                             "type": "datetime",
@@ -697,7 +697,7 @@
                             "unsigned": true,
                             "width": "1",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         }
                     },
                     "indices": {
@@ -1044,7 +1044,7 @@
                             "unsigned": true,
                             "width": "1",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         },
                         "sharedObjectType": {
                             "type": "varchar",
@@ -1253,7 +1253,7 @@
                             "unsigned": true,
                             "width": "1",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         }
                     },
                     "indices": {
@@ -1463,7 +1463,7 @@
                             "unsigned": true,
                             "width": "3",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         },
                         "storageTermUnit": {
                             "type": "enum",
@@ -1666,7 +1666,7 @@
                             "type": "int",
                             "width": "11",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         }
                     },
                     "indices": {
@@ -1777,7 +1777,7 @@
                             "unsigned": true,
                             "width": "10",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         },
                         "title": {
                             "type": "varchar",
@@ -1832,14 +1832,14 @@
                             "unsigned": true,
                             "width": "10",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         },
                         "rightCol": {
                             "type": "int",
                             "unsigned": true,
                             "width": "10",
                             "nullable": false,
-                            "default": "1"
+                            "default": 1
                         },
                         "parentId": {
                             "type": "int",
@@ -1852,7 +1852,7 @@
                             "type": "int",
                             "width": "10",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         },
                         "title": {
                             "type": "varchar",
@@ -1871,14 +1871,14 @@
                             "unsigned": true,
                             "width": "1",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         },
                         "depth": {
                             "type": "int",
                             "unsigned": true,
                             "width": "10",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         }
                     },
                     "indices": {
@@ -1948,14 +1948,14 @@
                             "unsigned": true,
                             "width": "10",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         },
                         "rightCol": {
                             "type": "int",
                             "unsigned": true,
                             "width": "10",
                             "nullable": false,
-                            "default": "1"
+                            "default": 1
                         },
                         "parentId": {
                             "type": "int",
@@ -1969,7 +1969,7 @@
                             "unsigned": true,
                             "width": "10",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         },
                         "comment": {
                             "type": "varchar",
@@ -1982,14 +1982,14 @@
                             "unsigned": true,
                             "width": "1",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         },
                         "depth": {
                             "type": "int",
                             "unsigned": true,
                             "width": "10",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         }
                     },
                     "indices": {
@@ -2162,7 +2162,7 @@
                             "type": "int",
                             "width": "11",
                             "nullable": false,
-                            "default": "1"
+                            "default": 1
                         },
                         "itemId": {
                             "type": "int",
@@ -2192,7 +2192,7 @@
                             "type": "int",
                             "width": "1",
                             "nullable": false,
-                            "default": "0"
+                            "default": 0
                         }
                     },
                     "indices": {
@@ -3962,7 +3962,7 @@
                     "varName": "createdTs",
                     "pluralForList": false,
                     "extraPropertyInfo": {
-                        "internalDateFormat": "YmdHis",
+                        "internalDateFormat": "Y-m-d H:i:s",
                         "outputDateFormat": "Y-m-d H:i:s"
                     },
                     "inherited": true,
@@ -3985,7 +3985,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -4020,7 +4023,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -5317,7 +5323,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -5410,7 +5419,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -6049,7 +6061,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -6084,7 +6099,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -7571,7 +7589,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -8369,7 +8390,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -8697,7 +8721,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -9315,7 +9342,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -9457,7 +9487,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -10742,7 +10775,10 @@
                     },
                     "dummyCaption": {
                         "__class": "Ac_Cg_Php_Expression",
-                        "expression": "''"
+                        "expression": "''",
+                        "key": false,
+                        "comment": false,
+                        "exportValue": false
                     },
                     "isRte": false,
                     "required": false,
@@ -11485,7 +11521,7 @@
                     "enabled": true,
                     "isPrivateVar": false,
                     "name": "titleM",
-                    "caption": "Title M",
+                    "caption": "TitleM",
                     "varName": "titleM",
                     "pluralForList": false,
                     "extraPropertyInfo": [],
@@ -11514,7 +11550,7 @@
                     "enabled": true,
                     "isPrivateVar": false,
                     "name": "titleF",
-                    "caption": "Title F",
+                    "caption": "TitleF",
                     "varName": "titleF",
                     "pluralForList": false,
                     "extraPropertyInfo": [],

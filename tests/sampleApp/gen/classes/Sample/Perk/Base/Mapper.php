@@ -14,37 +14,50 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Perk_Storage';
 
-    var $columnNames = array ( 0 => 'perkId', 1 => 'name', );
+    var $columnNames = [ 0 => 'perkId', 1 => 'name', ];
 
-    var $nullableColumns = array ( 0 => 'name', );
+    var $nullableColumns = [ 0 => 'name', ];
 
-    var $defaults = array (
+    var $defaults = [
             'perkId' => NULL,
             'name' => '',
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
    
     protected $autoincFieldName = 'perkId';
     protected $askRelationsForDefaults = false;
  
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_tags' => false,
             '_tagsCount' => false,
             '_tagsLoaded' => false,
             '_tagIds' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Perk 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Perk_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -58,7 +71,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Perk 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -111,7 +124,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Perk     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -120,7 +133,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Perk     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -133,7 +146,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Perk[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -155,7 +168,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -167,8 +180,8 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_tags' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_tags' => [
                 'srcMapperClass' => 'Sample_Perk_Mapper',
                 'destMapperClass' => 'Sample_Tag_Mapper',
                 'srcVarName' => '_tags',
@@ -179,31 +192,31 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
                 'destCountVarName' => '_perksCount',
                 'destLoadedVarName' => '_perksLoaded',
                 'destNNIdsVarName' => '_perkIds',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'perkId' => 'idOfPerk',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
-                'srcLoadNNIdsMethod' => array (
+                'srcLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadTagIdsFor',
-                ),
-                'destLoadNNIdsMethod' => array (
+                ],
+                'destLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadPerkIdsFor',
-                ),
+                ],
                 'midTableName' => '#__tag_perks',
-                'fieldLinks2' => array (
+                'fieldLinks2' => [
                     'idOfTag' => 'tagId',
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
-            'tags' => array (
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), [
+            'tags' => [
                 'relationId' => '_tags',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -214,6 +227,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForTags',
                 'getSrcObjectsMapperMethod' => 'getOfTags',
                 'createDestObjectMethod' => 'createTag',
+                'getAllDestObjectsMethod' => 'getAllTags',
                 'listDestObjectsMethod' => 'listTags',
                 'countDestObjectsMethod' => 'countTags',
                 'getDestObjectMethod' => 'getTag',
@@ -223,17 +237,19 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
                 'getDestIdsMethod' => 'getTagIds',
                 'setDestIdsMethod' => 'setTagIds',
                 'clearDestObjectsMethod' => 'clearTags',
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_perks_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_perks_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -241,11 +257,11 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'perkId',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

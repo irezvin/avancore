@@ -915,6 +915,8 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     
     function onShow() {
         $res = array(
+            'mapperCoreMixables' => $this->mapperCoreMixables,
+            'modelCoreMixables' => $this->modelCoreMixables,
             'getReferenceFieldsData()' => $this->getReferenceFieldsData(),
             'class' => get_class($this),
             //'modelRelations' => $this->_relations,

@@ -34,48 +34,52 @@ class Sample_Shop_Spec_Laptop_Base_ObjectMixable extends Ac_Model_Mixable_ExtraT
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array ( 0 => 'shopSpecLaptopShopSpec', ));
+        return array_merge(parent::listOwnProperties(), [ 0 => 'shopSpecLaptopShopSpec', ]);
     }
     
  
     protected function listOwnAssociations() {
-        return array ( 'shopSpecLaptopShopSpec' => 'Sample_Shop_Spec', );
+        return [ 'shopSpecLaptopShopSpec' => 'Sample_Shop_Spec', ];
     }
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopSpecLaptopShopSpec' => array (
+        if ($pi === false) $pi = [
+            'shopSpecLaptopShopSpec' => [
                 'className' => 'Sample_Shop_Spec',
                 'mapperClass' => 'Sample_Shop_Spec_Mapper',
                 'otherModelIdInMethodsPrefix' => 'shopSpecLaptop',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_laptop_shop_spec_laptop_shop_spec'),
                 'relationId' => '_shopSpecLaptopShopSpec',
                 'referenceVarName' => '_shopSpecLaptopShopSpec',
-            ),
-            'productId' => array (
+            ],
+            'productId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Spec_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'shopSpecLaptopShopSpec',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_laptop_product_id'),
-            ),
-            'weight' => array (
+            ],
+            'weight' => [
                 'dataType' => 'float',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_laptop_weight'),
-            ),
-            'battery' => array (
+            ],
+            'battery' => [
                 'maxLength' => '255',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_laptop_battery'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

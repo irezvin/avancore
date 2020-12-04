@@ -22,6 +22,16 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
     var $domain = false;
     
     /**
+     * Read-only variable that returns path of file for current template part output
+     */
+    protected $currFilePath = null;
+    
+    /**
+     * Read-only variable that returns id of file for current template part output
+     */
+    protected $currFileId = null;
+    
+    /**
      * Should return info on files that are generated with this template.
      * Keys of return array are:
      * - relPath - path to file relative to output root , 
@@ -36,12 +46,14 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
     
     function classToFile($className, $generated = false) {
         
-        $dir = $this->generator->classesDir;
-        if ($generated && strlen($this->generator->genDir)) $dir = $this->generator->genDir.'/'.$dir;
+        $dir = rtrim($this->generator->classesDir, '/');
+        if ($generated && strlen($this->generator->genDir)) {
+            $dir = rtrim($this->generator->genDir, '/').'/'.ltrim($dir, '/');
+        }
         
         if (strlen($dir)) $dir .= '/';
         
-        return $dir.'/'.str_replace('_', '/', $className).'.php';
+        return rtrim($dir, '/').'/'.str_replace('_', '/', $className).'.php';
     }
     
     function listFiles() {
@@ -65,8 +77,10 @@ class Ac_Cg_Template extends Ac_Legacy_Template {
     }
     
     function outputFile($id, Ac_Cg_Writer_Abstract $writer, $overwrite = false) {
-        $content = $this->fetchFileContent($id);
         $path = $this->getFilePath($id);
+        $this->currFilePath = $path;
+        $this->currFileId = $id;
+        $content = $this->fetchFileContent($id);
         $writer->writeContent($path, $content, $overwrite);
     }
     

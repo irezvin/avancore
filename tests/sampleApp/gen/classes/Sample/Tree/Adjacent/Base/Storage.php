@@ -8,19 +8,23 @@ class Sample_Tree_Adjacent_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'id'; 
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'parentId' => NULL,
-            'ordering' => '0',
+            'ordering' => 0,
             'title' => '',
             'tag' => NULL,
-        ); 
+        ]; 
 
-    var $nullableColumns = array ( 0 => 'parentId', 1 => 'tag', ); 
+    var $nullableColumns = [ 0 => 'parentId', 1 => 'tag', ]; 
 
     var $autoincFieldName = 'id'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'id', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'id',
+    ],
+]; 
  
     
 }

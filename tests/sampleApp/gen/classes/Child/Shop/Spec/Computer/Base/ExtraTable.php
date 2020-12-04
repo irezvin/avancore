@@ -12,12 +12,12 @@ class Child_Shop_Spec_Computer_Base_ExtraTable extends Sample_Shop_Spec_Computer
     
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_shopSpecComputerShopSpec' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_shopSpecComputerShopSpec' => [
                 'srcMapperClass' => 'Child_Shop_Spec_Computer_ImplMapper',
                 'destMapperClass' => 'Child_Shop_Spec_Mapper',
-            ),
-        ));
+            ],
+        ]);
         
     }
 }

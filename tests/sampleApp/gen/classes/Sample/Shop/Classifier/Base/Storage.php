@@ -8,15 +8,23 @@ class Sample_Shop_Classifier_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'id'; 
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'title' => '',
             'type' => NULL,
-        ); 
+        ]; 
 
     var $autoincFieldName = 'id'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'id', ), 'type_title' => array ( 0 => 'type', 1 => 'title', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'id',
+    ],
+    'type_title' => [
+        0 => 'type',
+        1 => 'title',
+    ],
+]; 
  
     
 }

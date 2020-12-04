@@ -35,37 +35,39 @@ class Sample_Shop_Classifier_Type_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopClassifier', )));
+        return array_unique(array_merge(parent::listOwnProperties(), [ 0 => 'shopClassifier', ]));
     }
     
  
     protected function listOwnLists() {
         
-        return array ( 'shopClassifier' => 'shopClassifier', );
+        return [ 'shopClassifier' => 'shopClassifier', ];
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'shopClassifier' => 'Sample_Shop_Classifier', );
+        return [ 'shopClassifier' => 'Sample_Shop_Classifier', ];
     }
 
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopClassifier' => array (
+        if ($pi === false) $pi = [
+            'shopClassifier' => [
                 'className' => 'Sample_Shop_Classifier',
                 'mapperClass' => 'Sample_Shop_Classifier_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_shop_classifier_type_shop_classifier'),
                 'relationId' => '_shopClassifier',
                 'countVarName' => '_shopClassifierCount',
                 'referenceVarName' => '_shopClassifier',
-            ),
-            'type' => array (
+            ],
+            'type' => [
                 'maxLength' => '16',
+
                 'caption' => new Ac_Lang_String('sample_shop_classifier_type_type'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 
@@ -114,6 +116,16 @@ class Sample_Shop_Classifier_Type_Base_Object extends Ac_Model_Object {
      */
     function getShopClassifierItem($id) {
         return $this->getShopClassifier($id);
+    }
+    
+    /**
+     * @return Sample_Shop_Classifier[] 
+     */
+    function getAllShopClassifier() {
+        $res = [];
+        foreach ($this->listShopClassifier() as $id)
+            $res[] = $this->getShopClassifier($id);
+        return $res;
     }
     
     /**

@@ -37,45 +37,48 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'people', )));
+        return array_unique(array_merge(parent::listOwnProperties(), [ 0 => 'people', ]));
     }
     
  
     protected function listOwnLists() {
         
-        return array ( 'people' => 'people', );
+        return [ 'people' => 'people', ];
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'people' => 'Sample_Person', );
+        return [ 'people' => 'Sample_Person', ];
     }
 
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'people' => array (
+        if ($pi === false) $pi = [
+            'people' => [
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_religion_people'),
                 'relationId' => '_people',
                 'countVarName' => '_peopleCount',
                 'referenceVarName' => '_people',
-            ),
-            'religionId' => array (
+            ],
+            'religionId' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_religion_religion_id'),
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'maxLength' => '45',
+
                 'caption' => new Ac_Lang_String('sample_religion_title'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 
@@ -124,6 +127,16 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
      */
     function getPeopleItem($id) {
         return $this->getPerson($id);
+    }
+    
+    /**
+     * @return Sample_Person[] 
+     */
+    function getAllPeople() {
+        $res = [];
+        foreach ($this->listPeople() as $id)
+            $res[] = $this->getPerson($id);
+        return $res;
     }
     
     /**

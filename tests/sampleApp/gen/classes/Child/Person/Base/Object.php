@@ -27,100 +27,102 @@ class Child_Person_Base_Object extends Sample_Person {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'portraitPersonPhoto' => array (
+        if ($pi === false) $pi = [
+            'portraitPersonPhoto' => [
                 'className' => 'Child_Person_Photo',
                 'mapperClass' => 'Child_Person_Photo_Mapper',
                 'caption' => 'Person photo',
-            ),
-            'religion' => array (
+            ],
+            'religion' => [
                 'className' => 'Child_Religion',
                 'mapperClass' => 'Child_Religion_Mapper',
                 'caption' => 'Religion',
-            ),
-            'tags' => array (
+            ],
+            'tags' => [
                 'className' => 'Child_Tag',
                 'mapperClass' => 'Child_Tag_Mapper',
                 'caption' => 'Tags',
-            ),
-            'tagIds' => array (
-                'values' => array (
+            ],
+            'tagIds' => [
+                'values' => [
                     'mapperClass' => 'Child_Tag_Mapper',
-                ),
-            ),
-            'personAlbums' => array (
+                ],
+            ],
+            'personAlbums' => [
                 'className' => 'Child_Person_Album',
                 'mapperClass' => 'Child_Person_Album_Mapper',
                 'caption' => 'Person albums',
-            ),
-            'personPhotos' => array (
+            ],
+            'personPhotos' => [
                 'className' => 'Child_Person_Photo',
                 'mapperClass' => 'Child_Person_Photo_Mapper',
                 'caption' => 'Person photos',
-            ),
-            'personPosts' => array (
+            ],
+            'personPosts' => [
                 'className' => 'Child_Person_Post',
                 'mapperClass' => 'Child_Person_Post_Mapper',
                 'caption' => 'Person posts',
-            ),
-            'incomingRelations' => array (
+            ],
+            'incomingRelations' => [
                 'className' => 'Child_Relation',
                 'mapperClass' => 'Child_Relation_Mapper',
                 'otherModelIdInMethodsPrefix' => 'incoming',
                 'caption' => 'Relations',
-            ),
-            'outgoingRelations' => array (
+            ],
+            'outgoingRelations' => [
                 'className' => 'Child_Relation',
                 'mapperClass' => 'Child_Relation_Mapper',
                 'otherModelIdInMethodsPrefix' => 'outgoing',
                 'caption' => 'Relations',
-            ),
-            'extraCodeShopProducts' => array (
+            ],
+            'extraCodeShopProducts' => [
                 'className' => 'Child_Shop_Product',
                 'mapperClass' => 'Child_Shop_Product_Mapper',
                 'caption' => 'Shop products',
-            ),
-            'noteShopProducts' => array (
+            ],
+            'noteShopProducts' => [
                 'className' => 'Child_Shop_Product',
                 'mapperClass' => 'Child_Shop_Product_Mapper',
                 'caption' => 'Shop products',
-            ),
-            'personId' => array (
+            ],
+            'personId' => [
                 'caption' => 'Person Id',
-            ),
-            'name' => array (
+            ],
+            'name' => [
                 'caption' => 'Name',
-            ),
-            'gender' => array (
+            ],
+            'gender' => [
                 'caption' => 'Gender',
-            ),
-            'isSingle' => array (
+            ],
+            'isSingle' => [
                 'caption' => 'Is Single',
-            ),
-            'birthDate' => array (
+            ],
+            'birthDate' => [
                 'caption' => 'Birth Date',
-            ),
-            'lastUpdatedDatetime' => array (
+            ],
+            'lastUpdatedDatetime' => [
                 'caption' => 'Last Updated Datetime',
-            ),
-            'createdTs' => array (
+            ],
+            'createdTs' => [
                 'caption' => 'Created Ts',
-            ),
-            'religionId' => array (
+            ],
+            'religionId' => [
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'mapperClass' => 'Child_Religion_Mapper',
-                ),
+                ],
                 'caption' => 'Religion Id',
-            ),
-            'portraitId' => array (
+            ],
+            'portraitId' => [
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'mapperClass' => 'Child_Person_Photo_Mapper',
-                ),
+                ],
                 'caption' => 'Portrait Id',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

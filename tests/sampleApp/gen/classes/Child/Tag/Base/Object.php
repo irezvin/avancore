@@ -27,40 +27,40 @@ class Child_Tag_Base_Object extends Sample_Tag {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'people' => array (
+        if ($pi === false) $pi = [
+            'people' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'caption' => 'People',
-            ),
-            'personIds' => array (
-                'values' => array (
+            ],
+            'personIds' => [
+                'values' => [
                     'mapperClass' => 'Child_Person_Mapper',
-                ),
-            ),
-            'perks' => array (
+                ],
+            ],
+            'perks' => [
                 'className' => 'Child_Perk',
                 'mapperClass' => 'Child_Perk_Mapper',
                 'caption' => 'Perks',
-            ),
-            'perkIds' => array (
-                'values' => array (
+            ],
+            'perkIds' => [
+                'values' => [
                     'mapperClass' => 'Child_Perk_Mapper',
-                ),
-            ),
-            'tagId' => array (
+                ],
+            ],
+            'tagId' => [
                 'caption' => 'Tag Id',
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'caption' => 'Title',
-            ),
-            'titleM' => array (
-                'caption' => 'Title M',
-            ),
-            'titleF' => array (
-                'caption' => 'Title F',
-            ),
-        );
+            ],
+            'titleM' => [
+                'caption' => 'TitleM',
+            ],
+            'titleF' => [
+                'caption' => 'TitleF',
+            ],
+        ];
     
         return $pi;
                 

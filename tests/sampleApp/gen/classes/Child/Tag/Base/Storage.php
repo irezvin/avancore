@@ -8,24 +8,24 @@ class Child_Tag_Base_Storage extends Sample_Tag_Storage {
     
     protected function doGetSqlSelectPrototype($primaryAlias = 't') {
         $res = parent::doGetSqlSelectPrototype($primaryAlias);
-        Ac_Util::ms($res, array (
-                'parts' => array (
-                    'personIds' => array (
+        Ac_Util::ms($res, [
+                'parts' => [
+                    'personIds' => [
                         'class' => 'Ac_Sql_Filter_NNCriterion_Simple',
                         'midSrcKey' => 'idOfTag',
                         'midDestKey' => 'idOfPerson',
                         'tableKey' => 'personId',
                         'midTableAlias' => 'mid__people',
-                    ),
-                    'perkIds' => array (
+                    ],
+                    'perkIds' => [
                         'class' => 'Ac_Sql_Filter_NNCriterion_Simple',
                         'midSrcKey' => 'idOfTag',
                         'midDestKey' => 'idOfPerk',
                         'tableKey' => 'perkId',
                         'midTableAlias' => 'mid__perks',
-                    ),
-                ),
-            ) 
+                    ],
+                ],
+            ] 
         );
         return $res;
     }

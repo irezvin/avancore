@@ -16,47 +16,60 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Shop_Spec_Monitor_Storage';
 
-    var $columnNames = array ( 0 => 'productId', 1 => 'diagonal', 2 => 'hRes', 3 => 'vRes', 4 => 'matrixTypeId', );
+    var $columnNames = [ 0 => 'productId', 1 => 'diagonal', 2 => 'hRes', 3 => 'vRes', 4 => 'matrixTypeId', ];
 
-    var $nullableColumns = array ( 0 => 'matrixTypeId', );
+    var $nullableColumns = [ 0 => 'matrixTypeId', ];
 
-    var $defaults = array (
+    var $defaults = [
             'productId' => NULL,
             'diagonal' => NULL,
             'hRes' => NULL,
             'vRes' => NULL,
             'matrixTypeId' => NULL,
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
     protected $askRelationsForDefaults = false;
  
     protected function doGetCoreMixables() { 
-        return Ac_Util::m(parent::doGetCoreMixables(), array (
-            'Ac_Model_Typer_Abstract' => array (
+        return Ac_Util::m(parent::doGetCoreMixables(), [
+            'Ac_Model_Typer_Abstract' => [
                 'class' => 'Ac_Model_Typer_ExtraTable',
                 'tableName' => '#__shop_spec_monitor',
                 'uniformTypeId' => 'Sample_Shop_Spec_Mapper',
-            ),
-        ));
+            ],
+        ]);
     }
     
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_monitorShopClassifier' => false,
             '_monitorShopSpecsCount' => false,
             '_monitorShopSpecsLoaded' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Shop_Spec_Monitor 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Shop_Spec_Monitor_ImplMapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -70,7 +83,7 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Shop_Spec_Monitor 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -123,7 +136,7 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Shop_Spec_Monitor     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -132,7 +145,7 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Shop_Spec_Monitor     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -145,7 +158,7 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Shop_Spec_Monitor[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -167,7 +180,7 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -175,8 +188,8 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
 
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_monitorShopClassifier' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_monitorShopClassifier' => [
                 'srcMapperClass' => 'Sample_Shop_Spec_Monitor_ImplMapper',
                 'destMapperClass' => 'Sample_Shop_Classifier_Mapper',
                 'srcVarName' => '_monitorShopClassifier',
@@ -185,23 +198,25 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
                 'destVarName' => '_monitorShopSpecs',
                 'destCountVarName' => '_shopSpecsCount',
                 'destLoadedVarName' => '_shopSpecsLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'matrixTypeId' => 'id',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_shop_spec_monitor_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_shop_spec_monitor_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -209,11 +224,11 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'productId',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

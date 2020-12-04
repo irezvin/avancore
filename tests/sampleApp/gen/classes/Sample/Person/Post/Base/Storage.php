@@ -8,20 +8,27 @@ class Sample_Person_Post_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'id'; 
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'personId' => NULL,
             'photoId' => NULL,
             'title' => '',
             'content' => '',
             'pubId' => NULL,
-        ); 
+        ]; 
 
-    var $nullableColumns = array ( 0 => 'personId', 1 => 'photoId', 2 => 'title', 3 => 'content', 4 => 'pubId', ); 
+    var $nullableColumns = [ 0 => 'personId', 1 => 'photoId', 2 => 'title', 3 => 'content', 4 => 'pubId', ]; 
 
     var $autoincFieldName = 'id'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'id', ), 'idxPubId' => array ( 0 => 'pubId', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'id',
+    ],
+    'idxPubId' => [
+        0 => 'pubId',
+    ],
+]; 
  
     
 }

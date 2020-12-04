@@ -14,23 +14,29 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Tag_Storage';
 
-    var $columnNames = array ( 0 => 'tagId', 1 => 'title', 2 => 'titleM', 3 => 'titleF', );
+    var $columnNames = [ 0 => 'tagId', 1 => 'title', 2 => 'titleM', 3 => 'titleF', ];
 
-    var $nullableColumns = array ( 0 => 'titleM', 1 => 'titleF', );
+    var $nullableColumns = [ 0 => 'titleM', 1 => 'titleF', ];
 
-    var $defaults = array (
+    var $defaults = [
             'tagId' => NULL,
             'title' => NULL,
             'titleM' => NULL,
             'titleF' => NULL,
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
    
     protected $autoincFieldName = 'tagId';
     protected $askRelationsForDefaults = false;
  
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_people' => false,
             '_peopleCount' => false,
             '_peopleLoaded' => false,
@@ -39,18 +45,25 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
             '_perksCount' => false,
             '_perksLoaded' => false,
             '_perkIds' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Tag 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Tag_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -64,7 +77,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Tag 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -117,7 +130,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Tag     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -126,7 +139,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Tag     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -139,7 +152,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Tag[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -161,7 +174,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -173,8 +186,8 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_people' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_people' => [
                 'srcMapperClass' => 'Sample_Tag_Mapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_people',
@@ -185,25 +198,25 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 'destCountVarName' => '_tagsCount',
                 'destLoadedVarName' => '_tagsLoaded',
                 'destNNIdsVarName' => '_tagIds',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'tagId' => 'idOfTag',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
-                'srcLoadNNIdsMethod' => array (
+                'srcLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadPersonIdsFor',
-                ),
-                'destLoadNNIdsMethod' => array (
+                ],
+                'destLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadTagIdsFor',
-                ),
+                ],
                 'midTableName' => '#__people_tags',
-                'fieldLinks2' => array (
+                'fieldLinks2' => [
                     'idOfPerson' => 'personId',
-                ),
-            ),
-            '_perks' => array (
+                ],
+            ],
+            '_perks' => [
                 'srcMapperClass' => 'Sample_Tag_Mapper',
                 'destMapperClass' => 'Sample_Perk_Mapper',
                 'srcVarName' => '_perks',
@@ -214,31 +227,31 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 'destCountVarName' => '_tagsCount',
                 'destLoadedVarName' => '_tagsLoaded',
                 'destNNIdsVarName' => '_tagIds',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'tagId' => 'idOfTag',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
-                'srcLoadNNIdsMethod' => array (
+                'srcLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadPerkIdsFor',
-                ),
-                'destLoadNNIdsMethod' => array (
+                ],
+                'destLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadTagIdsFor',
-                ),
+                ],
                 'midTableName' => '#__tag_perks',
-                'fieldLinks2' => array (
+                'fieldLinks2' => [
                     'idOfPerk' => 'perkId',
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
-            'people' => array (
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), [
+            'people' => [
                 'relationId' => '_people',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -249,6 +262,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForPeople',
                 'getSrcObjectsMapperMethod' => 'getOfPeople',
                 'createDestObjectMethod' => 'createPerson',
+                'getAllDestObjectsMethod' => 'getAllPeople',
                 'listDestObjectsMethod' => 'listPeople',
                 'countDestObjectsMethod' => 'countPeople',
                 'getDestObjectMethod' => 'getPerson',
@@ -258,8 +272,8 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 'getDestIdsMethod' => 'getPersonIds',
                 'setDestIdsMethod' => 'setPersonIds',
                 'clearDestObjectsMethod' => 'clearPeople',
-            ),
-            'perks' => array (
+            ],
+            'perks' => [
                 'relationId' => '_perks',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -270,6 +284,7 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForPerks',
                 'getSrcObjectsMapperMethod' => 'getOfPerks',
                 'createDestObjectMethod' => 'createPerk',
+                'getAllDestObjectsMethod' => 'getAllPerks',
                 'listDestObjectsMethod' => 'listPerks',
                 'countDestObjectsMethod' => 'countPerks',
                 'getDestObjectMethod' => 'getPerk',
@@ -279,17 +294,19 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
                 'getDestIdsMethod' => 'getPerkIds',
                 'setDestIdsMethod' => 'setPerkIds',
                 'clearDestObjectsMethod' => 'clearPerks',
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_tags_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_tags_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -297,14 +314,14 @@ class Sample_Tag_Base_Mapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'tagId',
-            ),
-            'Index_2' => array (
+            ],
+            'Index_2' => [
                 0 => 'title',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

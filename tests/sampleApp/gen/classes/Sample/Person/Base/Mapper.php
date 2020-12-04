@@ -14,28 +14,34 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Person_Storage';
 
-    var $columnNames = array ( 0 => 'personId', 1 => 'name', 2 => 'gender', 3 => 'isSingle', 4 => 'birthDate', 5 => 'lastUpdatedDatetime', 6 => 'createdTs', 7 => 'religionId', 8 => 'portraitId', );
+    var $columnNames = [ 0 => 'personId', 1 => 'name', 2 => 'gender', 3 => 'isSingle', 4 => 'birthDate', 5 => 'lastUpdatedDatetime', 6 => 'createdTs', 7 => 'religionId', 8 => 'portraitId', ];
 
-    var $nullableColumns = array ( 0 => 'lastUpdatedDatetime', 1 => 'religionId', 2 => 'portraitId', );
+    var $nullableColumns = [ 0 => 'lastUpdatedDatetime', 1 => 'religionId', 2 => 'portraitId', ];
 
-    var $defaults = array (
+    var $defaults = [
             'personId' => NULL,
             'name' => NULL,
             'gender' => 'F',
-            'isSingle' => '1',
+            'isSingle' => 1,
             'birthDate' => NULL,
             'lastUpdatedDatetime' => NULL,
             'createdTs' => 'CURRENT_TIMESTAMP',
             'religionId' => NULL,
             'portraitId' => NULL,
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
    
     protected $autoincFieldName = 'personId';
     protected $askRelationsForDefaults = false;
  
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_portraitPersonPhoto' => false,
             '_religion' => false,
             '_tags' => false,
@@ -67,18 +73,25 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
             '_shopProductsCount' => false,
             '_shopProductsLoaded' => false,
             '_noteShopProducts' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Person 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Person_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -92,7 +105,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Person 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -136,9 +149,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      * @return Sample_Person[]
      */
     function loadRecordsByCriteria($where = '', $keysToList = false, $order = '', $joins = '', $limitOffset = false, $limitCount = false, $tableAlias = false) {
-        $res = parent::loadRecordsByCriteria($where, $keysToList, $order, $joins, $limitOffset, $limitCount, $tableAlias);
-        return $res;
-        
+        return parent::loadRecordsByCriteria($where, $keysToList, $order, $joins, $limitOffset, $limitCount, $tableAlias);
     }
     
     /**
@@ -147,7 +158,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Person     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -156,7 +167,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Person     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -169,7 +180,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Person[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -191,7 +202,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -203,35 +214,35 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_portraitPersonPhoto' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_portraitPersonPhoto' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Person_Photo_Mapper',
                 'srcVarName' => '_portraitPersonPhoto',
                 'destVarName' => '_portraitPerson',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'personId',
                     'portraitId' => 'photoId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-            '_religion' => array (
+            ],
+            '_religion' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Religion_Mapper',
                 'srcVarName' => '_religion',
                 'destVarName' => '_people',
                 'destCountVarName' => '_peopleCount',
                 'destLoadedVarName' => '_peopleLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'religionId' => 'religionId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-            '_tags' => array (
+            ],
+            '_tags' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Tag_Mapper',
                 'srcVarName' => '_tags',
@@ -242,128 +253,128 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'destCountVarName' => '_peopleCount',
                 'destLoadedVarName' => '_peopleLoaded',
                 'destNNIdsVarName' => '_personIds',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'idOfPerson',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
-                'srcLoadNNIdsMethod' => array (
+                'srcLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadTagIdsFor',
-                ),
-                'destLoadNNIdsMethod' => array (
+                ],
+                'destLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadPersonIdsFor',
-                ),
+                ],
                 'midTableName' => '#__people_tags',
-                'fieldLinks2' => array (
+                'fieldLinks2' => [
                     'idOfTag' => 'tagId',
-                ),
-            ),
-            '_personAlbums' => array (
+                ],
+            ],
+            '_personAlbums' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Person_Album_Mapper',
                 'srcVarName' => '_personAlbums',
                 'srcCountVarName' => '_personAlbumsCount',
                 'srcLoadedVarName' => '_personAlbumsLoaded',
                 'destVarName' => '_person',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'personId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-            '_personPhotos' => array (
+            ],
+            '_personPhotos' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Person_Photo_Mapper',
                 'srcVarName' => '_personPhotos',
                 'srcCountVarName' => '_personPhotosCount',
                 'srcLoadedVarName' => '_personPhotosLoaded',
                 'destVarName' => '_person',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'personId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-            '_personPosts' => array (
+            ],
+            '_personPosts' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Person_Post_Mapper',
                 'srcVarName' => '_personPosts',
                 'srcCountVarName' => '_personPostsCount',
                 'srcLoadedVarName' => '_personPostsLoaded',
                 'destVarName' => '_person',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'personId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-            '_authorPublish' => array (
+            ],
+            '_authorPublish' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Publish_ImplMapper',
                 'srcVarName' => '_authorPublish',
                 'srcCountVarName' => '_authorPublishCount',
                 'srcLoadedVarName' => '_authorPublishLoaded',
                 'destVarName' => '_authorPerson',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'authorId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-            '_editorPublish' => array (
+            ],
+            '_editorPublish' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Publish_ImplMapper',
                 'srcVarName' => '_editorPublish',
                 'srcCountVarName' => '_editorPublishCount',
                 'srcLoadedVarName' => '_editorPublishLoaded',
                 'destVarName' => '_editorPerson',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'editorId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-            '_incomingRelations' => array (
+            ],
+            '_incomingRelations' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Relation_Mapper',
                 'srcVarName' => '_incomingRelations',
                 'srcCountVarName' => '_incomingRelationsCount',
                 'srcLoadedVarName' => '_incomingRelationsLoaded',
                 'destVarName' => '_otherPerson',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'otherPersonId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-            '_outgoingRelations' => array (
+            ],
+            '_outgoingRelations' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Relation_Mapper',
                 'srcVarName' => '_outgoingRelations',
                 'srcCountVarName' => '_outgoingRelationsCount',
                 'srcLoadedVarName' => '_outgoingRelationsLoaded',
                 'destVarName' => '_person',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'personId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-            '_extraCodeShopProducts' => array (
+            ],
+            '_extraCodeShopProducts' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Shop_Product_Mapper',
                 'srcVarName' => '_extraCodeShopProducts',
                 'srcCountVarName' => '_shopProductsCount',
                 'srcLoadedVarName' => '_shopProductsLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'responsiblePersonId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-            '_noteShopProducts' => array (
+            ],
+            '_noteShopProducts' => [
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Shop_Product_Mapper',
                 'srcVarName' => '_noteShopProducts',
@@ -372,19 +383,19 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'destVarName' => '_notePerson',
                 'destCountVarName' => '_noteShopProductsCount',
                 'destLoadedVarName' => '_noteShopProductsLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'noteAuthorId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
-            'portraitPersonPhoto' => array (
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), [
+            'portraitPersonPhoto' => [
                 'relationId' => '_portraitPersonPhoto',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -398,8 +409,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'getDestObjectMethod' => 'getPortraitPersonPhoto',
                 'setDestObjectMethod' => 'setPortraitPersonPhoto',
                 'clearDestObjectMethod' => 'clearPortraitPersonPhoto',
-            ),
-            'religion' => array (
+            ],
+            'religion' => [
                 'relationId' => '_religion',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -413,8 +424,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'getDestObjectMethod' => 'getReligion',
                 'setDestObjectMethod' => 'setReligion',
                 'clearDestObjectMethod' => 'clearReligion',
-            ),
-            'tags' => array (
+            ],
+            'tags' => [
                 'relationId' => '_tags',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -425,6 +436,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForTags',
                 'getSrcObjectsMapperMethod' => 'getOfTags',
                 'createDestObjectMethod' => 'createTag',
+                'getAllDestObjectsMethod' => 'getAllTags',
                 'listDestObjectsMethod' => 'listTags',
                 'countDestObjectsMethod' => 'countTags',
                 'getDestObjectMethod' => 'getTag',
@@ -434,8 +446,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'getDestIdsMethod' => 'getTagIds',
                 'setDestIdsMethod' => 'setTagIds',
                 'clearDestObjectsMethod' => 'clearTags',
-            ),
-            'personAlbums' => array (
+            ],
+            'personAlbums' => [
                 'relationId' => '_personAlbums',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -446,13 +458,14 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForPersonAlbums',
                 'getSrcObjectsMapperMethod' => 'getOfPersonAlbums',
                 'createDestObjectMethod' => 'createPersonAlbum',
+                'getAllDestObjectsMethod' => 'getAllPersonAlbums',
                 'listDestObjectsMethod' => 'listPersonAlbums',
                 'countDestObjectsMethod' => 'countPersonAlbums',
                 'getDestObjectMethod' => 'getPersonAlbum',
                 'addDestObjectMethod' => 'addPersonAlbum',
                 'isDestLoadedMethod' => 'isPersonAlbumsLoaded',
-            ),
-            'personPhotos' => array (
+            ],
+            'personPhotos' => [
                 'relationId' => '_personPhotos',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -463,13 +476,14 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForPersonPhotos',
                 'getSrcObjectsMapperMethod' => 'getOfPersonPhotos',
                 'createDestObjectMethod' => 'createPersonPhoto',
+                'getAllDestObjectsMethod' => 'getAllPersonPhotos',
                 'listDestObjectsMethod' => 'listPersonPhotos',
                 'countDestObjectsMethod' => 'countPersonPhotos',
                 'getDestObjectMethod' => 'getPersonPhoto',
                 'addDestObjectMethod' => 'addPersonPhoto',
                 'isDestLoadedMethod' => 'isPersonPhotosLoaded',
-            ),
-            'personPosts' => array (
+            ],
+            'personPosts' => [
                 'relationId' => '_personPosts',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -480,13 +494,14 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForPersonPosts',
                 'getSrcObjectsMapperMethod' => 'getOfPersonPosts',
                 'createDestObjectMethod' => 'createPersonPost',
+                'getAllDestObjectsMethod' => 'getAllPersonPosts',
                 'listDestObjectsMethod' => 'listPersonPosts',
                 'countDestObjectsMethod' => 'countPersonPosts',
                 'getDestObjectMethod' => 'getPersonPost',
                 'addDestObjectMethod' => 'addPersonPost',
                 'isDestLoadedMethod' => 'isPersonPostsLoaded',
-            ),
-            'authorPublish' => array (
+            ],
+            'authorPublish' => [
                 'relationId' => '_authorPublish',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -497,13 +512,14 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForAuthorPublish',
                 'getSrcObjectsMapperMethod' => 'getOfAuthorPublish',
                 'createDestObjectMethod' => 'createAuthorPublish',
+                'getAllDestObjectsMethod' => 'getAllAuthorPublish',
                 'listDestObjectsMethod' => 'listAuthorPublish',
                 'countDestObjectsMethod' => 'countAuthorPublish',
                 'getDestObjectMethod' => 'getAuthorPublish',
                 'addDestObjectMethod' => 'addAuthorPublish',
                 'isDestLoadedMethod' => 'isAuthorPublishLoaded',
-            ),
-            'editorPublish' => array (
+            ],
+            'editorPublish' => [
                 'relationId' => '_editorPublish',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -514,13 +530,14 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForEditorPublish',
                 'getSrcObjectsMapperMethod' => 'getOfEditorPublish',
                 'createDestObjectMethod' => 'createEditorPublish',
+                'getAllDestObjectsMethod' => 'getAllEditorPublish',
                 'listDestObjectsMethod' => 'listEditorPublish',
                 'countDestObjectsMethod' => 'countEditorPublish',
                 'getDestObjectMethod' => 'getEditorPublish',
                 'addDestObjectMethod' => 'addEditorPublish',
                 'isDestLoadedMethod' => 'isEditorPublishLoaded',
-            ),
-            'incomingRelations' => array (
+            ],
+            'incomingRelations' => [
                 'relationId' => '_incomingRelations',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -531,13 +548,14 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForIncomingRelations',
                 'getSrcObjectsMapperMethod' => 'getOfIncomingRelations',
                 'createDestObjectMethod' => 'createIncomingRelation',
+                'getAllDestObjectsMethod' => 'getAllIncomingRelations',
                 'listDestObjectsMethod' => 'listIncomingRelations',
                 'countDestObjectsMethod' => 'countIncomingRelations',
                 'getDestObjectMethod' => 'getIncomingRelation',
                 'addDestObjectMethod' => 'addIncomingRelation',
                 'isDestLoadedMethod' => 'isIncomingRelationsLoaded',
-            ),
-            'outgoingRelations' => array (
+            ],
+            'outgoingRelations' => [
                 'relationId' => '_outgoingRelations',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -548,13 +566,14 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForOutgoingRelations',
                 'getSrcObjectsMapperMethod' => 'getOfOutgoingRelations',
                 'createDestObjectMethod' => 'createOutgoingRelation',
+                'getAllDestObjectsMethod' => 'getAllOutgoingRelations',
                 'listDestObjectsMethod' => 'listOutgoingRelations',
                 'countDestObjectsMethod' => 'countOutgoingRelations',
                 'getDestObjectMethod' => 'getOutgoingRelation',
                 'addDestObjectMethod' => 'addOutgoingRelation',
                 'isDestLoadedMethod' => 'isOutgoingRelationsLoaded',
-            ),
-            'extraCodeShopProducts' => array (
+            ],
+            'extraCodeShopProducts' => [
                 'relationId' => '_extraCodeShopProducts',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -566,13 +585,14 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForExtraCodeShopProducts',
                 'getSrcObjectsMapperMethod' => 'getOfExtraCodeShopProducts',
                 'createDestObjectMethod' => 'createExtraCodeShopProduct',
+                'getAllDestObjectsMethod' => 'getAllExtraCodeShopProducts',
                 'listDestObjectsMethod' => 'listExtraCodeShopProducts',
                 'countDestObjectsMethod' => 'countExtraCodeShopProducts',
                 'getDestObjectMethod' => 'getExtraCodeShopProduct',
                 'addDestObjectMethod' => 'addExtraCodeShopProduct',
                 'isDestLoadedMethod' => 'isExtraCodeShopProductsLoaded',
-            ),
-            'noteShopProducts' => array (
+            ],
+            'noteShopProducts' => [
                 'relationId' => '_noteShopProducts',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -584,22 +604,25 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForNoteShopProducts',
                 'getSrcObjectsMapperMethod' => 'getOfNoteShopProducts',
                 'createDestObjectMethod' => 'createNoteShopProduct',
+                'getAllDestObjectsMethod' => 'getAllNoteShopProducts',
                 'listDestObjectsMethod' => 'listNoteShopProducts',
                 'countDestObjectsMethod' => 'countNoteShopProducts',
                 'getDestObjectMethod' => 'getNoteShopProduct',
                 'addDestObjectMethod' => 'addNoteShopProduct',
                 'isDestLoadedMethod' => 'isNoteShopProductsLoaded',
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_people_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_people_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -607,11 +630,11 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'personId',
-            ),
-        );
+            ],
+        ];
     }
 
     /**
@@ -619,7 +642,6 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
      */
     function loadByPersonId ($personId) {
         $recs = $this->loadRecordsByCriteria(''.$this->getDb()->n('personId').' = '.$this->getDb()->q($personId).'');
-        
         if (count($recs)) $res = $recs[0];
             else $res = null;
         return $res;

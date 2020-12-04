@@ -14,25 +14,25 @@ class Sample_Shop_Spec_Food_Base_ExtraTable extends Ac_Model_Mapper_Mixable_Extr
     
     
     protected function doGetRelationPrototypes() {
-        return array (
-            '_shopSpecFoodShopSpec' => array (
+        return [
+            '_shopSpecFoodShopSpec' => [
                 'srcMapperClass' => 'Sample_Shop_Spec_Food_ImplMapper',
                 'destMapperClass' => 'Sample_Shop_Spec_Mapper',
                 'srcVarName' => '_shopSpecFoodShopSpec',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'productId' => 'productId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-        );
+            ],
+        ];
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return array (
-            'shopSpecFoodShopSpec' => array (
+        return [
+            'shopSpecFoodShopSpec' => [
                 'relationId' => '_shopSpecFoodShopSpec',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -47,8 +47,8 @@ class Sample_Shop_Spec_Food_Base_ExtraTable extends Ac_Model_Mapper_Mixable_Extr
                 'getDestObjectMethod' => 'getShopSpecFoodShopSpec',
                 'setDestObjectMethod' => 'setShopSpecFoodShopSpec',
                 'clearDestObjectMethod' => 'clearShopSpecFoodShopSpec',
-            ),
-        );
+            ],
+        ];
     }
     
     

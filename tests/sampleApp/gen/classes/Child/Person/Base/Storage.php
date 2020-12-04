@@ -8,17 +8,17 @@ class Child_Person_Base_Storage extends Sample_Person_Storage {
     
     protected function doGetSqlSelectPrototype($primaryAlias = 't') {
         $res = parent::doGetSqlSelectPrototype($primaryAlias);
-        Ac_Util::ms($res, array (
-                'parts' => array (
-                    'tagIds' => array (
+        Ac_Util::ms($res, [
+                'parts' => [
+                    'tagIds' => [
                         'class' => 'Ac_Sql_Filter_NNCriterion_Simple',
                         'midSrcKey' => 'idOfPerson',
                         'midDestKey' => 'idOfTag',
                         'tableKey' => 'tagId',
                         'midTableAlias' => 'mid__tags',
-                    ),
-                ),
-            ) 
+                    ],
+                ],
+            ] 
         );
         return $res;
     }

@@ -1,5 +1,5 @@
 <?php
-    $lang = array (
+    $lang = [
         'sample_people_plural' => 'people',
         'sample_people_single' => 'person',
         'sample_perk_name' => 'Name',
@@ -199,8 +199,8 @@
         'sample_tag_perks' => 'Perks',
         'sample_tag_tag_id' => 'Tag Id',
         'sample_tag_title' => 'Title',
-        'sample_tag_title_f' => 'Title F',
-        'sample_tag_title_m' => 'Title M',
+        'sample_tag_title_f' => 'TitleF',
+        'sample_tag_title_m' => 'TitleM',
         'sample_tags_plural' => 'tags',
         'sample_tags_single' => 'tag',
         'sample_tree_adjacent_id' => 'Id',
@@ -226,5 +226,5 @@
         'sample_tree_record_title' => 'Title',
         'sample_tree_records_plural' => 'treeRecords',
         'sample_tree_records_single' => 'treeRecord',
-    );
+    ];
     

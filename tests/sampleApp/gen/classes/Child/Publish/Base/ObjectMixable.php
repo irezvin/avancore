@@ -24,67 +24,69 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array ( ));
+        return array_merge(parent::listOwnProperties(), []);
     }
     
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
-        if ($pi === false) $pi = array (
-            'authorPerson' => array (
+        if ($pi === false) $pi = [
+            'authorPerson' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'caption' => 'People',
-            ),
-            'editorPerson' => array (
+            ],
+            'editorPerson' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'caption' => 'People',
-            ),
-            'id' => array (
+            ],
+            'id' => [
                 'caption' => 'Id',
-            ),
-            'sharedObjectType' => array (
+            ],
+            'sharedObjectType' => [
                 'caption' => 'Shared Object Type',
-            ),
-            'published' => array (
+            ],
+            'published' => [
                 'caption' => 'Published',
-            ),
-            'deleted' => array (
+            ],
+            'deleted' => [
                 'caption' => 'Deleted',
-            ),
-            'publishUp' => array (
+            ],
+            'publishUp' => [
                 'caption' => 'Publish Up',
-            ),
-            'publishDown' => array (
+            ],
+            'publishDown' => [
                 'caption' => 'Publish Down',
-            ),
-            'authorId' => array (
+            ],
+            'authorId' => [
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'mapperClass' => 'Child_Person_Mapper',
-                ),
+                ],
                 'caption' => 'Author Id',
-            ),
-            'editorId' => array (
+            ],
+            'editorId' => [
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'mapperClass' => 'Child_Person_Mapper',
-                ),
+                ],
                 'caption' => 'Editor Id',
-            ),
-            'pubChannelId' => array (
+            ],
+            'pubChannelId' => [
                 'caption' => 'Pub Channel Id',
-            ),
-            'dateCreated' => array (
+            ],
+            'dateCreated' => [
                 'caption' => 'Date Created',
-            ),
-            'dateModified' => array (
+            ],
+            'dateModified' => [
                 'caption' => 'Date Modified',
-            ),
-            'dateDeleted' => array (
+            ],
+            'dateDeleted' => [
                 'caption' => 'Date Deleted',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

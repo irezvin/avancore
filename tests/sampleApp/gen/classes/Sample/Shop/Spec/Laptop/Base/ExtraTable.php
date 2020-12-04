@@ -14,25 +14,25 @@ class Sample_Shop_Spec_Laptop_Base_ExtraTable extends Ac_Model_Mapper_Mixable_Ex
     
     
     protected function doGetRelationPrototypes() {
-        return array (
-            '_shopSpecLaptopShopSpec' => array (
+        return [
+            '_shopSpecLaptopShopSpec' => [
                 'srcMapperClass' => 'Sample_Shop_Spec_Laptop_ImplMapper',
                 'destMapperClass' => 'Sample_Shop_Spec_Mapper',
                 'srcVarName' => '_shopSpecLaptopShopSpec',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'productId' => 'productId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-        );
+            ],
+        ];
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return array (
-            'shopSpecLaptopShopSpec' => array (
+        return [
+            'shopSpecLaptopShopSpec' => [
                 'relationId' => '_shopSpecLaptopShopSpec',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -47,8 +47,8 @@ class Sample_Shop_Spec_Laptop_Base_ExtraTable extends Ac_Model_Mapper_Mixable_Ex
                 'getDestObjectMethod' => 'getShopSpecLaptopShopSpec',
                 'setDestObjectMethod' => 'setShopSpecLaptopShopSpec',
                 'clearDestObjectMethod' => 'clearShopSpecLaptopShopSpec',
-            ),
-        );
+            ],
+        ];
     }
     
     

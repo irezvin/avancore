@@ -14,20 +14,26 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Person_Photo_Storage';
 
-    var $columnNames = array ( 0 => 'photoId', 1 => 'personId', 2 => 'filename', );
+    var $columnNames = [ 0 => 'photoId', 1 => 'personId', 2 => 'filename', ];
 
-    var $defaults = array (
+    var $defaults = [
             'photoId' => NULL,
             'personId' => NULL,
             'filename' => '',
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
    
     protected $autoincFieldName = 'photoId';
     protected $askRelationsForDefaults = false;
  
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_person' => false,
             '_personAlbums' => false,
             '_personAlbumsCount' => false,
@@ -37,18 +43,25 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
             '_personPosts' => false,
             '_personPostsCount' => false,
             '_personPostsLoaded' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Person_Photo 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Person_Photo_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -62,7 +75,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Person_Photo 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -115,7 +128,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Person_Photo     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -124,7 +137,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Person_Photo     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -137,7 +150,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Person_Photo[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -159,7 +172,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -171,22 +184,22 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_person' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_person' => [
                 'srcMapperClass' => 'Sample_Person_Photo_Mapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_person',
                 'destVarName' => '_personPhotos',
                 'destCountVarName' => '_personPhotosCount',
                 'destLoadedVarName' => '_personPhotosLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'personId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-            '_personAlbums' => array (
+            ],
+            '_personAlbums' => [
                 'srcMapperClass' => 'Sample_Person_Photo_Mapper',
                 'destMapperClass' => 'Sample_Person_Album_Mapper',
                 'srcVarName' => '_personAlbums',
@@ -197,59 +210,59 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
                 'destCountVarName' => '_personPhotosCount',
                 'destLoadedVarName' => '_personPhotosLoaded',
                 'destNNIdsVarName' => '_personPhotoIds',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'personId',
                     'photoId' => 'photoId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
-                'srcLoadNNIdsMethod' => array (
+                'srcLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadPersonAlbumIdsFor',
-                ),
-                'destLoadNNIdsMethod' => array (
+                ],
+                'destLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadPersonPhotoIdsFor',
-                ),
+                ],
                 'midTableName' => '#__album_photos',
-                'fieldLinks2' => array (
+                'fieldLinks2' => [
                     'personId' => 'personId',
                     'albumId' => 'albumId',
-                ),
-            ),
-            '_portraitPerson' => array (
+                ],
+            ],
+            '_portraitPerson' => [
                 'srcMapperClass' => 'Sample_Person_Photo_Mapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_portraitPerson',
                 'destVarName' => '_portraitPersonPhoto',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'personId',
                     'photoId' => 'portraitId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
-            ),
-            '_personPosts' => array (
+            ],
+            '_personPosts' => [
                 'srcMapperClass' => 'Sample_Person_Photo_Mapper',
                 'destMapperClass' => 'Sample_Person_Post_Mapper',
                 'srcVarName' => '_personPosts',
                 'srcCountVarName' => '_personPostsCount',
                 'srcLoadedVarName' => '_personPostsLoaded',
                 'destVarName' => '_personPhoto',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'personId',
                     'photoId' => 'photoId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
-            'person' => array (
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), [
+            'person' => [
                 'relationId' => '_person',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -263,8 +276,8 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
                 'getDestObjectMethod' => 'getPerson',
                 'setDestObjectMethod' => 'setPerson',
                 'clearDestObjectMethod' => 'clearPerson',
-            ),
-            'personAlbums' => array (
+            ],
+            'personAlbums' => [
                 'relationId' => '_personAlbums',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -275,6 +288,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForPersonAlbums',
                 'getSrcObjectsMapperMethod' => 'getOfPersonAlbums',
                 'createDestObjectMethod' => 'createPersonAlbum',
+                'getAllDestObjectsMethod' => 'getAllPersonAlbums',
                 'listDestObjectsMethod' => 'listPersonAlbums',
                 'countDestObjectsMethod' => 'countPersonAlbums',
                 'getDestObjectMethod' => 'getPersonAlbum',
@@ -284,8 +298,8 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
                 'getDestIdsMethod' => 'getPersonAlbumIds',
                 'setDestIdsMethod' => 'setPersonAlbumIds',
                 'clearDestObjectsMethod' => 'clearPersonAlbums',
-            ),
-            'portraitPerson' => array (
+            ],
+            'portraitPerson' => [
                 'relationId' => '_portraitPerson',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -300,8 +314,8 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
                 'getDestObjectMethod' => 'getPortraitPerson',
                 'setDestObjectMethod' => 'setPortraitPerson',
                 'clearDestObjectMethod' => 'clearPortraitPerson',
-            ),
-            'personPosts' => array (
+            ],
+            'personPosts' => [
                 'relationId' => '_personPosts',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -312,22 +326,25 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForPersonPosts',
                 'getSrcObjectsMapperMethod' => 'getOfPersonPosts',
                 'createDestObjectMethod' => 'createPersonPost',
+                'getAllDestObjectsMethod' => 'getAllPersonPosts',
                 'listDestObjectsMethod' => 'listPersonPosts',
                 'countDestObjectsMethod' => 'countPersonPosts',
                 'getDestObjectMethod' => 'getPersonPost',
                 'addDestObjectMethod' => 'addPersonPost',
                 'isDestLoadedMethod' => 'isPersonPostsLoaded',
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_person_photos_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_person_photos_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -335,11 +352,11 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'photoId',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

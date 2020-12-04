@@ -14,8 +14,8 @@ class Sample_Shop_Spec_Monitor_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
     
     
     protected function doGetRelationPrototypes() {
-        return array (
-            '_monitorShopClassifier' => array (
+        return [
+            '_monitorShopClassifier' => [
                 'srcMapperClass' => 'Sample_Shop_Spec_Monitor_ImplMapper',
                 'destMapperClass' => 'Sample_Shop_Classifier_Mapper',
                 'srcVarName' => '_monitorShopClassifier',
@@ -24,20 +24,20 @@ class Sample_Shop_Spec_Monitor_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
                 'destVarName' => '_monitorShopSpecs',
                 'destCountVarName' => '_shopSpecsCount',
                 'destLoadedVarName' => '_shopSpecsLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'matrixTypeId' => 'id',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-        );
+            ],
+        ];
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return array (
-            'monitorShopClassifier' => array (
+        return [
+            'monitorShopClassifier' => [
                 'relationId' => '_monitorShopClassifier',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -52,8 +52,8 @@ class Sample_Shop_Spec_Monitor_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
                 'getDestObjectMethod' => 'getMonitorShopClassifier',
                 'setDestObjectMethod' => 'setMonitorShopClassifier',
                 'clearDestObjectMethod' => 'clearMonitorShopClassifier',
-            ),
-        );
+            ],
+        ];
     }
     
     

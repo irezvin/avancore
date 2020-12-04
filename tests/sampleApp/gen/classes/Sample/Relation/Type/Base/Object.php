@@ -39,55 +39,59 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'relations', )));
+        return array_unique(array_merge(parent::listOwnProperties(), [ 0 => 'relations', ]));
     }
     
  
     protected function listOwnLists() {
         
-        return array ( 'relations' => 'relations', );
+        return [ 'relations' => 'relations', ];
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'relations' => 'Sample_Relation', );
+        return [ 'relations' => 'Sample_Relation', ];
     }
 
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'relations' => array (
+        if ($pi === false) $pi = [
+            'relations' => [
                 'className' => 'Sample_Relation',
                 'mapperClass' => 'Sample_Relation_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_relation_type_relations'),
                 'relationId' => '_relations',
                 'countVarName' => '_relationsCount',
                 'referenceVarName' => '_relations',
-            ),
-            'relationTypeId' => array (
+            ],
+            'relationTypeId' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_relation_type_relation_type_id'),
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'maxLength' => '45',
+
                 'caption' => new Ac_Lang_String('sample_relation_type_title'),
-            ),
-            'isSymmetrical' => array (
+            ],
+            'isSymmetrical' => [
                 'dataType' => 'bool',
                 'controlType' => 'selectList',
                 'maxLength' => '1',
-                'valueList' => array (
+                'valueList' => [
                     0 => 'No',
                     1 => 'Yes',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_relation_type_is_symmetrical'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 
@@ -136,6 +140,16 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
      */
     function getRelationsItem($id) {
         return $this->getRelation($id);
+    }
+    
+    /**
+     * @return Sample_Relation[] 
+     */
+    function getAllRelations() {
+        $res = [];
+        foreach ($this->listRelations() as $id)
+            $res[] = $this->getRelation($id);
+        return $res;
     }
     
     /**

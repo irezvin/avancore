@@ -32,7 +32,7 @@ class Ac_Cg_Template_ModelPart extends Ac_Cg_Template_ModelAndMapper {
                 'templatePart' => 'extraTable',
             ),
             'genExtraTable' => array(
-                'relPath' => $this->classToFile($this->extraTableClass, true), 
+                'relPath' => $this->classToFile($this->genExtraTableClass, true), 
                 'isEditable' => false, 
                 'templatePart' => 'genExtraTable',
             ),

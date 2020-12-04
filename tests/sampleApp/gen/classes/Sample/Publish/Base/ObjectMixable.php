@@ -54,136 +54,152 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array ( 0 => 'authorPerson', 1 => 'editorPerson', ));
+        return array_merge(parent::listOwnProperties(), [ 0 => 'authorPerson', 1 => 'editorPerson', ]);
     }
     
  
     protected function listOwnAssociations() {
-        return array ( 'authorPerson' => 'Sample_Person', 'editorPerson' => 'Sample_Person', );
+        return [ 'authorPerson' => 'Sample_Person', 'editorPerson' => 'Sample_Person', ];
     }
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
-        if ($pi === false) $pi = array (
-            'authorPerson' => array (
+        if ($pi === false) $pi = [
+            'authorPerson' => [
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'author',
+
                 'caption' => new Ac_Lang_String('sample_publish_author_person'),
                 'relationId' => '_authorPerson',
                 'referenceVarName' => '_authorPerson',
-            ),
-            'editorPerson' => array (
+            ],
+            'editorPerson' => [
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'editor',
+
                 'caption' => new Ac_Lang_String('sample_publish_editor_person'),
                 'relationId' => '_editorPerson',
                 'referenceVarName' => '_editorPerson',
-            ),
-            'id' => array (
+            ],
+            'id' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_publish_id'),
-            ),
-            'sharedObjectType' => array (
+            ],
+            'sharedObjectType' => [
                 'maxLength' => '50',
+
                 'caption' => new Ac_Lang_String('sample_publish_shared_object_type'),
-            ),
-            'published' => array (
+            ],
+            'published' => [
                 'dataType' => 'bool',
                 'controlType' => 'selectList',
                 'maxLength' => '1',
-                'valueList' => array (
+                'valueList' => [
                     0 => 'No',
                     1 => 'Yes',
-                ),
+                ],
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_publish_published'),
-            ),
-            'deleted' => array (
+            ],
+            'deleted' => [
                 'dataType' => 'bool',
                 'controlType' => 'selectList',
                 'maxLength' => '1',
-                'valueList' => array (
+                'valueList' => [
                     0 => 'No',
                     1 => 'Yes',
-                ),
+                ],
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_publish_deleted'),
-            ),
-            'publishUp' => array (
+            ],
+            'publishUp' => [
                 'dataType' => 'dateTime',
                 'controlType' => 'dateInput',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_publish_publish_up'),
                 'internalDateFormat' => 'Y-m-d H:i:s',
                 'outputDateFormat' => 'Y-m-d H:i:s',
-            ),
-            'publishDown' => array (
+            ],
+            'publishDown' => [
                 'dataType' => 'dateTime',
                 'controlType' => 'dateInput',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_publish_publish_down'),
                 'internalDateFormat' => 'Y-m-d H:i:s',
                 'outputDateFormat' => 'Y-m-d H:i:s',
-            ),
-            'authorId' => array (
+            ],
+            'authorId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'authorPerson',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_publish_author_id'),
-            ),
-            'editorId' => array (
+            ],
+            'editorId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'editorPerson',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_publish_editor_id'),
-            ),
-            'pubChannelId' => array (
+            ],
+            'pubChannelId' => [
                 'maxLength' => '255',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_publish_pub_channel_id'),
-            ),
-            'dateCreated' => array (
+            ],
+            'dateCreated' => [
                 'dataType' => 'dateTime',
                 'controlType' => 'dateInput',
+
                 'caption' => new Ac_Lang_String('sample_publish_date_created'),
                 'internalDateFormat' => 'Y-m-d H:i:s',
                 'outputDateFormat' => 'Y-m-d H:i:s',
-            ),
-            'dateModified' => array (
+            ],
+            'dateModified' => [
                 'dataType' => 'dateTime',
                 'controlType' => 'dateInput',
+
                 'caption' => new Ac_Lang_String('sample_publish_date_modified'),
                 'internalDateFormat' => 'Y-m-d H:i:s',
                 'outputDateFormat' => 'Y-m-d H:i:s',
-            ),
-            'dateDeleted' => array (
+            ],
+            'dateDeleted' => [
                 'dataType' => 'dateTime',
                 'controlType' => 'dateInput',
+
                 'caption' => new Ac_Lang_String('sample_publish_date_deleted'),
                 'internalDateFormat' => 'Y-m-d H:i:s',
                 'outputDateFormat' => 'Y-m-d H:i:s',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

@@ -255,6 +255,12 @@ class Ac_Test_Model extends Ac_Test_Base {
         $do2 = $assoc2->getDestObject($a);
         $this->assertSame($do2, $a->getReligion());
         
+        $rel = $a->getReligion();
+        $allPeople = $rel->getAllPeople();
+        $this->assertTrue(is_array($allPeople));
+        $this->assertEqual(count($allPeople), count($rel->listPeople()));
+        $this->assertEqual(array_unique(array_map('get_class', $allPeople)), ['Sample_Person']);
+        
         $a2 = $m->loadByPersonId(3);
         $this->assertTrue($assoc2->getCanLoadDestObjects());
         $do3 = $assoc2->getDestObject($a2);
@@ -327,6 +333,11 @@ class Ac_Test_Model extends Ac_Test_Base {
         $this->assertTrue(count($list) > 1);
         $this->assertTrue($r->isPeopleLoaded());
         $this->assertSame($r->getPerson(0), $p3);
+        $manyPeople = $r->getAllPeople();
+        $this->assertTrue(is_array($manyPeople));
+        $this->assertEqual(count($manyPeople), count($list));
+        
+        
         
         $tags = new Ac_Model_Mapper(array(
             'id' => 'Tags',

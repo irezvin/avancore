@@ -5,85 +5,110 @@ abstract class Child_DomainBase extends Sample {
     protected function doOnInitialize() {
         parent::doOnInitialize();
  
-        $this->setMapperAliases(array ( 'Sample_Person_Mapper' => 'Child_Person_Mapper', 'Sample_Perk_Mapper' => 'Child_Perk_Mapper', 'Sample_Person_Album_Mapper' => 'Child_Person_Album_Mapper', 'Sample_Person_Photo_Mapper' => 'Child_Person_Photo_Mapper', 'Sample_Person_Post_Mapper' => 'Child_Person_Post_Mapper', 'Sample_Publish_ImplMapper' => 'Child_Publish_ImplMapper', 'Sample_Relation_Type_Mapper' => 'Child_Relation_Type_Mapper', 'Sample_Relation_Mapper' => 'Child_Relation_Mapper', 'Sample_Religion_Mapper' => 'Child_Religion_Mapper', 'Sample_Shop_Category_Mapper' => 'Child_Shop_Category_Mapper', 'Sample_Shop_Classifier_Mapper' => 'Child_Shop_Classifier_Mapper', 'Sample_Shop_Classifier_Type_Mapper' => 'Child_Shop_Classifier_Type_Mapper', 'Sample_Shop_Product_Extra_Code_ImplMapper' => 'Child_Shop_Product_Extra_Code_ImplMapper', 'Sample_Shop_Product_Note_ImplMapper' => 'Child_Shop_Product_Note_ImplMapper', 'Sample_Shop_Product_Mapper' => 'Child_Shop_Product_Mapper', 'Sample_Shop_Spec_Computer_ImplMapper' => 'Child_Shop_Spec_Computer_ImplMapper', 'Sample_Shop_Spec_Food_ImplMapper' => 'Child_Shop_Spec_Food_ImplMapper', 'Sample_Shop_Spec_Laptop_ImplMapper' => 'Child_Shop_Spec_Laptop_ImplMapper', 'Sample_Shop_Spec_Monitor_ImplMapper' => 'Child_Shop_Spec_Monitor_ImplMapper', 'Sample_Shop_Spec_Mapper' => 'Child_Shop_Spec_Mapper', 'Sample_Tag_Mapper' => 'Child_Tag_Mapper', 'Sample_Tree_Adjacent_Mapper' => 'Child_Tree_Adjacent_Mapper', 'Sample_Tree_Combo_Mapper' => 'Child_Tree_Combo_Mapper', 'Sample_Tree_Record_Mapper' => 'Child_Tree_Record_Mapper', ), true);
+        $this->setMapperAliases([
+    'Sample_Person_Mapper' => 'Child_Person_Mapper',
+    'Sample_Perk_Mapper' => 'Child_Perk_Mapper',
+    'Sample_Person_Album_Mapper' => 'Child_Person_Album_Mapper',
+    'Sample_Person_Photo_Mapper' => 'Child_Person_Photo_Mapper',
+    'Sample_Person_Post_Mapper' => 'Child_Person_Post_Mapper',
+    'Sample_Publish_ImplMapper' => 'Child_Publish_ImplMapper',
+    'Sample_Relation_Type_Mapper' => 'Child_Relation_Type_Mapper',
+    'Sample_Relation_Mapper' => 'Child_Relation_Mapper',
+    'Sample_Religion_Mapper' => 'Child_Religion_Mapper',
+    'Sample_Shop_Category_Mapper' => 'Child_Shop_Category_Mapper',
+    'Sample_Shop_Classifier_Mapper' => 'Child_Shop_Classifier_Mapper',
+    'Sample_Shop_Classifier_Type_Mapper' => 'Child_Shop_Classifier_Type_Mapper',
+    'Sample_Shop_Product_Extra_Code_ImplMapper' => 'Child_Shop_Product_Extra_Code_ImplMapper',
+    'Sample_Shop_Product_Note_ImplMapper' => 'Child_Shop_Product_Note_ImplMapper',
+    'Sample_Shop_Product_Mapper' => 'Child_Shop_Product_Mapper',
+    'Sample_Shop_Spec_Computer_ImplMapper' => 'Child_Shop_Spec_Computer_ImplMapper',
+    'Sample_Shop_Spec_Food_ImplMapper' => 'Child_Shop_Spec_Food_ImplMapper',
+    'Sample_Shop_Spec_Laptop_ImplMapper' => 'Child_Shop_Spec_Laptop_ImplMapper',
+    'Sample_Shop_Spec_Monitor_ImplMapper' => 'Child_Shop_Spec_Monitor_ImplMapper',
+    'Sample_Shop_Spec_Mapper' => 'Child_Shop_Spec_Mapper',
+    'Sample_Tag_Mapper' => 'Child_Tag_Mapper',
+    'Sample_Tree_Adjacent_Mapper' => 'Child_Tree_Adjacent_Mapper',
+    'Sample_Tree_Combo_Mapper' => 'Child_Tree_Combo_Mapper',
+    'Sample_Tree_Record_Mapper' => 'Child_Tree_Record_Mapper',
+], true);
     }
 
 
     protected function doGetMapperPrototypes() {
-        return array (
-            'Child_Person_Mapper' => array (
+        return [
+            'Child_Person_Mapper' => [
                 'class' => 'Child_Person_Mapper',
-            ),
-            'Child_Perk_Mapper' => array (
+            ],
+            'Child_Perk_Mapper' => [
                 'class' => 'Child_Perk_Mapper',
-            ),
-            'Child_Person_Album_Mapper' => array (
+            ],
+            'Child_Person_Album_Mapper' => [
                 'class' => 'Child_Person_Album_Mapper',
-            ),
-            'Child_Person_Photo_Mapper' => array (
+            ],
+            'Child_Person_Photo_Mapper' => [
                 'class' => 'Child_Person_Photo_Mapper',
-            ),
-            'Child_Person_Post_Mapper' => array (
+            ],
+            'Child_Person_Post_Mapper' => [
                 'class' => 'Child_Person_Post_Mapper',
-            ),
-            'Child_Publish_ImplMapper' => array (
+            ],
+            'Child_Publish_ImplMapper' => [
                 'class' => 'Child_Publish_ImplMapper',
-            ),
-            'Child_Relation_Type_Mapper' => array (
+            ],
+            'Child_Relation_Type_Mapper' => [
                 'class' => 'Child_Relation_Type_Mapper',
-            ),
-            'Child_Relation_Mapper' => array (
+            ],
+            'Child_Relation_Mapper' => [
                 'class' => 'Child_Relation_Mapper',
-            ),
-            'Child_Religion_Mapper' => array (
+            ],
+            'Child_Religion_Mapper' => [
                 'class' => 'Child_Religion_Mapper',
-            ),
-            'Child_Shop_Category_Mapper' => array (
+            ],
+            'Child_Shop_Category_Mapper' => [
                 'class' => 'Child_Shop_Category_Mapper',
-            ),
-            'Child_Shop_Classifier_Mapper' => array (
+            ],
+            'Child_Shop_Classifier_Mapper' => [
                 'class' => 'Child_Shop_Classifier_Mapper',
-            ),
-            'Child_Shop_Classifier_Type_Mapper' => array (
+            ],
+            'Child_Shop_Classifier_Type_Mapper' => [
                 'class' => 'Child_Shop_Classifier_Type_Mapper',
-            ),
-            'Child_Shop_Product_Extra_Code_ImplMapper' => array (
+            ],
+            'Child_Shop_Product_Extra_Code_ImplMapper' => [
                 'class' => 'Child_Shop_Product_Extra_Code_ImplMapper',
-            ),
-            'Child_Shop_Product_Note_ImplMapper' => array (
+            ],
+            'Child_Shop_Product_Note_ImplMapper' => [
                 'class' => 'Child_Shop_Product_Note_ImplMapper',
-            ),
-            'Child_Shop_Product_Mapper' => array (
+            ],
+            'Child_Shop_Product_Mapper' => [
                 'class' => 'Child_Shop_Product_Mapper',
-            ),
-            'Child_Shop_Spec_Computer_ImplMapper' => array (
+            ],
+            'Child_Shop_Spec_Computer_ImplMapper' => [
                 'class' => 'Child_Shop_Spec_Computer_ImplMapper',
-            ),
-            'Child_Shop_Spec_Food_ImplMapper' => array (
+            ],
+            'Child_Shop_Spec_Food_ImplMapper' => [
                 'class' => 'Child_Shop_Spec_Food_ImplMapper',
-            ),
-            'Child_Shop_Spec_Laptop_ImplMapper' => array (
+            ],
+            'Child_Shop_Spec_Laptop_ImplMapper' => [
                 'class' => 'Child_Shop_Spec_Laptop_ImplMapper',
-            ),
-            'Child_Shop_Spec_Monitor_ImplMapper' => array (
+            ],
+            'Child_Shop_Spec_Monitor_ImplMapper' => [
                 'class' => 'Child_Shop_Spec_Monitor_ImplMapper',
-            ),
-            'Child_Shop_Spec_Mapper' => array (
+            ],
+            'Child_Shop_Spec_Mapper' => [
                 'class' => 'Child_Shop_Spec_Mapper',
-            ),
-            'Child_Tag_Mapper' => array (
+            ],
+            'Child_Tag_Mapper' => [
                 'class' => 'Child_Tag_Mapper',
-            ),
-            'Child_Tree_Adjacent_Mapper' => array (
+            ],
+            'Child_Tree_Adjacent_Mapper' => [
                 'class' => 'Child_Tree_Adjacent_Mapper',
-            ),
-            'Child_Tree_Combo_Mapper' => array (
+            ],
+            'Child_Tree_Combo_Mapper' => [
                 'class' => 'Child_Tree_Combo_Mapper',
-            ),
-            'Child_Tree_Record_Mapper' => array (
+            ],
+            'Child_Tree_Record_Mapper' => [
                 'class' => 'Child_Tree_Record_Mapper',
-            ),
-        );
+            ],
+        ];
     }
     
     /**
