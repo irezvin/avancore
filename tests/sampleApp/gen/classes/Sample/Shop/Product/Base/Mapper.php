@@ -14,50 +14,56 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Shop_Product_Storage';
 
-    var $columnNames = array ( 0 => 'id', 1 => 'sku', 2 => 'title', 3 => 'metaId', 4 => 'pubId', );
+    var $columnNames = [ 0 => 'id', 1 => 'sku', 2 => 'title', 3 => 'metaId', 4 => 'pubId', ];
 
-    var $nullableColumns = array ( 0 => 'metaId', 1 => 'pubId', );
+    var $nullableColumns = [ 0 => 'metaId', 1 => 'pubId', ];
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'sku' => '',
             'title' => '',
             'metaId' => NULL,
             'pubId' => NULL,
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
    
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;
  
     protected function doGetCoreMixables() { 
-        return Ac_Util::m(parent::doGetCoreMixables(), array (
-            'publish' => array (
+        return Ac_Util::m(parent::doGetCoreMixables(), [
+            'publish' => [
                 'class' => 'Sample_Publish_MapperMixable',
-                'colMap' => array (
+                'colMap' => [
                     'id' => 'pubId',
-                ),
-                'fieldNames' => array (
+                ],
+                'fieldNames' => [
                     'sharedObjectType' => false,
-                ),
-            ),
-            'extraCode' => array (
+                ],
+            ],
+            'extraCode' => [
                 'class' => 'Sample_Shop_Product_Extra_Code_MapperMixable',
-                'colMap' => array (
+                'colMap' => [
                     'productId' => 'id',
-                ),
-            ),
-            'note' => array (
+                ],
+            ],
+            'note' => [
                 'class' => 'Sample_Shop_Product_Note_MapperMixable',
-                'colMap' => array (
+                'colMap' => [
                     'productId' => 'id',
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
     }
     
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_shopCategories' => false,
             '_shopCategoriesCount' => false,
             '_shopCategoriesLoaded' => false,
@@ -74,18 +80,25 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
             '_notePerson' => false,
             '_noteShopProductsCount' => false,
             '_noteShopProductsLoaded' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Shop_Product 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Shop_Product_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -99,7 +112,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Shop_Product 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -152,7 +165,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Shop_Product     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -161,7 +174,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Shop_Product     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -174,7 +187,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Shop_Product[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -196,7 +209,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -208,8 +221,8 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_shopCategories' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_shopCategories' => [
                 'srcMapperClass' => 'Sample_Shop_Product_Mapper',
                 'destMapperClass' => 'Sample_Shop_Category_Mapper',
                 'srcVarName' => '_shopCategories',
@@ -220,25 +233,25 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'destCountVarName' => '_shopProductsCount',
                 'destLoadedVarName' => '_shopProductsLoaded',
                 'destNNIdsVarName' => '_shopProductIds',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'id' => 'productId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
-                'srcLoadNNIdsMethod' => array (
+                'srcLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadShopCategoryIdsFor',
-                ),
-                'destLoadNNIdsMethod' => array (
+                ],
+                'destLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadShopProductIdsFor',
-                ),
+                ],
                 'midTableName' => '#__shop_product_categories',
-                'fieldLinks2' => array (
+                'fieldLinks2' => [
                     'categoryId' => 'id',
-                ),
-            ),
-            '_referencedShopProducts' => array (
+                ],
+            ],
+            '_referencedShopProducts' => [
                 'srcMapperClass' => 'Sample_Shop_Product_Mapper',
                 'destMapperClass' => 'Sample_Shop_Product_Mapper',
                 'srcVarName' => '_referencedShopProducts',
@@ -249,25 +262,25 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'destCountVarName' => '_referencingShopProductsCount',
                 'destLoadedVarName' => '_referencingShopProductsLoaded',
                 'destNNIdsVarName' => '_referencingShopProductIds',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'id' => 'productId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
-                'srcLoadNNIdsMethod' => array (
+                'srcLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadReferencedShopProductIdsFor',
-                ),
-                'destLoadNNIdsMethod' => array (
+                ],
+                'destLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadReferencingShopProductIdsFor',
-                ),
+                ],
                 'midTableName' => '#__shop_product_related',
-                'fieldLinks2' => array (
+                'fieldLinks2' => [
                     'relatedProductId' => 'id',
-                ),
-            ),
-            '_referencingShopProducts' => array (
+                ],
+            ],
+            '_referencingShopProducts' => [
                 'srcMapperClass' => 'Sample_Shop_Product_Mapper',
                 'destMapperClass' => 'Sample_Shop_Product_Mapper',
                 'srcVarName' => '_referencingShopProducts',
@@ -278,42 +291,42 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'destCountVarName' => '_referencedShopProductsCount',
                 'destLoadedVarName' => '_referencedShopProductsLoaded',
                 'destNNIdsVarName' => '_referencedShopProductIds',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'id' => 'relatedProductId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => false,
-                'srcLoadNNIdsMethod' => array (
+                'srcLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadReferencingShopProductIdsFor',
-                ),
-                'destLoadNNIdsMethod' => array (
+                ],
+                'destLoadNNIdsMethod' => [
                     0 => true,
                     1 => 'loadReferencedShopProductIdsFor',
-                ),
+                ],
                 'midTableName' => '#__shop_product_related',
-                'fieldLinks2' => array (
+                'fieldLinks2' => [
                     'productId' => 'id',
-                ),
-            ),
-            '_shopSpec' => array (
+                ],
+            ],
+            '_shopSpec' => [
                 'srcMapperClass' => 'Sample_Shop_Product_Mapper',
                 'destMapperClass' => 'Sample_Shop_Spec_Mapper',
                 'srcVarName' => '_shopSpec',
                 'destVarName' => '_shopProduct',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'id' => 'productId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
-            'shopCategories' => array (
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), [
+            'shopCategories' => [
                 'relationId' => '_shopCategories',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -324,6 +337,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForShopCategories',
                 'getSrcObjectsMapperMethod' => 'getOfShopCategories',
                 'createDestObjectMethod' => 'createShopCategory',
+                'getAllDestObjectsMethod' => 'getAllShopCategories',
                 'listDestObjectsMethod' => 'listShopCategories',
                 'countDestObjectsMethod' => 'countShopCategories',
                 'getDestObjectMethod' => 'getShopCategory',
@@ -333,8 +347,8 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'getDestIdsMethod' => 'getShopCategoryIds',
                 'setDestIdsMethod' => 'setShopCategoryIds',
                 'clearDestObjectsMethod' => 'clearShopCategories',
-            ),
-            'referencedShopProducts' => array (
+            ],
+            'referencedShopProducts' => [
                 'relationId' => '_referencedShopProducts',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -345,6 +359,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForReferencedShopProducts',
                 'getSrcObjectsMapperMethod' => 'getOfReferencedShopProducts',
                 'createDestObjectMethod' => 'createReferencedShopProduct',
+                'getAllDestObjectsMethod' => 'getAllReferencedShopProducts',
                 'listDestObjectsMethod' => 'listReferencedShopProducts',
                 'countDestObjectsMethod' => 'countReferencedShopProducts',
                 'getDestObjectMethod' => 'getReferencedShopProduct',
@@ -354,8 +369,8 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'getDestIdsMethod' => 'getReferencedShopProductIds',
                 'setDestIdsMethod' => 'setReferencedShopProductIds',
                 'clearDestObjectsMethod' => 'clearReferencedShopProducts',
-            ),
-            'referencingShopProducts' => array (
+            ],
+            'referencingShopProducts' => [
                 'relationId' => '_referencingShopProducts',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -366,6 +381,7 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForReferencingShopProducts',
                 'getSrcObjectsMapperMethod' => 'getOfReferencingShopProducts',
                 'createDestObjectMethod' => 'createReferencingShopProduct',
+                'getAllDestObjectsMethod' => 'getAllReferencingShopProducts',
                 'listDestObjectsMethod' => 'listReferencingShopProducts',
                 'countDestObjectsMethod' => 'countReferencingShopProducts',
                 'getDestObjectMethod' => 'getReferencingShopProduct',
@@ -375,8 +391,8 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'getDestIdsMethod' => 'getReferencingShopProductIds',
                 'setDestIdsMethod' => 'setReferencingShopProductIds',
                 'clearDestObjectsMethod' => 'clearReferencingShopProducts',
-            ),
-            'shopSpec' => array (
+            ],
+            'shopSpec' => [
                 'relationId' => '_shopSpec',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -391,17 +407,19 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
                 'getDestObjectMethod' => 'getShopSpec',
                 'setDestObjectMethod' => 'setShopSpec',
                 'clearDestObjectMethod' => 'clearShopSpec',
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_shop_products_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_shop_products_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -409,14 +427,14 @@ class Sample_Shop_Product_Base_Mapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'id',
-            ),
-            'idxPubId' => array (
+            ],
+            'idxPubId' => [
                 0 => 'pubId',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

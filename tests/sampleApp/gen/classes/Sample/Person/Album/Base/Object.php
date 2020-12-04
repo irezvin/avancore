@@ -43,74 +43,79 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'person', 1 => 'personPhotos', 2 => 'personPhotoIds', )));
+        return array_unique(array_merge(parent::listOwnProperties(), [ 0 => 'person', 1 => 'personPhotos', 2 => 'personPhotoIds', ]));
     }
     
  
     protected function listOwnLists() {
         
-        return array ( 'personPhotos' => 'personPhotos', );
+        return [ 'personPhotos' => 'personPhotos', ];
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'person' => 'Sample_Person', 'personPhotos' => 'Sample_Person_Photo', );
+        return [ 'person' => 'Sample_Person', 'personPhotos' => 'Sample_Person_Photo', ];
     }
 
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'person' => array (
+        if ($pi === false) $pi = [
+            'person' => [
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_person_album_person'),
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
-            ),
-            'personPhotos' => array (
+            ],
+            'personPhotos' => [
                 'className' => 'Sample_Person_Photo',
                 'mapperClass' => 'Sample_Person_Photo_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_person_album_person_photos'),
                 'relationId' => '_personPhotos',
                 'countVarName' => '_personPhotosCount',
                 'nnIdsVarName' => '_personPhotoIds',
                 'referenceVarName' => '_personPhotos',
-            ),
-            'personPhotoIds' => array (
+            ],
+            'personPhotoIds' => [
                 'dataType' => 'int',
                 'arrayValue' => true,
                 'controlType' => 'selectList',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Photo_Mapper',
-                ),
+                ],
                 'showInTable' => false,
-            ),
-            'albumId' => array (
+            ],
+            'albumId' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_person_album_album_id'),
-            ),
-            'personId' => array (
+            ],
+            'personId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'person',
+
                 'caption' => new Ac_Lang_String('sample_person_album_person_id'),
-            ),
-            'albumName' => array (
+            ],
+            'albumName' => [
                 'maxLength' => '255',
+
                 'caption' => new Ac_Lang_String('sample_person_album_album_name'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 
@@ -202,6 +207,16 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
      */
     function getPersonPhotosItem($id) {
         return $this->getPersonPhoto($id);
+    }
+    
+    /**
+     * @return Sample_Person_Photo[] 
+     */
+    function getAllPersonPhotos() {
+        $res = [];
+        foreach ($this->listPersonPhotos() as $id)
+            $res[] = $this->getPersonPhoto($id);
+        return $res;
     }
     
     /**

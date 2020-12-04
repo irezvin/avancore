@@ -14,51 +14,64 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Person_Post_Storage';
 
-    var $columnNames = array ( 0 => 'id', 1 => 'personId', 2 => 'photoId', 3 => 'title', 4 => 'content', 5 => 'pubId', );
+    var $columnNames = [ 0 => 'id', 1 => 'personId', 2 => 'photoId', 3 => 'title', 4 => 'content', 5 => 'pubId', ];
 
-    var $nullableColumns = array ( 0 => 'personId', 1 => 'photoId', 2 => 'title', 3 => 'content', 4 => 'pubId', );
+    var $nullableColumns = [ 0 => 'personId', 1 => 'photoId', 2 => 'title', 3 => 'content', 4 => 'pubId', ];
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'personId' => NULL,
             'photoId' => NULL,
             'title' => '',
             'content' => '',
             'pubId' => NULL,
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
    
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;
  
     protected function doGetCoreMixables() { 
-        return Ac_Util::m(parent::doGetCoreMixables(), array (
-            'publish' => array (
+        return Ac_Util::m(parent::doGetCoreMixables(), [
+            'publish' => [
                 'class' => 'Sample_Publish_MapperMixable',
-                'colMap' => array (
+                'colMap' => [
                     'id' => 'pubId',
-                ),
-            ),
-        ));
+                ],
+            ],
+        ]);
     }
     
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_publish' => false,
             '_person' => false,
             '_personPhoto' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Person_Post 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Person_Post_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -72,7 +85,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Person_Post 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -125,7 +138,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Person_Post     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -134,7 +147,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Person_Post     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -147,7 +160,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Person_Post[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -169,7 +182,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -181,54 +194,54 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_publish' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_publish' => [
                 'srcMapperClass' => 'Sample_Person_Post_Mapper',
                 'destMapperClass' => 'Sample_Publish_ImplMapper',
                 'srcVarName' => '_publish',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'pubId' => 'id',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-            '_person' => array (
+            ],
+            '_person' => [
                 'srcMapperClass' => 'Sample_Person_Post_Mapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_person',
                 'destVarName' => '_personPosts',
                 'destCountVarName' => '_personPostsCount',
                 'destLoadedVarName' => '_personPostsLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'personId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-            '_personPhoto' => array (
+            ],
+            '_personPhoto' => [
                 'srcMapperClass' => 'Sample_Person_Post_Mapper',
                 'destMapperClass' => 'Sample_Person_Photo_Mapper',
                 'srcVarName' => '_personPhoto',
                 'destVarName' => '_personPosts',
                 'destCountVarName' => '_personPostsCount',
                 'destLoadedVarName' => '_personPostsLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'personId' => 'personId',
                     'photoId' => 'photoId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
-            'publish' => array (
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), [
+            'publish' => [
                 'relationId' => '_publish',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -242,8 +255,8 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
                 'getDestObjectMethod' => 'getPublish',
                 'setDestObjectMethod' => 'setPublish',
                 'clearDestObjectMethod' => 'clearPublish',
-            ),
-            'person' => array (
+            ],
+            'person' => [
                 'relationId' => '_person',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -257,8 +270,8 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
                 'getDestObjectMethod' => 'getPerson',
                 'setDestObjectMethod' => 'setPerson',
                 'clearDestObjectMethod' => 'clearPerson',
-            ),
-            'personPhoto' => array (
+            ],
+            'personPhoto' => [
                 'relationId' => '_personPhoto',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -272,17 +285,19 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
                 'getDestObjectMethod' => 'getPersonPhoto',
                 'setDestObjectMethod' => 'setPersonPhoto',
                 'clearDestObjectMethod' => 'clearPersonPhoto',
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_person_posts_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_person_posts_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -290,14 +305,14 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'id',
-            ),
-            'idxPubId' => array (
+            ],
+            'idxPubId' => [
                 0 => 'pubId',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

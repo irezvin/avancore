@@ -14,31 +14,44 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Shop_Spec_Storage';
 
-    var $columnNames = array ( 0 => 'productId', 1 => 'detailsUrl', 2 => 'specsType', );
+    var $columnNames = [ 0 => 'productId', 1 => 'detailsUrl', 2 => 'specsType', ];
 
-    var $defaults = array (
+    var $defaults = [
             'productId' => NULL,
             'detailsUrl' => '',
             'specsType' => '',
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
     protected $askRelationsForDefaults = false;
  
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_shopProduct' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Shop_Spec 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Shop_Spec_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -52,7 +65,7 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Shop_Spec 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -105,7 +118,7 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Shop_Spec     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -114,7 +127,7 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Shop_Spec     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -127,7 +140,7 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Shop_Spec[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -149,7 +162,7 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -161,26 +174,26 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_shopProduct' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_shopProduct' => [
                 'srcMapperClass' => 'Sample_Shop_Spec_Mapper',
                 'destMapperClass' => 'Sample_Shop_Product_Mapper',
                 'srcVarName' => '_shopProduct',
                 'destVarName' => '_shopSpec',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'productId' => 'id',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
-            'shopProduct' => array (
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), [
+            'shopProduct' => [
                 'relationId' => '_shopProduct',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -194,17 +207,19 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
                 'getDestObjectMethod' => 'getShopProduct',
                 'setDestObjectMethod' => 'setShopProduct',
                 'clearDestObjectMethod' => 'clearShopProduct',
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_shop_specs_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_shop_specs_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -212,11 +227,11 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'productId',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

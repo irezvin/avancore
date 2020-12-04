@@ -36,64 +36,69 @@ class Sample_Shop_Spec_Food_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTab
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array ( 0 => 'shopSpecFoodShopSpec', ));
+        return array_merge(parent::listOwnProperties(), [ 0 => 'shopSpecFoodShopSpec', ]);
     }
     
  
     protected function listOwnAssociations() {
-        return array ( 'shopSpecFoodShopSpec' => 'Sample_Shop_Spec', );
+        return [ 'shopSpecFoodShopSpec' => 'Sample_Shop_Spec', ];
     }
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopSpecFoodShopSpec' => array (
+        if ($pi === false) $pi = [
+            'shopSpecFoodShopSpec' => [
                 'className' => 'Sample_Shop_Spec',
                 'mapperClass' => 'Sample_Shop_Spec_Mapper',
                 'otherModelIdInMethodsPrefix' => 'shopSpecFood',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_food_shop_spec_food_shop_spec'),
                 'relationId' => '_shopSpecFoodShopSpec',
                 'referenceVarName' => '_shopSpecFoodShopSpec',
-            ),
-            'productId' => array (
+            ],
+            'productId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Spec_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'shopSpecFoodShopSpec',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_food_product_id'),
-            ),
-            'storageType' => array (
+            ],
+            'storageType' => [
                 'controlType' => 'selectList',
-                'valueList' => array (
+                'valueList' => [
                     'shelfStable' => 'shelfStable',
                     'frozen' => 'frozen',
                     'refrigerated' => 'refrigerated',
-                ),
+                ],
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_food_storage_type'),
-            ),
-            'storageTerm' => array (
+            ],
+            'storageTerm' => [
                 'dataType' => 'int',
                 'maxLength' => '3',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_food_storage_term'),
-            ),
-            'storageTermUnit' => array (
+            ],
+            'storageTermUnit' => [
                 'controlType' => 'selectList',
-                'valueList' => array (
+                'valueList' => [
                     'days' => 'days',
                     'months' => 'months',
                     'years' => 'years',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_food_storage_term_unit'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

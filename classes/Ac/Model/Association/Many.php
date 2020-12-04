@@ -3,6 +3,11 @@
 class Ac_Model_Association_Many extends Ac_Model_Association_Abstract {
     
     protected $isReferenced = false;   
+    
+    /**
+     * @var string
+     */
+    protected $getAllDestObjectsMethod = false;
 
     /**
      * @var string
@@ -18,7 +23,7 @@ class Ac_Model_Association_Many extends Ac_Model_Association_Abstract {
      * @var string
      */
     protected $getDestObjectMethod = false;
-
+    
     /**
      * @var string
      */
@@ -82,6 +87,22 @@ class Ac_Model_Association_Many extends Ac_Model_Association_Abstract {
         }
         return $this->countField;
     }
+
+    /**
+     * @param string $getAllDestObjectsMethod
+     */
+    function setGetAllDestObjectsMethod($getAllDestObjectsMethod) {
+        if ($getAllDestObjectsMethod !== ($oldGetAllDestObjectsMethod = $this->getAllDestObjectsMethod)) {
+            $this->getAllDestObjectsMethod = $getAllDestObjectsMethod;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    function getGetAllDestObjectsMethod() {
+        return $this->getAllDestObjectsMethod;
+    }    
     
     /**
      * @param string $listDestObjectsMethod
@@ -254,6 +275,17 @@ class Ac_Model_Association_Many extends Ac_Model_Association_Abstract {
         return $res;
     }
     
+    /**
+     * @return array
+     */
+    function getAllDestObjects($object) {
+        $res = [];
+        foreach ($this->listDestObjects($object) as $key) {
+            $res[] = $this->getDestObject($object, $key);
+        }
+        return $res;
+    }
+    
     function addDestObject($object, $destObject) {
         if ($this->useMapperMethods && ($m = $this->addDestObjectMethod)) {
             $res = $object->$m($destObject);
@@ -276,6 +308,7 @@ class Ac_Model_Association_Many extends Ac_Model_Association_Abstract {
     
     protected function getGuessMap() {
         return array_merge(parent::getGuessMap(), array(
+            'getAllDestObjectsMethod' => 'getAll{Plural}',
             'listDestObjectsMethod' => 'list{Plural}',
             'countDestObjectsMethod' => 'count{Plural}',
             'getDestObjectMethod' => 'get{Single}',
@@ -286,6 +319,7 @@ class Ac_Model_Association_Many extends Ac_Model_Association_Abstract {
     
     protected function getMethodImplMap() {
         return array_merge(parent::getMethodImplMap(), array(
+            'getAllDestObjectsMethod' => 'getAllDestObjects',
             'listDestObjectsMethod' => 'listDestObjects',
             'countDestObjectsMethod' => 'countDestObjects',
             'getDestObjectMethod' => 'getDestObject',
@@ -337,9 +371,5 @@ class Ac_Model_Association_Many extends Ac_Model_Association_Abstract {
     function model_onListLists(& $meta) {
         Ac_Util::ms($meta, $this->modelMeta['onListLists']);
     }
-    
-//    function getObjectPropertyName() {
-//        return $this->getPlural();
-//    }
     
 }

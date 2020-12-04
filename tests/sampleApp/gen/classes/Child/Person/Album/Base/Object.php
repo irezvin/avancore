@@ -27,35 +27,35 @@ class Child_Person_Album_Base_Object extends Sample_Person_Album {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'person' => array (
+        if ($pi === false) $pi = [
+            'person' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'caption' => 'People',
-            ),
-            'personPhotos' => array (
+            ],
+            'personPhotos' => [
                 'className' => 'Child_Person_Photo',
                 'mapperClass' => 'Child_Person_Photo_Mapper',
                 'caption' => 'Person photos',
-            ),
-            'personPhotoIds' => array (
-                'values' => array (
+            ],
+            'personPhotoIds' => [
+                'values' => [
                     'mapperClass' => 'Child_Person_Photo_Mapper',
-                ),
-            ),
-            'albumId' => array (
+                ],
+            ],
+            'albumId' => [
                 'caption' => 'Album Id',
-            ),
-            'personId' => array (
-                'values' => array (
+            ],
+            'personId' => [
+                'values' => [
                     'mapperClass' => 'Child_Person_Mapper',
-                ),
+                ],
                 'caption' => 'Person Id',
-            ),
-            'albumName' => array (
+            ],
+            'albumName' => [
                 'caption' => 'Album Name',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

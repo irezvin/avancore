@@ -85,6 +85,8 @@ class Ac_Cg_Generator {
      */
     var $verbose = false;
     
+    var $silenceImportantMessages = false;
+    
     /**
      * @var resource
      */
@@ -308,7 +310,7 @@ class Ac_Cg_Generator {
             }
             if ($this->_logFile) fputs($this->_logFile, date("Y-m-d H:i:s")."\t".$message."\n");
         }
-        if ($important || $this->verbose) {
+        if ($important && !$this->silenceImportantMessages || $this->verbose) {
             $c = $important? 'important' : '';
             if (PHP_SAPI === 'cli') {
                 static $stderr;
@@ -424,6 +426,8 @@ class Ac_Cg_Generator {
     function run($todo = false) {
         
         if (!$this->hasBegan()) $this->begin();
+        
+        $this->prepare();
         
         foreach ($this->listDomains() as $name) {
             $dom = $this->getDomain($name);

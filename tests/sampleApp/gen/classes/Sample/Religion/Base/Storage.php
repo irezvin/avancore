@@ -8,14 +8,21 @@ class Sample_Religion_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'religionId'; 
 
-    var $defaults = array (
+    var $defaults = [
             'religionId' => NULL,
             'title' => NULL,
-        ); 
+        ]; 
 
     var $autoincFieldName = 'religionId'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'religionId', ), 'Index_2' => array ( 0 => 'title', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'religionId',
+    ],
+    'Index_2' => [
+        0 => 'title',
+    ],
+]; 
  
     
 }

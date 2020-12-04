@@ -9,17 +9,30 @@ class Child_Tree_Record_Base_Mapper extends Sample_Tree_Record_Mapper {
     var $id = 'Child_Tree_Record_Mapper';
 
     var $storage = 'Child_Tree_Record_Storage';
+    
+    /**
+     * @var Child 
+     */
+     protected $application = false;
+     
  
  
     /**
      * @return Child_Tree_Record 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Child_Tree_Record_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Child 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -33,7 +46,7 @@ class Child_Tree_Record_Base_Mapper extends Sample_Tree_Record_Mapper {
     /**
      * @return Child_Tree_Record 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -86,7 +99,7 @@ class Child_Tree_Record_Base_Mapper extends Sample_Tree_Record_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Child_Tree_Record     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -95,7 +108,7 @@ class Child_Tree_Record_Base_Mapper extends Sample_Tree_Record_Mapper {
      * 
      * @param array $query
      * @return Child_Tree_Record     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -108,7 +121,7 @@ class Child_Tree_Record_Base_Mapper extends Sample_Tree_Record_Mapper {
      * @param bool $forceStorage
      * @return Child_Tree_Record[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -130,7 +143,7 @@ class Child_Tree_Record_Base_Mapper extends Sample_Tree_Record_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -143,10 +156,10 @@ class Child_Tree_Record_Base_Mapper extends Sample_Tree_Record_Mapper {
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
                 'singleCaption' => 'Tree record',
                 'pluralCaption' => 'Tree records',
-            ),
+            ],
             parent::doGetInfoParams()
         );
         

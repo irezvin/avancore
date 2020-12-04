@@ -27,24 +27,24 @@ class Child_Perk_Base_Object extends Sample_Perk {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'tags' => array (
+        if ($pi === false) $pi = [
+            'tags' => [
                 'className' => 'Child_Tag',
                 'mapperClass' => 'Child_Tag_Mapper',
                 'caption' => 'Tags',
-            ),
-            'tagIds' => array (
-                'values' => array (
+            ],
+            'tagIds' => [
+                'values' => [
                     'mapperClass' => 'Child_Tag_Mapper',
-                ),
-            ),
-            'perkId' => array (
+                ],
+            ],
+            'perkId' => [
                 'caption' => 'Perk Id',
-            ),
-            'name' => array (
+            ],
+            'name' => [
                 'caption' => 'Name',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

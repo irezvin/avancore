@@ -14,15 +14,21 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Tree_Record_Storage';
 
-    var $columnNames = array ( 0 => 'id', 1 => 'title', 2 => 'tag', );
+    var $columnNames = [ 0 => 'id', 1 => 'title', 2 => 'tag', ];
 
-    var $nullableColumns = array ( 0 => 'tag', );
+    var $nullableColumns = [ 0 => 'tag', ];
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'title' => '',
             'tag' => NULL,
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
    
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;
@@ -32,11 +38,18 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
      * @return Sample_Tree_Record 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Tree_Record_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -50,7 +63,7 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Tree_Record 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -103,7 +116,7 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Tree_Record     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -112,7 +125,7 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Tree_Record     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -125,7 +138,7 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Tree_Record[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -147,7 +160,7 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -160,10 +173,12 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_tree_records_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_tree_records_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -171,11 +186,11 @@ class Sample_Tree_Record_Base_Mapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'id',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

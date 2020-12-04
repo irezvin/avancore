@@ -8,26 +8,26 @@ class Child_Person_Album_Base_Storage extends Sample_Person_Album_Storage {
     
     protected function doGetSqlSelectPrototype($primaryAlias = 't') {
         $res = parent::doGetSqlSelectPrototype($primaryAlias);
-        Ac_Util::ms($res, array (
-                'parts' => array (
-                    'personPhotoIds' => array (
+        Ac_Util::ms($res, [
+                'parts' => [
+                    'personPhotoIds' => [
                         'class' => 'Ac_Sql_Filter_NNCriterion_Omni',
-                        'midSrcKeys' => array (
+                        'midSrcKeys' => [
                             0 => 'personId',
                             1 => 'albumId',
-                        ),
-                        'midDestKeys' => array (
+                        ],
+                        'midDestKeys' => [
                             0 => 'personId',
                             1 => 'photoId',
-                        ),
-                        'tableKeys' => array (
+                        ],
+                        'tableKeys' => [
                             0 => 'personId',
                             1 => 'photoId',
-                        ),
+                        ],
                         'midTableAlias' => 'mid__personPhotos',
-                    ),
-                ),
-            ) 
+                    ],
+                ],
+            ] 
         );
         return $res;
     }

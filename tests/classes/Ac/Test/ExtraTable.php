@@ -177,6 +177,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         $testProd->bind(array('title' => 'test product', 'sku' => '1337'));
         
         $author = $testProd->createAuthorPerson();
+        if (!$author) return false;
         $author->bind(array('name' => 'test author', 'birthDate' => date('1990-01-01')));
         
         $editor = $testProd->createEditorPerson();
@@ -254,6 +255,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
         ));
 
         $author = $newProd->createExtraCodePerson();
+        if (!$author) return false;
         $author->bind($b = array(
             'name' => 'test prod author',
             'gender' => 'M', 
@@ -327,6 +329,7 @@ class Ac_Test_ExtraTable extends Ac_Test_Base {
             'note' => 'foobar',
         ));
         $author = $prod->createNotePerson();
+        if (!$author) return false;
         $author->bind($b = array(
             'name' => 'Test author of a note', 
             'gender' => 'M',

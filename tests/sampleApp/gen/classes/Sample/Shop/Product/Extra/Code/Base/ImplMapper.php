@@ -16,47 +16,60 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Shop_Product_Extra_Code_Storage';
 
-    var $columnNames = array ( 0 => 'productId', 1 => 'ean', 2 => 'asin', 3 => 'gtin', 4 => 'responsiblePersonId', );
+    var $columnNames = [ 0 => 'productId', 1 => 'ean', 2 => 'asin', 3 => 'gtin', 4 => 'responsiblePersonId', ];
 
-    var $nullableColumns = array ( 0 => 'responsiblePersonId', );
+    var $nullableColumns = [ 0 => 'responsiblePersonId', ];
 
-    var $defaults = array (
+    var $defaults = [
             'productId' => NULL,
             'ean' => '',
             'asin' => '',
             'gtin' => '',
             'responsiblePersonId' => NULL,
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
     protected $askRelationsForDefaults = false;
  
     protected function doGetCoreMixables() { 
-        return Ac_Util::m(parent::doGetCoreMixables(), array (
-            'Ac_Model_Typer_Abstract' => array (
+        return Ac_Util::m(parent::doGetCoreMixables(), [
+            'Ac_Model_Typer_Abstract' => [
                 'class' => 'Ac_Model_Typer_ExtraTable',
                 'tableName' => '#__shop_product_extraCodes',
                 'uniformTypeId' => 'Sample_Shop_Product_Mapper',
-            ),
-        ));
+            ],
+        ]);
     }
     
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_extraCodePerson' => false,
             '_extraCodeShopProductsCount' => false,
             '_extraCodeShopProductsLoaded' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Shop_Product_Extra_Code 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Shop_Product_Extra_Code_ImplMapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -70,7 +83,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Shop_Product_Extra_Code 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -123,7 +136,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Shop_Product_Extra_Code     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -132,7 +145,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Shop_Product_Extra_Code     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -145,7 +158,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Shop_Product_Extra_Code[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -167,7 +180,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -179,8 +192,8 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_extraCodePerson' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_extraCodePerson' => [
                 'srcMapperClass' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_extraCodePerson',
@@ -189,23 +202,25 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
                 'destVarName' => '_extraCodeShopProducts',
                 'destCountVarName' => '_shopProductsCount',
                 'destLoadedVarName' => '_shopProductsLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'responsiblePersonId' => 'personId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_shop_product_extra_codes_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_shop_product_extra_codes_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -213,11 +228,11 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'productId',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

@@ -12,12 +12,12 @@ class Child_Shop_Spec_Food_Base_ExtraTable extends Sample_Shop_Spec_Food_MapperM
     
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_shopSpecFoodShopSpec' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_shopSpecFoodShopSpec' => [
                 'srcMapperClass' => 'Child_Shop_Spec_Food_ImplMapper',
                 'destMapperClass' => 'Child_Shop_Spec_Mapper',
-            ),
-        ));
+            ],
+        ]);
         
     }
 }

@@ -24,33 +24,33 @@ class Child_Shop_Spec_Food_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTabl
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array ( ));
+        return array_merge(parent::listOwnProperties(), []);
     }
     
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopSpecFoodShopSpec' => array (
+        if ($pi === false) $pi = [
+            'shopSpecFoodShopSpec' => [
                 'className' => 'Child_Shop_Spec',
                 'mapperClass' => 'Child_Shop_Spec_Mapper',
                 'caption' => 'Shop spec',
-            ),
-            'productId' => array (
-                'values' => array (
+            ],
+            'productId' => [
+                'values' => [
                     'mapperClass' => 'Child_Shop_Spec_Mapper',
-                ),
+                ],
                 'caption' => 'Product Id',
-            ),
-            'storageType' => array (
+            ],
+            'storageType' => [
                 'caption' => 'Storage Type',
-            ),
-            'storageTerm' => array (
+            ],
+            'storageTerm' => [
                 'caption' => 'Storage Term',
-            ),
-            'storageTermUnit' => array (
+            ],
+            'storageTermUnit' => [
                 'caption' => 'Storage Term Unit',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

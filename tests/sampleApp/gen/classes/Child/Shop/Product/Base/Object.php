@@ -27,83 +27,85 @@ class Child_Shop_Product_Base_Object extends Sample_Shop_Product {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopCategories' => array (
+        if ($pi === false) $pi = [
+            'shopCategories' => [
                 'className' => 'Child_Shop_Category',
                 'mapperClass' => 'Child_Shop_Category_Mapper',
                 'caption' => 'Shop categories',
-            ),
-            'shopCategoryIds' => array (
-                'values' => array (
+            ],
+            'shopCategoryIds' => [
+                'values' => [
                     'mapperClass' => 'Child_Shop_Category_Mapper',
-                ),
-            ),
-            'referencedShopProducts' => array (
+                ],
+            ],
+            'referencedShopProducts' => [
                 'className' => 'Child_Shop_Product',
                 'mapperClass' => 'Child_Shop_Product_Mapper',
                 'caption' => 'Shop products',
-            ),
-            'referencedShopProductIds' => array (
-                'values' => array (
+            ],
+            'referencedShopProductIds' => [
+                'values' => [
                     'mapperClass' => 'Child_Shop_Product_Mapper',
-                ),
-            ),
-            'referencingShopProducts' => array (
+                ],
+            ],
+            'referencingShopProducts' => [
                 'className' => 'Child_Shop_Product',
                 'mapperClass' => 'Child_Shop_Product_Mapper',
                 'caption' => 'Shop products',
-            ),
-            'referencingShopProductIds' => array (
-                'values' => array (
+            ],
+            'referencingShopProductIds' => [
+                'values' => [
                     'mapperClass' => 'Child_Shop_Product_Mapper',
-                ),
-            ),
-            'shopSpec' => array (
+                ],
+            ],
+            'shopSpec' => [
                 'className' => 'Child_Shop_Spec',
                 'mapperClass' => 'Child_Shop_Spec_Mapper',
                 'caption' => 'Shop spec',
-            ),
-            'id' => array (
+            ],
+            'id' => [
                 'caption' => 'Id',
-            ),
-            'sku' => array (
+            ],
+            'sku' => [
                 'caption' => 'Sku',
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'caption' => 'Title',
-            ),
-            'metaId' => array (
+            ],
+            'metaId' => [
                 'caption' => 'Meta Id',
-            ),
-            'pubId' => array (
+            ],
+            'pubId' => [
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'mapperClass' => 'Child_Publish_ImplMapper',
-                ),
+                ],
                 'caption' => 'Pub Id',
-            ),
-            'notePerson' => array (
+            ],
+            'notePerson' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'caption' => 'People',
-            ),
-            'productId' => array (
-                'values' => array (
+            ],
+            'productId' => [
+                'values' => [
                     'mapperClass' => 'Child_Shop_Product_Mapper',
-                ),
+                ],
                 'caption' => 'Product Id',
-            ),
-            'note' => array (
+            ],
+            'note' => [
                 'caption' => 'Note',
-            ),
-            'noteAuthorId' => array (
+            ],
+            'noteAuthorId' => [
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'mapperClass' => 'Child_Person_Mapper',
-                ),
+                ],
                 'caption' => 'Note Author Id',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

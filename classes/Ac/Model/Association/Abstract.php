@@ -1,6 +1,7 @@
 <?php
 
-abstract class Ac_Model_Association_Abstract extends Ac_Prototyped implements Ac_I_ModelAssociation, Ac_I_Mixable_Shared {
+abstract class Ac_Model_Association_Abstract extends Ac_Prototyped 
+    implements Ac_I_ModelAssociation, Ac_I_Mixable_Shared {
     
     protected $relationId = false;
 

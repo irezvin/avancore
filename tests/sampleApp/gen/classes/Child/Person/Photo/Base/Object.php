@@ -27,45 +27,45 @@ class Child_Person_Photo_Base_Object extends Sample_Person_Photo {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'person' => array (
+        if ($pi === false) $pi = [
+            'person' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'caption' => 'People',
-            ),
-            'personAlbums' => array (
+            ],
+            'personAlbums' => [
                 'className' => 'Child_Person_Album',
                 'mapperClass' => 'Child_Person_Album_Mapper',
                 'caption' => 'Person albums',
-            ),
-            'personAlbumIds' => array (
-                'values' => array (
+            ],
+            'personAlbumIds' => [
+                'values' => [
                     'mapperClass' => 'Child_Person_Album_Mapper',
-                ),
-            ),
-            'portraitPerson' => array (
+                ],
+            ],
+            'portraitPerson' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'caption' => 'People',
-            ),
-            'personPosts' => array (
+            ],
+            'personPosts' => [
                 'className' => 'Child_Person_Post',
                 'mapperClass' => 'Child_Person_Post_Mapper',
                 'caption' => 'Person posts',
-            ),
-            'photoId' => array (
+            ],
+            'photoId' => [
                 'caption' => 'Photo Id',
-            ),
-            'personId' => array (
-                'values' => array (
+            ],
+            'personId' => [
+                'values' => [
                     'mapperClass' => 'Child_Person_Mapper',
-                ),
+                ],
                 'caption' => 'Person Id',
-            ),
-            'filename' => array (
+            ],
+            'filename' => [
                 'caption' => 'Filename',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

@@ -8,14 +8,18 @@ class Sample_Shop_Spec_Computer_Base_Storage extends Ac_Model_Storage_MonoTable 
 
     var $primaryKey = 'productId'; 
 
-    var $defaults = array (
+    var $defaults = [
             'productId' => NULL,
             'hdd' => NULL,
             'ram' => NULL,
             'os' => '',
-        ); 
+        ]; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'productId', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'productId',
+    ],
+]; 
  
     
 }

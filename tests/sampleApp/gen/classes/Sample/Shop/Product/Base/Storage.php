@@ -8,49 +8,56 @@ class Sample_Shop_Product_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'id'; 
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'sku' => '',
             'title' => '',
             'metaId' => NULL,
             'pubId' => NULL,
-        ); 
+        ]; 
 
-    var $nullableColumns = array ( 0 => 'metaId', 1 => 'pubId', ); 
+    var $nullableColumns = [ 0 => 'metaId', 1 => 'pubId', ]; 
 
     var $autoincFieldName = 'id'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'id', ), 'idxPubId' => array ( 0 => 'pubId', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'id',
+    ],
+    'idxPubId' => [
+        0 => 'pubId',
+    ],
+]; 
  
  
     
     protected function doGetSqlSelectPrototype($primaryAlias = 't') {
         $res = parent::doGetSqlSelectPrototype($primaryAlias);
-        Ac_Util::ms($res, array (
-                'parts' => array (
-                    'shopCategoryIds' => array (
+        Ac_Util::ms($res, [
+                'parts' => [
+                    'shopCategoryIds' => [
                         'class' => 'Ac_Sql_Filter_NNCriterion_Simple',
                         'midSrcKey' => 'productId',
                         'midDestKey' => 'categoryId',
                         'tableKey' => 'id',
                         'midTableAlias' => 'mid__shopCategories',
-                    ),
-                    'referencedShopProductIds' => array (
+                    ],
+                    'referencedShopProductIds' => [
                         'class' => 'Ac_Sql_Filter_NNCriterion_Simple',
                         'midSrcKey' => 'productId',
                         'midDestKey' => 'relatedProductId',
                         'tableKey' => 'id',
                         'midTableAlias' => 'mid__referencedShopProducts',
-                    ),
-                    'referencingShopProductIds' => array (
+                    ],
+                    'referencingShopProductIds' => [
                         'class' => 'Ac_Sql_Filter_NNCriterion_Simple',
                         'midSrcKey' => 'relatedProductId',
                         'midDestKey' => 'productId',
                         'tableKey' => 'id',
                         'midTableAlias' => 'mid__referencingShopProducts',
-                    ),
-                ),
-            ) 
+                    ],
+                ],
+            ] 
         );
         return $res;
     }

@@ -24,40 +24,41 @@ class Child_Shop_Spec_Monitor_Base_ObjectMixable extends Ac_Model_Mixable_ExtraT
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array ( ));
+        return array_merge(parent::listOwnProperties(), []);
     }
     
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
-        if ($pi === false) $pi = array (
-            'monitorShopClassifier' => array (
+        if ($pi === false) $pi = [
+            'monitorShopClassifier' => [
                 'className' => 'Child_Shop_Classifier',
                 'mapperClass' => 'Child_Shop_Classifier_Mapper',
                 'caption' => 'Shop classifier',
-            ),
-            'productId' => array (
-                'values' => array (
+            ],
+            'productId' => [
+                'values' => [
                     'mapperClass' => 'Child_Shop_Spec_Mapper',
-                ),
+                ],
                 'caption' => 'Product Id',
-            ),
-            'diagonal' => array (
+            ],
+            'diagonal' => [
                 'caption' => 'Diagonal',
-            ),
-            'hRes' => array (
+            ],
+            'hRes' => [
                 'caption' => 'H Res',
-            ),
-            'vRes' => array (
+            ],
+            'vRes' => [
                 'caption' => 'V Res',
-            ),
-            'matrixTypeId' => array (
+            ],
+            'matrixTypeId' => [
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'mapperClass' => 'Child_Shop_Classifier_Mapper',
-                ),
+                ],
                 'caption' => 'Matrix Type Id',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

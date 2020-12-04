@@ -27,19 +27,19 @@ class Child_Religion_Base_Object extends Sample_Religion {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'people' => array (
+        if ($pi === false) $pi = [
+            'people' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'caption' => 'People',
-            ),
-            'religionId' => array (
+            ],
+            'religionId' => [
                 'caption' => 'Religion Id',
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'caption' => 'Title',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

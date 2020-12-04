@@ -8,17 +8,21 @@ class Sample_Tree_Record_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'id'; 
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'title' => '',
             'tag' => NULL,
-        ); 
+        ]; 
 
-    var $nullableColumns = array ( 0 => 'tag', ); 
+    var $nullableColumns = [ 0 => 'tag', ]; 
 
     var $autoincFieldName = 'id'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'id', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'id',
+    ],
+]; 
  
     
 }

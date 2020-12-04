@@ -8,40 +8,44 @@ class Sample_Person_Album_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'albumId'; 
 
-    var $defaults = array (
+    var $defaults = [
             'albumId' => NULL,
-            'personId' => '0',
+            'personId' => 0,
             'albumName' => '\'\'',
-        ); 
+        ]; 
 
     var $autoincFieldName = 'albumId'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'albumId', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'albumId',
+    ],
+]; 
  
  
     
     protected function doGetSqlSelectPrototype($primaryAlias = 't') {
         $res = parent::doGetSqlSelectPrototype($primaryAlias);
-        Ac_Util::ms($res, array (
-                'parts' => array (
-                    'personPhotoIds' => array (
+        Ac_Util::ms($res, [
+                'parts' => [
+                    'personPhotoIds' => [
                         'class' => 'Ac_Sql_Filter_NNCriterion_Omni',
-                        'midSrcKeys' => array (
+                        'midSrcKeys' => [
                             0 => 'personId',
                             1 => 'albumId',
-                        ),
-                        'midDestKeys' => array (
+                        ],
+                        'midDestKeys' => [
                             0 => 'personId',
                             1 => 'photoId',
-                        ),
-                        'tableKeys' => array (
+                        ],
+                        'tableKeys' => [
                             0 => 'personId',
                             1 => 'photoId',
-                        ),
+                        ],
                         'midTableAlias' => 'mid__personPhotos',
-                    ),
-                ),
-            ) 
+                    ],
+                ],
+            ] 
         );
         return $res;
     }

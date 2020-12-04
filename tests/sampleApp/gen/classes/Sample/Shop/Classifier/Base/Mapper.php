@@ -14,36 +14,49 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Shop_Classifier_Storage';
 
-    var $columnNames = array ( 0 => 'id', 1 => 'title', 2 => 'type', );
+    var $columnNames = [ 0 => 'id', 1 => 'title', 2 => 'type', ];
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'title' => '',
             'type' => NULL,
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
    
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;
  
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_shopClassifierType' => false,
             '_monitorShopSpecs' => false,
             '_shopSpecsCount' => false,
             '_shopSpecsLoaded' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Shop_Classifier 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Shop_Classifier_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -57,7 +70,7 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Shop_Classifier 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -110,7 +123,7 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Shop_Classifier     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -119,7 +132,7 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Shop_Classifier     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -132,7 +145,7 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Shop_Classifier[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -154,7 +167,7 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -166,40 +179,40 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_shopClassifierType' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_shopClassifierType' => [
                 'srcMapperClass' => 'Sample_Shop_Classifier_Mapper',
                 'destMapperClass' => 'Sample_Shop_Classifier_Type_Mapper',
                 'srcVarName' => '_shopClassifierType',
                 'destVarName' => '_shopClassifier',
                 'destCountVarName' => '_shopClassifierCount',
                 'destLoadedVarName' => '_shopClassifierLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'type' => 'type',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-            '_monitorShopSpecs' => array (
+            ],
+            '_monitorShopSpecs' => [
                 'srcMapperClass' => 'Sample_Shop_Classifier_Mapper',
                 'destMapperClass' => 'Sample_Shop_Spec_Mapper',
                 'srcVarName' => '_monitorShopSpecs',
                 'srcCountVarName' => '_shopSpecsCount',
                 'srcLoadedVarName' => '_shopSpecsLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'id' => 'matrixTypeId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
-            'shopClassifierType' => array (
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), [
+            'shopClassifierType' => [
                 'relationId' => '_shopClassifierType',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -213,8 +226,8 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
                 'getDestObjectMethod' => 'getShopClassifierType',
                 'setDestObjectMethod' => 'setShopClassifierType',
                 'clearDestObjectMethod' => 'clearShopClassifierType',
-            ),
-            'monitorShopSpecs' => array (
+            ],
+            'monitorShopSpecs' => [
                 'relationId' => '_monitorShopSpecs',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -226,22 +239,25 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForMonitorShopSpecs',
                 'getSrcObjectsMapperMethod' => 'getOfMonitorShopSpecs',
                 'createDestObjectMethod' => 'createMonitorShopSpec',
+                'getAllDestObjectsMethod' => 'getAllMonitorShopSpecs',
                 'listDestObjectsMethod' => 'listMonitorShopSpecs',
                 'countDestObjectsMethod' => 'countMonitorShopSpecs',
                 'getDestObjectMethod' => 'getMonitorShopSpec',
                 'addDestObjectMethod' => 'addMonitorShopSpec',
                 'isDestLoadedMethod' => 'isMonitorShopSpecsLoaded',
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_shop_classifier_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_shop_classifier_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -249,15 +265,15 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'id',
-            ),
-            'type_title' => array (
+            ],
+            'type_title' => [
                 0 => 'type',
                 1 => 'title',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

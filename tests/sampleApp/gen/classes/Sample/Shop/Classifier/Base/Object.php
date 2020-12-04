@@ -41,63 +41,68 @@ class Sample_Shop_Classifier_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopClassifierType', 1 => 'monitorShopSpecs', )));
+        return array_unique(array_merge(parent::listOwnProperties(), [ 0 => 'shopClassifierType', 1 => 'monitorShopSpecs', ]));
     }
     
  
     protected function listOwnLists() {
         
-        return array ( 'monitorShopSpecs' => 'shopSpecs', );
+        return [ 'monitorShopSpecs' => 'shopSpecs', ];
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'shopClassifierType' => 'Sample_Shop_Classifier_Type', 'monitorShopSpecs' => 'Sample_Shop_Spec', );
+        return [ 'shopClassifierType' => 'Sample_Shop_Classifier_Type', 'monitorShopSpecs' => 'Sample_Shop_Spec', ];
     }
 
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopClassifierType' => array (
+        if ($pi === false) $pi = [
+            'shopClassifierType' => [
                 'className' => 'Sample_Shop_Classifier_Type',
                 'mapperClass' => 'Sample_Shop_Classifier_Type_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_shop_classifier_shop_classifier_type'),
                 'relationId' => '_shopClassifierType',
                 'referenceVarName' => '_shopClassifierType',
-            ),
-            'monitorShopSpecs' => array (
+            ],
+            'monitorShopSpecs' => [
                 'className' => 'Sample_Shop_Spec',
                 'mapperClass' => 'Sample_Shop_Spec_Mapper',
                 'otherModelIdInMethodsPrefix' => 'monitor',
+
                 'caption' => new Ac_Lang_String('sample_shop_classifier_monitor_shop_specs'),
                 'relationId' => '_monitorShopSpecs',
                 'countVarName' => '_shopSpecsCount',
                 'referenceVarName' => '_monitorShopSpecs',
-            ),
-            'id' => array (
+            ],
+            'id' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_shop_classifier_id'),
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'maxLength' => '255',
+
                 'caption' => new Ac_Lang_String('sample_shop_classifier_title'),
-            ),
-            'type' => array (
+            ],
+            'type' => [
                 'controlType' => 'selectList',
                 'maxLength' => '16',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Classifier_Type_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'shopClassifierType',
+
                 'caption' => new Ac_Lang_String('sample_shop_classifier_type'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 
@@ -181,6 +186,16 @@ class Sample_Shop_Classifier_Base_Object extends Ac_Model_Object {
      */
     function getMonitorShopSpecsItem($id) {
         return $this->getMonitorShopSpec($id);
+    }
+    
+    /**
+     * @return Sample_Shop_Spec[] 
+     */
+    function getAllMonitorShopSpecs() {
+        $res = [];
+        foreach ($this->listMonitorShopSpecs() as $id)
+            $res[] = $this->getMonitorShopSpec($id);
+        return $res;
     }
     
     /**

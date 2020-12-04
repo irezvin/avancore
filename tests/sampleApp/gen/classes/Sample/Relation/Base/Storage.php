@@ -8,7 +8,7 @@ class Sample_Relation_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'relationId'; 
 
-    var $defaults = array (
+    var $defaults = [
             'relationId' => NULL,
             'personId' => NULL,
             'otherPersonId' => NULL,
@@ -16,13 +16,17 @@ class Sample_Relation_Base_Storage extends Ac_Model_Storage_MonoTable {
             'relationBegin' => NULL,
             'relationEnd' => NULL,
             'notes' => '',
-        ); 
+        ]; 
 
-    var $nullableColumns = array ( 0 => 'relationBegin', 1 => 'relationEnd', ); 
+    var $nullableColumns = [ 0 => 'relationBegin', 1 => 'relationEnd', ]; 
 
     var $autoincFieldName = 'relationId'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'relationId', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'relationId',
+    ],
+]; 
  
     
 }

@@ -27,17 +27,17 @@ class Child_Tree_Record_Base_Object extends Sample_Tree_Record {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'id' => array (
+        if ($pi === false) $pi = [
+            'id' => [
                 'caption' => 'Id',
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'caption' => 'Title',
-            ),
-            'tag' => array (
+            ],
+            'tag' => [
                 'caption' => 'Tag',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

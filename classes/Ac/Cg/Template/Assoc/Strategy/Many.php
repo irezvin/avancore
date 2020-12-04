@@ -4,6 +4,7 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
     
     function getGuessMap() {
         return array_merge(parent::getGuessMap(), array(
+            'getAllDestObjectsMethod' => 'getAll{Plural}',
             'listDestObjectsMethod' => 'list{Plural}',
             'countDestObjectsMethod' => 'count{Plural}',
             'getDestObjectMethod' => 'get{Single}',
@@ -67,6 +68,16 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
      */
     function get<?php $this->d($ucPlural); ?>Item($id) {
         return $this->get<?php $this->d($ucSingle); ?>($id);
+    }
+    
+    /**
+     * @return <?php $this->d($prop->className); ?>[] 
+     */
+    function getAll<?php $this->d($ucPlural); ?>() {
+        $res = [];
+        foreach ($this->list<?php $this->d($ucPlural); ?>() as $id)
+            $res[] = $this->get<?php $this->d($ucSingle); ?>($id);
+        return $res;
     }
     
     /**
@@ -145,6 +156,7 @@ class Ac_Cg_Template_Assoc_Strategy_Many extends Ac_Cg_Template_Assoc_Strategy {
 <?php        
     }
     
+
     
 }
 

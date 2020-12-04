@@ -14,35 +14,48 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Relation_Type_Storage';
 
-    var $columnNames = array ( 0 => 'relationTypeId', 1 => 'title', 2 => 'isSymmetrical', );
+    var $columnNames = [ 0 => 'relationTypeId', 1 => 'title', 2 => 'isSymmetrical', ];
 
-    var $defaults = array (
+    var $defaults = [
             'relationTypeId' => NULL,
             'title' => NULL,
-            'isSymmetrical' => '0',
-        );
+            'isSymmetrical' => 0,
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
    
     protected $autoincFieldName = 'relationTypeId';
     protected $askRelationsForDefaults = false;
  
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_relations' => false,
             '_relationsCount' => false,
             '_relationsLoaded' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Relation_Type 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Relation_Type_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -56,7 +69,7 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Relation_Type 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -109,7 +122,7 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Relation_Type     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -118,7 +131,7 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Relation_Type     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -131,7 +144,7 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Relation_Type[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -153,7 +166,7 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -165,27 +178,27 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_relations' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_relations' => [
                 'srcMapperClass' => 'Sample_Relation_Type_Mapper',
                 'destMapperClass' => 'Sample_Relation_Mapper',
                 'srcVarName' => '_relations',
                 'srcCountVarName' => '_relationsCount',
                 'srcLoadedVarName' => '_relationsLoaded',
                 'destVarName' => '_relationType',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'relationTypeId' => 'relationTypeId',
-                ),
+                ],
                 'srcIsUnique' => true,
                 'destIsUnique' => false,
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return Ac_Util::m(parent::doGetAssociationPrototypes(), array (
-            'relations' => array (
+        return Ac_Util::m(parent::doGetAssociationPrototypes(), [
+            'relations' => [
                 'relationId' => '_relations',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -196,22 +209,25 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
                 'loadSrcObjectsMapperMethod' => 'loadForRelations',
                 'getSrcObjectsMapperMethod' => 'getOfRelations',
                 'createDestObjectMethod' => 'createRelation',
+                'getAllDestObjectsMethod' => 'getAllRelations',
                 'listDestObjectsMethod' => 'listRelations',
                 'countDestObjectsMethod' => 'countRelations',
                 'getDestObjectMethod' => 'getRelation',
                 'addDestObjectMethod' => 'addRelation',
                 'isDestLoadedMethod' => 'isRelationsLoaded',
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_relation_types_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_relation_types_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -219,11 +235,11 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'relationTypeId',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

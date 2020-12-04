@@ -35,45 +35,49 @@ class Sample_Shop_Spec_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'shopProduct', )));
+        return array_unique(array_merge(parent::listOwnProperties(), [ 0 => 'shopProduct', ]));
     }
     
     
  
     protected function listOwnAssociations() {
-        return array ( 'shopProduct' => 'Sample_Shop_Product', );
+        return [ 'shopProduct' => 'Sample_Shop_Product', ];
     }
 
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'shopProduct' => array (
+        if ($pi === false) $pi = [
+            'shopProduct' => [
                 'className' => 'Sample_Shop_Product',
                 'mapperClass' => 'Sample_Shop_Product_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_shop_product'),
                 'relationId' => '_shopProduct',
                 'referenceVarName' => '_shopProduct',
-            ),
-            'productId' => array (
+            ],
+            'productId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'shopProduct',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_product_id'),
-            ),
-            'detailsUrl' => array (
+            ],
+            'detailsUrl' => [
                 'maxLength' => '255',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_details_url'),
-            ),
-            'specsType' => array (
+            ],
+            'specsType' => [
                 'maxLength' => '40',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_specs_type'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

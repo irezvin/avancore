@@ -217,7 +217,7 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
     }
     
     protected function adjustObjectProperty(Ac_Cg_Property_Object $prop) {
-        
+        ini_set('html_errors', false);
         $other = $prop->getMirrorProperty();
         
         if ($prop->otherModelIdInMethodsPrefix === false) {
@@ -242,7 +242,7 @@ class Ac_Cg_Model_Part extends Ac_Cg_Model {
             if ($other->otherModelIdInMethodsPrefix === false) {
                 $other->otherModelIdInMethodsPrefix = $this->getObjectPropertiesPrefix();
                 $other->varName = $other->getDefaultVarName();
-                $prop->pluralForList = $other->getDefaultPluralForList();
+                $other->pluralForList = $other->getDefaultPluralForList();
             }
             
             $other->canLoadDest = false;

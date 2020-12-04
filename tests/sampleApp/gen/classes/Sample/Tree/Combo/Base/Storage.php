@@ -8,23 +8,27 @@ class Sample_Tree_Combo_Base_Storage extends Ac_Model_Storage_MonoTable {
 
     var $primaryKey = 'id'; 
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
-            'leftCol' => '0',
-            'rightCol' => '1',
+            'leftCol' => 0,
+            'rightCol' => 1,
             'parentId' => NULL,
-            'ordering' => '0',
+            'ordering' => 0,
             'title' => '',
             'tag' => NULL,
-            'ignore' => '0',
-            'depth' => '0',
-        ); 
+            'ignore' => 0,
+            'depth' => 0,
+        ]; 
 
-    var $nullableColumns = array ( 0 => 'parentId', 1 => 'tag', ); 
+    var $nullableColumns = [ 0 => 'parentId', 1 => 'tag', ]; 
 
     var $autoincFieldName = 'id'; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'id', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'id',
+    ],
+]; 
  
     
 }

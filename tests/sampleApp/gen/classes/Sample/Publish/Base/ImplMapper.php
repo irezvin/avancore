@@ -16,15 +16,15 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $storage = 'Sample_Publish_Storage';
 
-    var $columnNames = array ( 0 => 'id', 1 => 'sharedObjectType', 2 => 'published', 3 => 'deleted', 4 => 'publishUp', 5 => 'publishDown', 6 => 'authorId', 7 => 'editorId', 8 => 'pubChannelId', 9 => 'dateCreated', 10 => 'dateModified', 11 => 'dateDeleted', );
+    var $columnNames = [ 0 => 'id', 1 => 'sharedObjectType', 2 => 'published', 3 => 'deleted', 4 => 'publishUp', 5 => 'publishDown', 6 => 'authorId', 7 => 'editorId', 8 => 'pubChannelId', 9 => 'dateCreated', 10 => 'dateModified', 11 => 'dateDeleted', ];
 
-    var $nullableColumns = array ( 0 => 'published', 1 => 'deleted', 2 => 'publishUp', 3 => 'publishDown', 4 => 'authorId', 5 => 'editorId', 6 => 'pubChannelId', );
+    var $nullableColumns = [ 0 => 'published', 1 => 'deleted', 2 => 'publishUp', 3 => 'publishDown', 4 => 'authorId', 5 => 'editorId', 6 => 'pubChannelId', ];
 
-    var $defaults = array (
+    var $defaults = [
             'id' => NULL,
             'sharedObjectType' => NULL,
-            'published' => '1',
-            'deleted' => '0',
+            'published' => 1,
+            'deleted' => 0,
             'publishUp' => '0000-00-00 00:00:00',
             'publishDown' => '0000-00-00 00:00:00',
             'authorId' => NULL,
@@ -33,38 +33,51 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
             'dateCreated' => '0000-00-00 00:00:00',
             'dateModified' => '0000-00-00 00:00:00',
             'dateDeleted' => '0000-00-00 00:00:00',
-        );
+        ];
+    
+    /**
+     * @var Sample 
+     */
+     protected $application = false;
+     
    
     protected $autoincFieldName = 'id';
     protected $askRelationsForDefaults = false;
  
     protected function doGetCoreMixables() { 
-        return Ac_Util::m(parent::doGetCoreMixables(), array (
-            'Ac_Model_Typer_Abstract' => array (
+        return Ac_Util::m(parent::doGetCoreMixables(), [
+            'Ac_Model_Typer_Abstract' => [
                 'class' => 'Ac_Model_Typer_ExtraTable',
                 'tableName' => '#__publish',
                 'objectTypeField' => 'sharedObjectType',
-            ),
-        ));
+            ],
+        ]);
     }
     
  
     function doGetInternalDefaults() {
-        return Ac_Util::m(parent::doGetInternalDefaults(), array (
+        return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_authorPerson' => false,
             '_editorPerson' => false,
-        ));
+        ]);
     }
     
     /**
      * @return Sample_Publish 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Sample_Publish_ImplMapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Sample 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -78,7 +91,7 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @return Sample_Publish 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -131,7 +144,7 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Sample_Publish     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -140,7 +153,7 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
      * 
      * @param array $query
      * @return Sample_Publish     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -153,7 +166,7 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
      * @param bool $forceStorage
      * @return Sample_Publish[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -175,7 +188,7 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -187,45 +200,47 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_authorPerson' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_authorPerson' => [
                 'srcMapperClass' => 'Sample_Publish_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_authorPerson',
                 'destVarName' => '_authorPublish',
                 'destCountVarName' => '_authorPublishCount',
                 'destLoadedVarName' => '_authorPublishLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'authorId' => 'personId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-            '_editorPerson' => array (
+            ],
+            '_editorPerson' => [
                 'srcMapperClass' => 'Sample_Publish_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_editorPerson',
                 'destVarName' => '_editorPublish',
                 'destCountVarName' => '_editorPublishCount',
                 'destLoadedVarName' => '_editorPublishLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'editorId' => 'personId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
+
                 'singleCaption' => new Ac_Lang_String('sample_publish_single'),
+
                 'pluralCaption' => new Ac_Lang_String('sample_publish_plural'),
-            ),
+            ],
             parent::doGetInfoParams()
         );
         
@@ -233,14 +248,14 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
     
     
     protected function doGetUniqueIndexData() {
-        return array (
-            'PRIMARY' => array (
+        return [
+            'PRIMARY' => [
                 0 => 'id',
-            ),
-            'idxPubChannelId' => array (
+            ],
+            'idxPubChannelId' => [
                 0 => 'pubChannelId',
-            ),
-        );
+            ],
+        ];
     }
 
     /**

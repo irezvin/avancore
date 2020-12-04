@@ -8,17 +8,21 @@ class Sample_Shop_Product_Extra_Code_Base_Storage extends Ac_Model_Storage_MonoT
 
     var $primaryKey = 'productId'; 
 
-    var $defaults = array (
+    var $defaults = [
             'productId' => NULL,
             'ean' => '',
             'asin' => '',
             'gtin' => '',
             'responsiblePersonId' => NULL,
-        ); 
+        ]; 
 
-    var $nullableColumns = array ( 0 => 'responsiblePersonId', ); 
+    var $nullableColumns = [ 0 => 'responsiblePersonId', ]; 
 
-    var $uniqueIndices = array ( 'PRIMARY' => array ( 0 => 'productId', ), ); 
+    var $uniqueIndices = [
+    'PRIMARY' => [
+        0 => 'productId',
+    ],
+]; 
  
     
 }

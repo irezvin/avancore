@@ -51,90 +51,97 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 0 => 'person', 1 => 'personAlbums', 2 => 'personAlbumIds', 3 => 'portraitPerson', 4 => 'personPosts', )));
+        return array_unique(array_merge(parent::listOwnProperties(), [ 0 => 'person', 1 => 'personAlbums', 2 => 'personAlbumIds', 3 => 'portraitPerson', 4 => 'personPosts', ]));
     }
     
  
     protected function listOwnLists() {
         
-        return array ( 'personAlbums' => 'personAlbums', 'personPosts' => 'personPosts', );
+        return [ 'personAlbums' => 'personAlbums', 'personPosts' => 'personPosts', ];
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'person' => 'Sample_Person', 'personAlbums' => 'Sample_Person_Album', 'portraitPerson' => 'Sample_Person', 'personPosts' => 'Sample_Person_Post', );
+        return [ 'person' => 'Sample_Person', 'personAlbums' => 'Sample_Person_Album', 'portraitPerson' => 'Sample_Person', 'personPosts' => 'Sample_Person_Post', ];
     }
 
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'person' => array (
+        if ($pi === false) $pi = [
+            'person' => [
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_person_photo_person'),
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
-            ),
-            'personAlbums' => array (
+            ],
+            'personAlbums' => [
                 'className' => 'Sample_Person_Album',
                 'mapperClass' => 'Sample_Person_Album_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_person_photo_person_albums'),
                 'relationId' => '_personAlbums',
                 'countVarName' => '_personAlbumsCount',
                 'nnIdsVarName' => '_personAlbumIds',
                 'referenceVarName' => '_personAlbums',
-            ),
-            'personAlbumIds' => array (
+            ],
+            'personAlbumIds' => [
                 'dataType' => 'int',
                 'arrayValue' => true,
                 'controlType' => 'selectList',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Album_Mapper',
-                ),
+                ],
                 'showInTable' => false,
-            ),
-            'portraitPerson' => array (
+            ],
+            'portraitPerson' => [
                 'className' => 'Sample_Person',
                 'mapperClass' => 'Sample_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'portrait',
+
                 'caption' => new Ac_Lang_String('sample_person_photo_portrait_person'),
                 'relationId' => '_portraitPerson',
                 'referenceVarName' => '_portraitPerson',
-            ),
-            'personPosts' => array (
+            ],
+            'personPosts' => [
                 'className' => 'Sample_Person_Post',
                 'mapperClass' => 'Sample_Person_Post_Mapper',
+
                 'caption' => new Ac_Lang_String('sample_person_photo_person_posts'),
                 'relationId' => '_personPosts',
                 'countVarName' => '_personPostsCount',
                 'referenceVarName' => '_personPosts',
-            ),
-            'photoId' => array (
+            ],
+            'photoId' => [
                 'dataType' => 'int',
                 'maxLength' => '10',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_person_photo_photo_id'),
-            ),
-            'personId' => array (
+            ],
+            'personId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'person',
+
                 'caption' => new Ac_Lang_String('sample_person_photo_person_id'),
-            ),
-            'filename' => array (
+            ],
+            'filename' => [
                 'maxLength' => '45',
+
                 'caption' => new Ac_Lang_String('sample_person_photo_filename'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 
@@ -226,6 +233,16 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
      */
     function getPersonAlbumsItem($id) {
         return $this->getPersonAlbum($id);
+    }
+    
+    /**
+     * @return Sample_Person_Album[] 
+     */
+    function getAllPersonAlbums() {
+        $res = [];
+        foreach ($this->listPersonAlbums() as $id)
+            $res[] = $this->getPersonAlbum($id);
+        return $res;
     }
     
     /**
@@ -357,6 +374,16 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
      */
     function getPersonPostsItem($id) {
         return $this->getPersonPost($id);
+    }
+    
+    /**
+     * @return Sample_Person_Post[] 
+     */
+    function getAllPersonPosts() {
+        $res = [];
+        foreach ($this->listPersonPosts() as $id)
+            $res[] = $this->getPersonPost($id);
+        return $res;
     }
     
     /**

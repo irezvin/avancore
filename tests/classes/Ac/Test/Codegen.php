@@ -42,13 +42,7 @@ class Ac_Test_Codegen extends Ac_Test_Base {
         $gen1->lintify = false;
         $gen1->outputDir = $this->getOut2();
         $gen1->logFileName = $this->getLog2();
-        ob_start();
-        $gen1->prepare();
-        $s = ob_get_clean();
-        // for some reason we don't have any messages regarding composite primary key, so fuck it
-//        if (!$this->assertTrue(preg_match('/#__cpk.*composite primary key/i', $s))) {
-//            var_dump($s);
-//        }
+        $gen1->silenceImportantMessages = true;
         $gen1->genEditable = 1;
         $gen1->genNonEditable = 1;
         $gen1->clearOutputDir = 1;
@@ -73,9 +67,18 @@ class Ac_Test_Codegen extends Ac_Test_Base {
                 $this->assertIsA($iDom, 'Ac_Cg_Domain');
             }
         }
+        /**
+         * calling prepare() during the run() of imported generator mangles "destCountVarName", 
+         * "destLoadedVarName" in relation prototypes of extra tables
+         * 
+         * @TODO fix it
+         */
         $gen2->run();
         
-        $this->assertEqual($out1, $out2 = $w2->getOutput(), 'Imported domain(s) must produce strictly equal output');
+        if (!$this->assertEqual($out1, $out2 = $w2->getOutput(), 'Imported domain(s) must produce strictly equal output')) {
+            file_put_contents('out1.txt', $out1);
+            file_put_contents('out2.txt', $out2);
+        }
     }
     
     function testBogusRegenFiles() {

@@ -9,17 +9,30 @@ class Child_Person_Base_Mapper extends Sample_Person_Mapper {
     var $id = 'Child_Person_Mapper';
 
     var $storage = 'Child_Person_Storage';
+    
+    /**
+     * @var Child 
+     */
+     protected $application = false;
+     
  
  
     /**
      * @return Child_Person 
      */ 
     static function factory ($className = false,
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
+        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
         trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
             "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
         $res = Ac_Model_Mapper::getMapper('Child_Person_Mapper')->createRecord($className);
         return $res;
+    }
+    
+    /**
+     * @return Child 
+     */
+    function getApplication() {
+        return parent::getApplication();
     }
     
     /**
@@ -33,7 +46,7 @@ class Child_Person_Base_Mapper extends Sample_Person_Mapper {
     /**
      * @return Child_Person 
      */ 
-    function reference ($values = array()) {
+    function reference ($values = []) {
         return parent::reference($values);
     }
     
@@ -86,7 +99,7 @@ class Child_Person_Base_Mapper extends Sample_Person_Mapper {
      * @param array $query
      * @param mixed $sort
      * @return Child_Person     */
-    function findFirst (array $query = array(), $sort = false) {
+    function findFirst (array $query = [], $sort = false) {
         return parent::findFirst($query, $sort);
     }
     
@@ -95,7 +108,7 @@ class Child_Person_Base_Mapper extends Sample_Person_Mapper {
      * 
      * @param array $query
      * @return Child_Person     */
-    function findOne (array $query = array()) {
+    function findOne (array $query = []) {
         return parent::findOne($query);
     }
     
@@ -108,7 +121,7 @@ class Child_Person_Base_Mapper extends Sample_Person_Mapper {
      * @param bool $forceStorage
      * @return Child_Person[]
      */
-    function find (array $query = array(), $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = array(), & $sorted = false) {
+    function find (array $query = [], $keysToList = true, $sort = false, $limit = false, $offset = false, & $remainingQuery = [], & $sorted = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::find($query, $keysToList, $sort, $limit, $offset, $remainingQuery, $sorted);
     }
@@ -130,7 +143,7 @@ class Child_Person_Base_Mapper extends Sample_Person_Mapper {
      * @param array $remainingQuery - return value - critria that Mapper wasn't able to understand (thus they weren't applied)
      * @param bool $sorted - return value - whether the result was sorted according to $sort paramter
      */
-    function filter (array $records, array $query = array(), $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
+    function filter (array $records, array $query = [], $sort = false, $limit = false, $offset = false, & $remainingQuery = true, & $sorted = false, $areByIds = false) {
         if (func_num_args() > 5) $remainingQuery = true;
         return parent::filter($records, $query, $sort, $limit, $offset, $remainingQuery, $sorted, $areByIds);
     }
@@ -142,59 +155,59 @@ class Child_Person_Base_Mapper extends Sample_Person_Mapper {
     }
     
     protected function doGetRelationPrototypes() {
-        return Ac_Util::m(parent::doGetRelationPrototypes(), array (
-            '_portraitPersonPhoto' => array (
+        return Ac_Util::m(parent::doGetRelationPrototypes(), [
+            '_portraitPersonPhoto' => [
                 'srcMapperClass' => 'Child_Person_Mapper',
                 'destMapperClass' => 'Child_Person_Photo_Mapper',
-            ),
-            '_religion' => array (
+            ],
+            '_religion' => [
                 'srcMapperClass' => 'Child_Person_Mapper',
                 'destMapperClass' => 'Child_Religion_Mapper',
-            ),
-            '_tags' => array (
+            ],
+            '_tags' => [
                 'srcMapperClass' => 'Child_Person_Mapper',
                 'destMapperClass' => 'Child_Tag_Mapper',
-            ),
-            '_personAlbums' => array (
+            ],
+            '_personAlbums' => [
                 'srcMapperClass' => 'Child_Person_Mapper',
                 'destMapperClass' => 'Child_Person_Album_Mapper',
-            ),
-            '_personPhotos' => array (
+            ],
+            '_personPhotos' => [
                 'srcMapperClass' => 'Child_Person_Mapper',
                 'destMapperClass' => 'Child_Person_Photo_Mapper',
-            ),
-            '_personPosts' => array (
+            ],
+            '_personPosts' => [
                 'srcMapperClass' => 'Child_Person_Mapper',
                 'destMapperClass' => 'Child_Person_Post_Mapper',
-            ),
-            '_incomingRelations' => array (
+            ],
+            '_incomingRelations' => [
                 'srcMapperClass' => 'Child_Person_Mapper',
                 'destMapperClass' => 'Child_Relation_Mapper',
                 'destVarName' => '_incomingPerson',
-            ),
-            '_outgoingRelations' => array (
+            ],
+            '_outgoingRelations' => [
                 'srcMapperClass' => 'Child_Person_Mapper',
                 'destMapperClass' => 'Child_Relation_Mapper',
                 'destVarName' => '_outgoingPerson',
-            ),
-            '_extraCodeShopProducts' => array (
+            ],
+            '_extraCodeShopProducts' => [
                 'srcMapperClass' => 'Child_Person_Mapper',
                 'destMapperClass' => 'Child_Shop_Product_Mapper',
-            ),
-            '_noteShopProducts' => array (
+            ],
+            '_noteShopProducts' => [
                 'srcMapperClass' => 'Child_Person_Mapper',
                 'destMapperClass' => 'Child_Shop_Product_Mapper',
-            ),
-        ));
+            ],
+        ]);
         
     }
     
     protected function doGetInfoParams() {
         return Ac_Util::m( 
-            array (
+            [
                 'singleCaption' => 'People',
                 'pluralCaption' => 'People',
-            ),
+            ],
             parent::doGetInfoParams()
         );
         

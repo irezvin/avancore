@@ -29,67 +29,67 @@ class Child_Relation_Base_Object extends Sample_Relation {
     }
     
     protected function listOwnProperties() {
-        return array_unique(array_merge(parent::listOwnProperties(), array ( 1 => 'incomingPerson', 2 => 'outgoingPerson', )));
+        return array_unique(array_merge(parent::listOwnProperties(), [ 1 => 'incomingPerson', 2 => 'outgoingPerson', ]));
     }
     
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'relationType' => array (
+        if ($pi === false) $pi = [
+            'relationType' => [
                 'className' => 'Child_Relation_Type',
                 'mapperClass' => 'Child_Relation_Type_Mapper',
                 'caption' => 'Relation type',
-            ),
-            'incomingPerson' => array (
+            ],
+            'incomingPerson' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'incoming',
                 'caption' => 'People',
                 'relationId' => '_incomingPerson',
                 'referenceVarName' => '_incomingPerson',
-            ),
-            'outgoingPerson' => array (
+            ],
+            'outgoingPerson' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'outgoing',
                 'caption' => 'People',
                 'relationId' => '_outgoingPerson',
                 'referenceVarName' => '_outgoingPerson',
-            ),
-            'relationId' => array (
+            ],
+            'relationId' => [
                 'caption' => 'Relation Id',
-            ),
-            'personId' => array (
-                'values' => array (
+            ],
+            'personId' => [
+                'values' => [
                     'mapperClass' => 'Child_Person_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'outgoingPerson',
                 'caption' => 'Person Id',
-            ),
-            'otherPersonId' => array (
-                'values' => array (
+            ],
+            'otherPersonId' => [
+                'values' => [
                     'mapperClass' => 'Child_Person_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'incomingPerson',
                 'caption' => 'Other Person Id',
-            ),
-            'relationTypeId' => array (
-                'values' => array (
+            ],
+            'relationTypeId' => [
+                'values' => [
                     'mapperClass' => 'Child_Relation_Type_Mapper',
-                ),
+                ],
                 'caption' => 'Relation Type Id',
-            ),
-            'relationBegin' => array (
+            ],
+            'relationBegin' => [
                 'caption' => 'Relation Begin',
-            ),
-            'relationEnd' => array (
+            ],
+            'relationEnd' => [
                 'caption' => 'Relation End',
-            ),
-            'notes' => array (
+            ],
+            'notes' => [
                 'caption' => 'Notes',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

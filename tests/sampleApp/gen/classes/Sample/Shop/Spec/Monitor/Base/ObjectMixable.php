@@ -42,79 +42,86 @@ class Sample_Shop_Spec_Monitor_Base_ObjectMixable extends Ac_Model_Mixable_Extra
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array ( 0 => 'monitorShopClassifier', ));
+        return array_merge(parent::listOwnProperties(), [ 0 => 'monitorShopClassifier', ]);
     }
  
     protected function listOwnLists() {
         
-        return array ( 'monitorShopClassifier' => 'monitorShopSpecs', );
+        return [ 'monitorShopClassifier' => 'monitorShopSpecs', ];
     }
 
     
  
     protected function listOwnAssociations() {
-        return array ( 'monitorShopClassifier' => 'Sample_Shop_Classifier', );
+        return [ 'monitorShopClassifier' => 'Sample_Shop_Classifier', ];
     }
 
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
-        if ($pi === false) $pi = array (
-            'monitorShopClassifier' => array (
+        if ($pi === false) $pi = [
+            'monitorShopClassifier' => [
                 'className' => 'Sample_Shop_Classifier',
                 'mapperClass' => 'Sample_Shop_Classifier_Mapper',
                 'otherModelIdInMethodsPrefix' => 'monitor',
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_monitor_monitor_shop_classifier'),
                 'relationId' => '_monitorShopClassifier',
                 'countVarName' => '_monitorShopSpecsCount',
                 'referenceVarName' => '_monitorShopClassifier',
-            ),
-            'productId' => array (
+            ],
+            'productId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Spec_Mapper',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_monitor_product_id'),
-            ),
-            'diagonal' => array (
+            ],
+            'diagonal' => [
                 'dataType' => 'float',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_monitor_diagonal'),
-            ),
-            'hRes' => array (
+            ],
+            'hRes' => [
                 'dataType' => 'int',
                 'maxLength' => '5',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_monitor_h_res'),
-            ),
-            'vRes' => array (
+            ],
+            'vRes' => [
                 'dataType' => 'int',
                 'maxLength' => '5',
-                'attribs' => array (
+                'attribs' => [
                     'size' => '6',
-                ),
+                ],
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_monitor_v_res'),
-            ),
-            'matrixTypeId' => array (
+            ],
+            'matrixTypeId' => [
                 'dataType' => 'int',
                 'controlType' => 'selectList',
                 'maxLength' => '10',
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Classifier_Mapper',
-                ),
+                ],
                 'objectPropertyName' => 'monitorShopClassifier',
                 'isNullable' => true,
+
                 'caption' => new Ac_Lang_String('sample_shop_spec_monitor_matrix_type_id'),
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

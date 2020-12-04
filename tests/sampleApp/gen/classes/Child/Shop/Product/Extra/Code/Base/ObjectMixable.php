@@ -24,40 +24,41 @@ class Child_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable_
     }
     
     protected function listOwnProperties() {
-        return array_merge(parent::listOwnProperties(), array ( ));
+        return array_merge(parent::listOwnProperties(), []);
     }
     
     protected function getOwnPropertiesInfo() {
     	static $pi = false; 
-        if ($pi === false) $pi = array (
-            'extraCodePerson' => array (
+        if ($pi === false) $pi = [
+            'extraCodePerson' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'caption' => 'People',
-            ),
-            'productId' => array (
-                'values' => array (
+            ],
+            'productId' => [
+                'values' => [
                     'mapperClass' => 'Child_Shop_Product_Mapper',
-                ),
+                ],
                 'caption' => 'Product Id',
-            ),
-            'ean' => array (
+            ],
+            'ean' => [
                 'caption' => 'Ean',
-            ),
-            'asin' => array (
+            ],
+            'asin' => [
                 'caption' => 'Asin',
-            ),
-            'gtin' => array (
+            ],
+            'gtin' => [
                 'caption' => 'Gtin',
-            ),
-            'responsiblePersonId' => array (
+            ],
+            'responsiblePersonId' => [
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'mapperClass' => 'Child_Person_Mapper',
-                ),
+                ],
                 'caption' => 'Responsible Person Id',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 

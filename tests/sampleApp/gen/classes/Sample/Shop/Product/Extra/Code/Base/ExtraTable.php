@@ -14,8 +14,8 @@ class Sample_Shop_Product_Extra_Code_Base_ExtraTable extends Ac_Model_Mapper_Mix
     
     
     protected function doGetRelationPrototypes() {
-        return array (
-            '_extraCodePerson' => array (
+        return [
+            '_extraCodePerson' => [
                 'srcMapperClass' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_extraCodePerson',
@@ -24,20 +24,20 @@ class Sample_Shop_Product_Extra_Code_Base_ExtraTable extends Ac_Model_Mapper_Mix
                 'destVarName' => '_extraCodeShopProducts',
                 'destCountVarName' => '_shopProductsCount',
                 'destLoadedVarName' => '_shopProductsLoaded',
-                'fieldLinks' => array (
+                'fieldLinks' => [
                     'responsiblePersonId' => 'personId',
-                ),
+                ],
                 'srcIsUnique' => false,
                 'destIsUnique' => true,
                 'srcOutgoing' => true,
-            ),
-        );
+            ],
+        ];
         
     }
     
     protected function doGetAssociationPrototypes() {
-        return array (
-            'extraCodePerson' => array (
+        return [
+            'extraCodePerson' => [
                 'relationId' => '_extraCodePerson',
                 'useMapperMethods' => true,
                 'useModelMethods' => true,
@@ -52,8 +52,8 @@ class Sample_Shop_Product_Extra_Code_Base_ExtraTable extends Ac_Model_Mapper_Mix
                 'getDestObjectMethod' => 'getExtraCodePerson',
                 'setDestObjectMethod' => 'setExtraCodePerson',
                 'clearDestObjectMethod' => 'clearExtraCodePerson',
-            ),
-        );
+            ],
+        ];
     }
     
     

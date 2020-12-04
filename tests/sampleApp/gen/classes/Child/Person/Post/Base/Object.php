@@ -27,49 +27,51 @@ class Child_Person_Post_Base_Object extends Sample_Person_Post {
     
     protected function getOwnPropertiesInfo() {
         static $pi = false; 
-        if ($pi === false) $pi = array (
-            'publish' => array (
+        if ($pi === false) $pi = [
+            'publish' => [
                 'className' => 'Child_Publish',
                 'mapperClass' => 'Child_Publish_ImplMapper',
                 'caption' => 'Publish',
-            ),
-            'person' => array (
+            ],
+            'person' => [
                 'className' => 'Child_Person',
                 'mapperClass' => 'Child_Person_Mapper',
                 'caption' => 'People',
-            ),
-            'personPhoto' => array (
+            ],
+            'personPhoto' => [
                 'className' => 'Child_Person_Photo',
                 'mapperClass' => 'Child_Person_Photo_Mapper',
                 'caption' => 'Person photo',
-            ),
-            'id' => array (
+            ],
+            'id' => [
                 'caption' => 'Id',
-            ),
-            'personId' => array (
+            ],
+            'personId' => [
                 'caption' => 'Person Id',
-            ),
-            'photoId' => array (
+            ],
+            'photoId' => [
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'mapperClass' => 'Child_Person_Photo_Mapper',
-                ),
+                ],
                 'caption' => 'Photo Id',
-            ),
-            'title' => array (
+            ],
+            'title' => [
                 'caption' => 'Title',
-            ),
-            'content' => array (
+            ],
+            'content' => [
                 'caption' => 'Content',
-            ),
-            'pubId' => array (
+            ],
+            'pubId' => [
+
                 'dummyCaption' => '',
-                'values' => array (
+                'values' => [
                     'mapperClass' => 'Child_Publish_ImplMapper',
-                ),
+                ],
                 'caption' => 'Pub Id',
-            ),
-        );
+            ],
+        ];
     
         return $pi;
                 
