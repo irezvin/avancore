@@ -17,7 +17,7 @@ class Ac_Admin_Pagination extends Ac_Legacy_Controller {
      * @var int
      */
     
-    var $limitStep = 50;      
+    var $limitStep = 50;
     
     /**
      * Max number of records to show in "select record count" list 
@@ -144,7 +144,7 @@ class Ac_Admin_Pagination extends Ac_Legacy_Controller {
             if ($v === false) $v = 0; 
             $this->_currentPageNo = $v;
             if ($this->totalRecords !== false) {
-                if ($this->_currentPageNo > $this->_getNumPages()) $this->_currentPageNo = $this->_getNumPages();
+                if ($this->_currentPageNo > ($this->_getNumPages() - 1)) $this->_currentPageNo = $this->_getNumPages() - 1;
             }
             if ($this->storeParamsInState) $this->_context->setStateVariable('pageNo', $v);
         }

@@ -8,8 +8,6 @@ class Ac_Legacy_Output_Joomla3 extends Ac_Legacy_Output_Joomla15 {
     
     protected static $handlerRegistered = false;
     
-    
-    
     function outputResponse(Ac_Legacy_Controller_Response_Html $response, $asModule = false) {
         $tmp = $this->mergeGlobalResponse;
         if ($asModule) $this->mergeGlobalResponse = false;

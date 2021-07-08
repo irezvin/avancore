@@ -41,4 +41,7 @@ abstract class Ac_Facet_SetView extends Ac_Prototyped {
         return $res;
     }
     
+    function notifySetValueChanged() {
+    }    
+    
 }

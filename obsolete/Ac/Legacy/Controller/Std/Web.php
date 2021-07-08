@@ -221,7 +221,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
                 if ($this->isJson || $this->forceJson) {
                     $this->_responseClass = 'Ac_Legacy_Controller_Response_Json';
                 }
-                parent::getResponse();
+                parent::getResponse($methodName);
                 if ($this->isJson || $this->forceJson) {
                     $resp = $this->_response;
                     $res = new Ac_Legacy_Controller_Response_Json();

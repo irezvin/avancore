@@ -14,6 +14,8 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
     
     protected $dumpNext = false;
     
+    const DUMP_DONT = 0;
+    
     const DUMP_DO = 1;
     
     const DUMP_OB_STOP = 2;

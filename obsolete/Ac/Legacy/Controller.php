@@ -357,14 +357,21 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_Nam
     /**
      * @return Ac_Cache_Accessor
      */
-    protected function getSimpleCachingAccessor(array $getResponseMethodArgs) {
+    protected function getSimpleCachingAccessor($responseMethodName, array $getResponseMethodArgs) {
         if (!$this->simpleCaching || $this->_context->requestMethod !== 'get') return new Ac_Cache_Accessor('');
+        $id['controllerClass'] = get_class($this);
+        $id['controllerId'] = $this->_instanceId;
         $id['responseMethodArgs'] = $getResponseMethodArgs;
         $id['baseUrl'] = (string) $this->_context->getBaseUrl();
         $id['contextData'] = $this->_context->getData();
         if ($this->simpleCacheExtra) $id['simpleCacheExtra'] = Ac_Util::getObjectProperty($this, $this->simpleCacheExtra);
+        $this->onSimpleCacheId($responseMethodName, $getResponseMethodArgs, $id);
         $c = $this->getCache();
-        return new Ac_Cache_Accessor($id, $c, $this->_instanceId);
+        $res = new Ac_Cache_Accessor($id, $c, $this->_instanceId);
+        return $res;
+    }
+    
+    protected function onSimpleCacheId($methodName, $methodArgs, array & $id) {
     }
     
     /**
@@ -386,7 +393,7 @@ class Ac_Legacy_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_Nam
         if ($this->_response) return $this->_response;
         if (!$this->_context) $this->_context = $this->guessContext();
         
-        $simpleCachingAccessor = $this->getSimpleCachingAccessor(func_get_args());
+        $simpleCachingAccessor = $this->getSimpleCachingAccessor($methodName, func_get_args());
         if ($resp = $simpleCachingAccessor->getData()) {
             $this->hitCache = true;
             $this->_response = $resp;

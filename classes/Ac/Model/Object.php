@@ -467,7 +467,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     // formerly _legacyStore
     protected function saveOwnRow() {
         $hyData = $this->getHyData();
-            $hyData = $this->mapper->peConvertForSave($this, $hyData);
+        $hyData = $this->mapper->peConvertForSave($this, $hyData);
         $res = (bool) $this->mapper->peSave($this, $hyData, $exists, $error, $newData);
             if (is_array($newData)) foreach ($newData as $k => $v) $this->$k = $v;
         if (!$res) {

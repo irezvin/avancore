@@ -309,7 +309,7 @@ Ajs_Util = {
     parseQuery: function(string, delim, eq) {
     	if (delim === undefined) delim = '&';
     	if (eq === undefined) eq = '=';
-    	
+    	string = decodeURI(string);
     	var pairs = string.split(delim), l = pairs.length, res = [];
     	for (var i = 0; i < l; i++) {
     		var nameVal = pairs[i].split(eq, 2), path = nameVal[0].replace(']', '');

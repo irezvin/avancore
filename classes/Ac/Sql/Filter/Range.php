@@ -21,6 +21,14 @@ class Ac_Sql_Filter_Range extends Ac_Sql_Filter {
     
     var $ignoreEmptyValue = true;
     
+    const MIN = 'min';
+    
+    const MAX = 'max';
+    
+    const EQ = 'eq';
+    
+    var $singleValue = self::MIN;
+    
     function _filterValue($item) {
         if ($this->valueRx !== false) {
             if (preg_match($this->valueRx, $item, $matches)) {
@@ -32,7 +40,7 @@ class Ac_Sql_Filter_Range extends Ac_Sql_Filter {
         } else {
             $res = true;
         }
-        if ($this->ignoreEmptyValue && empty($item)) $res = false;
+        if ($this->ignoreEmptyValue && !strlen($item)) $res = false;
         return $res;
     }
     
@@ -43,8 +51,8 @@ class Ac_Sql_Filter_Range extends Ac_Sql_Filter {
         foreach ($range as $k => $item) {
             if (is_array($item)) {
                 $itm = array();
-                if (array_key_exists('min', $item) && $this->_filterValue($item['min'])) $itm['min'] = $item['min'];
-                if (array_key_exists('max', $item) && $this->_filterValue($item['max'])) $itm['max'] = $item['max'];
+                if (array_key_exists('min', $item) && strlen($this->_filterValue($item['min']))) $itm['min'] = $item['min'];
+                if (array_key_exists('max', $item) && strlen($this->_filterValue($item['max']))) $itm['max'] = $item['max'];
                 //if (!count($itm)) trigger_error("At least one of the keys 'min' and 'max' must be given in \$range item");
                 if (count($itm)) $res[] = $itm;
             } elseif ($this->_filterValue($item)) {
@@ -60,7 +68,11 @@ class Ac_Sql_Filter_Range extends Ac_Sql_Filter {
         foreach ($intervals as $interval) {
             $item = null;
             $minMax = preg_split($this->minMaxSeparatorRx, $interval, 2);
-            if ($minMax[0] === $interval) $item = $interval; // we have one value...
+            if ($minMax[0] === $interval) {
+                $item = $interval; // we have one value...
+                if ($this->singleValue === self::MIN) $item = ['min' => $item];
+                elseif ($this->singleValue === self::MAX) $item = ['max' => $item];
+            }
             elseif (!strlen(trim($minMax[0]))) {
                 $item = array('max' => trim($minMax[1]));
             } elseif (!strlen(trim($minMax[1]))) {

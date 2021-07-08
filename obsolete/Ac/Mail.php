@@ -121,7 +121,7 @@ class Ac_Mail {
         $this->_to = $to;
         $this->_from = $from;
         $this->_data = $data;
-        $disp = Ac_Dispatcher::getInstance();
+        $disp = @Ac_Dispatcher::getInstance();
         if (is_object($disp) && $disp->config && $this->_from === false) {
             $this->_from = array($disp->config->mailFrom, $disp->config->fromName);
         }

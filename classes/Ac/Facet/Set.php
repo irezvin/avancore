@@ -92,6 +92,8 @@ class Ac_Facet_Set extends Ac_Prototyped {
 
     function setValue(array $value) {
         foreach ($this->items as $item) $item->notifySetValueChanged();
+        if (is_object($this->impl)) $this->impl->notifySetValueChanged();
+        if (is_object($this->view)) $this->view->notifySetValueChanged();
         $items = array_keys($this->items);
         $this->valueOrder = array();
         $emptyParamUsed = false;

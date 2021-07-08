@@ -110,7 +110,7 @@ abstract class Ac_Model_Relation_Abstract extends Ac_Prototyped {
 
     function setApplication(Ac_Application $application) {
         if ($application !== ($oldApplication = $this->application)) {
-            if ($this->immutable) throw self::immutableException();
+            if ($this->application && $this->immutable) throw self::immutableException();
             $this->application = $application;
             $this->doOnSetApplication($oldApplication);
             $this->reset();

@@ -19,6 +19,8 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
     
     var $pathwayConcatenator = ' &raquo; ';
     
+    var $showPoweredBy = false;
+    
     /**
      * Show xdebug_time_index() before </body> tag (for debug purposes)
      *
@@ -107,7 +109,9 @@ class Ac_Legacy_Template_HtmlPage extends Ac_Legacy_Template_Html {
     
     function showHead() {
 ?><head>
+<?php if ($this->showPoweredBy) { ?> 
     <!-- powered by Avancore <?php echo Ac_Avancore::version ?> -->
+<?php } ?>
 <?php   if ($this->getTitle()) { ?>
 
     <title><?php echo $this->getTitle(); ?></title>

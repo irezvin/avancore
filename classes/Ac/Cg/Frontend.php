@@ -205,7 +205,16 @@ class Ac_Cg_Frontend {
 <?php                     $this->showExpandable($cmn, false); ?>
 <?php                     var_dump(get_class($prop)); ?>
 <?php                     $this->show($prop); ?>
+<?php                     echo '<p>Property info</p>'; ?>
 <?php                     var_dump($prop->getAeModelPropertyInfo()); ?>
+<?php                     if ($prop instanceof Ac_Cg_Property_Object && ($relId = $prop->modelRelation) && ($rel = $model->getAeModelRelationPrototype($relId))) { ?>
+<?php                         echo '<p>Relation prototype</p>' ?>
+<?php                         var_dump($rel); ?>
+<?php                     } ?>                        
+<?php                     if ($prop instanceof Ac_Cg_Property_Object && ($assoc = $prop->getAssociationPrototype())) { ?>
+<?php                         echo '<p>Association prototype</p>' ?>
+<?php                         var_dump($assoc); ?>
+<?php                     } ?>                        
                       	</div>
               		</li>
 <?php           } ?> 

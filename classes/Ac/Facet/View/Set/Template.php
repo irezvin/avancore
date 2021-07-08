@@ -31,14 +31,16 @@ class Ac_Facet_View_Set_Template extends Ac_Facet_SetView {
     }
     
     protected function replacePlaceholder($matches) {
-        $args = explode(".", $matches[1]);
+        $args = preg_split("/(?<!\\\\)\\./", $matches[1]);
         $method = $args[0];
-        return call_user_func_array(array($this, 'tpl'.ucfirst($method)), array_slice($args, 1));
+        $methodArgs = [];
+        foreach (array_slice($args, 1) as $arg) $methodArgs[] = str_replace("\\.", ".", $arg);
+        return call_user_func_array(array($this, 'tpl'.ucfirst($method)), $methodArgs);
     }
     
     function renderSet(Ac_Legacy_Controller_Response_Html $response) {
         $this->currentResponse = $response;
-        echo $this->renderTemplate($this->template);
+        echo $this->renderTemplate($this->getTemplate());
     }
     
     function tplItem($item = false, $prop = false) {

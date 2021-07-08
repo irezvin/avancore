@@ -86,7 +86,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
             foreach ($prot->listFields() as $f) {
                 $pi = $prot->getPropertyInfo($f, true);
                 $s = false;
-                if (isset($pi->objectPropertyName) && strlen($opn = $pi->objectPropertyName)) {
+                if (isset($pi->assocPropertyName) && strlen($opn = $pi->assocPropertyName)) {
                     $op = $prot->getPropertyInfo($opn, true);
                     if (isset($op->mapperClass) && strlen($mc = $op->mapperClass)) {
                         $mpr = Ac_Model_Mapper::getMapper($mc);
