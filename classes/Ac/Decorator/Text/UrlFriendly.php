@@ -31,8 +31,10 @@ class Ac_Decorator_Text_UrlFriendly extends Ac_Decorator {
     }    
     
     function apply($value) {
-        $t = $this->getTransliterator();
-        if ($t) $value = $t->transliterate($value);
+        if (class_exists('Transliterator', false)) {
+            $t = $this->getTransliterator();
+            if ($t) $value = $t->transliterate($value);
+        }
         $value = strtolower($value);
         $value = preg_replace("/[^a-z0-9-\\/_ ]+/", "", $value);
         $value = preg_replace("/[- \\/_]+/", $this->delimiter, trim($value));

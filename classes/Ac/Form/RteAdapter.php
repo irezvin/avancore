@@ -25,7 +25,7 @@ abstract class Ac_Form_RteAdapter extends Ac_Prototyped {
         self::$defaultInstance = $defaultInstance;
     }
     
-    function getHtmlForEditor(Ac_Form_Control_Text $editor, & $id = false, Ac_Legacy_Controller_Response_Html $response = null) {
+    function getHtmlForEditor(Ac_Form_Control_Text $editor, & $id = false, Ac_Controller_Response_Html $response = null) {
         $tpl = new Ac_Form_Control_Template_Basic();
         ob_start();
         $tpl->_showTextArea($editor, $id);
@@ -35,7 +35,7 @@ abstract class Ac_Form_RteAdapter extends Ac_Prototyped {
             $html .= new Ac_Js_Script($s);
         }
         
-        if (!$response) $response = Ac_Legacy_Controller_Response_Global::r();
+        if (!$response) $response = Ac_Controller_Response_Global::r();
         
         foreach ($this->getJsLibs() as $lib) $response->addJsLib ($lib, false);
         foreach ($this->getCssLibs() as $lib) $response->addCssLib ($lib, false);

@@ -311,7 +311,7 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
 
     ?>        
 
-            class [[CLASS_CONTROLLER]] extends Ac_Legacy_Controller {
+            class [[CLASS_CONTROLLER]] extends Ac_Controller {
 
                 /**
                  * @var [[CLASS_APP]]
@@ -351,7 +351,7 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
 
     ?>        
 
-            class [[CLASS_FRONTEND_TEMPLATE]] extends Ac_Legacy_Template_Html {
+            class [[CLASS_FRONTEND_TEMPLATE]] extends Ac_Template_Html {
 
                 /**
                  * @var [[CLASS_FRONTEND]]
@@ -570,7 +570,7 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
 
             $u = Ac_Url::guess();
             $u->query = array();
-            $ctx = new Ac_Legacy_Controller_Context_Http();
+            $ctx = new Ac_Controller_Context_Http();
             $ctx->populate(array('get', 'post'));
             $ctx->setBaseUrl($u);
 
@@ -578,8 +578,8 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
             $c->setApplication([[CLASS_APP]]::getInstance());
             $resp = $c->getResponse();
 
-            $o = new Ac_Legacy_Output_Native;
-            $o->htmlTemplateSettings['doctypeTag'] = Ac_Legacy_Template_HtmlPage::doctypeHtml5;
+            $o = new Ac_Controller_Output_Native;
+            $o->htmlTemplateSettings['doctypeTag'] = Ac_Template_HtmlPage::doctypeHtml5;
             $o->htmlTemplateSettings['addXmlTag'] = false;
             $o->showOuterHtml = true;
             $o->outputResponse($resp);
@@ -624,7 +624,7 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
 
             $u = Ac_Url::guess();
             $u->query = array();
-            $ctx = new Ac_Legacy_Controller_Context_Http();
+            $ctx = new Ac_Controller_Context_Http();
             $ctx->populate(array('get', 'post'));
             $ctx->setBaseUrl($u);
 
@@ -632,8 +632,8 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
             $c->setApplication([[CLASS_APP]]::getInstance());
             $resp = $c->getResponse();
 
-            $o = new Ac_Legacy_Output_Native;
-            $o->htmlTemplateSettings['doctypeTag'] = Ac_Legacy_Template_HtmlPage::doctypeHtml5;
+            $o = new Ac_Controller_Output_Native;
+            $o->htmlTemplateSettings['doctypeTag'] = Ac_Template_HtmlPage::doctypeHtml5;
             $o->htmlTemplateSettings['addXmlTag'] = false;
             $o->showOuterHtml = true;
             $o->outputResponse($resp);

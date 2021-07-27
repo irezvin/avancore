@@ -213,7 +213,7 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
                 $this->setDb($db);
             }
             if (!$this->_db) {
-                $this->_db = new Ac_Sql_Db_Ae();
+                $this->_db = Ac_Application::getDefaultInstance()->getDb();
                 //trigger_error("getExpression(): database must be supplied either with \$db parameter or with setDb() call first", E_USER_ERROR);
             }
             $this->_expr = $this->_quotePart($this->parts, $this->_getQParams());

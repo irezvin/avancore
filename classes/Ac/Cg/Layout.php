@@ -175,7 +175,7 @@ abstract class Ac_Cg_Layout extends Ac_Prototyped {
         foreach ($jsonFiles as $file) {
             $json = json_decode(file_get_contents($file), true);
             if (!$json || !is_array($json)) {
-                trigger_error ("Cannot parse JSON in '{$file}'`", E_USER_WARNING);
+                trigger_error ("Cannot parse JSON in '{$file}'", E_USER_WARNING);
                 continue;
             }
             if (isset($json['pathRoot'])) {

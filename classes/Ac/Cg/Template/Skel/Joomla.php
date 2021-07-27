@@ -232,7 +232,7 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
             $u->query['option'] = JRequest::getVar('option');
             $u->query['view'] = JRequest::getVar('view');
             
-            $ctx = new Ac_Legacy_Controller_Context_Http(array('baseUrl' => $u));
+            $ctx = new Ac_Controller_Context_Http(array('baseUrl' => $u));
             $ctx->setData(JRequest::get());
             $itemId = JRequest::getVar('itemId');
             if ($itemId) $u->query['itemId'] = $itemId;
@@ -246,7 +246,7 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
             $controller->setApplication([[App]]::getInstance());
             
             $response = $controller->getResponse();
-            $output = new Ac_Legacy_Output_Joomla3();
+            $output = new Ac_Controller_Output_Joomla3();
             $output->outputResponse($response);
             
             

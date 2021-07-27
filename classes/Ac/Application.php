@@ -237,22 +237,22 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     }
     
     function initialize() {
-        $res = false;
-        if ($this->stage === self::STAGE_INITIALIZING) {
-            $adapter = $this->getAdapter();
-            if ($this->addIncludePaths) {
-                Ac_Util::addIncludePath($adapter->getClassPaths());
-                if (strlen($gp = $adapter->getGenPath()))
-                    Ac_Util::addIncludePath($adapter->getGenPath());
-            }
-            $this->initDeferredMixables();
-            $this->doOnInitialize();
-            $this->triggerEvent(self::EVENT_ON_INITIALIZE);
-            $this->stage = self::STAGE_INITIALIZED;
-            Ac_Application::registerInstance($this);
-            $res = true;
+        if ($this->stage !== self::STAGE_INITIALIZING) return false;
+        $adapter = $this->getAdapter();
+        if (is_file($f = $adapter->getAppRootDir().'/include/classAliases.php')) {
+            require_once($f);
         }
-        return $res;
+        if ($this->addIncludePaths) {
+            Ac_Util::addIncludePath($adapter->getClassPaths());
+            if (strlen($gp = $adapter->getGenPath()))
+                Ac_Util::addIncludePath($adapter->getGenPath());
+        }
+        $this->initDeferredMixables();
+        $this->doOnInitialize();
+        $this->triggerEvent(self::EVENT_ON_INITIALIZE);
+        $this->stage = self::STAGE_INITIALIZED;
+        Ac_Application::registerInstance($this);
+        return true;
     }
     
     protected function doOnInitialize() {
@@ -614,15 +614,13 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
         }
     }
     
-    function handleRequest(Ac_Cr_Context $context = null) {
-
+    function handleRequest(Ac_Controller_Context_Http $context = null) {
         $c = $this->getFrontController();
         $c->handleRequest($context);
         
     }
     
-    function handleAdminRequest(Ac_Cr_Context $context = null) {
-    
+    function handleAdminRequest(Ac_Controller_Context_Http $context = null) {
         $c = $this->getFrontController();
         $c->handleRequest($context, true);
         
@@ -649,17 +647,10 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     }
     
     /**
-     * @return Ac_Legacy_Controller
-     */
-    function getLegacyController($id, $dontThrow = false) {
-        return $this->getComponent($id, 'Ac_Legacy_Controller', $dontThrow);
-    }
-    
-    /**
-     * @return Ac_Cr_Controller
+     * @return Ac_Controller
      */
     function getController($id, $dontThrow = false) {
-        return $this->getComponent($id, 'Ac_Cr_Controller', $dontThrow);
+        return $this->getComponent($id, 'Ac_Controller', $dontThrow);
     }
     
     /**

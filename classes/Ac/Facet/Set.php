@@ -92,6 +92,8 @@ class Ac_Facet_Set extends Ac_Prototyped {
 
     function setValue(array $value) {
         foreach ($this->items as $item) $item->notifySetValueChanged();
+        if (is_object($this->impl)) $this->impl->notifySetValueChanged();
+        if (is_object($this->view)) $this->view->notifySetValueChanged();
         $items = array_keys($this->items);
         $this->valueOrder = array();
         $emptyParamUsed = false;
@@ -165,7 +167,7 @@ class Ac_Facet_Set extends Ac_Prototyped {
         $this->setValue($val);
     }
     
-    function render(Ac_Legacy_Controller_Response_Html $response, $return = false) {
+    function render(Ac_Controller_Response_Html $response, $return = false) {
         if ($return) ob_start();
         $this->getView(true)->renderSet($response);
         if ($return) return ob_get_clean();

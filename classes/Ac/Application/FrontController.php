@@ -3,7 +3,7 @@
 class Ac_Application_FrontController extends Ac_Application_Component {
     
     /**
-     * @var Ac_Cr_Context
+     * @var Ac_Controller_Context
      */
     protected $context = null;
     
@@ -14,34 +14,14 @@ class Ac_Application_FrontController extends Ac_Application_Component {
     protected $adminController = 'admin';
     
     /**
-     * @var Ac_Result_Writer
+     * @var Ac_Controller_Output
      */
-    protected $writer = null;
+    protected $output = null;
 
     /**
      * @var array
      */
-    protected $writerPrototype = null;
-
-    /**
-     * @var Ac_Result_Environment_Html
-     */
-    protected $environment = null;
-
-    /**
-     * @var array
-     */
-    protected $environmentPrototype = null;
-    
-    /**
-     * @var Ac_Legacy_Output
-     */
-    protected $legacyOutput = null;
-
-    /**
-     * @var array
-     */
-    protected $legacyOutputPrototype = null;
+    protected $outputPrototype = null;
     
     /**
      * @var bool
@@ -49,7 +29,7 @@ class Ac_Application_FrontController extends Ac_Application_Component {
     protected $useUrlMapper = true;
 
     /**
-     * @return Ac_Cr_Context
+     * @return Ac_Controller_Context
      */
     function getContext($asIs = false) {
         if ($this->context === null && !$asIs) {
@@ -58,98 +38,36 @@ class Ac_Application_FrontController extends Ac_Application_Component {
         return $this->context;
     }    
 
-    function setWriter(Ac_Result_Writer $writer = null) {
-        $this->writer = $writer;
-        $this->writerPrototype = null;
+    function setOutput(Ac_Controller_Output $output = null) {
+        $this->output = $output;
+        $this->outputPrototype = null;
     }
 
     /**
-     * @return Ac_Result_Writer
+     * @return Ac_Controller_Output
      */
-    function getWriter($asIs = false) {
-        if ($this->writer === null && !$asIs) {
-            if ($this->writerPrototype !== null) {
-                $this->writer = Ac_Prototyped::factory($this->writerPrototype, 'Ac_Result_Writer');
+    function getOutput($asIs = false) {
+        if ($this->output === null && !$asIs) {
+            if ($this->outputPrototype) {
+                $this->output = Ac_Prototyped::factory($this->outputPrototype, 'Ac_Controller_Output');
             } else {
-                $this->writer = $this->application->getAdapter()->createDefaultResultWriter();
+                $this->output = $this->application->getAdapter()->createDefaultOutput();
             }
         }
-        return $this->writer;
+        return $this->output;
     }
 
-    function setWriterPrototype(array $writerPrototype = null) {
-        $this->writerPrototype = $writerPrototype;
-        $this->writer = null;
+    function setOutputPrototype(array $outputPrototype = null) {
+        $this->outputPrototype = $outputPrototype;
+        $this->output = null;
     }
 
     /**
      * @return array
      */
-    function getWriterPrototype() {
-        return $this->writerPrototype;
+    function getOutputPrototype() {
+        return $this->outputPrototype;
     }
-
-    function setEnvironment(Ac_Result_Environment $environment = null) {
-        $this->environment = $environment;
-        $this->environmentPrototype = null;
-    }
-
-    /**
-     * @return Ac_Result_Environment_Html
-     */
-    function getEnvironment($asIs = false) {
-        if ($this->environment === false && !$asIs) {
-            if ($this->environmentPrototype !== null) {
-                $this->environment = Ac_Prototyped::factory($this->environmentPrototype, 'Ac_Result_Environment');
-            } else {
-                $this->environment = $this->application->getAdapter()->createDefaultResultEnvironment();
-            }
-        }
-        return $this->environment;
-    }
-
-    function setEnvironmentPrototype(array $environmentPrototype) {
-        $this->environmentPrototype = $environmentPrototype;
-        $this->environment = null;
-    }
-
-    function setLegacyOutput(Ac_Legacy_Output $legacyOutput = null) {
-        $this->legacyOutput = $legacyOutput;
-        $this->legacyOutputPrototype = null;
-    }
-
-    /**
-     * @return Ac_Legacy_Output
-     */
-    function getLegacyOutput($asIs = false) {
-        if ($this->legacyOutput === null && !$asIs) {
-            if ($this->legacyOutputPrototype) {
-                $this->legacyOutput = Ac_Prototyped::factory($this->legacyOutputPrototype, 'Ac_Legacy_Output');
-            } else {
-                $this->legacyOutput = $this->application->getAdapter()->createDefaultLegacyOutput();
-            }
-        }
-        return $this->legacyOutput;
-    }
-
-    function setLegacyOutputPrototype(array $legacyOutputPrototype = null) {
-        $this->legacyOutputPrototype = $legacyOutputPrototype;
-        $this->legacyOutput = null;
-    }
-
-    /**
-     * @return array
-     */
-    function getLegacyOutputPrototype() {
-        return $this->legacyOutputPrototype;
-    }
-
-    /**
-     * @return array
-     */
-    function getEnvironmentPrototype() {
-        return $this->environmentPrototype;
-    }    
 
     function setControllerParam($controllerParam) {
         $this->controllerParam = $controllerParam;
@@ -189,7 +107,7 @@ class Ac_Application_FrontController extends Ac_Application_Component {
         return $this->useUrlMapper;
     }    
     
-    function setContext(Ac_Cr_Context $context) {
+    function setContext(Ac_Controller_Context $context) {
         $this->context = $context;
     }
     
@@ -213,7 +131,7 @@ class Ac_Application_FrontController extends Ac_Application_Component {
     }
     
     
-    function handleRequest(Ac_Cr_Context $context = null, $admin = false) {
+    function handleRequest(Ac_Controller_Context $context = null, $admin = false) {
         
         if ($context) $this->setContext($context);
         else $this->setContext($this->getApplication()->getAdapter()->createDefaultContext());
@@ -224,12 +142,13 @@ class Ac_Application_FrontController extends Ac_Application_Component {
         if ($this->useUrlMapper) $urlMapper = $this->application->getUrlMapper();
         if ($urlMapper) {
             $this->context->getBaseUrl()->setUrlMapper($urlMapper);
-            if (strlen($pathInfo = $context->getRequest()->server->pathInfo)) {
+            // TODO
+            if (strlen($pathInfo = $context->pathInfo)) {
                 $params = $urlMapper->stringToParams($pathInfo);
                 if (is_null($params)) {
                     throw new Ac_E_ControllerException("Unparsable path: '{$pathInfo}'");
                 }
-                $this->context->getRequest()->updateValues('get', $params, true);
+                $this->context->updateData($params);
                 $this->context->getBaseUrl()->pathInfo = '';
             }
         }
@@ -256,41 +175,27 @@ class Ac_Application_FrontController extends Ac_Application_Component {
         
         $controller = $this->application->getComponent($controllerId, null, true);
         
-        if (!$controller || !($controller instanceof Ac_Cr_Controller || $controller instanceof Ac_Legacy_Controller)) {
+        if (!$controller || !($controller instanceof Ac_Cr_Controller || $controller instanceof Ac_Controller)) {
             throw new Ac_E_ControllerException("Controller '{$controllerId}' not found", 404);
         }
         
         
-        if ($controller instanceof Ac_Legacy_Controller) $this->processLegacyRequest($controller);
-        else $this->processRequest($controller);
+        $this->processRequest($controller);
         
     }
     
-    protected function processLegacyRequest (Ac_Legacy_Controller $controller) {
+    protected function processRequest (Ac_Controller $controller) {
         
-        $ctx = $this->getContext();
-        $lc = Ac_Legacy_Controller_Context_Http::createFromContext($ctx);
+        $ctx = clone $this->getContext();
         
-        $controller->setContext($lc);
+        $controller->setContext($ctx);
         
         $response = $controller->getResponse();
         
-        $output = $this->getLegacyOutput();
+        $output = $this->getOutput();
         
         $output->outputResponse($response);
         
     }
 
-    protected function processRequest (Ac_Cr_Controller $controller) {
-        
-        $controller->setContext($this->getContext());
-        
-        $result = $controller->getResult();
-        
-        $writer = $this->getWriter();
-        
-        $writer->writeResult($result);
-        
-    }
-   
 }

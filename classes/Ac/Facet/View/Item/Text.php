@@ -14,7 +14,7 @@ class Ac_Facet_View_Item_Text extends Ac_Facet_ItemView {
         return $this->dummyCaption !== false? $this->dummyCaption : $this->item->getCaption().'...';
     }
     
-    function renderItem(Ac_Legacy_Controller_Response_Html $response) {
+    function renderItem(Ac_Controller_Response_Html $response) {
         
         $a = array(
             'name' => $this->getHtmlName(),

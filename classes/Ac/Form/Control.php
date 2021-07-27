@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Form_Control extends Ac_Legacy_Controller {
+class Ac_Form_Control extends Ac_Controller {
 
     protected $init = false;
     
@@ -198,7 +198,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     var $hasOwnTemplates = false;
 
     /**
-     * @var Ac_Legacy_Controller_Response_Html
+     * @var Ac_Controller_Response_Html
      */
     var $htmlResponse = false;
     
@@ -274,7 +274,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     var $debug = false;
     
     /**
-     * @return Ac_Legacy_Controller_Context
+     * @return Ac_Controller_Context
      */
     protected function guessContext() {
         $url = Ac_Url::guess(true);
@@ -309,7 +309,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
 /**
      * Returns context of the controller 
-     * @return Ac_Legacy_Controller_Context_Http
+     * @return Ac_Controller_Context_Http
      */
     function getContext($asIs = false) {
         if ($this->_context === false && !$asIs) {
@@ -564,7 +564,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
                     $template->setVars($this->tplExtras);
                     $this->_presentation = $template->fetch($this->templatePart, $this->_doGetTemplatePartParams());
                     if ($l = $this->getAssetLibs()) {
-                        Ac_Legacy_Controller_Response_Global::r()->addAssetLibs($l);
+                        Ac_Controller_Response_Global::r()->addAssetLibs($l);
                     }
                     if ($js = $this->createJsObject()) { 
                         $script = new Ac_Js_Script($js->init());
@@ -616,7 +616,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
         }
         if (strlen($wcp[1]) && !$wcp[0]) $wcp[0] = $this->getTemplate();
         if ((is_object($wcp[0]) || strlen($wcp[0])) && strlen($wcp[1])) {
-            if (is_a($wcp[0], 'Ac_Legacy_Template')) $tpl = $wcp[0];
+            if (is_a($wcp[0], 'Ac_Template')) $tpl = $wcp[0];
                 else $tpl = $this->getSpecificTemplate($wcp[0]);
             $res = $tpl->fetch($wcp[1], $this->_doGetWrapperTemplatePartParams($wrappedHtml));
         } else {
@@ -994,7 +994,7 @@ class Ac_Form_Control extends Ac_Legacy_Controller {
     
     function bindAutoparams() {
         /**
-         * After I have added bindAutoparams() call to Ac_Legacy_Controller, doInitProperties() is called after
+         * After I have added bindAutoparams() call to Ac_Controller, doInitProperties() is called after
          * bindAutoparams(), that adds bug to the controls creation
          */
         if (!$this->init) return false;

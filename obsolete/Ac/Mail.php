@@ -34,7 +34,7 @@ class Ac_Mail {
     var $_textTemplate = false;
 
     /**
-     * @var Ac_Legacy_Template
+     * @var Ac_Template
      */
     var $templateObject = false;
     
@@ -121,7 +121,7 @@ class Ac_Mail {
         $this->_to = $to;
         $this->_from = $from;
         $this->_data = $data;
-        $disp = Ac_Dispatcher::getInstance();
+        $disp = @Ac_Dispatcher::getInstance();
         if (is_object($disp) && $disp->config && $this->_from === false) {
             $this->_from = array($disp->config->mailFrom, $disp->config->fromName);
         }
@@ -352,7 +352,7 @@ class Ac_Mail {
     }
     
     function fetchTemplate($templateName, $vars = array()) {
-        if ($this->templateObject && is_a($this->templateObject, 'Ac_Legacy_Template')) {
+        if ($this->templateObject && is_a($this->templateObject, 'Ac_Template')) {
             // A. Brave new templates 
             $this->templateObject->setVars($vars);
             return $this->templateObject->fetch($templateName);

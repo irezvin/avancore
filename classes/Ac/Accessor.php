@@ -1,151 +1,9 @@
 <?php
 
-// TODO: implement $convertToPaths (foo__bar -> array('foo', bar'); check Ac_Prototyped static methods to work with paths)
-// TODO: some sane logic on trying to get write-only properties or to write read-only properties
-// TODO: add __unset() support and iterator for listable objects
-// TODO: wrap Exceptions into some sane objects that know, at least, destination class
-class Ac_Accessor implements Ac_I_Accessor {
+abstract class Ac_Accessor {
     
-    protected $src = null;
+    protected static $methodSignatures = [];
 
-    protected $convertToPaths = false;
-    
-    protected $strategy = false;
-    
-    /**
-     * @var false|true|array
-     */
-    protected $collectErrors = false;
-    
-    /**
-     * @var propName => array($exception, $exception...)
-     */
-    protected $errors = array();
-    
-    protected static $methodSignatures = array();
-    
-    function getSrc() {
-        return $this->src;
-    }
-    
-    /**
-     * Enables error collector
-     * Note: errors are collected on set() only
-     * 
-     * @param bool|scalar|string|array $types 
-     * 
-     * true = catch all; 
-     * false = catch none; 
-     * string = class name or 
-     * array = class names of exceptions to catch
-     */
-    function setCollectErrors($types = null) {
-       if (is_string($types)) $types = array($types);
-       $this->collectErrors = $types; 
-    }
-    
-    function getCollectErrors() {
-        return $this->collectErrors;
-    }
-    
-    /**
-     * Returns collected errors and clears collected errors' memory
-     * @return array Collected errors
-     */
-    function clearErrors() {
-        $res = $this->errors;
-        $this->errors = array();
-        return $res;
-    }
-    
-    function getErrors($propName = false, $clear = false) {
-        if ($propName !== false) {
-            if (is_array($propName)) $propName = Ac_Util::arrayToPath($propName);
-            $res = isset($this->errors[$propName])? $this->errors[$propName] : array();
-            if ($clear) unset ($this->errors[$propName]);
-        } else {
-            $res = $this->errors;
-            if ($clear) $this->errors = array();
-        }
-        
-        return $res;
-    }
-    
-    function __construct($src, $convertToPaths = false, $strategy = false) {
-        $this->src = $src;
-        $this->convertToPaths = $convertToPaths;
-        if ($strategy) $this->strategy = Ac_Prototyped::factoryOnce($strategy, 'Ac_I_AccessorStrategy');
-    }
-    
-    function getProperty($name) {
-        if ($this->convertToPaths) $name = $this->convertToPath($name);
-        if ($this->strategy) return $this->strategy->getPropertyOf($this->src, $name);
-            else return Ac_Accessor::getObjectProperty($this->src, $name);
-    }
-    
-    function hasProperty($name) {
-        if ($this->convertToPaths) $name = $this->convertToPath($name);
-        if ($this->strategy) return $this->strategy->testPropertyOf($this->src, $name);
-        return Ac_Accessor::objectPropertyExists($this->src, $name);
-    }
-    
-    function setProperty($name, $value) {
-        if ($this->convertToPaths) $name = $this->convertToPath($name);
-        $res = true;
-        
-        if ($this->strategy) $f = array($this->strategy, 'setPropertyOf');
-        else $f = array('Ac_Accessor', 'setObjectProperty'); 
-        
-        if ($this->collectErrors !== false) {
-            try {
-                call_user_func($f, $this->src, $name, $value);
-            } catch (Exception $e) {
-                $match = false;
-                if ($this->collectErrors === true) $match = true;
-                else {
-                    foreach ($this->collectErrors as $class) {
-                        if (is_a($e, $class)) {
-                            $match = true;
-                            break;
-                        }
-                    }
-                }
-                if ($match) { 
-                   if (is_array($name)) $name = Ac_Util::arrayToPath ($name);
-                    $this->errors[$name][] = $e;
-                    $res = false;
-                } else {
-                    throw $e;
-                }
-            }
-        } else {
-            call_user_func($f, $this->src, $name, $value);
-        }
-        return $res;
-    }
-    
-    // TODO: difference for setters & getters?
-    function listProperties() {
-        if ($this->strategy) return $this->strategy->listPropertiesOf($this->src);
-        return Ac_Accessor::listObjectProperties($this->src);
-    }
-    
-    function convertToPath($name) {
-        return is_array($name)? $name : explode('__', $name);
-    }
-    
-    function __get($name) {
-        return $this->getProperty($name);
-    }
-    
-    function __set($name, $value) {
-        return $this->setProperty($name, $value);
-    }
-    
-    function __isset($name) {
-        return $this->hasProperty($name);
-    }
-    
     static function getObjectCollection($object, $listMethod, $getMethod) {
         $res = array();
         foreach($object->$listMethod() as $key) {
@@ -185,6 +43,7 @@ class Ac_Accessor implements Ac_I_Accessor {
         } elseif (is_object($item)) {
             $args = explode(':', $propertyName);
             $propertyName = $args[0];
+            if ($propertyName === '__class') return get_class($item);
             $args = array_slice($args, 1);
             if (strlen($propertyName) && method_exists($item, $g = 'get'.$propertyName)) {
                 $res = call_user_func_array(array($item, $g), $args); 
@@ -203,6 +62,7 @@ class Ac_Accessor implements Ac_I_Accessor {
                     array_key_exists($propertyName, Ac_Util::getPublicVars($item))
                     || method_exists($item, '__list_magic') && in_array($propertyName, $item->__list_magic())
                     || method_exists($item, '__list_all_properties') && in_array($propertyName, $item->__list_all_properties())
+                    || method_exists($item, '__get')
                 )
             ) {
                 $res = $item->$propertyName;

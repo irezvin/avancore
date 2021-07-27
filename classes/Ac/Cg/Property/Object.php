@@ -436,16 +436,23 @@ class Ac_Cg_Property_Object extends Ac_Cg_Property {
                         'mapperClass' => $this->_other->getMapperClass(),
                     ),
                     'showInTable' => false,
+                    'assocPropertyName' => $this->varName
                 ),
             );
+            $res[$this->varName]['idsPropertyName'] = $this->getIdsPropertyName();
         } else {
             $many = false;
             $res = parent::getAeModelPropertyInfo();
         }
         $relation = $this->modelRelation;
         if ($relation) {
-            //var_dump($relation);
             $prot = $this->_model->getAeModelRelationPrototype($relation);
+            if (!$many) {
+                if (count($prot['fieldLinks']) == 1) {
+                    $kk = array_keys($prot['fieldLinks']);
+                    $res['idPropertyName'] = $kk[0];
+                }
+            }
             if (isset($prot['srcVarName'])) {
                 if ($many) {
                     $res[$this->varName]['relationId'] = $prot['srcVarName'];

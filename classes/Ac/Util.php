@@ -20,6 +20,10 @@ abstract class Ac_Util {
 
     protected static $autoLoadRegistered = null;
     
+    protected static $classAliases = [];
+    
+    protected static $revClassAliases = [];
+    
     /**
      * Adds one or more include paths
      * @param false|string|array $path Path(s) to add (FALSE means directory with 'classes' where current file resides)
@@ -52,29 +56,44 @@ abstract class Ac_Util {
         return $p;
     } 
     
-    static function loadClass($className) {        
+    static function loadClass($className) {
+        
+        if (isset(self::$classAliases[$className]) && !class_exists($className, false)) {
+            $orig = self::$classAliases[$className];
+            $res = class_exists($orig);
+            if ($res && !class_exists($className)) {
+                class_alias($orig, $className);
+            }
+            return $res;
+        }
+        
         $fileLoaded = false;
         $fileName = str_replace('\\', DIRECTORY_SEPARATOR, $className);
         $fileName = str_replace('_', DIRECTORY_SEPARATOR, $fileName).'.php';
         $classDir = dirname(__FILE__).DIRECTORY_SEPARATOR.'..'.DIRECTORY_SEPARATOR;
         $f = $classDir.$fileName;
         $fileLoaded = false;
+        $res = false;
         if (is_file($f)) {
             require($f);
-            $fileLoaded = true;
+            $res = true;
         } else {
             $p = self::getSafeIncludePath();
             foreach ($p as $dir) {
                 if (is_file($f = $dir.DIRECTORY_SEPARATOR.$fileName)) {
                     require($f);
-                    $fileLoaded = true;
+                    $res = true;
                     break;
                 }
             }
         }
-        //if ($fileLoaded && !class_exists($className) || interface_exists($className))
-        //    trigger_error (__FILE__."::".__FUNCTION__." - class '$className' not found in the $fileName", E_USER_ERROR);
-        return $fileLoaded;
+        if ($res && !class_exists($className, false)) $res = false;
+        if ($res && isset(self::$revClassAliases[$className])) {
+            foreach (self::$revClassAliases[$className] as $alias) if (!class_exists($alias, false)) {
+                class_alias($className, $alias);
+            }
+        }
+        return $res;
     }
     
     static function registerAutoload($addIncludePath = false) {
@@ -95,6 +114,13 @@ abstract class Ac_Util {
         }
         if ($addIncludePath) self::addIncludePath();
         return $res;
+    }
+    
+    static function registerClassAliases(array $classAliases) {
+        foreach ($classAliases as $alias => $orig) {
+            self::$classAliases[$alias] = $orig;
+            self::$revClassAliases[$orig][] = $alias;
+        }
     }
     
     static function implementsInterface($classOrObject, $interfaceName) {

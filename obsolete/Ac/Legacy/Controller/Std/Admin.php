@@ -55,7 +55,7 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
         Ac_Util::setArrayByPath($_SESSION[$sv], $path, $state);
     }
 	
-	function applyState(Ac_Legacy_Controller_Context_Http $c) {
+	function applyState(Ac_Controller_Context_Http $c) {
         $dataPath = $c->getDataPath(true);
         $state = $this->loadState($dataPath);
         
@@ -89,15 +89,14 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
                 'baseUrl' => $bu->toString(),
                 'isInForm' => 'aForm',
             );
-            $context = new Ac_Legacy_Controller_Context_Http($contextOptions);
+            $context = new Ac_Controller_Context_Http($contextOptions);
             $context->populate('request', $px = $mapperId);
-            
             $this->applyState($context);
             
             $managerConfig = array('mapperClass' => $mapperId);
             $mapper = Ac_Model_Mapper::getMapper($mapperId);
             
-            if (!$mapper) throw new Ac_Legacy_Controller_Exception("No such mapper: ".$mapperId, 404);
+            if (!$mapper) throw new Ac_Controller_Exception("No such mapper: ".$mapperId, 404);
             
             if (strlen($mapper->managerClass)) $class = $mapper->managerClass;
                 else $class = 'Ac_Admin_Manager';
@@ -113,7 +112,7 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
             } else {
                 if ($this->separateToolbar) {
                     if (strlen($manager->toolbarContent)) {
-                        Ac_Legacy_Output_Joomla15::addHtmlToJoomlaToolbar($manager->toolbarContent);
+                        Ac_Controller_Output_Joomla15::addHtmlToJoomlaToolbar($manager->toolbarContent);
                     }
                 }
                 $this->_tplData['manager'] = $manager;

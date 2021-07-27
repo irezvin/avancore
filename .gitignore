@@ -12,3 +12,5 @@ emails/
 .tags
 commit.txt
 *#*
+tags
+.ctags.sh

@@ -81,7 +81,7 @@ class Ac_Facet_Item extends Ac_Prototyped {
     }
 
     function getCaption() {
-        return strlen($this->caption)? $this->caption : $this->name;
+        return $this->caption !== false? $this->caption : $this->name;
     }    
 
     function setImpl($impl) {
@@ -105,11 +105,16 @@ class Ac_Facet_Item extends Ac_Prototyped {
     
     function setValue($value) {
         $this->value = $value;
+        if (is_object($this->impl)) $this->impl->notifyItemValueChanged();
+        if (is_object($this->view)) $this->view->notifyItemValueChanged();
     }
     
     function notifySetValueChanged() {
-        if (!$this->possibleValuesSupplied) 
+        if (!$this->possibleValuesSupplied) {
             $this->possibleValues = false;
+        }
+        if (is_object($this->impl)) $this->impl->notifySetValueChanged();
+        if (is_object($this->view)) $this->view->notifySetValueChanged();
     }
     
     function getValue() {
@@ -157,7 +162,7 @@ class Ac_Facet_Item extends Ac_Prototyped {
         $cap = array();
         $vv = $this->getPossibleValues();
         foreach (Ac_Util::toArray($this->getValue()) as $v) {
-            if (isset($vv[$v])) $cap[] = $vv[$v]['title'];
+            if (isset($vv[$v])) $cap[$v] = $vv[$v]['title'];
         }
         if ($cap) $res = $glue === false? $cap : implode($glue, $cap);
         return $res;
@@ -191,7 +196,7 @@ class Ac_Facet_Item extends Ac_Prototyped {
         return $this->view;
     }    
     
-    function render(Ac_Legacy_Controller_Response_Html $response, $return = false) {
+    function render(Ac_Controller_Response_Html $response, $return = false) {
         if ($return) ob_start();
         $this->getView(true)->renderItem($response);
         if ($return) return ob_get_clean();

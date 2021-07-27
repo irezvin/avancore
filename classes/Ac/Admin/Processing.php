@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Admin_Processing extends Ac_Legacy_Controller {
+class Ac_Admin_Processing extends Ac_Controller {
     
     const DEFAULT_RECORDS_NONE = 0;
 

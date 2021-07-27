@@ -31,5 +31,7 @@ abstract class Ac_Facet_SetImpl extends Ac_Prototyped {
         return $res;
     }
     
+    function notifySetValueChanged() {
+    }
     
 }

@@ -1,6 +1,6 @@
 <?php
 
-class Sample_SecondCon extends Ac_Legacy_Controller {
+class Sample_SecondCon extends Ac_Controller {
     
     var $_templateClass = 'Sample_SecondCon_Template';
  

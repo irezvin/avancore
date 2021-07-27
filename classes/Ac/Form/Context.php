@@ -11,14 +11,14 @@
  * lang => _details[title][lang]
  */
 
-class Ac_Form_Context extends Ac_Legacy_Controller_Context_Http {  
+class Ac_Form_Context extends Ac_Controller_Context_Http {  
     
     var $controlName = false;
     var $idPrefix = false;
     var $valueFirst = true;
     
     /**
-     * @param Ac_Legacy_Controller_Context_Http $context
+     * @param Ac_Controller_Context_Http $context
      * @return Ac_Form_Context
      */
     static function spawnFrom($context, $subPath) {
@@ -50,8 +50,9 @@ class Ac_Form_Context extends Ac_Legacy_Controller_Context_Http {
         return $res;
     }
     
-    function getData($path = false, $defaultValue = false) {
+    function getData($path = false, $defaultValue = false, & $found = false) {
         $d = $this->_data;
+        $found = false;
         if ($this->valueFirst) {
             if (!is_array($d)) $r = array('value' => $d);
             else {
@@ -68,9 +69,10 @@ class Ac_Form_Context extends Ac_Legacy_Controller_Context_Http {
         }
         if ($path === false) {
             $res = $r;
+            $found = true;
         } else {
             if (!is_array($path)) $path = Ac_Util::pathToArray($path);
-            $res = Ac_Util::getArrayByPath($r, $path, $defaultValue);
+            $res = Ac_Util::getArrayByPath($r, $path, $defaultValue, $found);
         }
         return $res;
     }

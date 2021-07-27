@@ -3,20 +3,20 @@
 class Ac_Legacy_ResultWriter extends Ac_Result_Writer_AbstractHtmlRenderer {
 
     /**         
-     * @var Ac_Legacy_Controller_Response_Html
+     * @var Ac_Controller_Response_Html
      */
     protected $response = false;
 
-    function setResponse(Ac_Legacy_Controller_Response_Html $response = null) {
+    function setResponse(Ac_Controller_Response_Html $response = null) {
         if ($response === null) $response = false;
         $this->response = $response;
     }
     
     /**
-     * @return Ac_Legacy_Controller_Response_Html
+     * @return Ac_Controller_Response_Html
      */
     function getResponse() {
-        if ($this->response === false) return Ac_Legacy_Controller_Response_Global::r();
+        if ($this->response === false) return Ac_Controller_Response_Global::r();
         return $this->response;
     }
 

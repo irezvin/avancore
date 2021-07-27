@@ -22,7 +22,7 @@ class Ac_Model_Property implements Ac_I_Prototyped {
     var $required = null;
     var $readOnly = null;
     var $dataType = null;
-    var $defaultValue = null;    
+    var $defaultValue = null;
     
     var $caption = null;
     var $colCaption = null;

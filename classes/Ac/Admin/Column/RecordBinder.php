@@ -8,7 +8,7 @@ class Ac_Admin_Column_RecordBinder extends Ac_Admin_Column {
      var $trIdPrefix = 'tr';
      
      /**
-      * @var Ac_Legacy_Controller_Context_Http
+      * @var Ac_Controller_Context_Http
       */
      var $_context = false;
     

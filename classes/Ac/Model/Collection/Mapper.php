@@ -60,7 +60,9 @@ class Ac_Model_Collection_Mapper extends Ac_Model_Collection_Abstract {
      * Sets query to restrict items returned by the Mapper
      */
     function setQuery(array $query, $override = false) {
-        if ($this->isOpen) throw new Ac_E_InvalidUsage("Cannot ".__FUNCTION__."() while isOpen(). close() first");
+        if ($this->isOpen) {
+            $this->close();
+        }
         if ($override) Ac_Util::ms($this->query, $query);
             else $this->query = $query;
     }

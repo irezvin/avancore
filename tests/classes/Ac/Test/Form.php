@@ -224,7 +224,7 @@ class Ac_Test_Form extends Ac_Test_Base {
     
     function tearDown() {
         parent::tearDown();
-        Ac_Legacy_Controller_Response_Global::getInstance()->clearResponse();
+        Ac_Controller_Response_Global::getInstance()->clearResponse();
     }
     
 }

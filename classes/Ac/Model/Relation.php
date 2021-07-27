@@ -247,12 +247,13 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if ($srcMapper !== ($oldSrcMapper = $this->srcMapper) || $force) {
             if ($this->immutable) throw self::immutableException();
             $this->srcMapper = $srcMapper;
-            $this->srcMapper = $srcMapper;
             $this->srcMapperClass = $srcMapper->getId();
             if ($this->srcTableName === false) {
                 $this->srcTableName = $srcMapper->tableName;
             }
-            if (!$this->db) $this->db = $this->srcMapper->getApplication()->getDb();
+            if (!$this->db && $this->srcMapper->getApplication()) {
+                $this->db = $this->srcMapper->getApplication()->getDb();
+            }
             if ($this->srcOrdering === false) $this->srcOrdering = $this->srcMapper->getDefaultSort();
             $this->reset();
         }

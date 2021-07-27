@@ -234,7 +234,7 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     }
     
     /**
-     * @return Ac_Legacy_Controller_Context_Http
+     * @return Ac_Controller_Context_Http
      */
     function _createSubContext($name) {
         if (!$this->_context) $this->_context = $this->guessContext();

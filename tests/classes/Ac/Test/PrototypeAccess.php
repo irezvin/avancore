@@ -32,18 +32,6 @@ class Ac_Test_PrototypeAccess extends Ac_Test_Base {
         $this->assertEqual($a3->getBaz(), 'baz3');
     }
     
-    function testAccessor() {
-        $obj = new ApSample();
-        $acc = new Ac_Accessor($obj);
-        $this->assertTrue(!array_diff($acc->listProperties(), array('foo', 'bar', 'baz', 'readOnlyParam', 'writeOnlyParam')));
-        $acc->foo = '123';
-        $this->assertEqual($obj->foo, '123');
-        $acc->bar = '123';
-        $this->assertEqual($obj->bar, '123');
-        $acc->baz = '123';
-        $this->assertEqual($obj->getBaz(), '123');
-    }
-    
     function testArgMapping() {
         $m = new ReflectionMethod('ApSample2', '__construct');
         $this->assertArraysMatch (
@@ -135,49 +123,6 @@ class Ac_Test_PrototypeAccess extends Ac_Test_Base {
             '__initialize' => array('protMethod' => array())
         ));
         
-    }
-    
-    function testCollectErrors() {
-        $s = new ApSample3;
-        $a = new Ac_Accessor($s);
-        $a->setCollectErrors(array('ex1', 'ex2'));
-        $a->foo = 'ex1';
-        $a->foo = 'ex2';
-        $a->bar = 'ex2';
-        $this->assertEqual(
-            self::stringifyErrors($a->getErrors()),
-            array(
-                'foo' => array(
-                    "setFoo: \$val cannot be 'ex1'!",
-                    "setFoo: \$val cannot be 'ex2'!"
-                ),
-                'bar' => array(
-                    "setBar: \$val cannot be 'ex2'!"
-                ),
-            )
-        );
-        $this->assertEqual(
-            self::stringifyErrors($a->getErrors('foo')),
-            array(
-                "setFoo: \$val cannot be 'ex1'!",
-                "setFoo: \$val cannot be 'ex2'!"
-            )
-        );
-        $this->expectException(false, 'passing exception of non-listed type');
-        $a->bar = 'ex';
-    }
-    
-    
-    static function stringifyErrors(array $array) {
-        $res = array();
-        foreach ($array as $k => $v) {
-            if (is_object($v) && $v instanceof Exception) {
-                $v = $v->getMessage();
-            }
-            elseif (is_array($v)) $v = self::stringifyErrors($v);
-            $res[$k] = $v;
-        }
-        return $res;
     }
     
 }

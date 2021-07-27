@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Legacy_Template_Html {
+class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Template_Html {
 	
 	/**
 	 * @var Ac_Admin_Manager
@@ -8,7 +8,7 @@ class Ac_Legacy_Controller_Std_Admin_Template extends Ac_Legacy_Template_Html {
 	var $manager = false;
 	
 	/**
-	 * @var Ac_Legacy_Controller_Response_Http
+	 * @var Ac_Controller_Response_Http
 	 */
 	var $managerResponse = false;
     

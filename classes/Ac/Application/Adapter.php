@@ -302,7 +302,7 @@ class Ac_Application_Adapter extends Ac_Prototyped {
     
     protected function guessOutputPrototype() {
         if (!isset($this->config[$k = 'outputPrototype'])) {
-            $this->config[$k] = array('class' => 'Ac_Legacy_Output_Native');
+            $this->config[$k] = array('class' => 'Ac_Controller_Output_Native');
         }
     }
     
@@ -535,43 +535,26 @@ class Ac_Application_Adapter extends Ac_Prototyped {
     }
     
     /**
-     * @return Ac_Cr_Context
-     */
-    function createDefaultContext() {
-        $request = new Ac_Request;
-        $url = Ac_Url::guess(true);
-        $request->populate($url, $_SERVER['PHP_SELF'], $_POST, true);
-        
-        // TODO: fix $request->server->pathInfo
-        $request->server->pathInfo = $url->pathInfo;
-        
-        $context = new Ac_Cr_Context;
-        $context->setRequest($request);
-        $context->setBaseUrl($this->getWebUrl());
-        $context->getBaseUrl()->guessBase();
-        return $context;
-    }
-    
-    /**
-     * @return Ac_Result_Writer
-     */
-    function createDefaultResultWriter(Ac_Result_Environment $environment = null) {
-        $res = new Ac_Result_Writer_RenderHtml;
-        if (!$environment) $environment = $this->createDefaultEnvironment();
-        $res->setEnvironment($environment);
-        return $res;
-    }
-    
-    function createDefaultResultEnvironment() {
-        $res = new Ac_Result_Environment_Native;
-        return $res;
-    }
- 
-    /**
-     * @return Ac_Legacy_Output
+     * @return Ac_Controller_Output
      */
     function createDefaultLegacyOutput() {
-        return new Ac_Legacy_Output_Native;
+        return new Ac_Controller_Output_Native;
     }
+    
+    /**
+     * @return Ac_Controller_Context
+     */
+    function createDefaultContext() {
+        $res = new Ac_Controller_Context_Http;
+        $res->populate(null, false, null, true);
+        if ($this->webUrl) $baseUrl = $this->webUrl;
+        else {
+            $baseUrl = Ac_Url::guess(true);
+            $baseUrl->query = [];
+        }
+        $res->setBaseUrl($baseUrl);
+        return $res;
+    }
+    
     
 }

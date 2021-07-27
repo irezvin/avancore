@@ -9,7 +9,7 @@ if (!defined('AC_ADMIN_PAGINATION_OF')) define ('AC_ADMIN_PAGINATION_OF', 'of');
 if (!defined('AC_ADMIN_PAGINATION_SHOW_QTY')) define ('AC_ADMIN_PAGINATION_SHOW_QTY', 'Show #');
 if (!defined('AC_ADMIN_PAGINATION_RECORDS')) define ('AC_ADMIN_PAGINATION_RECORDS', 'records');
 
-class Ac_Admin_Template_Pagination extends Ac_Legacy_Template_Html {
+class Ac_Admin_Template_Pagination extends Ac_Template_Html {
 
     var $showFormTag = false;
     
@@ -65,7 +65,7 @@ class Ac_Admin_Template_Pagination extends Ac_Legacy_Template_Html {
      * Populates template with given Pagination controller
      *
      * @param Ac_Admin_Pagination $pagination
-     * @param Ac_Legacy_Controller_Context_Http $context
+     * @param Ac_Controller_Context_Http $context
      * @param array $limitsList
      */
     function populate(& $pagination, $context, $numPages, $limitsList) {
@@ -127,6 +127,7 @@ class Ac_Admin_Template_Pagination extends Ac_Legacy_Template_Html {
     }
     
     function showDefault() {
+        
         //foreach (array('numPages', 'limitsList', 'currPage', 'totalRecords', 'limit') as $v) var_dump($v, $this->$v);
         
         $fid = $this->formId;
@@ -168,8 +169,8 @@ class Ac_Admin_Template_Pagination extends Ac_Legacy_Template_Html {
             <?php } ?>
 <?php       if ($this->showLimits || $this->showTotals) { ?> 
             <div class='position'>
-                <?php echo AC_ADMIN_PAGINATION_SHOWING; ?> <?php $this->d($this->currPage*$limit + 1) ?> 
-                &ndash; <?php $this->d(min($nRecs = ($this->currPage + 1)*$limit + 1, $this->totalRecords === false? $nRecs : $this->totalRecords)); ?>
+                <?php echo AC_ADMIN_PAGINATION_SHOWING; ?> <?php $this->d(min([$this->currPage*$limit + 1, $this->totalRecords])) ?> 
+                &ndash; <?php $this->d(min([$nRecs = ($this->currPage + 1)*$limit, $this->totalRecords === false? $nRecs : $this->totalRecords])); ?>
 <?php          if ($this->totalRecords !== false) { ?>
                 <?php echo AC_ADMIN_PAGINATION_OF; ?> <?php $this->d($this->totalRecords); ?> 
 <?php          } else { ?>

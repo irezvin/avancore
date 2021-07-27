@@ -17,12 +17,12 @@ class Ac_Js {
         return $res;
     }
     
-    static protected function isArraySimple ($arr) {
+    static function isArraySimple ($arr) {
         foreach (array_keys($arr) as $k) if (!is_scalar($arr[$k])) return false;
         return true;   
     }
     
-    static protected function areOnlyNumericKeys ($arr) {
+    static function areOnlyNumericKeys ($arr) {
         foreach (array_keys($arr) as $k) if (!is_numeric($k)) return false;
         return true;
     }

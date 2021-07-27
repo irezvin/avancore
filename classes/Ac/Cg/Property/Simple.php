@@ -33,7 +33,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
      */
     var $_col = false;
     
-    var $_objectPropertyName = false;
+    var $_assocPropertyName = false;
     
     protected $skipInit = false;
     
@@ -41,7 +41,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
         return array_merge(
             array(
                 'dataType', 'controlType', 'maxLength', 'valueList', 'dummyCaption', 'isRte', 'required', 'values', 'attribs',
-                'objectPropertyName', 'isNullable',
+                'assocPropertyName', 'isNullable',
             ), 
             parent::listPassthroughVars()
         );
@@ -84,6 +84,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
             case 'TINYTEXT':
             case 'MEDIUMTEXT':
             case 'LONGTEXT':
+            case 'JSON':
                 $this->_useMaxLength();
                 $controlType = $this->isRte? 'rte' : 'textArea';
                 if (!$this->_col->nullable && is_null($this->_col->default) && !in_array($this->_col->name, $this->_model->tableObject->listPkFields()))
@@ -229,8 +230,8 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
         return array($this->getClassMemberName() => $this->default);
     }
     
-    function getObjectPropertyName() {
-        if ($this->_objectPropertyName === false) {
+    function getAssocPropertyName() {
+        if ($this->_assocPropertyName === false) {
             if ($sfc = $this->_col->pointsToSingleForeignColumn()) {
                 if ($sfc->isPk()) {
                     $foreignTbl = $sfc->_table;
@@ -241,7 +242,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
                                 if (Ac_Util::sameObject($om, $mod)) {
                                     $rel = $p->_rel;
                                     if (in_array($this->colName, array_keys($rel->columns))) {
-                                        $this->_objectPropertyName = $p->varName;
+                                        $this->_assocPropertyName = $p->varName;
                                         break;
                                     }
                                 }
@@ -251,7 +252,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
                 }
             }
         }
-        return $this->_objectPropertyName;
+        return $this->_assocPropertyName;
     }
     
     function serializeToArray() {
@@ -264,6 +265,14 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
         parent::unserializeFromArray($array);
         if (isset($array['_col'])) $this->_col = $this->unrefColumn($array['_col']);
         $this->skipInit = true;
+    }
+    
+    function getAeModelPropertyInfo() {
+        $res = parent::getAeModelPropertyInfo();
+        if ($op = $this->getAssocPropertyName()) {
+            $res['assocPropertyName'] = $op;
+        }
+        return $res;
     }
     
 }

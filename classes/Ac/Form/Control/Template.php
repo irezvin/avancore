@@ -3,7 +3,7 @@
 /**
  * Important note: form template show... methods should accept reference to the rendered control as the first parameter
  */
-class Ac_Form_Control_Template extends Ac_Legacy_Template_Html {
+class Ac_Form_Control_Template extends Ac_Template_Html {
     
     var $control = false;
 
@@ -12,7 +12,7 @@ class Ac_Form_Control_Template extends Ac_Legacy_Template_Html {
     function setVars($vars) {
         parent::setVars($vars);
         if (!$this->htmlResponse) {
-            $this->htmlResponse = Ac_Legacy_Controller_Response_Global::r();
+            $this->htmlResponse = Ac_Controller_Response_Global::r();
         }
     }
 

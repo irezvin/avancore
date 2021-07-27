@@ -286,7 +286,7 @@ class Ac_Table_Column {
         $app = $this->getApplication();
         if ($app) $ph = $app->getAssetPlaceholders(true);
             else $ph = array();
-        return Ac_Legacy_Controller_Response_Html::unfoldAssetString($string, $ph);
+        return Ac_Controller_Response_Html::unfoldAssetString($string, $ph);
     }
 
     /**

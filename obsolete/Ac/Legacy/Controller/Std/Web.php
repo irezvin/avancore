@@ -1,10 +1,10 @@
 <?php
 
 /**
- * Updated Ac_Legacy_Controller with best things taken from my recent projects.
+ * Updated Ac_Controller with best things taken from my recent projects.
  * Has JSON support, method chaining, output capture, exception handling and caching.
  */
-class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
+class Ac_Legacy_Controller_Std_Web extends Ac_Controller {
 
     // --------- cache support ---------
 
@@ -46,7 +46,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
     var $forceJson = false;
     
     /**
-     * @var Ac_Legacy_Controller_Response_Html
+     * @var Ac_Controller_Response_Html
      */
     var $_response = false;
 
@@ -146,7 +146,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
                 
                 // This allows us to add 'obsolete validators' to response
                 
-                if (isset($val['_response']) && $val['_response'] instanceof Ac_Legacy_Controller_Response) {
+                if (isset($val['_response']) && $val['_response'] instanceof Ac_Controller_Response) {
                     if ($val['_response']->isObsolete()) {
                         $res = false;
                     }
@@ -203,7 +203,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
     }
 
     /**
-     * @return Ac_Legacy_Controller_Response_Html
+     * @return Ac_Controller_Response_Html
      */
     function getResponse($methodName = false) {
         if ($methodName !== false) $this->_methodName = $methodName;
@@ -219,12 +219,12 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
              
             if ($this->_response === false) {
                 if ($this->isJson || $this->forceJson) {
-                    $this->_responseClass = 'Ac_Legacy_Controller_Response_Json';
+                    $this->_responseClass = 'Ac_Controller_Response_Json';
                 }
-                parent::getResponse();
+                parent::getResponse($methodName);
                 if ($this->isJson || $this->forceJson) {
                     $resp = $this->_response;
-                    $res = new Ac_Legacy_Controller_Response_Json();
+                    $res = new Ac_Controller_Response_Json();
                     foreach (array_merge($this->responses, array($resp)) as $response) {
                         $res->setInnerResponse($response, true);
                     }
@@ -232,7 +232,7 @@ class Ac_Legacy_Controller_Std_Web extends Ac_Legacy_Controller {
                 }
             }
             if (!$this->cacheSkip && $this->getCacheEnabled()) $this->saveToCache();
-        } catch (Ac_Legacy_Controller_Exception $e) {
+        } catch (Ac_Controller_Exception $e) {
             $res = $this->handleException($e);
         }
 

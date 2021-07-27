@@ -70,6 +70,12 @@ abstract class Ac_Facet_ItemView extends Ac_Prototyped {
         return $value;
     }
     
-    abstract function renderItem(Ac_Legacy_Controller_Response_Html $response);
+    function notifySetValueChanged() {
+    }
+    
+    function notifyItemValueChanged() {
+    }
+    
+    abstract function renderItem(Ac_Controller_Response_Html $response);
     
 }

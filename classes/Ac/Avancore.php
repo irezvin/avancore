@@ -8,7 +8,7 @@ if (!class_exists('Ac_Util', false)) {
 
 class Ac_Avancore extends Ac_Application {
     
-    const version = '0.3.4.4-trunk';
+    const version = '0.4.0';
     
     protected $defaultAssetsPlaceholder = '{AC}';
     
@@ -21,12 +21,9 @@ class Ac_Avancore extends Ac_Application {
     }
  
     protected function doOnInitialize() {
-        if ($res = parent::doOnInitialize()) {
-            if ($this->addIncludePaths) {
-                Ac_Util::addIncludePath(dirname(dirname(dirname(__FILE__))).'/obsolete');
-            }
+        if ($this->addIncludePaths) {
+            Ac_Util::addIncludePath(dirname(dirname(dirname(__FILE__))).'/obsolete');
         }
-        return $res;
     }
     
     /**

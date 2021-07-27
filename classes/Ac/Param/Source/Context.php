@@ -3,7 +3,7 @@
 class Ac_Param_Source_Context extends Ac_Prototyped implements Ac_I_Param_Destination {
     
     /**
-	 * @var Ac_Legacy_Controller_Context 
+	 * @var Ac_Controller_Context 
      */
     protected $data = false;
     
@@ -17,7 +17,7 @@ class Ac_Param_Source_Context extends Ac_Prototyped implements Ac_I_Param_Destin
         if (isset($options['data'])) $this->setData($options['data']);
     }
     
-    function setData(Ac_Legacy_Controller_Context $data) {
+    function setData(Ac_Controller_Context $data) {
         $this->data = $data;
     }
     

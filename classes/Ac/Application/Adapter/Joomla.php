@@ -41,7 +41,7 @@ class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
     
     protected function guessOutput() {
         if (!isset($this->config[$k = 'output'])) {
-            $this->config[$k] = array('class' => 'Ac_Legacy_Output_Joomla15');
+            $this->config[$k] = array('class' => 'Ac_Controller_Output_Joomla15');
         }
     }
     
@@ -139,21 +139,10 @@ class Ac_Application_Adapter_Joomla extends Ac_Application_Adapter {
     }
     
     /**
-     * @return Ac_Legacy_Output
+     * @return Ac_Controller_Output
      */
     function createDefaultLegacyOutput() {
-        return new Ac_Legacy_Output_Joomla3;
-    }
-    
-    /**
-     * @return Ac_Cr_Context
-     */
-    function createDefaultContext() {
-        $res = parent::createDefaultContext();
-        $url = $res->getBaseUrl();
-        $option = JFactory::getApplication()->input->get('option');
-        if ($option) $url->query['option'] = $option;
-        return $res;
+        return new Ac_Controller_Output_Joomla3;
     }
     
 }

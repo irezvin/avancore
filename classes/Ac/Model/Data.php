@@ -1197,8 +1197,9 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     }
     
     function _getOwnAssocList($head, $plural) {
-        if ($m = $this->_getMethod('get', $head.'Items') || $m = $this->_getMethod('get', $head)) $res = $this->$m();
-        else {
+        if (($m = $this->_getMethod('get', $head.'Items')) || ($m = $this->_getMethod('getAll', ucfirst($head))) || ($m = $this->_getMethod('get', $head))) {
+            $res = $this->$m();
+        } else {
             $res = array();
             foreach ($this->_listOwnProperty($head, $plural) as $key) $res[$key] = $this->_getOwnAssoc($head, $key, $plural);
         }

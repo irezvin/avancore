@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Admin_Manager extends Ac_Legacy_Controller {
+class Ac_Admin_Manager extends Ac_Controller {
 
     var $singleCaption = false;
     
@@ -192,12 +192,12 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
             $template = $this->getTemplate();
             $form = $this->getForm();
             if ($form) {
-                $hr = new Ac_Legacy_Controller_Response_Html();
+                $hr = new Ac_Controller_Response_Html();
                 $form->htmlResponse = $hr;
                 $hr->content = $form->fetchPresentation();
                 $this->_formResponse = $hr;
             } else {
-                $hr = new Ac_Legacy_Controller_Response_Html();
+                $hr = new Ac_Controller_Response_Html();
                 $this->_formResponse = $hr;
             }
         }
@@ -208,7 +208,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
         if ($this->_filterFormResponse === false) {
             $template = $this->getTemplate();
             $form = $this->getFilterForm();
-            $hr = new Ac_Legacy_Controller_Response_Html();
+            $hr = new Ac_Controller_Response_Html();
             $form->htmlResponse = $hr;
             $hr->content = $form->fetchPresentation();
             $this->_filterFormResponse = $hr;
@@ -519,7 +519,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     // -------------------------------------- request related methods -------------------------------------------------
     
     /**
-     * @return Ac_Legacy_Controller_Context_Http
+     * @return Ac_Controller_Context_Http
      */
     function getContext() {
         $res = parent::getContext();
@@ -1098,7 +1098,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
     
     /**
-     * @return Ac_Legacy_Controller_Context
+     * @return Ac_Controller_Context
      */
     function _createFormContext() {
         $res = $this->_context->spawn('form');
@@ -1108,7 +1108,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
     
     /**
-     * @return Ac_Legacy_Controller_Context
+     * @return Ac_Controller_Context
      */
     function _createFilterFormContext() {
         $res = $this->_context->spawn('filterForm');
@@ -1204,7 +1204,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     
     /**
      * @param string $id Sub manager id
-     * @return Ac_Legacy_Controller_Context_Http
+     * @return Ac_Controller_Context_Http
      */
     function _createSubManagerContext($id) {
         $ctx = $this->_context->spawn('sm_'.$id);
@@ -1212,7 +1212,7 @@ class Ac_Admin_Manager extends Ac_Legacy_Controller {
     }
     
 	/**
-     * @return Ac_Legacy_Controller_Context_Http
+     * @return Ac_Controller_Context_Http
      */
     function _createProcessingContext($processingId) {
         $ctx = $this->_context->spawn('processingParams');

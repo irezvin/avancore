@@ -611,7 +611,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             else $this->_showSelectListControls($control, $items);
             
         if ($control->type == 'chosen') {
-            $r = Ac_Legacy_Controller_Response_Global::r();
+            $r = Ac_Controller_Response_Global::r();
             if (!isset($control->tplExtras['noJquery']) || !$control->tplExtras['noJquery']) {
                 $r->addAssetLibs(array(
                     '{JQUERY}',
@@ -627,7 +627,9 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             ), $control->chosenOptions));
             echo new Ac_Js_Script("
                 jQuery(document).ready(function() {
-                    jQuery(".new Ac_Js_Val('#'.$controlId).").chosen({$options});
+                    var jq =  jQuery(".new Ac_Js_Val('#'.$controlId).");
+                    if (jq.chosen) jq.chosen({$options});
+                    else console.warn('jQuery(...).chosen not found');
                 });
             ");
         }

@@ -109,7 +109,7 @@ class Ac_Admin_Action extends Ac_Prototyped {
     
     function unfoldAssetString($string) {
         // Ugly...
-        return Ac_Legacy_Controller_Response_Html::unfoldAssetString($string, $this->manager->getApplication()->getAssetPlaceholders());
+        return Ac_Controller_Response_Html::unfoldAssetString($string, $this->manager->getApplication()->getAssetPlaceholders());
     }
     
     function getCaption() {

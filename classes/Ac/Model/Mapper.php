@@ -1128,24 +1128,27 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     function addRelation($id, $relation) {
-        if (!in_array($id, $this->listRelations())) {
-            $this->additionalRelations[] = $id;
-            if (is_array($relation)) {
-                // prototype will be stored for future use
-            } elseif (is_object($relation) && $relation instanceof Ac_Model_Relation) {
-                $relation->setApplication($this->application);
-                if ($relation->srcMapperClass == $this->getId()) {
-                    $relation->setSrcMapper($this);
-                } elseif ($relation->destMapperClass == $this->getId()) {
-                    $relation->setDestMapper($this);
-                }
-                $relation->setImmutable(true);
-                $this->relations[$id] = $relation;
+        if (in_array($id, $this->listRelations())) {
+            if ($this->relations[$id] === $relation) {
+                return; 
             } else {
-                throw Ac_E_InvalidCall::wrongType('relation', $relation, array('array', 'Ac_Model_Relation'));
+                throw Ac_E_InvalidCall::alreadySuchItem('relation', $id, 'deleteRelation');
             }
+        }
+        $this->additionalRelations[] = $id;
+        if (is_array($relation)) {
+            // prototype will be stored for future use
+        } elseif (is_object($relation) && $relation instanceof Ac_Model_Relation) {
+            $relation->setApplication($this->application);
+            if ($relation->srcMapperClass == $this->getId()) {
+                $relation->setSrcMapper($this);
+            } elseif ($relation->destMapperClass == $this->getId()) {
+                $relation->setDestMapper($this);
+            }
+            $relation->setImmutable(true);
+            $this->relations[$id] = $relation;
         } else {
-            throw Ac_E_InvalidCall::alreadySuchItem('relation', $id, 'deleteRelation');
+            throw Ac_E_InvalidCall::wrongType('relation', $relation, array('array', 'Ac_Model_Relation'));
         }
     }
     

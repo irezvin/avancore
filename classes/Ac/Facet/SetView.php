@@ -18,7 +18,7 @@ abstract class Ac_Facet_SetView extends Ac_Prototyped {
         return $this->facetSet;
     }    
     
-    abstract function renderSet(Ac_Legacy_Controller_Response_Html $response);
+    abstract function renderSet(Ac_Controller_Response_Html $response);
     
     function getJsResponse() {
         
@@ -40,5 +40,8 @@ abstract class Ac_Facet_SetView extends Ac_Prototyped {
         }
         return $res;
     }
+    
+    function notifySetValueChanged() {
+    }    
     
 }

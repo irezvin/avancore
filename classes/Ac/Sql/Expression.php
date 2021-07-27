@@ -9,7 +9,6 @@ class Ac_Sql_Expression implements Ac_I_Sql_Expression {
     }
     
     function __toString() {
-        //$db = Ac_Application::getDefaultInstance()->getDb();
         $db = null;
         return $this->getExpression($db);
     }

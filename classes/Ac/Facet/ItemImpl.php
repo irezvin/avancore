@@ -39,6 +39,12 @@ abstract class Ac_Facet_ItemImpl extends Ac_Prototyped {
         else return $this->value;
     }
     
+    function notifySetValueChanged() {
+    }
+    
+    function notifyItemValueChanged() {
+    }
+    
     abstract function getPossibleValues();
     
 }

@@ -28,12 +28,13 @@ class Ac_Sql_Dbi_Column extends Ac_Sql_Dbi_Object {
     /**
      * @return Ac_Sql_Dbi_Column 
      */
-    function pointsToSingleForeignColumn() {
+    function pointsToSingleForeignColumn(& $relationId = null) {
+        $relationId = null;
         $fcs = array();
         foreach ($this->_table->listRelations() as $r) {
             $rel = $this->_table->getRelation($r);
             if (isset($rel->columns[$this->name])) {
-                $fcs[$rel->table][$rel->columns[$this->name]] = true;
+                $fcs[$rel->table][$rel->columns[$this->name]] = $r;
             }
         }
         
@@ -45,6 +46,8 @@ class Ac_Sql_Dbi_Column extends Ac_Sql_Dbi_Object {
                  $kks = array_keys($fcs[$ks[0]]);
                  $ft = $this->_table->_database->getTable($ks[0]);
                  $res = $ft->getColumn($kks[0]);
+                 $vv = array_values($fcs[$ks[0]]);
+                 $relationId = $vv[0];
             }
         }
         

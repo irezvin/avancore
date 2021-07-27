@@ -11,7 +11,7 @@ class Ac_Admin_Column_Checked extends Ac_Admin_Column {
      var $_keyParamName = false;
 
      /**
-      * @var Ac_Legacy_Controller_Context_Http
+      * @var Ac_Controller_Context_Http
       */
      var $_context = false;
     

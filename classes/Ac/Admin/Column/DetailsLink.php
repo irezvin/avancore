@@ -3,7 +3,7 @@
 class Ac_Admin_Column_DetailsLink extends Ac_Admin_Column {
      
      /**
-      * @var Ac_Legacy_Controller_Context
+      * @var Ac_Controller_Context
       */
      var $_context = false;
      

@@ -16,9 +16,9 @@ $f = new Ac_Form(null, array(
 
 $ctx = new Ac_Form_Context();
 $ctx->populate(array('get', 'post'));
-$response = new Ac_Legacy_Controller_Response_Html($ctx);
+$response = new Ac_Controller_Response_Html($ctx);
 $response->content = $f->fetchPresentation();
 $response->content .= '<hr />'.$f->getControl('foo')->getValue();
-$output = new Ac_Legacy_Output_Native();
+$output = new Ac_Controller_Output_Native();
 $output->showOuterHtml = true;
 $output->outputResponse($response);

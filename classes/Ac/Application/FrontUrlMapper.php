@@ -193,6 +193,11 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
     }
     
     function applyAutoConfig($overwriteCustomPatterns = false) {
+        if ($this->didAutoConfigure) {
+            // check if no new controller appeared
+            if (implode(",", $this->extraControllerIds) === implode(",", $this->application->listComponents('Ac_I_Controller'))) 
+                return;
+        }
         $this->didAutoConfigure = true;
         if (!$this->application) {
             throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() without setApplication() first");
@@ -303,7 +308,7 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
     }
     
     function stringToParams($string) {
-        if ($this->autoConfigure && !$this->didAutoConfigure) $this->applyAutoConfig();
+        if ($this->autoConfigure) $this->applyAutoConfig();
         
         $params = parent::stringToParams($string);
         if ($params === null) return;
