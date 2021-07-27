@@ -238,6 +238,18 @@ class Ac_Facet_Set extends Ac_Prototyped {
      */
     function getDefaultValue() {
         return $this->defaultValue;
-    }    
+    }
+    
+    function __clone() {
+        if (is_object($this->impl)) {
+            $this->impl = clone $this->impl;
+            $this->impl->setFacetSet($this);
+        }
+        foreach ($this->items as $key => $item) {
+            if (!is_object($item)) continue;
+            $this->items[$key] = clone $item;
+            $this->items[$key]->setFacetSet($this);
+        }
+    }
     
 }
