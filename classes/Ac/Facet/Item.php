@@ -268,5 +268,11 @@ class Ac_Facet_Item extends Ac_Prototyped {
         return $this->titlesForValues;
     }    
     
+    function __clone() {
+        if (!is_object($this->impl)) return;
+        $this->impl = clone $this->impl;
+        $this->impl->setItem($this);
+    }
+    
     
 }

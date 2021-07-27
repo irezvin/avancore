@@ -1128,11 +1128,11 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     function addRelation($id, $relation) {
-        if (in_array($id, $this->listRelations())) {
-            if ($this->relations[$id] === $relation) return; 
-        } else {
-            throw Ac_E_InvalidCall::alreadySuchItem('relation', $id, 'deleteRelation');
-        }
+            if ($this->relations[$id] === $relation) {
+                return; 
+            } else {
+                throw Ac_E_InvalidCall::alreadySuchItem('relation', $id, 'deleteRelation');
+            }
         $this->additionalRelations[] = $id;
         if (is_array($relation)) {
             // prototype will be stored for future use
