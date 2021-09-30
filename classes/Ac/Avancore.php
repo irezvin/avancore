@@ -24,6 +24,7 @@ class Ac_Avancore extends Ac_Application {
         if ($this->addIncludePaths) {
             Ac_Util::addIncludePath(dirname(dirname(dirname(__FILE__))).'/obsolete');
         }
+        return $res;
     }
     
     /**
