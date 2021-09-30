@@ -30,6 +30,11 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
      */
     const EVENT_ON_COMPONENT_DELETED = 'onComponentDeleted';
     
+    /**
+     * onLogin ($data, & $errors = [])
+     */
+    const EVENT_ON_AUTHENTICATE = 'onLogin';
+    
     const CORE_COMPONENT_DB = 'core.db';
     const CORE_COMPONENT_LEGACY_DB = 'core.legacyDb';
     const CORE_COMPONENT_FLAGS = 'core.flags';
@@ -39,6 +44,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     const CORE_COMPONENT_MANAGER_CONFIG_SERVICE = 'core.managerConfigService';
     const CORE_COMPONENT_URL_MAPPER = 'core.urlMapper';
     const CORE_COMPONENT_FRONT_CONTROLLER = 'core.frontController';
+    const CORE_COMPONENT_USER_PROVIDER = 'core.userProvider';
     
     const STAGE_CONSTRUCTING = 'constructing';
     const STAGE_INITIALIZING = 'initializing';
@@ -53,6 +59,8 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     private static $lastInstance = null;
     
     private static $ids = array();
+    
+    protected $mapperShortIds = false;
 
     protected $stage = self::STAGE_CONSTRUCTING;
     
@@ -318,7 +326,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     }
     
     function hasMapper($id) {
-        return in_array($id, $this->listMappers());
+        return in_array($id, $this->listMappers()) || $this->hasComponent($id) && $this->getComponent($id) instanceof Ac_Model_Mapper;
     }
     
     /**
@@ -327,6 +335,18 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     function getMapper($id, $dontThrow = false) {
         return $this->getComponent($id, 'Ac_Model_Mapper', $dontThrow);
     }
+
+    protected function doGetMapperShortIds() {
+        if ($this->mapperShortIds !== false) return $this->mapperShortIds;
+        $this->mapperShortIds = [];
+        foreach ($this->listMappers() as $id) $this->mapperShortIds[$this->getMapper($id)] = $id;
+        return $this->mapperShortIds;
+    }
+    
+    function getMapperShortIds() {
+        return $this->doGetMapperShortIds();
+    }
+    
     
     function setComponentAliases(array $componentAliases, $add = false) {
         if ($add) Ac_Util::ms($this->componentAliases, $componentAliases);
@@ -398,7 +418,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     }
     
     function hasComponent($id) {
-        return in_array($id, $this->listComponents());
+        return in_array($id, $this->listComponents()) || isset($this->componentAliases[$id]);
     }    
     
     function addComponent($component, $id = null) {
@@ -534,14 +554,31 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
         return $this->extraAssetPlaceholders;
     }    
     
-    function setUser(Ac_I_User $user) {
+    function setUser(Ac_I_User $user = null) {
         $this->user = $user;
+        if (strlen(session_id())) {
+            if (!isset($_SESSION)) session_start();
+            if ($user && $user->getId()) {
+                $_SESSION['userId'] = $user->getId();
+            } else {
+                unset($_SESSION['userId']);
+            }
+        }
     }
 
     /**
      * @return Ac_I_User
      */
     function getUser() {
+        if ($this->user) return $this->user;
+        $provider = $this->getComponent($this->getUserProviderId(), 'Ac_I_UserProvider', true);        
+        if (!$provider) return;
+        if (strlen(session_id())) {
+            if (!isset($_SESSION)) session_start();
+            if (isset($_SESSION['userId'])) {
+                $this->user = $provider->getUser($_SESSION['userId']);
+            }
+        }
         return $this->user;
     }    
     
@@ -658,6 +695,35 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
      */
     function getFlags() {
         return $this->getComponent(self::CORE_COMPONENT_FLAGS, 'Ac_Flags', true);
+    }
+    
+    function login($data, & $errors = []) {
+        $errors = [];
+        $userId = null;
+        $provider = $this->getComponent($this->getUserProviderId(), 'Ac_I_UserProvider', true);
+        if ($provider) $userId = $provider->authenticate($data, $errors);
+        $this->triggerEvent(self::EVENT_ON_AUTHENTICATE, [$data, & $errors, $userId]);
+        if ($userId) {
+            $user = $provider->getUser($userId);
+            if (!$user) {
+                $userId = null;
+                $errors['user'] = 'Cannot retrieve user information';
+                return;
+            }
+        }
+        if ($userId) {
+            if (!isset($_SESSION)) session_start();
+            $_SESSION['userId'] = $userId;
+        }
+        return $userId;
+    }
+    
+    function logout() {
+        session_destroy();
+    }
+    
+    function getUserProviderId() {
+        return $this->adapter->getConfigValue('userProviderId', self::CORE_COMPONENT_USER_PROVIDER);
     }
     
 }

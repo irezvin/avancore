@@ -141,6 +141,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
         $this->mapperVars['recordClass'] = $this->model->getMapperRecordClass();
         $this->mapperVars['tableName'] = $this->tableName;
         $this->mapperVars['id'] = $this->mapperClass;
+        $this->mapperVars['shortId'] = $this->model->name;
         $this->mapperVars['storage'] = $this->storageClass;
         $this->mapperVars['columnNames'] = new Ac_Cg_Php_Expression($this->exportArray(array_keys($this->getDefaults($this->model)), 0, false, true, true));
         
@@ -441,7 +442,7 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     
 }
 
-<?php //$this->phpClose(); ?><?php        
+<?php        
     }
     
     function showModelObject() {  
@@ -488,7 +489,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
 <?php } ?>
 }
 
-<?php //$this->phpClose(); ?><?php
+<?php
     }
     
     function showGenMapper() {
@@ -728,7 +729,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     
 }
 
-<?php //$this->phpClose(); ?><?php
+<?php
     }
     
     function showMapper() {  
@@ -844,7 +845,7 @@ class <?php $this->d($this->mapperClass); ?> extends <?php $this->d($this->genMa
     
 }
     
-<?php //$this->phpClose(); ?><?php
+<?php
     }
 
     function showGenStorage() {

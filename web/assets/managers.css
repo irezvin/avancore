@@ -126,7 +126,7 @@ body.admin td.enabled {
 }
 
 
-.manager, .manager input {
+.avanadmin, .avanadmin input {
     font-family: Tahoma, Liberation Sans;
 }
 
@@ -253,4 +253,74 @@ table.actions td, .avanadmin .details table.actions td {
 .avanadmin .managerBookmark {
     position: absolute;
     top: -230px;    
+}
+
+.avanadmin.outer, .avanadmin body {
+    display: flex;
+}
+
+.avanadmin main {
+    flex-grow: 1;
+}
+
+.avanadmin header {
+    margin-right: .5em;
+    /*font-size: .8em;*/
+    text-align: center;
+    background-color: lightgray;
+    min-width: 8em;
+    padding-bottom: 1em;
+}
+
+.avanadmin header .user {
+    background-color: darkgray;
+    padding: .25em;
+    padding-bottom: 1em;
+    margin-bottom: .5em;
+    text-align: center;
+}
+
+.avanadmin .menuItem a {
+    display: block;
+    padding: .25em;    
+}
+
+.avanadmin .menuItem a:hover {
+    background: rgba(128,128,128,0.3);
+}
+
+html.avanadmin, html.avanadmin body {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    min-height: 100vh;
+}
+
+.avanadmin main {
+    padding: .75em;
+}
+
+.avanadmin .pagination {
+    margin: .75em 0;
+}
+
+.avanadmin .menuItem.active {
+    background-color: darkgray;
+    font-weight: bold;
+}
+
+.avanadmin nav ul {list-style: none;}
+.avanadmin nav ul, .avanadmin nav li {padding: 0;}
+.avanadmin nav li.expanded {
+    border: 1px solid darkgray;
+    margin: .5em 0;
+    padding: .5em;
+}
+
+.avanadmin nav li.hasChildren > a {
+    background-color: #c5c5c5;
+}
+
+.avanadmin nav li.hasChildren:not(.expanded) ul {
+    display: none;
 }

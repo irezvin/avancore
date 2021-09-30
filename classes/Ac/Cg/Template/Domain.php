@@ -12,6 +12,7 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
     var $modelMethodSuffixes = array();
     var $adminMenu = array();
     var $mapperAliases = array();
+    var $mapperShortIds = array();
     
     function doInit() {
         
@@ -20,6 +21,7 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
         $this->domainBaseClass = $this->domain->getParentAppClass();
         $this->mappers = array();
         $this->mapperAliases = $this->domain->getMapperAliases();
+        $this->mapperShortIds = [];
         
         foreach ($this->domain->listModels() as $m) {
             $mod = $this->domain->getModel($m);
@@ -36,6 +38,7 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
             }
             $this->modelClasses[$mod->getMapperClass()] = $mod->className;  
             $this->modelMethodSuffixes[$mod->getMapperClass()] = str_replace("_", "", $mod->className);
+            $this->mapperShortIds[$mod->name] = $mod->getMapperClass();
         }
     }
     
@@ -92,7 +95,6 @@ class <?php $this->d($this->domainClass); ?> extends <?php $this->d($this->domai
     }
     
 }
-<?php //$this->phpClose(); ?>
 <?php } 
 
     // --------------------------- domainGenFile -----------------------
@@ -101,6 +103,8 @@ class <?php $this->d($this->domainClass); ?> extends <?php $this->d($this->domai
 ?><?php $this->phpOpen(); ?> 
 
 abstract class <?php $this->d($this->domainGenClass); ?> extends <?php $this->d($this->domainBaseClass); ?> {
+
+    protected $componentAliases = <?php echo $this->export($this->mapperShortIds, false, 4); ?>;
 
     protected function doOnInitialize() {
         parent::doOnInitialize();

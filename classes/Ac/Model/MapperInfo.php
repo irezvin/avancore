@@ -3,7 +3,7 @@
 /**
  * Contains various meta-info about the mappers 
  */
-class Ac_Model_MapperInfo {
+class Ac_Model_MapperInfo extends Ac_Prototyped {
     
     /**
      * Class of mapper that is described by this info
@@ -35,13 +35,19 @@ class Ac_Model_MapperInfo {
      * Feature configs that will be applied by Ac_Admin_Manager
      * @var array
      */
-    var $adminFeatures = array();
+    var $adminFeatures = [];
     
-    function __construct ($mapperClass, $options = array()) {
-        Ac_Util::simpleBindAll($options, $this);
-        $this->mapperClass = $mapperClass;
+    var $manifest = null;
+    
+    var $adminGroupId = null;
+    
+    function hasPublicVars() {
+        return true;
     }
     
+    function setManifest($manifest) {
+        $this->manifest = Ac_Prototyped::factory($manifest, 'Ac_Admin_Manifest');
+    }
     
     
 }

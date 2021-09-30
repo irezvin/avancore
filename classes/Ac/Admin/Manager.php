@@ -533,7 +533,7 @@ class Ac_Admin_Manager extends Ac_Controller {
     function getDetailsUrl($record) {
         $ctx = $this->_context->cloneObject();
         $id = $this->getIdentifierOf($record);
-        $ctx->setData(array('keys' => array($id), 'action' => 'details'));
+        $ctx->setData(array('keys' => array($id), $this->_methodParamName => 'details'));
         $res = $ctx->getUrl();
         return $res;
     }
@@ -564,13 +564,13 @@ class Ac_Admin_Manager extends Ac_Controller {
     function getStateData($withFilterForm = null, $skipKeys = false) {
         $res = array();
         if ($this->_stayOnProcessing) {
-            $res['action'] = 'processing';
+            $res[$this->_methodParamName] = 'processing';
             $res['processing'] = $this->_stayOnProcessing;
         } else {
-            $res['action'] = $this->isForm()? 'details' : 'list';
+            $res[$this->_methodParamName] = $this->isForm()? 'details' : 'list';
         }
         if ($this->isNewRecord()) $res['new'] = 1;
-        elseif (($res['action'] !== 'form') && $keys = $this->getRecordIdentifiers()) {
+        elseif (($res[$this->_methodParamName] !== 'form') && $keys = $this->getRecordIdentifiers()) {
             $res['keys'] = $keys; 
         }
         elseif ($rec = $this->getRecord()) {
@@ -579,7 +579,7 @@ class Ac_Admin_Manager extends Ac_Controller {
         if ($this->_isForm && isset($this->_rqData['form']) && !$this->_recordStored) {
             $res['form'] = $this->_rqData['form'];
         }
-        if ($res['action'] === 'list' || $skipKeys) {
+        if ($res[$this->_methodParamName] === 'list' || $skipKeys) {
             unset($res['keys']);
         }
         if (($u = $this->getReturnUrl()) !== null) {
@@ -591,7 +591,7 @@ class Ac_Admin_Manager extends Ac_Controller {
         }
         
         if ($withFilterForm === null) {
-            $withFilterForm = $res['action'] !== 'list';
+            $withFilterForm = $res[$this->_methodParamName] !== 'list';
         }
         
         if ($withFilterForm) {
@@ -1440,7 +1440,13 @@ class Ac_Admin_Manager extends Ac_Controller {
             }
         }
         return $this->_returnUrl;
-    }    
+    }
+    
+    function _getTplData() {
+        $res = parent::_getTplData();
+        $res['actionParamName'] = $this->_methodParamName;
+        return $res;
+    }
     
 }
 

@@ -1,7 +1,7 @@
 <?php
 
 class Ac_Template {
-
+    
     /**
      * @var Ac_Controller
      */
@@ -20,16 +20,11 @@ class Ac_Template {
     var $_templateHelpers = array();
     
     /**
-     * Names of template variables that won't be set with setVars()
-     * @var array
-     * @access protected
-     */
-    var $_privateVars = array();
-    
-    /**
      * @var Ac_Application
      */
     protected $application = false;
+
+    protected $topLevelPart = null;
     
     /**
      * @param array $vars Initial values for template variables 
@@ -65,10 +60,6 @@ class Ac_Template {
      * @param array $vars Values of tempalte variables to assign 
      */
     function setVars($vars) {
-        $v = array();
-        foreach (array_diff(array_keys($vars), $this->_privateVars) as $k) {
-            $v[$k] = $vars[$k];
-        }
         Ac_Util::bindAutoparams($this, $vars);
     }
     
@@ -114,6 +105,8 @@ class Ac_Template {
      */
     function show($partName = 'default', $extraParams = array()) {
         if (method_exists($this, $mtdName = 'show'.$partName)) {
+            $partName[0] = strtolower($partName[0]);
+            $this->topLevelPart = $partName;
             return call_user_func_array(array(& $this, $mtdName), $extraParams);
         } else {
             trigger_error('Template part \''.$partName.'\' not exists', E_USER_ERROR);

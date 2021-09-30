@@ -83,45 +83,45 @@ class Ac_Legacy_Controller_Std_Admin extends Ac_Legacy_Controller_Std_Web {
 	function executeManager() {
 	    $mapperClasses = $this->doListMapperClasses();
 	    $mapperId = $this->_context->getData('mapper', $this->_defaultMapper);
-	    if (in_array($mapperId, $mapperClasses)) {
-	        $bu = $this->getUrl(array($this->_methodParamName => 'manager', 'mapper' => $mapperId));
-            $contextOptions = array(
-                'baseUrl' => $bu->toString(),
-                'isInForm' => 'aForm',
-            );
-            $context = new Ac_Controller_Context_Http($contextOptions);
-            $context->populate('request', $px = $mapperId);
-            $this->applyState($context);
-            
-            $managerConfig = array('mapperClass' => $mapperId);
-            $mapper = Ac_Model_Mapper::getMapper($mapperId);
-            
-            if (!$mapper) throw new Ac_Controller_Exception("No such mapper: ".$mapperId, 404);
-            
-            if (strlen($mapper->managerClass)) $class = $mapper->managerClass;
-                else $class = 'Ac_Admin_Manager';
-            if ($extra = $mapper->getManagerConfig()) {
-                Ac_Util::ms($managerConfig, $extra);
-            }
-            $manager = new $class ($context, $managerConfig, $px);
-            $manager->setApplication($this->getApplication());
-            if ($this->separateToolbar) $manager->separateToolbar = true;
-            $response = $manager->getResponse();
-            if ($response->noWrap) {
-                $this->_response = $response;
-            } else {
-                if ($this->separateToolbar) {
-                    if (strlen($manager->toolbarContent)) {
-                        Ac_Controller_Output_Joomla15::addHtmlToJoomlaToolbar($manager->toolbarContent);
-                    }
-                }
-                $this->_tplData['manager'] = $manager;
-                $this->_tplData['managerResponse'] = $response;
-                $this->_templatePart = 'manager';
-            }
-	    } else {
+	    if (!in_array($mapperId, $mapperClasses)) {
 	        $this->_response->redirectUrl = $this->getUrl(array($this->_methodParamName => 'start'));	        
-	    }
+            return;
+        }
+        $bu = $this->getUrl(array($this->_methodParamName => 'manager', 'mapper' => $mapperId));
+        $contextOptions = array(
+            'baseUrl' => $bu->toString(),
+            'isInForm' => 'aForm',
+        );
+        $context = new Ac_Controller_Context_Http($contextOptions);
+        $context->populate('request', $px = $mapperId);
+        $this->applyState($context);
+
+        $managerConfig = array('mapperClass' => $mapperId);
+        $mapper = Ac_Model_Mapper::getMapper($mapperId);
+
+        if (!$mapper) throw new Ac_Controller_Exception("No such mapper: ".$mapperId, 404);
+
+        if (strlen($mapper->managerClass)) $class = $mapper->managerClass;
+            else $class = 'Ac_Admin_Manager';
+        if ($extra = $mapper->getManagerConfig()) {
+            Ac_Util::ms($managerConfig, $extra);
+        }
+        $manager = new $class ($context, $managerConfig, $px);
+        $manager->setApplication($this->getApplication());
+        if ($this->separateToolbar) $manager->separateToolbar = true;
+        $response = $manager->getResponse();
+        if ($response->noWrap) {
+            $this->_response = $response;
+        } else {
+            if ($this->separateToolbar) {
+                if (strlen($manager->toolbarContent)) {
+                    Ac_Controller_Output_Joomla15::addHtmlToJoomlaToolbar($manager->toolbarContent);
+                }
+            }
+            $this->_tplData['manager'] = $manager;
+            $this->_tplData['managerResponse'] = $response;
+            $this->_templatePart = 'manager';
+        }
 	}
 	
 }

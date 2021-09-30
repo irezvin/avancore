@@ -48,6 +48,8 @@ class Ac_Controller_Context_Http extends Ac_Controller_Context {
      */
     var $autoVariable = false;
     
+    protected $usedParams = [];
+    
     function doAfterSetData() {
         $this->_url = false;
         if (!$this->stateIsExternal && strlen($this->stateVarName) && isset($this->_data[$this->stateVarName]) && is_array($this->_data[$this->stateVarName])) {
@@ -95,11 +97,14 @@ class Ac_Controller_Context_Http extends Ac_Controller_Context {
         if (!$url) $requestUri = Ac_Url::guess();
         else $requestUri = $url;
         $baseUrl = clone($requestUri);
+        $resultPath = null;
         if ($scriptName) {
             $this->pathInfo = Ac_Url::guessPathInfo('/'.ltrim($requestUri->path, '/'), $scriptName, $resultPath);
         }
         if (!$this->_baseUrl) {
-            $baseUrl->path = $resultPath;
+            if (!is_null($resultPath)) {
+                $baseUrl->path = $resultPath;
+            }
             $baseUrl->query = [];
             $this->setBaseUrl($baseUrl);
         }
@@ -241,8 +246,6 @@ class Ac_Controller_Context_Http extends Ac_Controller_Context {
         }
         return parent::updateData($values);
     }
-    
-    protected $usedParams = [];
     
     function useParam($path, $defaultValue = null, & $found = false) {
         $hash = is_array($path)? Ac_Util::arrayToPath($path) : $path;

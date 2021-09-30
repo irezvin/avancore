@@ -207,6 +207,9 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
             $newPathInfo = $this->urlMapper->moveParamsToString($remainingQuery);
             if (!is_null($newPathInfo)) $pathInfo = $newPathInfo;
         }
+//        if (preg_match('#/sc/#', $this->path)) {
+//            Ac_Debug::ddd($pathInfo, $this->path);
+//        }
         if (strlen($pathInfo)) {
             $res = rtrim($this->path, '/').'/'.ltrim($pathInfo, '/');
         } else {

@@ -15,6 +15,8 @@ class Ac_Controller_Context extends Ac_Prototyped {
     
     var $_state = array();
     
+    var $paramMap = [];
+    
     function hasPublicVars() {
         return true;
     }

@@ -560,7 +560,7 @@ class Ac_Cg_Generator {
         //$sync->ensureDirsNotNested();
             
         $copy = array(
-            'bin', 'classes', 'languages', 'obsolete', 'vendor', 'web/assets' => $destWebDir
+            'bin', 'classes', 'languages', 'obsolete', 'vendor', 'include', 'web/assets' => $destWebDir
         );
         foreach ($copy as $src => $dest) {
             if (is_numeric($src)) $src = $dest;

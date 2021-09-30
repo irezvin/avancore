@@ -66,7 +66,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
             $this->requestMethod = 'post'; 
         }
         $this->url = $context->getUrl();
-        $this->actionParam = $context->mapParam('action');
+        $this->actionParam = $context->mapParam($this->manager->_methodParamName);
         $this->processingParam = $context->mapParam('processing');
         $this->recordKeyParam = $context->mapParam('recordKey');
         $this->htmlIdsPrefix = $context->mapIdentifier('_');
@@ -111,7 +111,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
         $sd = $this->manager->getStateData();        
 ?>
 
-    <input type="hidden" name="<?php $this->d($ctx->mapParam($this->manager->_methodParamName)); ?>" id="<?php $this->d($aId = $ctx->mapIdentifier($this->manager->_methodParamName)); ?>" value="<?php if (isset($sd['action'])) $this->d($sd['action']); ?>" />
+    <input type="hidden" name="<?php $this->d($ctx->mapParam($this->manager->_methodParamName)); ?>" id="<?php $this->d($aId = $ctx->mapIdentifier($this->manager->_methodParamName)); ?>" value="<?php if (isset($sd[$this->manager->_methodParamName])) $this->d($sd[$this->manager->_methodParamName]); ?>" />
     <input type="hidden" name="<?php $this->d($ctx->mapParam($this->manager->getProcessingParamName())); ?>" id="<?php $this->d($pId = $this->manager->getProcessingParamName(true)); ?>" value="<?php if (isset($sd['processing'])) $this->d($sd['processing']); ?>" />
     <script type="text/javascript"><!--
     
@@ -285,7 +285,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
             
             // TODO: fix this ugly crap!
             $stateData = $this->manager->getStateData();
-            unset($stateData['action']);
+            unset($stateData[$this->manager->_methodParamName]);
             $adp = $this->manager->_context->getDataPath();
             echo $foo = Ac_Url::queryToHidden($stateData, /*Ac_Util::arrayToPath($adp)*/ $adp );
         } ?>

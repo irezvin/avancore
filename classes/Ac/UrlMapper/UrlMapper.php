@@ -226,8 +226,9 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
     }
 
     function setBaseUrl($baseUrl) {
-        if (is_string($baseUrl)) $baseUrl = new Ac_Url($baseUrl);
-        elseif ($baseUrl === true) $baseUrl = Ac_Url::guessBase();
+        if (is_string($baseUrl) || (is_object($baseUrl) && $baseUrl instanceof Ac_Url)) {
+            $baseUrl = new Ac_Url($baseUrl);
+        } elseif ($baseUrl === true) $baseUrl = Ac_Url::guessBase();
         elseif (!$baseUrl) $this->baseUrl = null;
         else throw Ac_E_InvalidCall::wrongType ('baseUrl', $baseUrl, array('string', 'Ac_Url', 'boolean', 'null'));
         $this->baseUrl = $baseUrl;

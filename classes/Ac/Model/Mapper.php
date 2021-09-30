@@ -226,6 +226,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     var $managerClass = false;
 
     protected $id = false;
+
+    protected $shortId = false;
     
     /**
      * @var Ac_Application
@@ -376,6 +378,15 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return $this->id;
     }    
 
+    function setShortId($shortId) {
+        $this->shortId = $shortId;
+    }
+
+    function getShortId() {
+        if (!strlen($this->shortId)) return $this->getId();
+        return $this->shortId;
+    }
+    
     function setApplication(Ac_Application $application) {
         $this->application = $application;
         if (!$this->db) $this->setDb($this->application->getDb());
@@ -795,7 +806,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      */
     function getInfo() {
         if ($this->info === false) {
-            $this->info = new Ac_Model_MapperInfo($this->getId(), $this->getInfoParams());
+            $params = $this->getInfoParams();
+            if (!isset($params['mapperClass'])) $params['mapperClass'] = $this->id;
+            $this->info = new Ac_Model_MapperInfo($params);
         }
         return $this->info;
     }

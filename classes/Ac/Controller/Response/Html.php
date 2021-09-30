@@ -18,6 +18,8 @@ class Ac_Controller_Response_Html extends Ac_Controller_Response_Http {
     
     var $bodyAttribs = array();
     
+    var $htmlAttribs = array();
+    
     var $headTags = array();
     
     var $initScripts = array();
@@ -106,11 +108,6 @@ class Ac_Controller_Response_Html extends Ac_Controller_Response_Http {
         return $res;
     }
     
-    function setBodyAttribute($attribute, $value = null) {
-        if (!is_null($value)) $this->bodyAttribs[$attribute] = $value;
-            else unset($this->bodyAttribs[$attribute]);
-    }
-    
     function addHeadTag($headTag, $key = false) {
         if ($key == false) $this->headTags[] = $headTag;
             else $this->headTags[$key] = $headTag;
@@ -154,6 +151,7 @@ class Ac_Controller_Response_Html extends Ac_Controller_Response_Http {
         Ac_Util::ms($this->data, $subResponse->data);
         $this->extraHeaders = Ac_Util::array_unique(array_merge($this->extraHeaders, $subResponse->extraHeaders));
         $this->bodyAttribs = Ac_Util::m($this->bodyAttribs, $subResponse->bodyAttribs);
+        $this->htmlAttribs = Ac_Util::m($this->htmlAttribs, $subResponse->htmlAttribs);
         $this->headTags = Ac_Util::array_unique(array_merge($this->headTags, $subResponse->headTags));
         $this->initScripts = Ac_Util::array_unique(array_merge(Ac_Util::toArray($this->initScripts), Ac_Util::toArray($subResponse->initScripts)));
         $this->parts = array_merge($this->parts, $subResponse->parts);

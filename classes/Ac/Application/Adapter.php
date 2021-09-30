@@ -35,6 +35,7 @@ if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/../P
  * @property $services
  * @property $mailSenderPrototype
  * @property $componentPrototypes
+ * @property $userProviderId
  *
  * @property $managerImagesUrl
  * @property $joomlaComponentName
@@ -537,8 +538,9 @@ class Ac_Application_Adapter extends Ac_Prototyped {
     /**
      * @return Ac_Controller_Output
      */
-    function createDefaultLegacyOutput() {
-        return new Ac_Controller_Output_Native;
+    function createDefaultOutput() {
+        $res = new Ac_Controller_Output_Native(['showOuterHtml' => true]);
+        return $res;
     }
     
     /**

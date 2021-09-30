@@ -2,6 +2,12 @@
 
 class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_WithSqlSelectPrototype {
 
+    var $lastCountQuery = null;
+    
+    var $lastFetchQuery = null;
+    
+    var $lastTitlesQuery = null;
+
     /**
      * Special name of the criterion to provide the Ac_Sql_Select instance or its' "prototype override"
      * to the Ac_Model_Storage_MonoTable instead of using the built-in one
@@ -176,6 +182,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
         if (is_numeric($limitCount)) {
             $sql = $this->db->applyLimits($sql, $limitCount, $limitOffset, strlen($order)? $order : false);
         }
+        $this->lastFetchQuery = $sql;
         $res = $this->loadFromRows($this->db->fetchArray($sql));
         return $res;
     }
@@ -576,10 +583,13 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
             $res = $this->loadRecordsByCriteria($where, $strSort, '', $offset, $limit, 't'); 
         } else {
             $select = $wss;
+            $select->distinct = true;
             // must apply the Sql Select
             if ($limit) $select->limitCount = $limit;
             if ($offset) $select->limitOffset = $offset;
-            $res = $this->loadFromRows($select->getDb()->fetchArray($select, $this->primaryKey), true);
+            $sql = $select->getExpression($this->getDb());
+            $this->lastFetchQuery = $sql;
+            $res = $this->loadFromRows($select->getDb()->fetchArray($sql, $this->primaryKey), true);
         }
         if ($strict) {
             if ($remainingQuery) 
@@ -674,6 +684,7 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
                     $q = $wss;
                     $q->columns[] = $col;
                 }
+                $this->lastTitlesQuery = $q;
                 $res = $db->fetchColumn($q, 'title', 'value');
             }
         }
@@ -688,7 +699,9 @@ class Ac_Model_Storage_MonoTable extends Ac_Model_Storage_Sql implements Ac_I_Wi
             $stmt->groupBy = array();
             $stmt->limitCount = false;
             $stmt->limitOffset = false;
-            $res = $this->getDb()->fetchValue($stmt);
+            $query = $stmt->getExpression($this->getDb());
+            $this->lastCountQuery = $query;
+            $res = $this->getDb()->fetchValue($query);
         } else {
             $res = false;
         }

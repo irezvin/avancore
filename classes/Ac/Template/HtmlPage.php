@@ -15,7 +15,7 @@ class Ac_Template_HtmlPage extends Ac_Template_Html {
     
     var $doctypeTag = self::doctypeHtml5;
     
-    var $titleConcatenator = ' - ';
+    var $titleConcatenator = ' &mdash; ';
     
     var $pathwayConcatenator = ' &raquo; ';
     
@@ -123,8 +123,7 @@ class Ac_Template_HtmlPage extends Ac_Template_Html {
     
     function showBody() {
         
-        $ba = Ac_Util::m($this->bodyAttribs, $this->htmlResponse->getData('bodyAttribs'));
-        $ba = Ac_Util::m($ba, $this->htmlResponse->bodyAttribs);
+        $ba = Ac_Util::m($this->bodyAttribs, $this->htmlResponse->bodyAttribs);
                 
 ?><body<?php if ($ba) echo " ".Ac_Util::mkAttribs($ba); ?>>
 <?php echo $this->htmlResponse->replacePlaceholders(false, true); ?>
@@ -143,7 +142,7 @@ class Ac_Template_HtmlPage extends Ac_Template_Html {
     function showDefault() {
         $nl = "";
         
-        $htmlAttribs = Ac_Util::m($this->htmlAttribs, $this->htmlResponse->getData('htmlAttribs', array()));
+        $htmlAttribs = Ac_Util::m($this->htmlAttribs, $this->htmlResponse->htmlAttribs);
 
         if ($this->addXmlTag) {
             if (!isset($htmlAttribs['xmlns'])) $htmlAttribs['xmlns'] = 'http://www.w3.org/1999/xhtml';

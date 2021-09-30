@@ -478,18 +478,17 @@ class Ac_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_NamedAppli
      * @return Ac_Template_Html
      */
     function getTemplate() {
-        if ($this->_template === false) {
-            if ($tc = $this->_templateClass) {
-                $this->_template = new $tc();
-                if ($this->_response === false) {
-                    if ($rc = $this->getResponseClass()) {
-                        $this->_response = new $rc;
-                    }
-                }
-                $this->_template->htmlResponse = $this->_response;
-                $this->_template->setVars($this->_getTplData());
+        if ($this->_template) return $this->_template;
+        if (!$this->_templateClass) return null;
+        $tc = $this->_templateClass;
+        $this->_template = new $tc();
+        if ($this->_response === false) {
+            if ($rc = $this->getResponseClass()) {
+                $this->_response = new $rc;
             }
         }
+        $this->_template->htmlResponse = $this->_response;
+        $this->_template->setVars($this->_getTplData());
         return $this->_template;
     }
 
@@ -536,6 +535,28 @@ class Ac_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_NamedAppli
     
     function getHitCache() {
         return $this->hitCache;
+    }
+    
+    function param($path, $defaultOrOptions = null, & $found = false) {
+        $default = null;
+        $found = false;
+        if (!is_array($defaultOrOptions)) {
+            $default = $defaultOrOptions;
+        } else {
+            if (array_key_exists('default', $defaultOrOptions)) {
+                $default = $defaultOrOptions['default'];
+            }
+        }
+        return $this->getContext()->getData($path, $default, $found);
+    }
+    
+    function require($path, array $options = []) {
+        $res = $this->param($path, $options, $found);
+        
+        if ($found) return $res;
+        
+        $mappedPath = $this->getContext()->mapParam($path);
+        throw new Ac_E_ControllerException("Required parameter '{$mappedPath}' not provided", 400);
     }
     
 }
