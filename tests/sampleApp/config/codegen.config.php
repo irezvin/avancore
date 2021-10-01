@@ -2,13 +2,13 @@
 
 require(__DIR__.'/app.config.php');
 
-$dbConf = $config['legacyDatabasePrototype']['__construct'][0];
+$dbConf = $config['dbPrototype'];
 
 $config = array(
     'generator' => array(
-        'user' => $dbConf['user'],
-        'password' => $dbConf['password'],
-        'host' => isset($dbConf['host'])? $dbConf['host'] : 'localhost',
+        'user' => $u,
+        'password' => $p,
+        'host' => 'localhost',
 //        'inspectorClass' => 'Ac_Sql_Dbi_Dbs_Inspector_Mysql5',
         'clearOutputDir' => false,
         'overwriteLog' => true,
@@ -22,13 +22,11 @@ $config = array(
         ),
     ),
     'domains.Sample' => array(
-        'strategyClass' => 'Ac_Cg_Strategy',
         'useLangStrings' => true,
         'appName' => 'Sample',
-        'dbName' => $dbConf['db'],
+        'dbName' => $d,
         'caption' => 'Avancore_Sample',
-        'josComId' => 'ac',
-        'tablePrefix' => $dbConf['prefix'],
+        'tablePrefix' => 'ac_',
         'subsystemPrefixes' => array(),
         'dontLinkSubsystems' => array(
         ),
@@ -41,7 +39,6 @@ $config = array(
             '#__shop_product_upc',
             '#__shop_meta',            
         ),
-        'defaultTitleColumn' => 'title',
         'dictionary' => array(
             'singularForms' => array(
                 'people' => 'person'
@@ -56,7 +53,6 @@ $config = array(
 
         'modelDefaults' => array(
             'generateMethodPlaceholders' => true,
-            'noUi' => true,
         	'hasUniformPropertiesInfo' => true,
         ),
         'models' => array(
@@ -148,7 +144,6 @@ $config = array(
         
         'appName' => 'Child',
         'caption' => 'Avancore_Child',
-        'josComId' => 'child',
     ),
 );
 

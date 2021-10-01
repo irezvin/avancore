@@ -233,10 +233,8 @@ class Ac_Cg_Model extends Ac_Cg_Base {
      */
     protected $parentModel = false;
     
-    function __construct($domain, $name, $config = array()) {
+    protected function setDomain(Ac_Cg_Domain $domain) {
         $this->_domain = $domain;
-        $this->name = $name;
-        Ac_Util::simpleBindAll($config, $this);
     }
     
     function listProperties() {
@@ -266,14 +264,16 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     function _initAllProperties() {
         $pNames = array_keys($this->_properties);
         // Instantiating properties
-        foreach ($pNames as $name) {
-            $conf = $this->_properties[$name];
-            if (isset($conf['metaPropertyClass']) && $conf['metaPropertyClass']) $cls = $conf['metaPropertyClass'];
-            else $cls = 'Ac_Cg_Property_Simple';
-            $this->_properties[$name]['_init'] = true;
-            $this->_properties[$name] = new $cls ($this, $name, $this->_properties[$name]);
-        }
-        
+        $this->_properties = Ac_Prototyped::factoryCollection(
+            $this->_properties, 
+            'Ac_Cg_Property', 
+            [
+                'model' => $this, 
+                '_init' => true
+            ], 
+            'name', 
+            true
+        );
     }
     
     /**
@@ -537,8 +537,8 @@ class Ac_Cg_Model extends Ac_Cg_Base {
      */
     function _addSimplePropertyConfig($colName) {
         $this->_properties[$colName] = array(
-            'column' => $colName, 
-            'metaPropertyClass' => 'Ac_Cg_Property_Simple',
+            'colName' => $colName, 
+            'class' => 'Ac_Cg_Property_Simple',
             'inherited' => $this->isPropertyInherited($colName, $ignore),
             'ignoreInDescendants' => $ignore,
             'enabled' => !$ignore && $this->isPropertyEnabled($colName, false),
@@ -574,7 +574,7 @@ class Ac_Cg_Model extends Ac_Cg_Base {
             }
             $xp = array(
                 'relation' => $modelRelation->relationName, 
-                'metaPropertyClass' => 'Ac_Cg_Property_Object', 
+                'class' => 'Ac_Cg_Property_Object', 
                 'isIncoming' => $modelRelation->isIncoming, 
                 'otherRelation' => $modelRelation->otherRelationName, 
                 'isOtherIncoming' => $modelRelation->isOtherRelationIncoming,
@@ -583,7 +583,6 @@ class Ac_Cg_Model extends Ac_Cg_Base {
                 'ignoreInDescendants' => $ignore,
                 'enabled' => !$ignore && $this->isPropertyEnabled($nm, true),
             );
-            //if (isset($this->properties[$nm]) && is_array($this->properties[$nm])) Ac_Util::ms($xp, $this->properties[$nm]);
             $this->_properties[$nm] = $xp;
         }
     }
@@ -1023,7 +1022,7 @@ class Ac_Cg_Model extends Ac_Cg_Base {
      */
     function getSerializationMap() {
         $res = array(
-            '_properties' => array('_properties', 'Ac_Cg_Property', array('__parent', 'name')),
+            '_properties' => array('_properties', 'Ac_Cg_Property', array()),
             '_relations' => array('_relations', 'Ac_Cg_Model_Relation', array()),
         );
         return $res;
@@ -1038,6 +1037,7 @@ class Ac_Cg_Model extends Ac_Cg_Base {
     }
     
     function unserializeFromArray($array) {
+        $this->_domain = Ac_Impl_ArraySerializer::getParent('Ac_Cg_Domain');
         parent::unserializeFromArray($array);
         $this->tableObject = $this->_domain->getDatabase()->getTable($this->table);
         $this->_init = true;

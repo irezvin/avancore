@@ -36,7 +36,6 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     const EVENT_ON_AUTHENTICATE = 'onLogin';
     
     const CORE_COMPONENT_DB = 'core.db';
-    const CORE_COMPONENT_LEGACY_DB = 'core.legacyDb';
     const CORE_COMPONENT_FLAGS = 'core.flags';
     const CORE_COMPONENT_CACHE = 'core.cache';
     const CORE_COMPONENT_MAIL_SENDER = 'core.mailSender';
@@ -75,8 +74,6 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     
     protected $addIncludePaths = true;
 
-    protected $legacyDatabase = null;
-    
     protected $db = null;
     
     /**
@@ -266,20 +263,6 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     protected function doOnInitialize() {
     }
 
-    function setLegacyDatabase(Ac_Legacy_Database $database) {
-        $this->legacyDatabase = $this->addComponent($database, self::CORE_COMPONENT_LEGACY_DB);
-    }
-
-    /**
-     * @return Ac_Legacy_Database
-     */
-    function getLegacyDatabase() {
-        if (!$this->legacyDatabase) {
-            $this->legacyDatabase = $this->getComponent(self::CORE_COMPONENT_LEGACY_DB, 'Ac_Legacy_Database', true);
-        }
-        return $this->legacyDatabase;
-    }
-
     function setDb(Ac_Sql_Db $db = null) {
         $this->addComponent($db, self::CORE_COMPONENT_DB);
     }
@@ -291,10 +274,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
         if ($this->db === null) {
             $this->db = $this->getComponent(self::CORE_COMPONENT_DB, 'Ac_Sql_Db', true);
             if (!$this->db && ($proto = $this->adapter->getDbPrototype())) {
-                $this->db = $this->addComponent(Ac_Prototyped::factory($this->adapter->getDbPrototype(), 'Ac_Sql_Db'), self::CORE_COMPONENT_DB);
-            }
-            if (!$this->db && $leg = $this->getLegacyDatabase()) {
-                $this->db = $this->addComponent(new Ac_Sql_Db_Ae($leg), self::CORE_COMPONENT_DB);
+                $this->db = $this->addComponent(Ac_Prototyped::factory($proto, 'Ac_Sql_Db'), self::CORE_COMPONENT_DB);
             }
         }
         return $this->db;
@@ -476,7 +456,6 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
 
         $res = array(
             self::CORE_COMPONENT_DB => $adapter->getDbPrototype(),
-            self::CORE_COMPONENT_LEGACY_DB => $adapter->getLegacyDatabasePrototype(),
             self::CORE_COMPONENT_FLAGS => array('class' => 'Ac_Flags'),
             self::CORE_COMPONENT_CACHE => $cachePrototype,
             self::CORE_COMPONENT_MAIL_SENDER => $adapter->getMailSenderPrototype(),

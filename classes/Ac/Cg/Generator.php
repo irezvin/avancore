@@ -1,6 +1,8 @@
 <?php
 
-class Ac_Cg_Generator {
+class Ac_Cg_Generator extends Ac_Prototyped {
+    
+    static $strictParams = Ac_Prototyped::STRICT_PARAMS_WARNING;
 
     const CONTENT_DIR = '__DIR__';
     
@@ -57,7 +59,7 @@ class Ac_Cg_Generator {
      * Static config array for current project
      * @var array
      */
-    var $staticConfig = false;
+    var $staticConfig = [];
     
     /**
      * Name of configuration file
@@ -138,25 +140,21 @@ class Ac_Cg_Generator {
     
     protected $startTime = null;
     
-    /**
-     * @param string $configOrFileName name of file with static configuration of project
-     */
-    function __construct($configOrFileName = false, $runtimeOptions = array()) {
-        if (is_array($configOrFileName)) $this->staticConfig = $configOrFileName;
-        else {
-            $this->_configFileName = $configOrFileName;
-            if (strlen($this->_configFileName)) {
-                // when codegen log path is not in codegen.config.php, we will product log in the same dir
-                // (useful for old layouts when 'avan gen' is called from some other place)
-                $this->logFileName = dirname($configOrFileName).'/generator_log.txt';
-                $this->_loadStaticConfig();
-            }
+    function hasPublicVars() {
+        return true;
+    }
+    
+    function __construct(array $options = []) {
+        if (array_key_exists('configPath', $options)) {
+            $this->_configFileName = $options['configPath'];
+            unset($options['configPath']);
+            $this->logFileName = dirname($this->_configFileName).'/generator_log.txt';
+            $this->_loadStaticConfig();
         }
-        if (isset($this->staticConfig['generator']) && is_array($this->staticConfig['generator'])) {
-            if (isset($this->staticConfig['generator']['staticConfig'])) unset($this->staticConfig['generator']['staticConfig']);
-            Ac_Util::simpleBind($this->staticConfig['generator'], $this); 
-            Ac_Util::simpleBind($runtimeOptions, $this);
-        }
+        if (!isset($this->staticConfig['generator'])) $this->staticConfig['generator'] = [];
+        unset($this->staticConfig['generator']['staticConfig']);
+        $options = Ac_Util::m($this->staticConfig['generator'], $options);
+        parent::__construct($options);
     }
     
     /**
@@ -229,7 +227,7 @@ class Ac_Cg_Generator {
             $c = $this->inspectorClass;
             $db = $this->getDb();
             if ($c) {
-                $this->_inspector = new $c($db, false);
+                $this->_inspector = new $c(['db' => $db]);
             } else {
                 $this->_inspector = $this->getDb()->getInspector();
             }
@@ -244,7 +242,9 @@ class Ac_Cg_Generator {
             if (isset($this->staticConfig['domains']) && is_array($this->staticConfig['domains'])) { 
                 foreach ($this->staticConfig['domains'] as $name => $config) {
                     if (is_array($this->domainDefaults)) $config = Ac_Util::m($this->domainDefaults, $config);
-                    $obj = new Ac_Cg_Domain($this, $name, $config);
+                    $config['generator'] = $this;
+                    $config['name'] = $name;
+                    $obj = new Ac_Cg_Domain($config);
                     $this->{$l}[$name] = $obj; 
                 }
             }
@@ -529,7 +529,7 @@ class Ac_Cg_Generator {
         if (isset($this->_domains[$name])) {
             throw Ac_E_InvalidCall::alreadySuchItem("domain", $name);
         }
-        $dom = new Ac_Cg_Domain($this, $name);
+        $dom = new Ac_Cg_Domain(['generator' => $this, 'name' => $name]);
         $dom->unserializeFromArray($json);
         $this->_domains[$name] = $dom;
         return $dom;

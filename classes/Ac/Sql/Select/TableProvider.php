@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
+class Ac_Sql_Select_TableProvider extends Ac_Prototyped {
 	
 	var $_id = false;
 	
@@ -61,22 +61,12 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
 		return $res;
     }
     
-    /**
-     * @param array $options
-     * @param Ac_Sql_Db $db
-     * @return Ac_Sql_Select
-     */
-    function __construct(array $options = array()) {
-        if (!is_array($options)) trigger_error("\$options must be an array", E_USER_ERROR);
-    	Ac_Util::bindAutoparams($this, $options, true);
-    }
-    
-    function _setTables($tables) {
+    protected function setTables($tables) {
     	if (!is_array($tables)) trigger_error("\$tables must be an array", E_USER_ERROR);
     	foreach (array_keys($tables) as $alias) $this->addTable($tables[$alias], $alias);
     }
     
-    function _setTableProviders($tableProviders) {
+    protected function setTableProviders($tableProviders) {
     	if (!is_array($tableProviders)) trigger_error('\$tableProviders must be an array');
     	foreach (array_keys($tableProviders) as $id) $this->addTableProvider($tableProviders[$id], $id);
     }
@@ -141,7 +131,7 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
             if (isset($options['class'])) 
                 $class = $options['class']; 
                 else $class = 'Ac_Sql_Select_Table';
-            $t = new $class ($this, $options);
+            $t = new $class ($options);
         }
         $t->setTableProvider($this);
         $alias = $t->alias? $t->alias : $t->name;
@@ -170,7 +160,7 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
     		if (strlen($id)) $options['id'] = $id;
     		if (!isset($options['id']) || !strlen($options['id'])) $options['id'] = count($this->_tableProviders) + 1;
     		$options['parent'] = $this;
-    		$t = Ac_Util::factoryWithOptions ($options, 'Ac_Sql_Select_TableProvider', 'class', true, true);
+    		$t = Ac_Prototyped::factory($options, 'Ac_Sql_Select_TableProvider');
     	}
     	$id = $t->getId();
     	if (isset($this->_tableProviders[$id])) trigger_error("table provider with id '{$id}' is already in table providers collection", E_USER_ERROR);
@@ -272,7 +262,7 @@ class Ac_Sql_Select_TableProvider implements Ac_I_Prototyped {
 		return $res;
 	}
 	
-	function _setId($id) {
+	protected function setId($id) {
 		$this->_id = $id;
 	}
 	

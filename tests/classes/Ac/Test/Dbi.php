@@ -53,44 +53,16 @@ class Ac_Test_Dbi extends Ac_Test_Base {
 	 */
 	function createDbiDatabaseWithMySql5Inspector() {
 		$sqlDb = $this->getAeDb();
-		$inspector = new Ac_Sql_Dbi_Inspector_MySql5($sqlDb, $this->getDbName());
-		$dbiDb = new Ac_Sql_Dbi_Database($inspector, $this->getDbName(), $this->getTablePrefix());
+		$inspector = $sqlDb->getInspector();
+		$dbiDb = new Ac_Sql_Dbi_Database([
+            'inspector' => $inspector, 
+            'name' => $this->getDbName(), 
+            'tablePrefix' => $this->getTablePrefix()
+        ]);
 		return $dbiDb;
 	}
-	
-	/**
-	 * @return Ac_Sql_Dbi_Database
-	 */
-	function createDbiDatabaseWithDefaultInspector() {
-		$sqlDb = $this->getAeDb();
-		$inspector = new Ac_Sql_Dbi_Inspector($sqlDb, $this->getDbName());
-		$dbiDb = new Ac_Sql_Dbi_Database($inspector, $this->getDbName(), $this->getTablePrefix());
-		return $dbiDb;
-	}
-	
-	/**
-	 * @return Ac_Sql_Dbi_Database
-	 */
-	function createDbiDatabaseWithLegacyInspector() {
-		
-		$lcl = new Ac_Util_LegacyAvancoreLoader(array('avancorePath' => dirname(__FILE__).'/../../../legacy'));
-		$lcl->load();
-		$inspector = new Ac_Sql_Dbi_Inspector_Legacy('ac_'); 
-		$dbiDb = new Ac_Sql_Dbi_Database($inspector, $this->getDbName(), $this->getTablePrefix());
-		return $dbiDb;
-	}
-	
 	
 	// --------------------------------+ tests +-----------------------------------
-	
-	function testDbiWithDefaultInspector() {
-		$dbi = $this->createDbiDatabaseWithDefaultInspector();
-		$tested = $this->collectDbInfo($dbi);
-		$standard = $this->getSampleDbInfo();
-        foreach (array_keys($standard['tables']) as $t) unset($standard['tables'][$t]['relations']);
-		$this->assertTrue(isset($tested['tables']));
-        $this->assertArraysMatch($standard, $tested, 'Default DBI info does not match: %s');
-	}
 	
 	function testDbiWithMySql5Inspector() {
 		$dbi = $this->createDbiDatabaseWithMySql5Inspector();
@@ -101,34 +73,6 @@ class Ac_Test_Dbi extends Ac_Test_Base {
             var_dump($tested);
             var_dump($proper);
         }
-	}
-	
-    function testAvancoreLegacy() {
-        // TODO: add Legacy Avancore Loader?
-        return;
-        
-		$dbi = $this->createDbiDatabaseWithLegacyInspector();
-		$tested = $this->collectDbInfo($dbi);
-		$standard = $this->getSampleDbInfo();
-		
-		foreach (array_keys($standard['tables']) as $tableName) {
-			// legacy proder doesn't return relation names; we know about that and we have to strip them from $standard to pass the test
-			if (isset($standard['tables'][$tableName]['relations'])) {
-				$standard['tables'][$tableName]['relations'] = array_values($standard['tables'][$tableName]['relations']);
-				foreach ($standard['tables'][$tableName]['relations'] as $i => & $j) $j['name'] = $i;
-			}
-			
-			// it also don't provide non-primary non-unique indexes 
-			if (isset($standard['tables'][$tableName]['indexes'])) {
-				foreach ($standard['tables'][$tableName]['indexes'] as $idxName => & $idx) {
-					if (!$idx['primary'] && !$idx['unique']) unset($standard['tables'][$tableName]['indexes'][$idxName]);
-				}
-			}
-		}
-		
-		$this->assertTrue(isset($standard['tables']));
-		$this->assertEqual(count($standard['tables']), count($tested['tables']), 'Found table counts don\'t match: %s');
-		$this->assertArraysMatch($tested, $standard, 'Default DBI info does not match: %s', '~^/tables(/[^/]+)?$~');
 	}
 	
 }

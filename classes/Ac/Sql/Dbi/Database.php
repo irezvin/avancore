@@ -20,12 +20,8 @@ class Ac_Sql_Dbi_Database extends Ac_Sql_Dbi_Object {
      */
     var $_extras = array();
 
-    function __construct($inspector, $name, $tablePrefix = false, $replacePrefixWith = '#__', $extras = array()) {
-        parent::__construct($inspector, $name);
-        $this->name = $name;
-        $this->tablePrefix = $tablePrefix;
-        $this->replacePrefixWith = $replacePrefixWith;
-        if (is_array($extras)) $this->_extras = $extras;
+    protected function setExtras(array $extras = []) {
+        $this->_extras = $extras;
     }
     
     function listTables() {
@@ -46,7 +42,12 @@ class Ac_Sql_Dbi_Database extends Ac_Sql_Dbi_Object {
         if ($this->_tables[$tableName] === false) {
             if (isset($this->_extras['tables']) && is_array($this->_extras['tables']) && isset($this->_extras['tables'][$tableName]) && is_array($this->_extras['tables'][$tableName])) $extras = $this->_extras['tables'][$tableName];
                 else $extras = array();
-            $this->_tables[$tableName] = new Ac_Sql_Dbi_Table($this->_inspector, $tableName, $this, $extras);
+            $this->_tables[$tableName] = new Ac_Sql_Dbi_Table([
+                'inspector' => $this->_inspector, 
+                'name' => $tableName, 
+                'database' => $this,
+                'extras' => $extras
+            ]);
         }
         return $this->_tables[$tableName];
     }

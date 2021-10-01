@@ -5,7 +5,7 @@
  **/
 
 class Ac_Cg_Domain extends Ac_Cg_Base {
-
+    
     /**
      * @var string Name of the domain
      */
@@ -246,31 +246,30 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
     /**
      * @param Ac_Cg_Generator $generator 
      */
-    function __construct($generator, $name, $config = array()) {
-        $this->_gen = $generator;
-        $this->name = $name;
-        foreach (array('parentDomainName', 'dontInheritProperties') as $k) {
-            if (isset($config[$k])) {
-                $this->$k = $config[$k];
-                unset($config->$k);
-            }
+    function __construct(array $options = array()) {
+        $this->initOptionsFirst(['generator', 'name', 'parentDomainName', 'dontInheritProperties'], $options);
+        if (!$this->name) throw new Ac_E_InvalidUsage("\$options['name'] must be provided for ".__METHOD__);
+        $dicConf = [];
+        if (isset($options['dictionary']) && is_array($options['dictionary'])) {
+            $dicConf = $options['dictionary'];
+            unset($options['dictionary']);
         }
-        $this->inheritDefaults($config);
-        Ac_Util::simpleBind($config, $this);
-        if (!$this->dbName) $this->dbName = $name;
-        if (!$this->appName) $this->appName = $name;
+        $this->inheritDefaults($options);
+        parent::__construct($options);
+        
+        if (!$this->dbName) $this->dbName = $this->name;
+        if (!$this->appName) $this->appName = $this->name;
         if (!$this->caption) $this->caption = $this->appName;
         
-        if (isset($config['dictionary']) && is_array($config['dictionary'])) {
-            $dicConf = $config['dictionary'];
-        } else {
-            $dicConf = array();
-        }
         if (!isset($dicConf['constantPrefix'])) $dicConf['constantPrefix'] = $this->appName; 
         $this->dictionary = new Ac_Cg_Dictionary($dicConf);
     }
     
-    protected function inheritDefaults(& $config) {
+    protected function setGenerator(Ac_Cg_Generator $generator) {
+        $this->_gen = $generator;
+    }
+    
+    protected function inheritDefaults(array & $options) {
         if ($this->parentDomainName) {
             $pd = $this->getParentDomain();
             foreach (array_diff(array(
@@ -306,12 +305,12 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
                 }
                 $this->$propName = $parentVal;
                 if (!in_array($propName, array('autoTablesIgnore'))) {
-                    if (isset($config[$propName]) && is_array($config[$propName]) && is_array($this->$propName)) {
-                        Ac_Util::ms($this->$propName, $config[$propName]);
+                    if (isset($options[$propName]) && is_array($options[$propName]) && is_array($this->$propName)) {
+                        Ac_Util::ms($this->$propName, $options[$propName]);
                         if (in_array($propName, 'subsystemPrefixes')) {
                             $this->$propName = array_unique($this->$propName);
                         }
-                        unset($config[$propName]);
+                        unset($options[$propName]);
                     }
                 }
             }
@@ -369,7 +368,13 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
     function getDatabase() {
         if ($this->_database === false) {
             $insp = $this->getInspector();
-            $this->_database = new Ac_Sql_Dbi_Database($insp, $this->dbName, $this->tablePrefix, $this->replaceTablePrefixWith, $this->schemaExtras);
+            $this->_database = new Ac_Sql_Dbi_Database([
+                'inspector' => $insp, 
+                'name' => $this->dbName, 
+                'tablePrefix' => $this->tablePrefix, 
+                'replacePrefixWith' => $this->replaceTablePrefixWith, 
+                'extras' => $this->schemaExtras
+            ]);
         }
         return $this->_database;
     }
@@ -388,7 +393,11 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
             elseif (isset($conf['metaModelClass']) && $conf['metaModelClass']) $cls = $conf['metaModelClass'];
             else $cls = 'Ac_Cg_Model';  
             
-            $this->_models[$name] = new $cls($this, $name, $conf);
+            Ac_Util::ms($conf, [
+                'domain' => $this,
+                'name' => $name
+            ]);
+            $this->_models[$name] = new $cls($conf);
             $this->_models[$name]->init();
         }
         return $this->_models[$name];
@@ -700,7 +709,7 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
     function getSerializationMap() {
         $res = array(
             'dictionary' => array('dictionary', 'Ac_Cg_Dictionary', array()),
-            '_models' => array('_models', 'Ac_Cg_Model', array('__parent', 'name')),
+            '_models' => array('_models', 'Ac_Cg_Model', array()),
         );
         return $res;
     }

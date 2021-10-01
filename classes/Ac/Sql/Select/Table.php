@@ -25,7 +25,7 @@ define('AC_USE_USING_ALWAYS', 1);
 /**
  * Represents table reference with JOIN in SQL SELECT statement family
  */
-class Ac_Sql_Select_Table {
+class Ac_Sql_Select_Table extends Ac_Prototyped {
     
     /**
      * SQL statement family to which current table reference belongs
@@ -87,16 +87,10 @@ class Ac_Sql_Select_Table {
     
     var $omitInFromClause = false;
     
-    /**
-     * @param array $options
-     * @param Ac_Sql_Select_TableProvider $tableProvider
-     * @return Ac_Sql_Select_Table
-     */
-    function __construct($tableProvider, $options = array()) {
-        if ($tableProvider) $options['tableProvider'] = $tableProvider;
-        Ac_Util::bindAutoparams($this, $options, true);
+    function hasPublicVars() {
+        return true;
     }
-    
+       
     /**
      * @param Ac_Sql_Select $sqlSelect
      */

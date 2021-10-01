@@ -28,12 +28,8 @@ class Ac_Sql_Dbi_Relation extends Ac_Sql_Dbi_Object {
     
     var $comment = false;
     
-    function __construct(& $inspector, $name, $table, $data) {
-        //Ac_Util::simpleBind($data, $this);
-        $data['name'] = $name;
-        $this->_assignProperties($data);
-        parent::__construct($inspector, $name);
-        $this->ownTable = $table;
+    function __construct(array $prototype = array()) {
+        parent::__construct($prototype);
         $this->table = $this->ownTable->_database->prefixizeTable($this->table);
     }
     

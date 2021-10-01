@@ -203,27 +203,6 @@ abstract class Ac_Util {
         return Ac_Mail_Util::getEmailRegex();
     }
 
-    /**
-     * Can be used to obfuscate emails and any text - generates javascript that writes it
-     * 
-     * @param type $str
-     * @return string 
-     */
-    static function jsEncode($str) {
-        $rnd = rand(1, 1000);
-        $res = "";
-        $len = strlen($str);
-        for ($i=$len-1; $i >= 0; $i--) 
-            $res .= (ord($str[$i]) + $rnd).($i > 0? "," : "");
-        $jsRes = "<script type='text/javascript'>";
-            $jsRes .= "var a = new Array($res);";
-            $jsRes .= "for (var i = a.length; i >= 0; i--) {";
-                $jsRes .= "document.write(String.fromCharCode(a[i] - $rnd));";
-            $jsRes .= "}";
-        $jsRes .= "</script>";
-        return $jsRes;
-    }
-
     static function implodeRecursive($glue, $array, $array_name = NULL) {
         if (is_string($array)) return $array;
         if (is_array($glue)) {
@@ -381,62 +360,6 @@ abstract class Ac_Util {
             }
         }
         return $res;
-    }
-    
-    static function bindArrayToObject ($array, $obj, $ignore='', $prefix=NULL, $checkSlashes=false) {
-        if (!is_array($array) || !is_object($obj)) return (false);
-        if (!is_array($ignore)) $ignore = explode(" ", $ignore);
-        foreach (array_keys(get_object_vars($obj)) as $k) {
-            if ($k[0] != '_') {
-                if (!in_array($k, $ignore)) {
-                    if ($prefix) {
-                        $ak = $prefix . $k;
-                    } else {
-                        $ak = $k;
-                    }
-                    if (isset($array[$ak])) {
-                        $obj->$k = $array[$ak];
-                    }
-                }
-            }
-        }
-        return true;
-    }
-    
-    static function simpleBind ($array, $obj) {
-        foreach (array_keys($array) as $k) if (($k[0] !== '_') && isset($obj->$k) || property_exists(get_class($obj), $k)) {
-            $obj->$k = $array[$k];
-        }
-    }
-    
-    static function simpleBindAll ($array, $obj, $onlyKeys = false) {
-        if (is_array($onlyKeys)) $keys = array_intersect(array_keys($array), $onlyKeys);
-            else $keys = array_keys($array);
-        foreach ($keys as $k) if (($k[0] !== '_')) {
-            $obj->$k = $array[$k];
-        }
-    }
-    
-    static function simpleBindVeryAll ($array, $obj, $onlyKeys = false) {
-        if (is_array($onlyKeys)) $keys = array_intersect(array_keys($array), $onlyKeys);
-            else $keys = array_keys($array);
-        foreach ($keys as $k) {
-            $obj->$k = $array[$k];
-        }
-    }
-    
-    static function smartBind ($array, $obj) {
-        foreach (array_keys($array) as $k) if ($k[0] !== '_') {
-            if (method_exists($obj, $setter = 'set'.$k)) $obj->$setter($array[$k]);
-            elseif (isset($obj->$k)) $obj->$k = $array[$k];
-        }
-    }
-    
-    static function filterValue($value, $noTrim = false, $allowHtml = false) {
-        if (!is_scalar($value)) return false;
-        if (!$allowHtml) $value = strip_tags($value);
-        if (!$noTrim) $value = trim($value);
-        return $value;
     }
     
     /**
@@ -771,16 +694,6 @@ abstract class Ac_Util {
         }
         return $src;
     }
-    
-    static function getIntArray($varName, $srcArr) {
-        if (!isset($srcArr[$varName])) return array();
-        $res = array();
-        if (!is_array($srcArr[$varName])) $s = array($srcArr[$varName]); else $s = $srcArr[$varName];
-        foreach ($s as $v) {
-            if (is_numeric($v)) $res[] = (int) $v;
-        }
-        return $res;
-    }
 
     /**
      * @deprecated Use Ac_Util::makeCsvLine
@@ -818,15 +731,6 @@ abstract class Ac_Util {
     
     static function array_values($array) {
         foreach ($array as $v) $res[] = $v;
-        return $res;
-    }
-    
-    /**
-     * @param array $keys list of keys of return array
-     * @return array ('key1' => false, 'key2' => false...)
-     */
-    static function lazyArray($keys) {
-        foreach ($keys as $k) $res[$k] = false;
         return $res;
     }
     
@@ -886,43 +790,7 @@ abstract class Ac_Util {
         }
         return $res;
     }
-
-    static function bindAutoparams($obj, $options, $alsoSimpleBind = true, $firstOnes = false) {
-        $bind = true;
-        if (method_exists($obj, 'bindAutoparams')) { 
-            if ($obj->bindAutoparams($options, $alsoSimpleBind, $firstOnes) === false) $bind = false;
-        }
-        if ($bind) {
-            $ov = get_object_vars($obj);
-            $keys = array_keys($options);
-            if (is_array($firstOnes)) {
-                $keys = array_unique(array_merge(array_intersect($firstOnes, $keys), $keys));
-            }
-            foreach ($keys as $k) {
-                if (is_callable($call = array($obj, 'set'.ucfirst($k))) || is_callable($call = array($obj, '_set'.ucfirst($k)))) { 
-                    call_user_func($call, $options[$k]);
-                }
-                elseif ($alsoSimpleBind && ($k[0] !== '_') && array_key_exists ($k, $ov)) $obj->{$k} = $options[$k]; 
-            }
-        }
-    }
-    
-    static function factoryWithOptions ($options = array(), $baseClass, $classParam = 'class', $ensureBaseClass = true, $loadWithUnderscores = false) {
-        $className = $baseClass;
-        if (strlen($classParam) && isset($options[$classParam]) && strlen($options[$classParam])) 
-            $className = $options[$classParam];
-        if (!class_exists($className)) {
-        	if ($loadWithUnderscores) {
-        		require($fName = str_replace('_', DIRECTORY_SEPARATOR, trim($className,'_').'.php'));
-        		if (!class_exists($className)) trigger_error ("Class '$className' not found in '{$fName}'", E_USER_ERROR);
-        	}
-        	trigger_error ("Class '$className' not found", E_USER_ERROR);
-        }
-        $res = new $className ($options);
-        if ($ensureBaseClass && !is_a($res, $baseClass)) trigger_error("Class '{$className}' is not a descendant of '{$baseClass}'", E_USER_ERROR);
-        return $res;
-    }
-    
+        
     static function getUploadedFilesByHierarchy() {
         $newOrdering = array();
         if (isset($_FILES)) {
@@ -1042,18 +910,7 @@ abstract class Ac_Util {
         
         if (!strlen($charset)) $charset = null;
         if ($double_encode) return htmlspecialchars($string, $quote_style, $charset);
-        elseif ((AC_PHP_VERSION_MAJOR >= 5) && (AC_PHP_VERSION_MINOR >= 2.3)) {
-            return htmlspecialchars($string, $quote_style, $charset, $double_encode);
-        }
-        else {
-            if (!$double_encode) {
-                $res = htmlspecialchars($string, $quote_style, $charset);
-                $res = preg_replace("/\&amp;((#[0-9][0-9]*)|(#[xX][0-9a-fA-F]+)|([a-z][0-9a-zA-Z]*));/",'&\\1;', $res);
-                return $res;
-            } else {
-                return htmlspecialchars($string, $quote_style, $charset);
-            }
-        }
+        return htmlspecialchars($string, $quote_style, $charset, $double_encode);
     }
     
     static function addTrailingSlash($string, $slashes = '/\\', $slashType = DIRECTORY_SEPARATOR) {
@@ -1093,33 +950,6 @@ abstract class Ac_Util {
             }
     	return $res;
     }
-    
-    /**
-     * Replaces objects in the array with the output of their $methodName() method.
-     * DO NOT USE until it's finished 
-     * 
-     * @param mixed $src 							Data source. For objects their $methodName() value is returned; arrays are processed recursively and other values are returned as-is. 
-     * @param string $methodName 					Method name to convert objects. 
-     * @param array $arguments 						Arguments for called method (if any).
-     * @param bool $descendIntoCollectedResults		If $src->$methodName() returns an array or an object, have collectRecursive() applied to the result before return 
-     * @param bool $rejectNonCompatible				Remove objects that don't have $methodName() method from output (also return NULL if such object is provided as $src) 
-     * @return mixed
-     */
-    static function & collectRecursive(& $src, $methodName, $arguments = array(), $descendIntoCollectedResults = true, $rejectNonCompatible = false) {
-    	if (is_array($src)) {
-    		$res = array();
-    		foreach (array_keys($src) as $k) {
-    			if (is_object($src[$k]) && (!$rejectNonCompatible || is_callable(array($src[$k], $methodName)))) {
-    				$res[$k] = $src[$k];
-    			}
-    		}
-    	} elseif (is_object($src)) {
-    		//  NOTE: unfinished function!!! 
-    	} else {
-    		$res = $src;
-    	}
-    	return $res;
-    }
 
     /**
      * Converts any non-array value into an array.
@@ -1138,31 +968,6 @@ abstract class Ac_Util {
     }
     
     /**
-     * Recursively filters array $arr leaving only objects of $requiredClasses
-     * @param array $arr
-     * @param string|array $allowedClasses One or several class names
-     * @param bool $withEmptyArrays Whether to leave empty arrays (ones without objects) in result
-     */
-    static function getObjectsOfClass(array $arr, $requiredClasses, $withEmptyArrays = false) {
-        $res = array();
-        $c = self::toArray($requiredClasses);
-        foreach ($arr as $k => $v) {
-            if (is_object($v)) {
-                foreach ($c as $class) 
-                    if ($v instanceof $class) {
-                        $res[$k] = $v;
-                        break;
-                    }
-            } elseif (is_array($v)) {
-                $v = self::getObjectsOfClass($v, $c, $withEmptyArrays);
-                if ($withEmptyArrays || count($v)) $res[$k] = $v;
-            }
-        }
-        return $res;
-    }
-
-
-    /**
      * This obfuscated function obfuscates email
      * 
      * Borrowed from http://www.maurits.vdschee.nl/php_hide_email/ (license: Public Domain)
@@ -1180,19 +985,6 @@ abstract class Ac_Util {
         $script = "eval(\"".str_replace(array("\\",'"'),array("\\\\",'\"'), $script)."\")"; 
         $script = '<script type="text/javascript">/*<![CDATA[*/'.$script.'/*]]>*/</script>';
         return '<span id="'.$id.'">[javascript protected email address]</span>'.$script;
-    }
-    
-    static function stringifyObjects(array $array) {
-        $res = array();
-        foreach ($array as $k => $v) {
-            if (is_object($v)) {
-                if (method_exists($v, '__toString')) $v = ''.$v;
-                else $v = '[object '.get_class($v).']';
-            }
-            elseif (is_array($v)) $v = self::stringifyObjects($v);
-            $res[$k] = $v;
-        }
-        return $res;
     }
     
     static function typeClass($item) {

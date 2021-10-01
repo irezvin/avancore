@@ -36,10 +36,12 @@ class Ac_Form_Control_Text_Autocomplete extends Ac_Form_Control_Text {
      */
     var $url = false;
     
-    function doInitProperties(array $options = array()) {
+    protected function doInitProperties(array & $options = array()) {
         parent::doInitProperties($options);
         if (isset($options['valuesProvider'])) $this->setValuesProvider($options['valuesProvider']);
         elseif (isset($options['valuesProviderPrototype'])) $this->setValuesProviderPrototype($options['valuesProviderPrototype']);
+        unset($options['valuesProvider']);
+        unset($options['valuesProviderPrototype']);
     }
     
     function setValuesProviderPrototype($prototype = array()) {

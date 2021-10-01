@@ -38,7 +38,7 @@ class Ac_Test_Codegen extends Ac_Test_Base {
         $w2 = new Ac_Cg_Writer_Memory();
         if ($this->write) $w2->setNextWriter (new Ac_Cg_Writer_File(array('basePath' => $this->getOut3())));
         
-        $gen1 = new Ac_Cg_Generator($this->getConfigPath());
+        $gen1 = new Ac_Cg_Generator(['configPath' => $this->getConfigPath()]);
         $gen1->lintify = false;
         $gen1->outputDir = $this->getOut2();
         $gen1->logFileName = $this->getLog2();
@@ -51,7 +51,7 @@ class Ac_Test_Codegen extends Ac_Test_Base {
         
         $out1 = $w1->getOutput();
             
-        $gen2 = new Ac_Cg_Generator(array());
+        $gen2 = new Ac_Cg_Generator();
         $gen2->lintify = false;
         $gen2->outputDir = $this->getOut3();
         $gen2->logFileName = $this->getLog3();

@@ -3,7 +3,7 @@
 /**
  * Responsible for connection of Ac_Admin_Manager with underlying model.
  */
-class Ac_Admin_Datalink {
+class Ac_Admin_Datalink extends Ac_Prototyped {
     
    /**
     * Manager that datalink works with 
@@ -17,21 +17,6 @@ class Ac_Admin_Datalink {
     * @var Ac_Admin_Processing
     */
    var $_processing = false;
-
-   function factory ($params = array()) {
-       $class = 'Ac_Admin_Datalink';
-       if (isset($params['class']) && strlen($params['class'])) {
-           $class = $params['class'];
-           unset($params['class']);
-       }
-       $res = new $class ($params);
-       if (!is_a($res, 'Ac_Admin_Datalink')) trigger_error ("'$class' is not descendant of Ac_Admin_Datalink", E_USER_ERROR);
-       return $res; 
-   }
-   
-   function __construct($params = array()) {
-       Ac_Util::simpleBind($params, $this);
-   }
    
    function getCacheId() {
        return false;

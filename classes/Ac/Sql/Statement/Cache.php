@@ -1,16 +1,16 @@
 <?php
 
-class Ac_Sql_Statement_Cache {
+class Ac_Sql_Statement_Cache extends Ac_Prototyped {
 	
 	var $defaults = array();
 	var $enabled = true;
 	
 	var $_stmtCache = array();
-	
-	function __construct($options) {
-		Ac_Util::bindAutoparams($this, $options);
-	}
-	
+
+    function hasPublicVars() {
+        return true;
+    }    
+    
 	function clear() {
 		$this->_stmtCache = array();
 	}

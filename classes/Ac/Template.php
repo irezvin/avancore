@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Template {
+class Ac_Template extends Ac_Prototyped {
     
     /**
      * @var Ac_Controller
@@ -26,33 +26,9 @@ class Ac_Template {
 
     protected $topLevelPart = null;
     
-    /**
-     * @param array $vars Initial values for template variables 
-     */
-    function __construct($vars = array()) {
-        $this->setVars($vars);
-    }
-    
-    /**
-     * @param string $className Name of template class
-     * @param array $vars Initial values for template variables
-     * @return Ac_Template
-     */
-    function factory($className, $vars = array()) {
-        $res = new $className($vars);
-        return $res;
-    }
-    
-    /**
-     * Returns current template variables
-     *
-     * @return array
-     */
-    function getVars() {
-        $res = array();
-        foreach (array_keys($vars = get_object_vars($this)) as $k) if ($k[0] != '_') $res[$k] = $vars[$k];
-        return $res;
-    }
+    function hasPublicVars() {
+        return true;
+    }    
     
     /**
      * Assigns template variables
@@ -60,35 +36,7 @@ class Ac_Template {
      * @param array $vars Values of tempalte variables to assign 
      */
     function setVars($vars) {
-        Ac_Util::bindAutoparams($this, $vars);
-    }
-    
-    /**
-     * Creates and shows other template instance
-     * 
-     * @param string $className Name of template class
-     * @param array $vars Initial values for template variables
-     * @param string $partName Name of template part to show
-     * @param array $extraParams Parameters to pass to template function
-     */
-    function showTemplate($className, $vars = array(), $partName = 'default', $extraParams = array()) {
-        $tpl = Ac_Template::factory($className, $vars);
-        return $tpl->show($partName, $extraParams);
-    }
-    
-    /**
-     * Creates other template instance and returns its rendered part
-     * 
-     * @param string $className Name of template class
-     * @param array $vars Initial values for template variables
-     * @param string $partName Name of template part to show
-     * @param array $extraParams Parameters to pass to template function
-     * 
-     * @return string rendered template part 
-     */
-    function fetchTemplate($className, $vars = array(), $partName = 'default', $extraParams = array()) {
-        $tpl = Ac_Template::factory($className, $vars);
-        return $tpl->fetch($partName, $extraParams);
+        $this->initFromPrototype($vars, Ac_Prototyped::STRICT_PARAMS_WARNING);
     }
         
     /**

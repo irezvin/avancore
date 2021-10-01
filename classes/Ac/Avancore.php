@@ -21,10 +21,10 @@ class Ac_Avancore extends Ac_Application {
     }
  
     protected function doOnInitialize() {
+        parent::doOnInitialize();
         if ($this->addIncludePaths) {
             Ac_Util::addIncludePath(dirname(dirname(dirname(__FILE__))).'/obsolete');
         }
-        return $res;
     }
     
     /**

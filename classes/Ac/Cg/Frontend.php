@@ -113,11 +113,11 @@ class Ac_Cg_Frontend {
         $this->check();
         $this->init();
             
-        $gen = $this->generator = new Ac_Cg_Generator($this->configPath);
+        $gen = $this->generator = new Ac_Cg_Generator(['configPath' => $this->configPath]);
         
         $gen->prepare();
     
-        $form = new Ac_Form(null, array(
+        $form = new Ac_Form(array(
             'htmlAttribs' => array(
                 'style' => 'float: left; padding: 1em; border: 1px solid silver; margin: 0.5em; background-color: lightyellow',
             ),

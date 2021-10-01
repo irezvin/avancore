@@ -1,8 +1,6 @@
 <?php
 
 class Ac_Form_Control extends Ac_Controller {
-
-    protected $init = false;
     
     /**
      * Name of the control
@@ -284,27 +282,28 @@ class Ac_Form_Control extends Ac_Controller {
         $context->populate(array('get', 'post'), $context->getDataPath());
         return $context;
     }
+
+    function setParent(Ac_Form_Control_Composite $parent = null) {
+        $this->_parent = $parent;
+    }
+
+    /**
+     * @return Ac_Form_Control_Composite
+     */
+    function getParent() {
+        return $this->parent;
+    }    
     
-    function doInitProperties(array $options = array()) {
-        if (isset($options['default'])) $this->setDefault($options['default']);
-        if (isset($options['parent']) && is_a($options['parent'], 'Ac_Form_Control')) $this->_parent = $options['parent'];
-        //if (isset($options['displayParent'])) $this->setDisplayParent($options['displayParent']);
-        //    elseif ($this->_parent) $this->setDisplayParent($this->_parent);
-        if (isset($options['model'])) {
-            $this->setModel($options['model']);
+    protected function doInitProperties(array & $options = array()) {
+        $this->initOptionsFirst(['default', 'parent', 'model', 'modelProperty'], $options);
+        if (isset($options['creationOrder'])) {
+            $this->_creationOrder = $options['creationOrder'];
+            unset($options['creationOrder']);
         }
-        if (isset($options['modelProperty'])) $this->setModelProperty($options['modelProperty']);
-        if (is_a($this->_context, 'Ac_Form_Context')) {
+        if ($this->_context && $this->_context instanceof Ac_Form_Context) {
             $this->_context->valueFirst = $this->valueFirstInContext;
         }
         $this->init = true;
-        $tmp = $options;
-        foreach (array('default', 'parent', 'model', 'modelProperty') as $opt) unset($tmp[$opt]);
-        if (isset($options['name'])) $this->name = $options['name'];
-        if (isset($options['creationOrder'])) {
-            $this->_creationOrder = $options['creationOrder'];
-        }
-        Ac_Util::bindAutoparams($this, $options);
     }
     
 /**
@@ -990,14 +989,6 @@ class Ac_Form_Control extends Ac_Controller {
             $curr = $curr->_parent;
         if ($class !== false && !($curr instanceof $class)) $curr = null;
         return $curr;
-    }
-    
-    function bindAutoparams() {
-        /**
-         * After I have added bindAutoparams() call to Ac_Controller, doInitProperties() is called after
-         * bindAutoparams(), that adds bug to the controls creation
-         */
-        if (!$this->init) return false;
     }
 
     function updateFromRequest() {

@@ -1,7 +1,13 @@
 <?php
 
-abstract class Ac_Cg_Base implements Ac_I_ArraySerializable_Extended {
+abstract class Ac_Cg_Base extends Ac_Prototyped implements Ac_I_ArraySerializable_Extended {
 
+    static $strictParams = Ac_Prototyped::STRICT_PARAMS_WARNING;
+    
+    function hasPublicVars() {
+        return true;
+    }    
+    
     /**
      * @return array(parentClass, parentMemberName)
      */

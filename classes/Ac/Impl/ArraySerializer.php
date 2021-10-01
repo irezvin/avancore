@@ -12,6 +12,7 @@ abstract class Ac_Impl_ArraySerializer {
     
     static function getParent($class = false) {
         $p = self::$parents;
+        $res = null;
         while($p && !$res) {
             $res = array_pop($p);
             if (strlen($class) && !is_object($res) && $res instanceof $class) $res = null;

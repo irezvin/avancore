@@ -35,11 +35,12 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
     
     var $_extras = array();
     
-    function __construct(& $inspector, $name, $database, $extras = array()) {
-        parent::__construct($inspector, $name);
-        $this->_assignProperties(array('name' => $name));
+    protected function setExtras(array $extras) {
+        $this->_extras = $extras;
+    }
+    
+    protected function setDatabase(Ac_Sql_Dbi_Database $database) {
         $this->_database = $database;
-        if (is_array($extras)) $this->_extras = $extras;
     }
     
     function listColumns() {
@@ -47,7 +48,11 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
             $allColumns = $this->_inspector->getColumnsForTable($this->_database->deprefixizeTable($this->name), $this->_database->name);
             if (isset($this->_extras['columns']) && is_array($this->_extras['columns'])) Ac_Util::ms($allColumns, $this->_extras['columns']); 
             foreach ($allColumns as $colName => $colData) {
-                $col = new Ac_Sql_Dbi_Column($this->_inspector, $colName, $this, $colData);
+                $col = new Ac_Sql_Dbi_Column(Ac_Util::m([
+                    'inspector' => $this->_inspector, 
+                    'name' => $colName, 
+                    'table' => $this,
+                ], $colData));
                 $this->_columns[$colName] = $col; 
             }
         }
@@ -69,10 +74,10 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
             if (isset($this->_extras['indices']) && is_array($this->_extras['indices'])) {
                 Ac_Util::ms($allIndices, $this->_extras['indices']);
             }
-            foreach ($allIndices as $name => $data) {
-                $obj = new Ac_Sql_Dbi_Index($this->_inspector, $name, $this, $data);
-                $this->_indices[$name] = $obj; 
-            }
+            $this->_indices = Ac_Prototyped::factoryCollection($allIndices, 'Ac_Sql_Dbi_Index', [
+                'inspector' => $this->_inspector,
+                'table' => $this,
+            ], 'name', true);
         }
         return array_keys($this->_indices);
     }
@@ -92,7 +97,11 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
             $allRelations = $this->_inspector->getRelationsForTable($this->_database->deprefixizeTable($this->name), $this->_database->name);
             if (isset($this->_extras['relations']) && is_array($this->_extras['relations'])) Ac_Util::ms($allRelations, $this->_extras['relations']);
             foreach ($allRelations as $name => $data) {
-                $obj = new Ac_Sql_Dbi_Relation($this->_inspector, $name, $this, $data);
+                $obj = new Ac_Sql_Dbi_Relation(Ac_Util::m([
+                    'inspector' => $this->_inspector, 
+                    'name' => $name, 
+                    'ownTable' => $this,
+                ], $data));
                 $this->_relations[$name] = $obj; 
             }
         }

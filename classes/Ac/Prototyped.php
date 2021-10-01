@@ -6,6 +6,10 @@
 if (!class_exists('Ac_I_Prototyped', false)) require_once(dirname(__FILE__).'/I/Prototyped.php');
 
 abstract class Ac_Prototyped implements Ac_I_Prototyped {
+
+    const STRICT_PARAMS_IGNORE = null;
+    const STRICT_PARAMS_WARNING = 'WARNING';
+    const STRICT_PARAMS_EXCEPTION = true;
     
     static $strictParams = true;
     
@@ -55,7 +59,7 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
         $v = ($this->hasPublicVars());
         $gotKeys = array();
         if ($v) $v = array_flip(array_keys(Ac_Util::getClassVars(get_class($this))));
-        if (is_null($strictParams)) $strictParams = self::$strictParams;
+        if (is_null($strictParams)) $strictParams = static::$strictParams;
         foreach ($prototype as $n => $opt) if ($n !== 'class') {
             if (Ac_Accessor::methodExists($this, $mn = 'set'.$n)) {
                 $this->$mn($opt);
@@ -63,11 +67,28 @@ abstract class Ac_Prototyped implements Ac_I_Prototyped {
             } elseif (isset($v[$n]) || method_exists($this, '__isset') && $this->__isset($n)) {
                 $this->$n = $opt;
                 $gotKeys[] = $n;
-            } elseif ($strictParams) {
-                throw new Ac_E_InvalidPrototype("Unknown member '{$n}' in class '".get_class($this)."'");
+            } else {
+                $this->onUnknownPrototypeKey($n, $opt, $strictParams);
             }
         }
         return $gotKeys;
+    }
+    
+    protected function onUnknownPrototypeKey($propName, $value, $strictParams = null) {
+        if ($strictParams === Ac_Prototyped::STRICT_PARAMS_WARNING) {
+            trigger_error("Unknown member '{$propName}' in class '".get_class($this)."'", E_USER_WARNING);
+        } elseif ($strictParams) {
+            throw new Ac_E_InvalidPrototype("Unknown member '{$propName}' in class '".get_class($this)."'");
+        }
+    }
+    
+    protected function initOptionsFirst(array $propNames, array & $options) {
+        $initFirst = [];
+        foreach ($propNames as $p) if (array_key_exists($p, $options)) {
+            $initFirst[$p] = $options[$p];
+            unset($options[$p]);
+        }
+        if ($initFirst) $this->initFromPrototype($initFirst);
     }
     
     /**

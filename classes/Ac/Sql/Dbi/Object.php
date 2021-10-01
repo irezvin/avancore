@@ -4,7 +4,7 @@
  * Base class for all database schema elements
  */
 
-class Ac_Sql_Dbi_Object {
+class Ac_Sql_Dbi_Object extends Ac_Prototyped {
     
     /**
      * @var Ac_Sql_Dbi_Inspector
@@ -17,14 +17,17 @@ class Ac_Sql_Dbi_Object {
     
     var $extensions = array();
     
-    function __construct ($inspector, $name) {
+    protected function setInspector(Ac_Sql_Dbi_Inspector $inspector) {
         $this->_inspector = $inspector;
-        $this->name = $name;
     }
     
-    function _assignProperties ($properties = array()) {
-    	Ac_Util::simpleBindAll($properties, $this, true);
-    	$this->knownProperties = array_keys($properties);
+    function hasPublicVars() {
+        return true;
+    }
+    
+    protected function initFromPrototype(array $prototype = array(), $strictParams = null) {
+        parent::initFromPrototype($prototype, $strictParams);
+        $this->knownProperties = array_keys($prototype);
     }
     
     function getKnownProperties() {

@@ -36,8 +36,12 @@ class Ac_Test_RefChecker extends Ac_Test_Base {
 	 */
 	function getDbi() {
 		$sqlDb = $this->getSqlDb();
-		$inspector = new Ac_Sql_Dbi_Inspector_MySql5($sqlDb, $this->getDbName());
-		$dbiDb = new Ac_Sql_Dbi_Database($inspector, $this->getDbName(), $this->getTablePrefix());
+		$inspector = $sqlDb->getInspector();
+		$dbiDb = new Ac_Sql_Dbi_Database([
+            'inspector' => $inspector, 
+            'name' => $this->getDbName(), 
+            'tablePrefix' => $this->getTablePrefix()
+        ]);
 		return $dbiDb;
 	}
 

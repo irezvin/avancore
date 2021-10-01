@@ -6,7 +6,7 @@ class Ac_Test_Form extends Ac_Test_Base {
     
     function testZeroDate() {
         
-        $p0 = new Ac_Form_Control_Date(null, array(
+        $p0 = new Ac_Form_Control_Date(array(
             'externalFormat' => 'd-m-Y',
             'internalFormat' => 'Y/m/d',
         ), 'date1');
@@ -14,7 +14,7 @@ class Ac_Test_Form extends Ac_Test_Base {
         $this->assertEqual($p0->getDisplayValue(), '23-12-1982');
         $this->assertEqual($p0->getValue(), '1982/12/23');
         
-        $p01 = new Ac_Form_Control_Date(null, array(
+        $p01 = new Ac_Form_Control_Date(array(
         ), 'date1');
         $p01->setValue('0000-00-00');
         // default external format is d.m.Y
@@ -22,7 +22,7 @@ class Ac_Test_Form extends Ac_Test_Base {
         $this->assertEqual($p01->getValue(), '0000-00-00');
         
         
-        $p1 = new Ac_Form_Control_Date(null, array(
+        $p1 = new Ac_Form_Control_Date(array(
             'externalFormat' => 'd-m-Y',
             'internalFormat' => 'Y/m/d',
         ), 'date1');
@@ -30,7 +30,7 @@ class Ac_Test_Form extends Ac_Test_Base {
         $this->assertEqual($p1->getDisplayValue(), '00-00-0000');
         $this->assertEqual($p1->getValue(), '0000/00/00');
         
-        $p2 = new Ac_Form_Control_DateTime(null, array(
+        $p2 = new Ac_Form_Control_DateTime(array(
             'externalFormat' => 'd-m-Y H:i:s',
             'internalFormat' => 'G:i:s d/n/y',
         ), 'date2');
@@ -38,7 +38,7 @@ class Ac_Test_Form extends Ac_Test_Base {
         $this->assertEqual($p2->getDisplayValue(), '00-00-0000 00:00:00');
         $this->assertEqual($p2->getValue(), '0:00:00 00/0/00');
         
-        $p3 = new Ac_Form_Control_DateTime(null, array(
+        $p3 = new Ac_Form_Control_DateTime(array(
             'externalFormat' => 'Foobar',
             'internalFormat' => 'Foobar',
         ), 'date2');
@@ -90,7 +90,7 @@ class Ac_Test_Form extends Ac_Test_Base {
     
     function testErrorList () {
         $person = Sample::getInstance()->getSamplePersonMapper()->createRecord();
-        $f = new Ac_Form(null, array(
+        $f = new Ac_Form(array(
             'controls' => array(
                 'errorList' => array(
                     'class' => 'Ac_Form_Control_ErrorList',
@@ -165,7 +165,6 @@ class Ac_Test_Form extends Ac_Test_Base {
      */
     function createTestForm1(array $prototypeExtra = array()) {
         $f1 = new Ac_Form(
-            null,
             Ac_Util::m(array(
                 'controls' => array(
                     'tabs' => array(

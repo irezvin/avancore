@@ -8,7 +8,7 @@ define('AC_RC_NUM_MISSING', 'numMissing');
 define('AC_RC_FIX_DELETE', 'delete');
 define('AC_RC_FIX_SET_TO_NON_REF', 'setToNonRef');
 
-class Ac_Sql_RefChecker {
+class Ac_Sql_RefChecker extends Ac_Prototyped {
 	
 	/**
 	 * @var Ac_Sql_Db
@@ -36,17 +36,15 @@ class Ac_Sql_RefChecker {
 	
 	var $extraRelations = false;
 	
-	function __construct ($options = array()) {
-		Ac_Util::bindAutoparams($this, $options, true);
-	}
-	
-	function _setDb($db) {
-		if (!is_a($db, 'Ac_Sql_Db')) trigger_error("\$db must be an instance of Ac_Sql_Db", E_USER_ERROR);
+    function hasPublicVars() {
+        return true;
+    }    
+    
+	protected function setDb(Ac_Sql_Db $db) {
 		$this->_db = $db;
 	}
 	
-	function _setSchema($schema) {
-		if (!is_a($schema, 'Ac_Sql_Dbi_Database')) trigger_error("\$schema must be an instance of Ac_Sql_Dbi_Database", E_USER_ERROR);
+	protected function setSchema(Ac_Sql_Dbi_Database $schema) {
 		$this->_schema = $schema;
 	}
 	

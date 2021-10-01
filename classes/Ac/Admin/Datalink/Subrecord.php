@@ -16,12 +16,16 @@ class Ac_Admin_Datalink_Subrecord extends Ac_Admin_Datalink {
      */
     var $_parentRecord = false;
    
-    function __construct($params = array()) {
-        parent::__construct($params);
+    function __construct(array $options = array()) {
         if (
-               isset($params['mapperClass']) && strlen($params['mapperClass'])
-            && isset($params['relationId']) && strlen($params['relationId'])
-        ) $this->setRelationId($params['mapperClass'], $params['relationId']);
+               isset($options['mapperClass']) && strlen($options['mapperClass'])
+            && isset($options['relationId']) && strlen($options['relationId'])
+        ) {
+            $this->setRelationId($options['mapperClass'], $options['relationId']);
+            unset($options['mapperClass']);
+            unset($options['relationId']);
+        }
+        parent::__construct($options);
     }
     
     function getCacheId() {

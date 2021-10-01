@@ -156,10 +156,6 @@ class Ac_Admin_Manager extends Ac_Controller {
      */
     protected $configService = false;
     
-    function doInitProperties(array $options = array()) {
-        Ac_Util::bindAutoparams($this, $options);
-    }
-    
     // ------------------------------------------- cache support methods ----------------------------------------------
     
     
@@ -709,7 +705,9 @@ class Ac_Admin_Manager extends Ac_Controller {
         if (isset($formConfig['class']) && strlen($formConfig['class'])) $class = $formConfig['class'];
             else $class = 'Ac_Form';
         $formContext = $this->_createFormContext();
-        $this->_form = new $class ($formContext, $formConfig, 'form');
+        $formConfig['context'] = $formContext;
+        $formConfig['instanceId'] = 'form';
+        $this->_form = new $class ($formConfig);
         $this->_form->htmlResponse = $this->_response;
         if (!is_a($this->_form, 'Ac_Form')) trigger_error ("'{$class}' is not descendant of Ac_Form", E_USER_ERROR);
         foreach ($this->listFeatures() as $f) {
@@ -729,8 +727,9 @@ class Ac_Admin_Manager extends Ac_Controller {
             if (isset($formConfig['controls']) && is_array($formConfig['controls']) && count($formConfig['controls'])) {
                 if (isset($formConfig['class']) && strlen($formConfig['class'])) $class = $formConfig['class'];
                     else $class = 'Ac_Form';
-                $formContext = $this->_createFilterFormContext();
-                $this->_filterForm = new $class ($formContext, $formConfig, 'filterForm');
+                $formConfig['context'] = $this->_createFilterFormContext();
+                $formConfig['instanceId'] = 'filterForm';
+                $this->_filterForm = new $class ($formConfig);
                 $this->_filterForm->htmlResponse = $this->_response;
                 if (!is_a($this->_filterForm, 'Ac_Form')) trigger_error ("'{$class}' is not descendant of Ac_Form", E_USER_ERROR);
                 foreach ($this->listFeatures() as $f) {
@@ -818,7 +817,8 @@ class Ac_Admin_Manager extends Ac_Controller {
             if (isset($featureSettings['class']) && strlen($featureSettings['class'])) {
                 $class = $featureSettings['class'];
             }
-            $feature = new $class ($this, $featureSettings);
+            $featureSettings['manager'] = $this;
+            $feature = new $class ($featureSettings);
             if ($feature->canBeApplied()) $this->_features[$fc] = $feature;
         }
         uasort($this->_features, array($this, 'cmpFeatures'));
@@ -899,7 +899,10 @@ class Ac_Admin_Manager extends Ac_Controller {
         if ($this->_pagination === false) {
             $context = $this->getContext();
             $pgContext = $context->spawn('pagination');
-            $this->_pagination = new Ac_Admin_Pagination($pgContext, array(), $this->_instanceId.'_pagination');
+            $this->_pagination = new Ac_Admin_Pagination([
+                'context' => $pgContext,
+                'instanceId' => $this->_instanceId.'_pagination'
+            ]);
             if ($coll = $this->getRecordsCollection()) {
                 if (!$this->dontCount)
                     $this->_pagination->totalRecords = $coll->getCount();
@@ -992,10 +995,13 @@ class Ac_Admin_Manager extends Ac_Controller {
                 $mapper = $this->application->getMapper($conf['mapperClass']);
                 $conf = Ac_Util::m($mapper->getManagerConfig(), $conf);
             }
+            unset($conf['_relId']);
             if (isset($conf['class']) && strlen($conf['class'])) {
                 $class = $conf['class'];
             } else $class = 'Ac_Admin_Manager';
-            $sm = new $class ($ctx, $conf, $this->_instanceId.'_'.$id);
+            $conf['context'] = $ctx;
+            $conf['instanceId'] = $this->_instanceId.'_'.$id;
+            $sm = new $class ($conf);
             $sm->setApplication($this->getApplication());
             $this->_subManagers[$id] = $sm;
             foreach ($this->listFeatures() as $f) {
@@ -1440,12 +1446,6 @@ class Ac_Admin_Manager extends Ac_Controller {
             }
         }
         return $this->_returnUrl;
-    }
-    
-    function _getTplData() {
-        $res = parent::_getTplData();
-        $res['actionParamName'] = $this->_methodParamName;
-        return $res;
     }
     
 }

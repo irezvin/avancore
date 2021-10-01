@@ -4,7 +4,7 @@
  * Strategy for retrieval of an information about database objects
  */
 
-class Ac_Sql_Dbi_Inspector {
+class Ac_Sql_Dbi_Inspector extends Ac_Prototyped {
 	
     /**
      * @var Ac_Sql_Db
@@ -16,15 +16,13 @@ class Ac_Sql_Dbi_Inspector {
     protected $isMariaDb102plus = null;
     
     var $defaultDatabaseName = false;
+    
+    function hasPublicVars() {
+        return true;
+    }
 
-    function __construct($sqlDb, $defaultDatabaseName = false) {
-        if (is_a($sqlDb, 'Ac_Legacy_Database')) {
-            $this->_db = new Ac_Sql_Db_Ae($sqlDb);
-        } else {
-            if (!is_a($sqlDb, 'Ac_Sql_Db')) trigger_error("\$sqlDb must be an instance of Ac_Sql_Db");
-    	    $this->_db = $sqlDb;
-        }
-        $this->defaultDatabaseName = $defaultDatabaseName;
+    protected function setDb(Ac_Sql_Db $db) {
+        $this->_db = $db;
     }
     
     // --------------------- DATABASE-RELATED METHODS ----------------------

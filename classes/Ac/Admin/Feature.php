@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Admin_Feature {
+class Ac_Admin_Feature extends Ac_Prototyped {
 
     /**
      * Priority that is used to sort features in the manager 
@@ -21,17 +21,10 @@ class Ac_Admin_Feature {
     
     var $usesSql = null;
     
-    /**
-     * @param Ac_Admin_Manager $manager
-     * @param array $options extra settings of the feature
-     * @return Ac_Admin_Feature
-     */
-    function __construct ($manager, $options = array()) {
-        if (!is_a($manager, 'Ac_Admin_Manager'))
-            trigger_error ('$manager must be instance of Ac_Admin_Manager', E_USER_ERROR);
-        Ac_Util::simpleBind($options, $this);
-        $this->manager = $manager;
-    }
+    function hasPublicVars() {
+        return true;
+    }    
+
     
     /**
      * Should return true if this feature can be applied to current manager

@@ -115,7 +115,11 @@ abstract class Ac_Sql_Dialect {
      */
     function createInspector(Ac_Sql_Db $db) {
         $c = $this->inspectorClass;
-        $dbi = new $c ($db, $db->getDbName());
+        $dbi = Ac_Prototyped::factory([
+            'class' => $c, 
+            'db' => $db, 
+            'defaultDatabaseName' => $db->getDbName()
+        ], 'Ac_Sql_Dbi_Inspector');
         return $dbi;
     }
     

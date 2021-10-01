@@ -27,11 +27,12 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
     
     protected $modelUpdated = false;
     
-    function doInitProperties(array $options = array()) {
+    protected function doInitProperties(array & $options = array()) {
         $this->_iid = round(rand()*100);
         parent::doInitProperties($options);
         if (!isset($options['controls'])) $options['controls'] = array();
         $this->addInitialControls($options['controls']);
+        unset($options['controls']);
     }
     
     protected function addInitialControls(array $controls) {
@@ -263,17 +264,17 @@ class Ac_Form_Control_Composite extends Ac_Form_Control {
             trigger_error ("Name in the settings of the sub control ('{$settings['name']}') does not match key in the array ('{$name}')", E_USER_WARNING);
         $settings['name'] = $name;
         $instanceId = $name;
-        $co = isset($settings['creationOrder'])? $settings['creationOrder'] : '-';
-        $res = new $class ($context, $settings, $instanceId);
+        $settings['context'] = $context;
+        $settings['instanceId'] = $instanceId;
+        $res = new $class ($settings);
         if (isset($settings['displayParent'])) $res->setDisplayParent($settings['displayParent']);
             else $res->setDisplayParent($this);
-        //if (isset($settings['_creationOrder'])) $res->_creationOrder = $settings['_creationOrder']; 
         return $res;
     }
     
     function _doInitDisplayChildren() {
         foreach ($this->listControls() as $c) {
-            $con = $this->getControl($c);
+            $this->getControl($c);
         }
     }
     

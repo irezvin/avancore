@@ -42,7 +42,7 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
         return $this->ignoreMidWhere;
     }    
     
-    function _setMapperClass($mapperClass) {
+    protected function setMapperClass($mapperClass) {
 		$this->_mapperClass = $mapperClass;
 	}
 	
@@ -52,7 +52,7 @@ class Ac_Model_Sql_TableProvider extends Ac_Sql_Select_TableProvider {
 		return $res;
 	} 
 	
-	function _setMapper($mapper) {
+	protected function setMapper($mapper) {
 		if (!is_a($mapper, 'Ac_Model_Mapper')) trigger_error("\$mapper should be an instance of Ac_Model_Mapper", E_USER_ERROR);
 		$this->_mapper = $mapper; 
 	}

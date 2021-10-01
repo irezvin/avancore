@@ -103,23 +103,6 @@ class Ac_Admin_Processing extends Ac_Controller {
         $this->id = $id;
     }
     
-    function doInitProperties(array $options = array()) {
-        if (!strcasecmp(get_class($this), 'ae_admin_processing'))
-            trigger_error ("Attempt to instantiate abstract class", E_USER_ERROR);
-        
-        if (isset($options['mapperClass'])) $this->setMapperClass($options['mapperClass']);
-        if (isset($options['datalink'])) {
-            trigger_error ("Cannot set datalink in the constructor - call setDatalink() after Ac_Admin_Processing instantiation", E_USER_ERROR);
-        }
-        
-        if (isset($options['recordKeys'])) $this->setRecordKeys($options['recordKeys']);
-        elseif (isset($options['records'])) $this->setRecords($options['records']);
-        elseif (isset($options['recordsCollection'])) $this->setRecordsCollection($options['recordsCollection']);
-        elseif (isset($options['noRecords']) && $options['noRecords']) $this->setNoRecords($options['noRecords']);        
-        
-        if (isset($options['manager']) && is_object($options['manager']) && $options['manager'] instanceof Ac_Admin_Manager) $this->setManager($options['manager']);
-    }
-    
     function setManager(Ac_Admin_Manager $manager) {
         $this->manager = $manager;
         if ($manager->getApplication()) $this->application = $manager->getApplication();

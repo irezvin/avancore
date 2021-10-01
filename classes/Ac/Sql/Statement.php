@@ -11,7 +11,7 @@
  * 
  * $db->query(Ac_Sql_Statement::factory("UPDATE foobar WHERE [[colName]] = {{value}}", array('colName' => 'id', 'value' => 'some unescaped string'));  
  */
-class Ac_Sql_Statement extends Ac_Sql_Expression {
+class Ac_Sql_Statement extends Ac_Sql_Expression implements Ac_I_Prototyped {
     
     var $parts = array();
     
@@ -32,6 +32,10 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
      * @return Ac_Sql_Statement
      */
     
+    function hasPublicVars() {
+        return true;
+    }
+    
     static function create($parts, $params = array(), $extraOptions = array()) {
         if (!is_array($parts)) $parts = array('expression' => $parts);
         $options = array(
@@ -39,7 +43,7 @@ class Ac_Sql_Statement extends Ac_Sql_Expression {
             'params' => $params,
         );
         if (is_array($extraOptions)) Ac_Util::ms($options, $extraOptions);
-        $res = Ac_Util::factoryWithOptions($options, 'Ac_Sql_Statement', 'class', true);
+        $res = Ac_Prototyped::factory($options, 'Ac_Sql_Statement');
         return $res;
     }
     

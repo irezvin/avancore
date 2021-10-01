@@ -32,12 +32,17 @@ class Ac_Cg_Property extends Ac_Cg_Base {
     
     var $ignoreInDescendants = false;
     
-    function __construct ($model, $name, $config = array()) {
-        $this->_model = $model;
-        $this->name = $name;
-        $init = isset($config['_init']) && $config['_init'];
-        Ac_Util::simpleBindAll($config, $this);
+    function __construct (array $options = array()) {
+        $init = false;
+        if (isset($options['_init']) && $options['_init']) $init = true;
+        unset($options['_init']);
+        $this->initOptionsFirst(['name', 'model'], $options);
+        parent::__construct($options);
         if ($init) $this->init();
+    }
+    
+    protected function setModel(Ac_Cg_Model $model) {
+        $this->_model = $model;
     }
     
     /**
@@ -115,6 +120,13 @@ class Ac_Cg_Property extends Ac_Cg_Base {
     function applyToSqlSelectPrototype(array & $prototype) {
         
     }
+    
+    function unserializeFromArray($array) {
+        $this->_model = Ac_Impl_ArraySerializer::getParent('Ac_Cg_Model');
+        parent::unserializeFromArray($array);
+        $this->_init = true;
+    }
+    
     
 }
 

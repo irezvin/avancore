@@ -2,6 +2,8 @@
 
 class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
     
+    static $strictParams = Ac_Prototyped::STRICT_PARAMS_WARNING;
+    
     /**
      * @var Ac_Cg_Template_ModelAndMapper
      */
@@ -68,10 +70,6 @@ class Ac_Cg_Template_Assoc_Strategy extends Ac_Cg_Template {
     
     var $inherited = false;
     var $parentProp = false;
-    
-    function __construct ($options) {
-        Ac_Util::simpleBindAll($options, $this);
-    }
     
     function getGuessMap() {
         $res = array(

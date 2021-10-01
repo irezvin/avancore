@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Admin_ReportEntry {
+class Ac_Admin_ReportEntry extends Ac_Prototyped {
     
     var $recordKey = false;
     var $recordTitle = false;
@@ -15,16 +15,15 @@ class Ac_Admin_ReportEntry {
 
     var $_entries = array();
     
+    function hasPublicVars() {
+        return true;
+    }    
+    
     function __construct ($description = false, $type = 'message', $dateTime = false, $recordKey = false, $recordTitle = false, $recordIsAvailable = false) {
-        if (func_num_args() == 1 && is_array($description)) Ac_Util::simpleBind($description, $this);
-        else {
-            $this->description = $description;
-            $this->dateTime = $dateTime;
-            $this->recordKey = $recordKey;
-            $this->recordTitle = $recordTitle;
-            $this->recordIsAvailable = $recordIsAvailable;
-            $this->type = $type;
-        }
+        if (func_num_args() == 1 && is_array($description)) $options = $description;
+        else $options = compact('description', 'dateTime', 'recordKey', 'recordTitle', 
+            'recordIsAvailable', 'type');
+        parent::__construct($options);
     }
     
     /**

@@ -1,6 +1,6 @@
 <?php
 
-class Ac_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_NamedApplicationComponent {
+class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_NamedApplicationComponent {
 
     /**
      * @var Ac_Application
@@ -131,45 +131,14 @@ class Ac_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_NamedAppli
     /**
      * @param Ac_Controller_Context $context
      */
-    function __construct ($context = null, $options = array(), $instanceId = false) {
-        
-        // Make the call Ac_Prototyped::factory compatible 
-        if (is_array($context) && func_num_args() == 1) {
-            $options = $context;
-            $context = null;
-            if (isset($options['context'])) $context = $options['context'];
-            if (isset($options['instanceId'])) $instanceId = $options['instanceId'];
+    function __construct (array $options = array()) {
+        $this->_instanceId = get_class($this);
+        if (isset($options['instanceId'])) {
+            $this->_instanceId = $options['instanceId'];
+            unset($options['instanceId']);
         }
-        
-        
-        if ($instanceId !== false) $this->_instanceId = $instanceId;
-            else $this->_instanceId = strtolower(get_class($this));
-
-        Ac_Util::bindAutoparams($this, $options);
         $this->doInitProperties($options);
-        
-        $contextParam = $context;
-    	if (!(is_object($contextParam) && $contextParam instanceof Ac_Controller_Context)) {
-            $context = null;
-            $url = null;
-            // TODO: check how often Url is used as param
-            if ($contextParam instanceof Ac_Url) $url = $contextParam->cloneObject();
-            elseif (is_string($contextParam)) $url = new Ac_Url($contextParam);
-            if ($url !== null) {
-                $context = new Ac_Controller_Context_Http();
-                $context->setBaseUrl($url);
-                $context->populate(array('get', 'post'));
-            }
-        }
-        if ($context) $this->setContext($context);
-    }
-    
-    /**
-     * Returns names of fields that will be automatically bound from request
-     * @return array
-     */
-    function listRequestVars() {
-        return array();
+        parent::__construct($options);
     }
     
     // --------------------- template methods ---------------------
@@ -178,7 +147,7 @@ class Ac_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_NamedAppli
      * Is called from the constructor
      * @param array $options
      */
-    function doInitProperties(array $options = array()) {
+    protected function doInitProperties(array & $options) {
     }
     
     /**
@@ -500,7 +469,6 @@ class Ac_Controller implements Ac_I_Prototyped, Ac_I_Controller, Ac_I_NamedAppli
         $res = Ac_Util::m($this->templateExtraVars, $this->_tplData);
         $res['controller'] = $this;
         $res['context'] = $this->getContext();
-        $res['newUi'] = true;
         $myVars = array_keys(get_object_vars($this));
         foreach ($this->_autoTplVars as $myVar => $tplVar) {
             if (is_numeric($myVar)) $myVar = $tplVar;
