@@ -2,6 +2,8 @@
 
 abstract class Ac_Sql_Part extends Ac_Prototyped {
     
+    static $strictParams = Ac_Prototyped::STRICT_PARAMS_WARNING;
+    
     /**
      * @var Ac_Sql_Part
      */    
@@ -53,16 +55,18 @@ abstract class Ac_Sql_Part extends Ac_Prototyped {
     protected $currentSelect = null;
     
     function __construct($options = array()) {
-        if (isset($options['db'])) $this->setDb($options['db']);
-        if (isset($options['parentPart'])) $this->setParentPart($options['parentPart']);
-        foreach (array_intersect(array_keys(get_object_vars($this)), array_keys($options)) as $k)
-            if ($k[0] != '_') $this->$k = $options[$k];
-        $this->_doOnInitialize($options);
-        if (isset($options['value'])) {
-            $this->bind($options['value']);
-        } elseif (isset($options['bind'])) {
-            $this->bind($options['bind']);
+        $hasValue = false;
+        $value = null;
+        if (array_key_exists('value', $options)) {
+            $value = $options['value'];
+            $hasValue = true;
+        } else if (array_key_exists('bind', $options)) {
+            $value = $options['bind'];
+            $hasValue = true;
         }
+        $this->initOptionsFirst(['db', 'parentPart'], $options);
+        parent::__construct($options);
+        if ($hasValue) $this->setValue($value);
     }
     
     function hasPublicVars() {
@@ -110,6 +114,10 @@ abstract class Ac_Sql_Part extends Ac_Prototyped {
             }
             $this->_doBind($input);
         }
+    }
+    
+    function setValue($value) {
+        return $this->bind($value);
     }
     
     function doesApply() {

@@ -18,16 +18,12 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
     
     var $extraAssets = [];
     
-    function __construct($context = null, $options = array(), $instanceId = false) {
-        if (func_num_args() == 1){
-            parent::__construct($context);
-        } else {
-            parent::__construct($context, $options, $instanceId);
-        }
+    function __construct(array $options = array()) {
         $this->_autoTplVars = array_merge($this->_autoTplVars, [
             'appCaption',
             'appCaptionSuffix',
         ]);
+        parent::__construct($options);
     }
     
     function getAppCaption() {
@@ -133,7 +129,8 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         if ($extra = $mapper->getManagerConfig()) {
             Ac_Util::ms($managerConfig, $extra);
         }
-        $manager = new $class ($context, $managerConfig);
+        $managerConfig['context'] = $context;
+        $manager = new $class ($managerConfig);
         $manager->_methodParamName = 'managerAction';
         $manager->setApplication($this->getApplication());
         //if ($this->separateToolbar) $manager->separateToolbar = true;

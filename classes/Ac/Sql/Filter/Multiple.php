@@ -20,6 +20,10 @@ class Ac_Sql_Filter_Multiple extends Ac_Sql_Filter {
      */
     var $setSameValueForAllChildren = false;
     
+    function setFilters(array $filters) {
+        $this->_filters = $filters;
+    }
+    
     function listFilters() {
         return array_keys($this->_filters);
     }

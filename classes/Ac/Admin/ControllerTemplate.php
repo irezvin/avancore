@@ -26,11 +26,12 @@ class Ac_Admin_ControllerTemplate extends Ac_Template_Html {
     
     function showMenu() {
         $menu = $this->controller->getMenu();
+        $user = $this->controller->getApplication()->getUser();
 ?>
         <header>
             <div class="logo"><h1><?php echo $this->appCaption; ?></h1></div>
             <div class="user">
-                <p><?php echo "Hello, User # ".$this->controller->getApplication()->getUser()->getId(); ?></p>
+                <p><?php if ($user) echo "Hello, User # ".$user->getId(); ?></p>
                 <div class="logout"><a class="logout" href="<?php echo $this->controller->getUrl(['action' => 'logout']); ?>">Logout</a></div>
             </div>
             <nav>
@@ -63,6 +64,10 @@ class Ac_Admin_ControllerTemplate extends Ac_Template_Html {
             $this->addAssetLibs($this->controller->extraAssets);
         }
         $this->showMenu();
+        $this->showMain($content);
+    }
+    
+    function showMain($content) {
 ?>
         <main>
 			<?php echo $content; ?>

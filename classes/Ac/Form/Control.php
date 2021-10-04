@@ -2,6 +2,8 @@
 
 class Ac_Form_Control extends Ac_Controller {
     
+    static $strictParams = Ac_Prototyped::STRICT_PARAMS_WARNING;
+    
     /**
      * Name of the control
      *

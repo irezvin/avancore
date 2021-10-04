@@ -199,7 +199,7 @@ section .manager .pagesList a {
     padding: 0;
 }
 
-.main .main {
+.main .main, main .main {
     margin: 1em 0;
     padding: 0;
 }
