@@ -1,4 +1,0 @@
-name,description,type,imageUrl,relatedText1,categories
-Item 1,Item 1 description,typeA,https://www.google.com.ua/images/srpr/logo3w.png,Blah blah,cat1/subCat1.1; cat2; cat3/subCat3.1/subCat3.1.1
-Item 2,Item 2 description,typeB,https://www.linux.com/templates/linuxcom_v2/images/lflogo_white.png,blah blah blah,cat1/subCat1.1; cat3
-Item 3,Item 3 description,typeA,http://noSuchAddress/noSuchImage.gif,More text,cat3/subCat3.1/subCat3.1.2; cat1/subCat1.2

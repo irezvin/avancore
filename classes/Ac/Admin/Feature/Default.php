@@ -252,7 +252,7 @@ class Ac_Admin_Feature_Default extends Ac_Admin_Feature {
                         $i = $subMapper->getInfo();
                         $asm = $i->allowSubManagers;
                         $res[$propName] = array('mapperClass' => $mc, 'allowSubManagers' => $asm, '_relId' => $p->relationId);
-                    }      
+                    }
                 }
             }
         }

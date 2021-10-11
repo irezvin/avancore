@@ -18,6 +18,10 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
     
     var $extraAssets = [];
     
+    var $stateVarName = true;
+
+    var $resetStateOnNoArgs = false;
+    
     function __construct(array $options = array()) {
         $this->_autoTplVars = array_merge($this->_autoTplVars, [
             'appCaption',
@@ -37,7 +41,7 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
             'controls' => [
                 'username' => ['class' => 'Ac_Form_Control_Text', 'required' => true],
                 'password' => ['class' => 'Ac_Form_Control_Text', 'type' => 'password', 'required' => true],
-                'submit' => ['class' => 'Ac_Form_Control_Button', 'type' => 'submit', 'caption' => 'Log In'],
+                'submit' => ['class' => 'Ac_Form_Control_Button', 'buttonType' => 'submit', 'caption' => 'Log In'],
             ],
             'submissionControl' => 'submit'
         ];
@@ -102,7 +106,60 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
     }
 
     function executeConfig() {
+    }    
+	
+	function getStateVarName() {
+	    if (!strlen($this->stateVarName)) $res = false;
+	    elseif ($this->stateVarName === true) $res = $this->_instanceId;
+	    else $res = $this->stateVarName;
+	    return $res;
+	}
+    
+    // @TODO: move persistent state handling to the adapter
+    
+    protected function loadState(array $path) {
+        $sv = $this->getStateVarName();
+        if (!$sv || !isset($_SESSION[$sv]) || !is_array($_SESSION[$sv])) return;
+        return Ac_Util::getArrayByPath($_SESSION[$sv], $path);
     }
+    
+    protected function saveState(array $state, array $path) {
+        $sv = $this->getStateVarName();
+        if (!$sv) return;
+        if (!isset($_SESSION[$sv])) $_SESSION[$sv] = array();
+        Ac_Util::setArrayByPath($_SESSION[$sv], $path, $state);
+    }
+	
+	function applyState(Ac_Controller_Context_Http $c) {
+        $dataPath = $c->getDataPath(true);
+        
+        $data = $c->getData();
+        
+        if (!isset($data['mapper']) || !$data['mapper']) return;
+        $mapper = $data['mapper'];
+        
+        $dataPath = array_merge(['mapper', $mapper], $dataPath);
+        $state = $this->loadState($dataPath);
+        
+        // Workaround for case when sometimes Cancel button saves ID of record into the state and 
+        // all subsequent actions are related only to that record
+        Ac_Util::unsetArrayByPath($state, array('keys'));
+
+        if (isset($data['managerAction']) && $data['managerAction'] !== 'list') {
+            return;
+        }
+        
+        if (!is_array($state)) $state = array();
+        if ($this->resetStateOnNoArgs && !count($data)) $state = array();
+        if ($c->getData('filterForm')) $state['filterForm'] = array();
+        $state['returnUrl'] = null;
+        $state['returnUrl64'] = null;
+
+        $state = Ac_Util::ms($state, $c->getData(), true);
+
+        $c->setData($state);
+        $this->saveState($state, $dataPath);
+	}    
 
     function executeManager($mapper) {
                 
@@ -116,8 +173,8 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
             'isInForm' => 'aForm',
         );
         $context = new Ac_Controller_Context_Http($contextOptions);
-        $context->populate('request');
-        //$this->applyState($context);
+        $context->populate('request', $this->_context->getDataPath());
+        $this->applyState($context);
 
         $managerConfig = array('mapperClass' => $mapperId);
         $mapper = Ac_Model_Mapper::getMapper($mapperId);

@@ -253,8 +253,7 @@ class Ac_Admin_Template extends Ac_Template_Html {
     }
             
     function showManagerWrapper($innerHtml, $isPart = false, $params = array()) {
-        //$this->addJsLib('prototype.js');
-
+    
         // TODO: FIX this one because there is no more Adapter here in Ac0.3!
         
         $this->addAssetLibs(

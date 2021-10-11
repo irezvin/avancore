@@ -995,13 +995,14 @@ class Ac_Admin_Manager extends Ac_Controller {
                 $mapper = $this->application->getMapper($conf['mapperClass']);
                 $conf = Ac_Util::m($mapper->getManagerConfig(), $conf);
             }
-            unset($conf['_relId']);
             if (isset($conf['class']) && strlen($conf['class'])) {
                 $class = $conf['class'];
             } else $class = 'Ac_Admin_Manager';
             $conf['context'] = $ctx;
             $conf['instanceId'] = $this->_instanceId.'_'.$id;
-            $sm = new $class ($conf);
+            $managerConf = $conf;
+            unset($managerConf['_relId']);
+            $sm = new $class ($managerConf);
             $sm->setApplication($this->getApplication());
             $this->_subManagers[$id] = $sm;
             foreach ($this->listFeatures() as $f) {
