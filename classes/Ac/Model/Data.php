@@ -1190,9 +1190,10 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
         } else {
             $subKey = false;
         }
-        //$target = $this->getAssoc($head, $subKey);
         $target = $this->_getOwnAssoc($head, $subKey, $plural);
-        $res = $target->getAssoc($tail, $key);
+        if ($target) {
+            $res = $target->getAssoc($tail, $key);
+        }
         return $res;
     }
     
