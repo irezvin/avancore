@@ -214,7 +214,7 @@ class Ac_Cg_App extends Ac_Prototyped {
         $configFile = $layout->findCodegenConfig();
         if ($configFile === false)
             throw new Ac_E_InvalidUsage("Cannot locate codegen.config.php");
-        $gen = new Ac_Cg_Generator($configFile);
+        $gen = new Ac_Cg_Generator(['configPath' => $configFile]);
         $gen->deployPath = $layout->getPathVar('pathGen', true, true);
         $gen->outputDir = $layout->getPathVar('pathVarCode', true);
         $gen->logFileName = $layout->getPathVar('pathVarLog', true).'/generator.log.txt';

@@ -1,0 +1,449 @@
+Legacy class name	Default ns class name	New ns class name	Notes
+Ac_Accessor	\Avancore\Accessor		
+Ac_Admin_Action	\Avancore\Admin\Action	\Avancore\Admin\AdminAction	
+Ac_Admin_Column	\Avancore\Admin\Column	\Avancore\Admin\Column\AbstractColumn	
+Ac_Admin_Column_Checked	\Avancore\Admin\Column\Checked	\Avancore\Admin\Column\CheckedColumn	
+Ac_Admin_Column_DetailsLink	\Avancore\Admin\Column\DetailsLink	\Avancore\Admin\Column\DetailsLinkColumn	
+Ac_Admin_Column_Published	\Avancore\Admin\Column\Published	\Avancore\Admin\Column\PublishedColumn	
+Ac_Admin_Column_RecordBinder	\Avancore\Admin\Column\RecordBinder	\Avancore\Admin\Column\RecordBinderColumn	
+Ac_Admin_Column_Reorder	\Avancore\Admin\Column\Reorder	\Avancore\Admin\Column\ReorderColumn	
+Ac_Admin_Column_SaveOrder	\Avancore\Admin\Column\SaveOrder	\Avancore\Admin\Column\SaveOrderColumn	
+Ac_Admin_Column_Switch	\Avancore\Admin\Column\Switch	\Avancore\Admin\Column\SwitchColumn	
+Ac_Admin_Controller	\Avancore\Admin\Controller	\Avancore\Admin\AdminController	
+Ac_Admin_ControllerTemplate	\Avancore\Admin\ControllerTemplate	\Avancore\Admin\AdminTemplate	
+Ac_Admin_Datalink	\Avancore\Admin\Datalink	\Avancore\Admin\Datalink\AbstractDatalink	
+Ac_Admin_Datalink_Subrecord	\Avancore\Admin\Datalink\Subrecord	\Avancore\Admin\Datalink\SubrecordDatalink	
+Ac_Admin_Feature	\Avancore\Admin\Feature	\Avancore\Admin\Feature\AbstractFeature	
+Ac_Admin_Feature_DebugSql	\Avancore\Admin\Feature\DebugSql	\Avancore\Admin\Feature\DebugSqlFeature	
+Ac_Admin_Feature_Default	\Avancore\Admin\Feature\Default	\Avancore\Admin\Feature\DefaultFeature	
+Ac_Admin_Feature_FacetedSearch	\Avancore\Admin\Feature\FacetedSearch		x
+Ac_Admin_Feature_FacetedSearch_Control	\Avancore\Admin\Feature\FacetedSearch\Control		x
+Ac_Admin_Feature_FacetedSearch_Template	\Avancore\Admin\Feature\FacetedSearch\Template		x
+Ac_Admin_Feature_Reorder	\Avancore\Admin\Feature\Reorder	\Avancore\Admin\Feature\ReorderFeature	
+Ac_Admin_Feature_ShowColumnsByFilter	\Avancore\Admin\Feature\ShowColumnsByFilter	\Avancore\Admin\Feature\ShowColumnsByFilterFeature	
+Ac_Admin_Feature_SimpleSearch	\Avancore\Admin\Feature\SimpleSearch	\Avancore\Admin\Feature\SimpleSearchFeature	
+Ac_Admin_Feature_Switch	\Avancore\Admin\Feature\Switch	\Avancore\Admin\Feature\SwitchFeature	
+Ac_Admin_Feature_Trigger	\Avancore\Admin\Feature\Trigger	\Avancore\Admin\Feature\TriggerFeature	
+Ac_Admin_Manager	\Avancore\Admin\Manager		
+Ac_Admin_ManagerConfigService	\Avancore\Admin\ManagerConfigService		
+Ac_Admin_ManagerConfigService_J25	\Avancore\Admin\ManagerConfigService\J25	\Avancore\Admin\Joomla25ManagerConfigService	
+Ac_Admin_Manifest	\Avancore\Admin\Manifest		
+Ac_Admin_MenuEntry	\Avancore\Admin\MenuEntry		
+Ac_Admin_MenuGroup	\Avancore\Admin\MenuGroup		
+Ac_Admin_Pagination	\Avancore\Admin\Pagination		
+Ac_Admin_Processing	\Avancore\Admin\Processing	\Avancore\Admin\AbstractProcessing	
+Ac_Admin_Processing_Delete	\Avancore\Admin\Processing\Delete	\Avancore\Admin\Processing\DeleteProcessing	
+Ac_Admin_Processing_MapperMethod	\Avancore\Admin\Processing\MapperMethod	\Avancore\Admin\Processing\MapperMethodProcessing	
+Ac_Admin_Processing_Method	\Avancore\Admin\Processing\Method	\Avancore\Admin\Processing\MethodProcessing	
+Ac_Admin_Processing_Publish	\Avancore\Admin\Processing\Publish	\Avancore\Admin\Processing\PublishProcessing	
+Ac_Admin_Processing_Reorder	\Avancore\Admin\Processing\Reorder	\Avancore\Admin\Processing\ReorderProcessing	
+Ac_Admin_Processing_SaveOrder	\Avancore\Admin\Processing\SaveOrder	\Avancore\Admin\Processing\SaveOrderProcessing	
+Ac_Admin_Processing_Switch	\Avancore\Admin\Processing\Switch	\Avancore\Admin\Processing\SwitchProcessing	
+Ac_Admin_ReportEntry	\Avancore\Admin\ReportEntry		
+Ac_Admin_Template	\Avancore\Admin\Template		
+Ac_Admin_Template_Pagination	\Avancore\Admin\Template\Pagination	\Avancore\Admin\PaginationTemplate	
+Ac_Application	\Avancore\Application	\Avancore\Application\AbstractApplication	
+Ac_Application_Adapter	\Avancore\Application\Adapter	\Avancore\Application\Adapter\AbstractAdapter	
+Ac_Application_Adapter_Joomla	\Avancore\Application\Adapter\Joomla	\Avancore\Application\Adapter\JoomlaAdapter	
+Ac_Application_Adapter_Slave	\Avancore\Application\Adapter\Slave	\Avancore\Application\Adapter\SecondaryAdapter	
+Ac_Application_Component	\Avancore\Application\Component	\Avancore\Application\ApplicationComponent	
+Ac_Application_FrontController	\Avancore\Application\FrontController		
+Ac_Application_FrontUrlMapper	\Avancore\Application\FrontUrlMapper		
+Ac_Application_User_AbstractProvider	\Avancore\Application\User\AbstractProvider	\Avancore\Application\UserProvider\AbstractUserProvider	
+Ac_Avancore	\Avancore\Avancore	\Avancore\Avancore	
+Ac_Cache	\Avancore\Cache	\Avancore\Cache\FileCache	
+Ac_Cache_Abstract	\Avancore\Cache\Abstract	\Avancore\Cache\AbstractCache	
+Ac_Cache_Accessor	\Avancore\Cache\Accessor	\Avancore\Cache\CacheAccessor	
+Ac_Cache_Memory	\Avancore\Cache\Memory	\Avancore\Cache\MemoryCache	
+Ac_Cache_Null	\Avancore\Cache\Null	\Avancore\Cache\NullCache	
+Ac_Cache_Util	\Avancore\Cache\Util	\Avancore\Interface\CacheUtilInterface	
+Ac_Cache_Util_PHP	\Avancore\Cache\Util\PHP	\Avancore\Cache\SimpleCacheUtil	
+Ac_Callbacks	\Avancore\Callbacks		
+Ac_Cg_App	\Avancore\Cg\App	\Avancore\Codegen\Application	
+Ac_Cg_Base	\Avancore\Cg\Base	\Avancore\Codegen\Component	
+Ac_Cg_Cli	\Avancore\Cg\Cli	\Avancore\Codegen\Cli	
+Ac_Cg_Dictionary	\Avancore\Cg\Dictionary	\Avancore\Codegen\Dictionary	
+Ac_Cg_DirSync	\Avancore\Cg\DirSync	\Avancore\Codegen\DirSync	
+Ac_Cg_Domain	\Avancore\Cg\Domain	\Avancore\Codegen\Domain	
+Ac_Cg_Frontend	\Avancore\Cg\Frontend	\Avancore\Codegen\Frontend	
+Ac_Cg_Generator	\Avancore\Cg\Generator	\Avancore\Codegen\Generator	
+Ac_Cg_Inflector	\Avancore\Cg\Inflector	\Avancore\Codegen\Inflector	
+Ac_Cg_Layout	\Avancore\Cg\Layout	\Avancore\Codegen\Layout\AbstractLayout	
+Ac_Cg_Layout_Joomla	\Avancore\Cg\Layout\Joomla	\Avancore\Codegen\Layout\JoomlaLayout	
+Ac_Cg_Layout_Native	\Avancore\Cg\Layout\Native	\Avancore\Codegen\Layout\NativeLayout	
+Ac_Cg_Member	\Avancore\Cg\Member	\Avancore\Codegen\Member	
+Ac_Cg_Model	\Avancore\Cg\Model	\Avancore\Codegen\Model	
+Ac_Cg_Model_Part	\Avancore\Cg\Model\Part	\Avancore\Codegen\ModelPart	
+Ac_Cg_Model_Relation	\Avancore\Cg\Model\Relation	\Avancore\Codegen\ModelRelation	
+Ac_Cg_Php_Expression	\Avancore\Cg\Php\Expression	\Avancore\Codegen\PhpExpression	
+Ac_Cg_Property	\Avancore\Cg\Property	\Avancore\Codegen\Property\AbstractProperty	
+Ac_Cg_Property_Object	\Avancore\Cg\Property\Object	\Avancore\Codegen\Property\ObjectProperty	
+Ac_Cg_Property_Simple	\Avancore\Cg\Property\Simple	\Avancore\Codegen\Property\SimpleProperty	
+Ac_Cg_Template	\Avancore\Cg\Template	\Avancore\Codegen\Template\AbstractTemplate	
+Ac_Cg_Template_Assoc_Strategy	\Avancore\Cg\Template\Assoc\Strategy	\Avancore\Codegen\Template\Association\AbstractAssociation	
+Ac_Cg_Template_Assoc_Strategy_Many	\Avancore\Cg\Template\Assoc\Strategy\Many	\Avancore\Codegen\Template\Association\OneToManyAssociation	
+Ac_Cg_Template_Assoc_Strategy_ManyToMany	\Avancore\Cg\Template\Assoc\Strategy\ManyToMany	\Avancore\Codegen\Template\Association\ManyToManyAssociation	
+Ac_Cg_Template_Assoc_Strategy_One	\Avancore\Cg\Template\Assoc\Strategy\One	\Avancore\Codegen\Template\Association\ToOneAssociation	
+Ac_Cg_Template_Domain	\Avancore\Cg\Template\Domain	\Avancore\Codegen\Template\DomainTemplate	
+Ac_Cg_Template_Languages	\Avancore\Cg\Template\Languages	\Avancore\Codegen\Template\LanguagesTemplate	
+Ac_Cg_Template_ModelAndMapper	\Avancore\Cg\Template\ModelAndMapper	\Avancore\Codegen\Template\ModelAndMapperTemplate	
+Ac_Cg_Template_ModelPart	\Avancore\Cg\Template\ModelPart	\Avancore\Codegen\Template\ModelPartTemplate	
+Ac_Cg_Template_Skel	\Avancore\Cg\Template\Skel	\Avancore\Codegen\Template\Skel\AbstractSkelTemplate	
+Ac_Cg_Template_Skel_Joomla	\Avancore\Cg\Template\Skel\Joomla	\Avancore\Codegen\Template\Skel\JoomlaSkelTemplate	
+Ac_Cg_Template_Skel_Native	\Avancore\Cg\Template\Skel\Native	\Avancore\Codegen\Template\Skel\NativeSkelTemplate	
+Ac_Cg_Util	\Avancore\Cg\Util	\Avancore\Codegen\Util	
+Ac_Cg_Writer_Abstract	\Avancore\Cg\Writer\Abstract	\Avancore\Codegen\Writer\AbstractWriter	
+Ac_Cg_Writer_File	\Avancore\Cg\Writer\File	\Avancore\Codegen\Writer\FileWriter	
+Ac_Cg_Writer_Memory	\Avancore\Cg\Writer\Memory	\Avancore\Codegen\Writer\MemoryWriter	
+Ac_Compat_Exception	\Avancore\Compat\Exception	\Avancore\Exception\CompatException	
+Ac_Compat_Overloader	\Avancore\Compat\Overloader		
+Ac_Controller	\Avancore\Controller	\Avancore\Controller\Controller	
+Ac_Controller_Context	\Avancore\Controller\Context	\Avancore\Controller\Context\AbstractContext	
+Ac_Controller_Context_Http	\Avancore\Controller\Context\Http	\Avancore\Controller\Context\HttpContext	
+Ac_Controller_Exception	\Avancore\Controller\Exception	\Avancore\Exception\ControllerException	duplicate?!
+Ac_Controller_Output	\Avancore\Controller\Output	\Avancore\Controller\Output\AbstractOutput	
+Ac_Controller_Output_Debug	\Avancore\Controller\Output\Debug	\Avancore\Controller\Output\DebugOutput	
+Ac_Controller_Output_Joomla	\Avancore\Controller\Output\Joomla	\Avancore\Controller\Output\JoomlaOutput	
+Ac_Controller_Output_Joomla15	\Avancore\Controller\Output\Joomla15		x
+Ac_Controller_Output_Joomla3	\Avancore\Controller\Output\Joomla3	\Avancore\Controller\Output\Joomla3Output	
+Ac_Controller_Output_Native	\Avancore\Controller\Output\Native	\Avancore\Controller\Output\NativeOutput	
+Ac_Controller_Response	\Avancore\Controller\Response	\Avancore\Controller\Response\AbstractResponse	
+Ac_Controller_Response_Global	\Avancore\Controller\Response\Global	\Avancore\Controller\Response\GlobalResponse	
+Ac_Controller_Response_Html	\Avancore\Controller\Response\Html	\Avancore\Controller\Response\HtmlResponse	
+Ac_Controller_Response_Http	\Avancore\Controller\Response\Http	\Avancore\Controller\Response\HttpResponse	
+Ac_Controller_Response_Json	\Avancore\Controller\Response\Json	\Avancore\Controller\Response\JsonResponse	
+Ac_Controller_Response_JsonPart	\Avancore\Controller\Response\JsonPart	\Avancore\Controller\Response\JsonResponsePart	
+Ac_Controller_Response_Part	\Avancore\Controller\Response\Part	\Avancore\Controller\Response\ResponsePart	
+Ac_Debug	\Avancore\Debug	\Avancore\Debug\Debug	
+Ac_Debug_Callbacks	\Avancore\Debug\Callbacks		
+Ac_Debug_FirePHP	\Avancore\Debug\FirePHP		
+Ac_Debug_Log	\Avancore\Debug\Log		
+Ac_Debug_Log_AbstractWriter	\Avancore\Debug\Log\AbstractWriter		
+Ac_Debug_Log_FileWriter	\Avancore\Debug\Log\FileWriter		
+Ac_Debug_Profiler	\Avancore\Debug\Profiler		
+Ac_Debug_Profiler_Counter	\Avancore\Debug\Profiler\Counter		
+Ac_Decorator	\Avancore\Decorator	\Avancore\Decorator\Decorator	
+Ac_Decorator_ArrayMod	\Avancore\Decorator\ArrayMod	\Avancore\Decorator\ArrayModDecorator	
+Ac_Decorator_Callback	\Avancore\Decorator\Callback	\Avancore\Decorator\CallbackDecorator	
+Ac_Decorator_Cast	\Avancore\Decorator\Cast	\Avancore\Decorator\CastDecorator	
+Ac_Decorator_Const	\Avancore\Decorator\Const	\Avancore\Decorator\ConstDecorator	
+Ac_Decorator_Date	\Avancore\Decorator\Date	\Avancore\Decorator\DateDecorator	
+Ac_Decorator_Debug_ObjectToClass	\Avancore\Decorator\Debug\ObjectToClass	\Avancore\Decorator\ObjectToClassDecorator	
+Ac_Decorator_If	\Avancore\Decorator\If	\Avancore\Decorator\IfDecorator	
+Ac_Decorator_Implode	\Avancore\Decorator\Implode	\Avancore\Decorator\ImplodeDecorator	
+Ac_Decorator_Map	\Avancore\Decorator\Map	\Avancore\Decorator\MapDecorator	
+Ac_Decorator_Model_Template	\Avancore\Decorator\Model\Template	\Avancore\Decorator\ModelTemplateDecorator	
+Ac_Decorator_Multi	\Avancore\Decorator\Multi	\Avancore\Decorator\MultiDecorator	
+Ac_Decorator_Print	\Avancore\Decorator\Print	\Avancore\Decorator\PrintDecorator	
+Ac_Decorator_ReplaceNull	\Avancore\Decorator\ReplaceNull	\Avancore\Decorator\ReplaceNullDecorator	
+Ac_Decorator_String	\Avancore\Decorator\String	\Avancore\Decorator\StringDecorator	
+Ac_Decorator_Text_Cut	\Avancore\Decorator\Text\Cut	\Avancore\Decorator\TextCutDecorator	
+Ac_Decorator_Text_FixJson	\Avancore\Decorator\Text\FixJson	\Avancore\Decorator\FixJsonDecorator	
+Ac_Decorator_Text_Hsc	\Avancore\Decorator\Text\Hsc	\Avancore\Decorator\HtmlEntitiesDecorator	
+Ac_Decorator_Text_Linkify	\Avancore\Decorator\Text\Linkify	\Avancore\Decorator\LinkifyDecorator	
+Ac_Decorator_Text_MakeLink	\Avancore\Decorator\Text\MakeLink	\Avancore\Decorator\MakeLinkDecorator	
+Ac_Decorator_Text_Split	\Avancore\Decorator\Text\Split	\Avancore\Decorator\SplitDecorator	
+Ac_Decorator_Text_Substitute	\Avancore\Decorator\Text\Substitute	\Avancore\Decorator\SubstituteDecorator	
+Ac_Decorator_Text_UrlFriendly	\Avancore\Decorator\Text\UrlFriendly	\Avancore\Decorator\UrlFriendlyDecorator	
+Ac_Decorator_ToArray	\Avancore\Decorator\ToArray	\Avancore\Decorator\ToArrayDecorator	
+Ac_Decorator_VarDump	\Avancore\Decorator\VarDump	\Avancore\Decorator\DumpDecorator	
+Ac_E_ArraySerialization	\Avancore\E\ArraySerialization	\Avancore\Exception\ArraySerializationException	
+Ac_E_Assertion	\Avancore\E\Assertion	\Avancore\Exception\AssertionException	
+Ac_E_Cli	\Avancore\E\Cli	\Avancore\Exception\CliException	
+Ac_E_ControllerException	\Avancore\E\ControllerException	\Avancore\Exception\ControllerException	
+Ac_E_Database	\Avancore\E\Database	\Avancore\Exception\DatabaseException	
+Ac_E_Etl	\Avancore\E\Etl		x
+Ac_E_InvalidAccess	\Avancore\E\InvalidAccess	\Avancore\Exception\InvalidAccessException	
+Ac_E_InvalidCall	\Avancore\E\InvalidCall	\Avancore\Exception\InvalidCallException	
+Ac_E_InvalidImplementation	\Avancore\E\InvalidImplementation	\Avancore\Exception\InvalidImplementationException	
+Ac_E_InvalidPrototype	\Avancore\E\InvalidPrototype	\Avancore\Exception\InvalidPrototypeException	
+Ac_E_InvalidUsage	\Avancore\E\InvalidUsage	\Avancore\Exception\InvalidUsageException	
+Ac_E_Template	\Avancore\E\Template	\Avancore\Exception\TemplateException	
+Ac_Event	\Avancore\Event	\Avancore\Event\Event	
+Ac_Event_Data	\Avancore\Event\Data	\Avancore\Event\EventData	
+Ac_Event_TraitWithEvents	\Avancore\Event\TraitWithEvents		
+Ac_Facet_Item	\Avancore\Facet\Item		
+Ac_Facet_ItemImpl	\Avancore\Facet\ItemImpl		
+Ac_Facet_ItemView	\Avancore\Facet\ItemView		
+Ac_Facet_Set	\Avancore\Facet\Set		
+Ac_Facet_SetImpl	\Avancore\Facet\SetImpl		
+Ac_Facet_SetView	\Avancore\Facet\SetView		
+Ac_Facet_Sql_I_ItemImpl	\Avancore\Facet\Sql\I\ItemImpl		
+Ac_Facet_Sql_ItemImpl	\Avancore\Facet\Sql\ItemImpl		
+Ac_Facet_Sql_NoValuesImpl	\Avancore\Facet\Sql\NoValuesImpl		
+Ac_Facet_Sql_SetImpl	\Avancore\Facet\Sql\SetImpl		
+Ac_Facet_Sql_ValueSetter	\Avancore\Facet\Sql\ValueSetter		
+Ac_Facet_Sql_ValueSetter_Ignore	\Avancore\Facet\Sql\ValueSetter\Ignore		
+Ac_Facet_Sql_ValueSetter_Part	\Avancore\Facet\Sql\ValueSetter\Part		
+Ac_Facet_Sql_ValueSetter_Where	\Avancore\Facet\Sql\ValueSetter\Where		
+Ac_Facet_ValueNotSet	\Avancore\Facet\ValueNotSet		
+Ac_Facet_View_Item_SelectList	\Avancore\Facet\View\Item\SelectList		
+Ac_Facet_View_Item_Text	\Avancore\Facet\View\Item\Text		
+Ac_Facet_View_Set_Template	\Avancore\Facet\View\Set\Template		
+Ac_File	\Avancore\File		
+Ac_File_Feature	\Avancore\File\Feature		
+Ac_File_Feature_HttpSend	\Avancore\File\Feature\HttpSend		
+Ac_File_Feature_Image	\Avancore\File\Feature\Image		
+Ac_File_Feature_MimeInfo	\Avancore\File\Feature\MimeInfo		
+Ac_File_Feature_MimeInfo_Exec	\Avancore\File\Feature\MimeInfo\Exec		
+Ac_File_Feature_MimeInfo_Finfo	\Avancore\File\Feature\MimeInfo\Finfo		
+Ac_File_Feature_MimeInfo_MimeContentType	\Avancore\File\Feature\MimeInfo\MimeContentType		
+Ac_File_Feature_WebMapping	\Avancore\File\Feature\WebMapping		
+Ac_File_Manager	\Avancore\File\Manager		
+Ac_File_ThumbGen	\Avancore\File\ThumbGen		
+Ac_File_ThumbGen_Image	\Avancore\File\ThumbGen\Image		
+Ac_Flags	\Avancore\Flags		
+Ac_Form	\Avancore\Form	\Avancore\Form\Form	
+Ac_Form_Context	\Avancore\Form\Context		
+Ac_Form_Control	\Avancore\Form\Control		
+Ac_Form_Control_Button	\Avancore\Form\Control\Button	\Avancore\Form\Control\ButtonControl	
+Ac_Form_Control_Composite	\Avancore\Form\Control\Composite	\Avancore\Form\Control\CompositeControl	
+Ac_Form_Control_Date	\Avancore\Form\Control\Date	\Avancore\Form\Control\DateControl	
+Ac_Form_Control_DateTime	\Avancore\Form\Control\DateTime	\Avancore\Form\Control\DateTimeControl	
+Ac_Form_Control_ErrorList	\Avancore\Form\Control\ErrorList	\Avancore\Form\Control\ErrorListControl	
+Ac_Form_Control_Group	\Avancore\Form\Control\Group	\Avancore\Form\Control\GroupControl	
+Ac_Form_Control_List	\Avancore\Form\Control\List	\Avancore\Form\Control\ListControl	
+Ac_Form_Control_Listable	\Avancore\Form\Control\Listable	\Avancore\Form\Control\ListableControl	
+Ac_Form_Control_Parameters	\Avancore\Form\Control\Parameters	\Avancore\Form\Control\ParametersControl	
+Ac_Form_Control_Path	\Avancore\Form\Control\Path	\Avancore\Form\Control\PathControl	
+Ac_Form_Control_Repeater	\Avancore\Form\Control\Repeater	\Avancore\Form\Control\RepeaterControl	
+Ac_Form_Control_Static	\Avancore\Form\Control\Static	\Avancore\Form\Control\StaticControl	
+Ac_Form_Control_Tabs	\Avancore\Form\Control\Tabs	\Avancore\Form\Control\TabsControl	
+Ac_Form_Control_Tabs_Sheet	\Avancore\Form\Control\Tabs\Sheet	\Avancore\Form\Control\TabSheetControl	
+Ac_Form_Control_Template	\Avancore\Form\Control\Template	\Avancore\Form\Template\AbstractTemplate	
+Ac_Form_Control_Template_Basic	\Avancore\Form\Control\Template\Basic	\Avancore\Form\Template\BasicTemplate	
+Ac_Form_Control_Template_Parameters	\Avancore\Form\Control\Template\Parameters	\Avancore\Form\Template\ParametersTemplate	
+Ac_Form_Control_Template_Placeholders	\Avancore\Form\Control\Template\Placeholders	\Avancore\Form\Template\PlaceholdersTemplate	
+Ac_Form_Control_Template_Tabs	\Avancore\Form\Control\Template\Tabs	\Avancore\Form\Template\TabsTemplate	
+Ac_Form_Control_Text	\Avancore\Form\Control\Text	\Avancore\Form\Control\TextControl	
+Ac_Form_Control_Toggle	\Avancore\Form\Control\Toggle	\Avancore\Form\Control\ToggleControl	
+Ac_Form_Control_Upload	\Avancore\Form\Control\Upload	\Avancore\Form\Control\UploadControl	
+Ac_Form_Converter	\Avancore\Form\Converter	\Avancore\Form\FormConverter	
+Ac_Form_RteAdapter	\Avancore\Form\RteAdapter	\Avancore\Form\RteAdapter\AbstractRteAdapter	
+Ac_Form_RteAdapter_TinyMce	\Avancore\Form\RteAdapter\TinyMce	\Avancore\Form\RteAdapter\TinyMceRteAdapter	
+Ac_I_Accessor	\Avancore\I\Accessor	\Avancore\Interface\AccessorInterface	rethink all interface names and locations
+Ac_I_ApplicationComponent	\Avancore\I\ApplicationComponent	\Avancore\Interface\ApplicationComponentInterface	
+Ac_I_ArraySerializable	\Avancore\I\ArraySerializable	\Avancore\Interface\ArraySerializableInterface	
+Ac_I_ArraySerializable_Extended	\Avancore\I\ArraySerializable\Extended	\Avancore\Interface\ArraySerializableExtendedInterface	
+Ac_I_BatchAwareMapper	\Avancore\I\BatchAwareMapper	\Avancore\Interface\BatchAwareMapperInterface	
+Ac_I_CollectionAwareObject	\Avancore\I\CollectionAwareObject	\Avancore\Interface\CollectionAwareObjectInterface	
+Ac_I_Compat	\Avancore\I\Compat	\Avancore\Interface\CompatInterface	
+Ac_I_Controller	\Avancore\I\Controller	\Avancore\Interface\ControllerInterface	
+Ac_I_Decorator	\Avancore\I\Decorator	\Avancore\Interface\DecoratorInterface	
+Ac_I_Decorator_Model	\Avancore\I\Decorator\Model	\Avancore\Interface\DecoratorModelInterface	
+Ac_I_EnumProvider	\Avancore\I\EnumProvider	\Avancore\Interface\EnumProviderInterface	
+Ac_I_Getter	\Avancore\I\Getter	\Avancore\Interface\GetterInterface	
+Ac_I_Jsable	\Avancore\I\Jsable	\Avancore\Interface\JsableInterface	
+Ac_I_Lang_ResourceProvider	\Avancore\I\Lang\ResourceProvider	\Avancore\Interface\LangResourceProviderInterface	
+Ac_I_LifecycleAwareCollection	\Avancore\I\LifecycleAwareCollection	\Avancore\Interface\LifecycleAwareCollectionInterface	
+Ac_I_Mail_Address	\Avancore\I\Mail\Address	\Avancore\Interface\MailAddressInterface	
+Ac_I_Mail_Attachment	\Avancore\I\Mail\Attachment	\Avancore\Interface\MailAttachmentInterface	
+Ac_I_Mail_ExtendedMessage	\Avancore\I\Mail\ExtendedMessage	\Avancore\Interface\MailExtendedMessageInterface	
+Ac_I_Mail_Message	\Avancore\I\Mail\Message	\Avancore\Interface\MailMessageInterface	
+Ac_I_Mail_Sender	\Avancore\I\Mail\Sender	\Avancore\Interface\MailSenderInterface	
+Ac_I_Mail_Sender_Smtp	\Avancore\I\Mail\Sender\Smtp	\Avancore\Interface\MailSmtpSenderInterface	
+Ac_I_Mail_Sender_WithDump	\Avancore\I\Mail\Sender\WithDump	\Avancore\Interface\MailDumpingSenderInterface	
+Ac_I_Mixable	\Avancore\I\Mixable	\Avancore\Interface\MixableInterface	
+Ac_I_Mixable_Shared	\Avancore\I\Mixable\Shared	\Avancore\Interface\SharedMixableInterface	
+Ac_I_Mixable_WithInit	\Avancore\I\Mixable\WithInit	\Avancore\Interface\MixableWithInitInterface	
+Ac_I_Mixin	\Avancore\I\Mixin	\Avancore\Interface\MixinInterface	
+Ac_I_ModelAssociation	\Avancore\I\ModelAssociation	\Avancore\Interface\ModelAssociationInterface	
+Ac_I_NamedApplicationComponent	\Avancore\I\NamedApplicationComponent	\Avancore\Interface\NamedApplicationComponentInterface	
+Ac_I_ObjectsCollection	\Avancore\I\ObjectsCollection	\Avancore\Interface\ObjectsCollectionInterface	
+Ac_I_Param	\Avancore\I\Param	\Avancore\Interface\ParamInterface	
+Ac_I_Param_Source	\Avancore\I\Param\Source	\Avancore\Interface\ParamSourceInterface	
+Ac_I_PhpExpression	\Avancore\I\PhpExpression	\Avancore\Interface\PhpExpressionInterface	
+Ac_I_PhpExpression_Extended	\Avancore\I\PhpExpression\Extended	\Avancore\Interface\ExtendedPhpExpressionInterface	
+Ac_I_Prototyped	\Avancore\I\Prototyped	\Avancore\Interface\PrototypedInterface	
+Ac_I_RedirectTarget	\Avancore\I\RedirectTarget	\Avancore\Interface\RedirectTargetInterface	
+Ac_I_Search_Criterion_Bulk	\Avancore\I\Search\Criterion\Bulk	\Avancore\Interface\BulkSearchCriterionInterface	
+Ac_I_Search_Criterion_ExtendedSort	\Avancore\I\Search\Criterion\ExtendedSort	\Avancore\Interface\ExtendedSearchCriterionInterface	
+Ac_I_Search_Criterion_Search	\Avancore\I\Search\Criterion\Search	\Avancore\Interface\SearchCriterionInterface	
+Ac_I_Search_Criterion_Sort	\Avancore\I\Search\Criterion\Sort	\Avancore\Interface\SortSearchCriterionInterface	
+Ac_I_Search_FilterProvider	\Avancore\I\Search\FilterProvider	\Avancore\Interface\SearchFilterProviderInterface	
+Ac_I_Search_RecordProvider	\Avancore\I\Search\RecordProvider	\Avancore\Interface\SearchRecordProviderInterface	
+Ac_I_Sql_Expression	\Avancore\I\Sql\Expression	\Avancore\Interface\SqlExpressionInterface	
+Ac_I_Tree_Mapper	\Avancore\I\Tree\Mapper	\Avancore\Interface\TreeMapperInterface	
+Ac_I_Tree_Mapper_AdjacencyList	\Avancore\I\Tree\Mapper\AdjacencyList	\Avancore\Interface\AdjacencyListTreeMapperInterface	
+Ac_I_Tree_Mapper_Combo	\Avancore\I\Tree\Mapper\Combo	\Avancore\Interface\ComboTreeMapperInterface	
+Ac_I_Tree_Mapper_NestedSets	\Avancore\I\Tree\Mapper\NestedSets	\Avancore\Interface\NestedSetsTreeMapperInterface	
+Ac_I_Tree_Node	\Avancore\I\Tree\Node	\Avancore\Interface\TreeNodeInterface	
+Ac_I_Tree_Provider	\Avancore\I\Tree\Provider	\Avancore\Interface\TreeProviderInterface	
+Ac_I_User	\Avancore\I\User	\Avancore\Interface\UserInterface	
+Ac_I_UserProvider	\Avancore\I\UserProvider	\Avancore\Interface\UserProviderInterface	
+Ac_I_WithCleanup	\Avancore\I\WithCleanup	\Avancore\Interface\WithCleanupInterface	
+Ac_I_WithEvents	\Avancore\I\WithEvents	\Avancore\Interface\WithEventsInterface	
+Ac_I_WithMapper	\Avancore\I\WithMapper	\Avancore\Interface\WithMapperInterface	
+Ac_I_WithMethods	\Avancore\I\WithMethods	\Avancore\Interface\WithMethodsInterface	
+Ac_I_WithSqlSelectPrototype	\Avancore\I\WithSqlSelectPrototype	\Avancore\Interface\WithSqlSelectPrototypeInterface	
+Ac_Impl_ArraySerializer	\Avancore\Impl\ArraySerializer	\Avancore\Util\ArraySerializer	
+Ac_Impl_Cleanup	\Avancore\Impl\Cleanup	\Avancore\Util\Cleanup	
+Ac_Js	\Avancore\Js	\Avancore\Js\Js	
+Ac_Js_Call	\Avancore\Js\Call		
+Ac_Js_Code	\Avancore\Js\Code		
+Ac_Js_Hash	\Avancore\Js\Hash		
+Ac_Js_New	\Avancore\Js\New	\Avancore\Js\NewOperator	
+Ac_Js_Object	\Avancore\Js\Object	\Avancore\Js\Object\Object	
+Ac_Js_Object_Assign	\Avancore\Js\Object\Assign		
+Ac_Js_Object_Init	\Avancore\Js\Object\Init		
+Ac_Js_Object_Ref	\Avancore\Js\Object\Ref		
+Ac_Js_Script	\Avancore\Js\Script		
+Ac_Js_String	\Avancore\Js\String		
+Ac_Js_Val	\Avancore\Js\Val		
+Ac_Js_Var	\Avancore\Js\Var		
+Ac_Lang_Resource	\Avancore\Lang\Resource	\Avancore\Lang\LangResource	
+Ac_Lang_ResourceProvider_Dir	\Avancore\Lang\ResourceProvider\Dir	\Avancore\Lang\DirectoryLangResourceProvider	
+Ac_Lang_String	\Avancore\Lang\String	\Avancore\Lang\LangString	
+Ac_Mail_Address	\Avancore\Mail\Address		
+Ac_Mail_Attachment	\Avancore\Mail\Attachment		
+Ac_Mail_Message	\Avancore\Mail\Message		
+Ac_Mail_PHPMailer_Mail	\Avancore\Mail\PHPMailer\Mail	\Avancore\Mail\PHPMailerSender\Mail	
+Ac_Mail_PHPMailer_SendMail	\Avancore\Mail\PHPMailer\SendMail	\Avancore\Mail\PHPMailerSender\SendMail	
+Ac_Mail_PHPMailer_Smtp	\Avancore\Mail\PHPMailer\Smtp	\Avancore\Mail\PHPMailerSender\Smtp	
+Ac_Mail_Sender_PHPMailer	\Avancore\Mail\Sender\PHPMailer	\Avancore\Mail\PHPMailerSender\Abstract	
+Ac_Mail_Util	\Avancore\Mail\Util		
+Ac_Mixable	\Avancore\Mixable		
+Ac_Mixin	\Avancore\Mixin	\Avancore\Mixin\Mixin	
+Ac_Mixin_WithEvents	\Avancore\Mixin\WithEvents	\Avancore\Mixin\MixinWithEvents	
+Ac_Model_Association_Abstract	\Avancore\Model\Association\Abstract	\Avancore\Model\Association\AbstractAssociation	
+Ac_Model_Association_Many	\Avancore\Model\Association\Many	\Avancore\Model\Association\ManyAssociation	
+Ac_Model_Association_ManyToMany	\Avancore\Model\Association\ManyToMany	\Avancore\Model\Association\ManyToManyAssociation	
+Ac_Model_Association_One	\Avancore\Model\Association\One	\Avancore\Model\Association\OneAssociation	
+Ac_Model_Collection_Abstract	\Avancore\Model\Collection\Abstract	\Avancore\Model\Collection\AbstractCollection	
+Ac_Model_Collection_Array	\Avancore\Model\Collection\Array	\Avancore\Model\Collection\ArrayCollection	
+Ac_Model_Collection_Mapper	\Avancore\Model\Collection\Mapper	\Avancore\Model\Collection\MapperCollection	
+Ac_Model_Collection_SqlMapper	\Avancore\Model\Collection\SqlMapper	\Avancore\Model\Collection\SqlMapperCollection	
+Ac_Model_Criterion_Callback	\Avancore\Model\Criterion\Callback	\Avancore\Model\Criterion\CallbackCriterion	
+Ac_Model_Criterion_FieldEquals	\Avancore\Model\Criterion\FieldEquals	\Avancore\Model\Criterion\FieldEqualsCriterion	
+Ac_Model_Criterion_Identifier	\Avancore\Model\Criterion\Identifier	\Avancore\Model\Criterion\IdentifierCriterion	
+Ac_Model_Criterion_MultiField	\Avancore\Model\Criterion\MultiField	\Avancore\Model\Criterion\MultiFieldCriterion	
+Ac_Model_Data	\Avancore\Model\Data	\Avancore\Model\DataObject	
+Ac_Model_DateTime	\Avancore\Model\DateTime	\Avancore\Util\DateTime	
+Ac_Model_Mapper	\Avancore\Model\Mapper		
+Ac_Model_MapperInfo	\Avancore\Model\MapperInfo		
+Ac_Model_Mapper_Mixable_ExtraTable	\Avancore\Model\Mapper\Mixable\ExtraTable	\Avancore\Model\MapperMixable\ExtraTable	
+Ac_Model_Mixable_Data	\Avancore\Model\Mixable\Data	\Avancore\Model\ModelMixable\Data	
+Ac_Model_Mixable_Dates	\Avancore\Model\Mixable\Dates	\Avancore\Model\ModelMixable\Dates	
+Ac_Model_Mixable_ExtraTable	\Avancore\Model\Mixable\ExtraTable	\Avancore\Model\ModelMixable\ExtraTable	
+Ac_Model_Mixable_Object	\Avancore\Model\Mixable\Object	\Avancore\Model\ModelMixable\Object	
+Ac_Model_Object	\Avancore\Model\Object	\Avancore\Model\PersistentObject	
+Ac_Model_Property	\Avancore\Model\Property		
+Ac_Model_Record	\Avancore\Model\Record	\Avancore\Model\Record	
+Ac_Model_Relation	\Avancore\Model\Relation	\Avancore\Model\Relation\SymmetricRelation	
+Ac_Model_Relation_Abstract	\Avancore\Model\Relation\Abstract	\Avancore\Model\Relation\AbstractRelation	
+Ac_Model_Relation_Impl	\Avancore\Model\Relation\Impl	\Avancore\Model\Relation\AsymmetricRelation	
+Ac_Model_Relation_Provider	\Avancore\Model\Relation\Provider	\Avancore\Model\Relation\ObjectsProvider\AbstractObjectsProvider	
+Ac_Model_Relation_Provider_Evaluator	\Avancore\Model\Relation\Provider\Evaluator	\Avancore\Model\Relation\ProviderConfigurator	
+Ac_Model_Relation_Provider_Mapper_Abstract	\Avancore\Model\Relation\Provider\Mapper\Abstract	\Avancore\Model\Relation\ObjectsProvider\AbstractMapperProvider	
+Ac_Model_Relation_Provider_Mapper_Omni	\Avancore\Model\Relation\Provider\Mapper\Omni	\Avancore\Model\Relation\ObjectsProvider\OmniMapperProvider	
+Ac_Model_Relation_Provider_Mapper_Pk	\Avancore\Model\Relation\Provider\Mapper\Pk	\Avancore\Model\Relation\ObjectsProvider\PrimaryKeyMapperProvider	
+Ac_Model_Relation_Provider_Sql	\Avancore\Model\Relation\Provider\Sql	\Avancore\Model\Relation\ObjectsProvider\AbstractSqlProvider	
+Ac_Model_Relation_Provider_Sql_Omni	\Avancore\Model\Relation\Provider\Sql\Omni	\Avancore\Model\Relation\ObjectsProvider\OmniSqlProvider	
+Ac_Model_Search	\Avancore\Model\Search		
+Ac_Model_SortCriterion_Callback	\Avancore\Model\SortCriterion\Callback	\Avancore\Model\SortCriterion\CallbackCriterion	
+Ac_Model_SortCriterion_Field	\Avancore\Model\SortCriterion\Field	\Avancore\Model\SortCriterion\SingleFieldCriterion	
+Ac_Model_SortCriterion_Fields	\Avancore\Model\SortCriterion\Fields	\Avancore\Model\SortCriterion\MultipleFieldsCriterion	
+Ac_Model_Sql_TableProvider	\Avancore\Model\Sql\TableProvider		
+Ac_Model_Storage	\Avancore\Model\Storage	\Avancore\Model\Storage\AbstractStorage	
+Ac_Model_Storage_InspectionResult	\Avancore\Model\Storage\InspectionResult		x
+Ac_Model_Storage_MonoTable	\Avancore\Model\Storage\MonoTable	\Avancore\Model\Storage\MonoTableStorage	
+Ac_Model_Storage_Sql	\Avancore\Model\Storage\Sql	\Avancore\Model\Storage\SqlStorage	
+Ac_Model_Tree_AbstractImpl	\Avancore\Model\Tree\AbstractImpl		
+Ac_Model_Tree_AdjacencyListImpl	\Avancore\Model\Tree\AdjacencyListImpl		
+Ac_Model_Tree_AdjacencyListMapper	\Avancore\Model\Tree\AdjacencyListMapper		
+Ac_Model_Tree_ComboImpl	\Avancore\Model\Tree\ComboImpl		
+Ac_Model_Tree_ComboMapper	\Avancore\Model\Tree\ComboMapper		
+Ac_Model_Tree_NestedSetsDebug	\Avancore\Model\Tree\NestedSetsDebug		
+Ac_Model_Tree_NestedSetsImpl	\Avancore\Model\Tree\NestedSetsImpl		
+Ac_Model_Tree_NestedSetsMapper	\Avancore\Model\Tree\NestedSetsMapper		
+Ac_Model_Tree_Object	\Avancore\Model\Tree\Object	\Avancore\Model\Tree\TreeObject	
+Ac_Model_Tree_Provider	\Avancore\Model\Tree\Provider		?
+Ac_Model_Typer_Abstract	\Avancore\Model\Typer\Abstract	\Avancore\Model\Typer\AbstractTyper	
+Ac_Model_Typer_ExtraTable	\Avancore\Model\Typer\ExtraTable	\Avancore\Model\Typer\ExtraTableTyper	
+Ac_Model_Typer_Simple	\Avancore\Model\Typer\Simple	\Avancore\Model\Typer\SimpleTyper	
+Ac_Model_Validator	\Avancore\Model\Validator		
+Ac_Model_Values	\Avancore\Model\Values	\Avancore\Model\Values\Values	
+Ac_Model_Values_Files	\Avancore\Model\Values\Files		
+Ac_Model_Values_Mapper	\Avancore\Model\Values\Mapper		
+Ac_Prototyped	\Avancore\Prototyped		
+Ac_Sql_Blocker	\Avancore\Sql\Blocker		
+Ac_Sql_Db	\Avancore\Sql\Db	\Avancore\Sql\Db\AbstractDb	
+Ac_Sql_Db_Mysqli	\Avancore\Sql\Db\Mysqli	\Avancore\Sql\Db\MysqliDb	
+Ac_Sql_Db_Pdo	\Avancore\Sql\Db\Pdo	\Avancore\Sql\Db\PdoDb	
+Ac_Sql_Dbi_Column	\Avancore\Sql\Dbi\Column		
+Ac_Sql_Dbi_Database	\Avancore\Sql\Dbi\Database		
+Ac_Sql_Dbi_Index	\Avancore\Sql\Dbi\Index		
+Ac_Sql_Dbi_Inspector	\Avancore\Sql\Dbi\Inspector	\Avancore\Sql\Dbi\Inspector\BasicInspector	
+Ac_Sql_Dbi_Inspector_Canned	\Avancore\Sql\Dbi\Inspector\Canned	\Avancore\Sql\Dbi\Inspector\CannedInspector	
+Ac_Sql_Dbi_Inspector_MsSql	\Avancore\Sql\Dbi\Inspector\MsSql	\Avancore\Sql\Dbi\Inspector\MsSqlInspector	
+Ac_Sql_Dbi_Inspector_MySql5	\Avancore\Sql\Dbi\Inspector\MySql5	\Avancore\Sql\Dbi\Inspector\MySql5Inspector	
+Ac_Sql_Dbi_Object	\Avancore\Sql\Dbi\Object		
+Ac_Sql_Dbi_Relation	\Avancore\Sql\Dbi\Relation		
+Ac_Sql_Dbi_Table	\Avancore\Sql\Dbi\Table		
+Ac_Sql_Dbi_TableProvider	\Avancore\Sql\Dbi\TableProvider		
+Ac_Sql_Dialect	\Avancore\Sql\Dialect	\Avancore\Sql\Dialect\AbstractDialect	
+Ac_Sql_Dialect_Mssql	\Avancore\Sql\Dialect\Mssql	\Avancore\Sql\Dialect\MssqlDialect	
+Ac_Sql_Dialect_Mysql	\Avancore\Sql\Dialect\Mysql	\Avancore\Sql\Dialect\MysqlDialect	
+Ac_Sql_Dialect_Pgsql	\Avancore\Sql\Dialect\Pgsql	\Avancore\Sql\Dialect\PgsqlDialect	
+Ac_Sql_Expression	\Avancore\Sql\Expression	\Avancore\Sql\Expression\SqlExpression	
+Ac_Sql_Expression_Complex	\Avancore\Sql\Expression\Complex	\Avancore\Sql\Expression\ComplexSqlExpression	
+Ac_Sql_Filter	\Avancore\Sql\Filter	\Avancore\Sql\Filter\AbstractFilter	
+Ac_Sql_Filter_Custom	\Avancore\Sql\Filter\Custom	\Avancore\Sql\Filter\CustomFilter	
+Ac_Sql_Filter_Equals	\Avancore\Sql\Filter\Equals	\Avancore\Sql\Filter\EqualsFilter	
+Ac_Sql_Filter_Multiple	\Avancore\Sql\Filter\Multiple	\Avancore\Sql\Filter\MultipleFilter	
+Ac_Sql_Filter_NNCriterion	\Avancore\Sql\Filter\NNCriterion	\Avancore\Sql\Filter\ManyToManyFilter\AbstracManyToManyFilter	
+Ac_Sql_Filter_NNCriterion_Omni	\Avancore\Sql\Filter\NNCriterion\Omni	\Avancore\Sql\Filter\NNCriterion\OmniManyToManyFilter	
+Ac_Sql_Filter_NNCriterion_Simple	\Avancore\Sql\Filter\NNCriterion\Simple	\Avancore\Sql\Filter\NNCriterion\SimpleManyToManyFilter	
+Ac_Sql_Filter_Range	\Avancore\Sql\Filter\Range	\Avancore\Sql\Filter\RangeFilter	
+Ac_Sql_Filter_Simple	\Avancore\Sql\Filter\Simple	\Avancore\Sql\Filter\SimpleFilter	
+Ac_Sql_Filter_String	\Avancore\Sql\Filter\String	\Avancore\Sql\Filter\StringFilter	
+Ac_Sql_Filter_Substring	\Avancore\Sql\Filter\Substring	\Avancore\Sql\Filter\SubstringFilter	
+Ac_Sql_Filter_Switcher	\Avancore\Sql\Filter\Switcher	\Avancore\Sql\Filter\SwitcherFilter	
+Ac_Sql_NestedSets	\Avancore\Sql\NestedSets		
+Ac_Sql_Order	\Avancore\Sql\Order	\Avancore\Sql\Sorter\AbstractSorter	
+Ac_Sql_Order_Columns	\Avancore\Sql\Order\Columns	\Avancore\Sql\Sorter\ColumnsSorter	
+Ac_Sql_Order_Multiple	\Avancore\Sql\Order\Multiple	\Avancore\Sql\Sorter\MultipleSorter	
+Ac_Sql_Order_Simple	\Avancore\Sql\Order\Simple	\Avancore\Sql\Sorter\SimpleSorter	
+Ac_Sql_Order_Switcher	\Avancore\Sql\Order\Switcher	\Avancore\Sql\Sorter\SwitcherSorter	
+Ac_Sql_Part	\Avancore\Sql\Part		
+Ac_Sql_RefChecker	\Avancore\Sql\RefChecker		
+Ac_Sql_Select	\Avancore\Sql\Select	\Avancore\Sql\Select\Select	
+Ac_Sql_Select_Expression	\Avancore\Sql\Select\Expression		
+Ac_Sql_Select_Table	\Avancore\Sql\Select\Table	\Avancore\Sql\Select\Table\Table	
+Ac_Sql_Select_TableProvider	\Avancore\Sql\Select\TableProvider		
+Ac_Sql_Select_Table_Clone	\Avancore\Sql\Select\Table\Clone	\Avancore\Sql\Select\Table\ClonedTable	
+Ac_Sql_Select_Table_Subquery	\Avancore\Sql\Select\Table\Subquery	\Avancore\Sql\Select\Table\SubqueryTable	
+Ac_Sql_Statement	\Avancore\Sql\Statement		
+Ac_Sql_Statement_Cache	\Avancore\Sql\Statement\Cache		
+Ac_Sql_Updater	\Avancore\Sql\Updater		
+Ac_Sql_Value	\Avancore\Sql\Value	\Avancore\Sql\SqlValue	
+Ac_Table	\Avancore\Table	\Avancore\Table\Table	
+Ac_Table_Column	\Avancore\Table\Column	\Avancore\Table\Column\Column	
+Ac_Table_Column_Checked	\Avancore\Table\Column\Checked	\Avancore\Table\Column\CheckedColumn	
+Ac_Table_Column_Link	\Avancore\Table\Column\Link	\Avancore\Table\Column\LinkColumn	
+Ac_Table_Column_MarkChanges	\Avancore\Table\Column\MarkChanges	\Avancore\Table\Column\MarkChangesColumn	
+Ac_Table_Column_Number	\Avancore\Table\Column\Number	\Avancore\Table\Column\NumberColumn	
+Ac_Table_Column_Published	\Avancore\Table\Column\Published	\Avancore\Table\Column\PublishedColumn	
+Ac_Table_Column_Reorder	\Avancore\Table\Column\Reorder	\Avancore\Table\Column\ReorderColumn	
+Ac_Table_Column_SaveOrder	\Avancore\Table\Column\SaveOrder	\Avancore\Table\Column\SaveOrderColumn	
+Ac_Table_Sequential	\Avancore\Table\Sequential	\Avancore\Table\SequentialTable	
+Ac_Template	\Avancore\Template	\Avancore\Template\Template	
+Ac_Template_Helper	\Avancore\Template\Helper	\Avancore\Template\Helper\AbstractHelper	?
+Ac_Template_Helper_Html	\Avancore\Template\Helper\Html	\Avancore\Template\Helper\HtmlHelper	?
+Ac_Template_Html	\Avancore\Template\Html	\Avancore\Template\HtmlTemplate	
+Ac_Template_HtmlPage	\Avancore\Template\HtmlPage	\Avancore\Template\HtmlPagePage	
+Ac_Template_JoomlaPage	\Avancore\Template\JoomlaPage	\Avancore\Template\JoomlaPagePage	
+Ac_Url	\Avancore\Url	\Avancore\Uri	
+Ac_UrlMapper_Pattern	\Avancore\UrlMapper\Pattern	\Avancore\Rewriter\Pattern	
+Ac_UrlMapper_StaticSignatures	\Avancore\UrlMapper\StaticSignatures	\Avancore\Rewriter\StaticSignaturesRewriter	
+Ac_UrlMapper_UrlMapper	\Avancore\UrlMapper\UrlMapper	\Avancore\Rewriter\BasicRewriter	
+Ac_Util	\Avancore\Util	\Avancore\Util\Util	
+Ac_Util_AssetRenderer	\Avancore\Util\AssetRenderer		
+Ac_Util_CallUserFunc	\Avancore\Util\CallUserFunc		
+Ac_Util_Cli	\Avancore\Util\Cli	\Avancore\Util\CommandArgsParser	
+Ac_Util_Csv	\Avancore\Util\Csv	\Avancore\Util\CsvReader\CsvReader	
+Ac_Util_Csv_Sections	\Avancore\Util\Csv\Sections	\Avancore\Util\CsvReader\SectionsCsvReader	
+Ac_Util_DeleteOldFiles	\Avancore\Util\DeleteOldFiles	\Avancore\Util\OldFilesDeleter	
+Ac_Util_Lock	\Avancore\Util\Lock	\Avancore\Util\Locker	
+Ac_Util_Periodic	\Avancore\Util\Periodic	\Avancore\Util\PeriodicExecutor	
+Ac_Util_Php	\Avancore\Util\Php	\Avancore\Util\PhpCodeUtil	

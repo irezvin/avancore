@@ -131,6 +131,10 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
     }
     
     function run() {
+        
+        ini_set('error_reporting', 'E_ALL');
+        ini_set('html_errors', 0);
+        
         if ($this->prefix === false) {
             if (isset($_SERVER['argv'])) $this->prefix = basename($_SERVER['argv'][0]);
                 else $this->prefix = "avan";
@@ -373,9 +377,11 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
     
     
     protected function genStats(Ac_Cg_Generator $gen) {
-        echo "Generator run complete in ".$gen->getOutputTime()." sec: "
-            .$gen->getOutputBytes()." bytes in "
-            .$gen->getOutputFiles()." files\n";
+        $size = $gen->getOutputBytes();
+        if ($size > 1024*1024) $size = round($size / 1024 / 1024, 1)." MiB";
+        else if ($size > 1024)  $size = round($size / 1024, 1)." KiB";
+        echo "Generator run complete. ".$gen->getOutputTime()." s; "
+            .$size." in ".$gen->getOutputFiles()." files\n";
     }
     
 }
