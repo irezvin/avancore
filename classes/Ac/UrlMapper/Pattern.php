@@ -128,6 +128,11 @@ class Ac_UrlMapper_Pattern extends Ac_Prototyped {
         if (!strlen($currParam)) { // this is empty separator of segments
             return;
         }
+        if ($currParam === '...') {
+            $currParam = "?'__pathInfo__'.*"; // support "..." - optional pathInfo
+        } else if ($currParam === '+++') {
+            $currParam = "?'__pathInfo__'.+"; // support "+++" - mandatory pathInfo
+        }
         if ($currParam == '?c' || $currParam == '?nc') { // previous segment was optional string that is required in canonical version
             $l = count($this->segments);
             if (!$l || is_array($this->segments[$l - 1])) {

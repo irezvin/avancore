@@ -172,9 +172,15 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
         
         if ($params === null) return $url;
         
+        if (isset($params['__pathInfo__'])) {
+            $url->pathInfo = $params['__pathInfo__'];
+            unset($params['__pathInfo__']);
+        } else {
+            $url->pathInfo = '';
+        }
+        
         $extractedParams = $params;
         Ac_Util::ms($url->query, $extractedParams);
-        $url->pathInfo = '';
         
         return $url;
     }
@@ -187,14 +193,25 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
         
         $this->lastMatch = null;
         $pathInfo = null;
+        $newPath = null;
+        
         if ($this->baseUrl) {
             if (!$url->hasBase($this->baseUrl, $pathInfo)) return $url;
-            // URL has extraneous path information so it was not parsed before
-            if (strlen($pathInfo)) return $url; 
         }
         if (!$dontClone) $url = clone $url;
-        $newPathInfo = $this->moveParamsToString($url->query); 
-        if ($newPathInfo !== null) $url->setPathInfo ($newPathInfo);
+        $params = $url->query;
+        if (strlen($url->pathInfo)) {
+            $params['__pathInfo__'] = $url->pathInfo;
+        } elseif (strlen($pathInfo)) {
+            $params['__pathInfo__'] = $pathInfo;
+            $newPath = substr($url->path, 0, -strlen($pathInfo));
+        }
+        $newPathInfo = $this->moveParamsToString($params);
+        if (is_null($newPathInfo)) return $url;
+        if (isset($params['__pathInfo__'])) return $url; // path info wasn't used
+        $url->query = $params;
+        if ($newPath !== null) $url->path = $newPath;
+        $url->setPathInfo($newPathInfo);
         return $url;
     }
 

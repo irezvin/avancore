@@ -44,6 +44,9 @@ class Ac_Test_Url extends Ac_Test_Base {
             ['http://example.com/foo/', '//example.com/foo/baz', 'baz'],
             ['hTTp://exAmpLe.cOm/foo/', 'httP://ExAmPle.com/foo/baz', 'baz'],
             ['http://example.com/inDEx.php', 'http://example.com/index.php/foo/bar', null],
+            ['/cms/', '/cms/foo/bar', 'foo/bar'],
+            ['/cms/', 'foo/bar', 'foo/bar'],
+            ['/cms/', '/foo/bar', null],
         );
         foreach ($tests as $test) {
             $proper = isset($test[2]);

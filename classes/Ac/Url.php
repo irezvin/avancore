@@ -497,12 +497,20 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
 
     function hasBase($baseUrl, & $pathInfo = null) {
         $pathInfo = null;
-        if (!$this->isFullyQualified()) {
-            return $this->resolve($baseUrl)->hasBase($baseUrl, $pathInfo);
-        }
         
         if (!(is_object($baseUrl) && $baseUrl instanceof Ac_Url)) {
             $baseUrl = new Ac_Url($baseUrl);
+        }
+        
+        $shouldResolve = false;
+        if (!$this->isFullyQualified()) {
+            $thisRoot = substr($this->path, 0, 1) === '/';
+            $baseRoot = substr($baseUrl->path, 0, 1) === '/';
+            $shouldResolve = $baseUrl->isFullyQualified() || $baseRoot && !$thisRoot;
+        }
+        
+        if ($shouldResolve) {
+            return $this->resolve($baseUrl)->hasBase($baseUrl, $pathInfo);
         }
         
         // compare pre-path parts

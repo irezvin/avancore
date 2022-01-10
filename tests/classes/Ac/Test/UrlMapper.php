@@ -135,6 +135,35 @@ class Ac_Test_UrlMapper extends Ac_Test_Base {
         
     }
     
+    function testPartialParse() {
+        
+        $m = new Ac_UrlMapper_UrlMapper([
+            'patterns' => [
+                "/{?'controller'user}/{action}",
+                "/{?'controller'api}/{...}",
+                "/{?'controller'pages}/{+++}.html",
+            ],
+            'baseUrl' => '/cms/',
+        ]);
+        
+        $examples = [
+            '/cms/api/foo/bar/baz' => '/cms/foo/bar/baz?controller=api',
+            '/cms/pages/whatever/and/more.html' => '/cms/whatever/and/more?controller=pages',
+            '/cms/user/login' => '/cms/?controller=user&action=login',
+        ];
+        
+        foreach ($examples as $orig => $mapped) {
+            $origUrl = new Ac_Url($orig);
+            $partiallyMappedString = ''.$m->pathToQuery($origUrl);
+            $this->assertEqual($partiallyMappedString, $mapped, 'Forward mapping: %s');
+            
+            $partiallyMappedUrl = new Ac_Url($mapped);
+            $sefString = ''.$m->queryToPath($partiallyMappedUrl);
+            $this->assertEqual($sefString, $orig, 'Back mapping: %s');
+        }
+        
+    }
+    
 //    function testFoo() {
 //        var_dump($u = Ac_Url::guess(true, array(
 //            'SERVER_NAME' => 'localhost',
