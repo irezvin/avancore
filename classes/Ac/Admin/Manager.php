@@ -334,7 +334,7 @@ class Ac_Admin_Manager extends Ac_Controller {
             $this->_recordIdentifiers = array();
             $this->_record = null;
             $u = $this->getManagerUrl('list');
-            $this->_response->hasToRedirect = $this->preserveFragment($u->toString());
+            $this->_response->hasToRedirect = $this->preserveFragment($u);
         }
             
     }
@@ -368,14 +368,14 @@ class Ac_Admin_Manager extends Ac_Controller {
                 $params = array();
                 if (strlen($u)) 
                     $params['returnUrl64'] = base64_encode($u);
-                $u = $this->getManagerUrl('new', $params)->toString();
+                $u = $this->getManagerUrl('new', $params);
             } elseif (strlen($u)) {
                 $this->_response->redirectUrl = $u;
                 $u = false;
             } elseif ($stayOnDetails) {
-                $u = $this->getManagerUrl('details', array('keys' => array($pk)))->toString();
+                $u = $this->getManagerUrl('details', array('key' => $pk));
             } else {
-                $u = $this->getManagerUrl('list', array('keys' => null))->toString();
+                $u = $this->getManagerUrl('list', array('keys' => null));
             }
             $this->_response->hasToRedirect = $this->preserveFragment($u);
             
@@ -401,15 +401,19 @@ class Ac_Admin_Manager extends Ac_Controller {
         $this->_stayOnProcessing = false;
         $u = $this->getReturnUrl();
         if (strlen($u)) {
-            $this->_response->redirectUrl = $this->preserveFragment(''.$u);
+            $this->_response->redirectUrl = $this->preserveFragment($u);
         } else {
             $u = $this->getManagerUrl('list');
-            $this->_response->hasToRedirect = $this->preserveFragment(''.$u);
+            $this->_response->hasToRedirect = $this->preserveFragment($u);
         }
     }
     
-    protected function preserveFragment($u) {
-        if ($f = $this->_context->getData('_fragment')) {
+    function preserveFragment($u) {
+        $f = $this->_context->getData('_fragment');
+        if (!$f) return $u;
+        if (is_object($u) && $u instanceof Ac_Url) {
+            $u->fragment = $f;
+        } else {
             $u .= '#'.$f;
         }
         return $u;
@@ -504,11 +508,14 @@ class Ac_Admin_Manager extends Ac_Controller {
     function getRecordIdentifiers() {
         if ($this->_recordIdentifiers === false) {
             $res = array();
+            if (isset($this->_rqData['key']) && strlen($this->_rqData['key'])) {
+                $res = [$this->_rqData['key']];
+            }
             if (isset($this->_rqData['keys']) && is_array($this->_rqData['keys'])) {
-                $res = array_unique($this->_rqData['keys']);
-                        }
+                $res = array_unique(array_merge($res, $this->_rqData['keys']));
+            }
             $this->_recordIdentifiers = $res;
-                    }
+        }
         return $this->_recordIdentifiers;
     }
 
@@ -529,7 +536,7 @@ class Ac_Admin_Manager extends Ac_Controller {
     function getDetailsUrl($record) {
         $ctx = $this->_context->cloneObject();
         $id = $this->getIdentifierOf($record);
-        $ctx->setData(array('keys' => array($id), $this->_methodParamName => 'details'));
+        $ctx->setData(array('key' => $id, $this->_methodParamName => 'details'));
         $res = $ctx->getUrl();
         return $res;
     }
@@ -540,14 +547,6 @@ class Ac_Admin_Manager extends Ac_Controller {
     function getManagerUrl($action = false, $extraParams = array()) {
         $c = $this->_context->cloneObject();
         $d = $extraParams;
-        /*
-        if ($action === false) $action = $this->isForm()? 'details' : 'list';
-        
-        if ($this->isNewRecord()) $d['new'] = 1;
-        elseif ($rec = $this->getRecord()) {
-            $d['keys'][] = $this->getIdentifierOf($rec);
-        }
-        */
         $skipKeys = (($this->_stayOnProcessing && $action === false) || $action === 'list');
         $s = $this->getStateData(false, $skipKeys);
         $d = Ac_Util::m($s, $d, true);
@@ -570,7 +569,7 @@ class Ac_Admin_Manager extends Ac_Controller {
             $res['keys'] = $keys; 
         }
         elseif ($rec = $this->getRecord()) {
-            $res['keys'][] = $this->getIdentifierOf($rec);
+            $res['key'] = $this->getIdentifierOf($rec);
         }
         if ($this->_isForm && isset($this->_rqData['form']) && !$this->_recordStored) {
             $res['form'] = $this->_rqData['form'];
@@ -1203,8 +1202,10 @@ class Ac_Admin_Manager extends Ac_Controller {
             $u = new Ac_Url($subRedirect);
             $mu = $this->getManagerUrl('details', $allState);
             $mu->query = Ac_Util::m($mu->query, $u->query, true);
-            if ($u->fragment) $mu->fragment = $u->fragment;
-            $this->_response->hasToRedirect = $mu->toString();
+            if ($u->fragment) {
+                $mu->fragment = $u->fragment;
+            }
+            $this->_response->hasToRedirect = $mu;
         }
         return $res;
     }
@@ -1447,6 +1448,21 @@ class Ac_Admin_Manager extends Ac_Controller {
             }
         }
         return $this->_returnUrl;
+    }
+
+    function unmapUrl() {
+        parent::unmapUrl();
+    }
+    
+    function getUrlMapperPrototype() {
+        return [
+            'class' => 'Ac_UrlMapper_UrlMapper',
+            'patterns' => [
+                ['definition' => '/{?c}', 'const' => [$this->_methodParamName => 'list']],
+                ['definition' => '/edit/{key}/{?c}', 'const' => [$this->_methodParamName => 'details']],
+                ['definition' => '/new{}/{?c}', 'const' => [$this->_methodParamName => 'new']],
+            ],
+        ];
     }
     
 }

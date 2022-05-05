@@ -22,19 +22,18 @@ class Ac_Admin_Column_Reorder extends Ac_Table_Column_Reorder {
         $spk = $this->manager->getIdentifierOf($record);
         
         if ($canUp = $this->canOrderUp($record, $rowNo)) {
-            $upJavascript = 'return '.(new Ac_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
+            $upJavascript = (new Ac_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
                 $this->getOrderUpTask(),
                 array($spk)
-            ))).';';
+            ))).'; return false;';
         }
         
         if ($canDown = $this->canOrderDown($record, $rowNo)) {
-            $downJavascript = 'return '.(new Ac_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
+            $downJavascript = (new Ac_Js_Call($this->manager->getJsManagerControllerRef().'.executeProcessing', array(
                 $this->getOrderDownTask(),
                 array($spk)
-            ))).';';
+            ))).'; return false;';
         }
-        
         echo "<td ".Ac_Util::mkAttribs($this->getCellAttribs()).">".$this->orderUpIcon($canUp, $upJavascript)."</td>";
         echo "<td ".Ac_Util::mkAttribs($this->getCellAttribs()).">".$this->orderDownIcon($canDown, $downJavascript)."</td>";
     }

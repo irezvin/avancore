@@ -24,6 +24,7 @@ class Ac_Admin_Processing_SaveOrder extends Ac_Admin_Processing {
 	function _doProcessRecord($record) {
 		
         if ($this->manager->getMapper() instanceof Ac_I_BatchAwareMapper) $this->manager->getMapper()->beginBatchChange(array($this->fieldName));
+        $record->load();
 		$value = $record->getField($this->fieldName);
 		$newValue = $this->getOrderingValue($record);
 		if ($newValue !== false && $newValue != $value) {

@@ -63,8 +63,14 @@ class Ac_Admin_ControllerTemplate extends Ac_Template_Html {
         if ($this->controller->extraAssets) {
             $this->addAssetLibs($this->controller->extraAssets);
         }
+?>
+        <div class="adminLayout">
+<?php            
         $this->showMenu();
         $this->showMain($content);
+?>        
+        </div>
+<?php
     }
     
     function showMain($content) {
@@ -100,7 +106,7 @@ class Ac_Admin_ControllerTemplate extends Ac_Template_Html {
         }
         if ($this->managerResponse && isset($this->managerResponse->hasToRedirect) && ($redir = $this->managerResponse->hasToRedirect)) {
             $bu = $ctx->getUrl();
-            $u = new Ac_Url($redir);
+            $u = $redir instanceof Ac_Url? clone $redir : new Ac_Url($redir);
             $bu->query = $u->query;
             $bu->fragment = $u->fragment;
             // this creates weird issues i.e. when we try to save the record
@@ -108,18 +114,32 @@ class Ac_Admin_ControllerTemplate extends Ac_Template_Html {
             $this->htmlResponse->redirectUrl = $bu;
         } else {
             $bu = $this->controller->getUrl(array($this->controller->_methodParamName => 'manager', 'mapper' => $this->context->getData('mapper')));
-            $formAttribs = array('action' => $bu->toString(false), 'method' => 'post', 'name' => 'aForm', 'id' => 'aForm',  /*'enctype' => 'multipart/form-data'*/);
+            $formAttribs = array('action' => $bu->toString(false), 'method' => 'post', 'name' => 'aForm', 'id' => 'aForm');
+            $formContent = $this->managerResponse->content;
+            // ugliest hack in the world to enable file-friendly encoding
+            // TODO: we can do better
+            if (preg_match('/input\\s+type=[\'"]file[\'"]/ui', $formContent)) {
+                $formAttribs['enctype'] = 'multipart/form-data';
+            }
+            
             $this->htmlResponse->mergeWithResponse($this->managerResponse);
             ob_start(); 
 ?>
             <form <?php echo Ac_Util::mkAttribs($formAttribs); ?>>
                 <?php echo $bu->getHidden(); ?>
-                <?php echo $this->managerResponse->content; ?>    				
+                <?php echo $formContent; ?>
             </form>
 <?php
             $this->showWrapper(ob_get_clean());
         }
 	}    
+    
+    function showSettings() {
+        ob_start();
+        echo "<h1>Settings</h1>";
+        $this->showWrapper(ob_get_clean());
+    
+    }
     
 }
 

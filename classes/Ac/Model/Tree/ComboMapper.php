@@ -88,25 +88,7 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
     function getNodeClass() {
         return 'Ac_Model_Tree_ComboImpl';
     }
-    
-    /*function loadNodes(array $ids) {
-        $ns = $this->getNestedSets();
-        if ($this)
-        $nodes = $this->getDb()->fetchArray(
-            "SELECT * FROM ".$ns->tableName
-            ." WHERE ".$ns->idCol." ".$this->getDb()->eqCriterion($ids)
-        );
-        $res = array();
-        foreach ($nodes as $id => $node) {
-            $objNode = new Ac_Model_Tree_ComboImpl(array(
-                'nodeData' => $node,
-                'mapper' => $this->mixin, 
-            ));
-            $res[$id] = $objNode;
-        }
-        return $res;
-    }*/
-    
+        
     protected function getStmtCacheDefaults() {
         $res = array_merge(parent::getStmtCacheDefaults(), array(
             'leftCol' => $this->leftCol,
@@ -258,6 +240,7 @@ class Ac_Model_Tree_ComboMapper extends Ac_Model_Tree_AdjacencyListMapper {
     }
     
     function reorderNode($id, $oldParentId, $oldOrdering, $newParentId, $newOrdering, $ignoreTheNode = false) {
+        parent::reorderNode($id, $oldParentId, $oldOrdering, $newParentId, $newOrdering, $ignoreTheNode);
         $ns = $this->getNestedSets();
         $res = $ns->moveNode($id, $newParentId, $newOrdering);
         return $res;

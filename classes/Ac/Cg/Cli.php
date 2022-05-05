@@ -134,6 +134,7 @@ class Ac_Cg_Cli extends Ac_Util_Cli {
         
         ini_set('error_reporting', 'E_ALL');
         ini_set('html_errors', 0);
+        ini_set('display_errors', 1);
         
         if ($this->prefix === false) {
             if (isset($_SERVER['argv'])) $this->prefix = basename($_SERVER['argv'][0]);

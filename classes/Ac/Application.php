@@ -476,7 +476,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
             $baseClass = null;
         }
         if (isset($this->componentAliases[$id])) {
-            $res = $this->getComponent($this->componentAliases[$id], $dontThrow, $baseClass);
+            $res = $this->getComponent($this->componentAliases[$id], $baseClass, $dontThrow);
         } elseif (in_array($id, $this->listComponents())) {
             if (!is_object($this->components[$id])) {
                 $this->components[$id] = Ac_Prototyped::factory($this->components[$id]);

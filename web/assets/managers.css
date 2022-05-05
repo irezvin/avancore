@@ -255,11 +255,11 @@ table.actions td, .avanadmin .details table.actions td {
     top: -230px;    
 }
 
-.avanadmin.outer, .avanadmin body {
+.avanadmin .adminLayout {
     display: flex;
 }
 
-.avanadmin main {
+.avanadmin .adminLayout main {
     flex-grow: 1;
 }
 

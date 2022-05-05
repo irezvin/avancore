@@ -90,7 +90,7 @@ class Ac_Form_Control_Text extends Ac_Form_Control_Listable {
         if (!$this->rteAdapter) {
             $this->rteAdapter = Ac_Form_RteAdapter::getDefaultInstance();
         } else {
-            if (!is_object($this->rteAdapter)) $this->rteAdapter = Ac_Prototyped::factory($this->rteAdapter, 'Ac_From_RteAdapter');
+            if (!is_object($this->rteAdapter)) $this->rteAdapter = Ac_Prototyped::factory($this->rteAdapter, 'Ac_Form_RteAdapter');
         }
         return $this->rteAdapter;
     }

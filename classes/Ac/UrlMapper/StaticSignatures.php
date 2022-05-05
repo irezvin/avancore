@@ -24,6 +24,8 @@ class Ac_UrlMapper_StaticSignatures extends Ac_UrlMapper_UrlMapper {
 
     protected $suffix = '/{?c}';
     
+    protected $prefix = '';
+    
     protected $methodParamName = 'action';
     
     /**
@@ -39,6 +41,16 @@ class Ac_UrlMapper_StaticSignatures extends Ac_UrlMapper_UrlMapper {
 
     function getControllerClass() {
         return $this->controllerClass;
+    }
+
+    function setPrefix($prefix) {
+        if ($this->prefix === $prefix) return;
+        $this->prefix = $prefix;
+        $this->patterns = false;
+    }
+    
+    function getPrefix() {
+        return $this->prefix;
     }
 
     function setSuffix($suffix) {
@@ -112,6 +124,7 @@ class Ac_UrlMapper_StaticSignatures extends Ac_UrlMapper_UrlMapper {
     }
     
     protected function makePatternDefinition($path, array $const = array()) {
+        $path = $this->prefix.$path;
         if (substr($path, -1)) $path = substr($path, 0, -1) . $this->suffix;
         if ($const) $res = array('definition' => $path, 'const' => $const);
         else $res = $path;

@@ -484,7 +484,7 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
         return $res;
     }
     
-    function setUrlMapper(Ac_UrlMapper_UrlMapper $urlMapper) {
+    function setUrlMapper(Ac_UrlMapper_UrlMapper $urlMapper = null) {
         $this->urlMapper = $urlMapper;
     }
 

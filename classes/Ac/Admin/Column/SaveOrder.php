@@ -27,7 +27,7 @@ class Ac_Admin_Column_SaveOrder extends Ac_Table_Column_SaveOrder {
         <th <?php echo Ac_Util::mkAttribs($this->getHeaderAttribs($rowCount, $rowNo)); ?> > 
             <?php echo $this->getTitle(); ?> 
         </th>
-        <th <?php echo Ac_Util::mkAttribs($this->getHeaderAttribs($rowCount, $rowNo)); ?> > <a href="#" onclick="<?php echo $saveOrderCall; ?>"><img src="<?php echo $saveOrderIcon; ?>" border="0" width="16" height="16" alt="<?php echo ACLT_SAVE_ORDER; ?>" /></a></th>
+        <th <?php echo Ac_Util::mkAttribs($this->getHeaderAttribs($rowCount, $rowNo)); ?> > <a href="#" onclick="<?php echo $saveOrderCall; ?>; return false;"><img src="<?php echo $saveOrderIcon; ?>" border="0" width="16" height="16" alt="<?php echo ACLT_SAVE_ORDER; ?>" /></a></th>
         <?php
     }
     

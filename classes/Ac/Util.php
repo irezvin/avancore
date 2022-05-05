@@ -30,7 +30,7 @@ abstract class Ac_Util {
      * @param bool $prepend Add this path to beginning of include_path list (not the end)
      */
     static function addIncludePath($path = false, $prepend = false) {
-        if ($path === false) $path = array(dirname(dirname(__FILE__)), dirname(dirname(dirname(__FILE__))).'/obsolete');
+        if ($path === false) $path = array(dirname(dirname(__FILE__)));
         $paths = explode(PATH_SEPARATOR, ini_get('include_path'));
         if (!is_array($path)) $path = array($path);
         if ($prepend) $paths = array_merge($path, array_diff($paths, $path));

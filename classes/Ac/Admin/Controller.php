@@ -66,6 +66,14 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         return $form;
     }
     
+    function execute() {
+        $this->_response->redirectUrl = $this->getDefaultLocation();
+    }
+    
+    function getDefaultLocation() {
+        return $this->getUrl(['action' => 'dashboard']);
+    }
+    
     function executeLogin() {
         if ($this->getApplication()->getUser()) {
             $this->_templatePart = 'loggedIn';
@@ -87,7 +95,7 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
                     $redir = $this->getUrl($menu[0]->query);
                 }
             }
-            if (!strlen($redir)) $redir = $this->getUrl(['action' => 'dashboard']);
+            if (!strlen($redir)) $redir = $this->getDefaultLocation();
             $this->_response->redirectUrl = $redir;
         } else {
             $loginForm->errors = $errors;
@@ -105,7 +113,8 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         $this->_response->redirectUrl = $redir;
     }
 
-    function executeConfig() {
+    function executeSettings() {
+        $this->_templatePart = true;
     }    
 	
 	function getStateVarName() {
@@ -130,16 +139,23 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         Ac_Util::setArrayByPath($_SESSION[$sv], $path, $state);
     }
 	
-	function applyState(Ac_Controller_Context_Http $c) {
+	function applyState(Ac_Controller_Context_Http $c, $mapperId = null) {
         $dataPath = $c->getDataPath(true);
         
         $data = $c->getData();
         
-        if (!isset($data['mapper']) || !$data['mapper']) return;
-        $mapper = $data['mapper'];
+        if (!$mapperId) {
+            if (isset($data['mapper']) && $data['mapper']) $mapperId = $data['mapper'];
+        }
         
-        $dataPath = array_merge(['mapper', $mapper], $dataPath);
+        if (!$mapperId) return;
+        
+        $dataPath = array_merge(['mapper', $mapperId], $dataPath);
         $state = $this->loadState($dataPath);
+        
+        if (isset($state['__pathInfo__'])) {
+            unset($state['__pathInfo__']);
+        }
         
         // Workaround for case when sometimes Cancel button saves ID of record into the state and 
         // all subsequent actions are related only to that record
@@ -169,12 +185,14 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         $bu = $this->getUrl(array($this->_methodParamName => 'manager', 'mapper' => $mapperId));
         unset($bu->query['managerAction']);
         $contextOptions = array(
-            'baseUrl' => $bu->toString(),
+            'baseUrl' => $bu,
             'isInForm' => 'aForm',
         );
+        $pathInfo = $this->param('__pathInfo__');
         $context = new Ac_Controller_Context_Http($contextOptions);
         $context->populate('request', $this->_context->getDataPath());
-        $this->applyState($context);
+        if ($pathInfo) $context->updateData(['__pathInfo__' => $pathInfo]);
+        $this->applyState($context, $mapperId);
 
         $managerConfig = array('mapperClass' => $mapperId);
         $mapper = Ac_Model_Mapper::getMapper($mapperId);
@@ -186,11 +204,13 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         if ($extra = $mapper->getManagerConfig()) {
             Ac_Util::ms($managerConfig, $extra);
         }
-        $managerConfig['context'] = $context;
+        if ($this->useUrlMapper) {
+            $managerConfig['useUrlMapper'] = true;
+        }
         $manager = new $class ($managerConfig);
         $manager->_methodParamName = 'managerAction';
         $manager->setApplication($this->getApplication());
-        //if ($this->separateToolbar) $manager->separateToolbar = true;
+        $manager->setContext($context);
         $response = $manager->getResponse();
         if ($response->noWrap) {
             $this->_response = $response;
@@ -232,7 +252,7 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
             'Ac_Admin_MenuGroup',
             [],
             'id',
-            true,
+            true
         );
         return $this->menuGroups;        
     }
@@ -284,8 +304,21 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         
         return $res;
     }
-
-    function executeApi($mapper) {
+    
+    function getUrlMapperPrototype() {
+        return [
+            'class' => 'Ac_UrlMapper_StaticSignatures',
+            'controllerClass' => get_class($this),
+            'patterns' => [
+                ['definition' => '/m/{mapper}/{?c}{...}', 'const' => ['action' => 'manager']]
+            ],
+            'ignoreMethods' => [
+                'executeManager'
+            ]
+        ];
     }
+
+//    function executeApi($mapper) {
+//    }
 
 }

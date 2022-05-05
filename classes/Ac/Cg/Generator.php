@@ -324,7 +324,7 @@ class Ac_Cg_Generator extends Ac_Prototyped {
     }
     
     function prepare() {
-        
+
         foreach ($this->listDomains() as $domain) {
             $domainObject = $this->getDomain($domain);
             $domainObject->beforeGenerate();
@@ -560,7 +560,7 @@ class Ac_Cg_Generator extends Ac_Prototyped {
         //$sync->ensureDirsNotNested();
             
         $copy = array(
-            'bin', 'classes', 'languages', 'obsolete', 'vendor', 'include', 'web/assets' => $destWebDir
+            'bin', 'classes', 'languages', 'vendor', 'include', 'web/assets' => $destWebDir
         );
         foreach ($copy as $src => $dest) {
             if (is_numeric($src)) $src = $dest;

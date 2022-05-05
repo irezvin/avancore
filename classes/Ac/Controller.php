@@ -31,6 +31,8 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
      */
     var $_context = false;
     
+    protected $isInit = false;
+    
     /**
      * @var array
      */
@@ -50,6 +52,8 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
      * @var Ac_Controller_Response_Html
      */
     var $_response = false;
+    
+    var $useUrlMapper = false;
     
     const OUTPUT_RESPONSE_PREPEND = 1;
     
@@ -139,6 +143,8 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
         }
         $this->doInitProperties($options);
         parent::__construct($options);
+        $this->isInit = true;
+        $this->onInitComplete();
     }
     
     // --------------------- template methods ---------------------
@@ -164,11 +170,51 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
     
     // --------------------- context-related methods ---------------------
 
+    protected function onInitComplete() {
+        if ($this->_context) {
+            $this->bindFromRequest();
+        }
+    }
+    
     function bindFromRequest() {
+        if ($this->useUrlMapper) $this->unmapUrl();
         $this->_rqData = $this->getContext()->getData();
         $this->_state = $this->getContext()->getState();
         $this->_rqWithState = Ac_Util::m($this->_state, $this->_rqData, true);
         $this->doBindFromRequest();
+    }
+    
+    protected function unmapUrl() {
+        $context = $this->getContext();
+        if (!$context) return;
+        if (!($context instanceof Ac_Controller_Context_Http)) return;
+        $baseUrl = $context->getBaseUrl();
+        if (!$baseUrl) return;
+        $pathInfo = null;
+        $url = clone $baseUrl;
+        $urlMapper = $this->createUrlMapper();
+        if (!$urlMapper) return;
+        if (strlen($url->pathInfo)) {
+            $pathInfo = $url->pathInfo;
+            $url->pathInfo = '';
+        } elseif (isset($url->query['__pathInfo__'])) {
+            $pathInfo = $url->query['__pathInfo__'];
+            unset($url->query['__pathInfo__']);
+        } else {
+            $pathInfo = $context->getData('__pathInfo__');
+        }
+        $oldMapper = $url->getUrlMapper();
+        $url->setUrlMapper($urlMapper);
+        if ($oldMapper) $urlMapper->setParentMapper($oldMapper);
+        if ($pathInfo) {
+            $params = $urlMapper->stringToParams($pathInfo);
+            if (is_null($params)) {
+                throw new Exception("Unparsable path: '{$pathInfo}'");
+            }
+            $this->_context->updateData($params);
+            if (!isset($params['__pathInfo__'])) $this->_context->updateData(['__pathInfo__' => null]);
+        }
+        $this->_context->setBaseUrl($url);
     }
     
     function isRequestValid() {
@@ -196,7 +242,9 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
         if ($hadOldContext) {
             $this->resetState();
         }
-        $this->bindFromRequest();
+        if ($this->isInit) {
+            $this->bindFromRequest();
+        }
     }
     
     /**
@@ -302,9 +350,19 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
         return $res;
     }
     
-    function calcUrlMapperConfig() {
+    protected function getUrlMapperPrototype() {
         $res = array('class' => 'Ac_UrlMapper_StaticSignatures', 'controllerClass' => get_class($this));
         return $res;
+    }
+    
+    /**
+     * Creates default URL mapper for this controller
+     * @return Ac_UrlMapper_UrlMapper
+     */
+    function createUrlMapper() {
+        $config = $this->getUrlMapperPrototype();
+        if (!$config) return null;
+        return Ac_Prototyped::factory($config, 'Ac_UrlMapper_UrlMapper');
     }
     
     /**

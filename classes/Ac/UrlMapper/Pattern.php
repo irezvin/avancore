@@ -215,9 +215,12 @@ class Ac_UrlMapper_Pattern extends Ac_Prototyped {
     
     function moveParamsToString(array & $params) {
         foreach ($this->params as $param => $condition) {
-            // missing paramument
             if (is_string($condition)) { // check that param matches regex
-                if (!array_key_exists($param, $params)) return;
+                if (!array_key_exists($param, $params)) {
+                    // check if condition accepts empty param
+                    if (preg_match($condition, '')) continue;
+                    return;
+                }
                 if (!preg_match($condition, $params[$param])) return;
             } elseif ($condition === true) {
                 if (!array_key_exists($param, $params)) return;
@@ -242,13 +245,15 @@ class Ac_UrlMapper_Pattern extends Ac_Prototyped {
                 continue;
             }
             if ($seg['type'] === self::SEG_TYPE_PARAM) {
-                $res .= $params[$seg['name']];
+                $res .= isset($params[$seg['name']])? $params[$seg['name']] : '';
                 unset($params[$seg['name']]);
                 continue;
             }
             throw new Exception("Assertion: unknown segement type");
         }
         if ($this->const) foreach ($this->const as $name => $value) unset($params[$name]);
+        // ugly hack to fix repeating slashes
+        $res = preg_replace('#/+#', '/', $res);
         return $res;
     }
     

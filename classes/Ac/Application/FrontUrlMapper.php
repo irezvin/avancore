@@ -2,7 +2,7 @@
 
 /**
  * Special version of UrlMapper that's intended to work with Ac_Application_FrontController to extract 
- * controller ID from path segment into $controllerParam and pass remaining part of pathInfo into _pathInfo param.
+ * controller ID from path segment into $controllerParam and pass remaining part of pathInfo into __pathInfo__ param.
  * 
  * The special case here is that "defaultController" doesn't require id, and when it is used, first segment of path
  * is part of pathInfo for default controller.
@@ -221,11 +221,11 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
         $patterns = array();
         
         if (strlen($this->defaultController)) {
-            $patterns[self::PATTERN_ID_DEFAULT] = array('const' => array('controller' => null), 'definition' => "{?'_pathInfo'/.*}");
+            $patterns[self::PATTERN_ID_DEFAULT] = array('const' => array('controller' => null), 'definition' => "{?'__pathInfo__'/.*}");
         }
         if ($this->extraControllerIds) {
             $rx = implode("|", array_map('preg_quote', $this->extraControllerIds, array_fill(0, count($this->extraControllerIds), '~')));
-            $patterns[self::PATTERN_ID_CONTROLLER] = array('definition' => "/{?'controller'{$rx}}{?'_pathInfo'/.*}");
+            $patterns[self::PATTERN_ID_CONTROLLER] = array('definition' => "/{?'controller'{$rx}}{?'__pathInfo__'/.*}");
         }
         
         if (!$overwriteCustomPatterns) {
@@ -243,7 +243,7 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
         if (!($controllerId === $this->defaultController || in_array($controllerId, $this->getExtraControllerIds()))) return;
         $class = $this->application->getComponentClass($controllerId);
         if (!$class) return;
-        $cm = false;
+        $cm = null;
         if (array_key_exists($controllerId, $this->urlMappers)) {
             $cm = $this->urlMappers[$controllerId];
         } elseif (method_exists($class, 'getUrlPatterns')) {
@@ -256,11 +256,9 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
             }
         } else {
             $controller = $this->application->getComponent($controllerId, 'Ac_I_Controller');
-            if (method_exists($controller, 'createUrlMapper')) {
-                $cm = $controller->createUrlMapper();
-            }
+            $cm = $controller->createUrlMapper();
         }
-        if ($cm === false && $this->useDefaultMapper) {
+        if ($cm === null && $this->useDefaultMapper) {
             $cm = new Ac_UrlMapper_StaticSignatures();
         }
         if ($cm) {
@@ -301,9 +299,9 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
         
         if (is_null($childPathInfo)) return; // cannot move
         
-        $params['_pathInfo'] = $childPathInfo;
+        $params['__pathInfo__'] = $childPathInfo;
         $res = parent::moveParamsToString($params);
-        unset($params['_pathInfo']);
+        unset($params['__pathInfo__']);
         return $res;
     }
     
@@ -313,9 +311,9 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
         $params = parent::stringToParams($string);
         if ($params === null) return;
         
-        if (!isset($params['_pathInfo'])) return $params;
+        if (!isset($params['__pathInfo__'])) return $params;
         
-        $pathInfo = $params['_pathInfo'];
+        $pathInfo = $params['__pathInfo__'];
         
         $controllerId = null;
         
@@ -335,7 +333,7 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
         
         if (is_null($childParams)) return null;
         
-        unset($params['_pathInfo']);
+        unset($params['__pathInfo__']);
 
         Ac_Util::ms($params, $childParams);
         return $params;

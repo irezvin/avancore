@@ -721,18 +721,6 @@ AvanControllers.ActionsController.ShowImage.prototype = {
     },
 
     update: function(action, params) {
-        /*if (this.enDis) this.enDis.update(action, params);
-        if (params && params.allowed !== null) {
-            if (params.allowed) {
-                if (this.action.image) {
-                    this.element.src = this.action.image;
-                }
-            } else {
-                if (this.action.disabledImage) this.element.src = this.action.disabledImage;
-                    else if (this.action.image) this.element.src = this.action.image;
-            }
-        }*/
-        
        return AvanManagerRenderer.onUpdateActionButton(action, this, params); 
         
     }

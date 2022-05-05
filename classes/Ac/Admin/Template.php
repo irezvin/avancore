@@ -253,7 +253,6 @@ class Ac_Admin_Template extends Ac_Template_Html {
     }
             
     function showManagerWrapper($innerHtml, $isPart = false, $params = array()) {
-    
         // TODO: FIX this one because there is no more Adapter here in Ac0.3!
         
         $this->addAssetLibs(
@@ -271,7 +270,6 @@ class Ac_Admin_Template extends Ac_Template_Html {
         
         $context = $this->manager->getContext();
         $formName = $this->manager->getManagerFormName();
-        
         if (!$context->isInForm) {
             
             $url = $this->manager->getManagerUrl();
@@ -284,6 +282,10 @@ class Ac_Admin_Template extends Ac_Template_Html {
             
             // TODO: fix this ugly crap!
             $stateData = $this->manager->getStateData();
+            
+            // on some occasions leads to duplication of submitted values
+            unset($stateData['form']);
+            
             unset($stateData[$this->manager->_methodParamName]);
             $adp = $this->manager->_context->getDataPath();
             echo $foo = Ac_Url::queryToHidden($stateData, /*Ac_Util::arrayToPath($adp)*/ $adp );

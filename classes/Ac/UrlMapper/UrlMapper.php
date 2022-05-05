@@ -24,7 +24,7 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
      */
     protected $parentMapper = false;
     
-    protected $parentPathInfoParam = '_pathInfo';
+    protected $parentPathInfoParam = '__pathInfo__';
     
     /**
      * $patterns is array of patterns or pattern definitions.
@@ -171,14 +171,7 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
         $params = $this->stringToParams($url->pathInfo);
         
         if ($params === null) return $url;
-        
-        if (isset($params['__pathInfo__'])) {
-            $url->pathInfo = $params['__pathInfo__'];
-            unset($params['__pathInfo__']);
-        } else {
-            $url->pathInfo = '';
-        }
-        
+                
         $extractedParams = $params;
         Ac_Util::ms($url->query, $extractedParams);
         
@@ -210,7 +203,10 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
         if (is_null($newPathInfo)) return $url;
         if (isset($params['__pathInfo__'])) return $url; // path info wasn't used
         $url->query = $params;
-        if ($newPath !== null) $url->path = $newPath;
+        if ($newPath !== null) {
+            $url->path = $newPath;
+        }
+        // ugly hack to get rid of double backslashes
         $url->setPathInfo($newPathInfo);
         return $url;
     }

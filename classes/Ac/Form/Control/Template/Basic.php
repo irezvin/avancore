@@ -74,7 +74,6 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
      * @param Ac_Form $form
      */
     function showForm ($form, $html) {
-        
         if (is_array($form->jsLibs)) foreach ($form->jsLibs as $jsLib) $this->addJsLib($jsLib);
         if (is_array($form->cssLibs)) foreach ($form->cssLibs as $cssLib) $this->addCssLib($cssLib);
         if (is_array($form->inlineStyles)) foreach ($form->inlineStyles as $inlineStyle) {
@@ -96,7 +95,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
                 $actionUrl = $form->getActionUrl();
                 $attribs['action'] = ''.$actionUrl;
             }
-                else $actionUrl = null;
+            else $actionUrl = null;
         ?>
         
         <form <?php echo Ac_Util::mkAttribs($attribs); ?> >

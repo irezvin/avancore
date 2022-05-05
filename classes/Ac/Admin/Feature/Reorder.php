@@ -55,7 +55,7 @@ class Ac_Admin_Feature_Reorder extends Ac_Admin_Feature {
         }
         
         if ($c && is_array($this->orderDownProcessing)) {
-            $orderUpTask = $c.'OrderDown';
+            $orderDownTask = $c.'OrderDown';
         }
         
         $res = [];
@@ -67,6 +67,7 @@ class Ac_Admin_Feature_Reorder extends Ac_Admin_Feature {
                 'class' => 'Ac_Admin_Column_Reorder',
                 'orderUpTask' => $orderUpTask,
                 'orderDownTask' => $orderDownTask,
+                'orderProperty' => $this->groupProperty? $this->groupProperty : false,
             ], $this->columnPrototype);
         }
         
@@ -101,7 +102,6 @@ class Ac_Admin_Feature_Reorder extends Ac_Admin_Feature {
             $res[$so.'SaveOrder'] = Ac_Util::m([
                 'class' => 'Ac_Admin_Processing_SaveOrder',
                 'fieldName' => $this->getFieldName(),
-                'mode' => 'save',
             ], $this->saveOrderProcessing);
         }
         return $res;

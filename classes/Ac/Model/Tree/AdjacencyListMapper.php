@@ -345,14 +345,14 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
         foreach ($ords as $ord) {
             $lbl = $this->getOrderingValuesLabel($ord);
             if ($ord[$this->mixin->pk] == $modelObject->{$this->mixin->pk}) {
-                $lbl .= ' '.(new Ac_Lang_String('model_ordering_current'));
+                $lbl .= ' '.(new Ac_Lang_String('model_ordering_current', '(Current)'));
                 $foundMyself = true;
             }
             $res[$ord['ordering']] = $lbl;   
         }
-        if (!count($ords)) $res[' 0'] = new Ac_Lang_String('model_ordering_only');
+        if (!count($ords)) $res[' 0'] = new Ac_Lang_String('model_ordering_only', '(N/A)');
         elseif (!$foundMyself) {
-            $res[Ac_Model_Tree_AbstractImpl::ORDER_LAST] = new Ac_Lang_String('model_ordering_last');
+            $res[Ac_Model_Tree_AbstractImpl::ORDER_LAST] = new Ac_Lang_String('model_ordering_last', '(Last)');
         }
         return $res;
     }
@@ -432,7 +432,7 @@ class Ac_Model_Tree_AdjacencyListMapper extends Ac_Mixable {
 
                 $crit = is_null($newParentId)? '[[nodeParent]] IS NULL' : '[[nodeParent]] = {{parentId}}';
                 if ($ignoreTheNode) $crit .= " AND  [[pk]] <> {{id}}";
-                
+
                 $db->query($stmt = $this->stmtCache->getStatement('
                         UPDATE [[table]] 
                         SET [[nodeOrder]] = IF ([[pk]] = {{id}}, {{newOrdering}}, [[nodeOrder]] {{delta}})
