@@ -12,6 +12,8 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Religion_Mapper';
 
+    var $shortId = 'religion';
+
     var $storage = 'Sample_Religion_Storage';
 
     var $columnNames = [ 0 => 'religionId', 1 => 'title', ];
@@ -24,7 +26,7 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
    
     protected $autoincFieldName = 'religionId';
@@ -53,8 +55,8 @@ class Sample_Religion_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

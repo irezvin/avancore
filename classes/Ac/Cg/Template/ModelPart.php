@@ -161,8 +161,8 @@ class <?php $this->d($this->extraTableClass); ?> extends <?php $this->d($this->g
     /**
      * @return <?php echo $this->domain->getAppClass(); ?> 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     protected function listOwnProperties() {

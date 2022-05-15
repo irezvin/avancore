@@ -12,6 +12,8 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Classifier_Mapper';
 
+    var $shortId = 'shopClassifier';
+
     var $storage = 'Sample_Shop_Classifier_Storage';
 
     var $columnNames = [ 0 => 'id', 1 => 'title', 2 => 'type', ];
@@ -25,7 +27,7 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
    
     protected $autoincFieldName = 'id';
@@ -36,8 +38,8 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
         return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_shopClassifierType' => false,
             '_monitorShopSpecs' => false,
-            '_shopSpecsCount' => false,
-            '_shopSpecsLoaded' => false,
+            '_monitorShopSpecsCount' => false,
+            '_monitorShopSpecsLoaded' => false,
         ]);
     }
     
@@ -55,8 +57,8 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -198,8 +200,8 @@ class Sample_Shop_Classifier_Base_Mapper extends Ac_Model_Mapper {
                 'srcMapperClass' => 'Sample_Shop_Classifier_Mapper',
                 'destMapperClass' => 'Sample_Shop_Spec_Mapper',
                 'srcVarName' => '_monitorShopSpecs',
-                'srcCountVarName' => '_shopSpecsCount',
-                'srcLoadedVarName' => '_shopSpecsLoaded',
+                'srcCountVarName' => '_monitorShopSpecsCount',
+                'srcLoadedVarName' => '_monitorShopSpecsLoaded',
                 'fieldLinks' => [
                     'id' => 'matrixTypeId',
                 ],

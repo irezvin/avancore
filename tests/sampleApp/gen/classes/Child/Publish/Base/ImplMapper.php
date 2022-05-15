@@ -8,12 +8,14 @@ class Child_Publish_Base_ImplMapper extends Sample_Publish_ImplMapper {
 
     var $id = 'Child_Publish_ImplMapper';
 
+    var $shortId = 'publish';
+
     var $storage = 'Child_Publish_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -31,8 +33,8 @@ class Child_Publish_Base_ImplMapper extends Sample_Publish_ImplMapper {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

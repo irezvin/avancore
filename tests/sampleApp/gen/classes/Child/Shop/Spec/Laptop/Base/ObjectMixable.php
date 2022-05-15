@@ -19,8 +19,8 @@ class Child_Shop_Spec_Laptop_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTa
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     protected function listOwnProperties() {

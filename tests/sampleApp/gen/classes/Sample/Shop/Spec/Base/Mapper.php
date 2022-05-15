@@ -12,6 +12,8 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Spec_Mapper';
 
+    var $shortId = 'shopSpecs';
+
     var $storage = 'Sample_Shop_Spec_Storage';
 
     var $columnNames = [ 0 => 'productId', 1 => 'detailsUrl', 2 => 'specsType', ];
@@ -25,7 +27,7 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
     protected $askRelationsForDefaults = false;
  
@@ -50,8 +52,8 @@ class Sample_Shop_Spec_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

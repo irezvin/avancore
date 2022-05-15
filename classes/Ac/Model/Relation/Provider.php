@@ -5,7 +5,7 @@ abstract class Ac_Model_Relation_Provider extends Ac_Prototyped {
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
     
     /**
      * Whether each $keys or $keys2 combination uniquely identifies record in the source
@@ -38,17 +38,17 @@ abstract class Ac_Model_Relation_Provider extends Ac_Prototyped {
         return false;
     }
     
-    function setApplication(Ac_Application $application) {
-        if ($application !== ($oldApplication = $this->application)) {
-            $this->application = $application;
+    function setApp(Ac_Application $app) {
+        if ($app !== ($oldApp = $this->app)) {
+            $this->app = $app;
         }
     }
     
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        return $this->application;
+    function getApp() {
+        return $this->app;
     }
     
     protected function putRowToArray(& $row, & $instance, & $array, $keys, $unique) {

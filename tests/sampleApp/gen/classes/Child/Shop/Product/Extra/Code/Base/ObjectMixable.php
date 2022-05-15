@@ -19,8 +19,8 @@ class Child_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable_
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     protected function listOwnProperties() {

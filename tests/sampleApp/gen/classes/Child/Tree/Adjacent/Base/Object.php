@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Child $app Access to App instance (via Mapper)
+ */
 class Child_Tree_Adjacent_Base_Object extends Sample_Tree_Adjacent {
 
     
@@ -13,8 +15,8 @@ class Child_Tree_Adjacent_Base_Object extends Sample_Tree_Adjacent {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

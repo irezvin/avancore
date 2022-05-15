@@ -10,12 +10,14 @@ class Child_Shop_Product_Note_Base_ImplMapper extends Sample_Shop_Product_Note_I
 
     var $id = 'Child_Shop_Product_Note_ImplMapper';
 
+    var $shortId = 'shopProductNotes';
+
     var $storage = 'Child_Shop_Product_Note_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
     protected function doGetCoreMixables() { 
@@ -41,8 +43,8 @@ class Child_Shop_Product_Note_Base_ImplMapper extends Sample_Shop_Product_Note_I
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

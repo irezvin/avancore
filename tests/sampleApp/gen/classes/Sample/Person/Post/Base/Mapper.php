@@ -12,6 +12,8 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Person_Post_Mapper';
 
+    var $shortId = 'personPosts';
+
     var $storage = 'Sample_Person_Post_Storage';
 
     var $columnNames = [ 0 => 'id', 1 => 'personId', 2 => 'photoId', 3 => 'title', 4 => 'content', 5 => 'pubId', ];
@@ -30,7 +32,7 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
    
     protected $autoincFieldName = 'id';
@@ -70,8 +72,8 @@ class Sample_Person_Post_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

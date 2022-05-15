@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Shop_Classifier_Base_Object extends Ac_Model_Object {
 
 
@@ -9,9 +11,9 @@ class Sample_Shop_Classifier_Base_Object extends Ac_Model_Object {
 
     var $_monitorShopSpecs = false;
 
-    var $_shopSpecsCount = false;
+    var $_monitorShopSpecsCount = false;
 
-    var $_shopSpecsLoaded = false;
+    var $_monitorShopSpecsLoaded = false;
 
     var $id = NULL;
 
@@ -29,8 +31,8 @@ class Sample_Shop_Classifier_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -47,7 +49,7 @@ class Sample_Shop_Classifier_Base_Object extends Ac_Model_Object {
  
     protected function listOwnLists() {
         
-        return [ 'monitorShopSpecs' => 'shopSpecs', ];
+        return [ 'monitorShopSpecs' => 'monitorShopSpecs', ];
     }
 
     
@@ -64,6 +66,7 @@ class Sample_Shop_Classifier_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Shop_Classifier_Type_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_shop_classifier_shop_classifier_type'),
+                'idPropertyName' => 'type',
                 'relationId' => '_shopClassifierType',
                 'referenceVarName' => '_shopClassifierType',
             ],
@@ -73,8 +76,9 @@ class Sample_Shop_Classifier_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPrefix' => 'monitor',
 
                 'caption' => new Ac_Lang_String('sample_shop_classifier_monitor_shop_specs'),
+                'idPropertyName' => 'id',
                 'relationId' => '_monitorShopSpecs',
-                'countVarName' => '_shopSpecsCount',
+                'countVarName' => '_monitorShopSpecsCount',
                 'referenceVarName' => '_monitorShopSpecs',
             ],
             'id' => [
@@ -98,7 +102,7 @@ class Sample_Shop_Classifier_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Classifier_Type_Mapper',
                 ],
-                'objectPropertyName' => 'shopClassifierType',
+                'assocPropertyName' => 'shopClassifierType',
 
                 'caption' => new Ac_Lang_String('sample_shop_classifier_type'),
             ],
@@ -169,7 +173,7 @@ class Sample_Shop_Classifier_Base_Object extends Ac_Model_Object {
      * @return bool
      */
     function isMonitorShopSpecsLoaded() {
-        return $this->_shopSpecsLoaded;
+        return $this->_monitorShopSpecsLoaded;
     }
     
     /**

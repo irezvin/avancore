@@ -8,12 +8,14 @@ class Child_Tree_Record_Base_Mapper extends Sample_Tree_Record_Mapper {
 
     var $id = 'Child_Tree_Record_Mapper';
 
+    var $shortId = 'treeRecords';
+
     var $storage = 'Child_Tree_Record_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -31,8 +33,8 @@ class Child_Tree_Record_Base_Mapper extends Sample_Tree_Record_Mapper {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

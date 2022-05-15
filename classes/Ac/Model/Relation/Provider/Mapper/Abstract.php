@@ -34,14 +34,14 @@ abstract class Ac_Model_Relation_Provider_Mapper_Abstract extends Ac_Model_Relat
         if (!$mapper) $this->mapper = null;
         elseif ($mapper instanceof Ac_Model_Mapper) $this->mapper = $mapper;
         elseif (is_string($mapper)) {
-            if ($this->application) {
-                $this->mapper = $this->application->getMapper($mapper);
+            if ($this->app) {
+                $this->mapper = $this->app->getMapper($mapper);
             } else {
                 $this->mapper = Ac_Model_Mapper::getMapper($mapper);
             }
         } else {
             $def = array();
-            if ($this->application) $def['application'] = $this->application;
+            if ($this->app) $def['app'] = $this->app;
             $this->mapper = Ac_Prototyped::factory($mapper, 'Ac_Model_Mapper', $def);
         }
     }

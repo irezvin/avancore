@@ -8,12 +8,14 @@ class Child_Relation_Base_Mapper extends Sample_Relation_Mapper {
 
     var $id = 'Child_Relation_Mapper';
 
+    var $shortId = 'relations';
+
     var $storage = 'Child_Relation_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -38,8 +40,8 @@ class Child_Relation_Base_Mapper extends Sample_Relation_Mapper {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

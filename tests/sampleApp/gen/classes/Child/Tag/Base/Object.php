@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Child $app Access to App instance (via Mapper)
+ */
 class Child_Tag_Base_Object extends Sample_Tag {
 
     
@@ -13,8 +15,8 @@ class Child_Tag_Base_Object extends Sample_Tag {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

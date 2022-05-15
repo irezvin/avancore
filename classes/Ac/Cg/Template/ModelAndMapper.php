@@ -366,7 +366,9 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
 ?>
 <?php $this->phpOpen(); ?>
 
-
+/**
+ * @property <?php echo $this->domain->getAppClass(); ?> $app Access to App instance (via Mapper)
+ */
 <?php if ($this->model->parentClassIsAbstract) echo "abstract "; ?>class <?php $this->d($this->genModelClass); ?> extends <?php $this->d($this->parentClass); ?> {
 
 <?php $this->declareClassMembers ($this->vars, 4); ?>
@@ -381,8 +383,8 @@ class Ac_Cg_Template_ModelAndMapper extends Ac_Cg_Template {
     /**
      * @return <?php echo $this->domain->getAppClass(); ?> 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -508,7 +510,7 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     /**
      * @var <?php echo $this->domain->getAppClass(); ?> 
      */
-     protected $application = false;
+     protected $app = false;
      
 <?php if ($this->autoincFieldName && !isset($this->ignoreMethods['autoincFieldName'])) { ?>
    
@@ -547,8 +549,8 @@ class <?php $this->d($this->modelClass); ?> extends <?php $this->d($this->genMod
     /**
      * @return <?php echo $this->domain->getAppClass(); ?> 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

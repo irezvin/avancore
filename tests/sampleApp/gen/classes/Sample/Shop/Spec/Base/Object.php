@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Shop_Spec_Base_Object extends Ac_Model_Object {
 
 
@@ -23,8 +25,8 @@ class Sample_Shop_Spec_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -52,6 +54,7 @@ class Sample_Shop_Spec_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Shop_Product_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_shop_spec_shop_product'),
+                'idPropertyName' => 'productId',
                 'relationId' => '_shopProduct',
                 'referenceVarName' => '_shopProduct',
             ],
@@ -63,7 +66,7 @@ class Sample_Shop_Spec_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ],
-                'objectPropertyName' => 'shopProduct',
+                'assocPropertyName' => 'shopProduct',
 
                 'caption' => new Ac_Lang_String('sample_shop_spec_product_id'),
             ],

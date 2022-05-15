@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Person_Album_Base_Object extends Ac_Model_Object {
 
 
@@ -31,8 +33,8 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -66,6 +68,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_person_album_person'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
             ],
@@ -74,6 +77,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Photo_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_person_album_person_photos'),
+                'idsPropertyName' => 'personPhotoIds',
                 'relationId' => '_personPhotos',
                 'countVarName' => '_personPhotosCount',
                 'nnIdsVarName' => '_personPhotoIds',
@@ -88,6 +92,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Person_Photo_Mapper',
                 ],
                 'showInTable' => false,
+                'assocPropertyName' => 'personPhotos',
             ],
             'albumId' => [
                 'dataType' => 'int',
@@ -106,7 +111,7 @@ class Sample_Person_Album_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ],
-                'objectPropertyName' => 'person',
+                'assocPropertyName' => 'person',
 
                 'caption' => new Ac_Lang_String('sample_person_album_person_id'),
             ],

@@ -1,6 +1,16 @@
 <?php
 
+/**
+ * @property Ac_Application $application
+ * @method Ac_Application getApplication()
+ * @method void setApplication(Ac_Application $application)
+ */
 class Ac_Template extends Ac_Prototyped {
+
+    use Ac_Compat_Overloader;
+    protected static $_compat_application = 'app';
+    protected static $_compat_setApplication = 'setApp';
+    protected static $_compat_getApplication = 'getApp';
     
     /**
      * @var Ac_Controller
@@ -22,7 +32,7 @@ class Ac_Template extends Ac_Prototyped {
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
 
     protected $topLevelPart = null;
     
@@ -142,19 +152,19 @@ class Ac_Template extends Ac_Prototyped {
         return $this->l($langString, $defaultOrArgs, $return);
     }
 
-    function setApplication(Ac_Application $application) {
-        $this->application = $application;
+    function setApp(Ac_Application $app) {
+        $this->app = $app;
     }
 
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        if ($this->application === false) {
-            if ($this->controller) return $this->controller->getApplication ();
+    function getApp() {
+        if ($this->app === false) {
+            if ($this->controller) return $this->controller->getApp();
             else return Ac_Application::getDefaultInstance ();
         }
-        return $this->application;
+        return $this->app;
     }    
 
 }

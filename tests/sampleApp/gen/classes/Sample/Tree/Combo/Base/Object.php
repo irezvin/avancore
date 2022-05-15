@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
 
 
@@ -33,8 +35,8 @@ class Sample_Tree_Combo_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

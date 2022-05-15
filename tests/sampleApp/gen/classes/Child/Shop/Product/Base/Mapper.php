@@ -8,12 +8,14 @@ class Child_Shop_Product_Base_Mapper extends Sample_Shop_Product_Mapper {
 
     var $id = 'Child_Shop_Product_Mapper';
 
+    var $shortId = 'shopProducts';
+
     var $storage = 'Child_Shop_Product_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
     protected function doGetCoreMixables() { 
@@ -45,8 +47,8 @@ class Child_Shop_Product_Base_Mapper extends Sample_Shop_Product_Mapper {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

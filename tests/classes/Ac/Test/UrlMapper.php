@@ -120,7 +120,7 @@ class Ac_Test_UrlMapper extends Ac_Test_Base {
             ),
             'baseUrl' => 'https://www.example.com/cms/',
         ));
-        
+
         $this->assertEqual($res = $m->strPathToQuery($url = 'https://www.example.com/cms/list/'),
             $proper = 'https://www.example.com/cms/?action=list');
         $this->assertEqual($res = $m->strQueryToPath($proper), $url);

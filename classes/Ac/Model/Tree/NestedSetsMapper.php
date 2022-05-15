@@ -177,7 +177,7 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
         if ($this->nsRelation === false && $this->mixin) {
             if (strlen($this->nsTableName)) {
                 $this->nsRelation = new Ac_Model_Relation(array(
-                    'application' => $this->mixin->getApplication(),
+                    'app' => $this->mixin->getApp(),
                     'srcTableName' => $ns->tableName,
                     'destMapper' => $this->mixin,
                     'fieldLinks' => array($ns->idCol => $this->mixin->pk),
@@ -225,7 +225,7 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
         if ($this->childrenCountRelation === false) {
             $ns = $this->getNestedSets();
             $this->childrenCountRelation = new Ac_Model_Relation(array(
-                'application' => $this->mixin->getApplication(),
+                'app' => $this->mixin->getApp(),
                 'srcTableName' => $this->mixin->tableName,
                 'destTableName' => new Ac_Sql_Expression("(
                     SELECT {$ns->parentCol} AS parentId, COUNT(ns.{$ns->idCol}) AS `count` 
@@ -256,7 +256,7 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
             else 
                 $treeJoinCriterion = "";
             $this->allChildrenCountRelation = new Ac_Model_Relation(array(
-                'application' => $this->mixin->getApplication(),
+                'app' => $this->mixin->getApp(),
                 'srcTableName' => $this->mixin->tableName,
                 'destTableName' => new Ac_Sql_Expression("(
                     SELECT parents.{$ns->idCol} AS parentId, COUNT(children.{$ns->idCol}) AS `count` 
@@ -285,7 +285,7 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
         if ($this->childIdsRelation === false) {
             $ns = $this->getNestedSets();
         	$this->childIdsRelation = new Ac_Model_Relation(array(
-                'application' => $this->mixin->getApplication(),
+                'app' => $this->mixin->getApp(),
                 'srcTableName' => $this->mixin->tableName,
                 'destTableName' => $ns->tableName,
                 'fieldLinks' => array(
@@ -309,7 +309,7 @@ class Ac_Model_Tree_NestedSetsMapper extends Ac_Mixable {
         if ($this->containersRelation === false) {
             $ns = $this->getNestedSets();
             $this->containersRelation = new Ac_Model_Relation(array(
-                'application' => $this->mixin->getApplication(),
+                'app' => $this->mixin->getApp(),
                 'srcTableName' => $ns->tableName,
                 'destMapper' => $this->mixin,
                 'fieldLinks' => array(

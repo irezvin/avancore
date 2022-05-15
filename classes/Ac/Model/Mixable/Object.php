@@ -12,14 +12,14 @@ class Ac_Model_Mixable_Object extends Ac_Model_Mixable_Data {
     /**
      * @retrun Ac_Application
      */
-    function getApplication() {
-        if ($this->mixin) $res = $this->mixin->getApplication();
+    function getApp() {
+        if ($this->mixin) $res = $this->mixin->getApp();
             else $res = null;
         return $res;
     }
     
     function listNonMixedMethods() {
-        return array_merge(parent::listNonMixedMethods(), array('getApplication'));
+        return array_merge(parent::listNonMixedMethods(), array('getApp'));
     }
     
     protected function doOnCreate() {

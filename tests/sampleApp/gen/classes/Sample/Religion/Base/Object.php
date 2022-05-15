@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Religion_Base_Object extends Ac_Model_Object {
 
 
@@ -25,8 +27,8 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -60,6 +62,7 @@ class Sample_Religion_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_religion_people'),
+                'idPropertyName' => 'religionId',
                 'relationId' => '_people',
                 'countVarName' => '_peopleCount',
                 'referenceVarName' => '_people',

@@ -58,6 +58,8 @@ class Weight implements Ac_I_Mixable {
 
 class Body extends Ac_Mixin {
 
+    use Ac_Compat_Overloader;
+    
     protected $protVar = false;
     
     protected function doGetCoreMixables() {

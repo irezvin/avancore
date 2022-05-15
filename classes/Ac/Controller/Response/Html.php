@@ -83,7 +83,7 @@ class Ac_Controller_Response_Html extends Ac_Controller_Response_Http {
     
     function getAssetPlaceholders() {
         if ($this->assetPlaceholders === false) {
-            $this->assetPlaceholders = $this->getApplication()->getAssetPlaceholders(true);
+            $this->assetPlaceholders = $this->getApp()->getAssetPlaceholders(true);
         }
         return $this->assetPlaceholders;
     }

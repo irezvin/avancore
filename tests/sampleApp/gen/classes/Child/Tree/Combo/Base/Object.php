@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Child $app Access to App instance (via Mapper)
+ */
 class Child_Tree_Combo_Base_Object extends Sample_Tree_Combo {
 
     
@@ -13,8 +15,8 @@ class Child_Tree_Combo_Base_Object extends Sample_Tree_Combo {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

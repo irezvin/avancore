@@ -5,17 +5,17 @@ class Ac_Model_Relation_Provider_Evaluator {
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
 
-    function setApplication(Ac_Application $application) {
-        $this->application = $application;
+    function setApp(Ac_Application $app) {
+        $this->app = $app;
     }
 
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        return $this->application;
+    function getApp() {
+        return $this->app;
     }    
     
     protected function evaluateMapperProvider(array $relationProps, $preferWhenSeveralFields = false) {
@@ -24,7 +24,7 @@ class Ac_Model_Relation_Provider_Evaluator {
         if (isset($relationProps['destMapper']) && $relationProps['destMapper'])
             $mapper = $relationProps['destMapper'];
         elseif ($relationProps['destMapperClass']) {
-            $mapper = $this->application? $this->application->getMapper($relationProps['destMapperClass']) 
+            $mapper = $this->app? $this->app->getMapper($relationProps['destMapperClass']) 
                 : Ac_Application::getDefaultInstance()->getMapper($relationProps['destMapperClass']);
         }
         if ($mapper) {

@@ -1,11 +1,22 @@
 <?php
 
+/**
+ * @property Ac_Application $application
+ * @method Ac_Application getApplication()
+ * @method void setApplication(Ac_Application $application)
+ */
 class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_NamedApplicationComponent {
 
+    use Ac_Compat_Overloader;
+    
+    protected static $_compat_application = 'app';
+    protected static $_compat_setApplication = 'setApp';
+    protected static $_compat_getApplication = 'getApp';
+    
     /**
      * @var Ac_Application
      */
-    protected $application = null;
+    protected $app = null;
     
     /**
      * @var string
@@ -533,7 +544,7 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
             if (!isset($res[$tplVar])) {
                 $val = false;
                 $res[$tplVar] = false;
-                if (is_callable(array($this, $methodName = 'get'.$myVar))) {
+                if (Ac_Accessor::methodExists($this, $methodName = 'get'.$myVar)) {
                     $val = $this->$methodName();
                 } elseif(in_array($myVar, $myVars)) {
                     $val = $this->$myVar; 
@@ -546,17 +557,17 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
         return $res;
     }
 
-    function setApplication(Ac_Application $application) {
-        if ($this->application && $this->application !== $application) throw new Exception("Can setApplication() only once");
-        $this->application = $application;
+    function setApp(Ac_Application $app) {
+        if ($this->app && $this->app !== $app) throw new Exception("Can setApplication() only once");
+        $this->app = $app;
     }
 
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        if (!$this->application) return Ac_Application::getDefaultInstance();
-        return $this->application;
+    function getApp() {
+        if (!$this->app) return Ac_Application::getDefaultInstance();
+        return $this->app;
     }
     
     function getHitCache() {
@@ -584,5 +595,6 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
         $mappedPath = $this->getContext()->mapParam($path);
         throw new Ac_E_ControllerException("Required parameter '{$mappedPath}' not provided", 400);
     }
+    
     
 }

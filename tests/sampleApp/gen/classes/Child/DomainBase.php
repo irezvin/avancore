@@ -2,6 +2,33 @@
 
 abstract class Child_DomainBase extends Sample {
 
+    protected $componentAliases = [
+        'people' => 'Child_Person_Mapper',
+        'perks' => 'Child_Perk_Mapper',
+        'personAlbums' => 'Child_Person_Album_Mapper',
+        'personPhotos' => 'Child_Person_Photo_Mapper',
+        'personPosts' => 'Child_Person_Post_Mapper',
+        'publish' => 'Child_Publish_ImplMapper',
+        'relationTypes' => 'Child_Relation_Type_Mapper',
+        'relations' => 'Child_Relation_Mapper',
+        'religion' => 'Child_Religion_Mapper',
+        'shopCategories' => 'Child_Shop_Category_Mapper',
+        'shopClassifier' => 'Child_Shop_Classifier_Mapper',
+        'shopClassifierType' => 'Child_Shop_Classifier_Type_Mapper',
+        'shopProductExtraCodes' => 'Child_Shop_Product_Extra_Code_ImplMapper',
+        'shopProductNotes' => 'Child_Shop_Product_Note_ImplMapper',
+        'shopProducts' => 'Child_Shop_Product_Mapper',
+        'shopSpecComputer' => 'Child_Shop_Spec_Computer_ImplMapper',
+        'shopSpecFood' => 'Child_Shop_Spec_Food_ImplMapper',
+        'shopSpecLaptop' => 'Child_Shop_Spec_Laptop_ImplMapper',
+        'shopSpecMonitor' => 'Child_Shop_Spec_Monitor_ImplMapper',
+        'shopSpecs' => 'Child_Shop_Spec_Mapper',
+        'tags' => 'Child_Tag_Mapper',
+        'treeAdjacent' => 'Child_Tree_Adjacent_Mapper',
+        'treeCombos' => 'Child_Tree_Combo_Mapper',
+        'treeRecords' => 'Child_Tree_Record_Mapper',
+    ];
+
     protected function doOnInitialize() {
         parent::doOnInitialize();
  

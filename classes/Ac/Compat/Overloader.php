@@ -14,8 +14,9 @@ trait Ac_Compat_Overloader {
     
     static $defaultAction = Ac_I_Compat::ACTION_NONE;
     
-    function __get($property) {
-        return $this->compatGet($property);
+    function & __get($property) {
+        $res = $this->compatGet($property);
+        return $res;
     }
     
     // by default __set doesn't allow creation of arbitrary properties
@@ -32,7 +33,13 @@ trait Ac_Compat_Overloader {
     }
     
     function hasMethod($methodName) {
-        return method_exists($this, $methodName) || $this->compatCall($methodName, [], true);
+        if (method_exists($this, $methodName) || $this->compatCall($methodName, [], true)) {
+            return true;
+        }
+        if (isset(self::$magicParent) && method_exists($parent = self::$magicParent, 'hasMethod')) {
+            return $parent::hasMethod($methodName);
+        }
+        return false;
     }
     
     protected static function implCompatOverloaderAction($class, $action, $old, $new, $mode) {
@@ -60,6 +67,8 @@ trait Ac_Compat_Overloader {
         throw Ac_Compat_Exception($message);
     }
     
+    protected $compatCallLock = 0;
+    
     protected function compatPropertyAccess($property, $type = Ac_I_Compat::ACCESS_GET, $setValue = null, $allowArbitrarySet = true) {
         $newProperty = false;
         $accessor = null;
@@ -73,8 +82,38 @@ trait Ac_Compat_Overloader {
         if (isset(self::$$newPropertyVar)) $newProperty = self::$$newPropertyVar;
         if (!$newProperty) { // there's no alias
             
+            // !! TODO: compatibility with parent's __get, __set, __isset
+            
             // standard PHP behaviour for isset($object->var) is to return FALSE when variable doesn't exist or is out of scope
-            if ($type === Ac_I_Compat::ACCESS_ISSET) return false;
+            
+            $parent = get_parent_class($this);
+            
+            if (!$this->compatCallLock) {
+                if ($type === Ac_I_Compat::ACCESS_ISSET) {
+                    if (isset(self::$magicParent) && method_exists($parent = self::$magicParent, '__isset')) {
+                        $this->compatCallLock++;
+                        $res = $parent::__isset($property);
+                        $this->compatCallLock--;
+                        return $res;
+                    }
+                    return false;
+                } elseif ($type === Ac_I_Compat::ACCESS_GET) {
+                    if (isset(self::$magicParent) && method_exists($parent = self::$magicParent, '__get')) {
+                        $this->compatCallLock++;
+                        $res = $parent::__get($property);
+                        $this->compatCallLock--;
+                        return $res;
+                    }
+                } else {
+                    if (isset(self::$magicParent) && method_exists($parent = self::$magicParent, '__set')) {
+                        $this->compatCallLock++;
+                        $res = $parent::__set($property, $setValue);
+                        $this->compatCallLock--;
+                        return $res;
+                    }
+                }
+            }
+            
             
             if ($type === Ac_I_Compat::ACCESS_SET && $allowArbitrarySet) {
                 // since this was done through compat, property is either private or protected
@@ -86,6 +125,7 @@ trait Ac_Compat_Overloader {
                 $modifier = $rp->isPrivate()? "private" : "protected";
                 trigger_error("Cannot access {$modifier} property ".get_class($this)."::{$property}", E_USER_ERROR);
             }
+            
             trigger_error("Undefined property: ".get_class($this)."::\${$property}", E_USER_NOTICE);
             return;
             
@@ -120,6 +160,7 @@ trait Ac_Compat_Overloader {
             // returns TRUE if class member is defined
             return true;
         }
+        
         throw Ac_E_InvalidCall::outOfConst('type', $type, 'ACCESS_', 'Ac_I_Compat');
     }
     
@@ -140,7 +181,13 @@ trait Ac_Compat_Overloader {
         $newMethodVar = '_compat_'.$method;
         if (isset(self::$$newMethodVar)) $newMethod = self::$$newMethodVar;
         if (!$newMethod) {
-            if ($checkOnly) return false;
+            if ($checkOnly) {
+                return false;
+            }
+            if (isset(self::$magicParent) && method_exists($parent = self::$magicParent, '__call')) {
+                $res = parent::__call($method, $args);
+                return $res;
+            }
             trigger_error("Call to undefined method ".get_class($this)."::{$method}()", E_USER_ERROR);
             return;
         }

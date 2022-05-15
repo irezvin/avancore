@@ -7,10 +7,6 @@ class Sample_Shop_Spec_Monitor_Base_ObjectMixable extends Ac_Model_Mixable_Extra
 
     var $_monitorShopClassifier = false;
 
-    var $_monitorShopSpecsCount = false;
-
-    var $_monitorShopSpecsLoaded = false;
-
     var $productId = NULL;
 
     var $diagonal = 0;
@@ -37,19 +33,13 @@ class Sample_Shop_Spec_Monitor_Base_ObjectMixable extends Ac_Model_Mixable_Extra
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     protected function listOwnProperties() {
         return array_merge(parent::listOwnProperties(), [ 0 => 'monitorShopClassifier', ]);
     }
- 
-    protected function listOwnLists() {
-        
-        return [ 'monitorShopClassifier' => 'monitorShopSpecs', ];
-    }
-
     
  
     protected function listOwnAssociations() {
@@ -65,8 +55,8 @@ class Sample_Shop_Spec_Monitor_Base_ObjectMixable extends Ac_Model_Mixable_Extra
                 'otherModelIdInMethodsPrefix' => 'monitor',
 
                 'caption' => new Ac_Lang_String('sample_shop_spec_monitor_monitor_shop_classifier'),
+                'idPropertyName' => 'matrixTypeId',
                 'relationId' => '_monitorShopClassifier',
-                'countVarName' => '_monitorShopSpecsCount',
                 'referenceVarName' => '_monitorShopClassifier',
             ],
             'productId' => [
@@ -116,7 +106,7 @@ class Sample_Shop_Spec_Monitor_Base_ObjectMixable extends Ac_Model_Mixable_Extra
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Classifier_Mapper',
                 ],
-                'objectPropertyName' => 'monitorShopClassifier',
+                'assocPropertyName' => 'monitorShopClassifier',
                 'isNullable' => true,
 
                 'caption' => new Ac_Lang_String('sample_shop_spec_monitor_matrix_type_id'),

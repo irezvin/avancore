@@ -171,6 +171,12 @@ class Ac_UrlMapper_UrlMapper extends Ac_Prototyped {
         $params = $this->stringToParams($url->pathInfo);
         
         if ($params === null) return $url;
+        if (isset($params[$this->parentPathInfoParam])) {
+            $url->pathInfo = $params[$this->parentPathInfoParam];
+            unset($params[$this->parentPathInfoParam]);
+        } else {
+            $url->pathInfo = null;
+        }
                 
         $extractedParams = $params;
         Ac_Util::ms($url->query, $extractedParams);

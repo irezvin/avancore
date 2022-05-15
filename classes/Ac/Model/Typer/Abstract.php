@@ -17,7 +17,7 @@ abstract class Ac_Model_Typer_Abstract extends Ac_Mixable {
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
     
     /**
      * Whether to handle Mapper's onBeforeLoadFromRows event.
@@ -69,16 +69,16 @@ abstract class Ac_Model_Typer_Abstract extends Ac_Mixable {
         return $res;
     }
 
-    function setApplication(Ac_Application $application) {
-        $this->application = $application;
+    function setApp(Ac_Application $app) {
+        $this->app = $app;
     }
 
     /**
-     * @return Ac_Application
+     * @return Ac_App
      */
-    function getApplication() {
-        if ($this->application) return $this->application;
-        elseif ($this->mixin) return $this->mixin->getApplication();
+    function getApp() {
+        if ($this->app) return $this->app;
+        elseif ($this->mixin) return $this->mixin->getApp();
     }
     
     function onBeforeLoadFromRows(array & $uniqueRows, array & $objects) {

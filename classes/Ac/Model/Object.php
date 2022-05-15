@@ -1,5 +1,8 @@
 <?php
 
+/**
+ * @property Ac_Sql_Db $db Access to Db instance
+ */
 abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionAwareObject {
 
     const ACTUAL_REASON_LOAD = 1;
@@ -166,10 +169,18 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     protected $_magicSetLock = false;
     
     /**
+     * @deprecated since 0.4.2
      * @return Ac_Application
      */
     function getApplication() {
-        return $this->mapper->getApplication();
+        return $this->getApp();
+    }
+    
+    /**
+     * @return Ac_Application
+     */
+    function getApp() {
+        return $this->mapper->getApp();
     }
     
     /**
@@ -655,7 +666,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     }
     
     /**
-     * Returns unique per-application ID of current model object
+     * Returns unique per-app ID of current model object
      * @return string
      */
     function getIdentifier() {
@@ -980,6 +991,10 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
     }
     
     function & __get($name) {
+        
+        if ($name === 'app') return $this->getApp();
+        if ($name === 'db') return $this->getDb();
+        
         $tmp = $this->_magicGetLock;
         $this->_magicGetLock = $name;
         if (in_array($name, $this->listFields()) || strpos($name, '[') !== false) {

@@ -172,14 +172,14 @@ class Ac_Admin_Manager extends Ac_Controller {
     }
     
     function _loadFromCache($d = false, $rqd = false) {
-        $cache = $this->getApplication()->getCache();
+        $cache = $this->getApp()->getCache();
         $cid = $this->_getCacheId($d, $rqd);
         return $cache->get($cid, $this->_getCacheGroup());
     }
     
     function _saveToCache($data, $d = false, $rqd = false) {
         $cid = $this->_getCacheId($d, $rqd);
-        $cache = $this->getApplication()->getCache();
+        $cache = $this->getApp()->getCache();
         return $cache->put($cid, $data, $this->_getCacheGroup());
     }
     
@@ -991,7 +991,7 @@ class Ac_Admin_Manager extends Ac_Controller {
             $conf = $this->_subManagers[$id];
             $ctx = $this->_createSubManagerContext($id);
             if (isset($conf['mapperClass']) && strlen($conf['mapperClass'])) {
-                $mapper = $this->application->getMapper($conf['mapperClass']);
+                $mapper = $this->app->getMapper($conf['mapperClass']);
                 $conf = Ac_Util::m($mapper->getManagerConfig(), $conf);
             }
             if (isset($conf['class']) && strlen($conf['class'])) {
@@ -1002,7 +1002,7 @@ class Ac_Admin_Manager extends Ac_Controller {
             $managerConf = $conf;
             unset($managerConf['_relId']);
             $sm = new $class ($managerConf);
-            $sm->setApplication($this->getApplication());
+            $sm->setApp($this->getApp());
             $this->_subManagers[$id] = $sm;
             foreach ($this->listFeatures() as $f) {
                 $feat = $this->getFeature($f);
@@ -1024,7 +1024,7 @@ class Ac_Admin_Manager extends Ac_Controller {
             $prot = $this->_processings[$p];
             if (!isset($prot['id']) || !strlen($prot['id'])) $prot['id'] = $p;
             $prot['manager'] = $this;
-            $prot['application'] = $this->application;
+            $prot['app'] = $this->app;
             $class = $prot['class'];
             if (isset($prot['class']) && strlen($prot['class'])) {
                 $class = $prot['class'];
@@ -1355,7 +1355,7 @@ class Ac_Admin_Manager extends Ac_Controller {
     function createBareCollection() {
         $proto = array(
             'class' => 'Ac_Model_Collection_Mapper',
-            'application' => $this->getApplication(),
+            'app' => $this->getApp(),
             'mapper' => $this->getMapper(),
             'query' => array(),
             'autoOpen' => true,
@@ -1435,7 +1435,7 @@ class Ac_Admin_Manager extends Ac_Controller {
      * @return Ac_Admin_ManagerConfigService
      */
     function getConfigService() {
-        return $this->application->getComponent(Ac_Application::CORE_COMPONENT_MANAGER_CONFIG_SERVICE);
+        return $this->app->getComponent(Ac_Application::CORE_COMPONENT_MANAGER_CONFIG_SERVICE);
     }
     
     function getReturnUrl() {

@@ -4,12 +4,18 @@
 
 class Ac_Admin_ManagerConfigService implements Ac_I_ApplicationComponent {
 
+    use Ac_Compat_Overloader;
+    
+    protected static $_compat_application = 'app';
+    protected static $_compat_setApplication = 'setApp';
+    protected static $_compat_getApplication = 'getApp';
+    
     protected $toolbarImagesMap = false;
     
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
     
     protected $toolbarImagePlaceholder = '{TOOLBAR}';
     
@@ -54,8 +60,8 @@ class Ac_Admin_ManagerConfigService implements Ac_I_ApplicationComponent {
         );
     }
     
-    function __construct(Ac_Application $application = null) {
-        if ($application) $this->setApplication($application);
+    function __construct(Ac_Application $app = null) {
+        if ($app) $this->setApp($app);
     }
     
     function getToolbarImagesMap($forKind = false) {
@@ -76,7 +82,7 @@ class Ac_Admin_ManagerConfigService implements Ac_I_ApplicationComponent {
     
     function getImagePrefix() {
         $imagePrefix = $this->getDefaultImagePrefix();
-        $managerImagesUrl = $this->getApplication()->getAdapter()->getConfigValue('managerImagesUrl');
+        $managerImagesUrl = $this->getApp()->getAdapter()->getConfigValue('managerImagesUrl');
         if (!is_null($managerImagesUrl)) {
             $imagePrefix = $managerImagesUrl;
         }
@@ -92,9 +98,9 @@ class Ac_Admin_ManagerConfigService implements Ac_I_ApplicationComponent {
         );
     }
 
-    function setApplication(Ac_Application $application) {
-        if ($application !== ($oldApplication = $this->application)) {
-            $this->application = $application;
+    function setApp(Ac_Application $app) {
+        if ($app !== ($oldApp = $this->app)) {
+            $this->app = $app;
             $this->setToolbarImagePlaceholder($this->toolbarImagePlaceholder, true);
         }
     }
@@ -102,8 +108,8 @@ class Ac_Admin_ManagerConfigService implements Ac_I_ApplicationComponent {
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        return $this->application;
+    function getApp() {
+        return $this->app;
     }    
     
     function showToolbarHeader($toolbarHeader) {
@@ -119,7 +125,7 @@ class Ac_Admin_ManagerConfigService implements Ac_I_ApplicationComponent {
         
         if ($toolbarImagePlaceholder !== ($oldToolbarImagePlaceholder = $this->toolbarImagePlaceholder) || $force) {
             $this->toolbarImagePlaceholder = $toolbarImagePlaceholder;
-            if ($a = $this->application) {
+            if ($a = $this->app) {
                 $p = $a->getExtraAssetPlaceholders();
                 if (isset($p[$oldToolbarImagePlaceholder])) unset($p[$oldToolbarImagePlaceholder]);
                 if ($toolbarImagePlaceholder !== false) {
@@ -133,7 +139,7 @@ class Ac_Admin_ManagerConfigService implements Ac_I_ApplicationComponent {
     function getToolbarImagePlaceholder($expandAppId = false) {
         $res = $this->toolbarImagePlaceholder;
         if ($expandAppId) {
-            $a = $this->application;
+            $a = $this->app;
             if ($a) {
                 $res = sprintf($res, strtoupper(get_class($a)));
             }

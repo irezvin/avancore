@@ -243,7 +243,7 @@ class Ac_Cg_Template_Skel_Joomla extends Ac_Cg_Template_Skel {
                 $controller = new [[App]]_Frontend($ctx);
             }
             
-            $controller->setApplication([[App]]::getInstance());
+            $controller->setApp([[App]]::getInstance());
             
             $response = $controller->getResponse();
             $output = new Ac_Controller_Output_Joomla3();

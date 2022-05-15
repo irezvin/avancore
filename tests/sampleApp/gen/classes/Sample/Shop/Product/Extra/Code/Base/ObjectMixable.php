@@ -7,10 +7,6 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
 
     var $_extraCodePerson = false;
 
-    var $_extraCodeShopProductsCount = false;
-
-    var $_extraCodeShopProductsLoaded = false;
-
     var $productId = NULL;
 
     var $ean = '';
@@ -37,19 +33,13 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     protected function listOwnProperties() {
         return array_merge(parent::listOwnProperties(), [ 0 => 'extraCodePerson', ]);
     }
- 
-    protected function listOwnLists() {
-        
-        return [ 'extraCodePerson' => 'extraCodeShopProducts', ];
-    }
-
     
  
     protected function listOwnAssociations() {
@@ -65,8 +55,8 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
                 'otherModelIdInMethodsPrefix' => 'extraCode',
 
                 'caption' => new Ac_Lang_String('sample_shop_product_extra_code_extra_code_person'),
+                'idPropertyName' => 'responsiblePersonId',
                 'relationId' => '_extraCodePerson',
-                'countVarName' => '_extraCodeShopProductsCount',
                 'referenceVarName' => '_extraCodePerson',
             ],
             'productId' => [
@@ -105,7 +95,7 @@ class Sample_Shop_Product_Extra_Code_Base_ObjectMixable extends Ac_Model_Mixable
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ],
-                'objectPropertyName' => 'extraCodePerson',
+                'assocPropertyName' => 'extraCodePerson',
                 'isNullable' => true,
 
                 'caption' => new Ac_Lang_String('sample_shop_product_extra_code_responsible_person_id'),

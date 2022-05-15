@@ -8,12 +8,14 @@ class Child_Shop_Spec_Laptop_Base_ImplMapper extends Sample_Shop_Spec_Laptop_Imp
 
     var $id = 'Child_Shop_Spec_Laptop_ImplMapper';
 
+    var $shortId = 'shopSpecLaptop';
+
     var $storage = 'Child_Shop_Spec_Laptop_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -31,8 +33,8 @@ class Child_Shop_Spec_Laptop_Base_ImplMapper extends Sample_Shop_Spec_Laptop_Imp
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

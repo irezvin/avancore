@@ -14,6 +14,8 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Spec_Monitor_ImplMapper';
 
+    var $shortId = 'shopSpecMonitor';
+
     var $storage = 'Sample_Shop_Spec_Monitor_Storage';
 
     var $columnNames = [ 0 => 'productId', 1 => 'diagonal', 2 => 'hRes', 3 => 'vRes', 4 => 'matrixTypeId', ];
@@ -31,7 +33,7 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
     protected $askRelationsForDefaults = false;
  
@@ -49,8 +51,6 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_monitorShopClassifier' => false,
-            '_monitorShopSpecsCount' => false,
-            '_monitorShopSpecsLoaded' => false,
         ]);
     }
     
@@ -68,8 +68,8 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -193,11 +193,9 @@ class Sample_Shop_Spec_Monitor_Base_ImplMapper extends Ac_Model_Mapper {
                 'srcMapperClass' => 'Sample_Shop_Spec_Monitor_ImplMapper',
                 'destMapperClass' => 'Sample_Shop_Classifier_Mapper',
                 'srcVarName' => '_monitorShopClassifier',
-                'srcCountVarName' => '_monitorShopSpecsCount',
-                'srcLoadedVarName' => '_monitorShopSpecsLoaded',
                 'destVarName' => '_monitorShopSpecs',
-                'destCountVarName' => '_shopSpecsCount',
-                'destLoadedVarName' => '_shopSpecsLoaded',
+                'destCountVarName' => '_monitorShopSpecsCount',
+                'destLoadedVarName' => '_monitorShopSpecsLoaded',
                 'fieldLinks' => [
                     'matrixTypeId' => 'id',
                 ],

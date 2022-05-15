@@ -14,6 +14,8 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Publish_ImplMapper';
 
+    var $shortId = 'publish';
+
     var $storage = 'Sample_Publish_Storage';
 
     var $columnNames = [ 0 => 'id', 1 => 'sharedObjectType', 2 => 'published', 3 => 'deleted', 4 => 'publishUp', 5 => 'publishDown', 6 => 'authorId', 7 => 'editorId', 8 => 'pubChannelId', 9 => 'dateCreated', 10 => 'dateModified', 11 => 'dateDeleted', ];
@@ -38,7 +40,7 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
    
     protected $autoincFieldName = 'id';
@@ -76,8 +78,8 @@ class Sample_Publish_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

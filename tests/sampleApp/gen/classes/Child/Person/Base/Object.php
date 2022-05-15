@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Child $app Access to App instance (via Mapper)
+ */
 class Child_Person_Base_Object extends Sample_Person {
 
     
@@ -13,8 +15,8 @@ class Child_Person_Base_Object extends Sample_Person {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

@@ -19,8 +19,8 @@ class Child_Shop_Spec_Computer_Base_ObjectMixable extends Ac_Model_Mixable_Extra
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     protected function listOwnProperties() {

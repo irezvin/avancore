@@ -12,6 +12,8 @@ class Sample_Shop_Spec_Computer_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Spec_Computer_ImplMapper';
 
+    var $shortId = 'shopSpecComputer';
+
     var $storage = 'Sample_Shop_Spec_Computer_Storage';
 
     var $columnNames = [ 0 => 'productId', 1 => 'hdd', 2 => 'ram', 3 => 'os', ];
@@ -26,7 +28,7 @@ class Sample_Shop_Spec_Computer_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
     protected $askRelationsForDefaults = false;
  
@@ -51,8 +53,8 @@ class Sample_Shop_Spec_Computer_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

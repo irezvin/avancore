@@ -235,10 +235,10 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         parent::doConstruct($prototype);
         
         if (($this->srcTableName === false) && strlen($this->srcMapperClass)) {
-            $this->setSrcMapper(Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->application? $this->application : null));
+            $this->setSrcMapper(Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->app? $this->app : null));
         }
         if (($this->destTableName === false) && strlen($this->destMapperClass)) {
-            $this->setDestMapper(Ac_Model_Mapper::getMapper($this->destMapperClass, $this->application? $this->application : null));
+            $this->setDestMapper(Ac_Model_Mapper::getMapper($this->destMapperClass, $this->app? $this->app: null));
         }
         
     }
@@ -251,8 +251,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             if ($this->srcTableName === false) {
                 $this->srcTableName = $srcMapper->tableName;
             }
-            if (!$this->db && $this->srcMapper->getApplication()) {
-                $this->db = $this->srcMapper->getApplication()->getDb();
+            if (!$this->db && $this->srcMapper->getApp()) {
+                $this->db = $this->srcMapper->getApp()->getDb();
             }
             if ($this->srcOrdering === false) $this->srcOrdering = $this->srcMapper->getDefaultSort();
             $this->reset();
@@ -273,7 +273,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
             if ($this->destTableName === false) {
                 $this->destTableName = $destMapper->tableName;
             }
-            if (!$this->db) $this->db = $this->destMapper->getApplication()->getDb();
+            if (!$this->db) $this->db = $this->destMapper->getApp()->getDb();
             if ($this->destOrdering === false) $this->destOrdering = $this->destMapper->getDefaultSort();
             $this->reset();
         }
@@ -286,9 +286,9 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         return $this->destMapper;
     }
     
-    protected function doOnSetApplication($oldApplication) {
-        $this->setDb($this->application->getDb());
-        if (!$oldApplication) {
+    protected function doOnSetApp($oldApp) {
+        $this->setDb($this->app->getDb());
+        if (!$oldApp) {
             if ($this->srcMapperClass && !$this->srcMapper) $this->setSrcMapperClass($this->srcMapperClass, true);
             if ($this->destMapperClass && !$this->destMapper) $this->setDestMapper($this->destMapper, true);
         }
@@ -306,8 +306,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if ($srcMapperClass !== ($oldSrcMapperClass = $this->srcMapperClass) || $force) {
             if ($this->immutable) throw self::immutableException();
             $this->srcMapperClass = $srcMapperClass;
-            if (strlen($srcMapperClass) && $this->application) {
-                $this->setSrcMapper(Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->application));
+            if (strlen($srcMapperClass) && $this->app) {
+                $this->setSrcMapper(Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->app));
             }
             $this->reset();
         }
@@ -335,8 +335,8 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         if ($destMapperClass !== ($oldDestMapperClass = $this->destMapperClass) || $force) {
             if ($this->immutable) throw self::immutableException();
             $this->destMapperClass = $destMapperClass;
-            if (strlen($destMapperClass) && $this->application) {
-                $this->setDestMapper(Ac_Model_Mapper::getMapper($this->destMapperClass, $this->application));
+            if (strlen($destMapperClass) && $this->app) {
+                $this->setDestMapper(Ac_Model_Mapper::getMapper($this->destMapperClass, $this->app));
             }
             $this->reset();
         }
@@ -1271,7 +1271,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
      */
     protected function getProviderEvaluator() {
         $res = null;
-        $app = $this->application? $this->application: Ac_Application::getDefaultInstance();
+        $app = $this->app? $this->app: Ac_Application::getDefaultInstance();
         if ($app) $res = $app->getComponent(Ac_Application::CORE_COMPONENT_RELATION_PROVIDER_EVALUATOR);
         return $res;
     }

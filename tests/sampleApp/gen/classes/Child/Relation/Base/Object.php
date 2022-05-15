@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Child $app Access to App instance (via Mapper)
+ */
 class Child_Relation_Base_Object extends Sample_Relation {
 
 
@@ -17,8 +19,8 @@ class Child_Relation_Base_Object extends Sample_Relation {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -46,6 +48,7 @@ class Child_Relation_Base_Object extends Sample_Relation {
                 'mapperClass' => 'Child_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'incoming',
                 'caption' => 'People',
+                'idPropertyName' => 'otherPersonId',
                 'relationId' => '_incomingPerson',
                 'referenceVarName' => '_incomingPerson',
             ],
@@ -54,6 +57,7 @@ class Child_Relation_Base_Object extends Sample_Relation {
                 'mapperClass' => 'Child_Person_Mapper',
                 'otherModelIdInMethodsPrefix' => 'outgoing',
                 'caption' => 'People',
+                'idPropertyName' => 'personId',
                 'relationId' => '_outgoingPerson',
                 'referenceVarName' => '_outgoingPerson',
             ],
@@ -64,14 +68,14 @@ class Child_Relation_Base_Object extends Sample_Relation {
                 'values' => [
                     'mapperClass' => 'Child_Person_Mapper',
                 ],
-                'objectPropertyName' => 'outgoingPerson',
+                'assocPropertyName' => 'outgoingPerson',
                 'caption' => 'Person Id',
             ],
             'otherPersonId' => [
                 'values' => [
                     'mapperClass' => 'Child_Person_Mapper',
                 ],
-                'objectPropertyName' => 'incomingPerson',
+                'assocPropertyName' => 'incomingPerson',
                 'caption' => 'Other Person Id',
             ],
             'relationTypeId' => [

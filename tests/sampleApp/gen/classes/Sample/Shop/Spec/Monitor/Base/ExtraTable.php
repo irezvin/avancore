@@ -19,11 +19,9 @@ class Sample_Shop_Spec_Monitor_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
                 'srcMapperClass' => 'Sample_Shop_Spec_Monitor_ImplMapper',
                 'destMapperClass' => 'Sample_Shop_Classifier_Mapper',
                 'srcVarName' => '_monitorShopClassifier',
-                'srcCountVarName' => '_monitorShopSpecsCount',
-                'srcLoadedVarName' => '_monitorShopSpecsLoaded',
                 'destVarName' => '_monitorShopSpecs',
-                'destCountVarName' => '_shopSpecsCount',
-                'destLoadedVarName' => '_shopSpecsLoaded',
+                'destCountVarName' => '_monitorShopSpecsCount',
+                'destLoadedVarName' => '_monitorShopSpecsLoaded',
                 'fieldLinks' => [
                     'matrixTypeId' => 'id',
                 ],

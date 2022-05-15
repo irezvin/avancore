@@ -13,8 +13,8 @@ class Ac_Test_Mapper extends Ac_Test_Base {
     
     function testMapper() {
         $sam = Sample::getInstance();
-        $sam->addComponent(Ac_Prototyped::factory(array('id' => 'people', 'tableName' => '#__people'), 'Ac_Model_Mapper'));
-        $m = $sam->getMapper('people');
+        $sam->addComponent(Ac_Prototyped::factory(array('id' => 'peopleMapper', 'tableName' => '#__people'), 'Ac_Model_Mapper'));
+        $m = $sam->getMapper('peopleMapper');
         $this->assertEqual($m->pk, 'personId', 'Auto-detection of primary key by Ac_Model_Mapper');
         $found = false;
         $peopl = $sam->getSamplePersonMapper();
@@ -27,7 +27,7 @@ class Ac_Test_Mapper extends Ac_Test_Base {
         $this->assertEqual($peopl->getIdentifierPublicField(), 'personId', 'Generated mapper should return proper identifierPublicField (but %s)');
         
         $this->assertTrue(!array_diff($m->getColumnNames(), $this->peopleCols), 'Ac_Model_Mapper::getColumnNames()');
-        $this->assertSame($m, Ac_Model_Mapper::getMapper('people'));
+        $this->assertSame($m, Ac_Model_Mapper::getMapper('peopleMapper'));
         $m->useRecordsCollection = true;
         $rec = $m->loadRecord(3);
         $this->assertEqual(Ac_Accessor::getObjectProperty($rec, 'personId'), 3, 'Ensure Ac_Accessor retrieves values from barebones Ac_Model_Object');

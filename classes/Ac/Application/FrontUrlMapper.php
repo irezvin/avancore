@@ -16,10 +16,16 @@
  */
 class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac_I_ApplicationComponent {
     
+    use Ac_Compat_Overloader;
+    
+    protected static $_compat_application = 'app';
+    protected static $_compat_setApplication = 'setApp';
+    protected static $_compat_getApplication = 'getApp';
+    
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
     
     /**
      * @var string
@@ -82,16 +88,16 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
         parent::__construct($prototype);
     }
     
-    function setApplication(Ac_Application $application) {
-        $this->application = $application;
+    function setApp(Ac_Application $app) {
+        $this->app = $app;
         $this->didAutoConfigure = false;
     }
 
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        return $this->application;
+    function getApp() {
+        return $this->app;
     }
     
     function setPatterns(array $patterns, $replace = true) {
@@ -195,18 +201,18 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
     function applyAutoConfig($overwriteCustomPatterns = false) {
         if ($this->didAutoConfigure) {
             // check if no new controller appeared
-            if (implode(",", $this->extraControllerIds) === implode(",", $this->application->listComponents('Ac_I_Controller'))) 
+            if (implode(",", $this->extraControllerIds) === implode(",", $this->app->listComponents('Ac_I_Controller'))) 
                 return;
         }
         $this->didAutoConfigure = true;
-        if (!$this->application) {
-            throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() without setApplication() first");
+        if (!$this->app) {
+            throw new Ac_E_InvalidUsage("Cannot ".__METHOD__."() without setApp() first");
         }
-        $frontController = $this->application->getFrontController();
+        $frontController = $this->app->getFrontController();
         $this->controllerParam = $frontController->getControllerParam();
         $this->defaultController = $frontController->getDefaultController();
         $this->adminController = $frontController->getAdminController();
-        $this->extraControllerIds = $this->application->listComponents('Ac_I_Controller');
+        $this->extraControllerIds = $this->app->listComponents('Ac_I_Controller');
         if (!$this->allowAdmin && $this->adminController) {
             $this->extraControllerIds = array_diff($this->extraControllerIds, [$this->adminController]);
         }
@@ -241,7 +247,7 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
         $this->childMappers[$controllerId] = null;
         if (!strlen($controllerId)) return;
         if (!($controllerId === $this->defaultController || in_array($controllerId, $this->getExtraControllerIds()))) return;
-        $class = $this->application->getComponentClass($controllerId);
+        $class = $this->app->getComponentClass($controllerId);
         if (!$class) return;
         $cm = null;
         if (array_key_exists($controllerId, $this->urlMappers)) {
@@ -255,7 +261,7 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
                 $cm = array('patterns' => $patterns);
             }
         } else {
-            $controller = $this->application->getComponent($controllerId, 'Ac_I_Controller');
+            $controller = $this->app->getComponent($controllerId, 'Ac_I_Controller');
             $cm = $controller->createUrlMapper();
         }
         if ($cm === null && $this->useDefaultMapper) {

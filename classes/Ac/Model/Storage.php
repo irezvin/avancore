@@ -9,7 +9,7 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
     
     /**
      * Mapper that owns the Storage
@@ -69,15 +69,15 @@ abstract class Ac_Model_Storage extends Ac_Prototyped implements Ac_I_Search_Rec
         return $this->mapper;
     }
 
-    function setApplication(Ac_Application $application) {
-        $this->application = $application;
+    function setApp(Ac_Application $app) {
+        $this->app = $app;
     }
 
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        return $this->application;
+    function getApp() {
+        return $this->app;
     }    
     
     /**

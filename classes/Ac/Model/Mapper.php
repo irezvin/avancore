@@ -1,7 +1,18 @@
 <?php
 
+/**
+ * @property Ac_Application $application
+ * @method Ac_Application getApplication()
+ * @method void setApplication(Ac_Application $application)
+ */
 class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAwareCollection, Ac_I_Search_FilterProvider, Ac_I_Search_RecordProvider, Ac_I_NamedApplicationComponent {
 
+    use Ac_Compat_Overloader;
+    
+    protected static $_compat_application = 'app';
+    protected static $_compat_setApplication = 'setApp';
+    protected static $_compat_getApplication = 'getApp';
+    
     static $collectGarbageAfterCountFind = true;
     
     /**
@@ -232,7 +243,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
 
     protected $autoincFieldName = false;
 
@@ -357,7 +368,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     function initFromPrototype(array $prototype = array(), $strictParams = null) {
-        $first = array_flip(array('id', 'tableName', 'db', 'application'));
+        $first = array_flip(array('id', 'tableName', 'db', 'app'));
         $prototype = array_merge(array_intersect_key($prototype, $first), array_diff_key($prototype, $first));
         return parent::initFromPrototype($prototype, $strictParams);
     }
@@ -387,9 +398,9 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return $this->shortId;
     }
     
-    function setApplication(Ac_Application $application) {
-        $this->application = $application;
-        if (!$this->db) $this->setDb($this->application->getDb());
+    function setApp(Ac_Application $app) {
+        $this->app = $app;
+        if (!$this->db) $this->setDb($this->app->getDb());
         
         // buggy at the moment - works bad with Ac_Prototyped::factoryCollection()
         /*if (strlen($this->getId())) 
@@ -397,24 +408,24 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         
         if ($this->relations) {
             foreach ($this->relations as $rel) {
-                if (is_object($rel)) $rel->setApplication($application);
+                if (is_object($rel)) $rel->setApp($app);
             }
         }
         if (!$this->db) {
-            $this->setDb($this->application->getDb());
+            $this->setDb($this->app->getDb());
         }
     }
 
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        return $this->application;
+    function getApp() {
+        return $this->app;
     }
 
     function setDb(Ac_Sql_Db $db) {
         $this->db = $db;
-        if (!$this->pk && strlen($this->tableName)) $this->getStorage ();
+        if (!$this->pk && strlen($this->tableName)) $this->getStorage();
     }
 
     /**
@@ -769,7 +780,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     // ----------------------------------- Cache support functions --------------------------------
 
     function getMtime() {
-        return $this->application->getFlags()->getMtime('mapper.'.$this->id);
+        return $this->app->getFlags()->getMtime('mapper.'.$this->id);
     }
     
     function getLastUpdateTime() {
@@ -787,7 +798,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     protected function doMarkUpdated() {
         $this->triggerEvent(self::EVENT_ON_UPDATED);
-        $this->application->getFlags()->touch('mapper.'.$this->id);
+        $this->app->getFlags()->touch('mapper.'.$this->id);
     }
     
     function beginUpdate() {
@@ -843,6 +854,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         return $res;
     }
     
+    // TODO: add limit, offset for autocomplete capability; add ad-hoc search-by-title criterion
     function getTitles(array $query = array(), $sort = false, $titleProperty = false, $valueProperty = false) {
         if ($titleProperty === false) $titleProperty = $this->getTitleFieldName();
         $idForTitle = !$titleProperty;
@@ -1111,7 +1123,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
      */
     protected function createRelation($proto) {
         // Replace mapper classes with mapper instances, if possible
-        if ($this->application) $proto['application'] = $this->application;
+        if ($this->app) $proto['app'] = $this->app;
         if (isset($proto['srcMapperClass']) && $proto['srcMapperClass'] == $this->getId()) {
             $proto['srcMapper'] = $this;
         } elseif (isset($proto['destMapperClass']) && $proto['destMapperClass'] == $this->getId()) {
@@ -1152,7 +1164,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
         if (is_array($relation)) {
             // prototype will be stored for future use
         } elseif (is_object($relation) && $relation instanceof Ac_Model_Relation) {
-            $relation->setApplication($this->application);
+            $relation->setApp($this->app);
             if ($relation->srcMapperClass == $this->getId()) {
                 $relation->setSrcMapper($this);
             } elseif ($relation->destMapperClass == $this->getId()) {
@@ -1494,7 +1506,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 $rel = $mapper->getRelation($id);
                 $recs = $rel->loadDest($recs);
                 if (count($relId)) {
-                    $mapper = $this->getApplication()->getMapper($rel->destMapperClass);
+                    $mapper = $this->app->getMapper($rel->destMapperClass);
                     $recs = Ac_Util::flattenArray($recs);
                 }
             }
@@ -1598,6 +1610,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 $this->getColumnNames();
             $this->computedDefaults = $this->defaults;
             $this->triggerEvent(self::EVENT_ON_GET_DEFAULTS, array(& $this->computedDefaults));
+            if (!is_array($this->computedDefaults)) $this->computedDefaults = [];
         }
         $res = $this->computedDefaults;
         if ($full) Ac_Util::ms($res, $this->getInternalDefaults());
@@ -1666,6 +1679,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                     }
                     $res[$idx][$key] = $value;
                 }
+                if (!isset($res[$idx])) $res[$idx] = [];
             }
             if ($singleRow) $res = $res[0];
         } else {
@@ -1774,7 +1788,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             'class' => 'Ac_Model_Storage_MonoTable',
             'tableName' => $this->tableName,
             'recordClass' => $this->recordClass,
-            'application' => $this->application,
+            'app' => $this->app,
             'db' => $this->db,
         );
         if ($this->columnNames) $res['columns'] = $this->columnNames;

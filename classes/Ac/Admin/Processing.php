@@ -105,7 +105,7 @@ class Ac_Admin_Processing extends Ac_Controller {
     
     function setManager(Ac_Admin_Manager $manager) {
         $this->manager = $manager;
-        if ($manager->getApplication()) $this->application = $manager->getApplication();
+        if ($manager->getApp()) $this->app = $manager->getApp();
     }
     
     function setMapperClass($mapperClass) {

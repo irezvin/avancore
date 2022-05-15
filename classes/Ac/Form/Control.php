@@ -1112,9 +1112,9 @@ class Ac_Form_Control extends Ac_Controller {
         return $res;
     }
     
-    function getApplication() {
-        if ($this->application) $res = $this->application;
-        elseif ($this->_parent) $res = $this->_parent->getApplication();
+    function getApp() {
+        if ($this->app) $res = $this->app;
+        elseif ($this->_parent) $res = $this->_parent->getApp();
         else $res = Ac_Application::getDefaultInstance();
         return $res;
     }

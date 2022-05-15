@@ -35,7 +35,7 @@ abstract class Ac_Model_Relation_Abstract extends Ac_Prototyped {
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
     
     /**
      * Describes cardinality of source table (true if source fields point to unique record)
@@ -67,9 +67,9 @@ abstract class Ac_Model_Relation_Abstract extends Ac_Prototyped {
         }
         else $imm = false;
         
-        if (isset($prototype['application']) && $prototype['application']) {
-            $this->setApplication($prototype['application']);
-            unset ($prototype['application']);
+        if (isset($prototype['app']) && $prototype['app']) {
+            $this->setApp($prototype['app']);
+            unset ($prototype['app']);
         }
         
         $this->doConstruct($prototype);
@@ -88,10 +88,10 @@ abstract class Ac_Model_Relation_Abstract extends Ac_Prototyped {
         parent::__construct($prototype);
         
         if (($this->srcTableName === false) && strlen($this->srcMapperClass)) {
-            $this->setSrcMapper(Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->application? $this->application : null));
+            $this->setSrcMapper(Ac_Model_Mapper::getMapper($this->srcMapperClass, $this->app? $this->app : null));
         }
         if (($this->destTableName === false) && strlen($this->destMapperClass)) {
-            $this->setDestMapper(Ac_Model_Mapper::getMapper($this->destMapperClass, $this->application? $this->application : null));
+            $this->setDestMapper(Ac_Model_Mapper::getMapper($this->destMapperClass, $this->app? $this->app : null));
         }
         
     }
@@ -108,11 +108,11 @@ abstract class Ac_Model_Relation_Abstract extends Ac_Prototyped {
         return $this->debug;
     }
 
-    function setApplication(Ac_Application $application) {
-        if ($application !== ($oldApplication = $this->application)) {
-            if ($this->application && $this->immutable) throw self::immutableException();
-            $this->application = $application;
-            $this->doOnSetApplication($oldApplication);
+    function setApp(Ac_Application $app) {
+        if ($app !== ($oldApp = $this->app)) {
+            if ($this->app && $this->immutable) throw self::immutableException();
+            $this->app = $app;
+            $this->doOnSetApp($oldApp);
             $this->reset();
         }
     }
@@ -120,11 +120,11 @@ abstract class Ac_Model_Relation_Abstract extends Ac_Prototyped {
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        return $this->application;
+    function getApp() {
+        return $this->app;
     }
     
-    protected function doOnSetApplication($oldApplication) {
+    protected function doOnSetApp($oldApp) {
     }
     
     /**
@@ -320,7 +320,7 @@ abstract class Ac_Model_Relation_Abstract extends Ac_Prototyped {
     
     protected function getSrcImplPrototype() {
         $res = array(
-            'application' => $this->application,
+            'app' => $this->app,
             'srcIsUnique' => $this->getDestIsUnique(),
             'destIsUnique' => $this->getSrcIsUnique(),
         );
@@ -329,7 +329,7 @@ abstract class Ac_Model_Relation_Abstract extends Ac_Prototyped {
     
     protected function getDestImplPrototype() {
         $res = array(
-            'application' => $this->application,
+            'app' => $this->app,
             'srcIsUnique' => $this->getSrcIsUnique(),
             'destIsUnique' => $this->getDestIsUnique(),
         );

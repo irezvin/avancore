@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Person_Post_Base_Object extends Ac_Model_Object {
 
 
@@ -33,8 +35,8 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -62,6 +64,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Publish_ImplMapper',
 
                 'caption' => new Ac_Lang_String('sample_person_post_publish'),
+                'idPropertyName' => 'pubId',
                 'relationId' => '_publish',
                 'referenceVarName' => '_publish',
             ],
@@ -70,6 +73,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_person_post_person'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
             ],
@@ -110,7 +114,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Photo_Mapper',
                 ],
-                'objectPropertyName' => 'personPhoto',
+                'assocPropertyName' => 'personPhoto',
                 'isNullable' => true,
 
                 'caption' => new Ac_Lang_String('sample_person_post_photo_id'),
@@ -137,7 +141,7 @@ class Sample_Person_Post_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Publish_ImplMapper',
                 ],
-                'objectPropertyName' => 'publish',
+                'assocPropertyName' => 'publish',
                 'isNullable' => true,
 
                 'caption' => new Ac_Lang_String('sample_person_post_pub_id'),

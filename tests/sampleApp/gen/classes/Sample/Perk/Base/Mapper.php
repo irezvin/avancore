@@ -12,6 +12,8 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Perk_Mapper';
 
+    var $shortId = 'perks';
+
     var $storage = 'Sample_Perk_Storage';
 
     var $columnNames = [ 0 => 'perkId', 1 => 'name', ];
@@ -26,7 +28,7 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
    
     protected $autoincFieldName = 'perkId';
@@ -56,8 +58,8 @@ class Sample_Perk_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

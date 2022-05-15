@@ -8,12 +8,14 @@ class Child_Shop_Spec_Base_Mapper extends Sample_Shop_Spec_Mapper {
 
     var $id = 'Child_Shop_Spec_Mapper';
 
+    var $shortId = 'shopSpecs';
+
     var $storage = 'Child_Shop_Spec_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -31,8 +33,8 @@ class Child_Shop_Spec_Base_Mapper extends Sample_Shop_Spec_Mapper {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

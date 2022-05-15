@@ -8,12 +8,14 @@ class Child_Religion_Base_Mapper extends Sample_Religion_Mapper {
 
     var $id = 'Child_Religion_Mapper';
 
+    var $shortId = 'religion';
+
     var $storage = 'Child_Religion_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -31,8 +33,8 @@ class Child_Religion_Base_Mapper extends Sample_Religion_Mapper {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

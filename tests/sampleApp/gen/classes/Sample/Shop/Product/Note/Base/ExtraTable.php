@@ -15,11 +15,9 @@ class Sample_Shop_Product_Note_Base_ExtraTable extends Ac_Model_Mapper_Mixable_E
                 'srcMapperClass' => 'Sample_Shop_Product_Note_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_notePerson',
-                'srcCountVarName' => '_noteShopProductsCount',
-                'srcLoadedVarName' => '_noteShopProductsLoaded',
                 'destVarName' => '_noteShopProducts',
-                'destCountVarName' => '_shopProductsCount',
-                'destLoadedVarName' => '_shopProductsLoaded',
+                'destCountVarName' => '_noteShopProductsCount',
+                'destLoadedVarName' => '_noteShopProductsLoaded',
                 'fieldLinks' => [
                     'noteAuthorId' => 'personId',
                 ],

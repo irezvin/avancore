@@ -12,6 +12,8 @@ class Sample_Shop_Spec_Food_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Spec_Food_ImplMapper';
 
+    var $shortId = 'shopSpecFood';
+
     var $storage = 'Sample_Shop_Spec_Food_Storage';
 
     var $columnNames = [ 0 => 'productId', 1 => 'storageType', 2 => 'storageTerm', 3 => 'storageTermUnit', ];
@@ -28,7 +30,7 @@ class Sample_Shop_Spec_Food_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
     protected $askRelationsForDefaults = false;
  
@@ -53,8 +55,8 @@ class Sample_Shop_Spec_Food_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

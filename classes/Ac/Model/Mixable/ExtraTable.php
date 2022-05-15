@@ -26,7 +26,7 @@ class Ac_Model_Mixable_ExtraTable extends Ac_Model_Mixable_Object {
      */
     protected function getMapper($id = false) {
         if ($id === false) return $this->mapper;
-            else return $this->getApplication()->getMapper($id);
+            else return $this->getApp()->getMapper($id);
     }
 
     /**

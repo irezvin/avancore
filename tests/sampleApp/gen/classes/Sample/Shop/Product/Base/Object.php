@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
 
 
@@ -43,10 +45,6 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
 
     var $_notePerson = false;
 
-    var $_noteShopProductsCount = false;
-
-    var $_noteShopProductsLoaded = false;
-
     var $productId = NULL;
 
     var $note = '';
@@ -63,8 +61,8 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -81,7 +79,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
  
     protected function listOwnLists() {
         
-        return [ 'shopCategories' => 'shopCategories', 'referencedShopProducts' => 'referencedShopProducts', 'referencingShopProducts' => 'referencingShopProducts', 'notePerson' => 'noteShopProducts', ];
+        return [ 'shopCategories' => 'shopCategories', 'referencedShopProducts' => 'referencedShopProducts', 'referencingShopProducts' => 'referencingShopProducts', ];
     }
 
     
@@ -98,6 +96,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Shop_Category_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_shop_product_shop_categories'),
+                'idsPropertyName' => 'shopCategoryIds',
                 'relationId' => '_shopCategories',
                 'countVarName' => '_shopCategoriesCount',
                 'nnIdsVarName' => '_shopCategoryIds',
@@ -112,6 +111,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Shop_Category_Mapper',
                 ],
                 'showInTable' => false,
+                'assocPropertyName' => 'shopCategories',
             ],
             'referencedShopProducts' => [
                 'className' => 'Sample_Shop_Product',
@@ -119,6 +119,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPrefix' => 'referenced',
 
                 'caption' => new Ac_Lang_String('sample_shop_product_referenced_shop_products'),
+                'idsPropertyName' => 'referencedShopProductIds',
                 'relationId' => '_referencedShopProducts',
                 'countVarName' => '_referencedShopProductsCount',
                 'nnIdsVarName' => '_referencedShopProductIds',
@@ -133,6 +134,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ],
                 'showInTable' => false,
+                'assocPropertyName' => 'referencedShopProducts',
             ],
             'referencingShopProducts' => [
                 'className' => 'Sample_Shop_Product',
@@ -140,6 +142,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPrefix' => 'referencing',
 
                 'caption' => new Ac_Lang_String('sample_shop_product_referencing_shop_products'),
+                'idsPropertyName' => 'referencingShopProductIds',
                 'relationId' => '_referencingShopProducts',
                 'countVarName' => '_referencingShopProductsCount',
                 'nnIdsVarName' => '_referencingShopProductIds',
@@ -154,12 +157,14 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ],
                 'showInTable' => false,
+                'assocPropertyName' => 'referencingShopProducts',
             ],
             'shopSpec' => [
                 'className' => 'Sample_Shop_Spec',
                 'mapperClass' => 'Sample_Shop_Spec_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_shop_product_shop_spec'),
+                'idPropertyName' => 'id',
                 'relationId' => '_shopSpec',
                 'referenceVarName' => '_shopSpec',
             ],
@@ -212,8 +217,8 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPrefix' => 'note',
 
                 'caption' => new Ac_Lang_String('sample_shop_product_note_person'),
+                'idPropertyName' => 'noteAuthorId',
                 'relationId' => '_notePerson',
-                'countVarName' => '_noteShopProductsCount',
                 'referenceVarName' => '_notePerson',
             ],
             'productId' => [
@@ -224,7 +229,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Product_Mapper',
                 ],
-                'objectPropertyName' => 'referencedShopProducts',
+                'assocPropertyName' => 'referencedShopProducts',
 
                 'caption' => new Ac_Lang_String('sample_shop_product_product_id'),
             ],
@@ -243,7 +248,7 @@ class Sample_Shop_Product_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ],
-                'objectPropertyName' => 'notePerson',
+                'assocPropertyName' => 'notePerson',
                 'isNullable' => true,
 
                 'caption' => new Ac_Lang_String('sample_shop_product_note_author_id'),

@@ -16,7 +16,7 @@ class Ac_Model_Collection_Mapper extends Ac_Model_Collection_Abstract {
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
 
     /**
      * identifier of used mapper
@@ -92,18 +92,18 @@ class Ac_Model_Collection_Mapper extends Ac_Model_Collection_Abstract {
      * Sets query to restrict items returned by the Mapper
      */
     
-    function setApplication(Ac_Application $application) {
-        if ($application !== ($oldApplication = $this->application)) {
+    function setApp(Ac_Application $app) {
+        if ($app !== ($oldApp = $this->app)) {
             if ($this->isOpen) throw new Ac_E_InvalidUsage("Cannot ".__FUNCTION__."() while isOpen(). close() first");
-            $this->application = $application;
+            $this->app = $app;
         }
     }
 
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        return $this->application;
+    function getApp() {
+        return $this->app;
     }    
     
     /**
@@ -148,7 +148,7 @@ class Ac_Model_Collection_Mapper extends Ac_Model_Collection_Abstract {
     function getMapper($asIs = false, $require = false) {
         if (!$this->mapper) {
             if (strlen($this->mapperId)) {
-                if ($this->application) $this->mapper = $this->application->getMapper($this->mapperId);
+                if ($this->app) $this->mapper = $this->app->getMapper($this->mapperId);
                     else $this->mapper = Ac_Model_Mapper::getMapper($this->mapperId);
             }
             if ($require && !$this->mapper) {

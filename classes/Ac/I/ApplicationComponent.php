@@ -2,8 +2,8 @@
 
 interface Ac_I_ApplicationComponent {
     
-    function setApplication(Ac_Application $application);
+    function setApp(Ac_Application $app);
     
-    function getApplication();
+    function getApp();
     
 }

@@ -5,7 +5,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
     
     /**
      * Description of links between soruce and destination fields. Structure of the array is as follows:
@@ -86,27 +86,27 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
      */
     function __construct (array $prototype = array()) {
         
-        if (isset($prototype['application'])) {
-            if ($prototype['application'])
-                $this->setApplication($prototype['application']);
-            unset ($prototype['application']);
+        if (isset($prototype['app'])) {
+            if ($prototype['app'])
+                $this->setApp($prototype['app']);
+            unset ($prototype['app']);
         }
         
         parent::__construct($prototype);
         
     }
     
-    function setApplication(Ac_Application $application) {
-        if ($application !== ($oldApplication = $this->application)) {
-            $this->application = $application;
+    function setApp(Ac_Application $app) {
+        if ($app !== ($oldApp = $this->app)) {
+            $this->app = $app;
         }
     }
     
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        return $this->application;
+    function getApp() {
+        return $this->app;
     }
     
     /**
@@ -408,7 +408,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
             $res = null;
             if (is_object($this->destMapper)) $res = $this->destMapper;
             elseif ($this->destMapper) 
-                $res = $this->application? $this->application->getMapper ($this->destMapper) : Ac_Model_Mapper::getMapper($this->destMapper);
+                $res = $this->app? $this->app->getMapper ($this->destMapper) : Ac_Model_Mapper::getMapper($this->destMapper);
         }
         return $res;
     }
@@ -430,7 +430,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
                 $this->provider = $mapper->getRelationProviderByRelationId($this->provider);
             } elseif ($this->provider) {
                 $def = array();
-                if ($this->application) $def['application'] = $this->application;
+                if ($this->app) $def['app'] = $this->app;
                 $this->provider = Ac_Prototyped::factory($this->provider, 'Ac_Model_Relation_Provider', $def);
             }
             $res = $this->provider;
@@ -453,7 +453,7 @@ class Ac_Model_Relation_Impl extends Ac_Prototyped {
         if (!is_object($this->destNNIdsImpl) && !$asIs) {
             if ($this->destNNIdsImpl) {
                 $def = array();
-                if ($this->application) $def['application'] = $this->application;
+                if ($this->app) $def['app'] = $this->app;
                 $this->destNNIdsImpl = Ac_Prototyped::factory($this->destNNIdsImpl, 'Ac_Model_Relation_Impl', $def);
             }
             if (!$this->destNNIdsImpl) return null;

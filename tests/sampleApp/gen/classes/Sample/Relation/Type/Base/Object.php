@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
 
 
@@ -27,8 +29,8 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -62,6 +64,7 @@ class Sample_Relation_Type_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Relation_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_relation_type_relations'),
+                'idPropertyName' => 'relationTypeId',
                 'relationId' => '_relations',
                 'countVarName' => '_relationsCount',
                 'referenceVarName' => '_relations',

@@ -6,7 +6,7 @@ class Ac_Test_MultiType extends Ac_Test_Base {
     
     function testMixableTyperSeveralMappers () {
         $typer = new Ac_Model_Typer_ExtraTable (array(
-            'application' => Sample::getInstance(),
+            'app' => Sample::getInstance(),
             'objectTypeField' => 'sharedObjectType',
             'tableName' => '#__publish',
         ));
@@ -30,7 +30,7 @@ class Ac_Test_MultiType extends Ac_Test_Base {
     
     function testMixableTyperOneMapper () {
         $typer = new Ac_Model_Typer_ExtraTable (array(
-            'application' => Sample::getInstance(),
+            'app' => Sample::getInstance(),
             'uniformTypeId' => 'Sample_Shop_Product_Mapper',
             'tableName' => '#__shop_product_notes',
         ));

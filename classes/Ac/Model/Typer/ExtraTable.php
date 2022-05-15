@@ -178,12 +178,12 @@ class Ac_Model_Typer_ExtraTable extends Ac_Model_Typer_Abstract {
             if (!$this->typeMap[$typeId] instanceof Ac_Model_Mapper) {
                 if (is_object($this->typeMap[$typeId])) 
                     throw new Ac_E_InvalidUsage("\$typeMap['{$typeId}'] must be either a Mapper identifier or Ac_Model_Mapper, but ".Ac_Util::typeClass ($typeMap[$typeId])." is provided");
-                $this->typeMap[$typeId] = $this->getApplication()->getMapper($this->typeMap[$typeId]);
+                $this->typeMap[$typeId] = $this->getApp()->getMapper($this->typeMap[$typeId]);
             }
             $res = $this->typeMap[$typeId];
         } else {
             if ($this->detectMappers) {
-                if (($m = $this->getApplication()->getMapper($typeId, true))) {
+                if (($m = $this->getApp()->getMapper($typeId, true))) {
                     $res = $this->typeMap[$typeId] = $m;
                 } else {
                     $res = null;

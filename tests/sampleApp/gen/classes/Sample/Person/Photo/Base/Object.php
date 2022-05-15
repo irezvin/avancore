@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
 
 
@@ -39,8 +41,8 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -74,6 +76,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_person_photo_person'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
             ],
@@ -82,6 +85,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Album_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_person_photo_person_albums'),
+                'idsPropertyName' => 'personAlbumIds',
                 'relationId' => '_personAlbums',
                 'countVarName' => '_personAlbumsCount',
                 'nnIdsVarName' => '_personAlbumIds',
@@ -96,6 +100,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Person_Album_Mapper',
                 ],
                 'showInTable' => false,
+                'assocPropertyName' => 'personAlbums',
             ],
             'portraitPerson' => [
                 'className' => 'Sample_Person',
@@ -132,7 +137,7 @@ class Sample_Person_Photo_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ],
-                'objectPropertyName' => 'person',
+                'assocPropertyName' => 'person',
 
                 'caption' => new Ac_Lang_String('sample_person_photo_person_id'),
             ],

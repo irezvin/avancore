@@ -12,6 +12,8 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Relation_Type_Mapper';
 
+    var $shortId = 'relationTypes';
+
     var $storage = 'Sample_Relation_Type_Storage';
 
     var $columnNames = [ 0 => 'relationTypeId', 1 => 'title', 2 => 'isSymmetrical', ];
@@ -25,7 +27,7 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
    
     protected $autoincFieldName = 'relationTypeId';
@@ -54,8 +56,8 @@ class Sample_Relation_Type_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

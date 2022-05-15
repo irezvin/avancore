@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Perk_Base_Object extends Ac_Model_Object {
 
 
@@ -27,8 +29,8 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -62,6 +64,7 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Tag_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_perk_tags'),
+                'idsPropertyName' => 'tagIds',
                 'relationId' => '_tags',
                 'countVarName' => '_tagsCount',
                 'nnIdsVarName' => '_tagIds',
@@ -76,6 +79,7 @@ class Sample_Perk_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Tag_Mapper',
                 ],
                 'showInTable' => false,
+                'assocPropertyName' => 'tags',
             ],
             'perkId' => [
                 'dataType' => 'int',

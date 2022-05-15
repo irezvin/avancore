@@ -8,12 +8,14 @@ class Child_Shop_Category_Base_Mapper extends Sample_Shop_Category_Mapper {
 
     var $id = 'Child_Shop_Category_Mapper';
 
+    var $shortId = 'shopCategories';
+
     var $storage = 'Child_Shop_Category_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
     protected function doGetCoreMixables() { 
@@ -39,8 +41,8 @@ class Child_Shop_Category_Base_Mapper extends Sample_Shop_Category_Mapper {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

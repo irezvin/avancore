@@ -8,12 +8,14 @@ class Child_Shop_Spec_Food_Base_ImplMapper extends Sample_Shop_Spec_Food_ImplMap
 
     var $id = 'Child_Shop_Spec_Food_ImplMapper';
 
+    var $shortId = 'shopSpecFood';
+
     var $storage = 'Child_Shop_Spec_Food_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -31,8 +33,8 @@ class Child_Shop_Spec_Food_Base_ImplMapper extends Sample_Shop_Spec_Food_ImplMap
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

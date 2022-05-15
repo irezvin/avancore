@@ -12,6 +12,8 @@ class Sample_Shop_Spec_Laptop_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Spec_Laptop_ImplMapper';
 
+    var $shortId = 'shopSpecLaptop';
+
     var $storage = 'Sample_Shop_Spec_Laptop_Storage';
 
     var $columnNames = [ 0 => 'productId', 1 => 'weight', 2 => 'battery', ];
@@ -25,7 +27,7 @@ class Sample_Shop_Spec_Laptop_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
     protected $askRelationsForDefaults = false;
  
@@ -50,8 +52,8 @@ class Sample_Shop_Spec_Laptop_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

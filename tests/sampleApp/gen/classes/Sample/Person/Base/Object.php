@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Person_Base_Object extends Ac_Model_Object {
 
 
@@ -61,11 +63,15 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
 
     var $_extraCodeShopProducts = false;
 
-    var $_shopProductsCount = false;
+    var $_extraCodeShopProductsCount = false;
 
-    var $_shopProductsLoaded = false;
+    var $_extraCodeShopProductsLoaded = false;
 
     var $_noteShopProducts = false;
+
+    var $_noteShopProductsCount = false;
+
+    var $_noteShopProductsLoaded = false;
 
     var $personId = NULL;
 
@@ -95,8 +101,8 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -113,7 +119,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
  
     protected function listOwnLists() {
         
-        return [ 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'authorPublish' => 'authorPublish', 'editorPublish' => 'editorPublish', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', 'extraCodeShopProducts' => 'shopProducts', 'noteShopProducts' => 'shopProducts', ];
+        return [ 'tags' => 'tags', 'personAlbums' => 'personAlbums', 'personPhotos' => 'personPhotos', 'personPosts' => 'personPosts', 'authorPublish' => 'authorPublish', 'editorPublish' => 'editorPublish', 'incomingRelations' => 'incomingRelations', 'outgoingRelations' => 'outgoingRelations', 'extraCodeShopProducts' => 'extraCodeShopProducts', 'noteShopProducts' => 'noteShopProducts', ];
     }
 
     
@@ -139,6 +145,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Religion_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_person_religion'),
+                'idPropertyName' => 'religionId',
                 'relationId' => '_religion',
                 'referenceVarName' => '_religion',
             ],
@@ -147,6 +154,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Tag_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_person_tags'),
+                'idsPropertyName' => 'tagIds',
                 'relationId' => '_tags',
                 'countVarName' => '_tagsCount',
                 'nnIdsVarName' => '_tagIds',
@@ -161,12 +169,14 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                     'mapperClass' => 'Sample_Tag_Mapper',
                 ],
                 'showInTable' => false,
+                'assocPropertyName' => 'tags',
             ],
             'personAlbums' => [
                 'className' => 'Sample_Person_Album',
                 'mapperClass' => 'Sample_Person_Album_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_person_person_albums'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_personAlbums',
                 'countVarName' => '_personAlbumsCount',
                 'referenceVarName' => '_personAlbums',
@@ -176,6 +186,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Photo_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_person_person_photos'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_personPhotos',
                 'countVarName' => '_personPhotosCount',
                 'referenceVarName' => '_personPhotos',
@@ -185,6 +196,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Person_Post_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_person_person_posts'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_personPosts',
                 'countVarName' => '_personPostsCount',
                 'referenceVarName' => '_personPosts',
@@ -195,6 +207,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPrefix' => 'author',
 
                 'caption' => new Ac_Lang_String('sample_person_author_publish'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_authorPublish',
                 'countVarName' => '_authorPublishCount',
                 'referenceVarName' => '_authorPublish',
@@ -205,6 +218,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPrefix' => 'editor',
 
                 'caption' => new Ac_Lang_String('sample_person_editor_publish'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_editorPublish',
                 'countVarName' => '_editorPublishCount',
                 'referenceVarName' => '_editorPublish',
@@ -216,6 +230,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPlural' => 'incomingRelations',
 
                 'caption' => new Ac_Lang_String('sample_person_incoming_relations'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_incomingRelations',
                 'countVarName' => '_incomingRelationsCount',
                 'referenceVarName' => '_incomingRelations',
@@ -227,6 +242,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPlural' => 'outgoingRelations',
 
                 'caption' => new Ac_Lang_String('sample_person_outgoing_relations'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_outgoingRelations',
                 'countVarName' => '_outgoingRelationsCount',
                 'referenceVarName' => '_outgoingRelations',
@@ -237,8 +253,9 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPrefix' => 'extraCode',
 
                 'caption' => new Ac_Lang_String('sample_person_extra_code_shop_products'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_extraCodeShopProducts',
-                'countVarName' => '_shopProductsCount',
+                'countVarName' => '_extraCodeShopProductsCount',
                 'referenceVarName' => '_extraCodeShopProducts',
             ],
             'noteShopProducts' => [
@@ -247,8 +264,9 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPrefix' => 'note',
 
                 'caption' => new Ac_Lang_String('sample_person_note_shop_products'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_noteShopProducts',
-                'countVarName' => '_shopProductsCount',
+                'countVarName' => '_noteShopProductsCount',
                 'referenceVarName' => '_noteShopProducts',
             ],
             'personId' => [
@@ -320,7 +338,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Religion_Mapper',
                 ],
-                'objectPropertyName' => 'religion',
+                'assocPropertyName' => 'religion',
                 'isNullable' => true,
 
                 'caption' => new Ac_Lang_String('sample_person_religion_id'),
@@ -335,7 +353,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Photo_Mapper',
                 ],
-                'objectPropertyName' => 'portraitPersonPhoto',
+                'assocPropertyName' => 'portraitPersonPhoto',
                 'isNullable' => true,
 
                 'caption' => new Ac_Lang_String('sample_person_portrait_id'),
@@ -1080,7 +1098,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      * @return bool
      */
     function isExtraCodeShopProductsLoaded() {
-        return $this->_shopProductsLoaded;
+        return $this->_extraCodeShopProductsLoaded;
     }
     
     /**
@@ -1147,7 +1165,7 @@ class Sample_Person_Base_Object extends Ac_Model_Object {
      * @return bool
      */
     function isNoteShopProductsLoaded() {
-        return $this->_shopProductsLoaded;
+        return $this->_noteShopProductsLoaded;
     }
     
     /**

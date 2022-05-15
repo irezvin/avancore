@@ -49,8 +49,8 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     protected function listOwnProperties() {
@@ -71,6 +71,7 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
                 'otherModelIdInMethodsPrefix' => 'author',
 
                 'caption' => new Ac_Lang_String('sample_publish_author_person'),
+                'idPropertyName' => 'authorId',
                 'relationId' => '_authorPerson',
                 'referenceVarName' => '_authorPerson',
             ],
@@ -80,6 +81,7 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
                 'otherModelIdInMethodsPrefix' => 'editor',
 
                 'caption' => new Ac_Lang_String('sample_publish_editor_person'),
+                'idPropertyName' => 'editorId',
                 'relationId' => '_editorPerson',
                 'referenceVarName' => '_editorPerson',
             ],
@@ -149,7 +151,7 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ],
-                'objectPropertyName' => 'authorPerson',
+                'assocPropertyName' => 'authorPerson',
                 'isNullable' => true,
 
                 'caption' => new Ac_Lang_String('sample_publish_author_id'),
@@ -164,7 +166,7 @@ class Sample_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ],
-                'objectPropertyName' => 'editorPerson',
+                'assocPropertyName' => 'editorPerson',
                 'isNullable' => true,
 
                 'caption' => new Ac_Lang_String('sample_publish_editor_id'),

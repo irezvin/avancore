@@ -8,12 +8,14 @@ class Child_Person_Post_Base_Mapper extends Sample_Person_Post_Mapper {
 
     var $id = 'Child_Person_Post_Mapper';
 
+    var $shortId = 'personPosts';
+
     var $storage = 'Child_Person_Post_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
     protected function doGetCoreMixables() { 
@@ -39,8 +41,8 @@ class Child_Person_Post_Base_Mapper extends Sample_Person_Post_Mapper {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

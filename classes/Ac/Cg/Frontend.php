@@ -31,7 +31,7 @@ class Ac_Cg_Frontend {
     /**
      * @var Ac_Application
      */
-    var $application = false;
+    var $app = false;
     
     /**
      * @var Ac_Cg_Generator

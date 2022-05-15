@@ -12,6 +12,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Person_Mapper';
 
+    var $shortId = 'people';
+
     var $storage = 'Sample_Person_Storage';
 
     var $columnNames = [ 0 => 'personId', 1 => 'name', 2 => 'gender', 3 => 'isSingle', 4 => 'birthDate', 5 => 'lastUpdatedDatetime', 6 => 'createdTs', 7 => 'religionId', 8 => 'portraitId', ];
@@ -33,7 +35,7 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
    
     protected $autoincFieldName = 'personId';
@@ -70,9 +72,11 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
             '_outgoingRelationsCount' => false,
             '_outgoingRelationsLoaded' => false,
             '_extraCodeShopProducts' => false,
-            '_shopProductsCount' => false,
-            '_shopProductsLoaded' => false,
+            '_extraCodeShopProductsCount' => false,
+            '_extraCodeShopProductsLoaded' => false,
             '_noteShopProducts' => false,
+            '_noteShopProductsCount' => false,
+            '_noteShopProductsLoaded' => false,
         ]);
     }
     
@@ -90,8 +94,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -366,8 +370,8 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Shop_Product_Mapper',
                 'srcVarName' => '_extraCodeShopProducts',
-                'srcCountVarName' => '_shopProductsCount',
-                'srcLoadedVarName' => '_shopProductsLoaded',
+                'srcCountVarName' => '_extraCodeShopProductsCount',
+                'srcLoadedVarName' => '_extraCodeShopProductsLoaded',
                 'fieldLinks' => [
                     'personId' => 'responsiblePersonId',
                 ],
@@ -378,11 +382,9 @@ class Sample_Person_Base_Mapper extends Ac_Model_Mapper {
                 'srcMapperClass' => 'Sample_Person_Mapper',
                 'destMapperClass' => 'Sample_Shop_Product_Mapper',
                 'srcVarName' => '_noteShopProducts',
-                'srcCountVarName' => '_shopProductsCount',
-                'srcLoadedVarName' => '_shopProductsLoaded',
+                'srcCountVarName' => '_noteShopProductsCount',
+                'srcLoadedVarName' => '_noteShopProductsLoaded',
                 'destVarName' => '_notePerson',
-                'destCountVarName' => '_noteShopProductsCount',
-                'destLoadedVarName' => '_noteShopProductsLoaded',
                 'fieldLinks' => [
                     'personId' => 'noteAuthorId',
                 ],

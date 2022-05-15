@@ -27,9 +27,9 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
      */
     protected $layout = false;
     
-    function extractConfig(Ac_Application $application) {
+    function extractConfig(Ac_Application $app) {
         $res = array();
-        $adapter = $application->getAdapter();
+        $adapter = $app->getAdapter();
         $dbPrototype = $adapter->getConfigValue('dbPrototype');
         if (!is_array($dbPrototype)) return array();
         $this->dbPrototype = $dbPrototype;
@@ -142,10 +142,10 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
                 Ac_Lang_ResourceProvider_Dir::autoRegister($dir.'/languages');
             }
             
-            if (!Ac_Application::listInstances('[[CLASS_APP]]')) {
+            if (!Ac_Application::listInstances('[[CLASS_APPLICATION]]')) {
                 if (class_exists('JFactory', false)) $adapterClass = 'Ac_Application_Adapter_Joomla';
                 else $adapterClass = 'Ac_Application_Adapter';
-                new [[CLASS_APP]](array('adapter' => new $adapterClass));
+                new [[CLASS_APPLICATION]](array('adapter' => new $adapterClass));
             }
 
     <?php
@@ -161,7 +161,7 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
 
             require_once(dirname(__FILE__).'/../gen/classes/'.'[[FILE_APP_BASE]]');
 
-            class [[CLASS_APP]] extends [[CLASS_APP_BASE]] {
+            class [[CLASS_APPLICATION]] extends [[CLASS_APPLICATION_BASE]] {
 
                 function getAppClassFile() {
                     return dirname(__FILE__);
@@ -169,17 +169,17 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
 
                 /**
                  * @deprecated
-                 * @return [[CLASS_APP]]
+                 * @return [[CLASS_APPLICATION]]
                  */
                 static function getInstance($id = null) {
                     return static::i($id);
                 }
 
                 /**
-                 * @return [[CLASS_APP]]
+                 * @return [[CLASS_APPLICATION]]
                  */
                 static function i($id = null) {
-                    return Ac_Avancore::getApplicationInstance(get_called_class(), $id);
+                    return Ac_Avancore::getAppInstance(get_called_class(), $id);
                 }
 
             }
@@ -201,12 +201,12 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
                 var $_templateClass = '[[CLASS_ADMIN_TEMPLATE]]';
 
                 /**
-                 * @var [[CLASS_APP]]
+                 * @var [[CLASS_APPLICATION]]
                  */
-                protected $application = false;
+                protected $app = false;
 
                 function doListMapperClasses() {
-                    $res = $this->application->listMappers();
+                    $res = $this->app->listMappers();
                     return $res;
                 }
 
@@ -238,7 +238,7 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
                 function getLinks() {
                     $res = array();
                     foreach ($this->controller->doListMapperClasses() as $i) {
-                        $map = $this->controller->getApplication()->getMapper($i);
+                        $map = $this->controller->getApp()->getMapper($i);
                         $info = $map->getInfo();
                         $cap = strlen($info->pluralCaption)? $info->pluralCaption : $i;
                         $res[$cap] = array('mapper' => $i);
@@ -284,19 +284,19 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
             class [[CLASS_COMPONENT]] extends Ac_Application_Component {
 
                 /**
-                 * @var [[CLASS_APP]]
+                 * @var [[CLASS_APPLICATION]]
                  */
-                protected $application = false;
+                protected $app = false;
 
-                function setApplication([[CLASS_APP]] $application) {
-                    parent::setApplication($application);
+                function setApp([[CLASS_APPLICATION]] $app) {
+                    parent::setApp($app);
                 }
 
                 /**
-                 * @return [[CLASS_APP]]
+                 * @return [[CLASS_APPLICATION]]
                  */
-                function getApplication() {
-                    return parent::getApplication();
+                function getApp() {
+                    return parent::getApp();
                 }
 
             }
@@ -314,9 +314,9 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
             class [[CLASS_CONTROLLER]] extends Ac_Controller {
 
                 /**
-                 * @var [[CLASS_APP]]
+                 * @var [[CLASS_APPLICATION]]
                  */
-                protected $application = false;
+                protected $app = false;
 
             }
     <?php
@@ -333,9 +333,9 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
             class [[CLASS_FRONTEND]] extends [[CLASS_CONTROLLER]] {
 
                 /**
-                 * @var [[CLASS_APP]]
+                 * @var [[CLASS_APPLICATION]]
                  */
-                protected $application = false;
+                protected $app = false;
 
                 var $_templateClass = '[[CLASS_FRONTEND_TEMPLATE]]';
 
@@ -536,7 +536,7 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
 
     ?>        
 
-            abstract class [[CLASS_APP_BASE]] extends Ac_Application {
+            abstract class [[CLASS_APPLICATION_BASE]] extends Ac_Application {
             }
     <?php
     }
@@ -575,7 +575,7 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
             $ctx->setBaseUrl($u);
 
             $c = new [[CLASS_ADMIN]]();
-            $c->setApplication([[CLASS_APP]]::getInstance());
+            $c->setApp([[CLASS_APPLICATION]]::getInstance());
             $resp = $c->getResponse();
 
             $o = new Ac_Controller_Output_Native;
@@ -629,7 +629,7 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
             $ctx->setBaseUrl($u);
 
             $c = new [[CLASS_FRONTEND]]();
-            $c->setApplication([[CLASS_APP]]::getInstance());
+            $c->setApp([[CLASS_APPLICATION]]::getInstance());
             $resp = $c->getResponse();
 
             $o = new Ac_Controller_Output_Native;
@@ -656,8 +656,8 @@ class Ac_Cg_Template_Skel extends Ac_Cg_Template {
             'APP_PLACEHOLDER' => '{'.strtoupper($this->appName).'}',
             'CLASS_ADMIN' => "{$this->appName}_Admin",
             'CLASS_ADMIN_TEMPLATE' => "{$this->appName}_AdminTemplate",
-            'CLASS_APP' => "{$this->appName}",
-            'CLASS_APP_BASE' => "{$this->appName}_DomainBase",
+            'CLASS_APPLICATION' => "{$this->appName}",
+            'CLASS_APPLICATION_BASE' => "{$this->appName}_DomainBase",
             'FILE_APP_BASE' => $this->appName.'/DomainBase.php',
             'CLASS_COMPONENT' => "{$this->appName}_Component",
             'CLASS_CONTROLLER' => "{$this->appName}_Controller",

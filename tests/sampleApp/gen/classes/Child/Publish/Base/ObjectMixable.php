@@ -19,8 +19,8 @@ class Child_Publish_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTable {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     protected function listOwnProperties() {

@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Shop_Classifier_Type_Base_Object extends Ac_Model_Object {
 
 
@@ -23,8 +25,8 @@ class Sample_Shop_Classifier_Type_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -58,6 +60,7 @@ class Sample_Shop_Classifier_Type_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Shop_Classifier_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_shop_classifier_type_shop_classifier'),
+                'idPropertyName' => 'type',
                 'relationId' => '_shopClassifier',
                 'countVarName' => '_shopClassifierCount',
                 'referenceVarName' => '_shopClassifier',

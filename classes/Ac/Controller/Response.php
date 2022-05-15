@@ -188,17 +188,17 @@ class Ac_Controller_Response {
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
 
-    function setApplication(Ac_Application $application) {
-        $this->application = $application;
+    function setApp(Ac_Application $app) {
+        $this->app = $app;
     }
 
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        if ($this->application) $res = $this->application;
+    function getApp() {
+        if ($this->app) $res = $this->app;
             else $res = Ac_Application::getDefaultInstance ();
         return $res;
     }    

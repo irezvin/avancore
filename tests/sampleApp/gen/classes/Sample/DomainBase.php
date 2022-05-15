@@ -2,6 +2,33 @@
 
 abstract class Sample_DomainBase extends Ac_Application {
 
+    protected $componentAliases = [
+        'people' => 'Sample_Person_Mapper',
+        'perks' => 'Sample_Perk_Mapper',
+        'personAlbums' => 'Sample_Person_Album_Mapper',
+        'personPhotos' => 'Sample_Person_Photo_Mapper',
+        'personPosts' => 'Sample_Person_Post_Mapper',
+        'publish' => 'Sample_Publish_ImplMapper',
+        'relationTypes' => 'Sample_Relation_Type_Mapper',
+        'relations' => 'Sample_Relation_Mapper',
+        'religion' => 'Sample_Religion_Mapper',
+        'shopCategories' => 'Sample_Shop_Category_Mapper',
+        'shopClassifier' => 'Sample_Shop_Classifier_Mapper',
+        'shopClassifierType' => 'Sample_Shop_Classifier_Type_Mapper',
+        'shopProductExtraCodes' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
+        'shopProductNotes' => 'Sample_Shop_Product_Note_ImplMapper',
+        'shopProducts' => 'Sample_Shop_Product_Mapper',
+        'shopSpecComputer' => 'Sample_Shop_Spec_Computer_ImplMapper',
+        'shopSpecFood' => 'Sample_Shop_Spec_Food_ImplMapper',
+        'shopSpecLaptop' => 'Sample_Shop_Spec_Laptop_ImplMapper',
+        'shopSpecMonitor' => 'Sample_Shop_Spec_Monitor_ImplMapper',
+        'shopSpecs' => 'Sample_Shop_Spec_Mapper',
+        'tags' => 'Sample_Tag_Mapper',
+        'treeAdjacent' => 'Sample_Tree_Adjacent_Mapper',
+        'treeCombos' => 'Sample_Tree_Combo_Mapper',
+        'treeRecords' => 'Sample_Tree_Record_Mapper',
+    ];
+
     protected function doOnInitialize() {
         parent::doOnInitialize();
     }

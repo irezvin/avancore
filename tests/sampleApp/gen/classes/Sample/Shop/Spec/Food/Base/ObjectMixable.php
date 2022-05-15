@@ -31,8 +31,8 @@ class Sample_Shop_Spec_Food_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTab
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     protected function listOwnProperties() {
@@ -53,6 +53,7 @@ class Sample_Shop_Spec_Food_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTab
                 'otherModelIdInMethodsPrefix' => 'shopSpecFood',
 
                 'caption' => new Ac_Lang_String('sample_shop_spec_food_shop_spec_food_shop_spec'),
+                'idPropertyName' => 'productId',
                 'relationId' => '_shopSpecFoodShopSpec',
                 'referenceVarName' => '_shopSpecFoodShopSpec',
             ],
@@ -64,7 +65,7 @@ class Sample_Shop_Spec_Food_Base_ObjectMixable extends Ac_Model_Mixable_ExtraTab
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Spec_Mapper',
                 ],
-                'objectPropertyName' => 'shopSpecFoodShopSpec',
+                'assocPropertyName' => 'shopSpecFoodShopSpec',
 
                 'caption' => new Ac_Lang_String('sample_shop_spec_food_product_id'),
             ],

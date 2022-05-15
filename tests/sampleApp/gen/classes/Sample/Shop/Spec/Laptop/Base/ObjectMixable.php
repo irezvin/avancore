@@ -29,8 +29,8 @@ class Sample_Shop_Spec_Laptop_Base_ObjectMixable extends Ac_Model_Mixable_ExtraT
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     protected function listOwnProperties() {
@@ -51,6 +51,7 @@ class Sample_Shop_Spec_Laptop_Base_ObjectMixable extends Ac_Model_Mixable_ExtraT
                 'otherModelIdInMethodsPrefix' => 'shopSpecLaptop',
 
                 'caption' => new Ac_Lang_String('sample_shop_spec_laptop_shop_spec_laptop_shop_spec'),
+                'idPropertyName' => 'productId',
                 'relationId' => '_shopSpecLaptopShopSpec',
                 'referenceVarName' => '_shopSpecLaptopShopSpec',
             ],
@@ -62,7 +63,7 @@ class Sample_Shop_Spec_Laptop_Base_ObjectMixable extends Ac_Model_Mixable_ExtraT
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Spec_Mapper',
                 ],
-                'objectPropertyName' => 'shopSpecLaptopShopSpec',
+                'assocPropertyName' => 'shopSpecLaptopShopSpec',
 
                 'caption' => new Ac_Lang_String('sample_shop_spec_laptop_product_id'),
             ],

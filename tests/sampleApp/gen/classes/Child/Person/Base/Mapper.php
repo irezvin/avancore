@@ -8,12 +8,14 @@ class Child_Person_Base_Mapper extends Sample_Person_Mapper {
 
     var $id = 'Child_Person_Mapper';
 
+    var $shortId = 'people';
+
     var $storage = 'Child_Person_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -31,8 +33,8 @@ class Child_Person_Base_Mapper extends Sample_Person_Mapper {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

@@ -19,11 +19,9 @@ class Sample_Shop_Product_Extra_Code_Base_ExtraTable extends Ac_Model_Mapper_Mix
                 'srcMapperClass' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_extraCodePerson',
-                'srcCountVarName' => '_extraCodeShopProductsCount',
-                'srcLoadedVarName' => '_extraCodeShopProductsLoaded',
                 'destVarName' => '_extraCodeShopProducts',
-                'destCountVarName' => '_shopProductsCount',
-                'destLoadedVarName' => '_shopProductsLoaded',
+                'destCountVarName' => '_extraCodeShopProductsCount',
+                'destLoadedVarName' => '_extraCodeShopProductsLoaded',
                 'fieldLinks' => [
                     'responsiblePersonId' => 'personId',
                 ],

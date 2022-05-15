@@ -35,6 +35,9 @@ class Ac_Model_Property implements Ac_I_Prototyped {
     var $noBind = null;
     var $noExport = null;
     
+    var $apiDefault = null;
+    var $apiDeny = false;
+    
     var $allowHtml = null;
     
     var $restrictToListOnConvert = false;

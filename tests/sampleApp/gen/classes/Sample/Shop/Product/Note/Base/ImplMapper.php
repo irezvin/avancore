@@ -14,6 +14,8 @@ class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Product_Note_ImplMapper';
 
+    var $shortId = 'shopProductNotes';
+
     var $storage = 'Sample_Shop_Product_Note_Storage';
 
     var $columnNames = [ 0 => 'productId', 1 => 'note', 2 => 'noteAuthorId', ];
@@ -29,7 +31,7 @@ class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
     protected $askRelationsForDefaults = false;
  
@@ -47,8 +49,6 @@ class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_notePerson' => false,
-            '_noteShopProductsCount' => false,
-            '_noteShopProductsLoaded' => false,
         ]);
     }
     
@@ -66,8 +66,8 @@ class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -191,11 +191,9 @@ class Sample_Shop_Product_Note_Base_ImplMapper extends Ac_Model_Mapper {
                 'srcMapperClass' => 'Sample_Shop_Product_Note_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_notePerson',
-                'srcCountVarName' => '_noteShopProductsCount',
-                'srcLoadedVarName' => '_noteShopProductsLoaded',
                 'destVarName' => '_noteShopProducts',
-                'destCountVarName' => '_shopProductsCount',
-                'destLoadedVarName' => '_shopProductsLoaded',
+                'destCountVarName' => '_noteShopProductsCount',
+                'destLoadedVarName' => '_noteShopProductsLoaded',
                 'fieldLinks' => [
                     'noteAuthorId' => 'personId',
                 ],

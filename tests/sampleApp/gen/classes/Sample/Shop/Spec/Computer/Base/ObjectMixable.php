@@ -31,8 +31,8 @@ class Sample_Shop_Spec_Computer_Base_ObjectMixable extends Ac_Model_Mixable_Extr
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     protected function listOwnProperties() {
@@ -53,6 +53,7 @@ class Sample_Shop_Spec_Computer_Base_ObjectMixable extends Ac_Model_Mixable_Extr
                 'otherModelIdInMethodsPrefix' => 'shopSpecComputer',
 
                 'caption' => new Ac_Lang_String('sample_shop_spec_computer_shop_spec_computer_shop_spec'),
+                'idPropertyName' => 'productId',
                 'relationId' => '_shopSpecComputerShopSpec',
                 'referenceVarName' => '_shopSpecComputerShopSpec',
             ],
@@ -64,7 +65,7 @@ class Sample_Shop_Spec_Computer_Base_ObjectMixable extends Ac_Model_Mixable_Extr
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Shop_Spec_Mapper',
                 ],
-                'objectPropertyName' => 'shopSpecComputerShopSpec',
+                'assocPropertyName' => 'shopSpecComputerShopSpec',
 
                 'caption' => new Ac_Lang_String('sample_shop_spec_computer_product_id'),
             ],

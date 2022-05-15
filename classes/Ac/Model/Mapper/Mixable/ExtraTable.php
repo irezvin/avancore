@@ -268,7 +268,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
         if ($this->implMapper !== false && !is_object($this->implMapper) && $this->mixin) {
             $def = array();
             if ($this->mixin) 
-                $def['application'] = $this->mixin->getApplication();
+                $def['app'] = $this->mixin->getApp();
             $this->implMapper = Ac_Prototyped::factory($this->implMapper, 'Ac_Model_Mapper', $def);
             if ($this->tableName && $this->implMapper->tableName !== $this->tableName) {
                 throw new Ac_E_InvalidUsage("\$tableName, if set, must not be different from \$implMapper->tableName");
@@ -279,7 +279,7 @@ class Ac_Model_Mapper_Mixable_ExtraTable extends Ac_Mixable {
             $this->implMapper = new Ac_Model_Mapper(array(
                 'id' => 'extraTable_'.$this->mixin->getId().$this->tableName,
                 'tableName' => $this->tableName,
-                'application' => $this->mixin->getApplication(),
+                'app' => $this->mixin->getApp(),
             ));
         }
         return $this->implMapper;

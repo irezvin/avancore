@@ -380,7 +380,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     protected function registerComponents(array $components) {
         if (!$components) return;
         foreach ($components as $id => $reg) {
-            if ($reg instanceof Ac_I_ApplicationComponent) $reg->setApplication($this);
+            if ($reg instanceof Ac_I_ApplicationComponent) $reg->setApp($this);
             if ($reg instanceof Ac_I_NamedApplicationComponent) $reg->setId($id);
         }
         $this->triggerEvent(self::EVENT_ON_REGISTER_COMPONENTS, $components);

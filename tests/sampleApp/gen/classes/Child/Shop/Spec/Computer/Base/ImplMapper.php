@@ -8,12 +8,14 @@ class Child_Shop_Spec_Computer_Base_ImplMapper extends Sample_Shop_Spec_Computer
 
     var $id = 'Child_Shop_Spec_Computer_ImplMapper';
 
+    var $shortId = 'shopSpecComputer';
+
     var $storage = 'Child_Shop_Spec_Computer_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -31,8 +33,8 @@ class Child_Shop_Spec_Computer_Base_ImplMapper extends Sample_Shop_Spec_Computer
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

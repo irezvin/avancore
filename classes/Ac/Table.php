@@ -74,7 +74,7 @@ class Ac_Table {
     /**
      * @var Ac_Application
      */
-    protected $application = false;
+    protected $app = false;
     
     /**
      * @param array columnSettings Array 'column name' => array('class' => 'column class', ...other settings...)
@@ -277,18 +277,18 @@ class Ac_Table {
         // TODO
     }
     
-    function setApplication(Ac_Application $application) {
-        $this->application = $application;
+    function setApp(Ac_Application $app) {
+        $this->app = $app;
     }
 
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        if ($this->application === false) {
-            $this->application = Ac_Application::getDefaultInstance();
+    function getApp() {
+        if ($this->app === false) {
+            $this->app = Ac_Application::getDefaultInstance();
         }
-        return $this->application;
+        return $this->app;
     }    
     
 }

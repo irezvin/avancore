@@ -12,6 +12,8 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Tree_Combo_Mapper';
 
+    var $shortId = 'treeCombos';
+
     var $storage = 'Sample_Tree_Combo_Storage';
 
     var $columnNames = [ 0 => 'id', 1 => 'leftCol', 2 => 'rightCol', 3 => 'parentId', 4 => 'ordering', 5 => 'title', 6 => 'tag', 7 => 'ignore', 8 => 'depth', ];
@@ -33,7 +35,7 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
    
     protected $autoincFieldName = 'id';
@@ -54,8 +56,8 @@ class Sample_Tree_Combo_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

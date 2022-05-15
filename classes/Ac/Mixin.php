@@ -2,6 +2,8 @@
 
 class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
     
+    protected static $magicParent = 'Ac_Mixin';
+    
     protected $mixables = array();
     
     /**

@@ -1,6 +1,17 @@
 <?php
 
+/**
+ * @property Ac_Application $application
+ * @method Ac_Application getApplication()
+ * @method void setApplication(Ac_Application $application)
+ */
 abstract class Ac_Model_Collection_Abstract extends Ac_Prototyped implements Iterator {
+
+    use Ac_Compat_Overloader;
+    
+    protected static $_compat_application = 'app';
+    protected static $_compat_setApplication = 'setApp';
+    protected static $_compat_getApplication = 'getApp';
     
     /**
      * @var bool

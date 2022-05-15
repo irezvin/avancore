@@ -10,12 +10,14 @@ class Child_Shop_Spec_Monitor_Base_ImplMapper extends Sample_Shop_Spec_Monitor_I
 
     var $id = 'Child_Shop_Spec_Monitor_ImplMapper';
 
+    var $shortId = 'shopSpecMonitor';
+
     var $storage = 'Child_Shop_Spec_Monitor_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
     protected function doGetCoreMixables() { 
@@ -41,8 +43,8 @@ class Child_Shop_Spec_Monitor_Base_ImplMapper extends Sample_Shop_Spec_Monitor_I
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

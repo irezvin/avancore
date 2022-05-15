@@ -8,12 +8,14 @@ class Child_Tree_Combo_Base_Mapper extends Sample_Tree_Combo_Mapper {
 
     var $id = 'Child_Tree_Combo_Mapper';
 
+    var $shortId = 'treeCombos';
+
     var $storage = 'Child_Tree_Combo_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -31,8 +33,8 @@ class Child_Tree_Combo_Base_Mapper extends Sample_Tree_Combo_Mapper {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

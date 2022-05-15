@@ -283,7 +283,7 @@ class Ac_Table_Column {
     
     function unfoldAssetString($string) {
         // Ugly...
-        $app = $this->getApplication();
+        $app = $this->getApp();
         if ($app) $ph = $app->getAssetPlaceholders(true);
             else $ph = array();
         return Ac_Controller_Response_Html::unfoldAssetString($string, $ph);
@@ -292,8 +292,8 @@ class Ac_Table_Column {
     /**
      * @return Ac_Application
      */
-    function getApplication() {
-        return $this->_table->getApplication();
+    function getApp() {
+        return $this->_table->getApp();
     }    
     
 }

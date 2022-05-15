@@ -8,12 +8,14 @@ class Child_Shop_Classifier_Type_Base_Mapper extends Sample_Shop_Classifier_Type
 
     var $id = 'Child_Shop_Classifier_Type_Mapper';
 
+    var $shortId = 'shopClassifierType';
+
     var $storage = 'Child_Shop_Classifier_Type_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -31,8 +33,8 @@ class Child_Shop_Classifier_Type_Base_Mapper extends Sample_Shop_Classifier_Type
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

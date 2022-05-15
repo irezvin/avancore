@@ -8,12 +8,14 @@ class Child_Tag_Base_Mapper extends Sample_Tag_Mapper {
 
     var $id = 'Child_Tag_Mapper';
 
+    var $shortId = 'tags';
+
     var $storage = 'Child_Tag_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
  
@@ -31,8 +33,8 @@ class Child_Tag_Base_Mapper extends Sample_Tag_Mapper {
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

@@ -1,5 +1,7 @@
 <?php
-
+/**
+ * @property Sample $app Access to App instance (via Mapper)
+ */
 class Sample_Relation_Base_Object extends Ac_Model_Object {
 
 
@@ -35,8 +37,8 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -64,6 +66,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'mapperClass' => 'Sample_Relation_Type_Mapper',
 
                 'caption' => new Ac_Lang_String('sample_relation_relation_type'),
+                'idPropertyName' => 'relationTypeId',
                 'relationId' => '_relationType',
                 'referenceVarName' => '_relationType',
             ],
@@ -74,6 +77,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPlural' => 'otherPeople',
 
                 'caption' => new Ac_Lang_String('sample_relation_other_person'),
+                'idPropertyName' => 'otherPersonId',
                 'relationId' => '_otherPerson',
                 'referenceVarName' => '_otherPerson',
             ],
@@ -84,6 +88,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                 'otherModelIdInMethodsPlural' => 'people',
 
                 'caption' => new Ac_Lang_String('sample_relation_person'),
+                'idPropertyName' => 'personId',
                 'relationId' => '_person',
                 'referenceVarName' => '_person',
             ],
@@ -104,7 +109,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ],
-                'objectPropertyName' => 'person',
+                'assocPropertyName' => 'person',
 
                 'caption' => new Ac_Lang_String('sample_relation_person_id'),
             ],
@@ -116,7 +121,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Person_Mapper',
                 ],
-                'objectPropertyName' => 'otherPerson',
+                'assocPropertyName' => 'otherPerson',
 
                 'caption' => new Ac_Lang_String('sample_relation_other_person_id'),
             ],
@@ -128,7 +133,7 @@ class Sample_Relation_Base_Object extends Ac_Model_Object {
                     'class' => 'Ac_Model_Values_Mapper',
                     'mapperClass' => 'Sample_Relation_Type_Mapper',
                 ],
-                'objectPropertyName' => 'relationType',
+                'assocPropertyName' => 'relationType',
 
                 'caption' => new Ac_Lang_String('sample_relation_relation_type_id'),
             ],

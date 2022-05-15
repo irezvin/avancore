@@ -14,6 +14,8 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Shop_Product_Extra_Code_ImplMapper';
 
+    var $shortId = 'shopProductExtraCodes';
+
     var $storage = 'Sample_Shop_Product_Extra_Code_Storage';
 
     var $columnNames = [ 0 => 'productId', 1 => 'ean', 2 => 'asin', 3 => 'gtin', 4 => 'responsiblePersonId', ];
@@ -31,7 +33,7 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
     protected $askRelationsForDefaults = false;
  
@@ -49,8 +51,6 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     function doGetInternalDefaults() {
         return Ac_Util::m(parent::doGetInternalDefaults(), [
             '_extraCodePerson' => false,
-            '_extraCodeShopProductsCount' => false,
-            '_extraCodeShopProductsLoaded' => false,
         ]);
     }
     
@@ -68,8 +68,8 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
@@ -197,11 +197,9 @@ class Sample_Shop_Product_Extra_Code_Base_ImplMapper extends Ac_Model_Mapper {
                 'srcMapperClass' => 'Sample_Shop_Product_Extra_Code_ImplMapper',
                 'destMapperClass' => 'Sample_Person_Mapper',
                 'srcVarName' => '_extraCodePerson',
-                'srcCountVarName' => '_extraCodeShopProductsCount',
-                'srcLoadedVarName' => '_extraCodeShopProductsLoaded',
                 'destVarName' => '_extraCodeShopProducts',
-                'destCountVarName' => '_shopProductsCount',
-                'destLoadedVarName' => '_shopProductsLoaded',
+                'destCountVarName' => '_extraCodeShopProductsCount',
+                'destLoadedVarName' => '_extraCodeShopProductsLoaded',
                 'fieldLinks' => [
                     'responsiblePersonId' => 'personId',
                 ],

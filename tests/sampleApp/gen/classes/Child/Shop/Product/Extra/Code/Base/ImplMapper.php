@@ -10,12 +10,14 @@ class Child_Shop_Product_Extra_Code_Base_ImplMapper extends Sample_Shop_Product_
 
     var $id = 'Child_Shop_Product_Extra_Code_ImplMapper';
 
+    var $shortId = 'shopProductExtraCodes';
+
     var $storage = 'Child_Shop_Product_Extra_Code_Storage';
     
     /**
      * @var Child 
      */
-     protected $application = false;
+     protected $app = false;
      
  
     protected function doGetCoreMixables() { 
@@ -41,8 +43,8 @@ class Child_Shop_Product_Extra_Code_Base_ImplMapper extends Sample_Shop_Product_
     /**
      * @return Child 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

@@ -12,6 +12,8 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Person_Photo_Mapper';
 
+    var $shortId = 'personPhotos';
+
     var $storage = 'Sample_Person_Photo_Storage';
 
     var $columnNames = [ 0 => 'photoId', 1 => 'personId', 2 => 'filename', ];
@@ -25,7 +27,7 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
    
     protected $autoincFieldName = 'photoId';
@@ -60,8 +62,8 @@ class Sample_Person_Photo_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**

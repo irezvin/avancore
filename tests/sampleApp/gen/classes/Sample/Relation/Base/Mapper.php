@@ -12,6 +12,8 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
 
     var $id = 'Sample_Relation_Mapper';
 
+    var $shortId = 'relations';
+
     var $storage = 'Sample_Relation_Storage';
 
     var $columnNames = [ 0 => 'relationId', 1 => 'personId', 2 => 'otherPersonId', 3 => 'relationTypeId', 4 => 'relationBegin', 5 => 'relationEnd', 6 => 'notes', ];
@@ -31,7 +33,7 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @var Sample 
      */
-     protected $application = false;
+     protected $app = false;
      
    
     protected $autoincFieldName = 'relationId';
@@ -60,8 +62,8 @@ class Sample_Relation_Base_Mapper extends Ac_Model_Mapper {
     /**
      * @return Sample 
      */
-    function getApplication() {
-        return parent::getApplication();
+    function getApp() {
+        return parent::getApp();
     }
     
     /**
