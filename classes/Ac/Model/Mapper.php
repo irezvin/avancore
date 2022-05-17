@@ -9,6 +9,8 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
 
     use Ac_Compat_Overloader;
     
+    use Ac_Sql_WithDbFn;
+    
     protected static $_compat_application = 'app';
     protected static $_compat_setApplication = 'setApp';
     protected static $_compat_getApplication = 'getApp';
@@ -485,29 +487,24 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     /**
-     * Creates new record instance that is bound to $this mapper.
+     * Creates new record instance that is bound to this mapper.
      * 
-     * @param string $typeId Id of child mapper (FALSE = create default if possible)
+     * @param string|array $typeIdOrDefaults Id of child mapper (FALSE = create default if possible)
+     * @param array $defaults Values of object properties' to assign
      * @return Ac_Model_Object
      */
-    function createRecord($typeId = false) {
+    function createRecord($typeIdOrDefaults = false, array $defaults = []) {
+        if (is_array($typeIdOrDefaults) && !$defaults) {
+            $defaults = $typeIdOrDefaults;
+            $typeId = false;
+        } else {
+            $typeId = $typeIdOrDefaults;
+        }
         $res = $this->getStorage()->createRecord($typeId);
+        if ($defaults) Ac_Accessor::setObjectProperty($res, $defaults);
         return $res;
     }
-    
-    /**
-     * Deprecated - use Ac_Model_Mapper::createRecord() instead
-     * 
-     * @deprecated since 0.3.2
-     * @param string $className Same as createRecord::$className
-     * @return Ac_Model_Object
-     */
-    static function factory($className = false, 
-        $unused1 = null, array $unused2 = array(), $unused3 = false, $unused4 = null) {
-        throw new Exception("Cannot use Ac_Model_Mapper::factory() directly; using factory() in descendant "
-            . "classes is deprecated too. User createRecord() instead");
-    }
-    
+      
     function listRecords() {
         if ($this->allRecordsLoaded)
             $res = array_diff(array_keys($this->recordsCollection), $this->keysOfNewRecords);

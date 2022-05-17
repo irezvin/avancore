@@ -29,16 +29,6 @@ class Child_Shop_Product_Extra_Code_Base_ImplMapper extends Sample_Shop_Product_
     }
     
  
-    /**
-     * @return Child_Shop_Product_Extra_Code 
-     */ 
-    static function factory ($className = false,
-        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
-        trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
-            "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
-        $res = Ac_Model_Mapper::getMapper('Child_Shop_Product_Extra_Code_ImplMapper')->createRecord($className);
-        return $res;
-    }
     
     /**
      * @return Child 
@@ -48,10 +38,14 @@ class Child_Shop_Product_Extra_Code_Base_ImplMapper extends Sample_Shop_Product_
     }
     
     /**
+     * Creates new ShopProductExtraCodes instance that is bound to this mapper.
+     * 
+     * @param string|array $typeIdOrDefaults Id of child mapper (FALSE = create default if possible)
+     * @param array $defaults Values of object properties' to assign
      * @return Child_Shop_Product_Extra_Code 
      */ 
-    function createRecord ($className = false) {
-        $res = parent::createRecord($className);
+    function createRecord($typeIdOrDefaults = false, array $defaults = []) {
+        $res = parent::createRecord($typeIdOrDefaults, $defaults);
         return $res;
     }
     

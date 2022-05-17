@@ -5,6 +5,8 @@
  */
 abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionAwareObject {
 
+    use Ac_Sql_WithDbFn;
+    
     const ACTUAL_REASON_LOAD = 1;
     
     const ACTUAL_REASON_SAVE = 2;

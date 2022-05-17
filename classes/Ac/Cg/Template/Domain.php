@@ -5,6 +5,9 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
     var $domainClass = false;
     var $domainGenClass = false;
     var $domainBaseClass = false;
+    var $componentsAccessorClass = false;
+    var $componentsAccessorGenClass = false;
+    var $componentsAccessorBaseClass = false;
     var $mappers = array();
     var $mappersOverride = array();
     var $mapperPrototypes = array();
@@ -19,6 +22,9 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
         $this->domainClass = $this->domain->getAppClass();
         $this->domainGenClass = $this->domain->appName.'_DomainBase';
         $this->domainBaseClass = $this->domain->getParentAppClass();
+        $this->componentsAccessorClass = $this->domain->getComponentsAccessorClass();
+        $this->componentsAccessorGenClass = $this->domain->getComponentsAccessorGenClass();
+        $this->componentsAccessorBaseClass = $this->domain->getComponentsAccessorBaseClass();
         $this->mappers = array();
         $this->mapperAliases = $this->domain->getMapperAliases();
         $this->mapperShortIds = [];
@@ -45,26 +51,36 @@ class Ac_Cg_Template_Domain extends Ac_Cg_Template {
     function _generateFilesList() {
         $domDat = trim(str_replace('\\', '_', $this->domainClass), '_').'.json';
         $res = array();
-        $res['domainFile'] = array(
+        $res['domainFile'] = [
             'relPath' => $this->classToFile($this->domainClass),
             'isEditable' => true,
             'templatePart' => 'domainFile',
-        );
-        $res['domainGenFile'] = array(
+        ];
+        $res['domainGenFile'] = [
             'relPath' => $this->classToFile($this->domainGenClass, true),
             'isEditable' => false,
             'templatePart' => 'domainGenFile',
-        );
-        $res['domainDumpFile'] = array(
+        ];
+        $res['domainDumpFile'] = [
             'relPath' => $this->generator->genDir.'/data/'.$domDat,
             'isEditable' => false,
             'templatePart' => 'domainDump',
-        );
-        $res['domainDumpHtaccess'] = array(
+        ];
+        $res['domainDumpHtaccess'] = [
             'relPath' => $this->generator->genDir.'/data/.htaccess',
             'isEditable' => false,
             'templatePart' => 'denyHtaccess',
-        );
+        ];
+        $res['componentsAccessorFile'] = [
+            'relPath' => $this->classToFile($this->componentsAccessorClass),
+            'isEditable' => true,
+            'templatePart' => 'componentsAccessorFile',
+        ];
+        $res['componentsAccessorGenFile'] = [
+            'relPath' => $this->classToFile($this->componentsAccessorGenClass, true),
+            'isEditable' => false,
+            'templatePart' => 'componentsAccessorGenFile',
+        ];
         return $res;
     }
     
@@ -102,6 +118,9 @@ class <?php $this->d($this->domainClass); ?> extends <?php $this->d($this->domai
     function showDomainGenFile() {
 ?><?php $this->phpOpen(); ?> 
 
+/**
+ * @property <?php $this->d($this->componentsAccessorClass); ?> $c Convenient access to application components
+ */
 abstract class <?php $this->d($this->domainGenClass); ?> extends <?php $this->d($this->domainBaseClass); ?> {
 
     protected $componentAliases = <?php echo $this->export($this->mapperShortIds, false, 4); ?>;
@@ -138,8 +157,8 @@ abstract class <?php $this->d($this->domainGenClass); ?> extends <?php $this->d(
 <?php   } ?>
     
 <?php } ?>
-<?php if (count($this->modelClasses)) { ?>
-<?php foreach ($this->modelClasses as $mapperClass => $modelClass) { ?> 
+<?php   if (count($this->modelClasses)) { ?>
+<?php       foreach ($this->modelClasses as $mapperClass => $modelClass) { ?> 
     /**
      * @return <?php $this->d($modelClass); ?> 
      */
@@ -150,15 +169,52 @@ abstract class <?php $this->d($this->domainGenClass); ?> extends <?php $this->d(
     /**
      * @return <?php $this->d($modelClass); ?> 
      */
-    function create<?php $this->d($this->modelMethodSuffixes[$mapperClass]); ?> () {
-        return $this->getMapper(<?php $this->str($mapperClass); ?>)->createRecord();
+    function create<?php $this->d($this->modelMethodSuffixes[$mapperClass]); ?> (array $defaults = []) {
+        return $this->getMapper(<?php $this->str($mapperClass); ?>)->createRecord(false, $defaults);
     }
     
-<?php } ?>
+<?php       } ?>
 
-<?php } ?>
+<?php   } ?>
+    protected function doGetComponentPrototypes() {
+        $res = parent::doGetComponentPrototypes();
+        $res[self::CORE_COMPONENT_COMPONENTS_ACCESSOR] = ['class' => <?php $this->str($this->componentsAccessorClass); ?>];
+        return $res;
+    }
+    
 }
 <?php } 
+
+    // --------------------------- componentsAccessorFile -------------------------
+    
+    function showComponentsAccessorFile() {
+?><?php $this->phpOpen(); ?> 
+
+class <?php $this->d($this->componentsAccessorClass); ?> extends <?php $this->d($this->componentsAccessorGenClass); ?> {
+    
+}
+<?php } 
+
+    // --------------------------- componentsAccessorGenFile -----------------------
+
+    function showComponentsAccessorGenFile() {
+?><?php $this->phpOpen(); ?> 
+
+/**
+<?php if (0) foreach ($this->mappers as $sfx => $class) { ?>
+ * @property <?php echo $class; ?> $<?php echo $sfx; ?> 
+<?php } ?>
+ *    
+<?php foreach ($this->mapperShortIds as $id => $class) { ?>
+ * @property <?php echo $class; ?> $<?php echo $id; ?> 
+<?php } ?>
+ */
+abstract class <?php $this->d($this->componentsAccessorGenClass); ?> extends <?php $this->d($this->componentsAccessorBaseClass); ?> {
+    
+}
+<?php }
+
+    // ---------------------------------------------------------------------------------
 
     function showDomainDump() {
         $k = 0;

@@ -3,8 +3,13 @@
 if (!class_exists('Ac_Util', false)) require_once(dirname(__FILE__).'/Util.php');
 if (!class_exists('Ac_Prototyped', false)) require_once(dirname(__FILE__).'/Prototyped.php');
 
+/**
+ * @property Ac_Application_ComponentsAccessor $c Convenient access to application components
+ */
 abstract class Ac_Application extends Ac_Mixin_WithEvents {
 
+    use Ac_Sql_WithDbFn;
+    
     /**
      * onInitialize
      */
@@ -36,6 +41,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     const EVENT_ON_AUTHENTICATE = 'onLogin';
     
     const CORE_COMPONENT_DB = 'core.db';
+    const CORE_COMPONENT_COMPONENTS_ACCESSOR = 'core.componentsAccessor';
     const CORE_COMPONENT_FLAGS = 'core.flags';
     const CORE_COMPONENT_CACHE = 'core.cache';
     const CORE_COMPONENT_MAIL_SENDER = 'core.mailSender';
@@ -456,7 +462,8 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
 
         $res = array(
             self::CORE_COMPONENT_DB => $adapter->getDbPrototype(),
-            self::CORE_COMPONENT_FLAGS => array('class' => 'Ac_Flags'),
+            self::CORE_COMPONENT_COMPONENTS_ACCESSOR => ['class' => 'Ac_Application_ComponentsAccessor'],
+            self::CORE_COMPONENT_FLAGS => ['class' => 'Ac_Flags'],
             self::CORE_COMPONENT_CACHE => $cachePrototype,
             self::CORE_COMPONENT_MAIL_SENDER => $adapter->getMailSenderPrototype(),
             self::CORE_COMPONENT_RELATION_PROVIDER_EVALUATOR => array('class' => 'Ac_Model_Relation_Provider_Evaluator'),
@@ -703,6 +710,15 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     
     function getUserProviderId() {
         return $this->adapter->getConfigValue('userProviderId', self::CORE_COMPONENT_USER_PROVIDER);
+    }
+    
+    function & __get($varName) {
+        if ($varName === 'c') {
+            $res = $this->getComponent(self::CORE_COMPONENT_COMPONENTS_ACCESSOR);
+            return $res;
+        }
+        $res = & parent::__get($varName);
+        return $res;
     }
     
 }

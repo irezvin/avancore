@@ -1,5 +1,8 @@
 <?php 
 
+/**
+ * @property Sample_ComponentsAccessor $c Convenient access to application components
+ */
 abstract class Sample_DomainBase extends Ac_Application {
 
     protected $componentAliases = [
@@ -290,8 +293,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Person 
      */
-    function createSamplePerson () {
-        return $this->getMapper('Sample_Person_Mapper')->createRecord();
+    function createSamplePerson (array $defaults = []) {
+        return $this->getMapper('Sample_Person_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -305,8 +308,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Perk 
      */
-    function createSamplePerk () {
-        return $this->getMapper('Sample_Perk_Mapper')->createRecord();
+    function createSamplePerk (array $defaults = []) {
+        return $this->getMapper('Sample_Perk_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -320,8 +323,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Person_Album 
      */
-    function createSamplePersonAlbum () {
-        return $this->getMapper('Sample_Person_Album_Mapper')->createRecord();
+    function createSamplePersonAlbum (array $defaults = []) {
+        return $this->getMapper('Sample_Person_Album_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -335,8 +338,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Person_Photo 
      */
-    function createSamplePersonPhoto () {
-        return $this->getMapper('Sample_Person_Photo_Mapper')->createRecord();
+    function createSamplePersonPhoto (array $defaults = []) {
+        return $this->getMapper('Sample_Person_Photo_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -350,8 +353,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Person_Post 
      */
-    function createSamplePersonPost () {
-        return $this->getMapper('Sample_Person_Post_Mapper')->createRecord();
+    function createSamplePersonPost (array $defaults = []) {
+        return $this->getMapper('Sample_Person_Post_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -365,8 +368,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Publish 
      */
-    function createSamplePublish () {
-        return $this->getMapper('Sample_Publish_ImplMapper')->createRecord();
+    function createSamplePublish (array $defaults = []) {
+        return $this->getMapper('Sample_Publish_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -380,8 +383,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Relation_Type 
      */
-    function createSampleRelationType () {
-        return $this->getMapper('Sample_Relation_Type_Mapper')->createRecord();
+    function createSampleRelationType (array $defaults = []) {
+        return $this->getMapper('Sample_Relation_Type_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -395,8 +398,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Relation 
      */
-    function createSampleRelation () {
-        return $this->getMapper('Sample_Relation_Mapper')->createRecord();
+    function createSampleRelation (array $defaults = []) {
+        return $this->getMapper('Sample_Relation_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -410,8 +413,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Religion 
      */
-    function createSampleReligion () {
-        return $this->getMapper('Sample_Religion_Mapper')->createRecord();
+    function createSampleReligion (array $defaults = []) {
+        return $this->getMapper('Sample_Religion_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -425,8 +428,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Shop_Category 
      */
-    function createSampleShopCategory () {
-        return $this->getMapper('Sample_Shop_Category_Mapper')->createRecord();
+    function createSampleShopCategory (array $defaults = []) {
+        return $this->getMapper('Sample_Shop_Category_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -440,8 +443,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Shop_Classifier 
      */
-    function createSampleShopClassifier () {
-        return $this->getMapper('Sample_Shop_Classifier_Mapper')->createRecord();
+    function createSampleShopClassifier (array $defaults = []) {
+        return $this->getMapper('Sample_Shop_Classifier_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -455,8 +458,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Shop_Classifier_Type 
      */
-    function createSampleShopClassifierType () {
-        return $this->getMapper('Sample_Shop_Classifier_Type_Mapper')->createRecord();
+    function createSampleShopClassifierType (array $defaults = []) {
+        return $this->getMapper('Sample_Shop_Classifier_Type_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -470,8 +473,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Shop_Product_Extra_Code 
      */
-    function createSampleShopProductExtraCode () {
-        return $this->getMapper('Sample_Shop_Product_Extra_Code_ImplMapper')->createRecord();
+    function createSampleShopProductExtraCode (array $defaults = []) {
+        return $this->getMapper('Sample_Shop_Product_Extra_Code_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -485,8 +488,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Shop_Product_Note 
      */
-    function createSampleShopProductNote () {
-        return $this->getMapper('Sample_Shop_Product_Note_ImplMapper')->createRecord();
+    function createSampleShopProductNote (array $defaults = []) {
+        return $this->getMapper('Sample_Shop_Product_Note_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -500,8 +503,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Shop_Product 
      */
-    function createSampleShopProduct () {
-        return $this->getMapper('Sample_Shop_Product_Mapper')->createRecord();
+    function createSampleShopProduct (array $defaults = []) {
+        return $this->getMapper('Sample_Shop_Product_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -515,8 +518,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Shop_Spec_Computer 
      */
-    function createSampleShopSpecComputer () {
-        return $this->getMapper('Sample_Shop_Spec_Computer_ImplMapper')->createRecord();
+    function createSampleShopSpecComputer (array $defaults = []) {
+        return $this->getMapper('Sample_Shop_Spec_Computer_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -530,8 +533,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Shop_Spec_Food 
      */
-    function createSampleShopSpecFood () {
-        return $this->getMapper('Sample_Shop_Spec_Food_ImplMapper')->createRecord();
+    function createSampleShopSpecFood (array $defaults = []) {
+        return $this->getMapper('Sample_Shop_Spec_Food_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -545,8 +548,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Shop_Spec_Laptop 
      */
-    function createSampleShopSpecLaptop () {
-        return $this->getMapper('Sample_Shop_Spec_Laptop_ImplMapper')->createRecord();
+    function createSampleShopSpecLaptop (array $defaults = []) {
+        return $this->getMapper('Sample_Shop_Spec_Laptop_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -560,8 +563,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Shop_Spec_Monitor 
      */
-    function createSampleShopSpecMonitor () {
-        return $this->getMapper('Sample_Shop_Spec_Monitor_ImplMapper')->createRecord();
+    function createSampleShopSpecMonitor (array $defaults = []) {
+        return $this->getMapper('Sample_Shop_Spec_Monitor_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -575,8 +578,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Shop_Spec 
      */
-    function createSampleShopSpec () {
-        return $this->getMapper('Sample_Shop_Spec_Mapper')->createRecord();
+    function createSampleShopSpec (array $defaults = []) {
+        return $this->getMapper('Sample_Shop_Spec_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -590,8 +593,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Tag 
      */
-    function createSampleTag () {
-        return $this->getMapper('Sample_Tag_Mapper')->createRecord();
+    function createSampleTag (array $defaults = []) {
+        return $this->getMapper('Sample_Tag_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -605,8 +608,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Tree_Adjacent 
      */
-    function createSampleTreeAdjacent () {
-        return $this->getMapper('Sample_Tree_Adjacent_Mapper')->createRecord();
+    function createSampleTreeAdjacent (array $defaults = []) {
+        return $this->getMapper('Sample_Tree_Adjacent_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -620,8 +623,8 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Tree_Combo 
      */
-    function createSampleTreeCombo () {
-        return $this->getMapper('Sample_Tree_Combo_Mapper')->createRecord();
+    function createSampleTreeCombo (array $defaults = []) {
+        return $this->getMapper('Sample_Tree_Combo_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -635,9 +638,15 @@ abstract class Sample_DomainBase extends Ac_Application {
     /**
      * @return Sample_Tree_Record 
      */
-    function createSampleTreeRecord () {
-        return $this->getMapper('Sample_Tree_Record_Mapper')->createRecord();
+    function createSampleTreeRecord (array $defaults = []) {
+        return $this->getMapper('Sample_Tree_Record_Mapper')->createRecord(false, $defaults);
     }
     
 
+    protected function doGetComponentPrototypes() {
+        $res = parent::doGetComponentPrototypes();
+        $res[self::CORE_COMPONENT_COMPONENTS_ACCESSOR] = ['class' => 'Sample_ComponentsAccessor'];
+        return $res;
+    }
+    
 }

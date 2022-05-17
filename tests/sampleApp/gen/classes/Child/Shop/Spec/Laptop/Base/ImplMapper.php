@@ -19,16 +19,6 @@ class Child_Shop_Spec_Laptop_Base_ImplMapper extends Sample_Shop_Spec_Laptop_Imp
      
  
  
-    /**
-     * @return Child_Shop_Spec_Laptop 
-     */ 
-    static function factory ($className = false,
-        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
-        trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
-            "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
-        $res = Ac_Model_Mapper::getMapper('Child_Shop_Spec_Laptop_ImplMapper')->createRecord($className);
-        return $res;
-    }
     
     /**
      * @return Child 
@@ -38,10 +28,14 @@ class Child_Shop_Spec_Laptop_Base_ImplMapper extends Sample_Shop_Spec_Laptop_Imp
     }
     
     /**
+     * Creates new ShopSpecLaptop instance that is bound to this mapper.
+     * 
+     * @param string|array $typeIdOrDefaults Id of child mapper (FALSE = create default if possible)
+     * @param array $defaults Values of object properties' to assign
      * @return Child_Shop_Spec_Laptop 
      */ 
-    function createRecord ($className = false) {
-        $res = parent::createRecord($className);
+    function createRecord($typeIdOrDefaults = false, array $defaults = []) {
+        $res = parent::createRecord($typeIdOrDefaults, $defaults);
         return $res;
     }
     

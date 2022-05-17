@@ -24,6 +24,8 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
     
     var $appBaseClass = 'Ac_Application';
     
+    var $componentsAccessorBaseClass = 'Ac_Application_ComponentsAccessor';
+    
     /**
      * Caption of whole application (defaults to appName)
      * @var string
@@ -634,6 +636,23 @@ class Ac_Cg_Domain extends Ac_Cg_Base {
     
     function getAppClass() {
         return strlen($this->appClass)? $this->appClass : $this->appName;
+    }
+    
+    function getComponentsAccessorClass() {
+        return $this->getAppClass().'_ComponentsAccessor';
+    }
+    
+    function getComponentsAccessorGenClass() {
+        return $this->getAppClass().'_GenComponentsAccessor';
+    }
+    
+    function getComponentsAccessorBaseClass() {
+        if (($pd = $this->getParentDomain())) {
+            $res = $pd->getComponentsAccessorClass();
+        } else {
+            $res = $this->componentsAccessorBaseClass;
+        }
+        return $res;
     }
     
     function getLangStrings($key = false) {

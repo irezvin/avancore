@@ -1,5 +1,8 @@
 <?php 
 
+/**
+ * @property Child_ComponentsAccessor $c Convenient access to application components
+ */
 abstract class Child_DomainBase extends Sample {
 
     protected $componentAliases = [
@@ -485,8 +488,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Person 
      */
-    function createChildPerson () {
-        return $this->getMapper('Child_Person_Mapper')->createRecord();
+    function createChildPerson (array $defaults = []) {
+        return $this->getMapper('Child_Person_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -500,8 +503,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Perk 
      */
-    function createChildPerk () {
-        return $this->getMapper('Child_Perk_Mapper')->createRecord();
+    function createChildPerk (array $defaults = []) {
+        return $this->getMapper('Child_Perk_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -515,8 +518,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Person_Album 
      */
-    function createChildPersonAlbum () {
-        return $this->getMapper('Child_Person_Album_Mapper')->createRecord();
+    function createChildPersonAlbum (array $defaults = []) {
+        return $this->getMapper('Child_Person_Album_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -530,8 +533,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Person_Photo 
      */
-    function createChildPersonPhoto () {
-        return $this->getMapper('Child_Person_Photo_Mapper')->createRecord();
+    function createChildPersonPhoto (array $defaults = []) {
+        return $this->getMapper('Child_Person_Photo_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -545,8 +548,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Person_Post 
      */
-    function createChildPersonPost () {
-        return $this->getMapper('Child_Person_Post_Mapper')->createRecord();
+    function createChildPersonPost (array $defaults = []) {
+        return $this->getMapper('Child_Person_Post_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -560,8 +563,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Publish 
      */
-    function createChildPublish () {
-        return $this->getMapper('Child_Publish_ImplMapper')->createRecord();
+    function createChildPublish (array $defaults = []) {
+        return $this->getMapper('Child_Publish_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -575,8 +578,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Relation_Type 
      */
-    function createChildRelationType () {
-        return $this->getMapper('Child_Relation_Type_Mapper')->createRecord();
+    function createChildRelationType (array $defaults = []) {
+        return $this->getMapper('Child_Relation_Type_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -590,8 +593,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Relation 
      */
-    function createChildRelation () {
-        return $this->getMapper('Child_Relation_Mapper')->createRecord();
+    function createChildRelation (array $defaults = []) {
+        return $this->getMapper('Child_Relation_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -605,8 +608,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Religion 
      */
-    function createChildReligion () {
-        return $this->getMapper('Child_Religion_Mapper')->createRecord();
+    function createChildReligion (array $defaults = []) {
+        return $this->getMapper('Child_Religion_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -620,8 +623,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Shop_Category 
      */
-    function createChildShopCategory () {
-        return $this->getMapper('Child_Shop_Category_Mapper')->createRecord();
+    function createChildShopCategory (array $defaults = []) {
+        return $this->getMapper('Child_Shop_Category_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -635,8 +638,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Shop_Classifier 
      */
-    function createChildShopClassifier () {
-        return $this->getMapper('Child_Shop_Classifier_Mapper')->createRecord();
+    function createChildShopClassifier (array $defaults = []) {
+        return $this->getMapper('Child_Shop_Classifier_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -650,8 +653,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Shop_Classifier_Type 
      */
-    function createChildShopClassifierType () {
-        return $this->getMapper('Child_Shop_Classifier_Type_Mapper')->createRecord();
+    function createChildShopClassifierType (array $defaults = []) {
+        return $this->getMapper('Child_Shop_Classifier_Type_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -665,8 +668,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Shop_Product_Extra_Code 
      */
-    function createChildShopProductExtraCode () {
-        return $this->getMapper('Child_Shop_Product_Extra_Code_ImplMapper')->createRecord();
+    function createChildShopProductExtraCode (array $defaults = []) {
+        return $this->getMapper('Child_Shop_Product_Extra_Code_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -680,8 +683,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Shop_Product_Note 
      */
-    function createChildShopProductNote () {
-        return $this->getMapper('Child_Shop_Product_Note_ImplMapper')->createRecord();
+    function createChildShopProductNote (array $defaults = []) {
+        return $this->getMapper('Child_Shop_Product_Note_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -695,8 +698,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Shop_Product 
      */
-    function createChildShopProduct () {
-        return $this->getMapper('Child_Shop_Product_Mapper')->createRecord();
+    function createChildShopProduct (array $defaults = []) {
+        return $this->getMapper('Child_Shop_Product_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -710,8 +713,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Shop_Spec_Computer 
      */
-    function createChildShopSpecComputer () {
-        return $this->getMapper('Child_Shop_Spec_Computer_ImplMapper')->createRecord();
+    function createChildShopSpecComputer (array $defaults = []) {
+        return $this->getMapper('Child_Shop_Spec_Computer_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -725,8 +728,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Shop_Spec_Food 
      */
-    function createChildShopSpecFood () {
-        return $this->getMapper('Child_Shop_Spec_Food_ImplMapper')->createRecord();
+    function createChildShopSpecFood (array $defaults = []) {
+        return $this->getMapper('Child_Shop_Spec_Food_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -740,8 +743,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Shop_Spec_Laptop 
      */
-    function createChildShopSpecLaptop () {
-        return $this->getMapper('Child_Shop_Spec_Laptop_ImplMapper')->createRecord();
+    function createChildShopSpecLaptop (array $defaults = []) {
+        return $this->getMapper('Child_Shop_Spec_Laptop_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -755,8 +758,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Shop_Spec_Monitor 
      */
-    function createChildShopSpecMonitor () {
-        return $this->getMapper('Child_Shop_Spec_Monitor_ImplMapper')->createRecord();
+    function createChildShopSpecMonitor (array $defaults = []) {
+        return $this->getMapper('Child_Shop_Spec_Monitor_ImplMapper')->createRecord(false, $defaults);
     }
     
  
@@ -770,8 +773,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Shop_Spec 
      */
-    function createChildShopSpec () {
-        return $this->getMapper('Child_Shop_Spec_Mapper')->createRecord();
+    function createChildShopSpec (array $defaults = []) {
+        return $this->getMapper('Child_Shop_Spec_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -785,8 +788,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Tag 
      */
-    function createChildTag () {
-        return $this->getMapper('Child_Tag_Mapper')->createRecord();
+    function createChildTag (array $defaults = []) {
+        return $this->getMapper('Child_Tag_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -800,8 +803,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Tree_Adjacent 
      */
-    function createChildTreeAdjacent () {
-        return $this->getMapper('Child_Tree_Adjacent_Mapper')->createRecord();
+    function createChildTreeAdjacent (array $defaults = []) {
+        return $this->getMapper('Child_Tree_Adjacent_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -815,8 +818,8 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Tree_Combo 
      */
-    function createChildTreeCombo () {
-        return $this->getMapper('Child_Tree_Combo_Mapper')->createRecord();
+    function createChildTreeCombo (array $defaults = []) {
+        return $this->getMapper('Child_Tree_Combo_Mapper')->createRecord(false, $defaults);
     }
     
  
@@ -830,9 +833,15 @@ abstract class Child_DomainBase extends Sample {
     /**
      * @return Child_Tree_Record 
      */
-    function createChildTreeRecord () {
-        return $this->getMapper('Child_Tree_Record_Mapper')->createRecord();
+    function createChildTreeRecord (array $defaults = []) {
+        return $this->getMapper('Child_Tree_Record_Mapper')->createRecord(false, $defaults);
     }
     
 
+    protected function doGetComponentPrototypes() {
+        $res = parent::doGetComponentPrototypes();
+        $res[self::CORE_COMPONENT_COMPONENTS_ACCESSOR] = ['class' => 'Child_ComponentsAccessor'];
+        return $res;
+    }
+    
 }

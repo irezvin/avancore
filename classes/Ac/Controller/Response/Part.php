@@ -51,18 +51,7 @@ class Ac_Controller_Response_Part extends Ac_Prototyped {
     protected $signature = false;
     
     protected $lock = 0;
-    
-    /**
-     * @return Ac_Controller_Response_Part
-     * @see Ac_Prototyped::factory()
-     */
-    static function factory($signature) {
-        if (is_object($signature) && $signature instanceof Ac_Controller_Response_Part) $res = $signature;
-            elseif (is_array($signature)) $res = Ac_Prototyped::factory($signature, 'Ac_Controller_Response_Part');
-            else $res = Ac_Prototyped::factory(array('class' => (string) $signature), 'Ac_Controller_Response_Part');
-        return $res;
-    }
-    
+        
     function __construct(array $options = array()) {
         $this->signature = $options;
         parent::__construct($options);

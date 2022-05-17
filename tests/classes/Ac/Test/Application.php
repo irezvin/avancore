@@ -20,4 +20,14 @@ class Ac_Test_Application extends Ac_Test_Base {
         }
     }
     
+    function testConvenientAccess() {
+        $sam = $this->getSampleApp();
+        $this->assertTrue($sam->c->people instanceof Sample_Person_Mapper);
+        $this->assertEqual(array_values($sam->db('a', 'b', 'c')->fetchRow('SELECT ?, ?, ?')), ['a', 'b', 'c']);
+        $person = $sam->createSamplePerson(['name' => 'Foo Example', 'gender' => 'M']);
+        $this->assertEqual($person->name, 'Foo Example');
+        $this->assertEqual($person->gender, 'M');
+        $this->assertEqual(array_values($person->db('a', 'b')->fetchRow('SELECT ?, ?')), ['a', 'b']);
+    }
+    
 }

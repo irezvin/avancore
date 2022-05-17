@@ -26,16 +26,6 @@ class Child_Relation_Base_Mapper extends Sample_Relation_Mapper {
         ]);
     }
     
-    /**
-     * @return Child_Relation 
-     */ 
-    static function factory ($className = false,
-        $unused1 = null, array $unused2 = [], $unused3 = false, $unused4 = null) {
-        trigger_error("Ac_Model_Mapper::factory() is deprecated and will be removed in the future; use ".
-            "Ac_Model_Mapper::createRecord() instead", E_USER_DEPRECATED);
-        $res = Ac_Model_Mapper::getMapper('Child_Relation_Mapper')->createRecord($className);
-        return $res;
-    }
     
     /**
      * @return Child 
@@ -45,10 +35,14 @@ class Child_Relation_Base_Mapper extends Sample_Relation_Mapper {
     }
     
     /**
+     * Creates new Relations instance that is bound to this mapper.
+     * 
+     * @param string|array $typeIdOrDefaults Id of child mapper (FALSE = create default if possible)
+     * @param array $defaults Values of object properties' to assign
      * @return Child_Relation 
      */ 
-    function createRecord ($className = false) {
-        $res = parent::createRecord($className);
+    function createRecord($typeIdOrDefaults = false, array $defaults = []) {
+        $res = parent::createRecord($typeIdOrDefaults, $defaults);
         return $res;
     }
     

@@ -4,6 +4,7 @@
     "appName": "Sample",
     "appClass": false,
     "appBaseClass": "Ac_Application",
+    "componentsAccessorBaseClass": "Ac_Application_ComponentsAccessor",
     "caption": "Avancore_Sample",
     "dbName": "avancore_test",
     "relationsToNonModels": false,
