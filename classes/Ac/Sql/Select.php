@@ -1,7 +1,7 @@
 <?php
 
 class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expression {
-    
+
     /**
      * @var Ac_Sql_Db
      */
@@ -99,7 +99,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
      * @return Ac_Sql_Db
      */
     function getDb() {
-        if ($this->_db === false) return new Ac_Sql_Db_Ae();
+        if ($this->_db === false) return Ac_Application::getDefaultInstance()->getDb();
         return $this->_db;
     }
     
@@ -428,52 +428,31 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
         }
         return $this->effectivePrimaryAlias;
     }
+
+    function getMapper() {
+        foreach ($this->listTableProviders() as $tp) {
+            $prov = $this->getTableProvider($tp);
+            if (method_exists($prov, 'getMapper')) return $prov->getMapper();
+        }
+        return null;
+    }
     
     /**
-     * @return Ac_Legacy_Collection
+     * @return Ac_Model_Collection_Mapper
      */
-    function createCollection($mapperClass = false, $pkName = false, $ignorePrimaryAlias = false) {
-        if (!strlen($mapperClass) && !strlen($pkName)) trigger_error("Even mapper class or pk name must be provided", E_USER_ERROR);
-        $res = new Ac_Legacy_Collection();
+    function createCollection(Ac_Model_Mapper $mapper = null) {
         
-        $this->beginCalc();
+        if (is_null($mapper)) $mapper = $this->getMapper();
+        if (!$mapper) {
+            throw Ac_E_InvalidUsage(__METHOD__.
+                ": cannot find associated Mapper; plase provide \$mapper argument"
+            );
+        }
+        return new Ac_Model_Collection_SqlMapper([
+            'mapper' => $mapper,
+            'sqlSelect' => $this
+        ]);
         
-        $orderedAliases = $this->_getOrderedAliases($this->getUsedAliases());
-        if (!count($orderedAliases)) {
-            $orderedAliases = array($this->getEffectivePrimaryAlias());
-        }
-        $t = $this->getTable($this->getEffectivePrimaryAlias());
-            
-        if ($mapperClass) {
-            $mapper = Ac_Model_Mapper::getMapper($mapperClass);
-            if ($mapper->tableName !== $t->name) 
-                trigger_error("Table of '{$mapperClass}' is '{$mapper->tableName}' and does not match name of primary table '{$t->name}'", E_USER_WARNING);
-            $res->useMapper($mapperClass);
-        }
-        else {
-            $res->useNoMapper($t->name, $pkName);
-        }
-        $res->setAlias($orderedAliases[0]);
-        foreach ($this->otherJoins as $j) $res->addJoin($j);
-        for ($i = 1; $i < count($orderedAliases); $i++) {
-            $tbl = $this->getTable($orderedAliases[$i]);
-            $res->addJoin($tbl->getJoinClausePart());
-        }
-        foreach ($this->otherJoinsAfter as $j) $res->addJoin($j);
-        if ($this->where) {
-            if (is_array($this->where)) foreach ($this->getWhereClause(false, 'plain') as $w) $res->addWhere($w);
-            else $res->addWhere($this->where);
-        }
-        if ($this->orderBy) foreach ($this->orderBy as $o) $res->addOrder($o);
-        if ($this->groupBy) $res->setGroupBy($this->getGroupByClause(false));
-        if ($this->having) $res->setHaving($this->having);
-        if ($this->limitCount) {
-            $res->setLimits($this->limitOffset, $this->limitCount);
-        }
-        
-        $this->endCalc();
-        
-        return $res;
     }
     
     /**
@@ -505,6 +484,27 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
     
     function listParts() {
         return array_keys($this->parts);
+    }
+    
+    function setPartValues(array $partValues, $resetOthers = false) {
+        foreach ($partValues as $k => $v) $this->getPart($k)->setValue($v);
+        if ($resetOthers) {
+            foreach (array_diff($this->listParts(), array_keys($partValues)) as $k) {
+                $this->getPart($k)->setValue();
+            }
+        }
+    }
+    
+    /**
+     * @return array
+     */
+    function getPartValues() {
+        $res = [];
+        foreach ($this->listParts() as $k) {
+            $part = $this->getPart($k);
+            if ($part->doesApply()) $res[$k] = $part->getValue();
+        }
+        return $res;
     }
     
     /**
@@ -583,6 +583,56 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
         }
         return $res;
     }
+    
+    /**
+     * @return array
+     */
+    function fetchArray($keyColumn = false, $withNumericKeys = false) {
+        return $this->getDb()->fetchArray($this, $keyColumn, $withNumericKeys);
+    }
+    
+    /**
+     * @return object[]
+     */
+    function fetchObjects($keyColumn = false) {
+        return $this->getDb()->fetchObjects($this, $keyColumn, $withNumericKeys);
+    }
+
+    /**
+     * @return Ac_Model_Object[]
+     */
+    function fetchInstances($keysToList = false, Ac_Model_Mapper $mapper = null) {
+        
+        if (is_null($mapper)) $mapper = $this->getMapper();
+        if (!$mapper) {
+            throw Ac_E_InvalidUsage(__METHOD__.
+                ": cannot find associated Mapper; plase provide \$mapper argument"
+            );
+        }
+        return $mapper->loadFromRows($this->fetchArray(), $keysToList);
+        
+    }
+
+    /**
+     * @return array[]
+     */
+    function fetchRow($key = false, $keyColumn = false, $withNumericKeys = false, $default = false) {
+        return $this->getDb()->fetchRow($this, $key, $keyColumn, $withNumericKeys, $default);
+    }
+    
+    /**
+     * @return array[]
+     */
+    function fetchColumn($colNo = 0, $keyColumn = false) {
+        return $this->getDb()->fetchColumn($this, $colNo, $keyColumn);
+    }
+    
+    /**
+     * @return mixed
+     */
+    function fetchValue($query, $colNo = 0, $default = null) {
+        return $this->getDb()->fetchValue($this, $colNo, $default);
+    }    
     
 }
 

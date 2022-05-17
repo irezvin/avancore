@@ -54,6 +54,8 @@ abstract class Ac_Sql_Part extends Ac_Prototyped {
      */
     protected $currentSelect = null;
     
+    protected $value = null;
+    
     function __construct($options = array()) {
         $hasValue = false;
         $value = null;
@@ -101,6 +103,7 @@ abstract class Ac_Sql_Part extends Ac_Prototyped {
     
     function bind($input) {
         if ($this->inputDecorator) $input = Ac_Decorator::decorate ($this->inputDecorator, $input, $this->inputDecorator);
+        $this->value = $input;
         if (!$this->appliedOnEmptyInput && empty($input) && $input !== 0 && $input !== '0') {
             if (empty($input) && $input !== 0 && $input !== '0') {
                 $this->applied = false;
@@ -116,8 +119,17 @@ abstract class Ac_Sql_Part extends Ac_Prototyped {
         }
     }
     
-    function setValue($value) {
+    function setValue($value = null) {
+        if (!func_num_args()) { // special format: call without arguments disables the part
+            $this->applied = false;
+            $this->value = null;
+            return;
+        }
         return $this->bind($value);
+    }
+    
+    function getValue() {
+        return $this->value;
     }
     
     function doesApply() {

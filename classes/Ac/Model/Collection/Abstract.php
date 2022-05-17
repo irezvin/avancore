@@ -315,8 +315,6 @@ abstract class Ac_Model_Collection_Abstract extends Ac_Prototyped implements Ite
      * If $groupSize is 0, will fetch all items (with regard to $limit and $offset) into memory before iterating.
      * If $groupSize is non-zero, will fetch items in blocks of $groupSize and iterate over the block, then fetch
      * new block in the end of previous block.
-     * 
-     * @see Ac_Model_Collection_Abstract::fetchItem
      */
     function fetchItem() {
         if (!$this->isOpen) {

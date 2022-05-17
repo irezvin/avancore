@@ -238,5 +238,31 @@ class Ac_Test_SqlSelect extends Ac_Test_Base {
             ')
         );
     }
+    
+    function testDbFunctions() {
+        
+        $peopleSqlSelect = $this->getSampleApp()->c->people->createSqlSelect(['partValues' => ['birthYear' => 1981]]);
+        $this->assertEqual($peopleSqlSelect->getPartValues(), ['birthYear' => 1981],
+            'getPartValues() works');
+        
+        $sql = $peopleSqlSelect.'';
+        $db = $peopleSqlSelect->getDb();
+        $this->assertEqual($peopleSqlSelect->fetchColumn('personId'), $db->fetchColumn($sql, 'personId'),
+                'sqlSelect: fetchColumn()');
+        
+        $this->assertEqual($arr = $peopleSqlSelect->fetchArray('personId'), $db->fetchArray($sql, 'personId'),
+                'sqlSelect: fetchArray()');
+        
+        $arr2 = [];
+        foreach ($peopleSqlSelect->createCollection() as $person) {
+            $arr2[] = $person->getDataFields();
+        }
+        $this->assertEqual($arr2, array_values($arr), 'sqlSelect: createCollection() works');
+        
+        $arr3 = Ac_Accessor::getObjectProperty($peopleSqlSelect->fetchInstances(true), 'dataFields',
+            'sqlSelect: fetchInstances() works');
+        $this->assertEqual($arr3, $arr);
+    }
+    
 	
 }
