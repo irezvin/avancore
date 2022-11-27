@@ -196,7 +196,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     }
     
     static function listInstances($className = null) {
-        if (strlen($className)) $res = isset(self::$instances[$className])? array_keys(self::$instances[$className]) : array();
+        if (!empty($className)) $res = isset(self::$instances[$className])? array_keys(self::$instances[$className]) : array();
         else {
             $res = array();
             foreach (self::$instances as $className => $list) {
@@ -255,7 +255,8 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
         }
         if ($this->addIncludePaths) {
             Ac_Util::addIncludePath($adapter->getClassPaths());
-            if (strlen($gp = $adapter->getGenPath()))
+            $gp = $adapter->getGenPath();
+            if (!is_null($gp) && strlen($gp))
                 Ac_Util::addIncludePath($adapter->getGenPath());
         }
         $this->initDeferredMixables();
@@ -507,7 +508,7 @@ abstract class Ac_Application extends Ac_Mixin_WithEvents {
     
     function getDefaultAssetPlaceholders() {
         $res = array();
-        if (strlen($this->defaultAssetsPlaceholder)) $res[$this->defaultAssetsPlaceholder] = $this->adapter->getWebAssetsUrl();
+        if (!empty($this->defaultAssetsPlaceholder)) $res[$this->defaultAssetsPlaceholder] = $this->adapter->getWebAssetsUrl();
         return $res;
     }
     

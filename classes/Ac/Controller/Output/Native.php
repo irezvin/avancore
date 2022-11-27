@@ -16,7 +16,7 @@ class Ac_Controller_Output_Native extends Ac_Controller_Output {
         return headers_sent();
     }
     
-    function header($header, $replace = true, $httpResponseCode = null) {
+    function header($header, $replace = true, $httpResponseCode = 0) {
         return header($header, $replace, $httpResponseCode);
     }
     

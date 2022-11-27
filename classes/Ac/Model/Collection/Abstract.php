@@ -451,24 +451,29 @@ abstract class Ac_Model_Collection_Abstract extends Ac_Prototyped implements Ite
     
     // ------------------------------ Iterator support ------------------------------
     
+    #[\ReturnTypeWillChange]
     function current() {
         return $this->currentItem;
     }
     
+    #[\ReturnTypeWillChange]
     function key() {
         return $this->currentKey;
     }
     
+    #[\ReturnTypeWillChange]
     function next() {
         $this->fetchItem();
     }    
     
+    #[\ReturnTypeWillChange]
     function rewind() {
         $this->setIsOpen(false);
         $this->setIsOpen(true);
         $this->fetchItem();
     }
     
+    #[\ReturnTypeWillChange]
     function valid() {
         return $this->currentKey !== false;
     }

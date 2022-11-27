@@ -222,22 +222,27 @@ class Tr_Node implements ArrayAccess, RecursiveIterator {
     
     // --- ArrayAccess ----
     
+    #[\ReturnTypeWillChange]
     function offsetExists($offset) {
         return isset($this->children[$offset]);
     }
     
+    #[\ReturnTypeWillChange]
     function offsetGet($offset) {
         return $this->getChild($offset);
     }
     
+    #[\ReturnTypeWillChange]
     function offsetSet($offset, $value) {
         throw new Exception("Not supported");
     }
     
+    #[\ReturnTypeWillChange]
     function offsetUnset($offset) {
         throw new Exception("Not supported");
     }
     
+    #[\ReturnTypeWillChange]
     function __toString() {
         return $this->dump();
     }
@@ -276,21 +281,25 @@ class Tr_Node implements ArrayAccess, RecursiveIterator {
     
     // --- Iterator ---
     
+    #[\ReturnTypeWillChange]
     public function current() {
         if ($this->pos !== null && $this->pos < count($this->children)) return $this->getChild($this->key());
         else return false;
     }
     
+    #[\ReturnTypeWillChange]
     public function next() {
         if ($this->pos < count($this->children)) {
             $this->pos++;
         }
     }
     
+    #[\ReturnTypeWillChange]
     public function rewind() {
         $this->pos = 0;
     }
     
+    #[\ReturnTypeWillChange]
     public function key() {
         if ($this->pos < count($this->children)) {
             $tmp = array_keys($this->children);
@@ -301,16 +310,19 @@ class Tr_Node implements ArrayAccess, RecursiveIterator {
         return $res;
     }
     
+    #[\ReturnTypeWillChange]
     public function valid() {
         return $this->pos < count($this->children);
     }
     
+    #[\ReturnTypeWillChange]
     public function hasChildren() {
         if ($this->valid()) $res = count($this->current()->getNodes()) > 0;
             else $res = false;
         return $res;
     }
     
+    #[\ReturnTypeWillChange]
     public function getChildren() {
         if ($this->valid()) {
             $res = $this->current();

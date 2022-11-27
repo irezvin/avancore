@@ -177,7 +177,7 @@ class Ac_Mixin extends Ac_Prototyped implements Ac_I_Mixin {
             if (!$mix instanceof Ac_I_Mixable) throw Ac_E_InvalidCall("\$mixables['{$id}'] must implement "
             . "Ac_I_Mixable, but ".Ac_Util::typeClass ($mix)." was provided instead");
             if (is_numeric($id)) $id = $mix->getMixableId();
-            if (is_numeric($id) || !strlen($id)) array_push($this->mixables, $mix);
+            if (is_numeric($id) || empty($id)) array_push($this->mixables, $mix);
             else {
                 if (isset($this->mixables[$id])) {
                     if (isset($this->coreMixableIds[$id])) 

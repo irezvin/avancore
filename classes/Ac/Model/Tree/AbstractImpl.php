@@ -251,7 +251,8 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
     }
     
     function notifyChildNodeAdded(Ac_I_Tree_Node $childNode) {
-        if (!strlen($childNode->getNodeId())) {
+        $id = $childNode->getNodeId();
+        if (is_null($id) || !strlen($id)) {
             $hasNode = false;
             foreach (array_keys($this->tmpChildren) as $k) {
                 if ($this->tmpChildren[$k] === $childNode) {
@@ -310,11 +311,11 @@ abstract class Ac_Model_Tree_AbstractImpl extends Ac_Prototyped implements Ac_I_
         }
         
         // still no trace of the parent? get value from the container
-        if (!strlen($currParentId) && !is_null($currParentId)) {
+        if (!is_null($currParentId) && !strlen($currParentId)) {
             $log['doGetInternalParentId()'] = $currParentId = $this->doGetInternalParentId();
         }
         
-        if (!strlen($currParentId) && !is_null($currParentId)) {
+        if (!is_null($currParentId) && !strlen($currParentId)) {
             $log['getParentIdFromDb()'] = $currParentId = $this->getParentIdFromDb();
         }
         

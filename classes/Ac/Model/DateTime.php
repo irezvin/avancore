@@ -196,7 +196,7 @@ class Ac_Model_DateTime {
             return false;
         }
         $res = array();
-        if (preg_match ("/^{$rx}\$/u", $inputString, $res)) {
+        if (preg_match ("/^{$rx}\$/u", (string) $inputString, $res)) {
             //lplp::p($res, 1);
             return $res;
         }

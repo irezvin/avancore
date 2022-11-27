@@ -282,7 +282,7 @@ class Ac_Sql_Updater extends Ac_Prototyped implements Ac_I_Sql_Expression {
             if (is_object($this->src) && ($this->src instanceof Ac_Sql_Select)) {
                 $db = $this->src->getDb();
             }
-            if (!$db) $db = Ac_Application::getDefaultInstance()->getDb();
+            if (!$db) $db = Ac_Sql_Db::getDefaultInstance();
         }
         if (!$db) throw new Ac_E_InvalidUsage("Cannot obtain Ac_Sql_Db instance during execute(); please provide \$db argument");
         foreach ($this->getExpression($db, true) as $stmt) {

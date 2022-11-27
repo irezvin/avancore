@@ -47,7 +47,7 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
     /**
      * @var array
      */
-    var $_rqData = false;
+    var $_rqData = [];
     
     /**
      * @var array
@@ -239,7 +239,7 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
         $this->_response = false;
         $this->_state = array();
         $this->_stateData = false;
-        $this->_rqData = false;
+        $this->_rqData = [];
         $this->_rqWithState = false;
         $this->_tplData = array();
         $this->_templatePart = false;
@@ -519,7 +519,7 @@ class Ac_Controller extends Ac_Prototyped implements Ac_I_Controller, Ac_I_Named
         if ($this->_template) return $this->_template;
         if (!$this->_templateClass) return null;
         $tc = $this->_templateClass;
-        $this->_template = new $tc();
+        $this->_template = new $tc(['app' => $this->app]);
         if ($this->_response === false) {
             if ($rc = $this->getResponseClass()) {
                 $this->_response = new $rc;

@@ -32,7 +32,7 @@ class Ac_Cache_Accessor {
         if (func_num_args()) $this->uns = $unserialize;
         if (!$this->cache) return null;
         $this->value = $this->cache->get($this->id, $this->group, null, $this->evenOld);
-        if ($this->uns && strlen($this->value)) $this->value = unserialize($this->value);
+        if ($this->uns && !is_null($this->value) && strlen($this->value)) $this->value = unserialize($this->value);
         return $this->value;
     }
     
@@ -41,7 +41,7 @@ class Ac_Cache_Accessor {
      */
     function getData() {
         $this->uns = true;
-        if ($this->value !== false) $this->value = strlen($this->value)? unserialize($this->value) : null;
+        if ($this->value !== false) $this->value = (!is_null($this->value) && strlen($this->value))? unserialize($this->value) : null;
         if ($this->value === false) $this->getValue();
         return $this->value;
     }

@@ -223,7 +223,7 @@ class Ac_Model_Tree_AdjacencyListImpl extends Ac_Model_Tree_AbstractImpl {
         $newParentId = $this->container->getField($this->parentField);
         $newOrdering = $this->container->getField($this->orderingField);
         
-        if (!strlen($newParentId)) $newParentId = $this->defaultParentValue;
+        if (is_null($newParentId) || !strlen($newParentId)) $newParentId = $this->defaultParentValue;
         
         $isParentIdChanged = $newParentId != $this->origParentId;
         

@@ -453,7 +453,7 @@ class Ac_Model_Data extends Ac_Mixin_WithEvents {
     
     function _checkOwnFields() {
         $val = $this->_createValidator();
-        $fieldsToCheck = false;
+        $fieldsToCheck = [];
         $val->fieldList = array();
         foreach ($this->listFields() as $propName) {
             if ($this->_getPlural($propName) && $keys = $this->listProperty($propName)) {

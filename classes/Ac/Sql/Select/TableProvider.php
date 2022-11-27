@@ -40,7 +40,7 @@ class Ac_Sql_Select_TableProvider extends Ac_Prototyped {
      */
     static function createSelect($mapperClass, $db, $alias = 't') {
 		if (empty($db)) {
-			$aDb = Ac_Application::getDefaultInstance()->getDb();
+			$aDb = Ac_Sql_Db::getDefaultInstance();
 		} else {
 			$aDb = $db;
 		}

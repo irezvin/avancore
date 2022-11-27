@@ -19,7 +19,8 @@ abstract class Ac_Sql_Dialect {
     }
     
     function nameQuote($name) {
-        return $this->nameQuoteChar.str_replace($this->nameQuoteChar, "\\".$this->nameQuoteChar, $name).$this->nameQuoteChar;
+        if (is_null($name)) $name = '';
+        return $this->nameQuoteChar.str_replace($this->nameQuoteChar, $this->nameQuoteChar.$this->nameQuoteChar, $name).$this->nameQuoteChar;
     }
     
     function nameUnquote($name) {

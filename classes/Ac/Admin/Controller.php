@@ -42,6 +42,7 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
                 'username' => ['class' => 'Ac_Form_Control_Text', 'required' => true],
                 'password' => ['class' => 'Ac_Form_Control_Text', 'type' => 'password', 'required' => true],
                 'submit' => ['class' => 'Ac_Form_Control_Button', 'buttonType' => 'submit', 'caption' => 'Log In'],
+                'redir' => ['class' => 'Ac_Form_Control_Text', 'type' => 'hidden', 'showWrapper' => false],
             ],
             'submissionControl' => 'submit'
         ];
@@ -54,7 +55,10 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         if (!in_array($methodName, $this->publicMethods)) {
             $user = $this->getApplication()->getUser();
             if (!$user) {
-                $this->_response->redirectUrl = $this->getUrl(['action' => 'login']);
+                $this->_response->redirectUrl = $this->getUrl([
+                    'action' => 'login',
+                    'redir' => $_SERVER['REQUEST_URI'],
+                ]);
                 return false;
             }
         }
@@ -74,9 +78,22 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         return $this->getUrl(['action' => 'dashboard']);
     }
     
+    protected function redirAfterLogin() {
+        $redir = $this->_context->getData('redir');
+        if (!strlen($redir)) {
+            $menu = array_values($this->getMenu());
+            if ($menu) {
+                $redir = $this->getUrl($menu[0]->query);
+            }
+        }
+        if (!strlen($redir)) $redir = $this->getDefaultLocation();
+        $this->_response->redirectUrl = $redir;
+    }
+    
     function executeLogin() {
         if ($this->getApplication()->getUser()) {
             $this->_templatePart = 'loggedIn';
+            $this->redirAfterLogin();
             return;
         }
         $loginForm = $this->createLoginForm();
@@ -88,15 +105,7 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         $errors = [];
         $errors = ['password' => 'Username / password do not match'];
         if ($this->getApplication()->login($data, $errors)) {
-            $redir = $this->_context->getData('redir');
-            if (!strlen($redir)) {
-                $menu = array_values($this->getMenu());
-                if ($menu) {
-                    $redir = $this->getUrl($menu[0]->query);
-                }
-            }
-            if (!strlen($redir)) $redir = $this->getDefaultLocation();
-            $this->_response->redirectUrl = $redir;
+            $this->redirAfterLogin();
         } else {
             $loginForm->errors = $errors;
         }
@@ -108,7 +117,7 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
     
     function executeLogout() {
         $this->getApplication()->logout();
-        $redir = $this->_context->getData('redir');        
+        $redir = $this->_context->getData('redir');
         if (!strlen($redir)) $redir = $this->getUrl(['action' => 'login']);
         $this->_response->redirectUrl = $redir;
     }
@@ -177,28 +186,31 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         $this->saveState($state, $dataPath);
 	}    
 
-    function executeManager($mapper) {
-                
-        $mapperId = $mapper;
-        $mapper = null;
+    /**
+     * @return Ac_Admin_Manager
+     */
+    function createManager($mapper, Ac_Controller_Context $context = null) {
         
-        $bu = $this->getUrl(array($this->_methodParamName => 'manager', 'mapper' => $mapperId));
-        unset($bu->query['managerAction']);
-        $contextOptions = array(
-            'baseUrl' => $bu,
-            'isInForm' => 'aForm',
-        );
-        $pathInfo = $this->param('__pathInfo__');
-        $context = new Ac_Controller_Context_Http($contextOptions);
-        $context->populate('request', $this->_context->getDataPath());
-        if ($pathInfo) $context->updateData(['__pathInfo__' => $pathInfo]);
-        $this->applyState($context, $mapperId);
+        if (!(is_object($mapper))) $mapper = $this->app->getMapper($mapper);
 
+        $mapperId = $mapper->getId();
+        
         $managerConfig = array('mapperClass' => $mapperId);
-        $mapper = Ac_Model_Mapper::getMapper($mapperId);
-
-        if (!$mapper) throw new Ac_Controller_Exception("No such mapper: ".$mapperId, 404);
-
+        
+        if (is_null($context)) {
+            $bu = $this->getUrl(array($this->_methodParamName => 'manager', 'mapper' => $mapperId));
+            unset($bu->query['managerAction']);
+            $contextOptions = array(
+                'baseUrl' => $bu,
+                'isInForm' => 'aForm',
+            );
+            $pathInfo = $this->param('__pathInfo__');
+            $context = new Ac_Controller_Context_Http($contextOptions);
+            $context->populate('request', $this->_context->getDataPath());
+            if ($pathInfo) $context->updateData(['__pathInfo__' => $pathInfo]);
+            $this->applyState($context, $mapperId);
+        }
+        
         if (strlen($mapper->managerClass)) $class = $mapper->managerClass;
             else $class = 'Ac_Admin_Manager';
         if ($extra = $mapper->getManagerConfig()) {
@@ -211,6 +223,21 @@ class Ac_Admin_Controller extends Ac_Controller implements Ac_I_WithEvents {
         $manager->_methodParamName = 'managerAction';
         $manager->setApplication($this->getApplication());
         $manager->setContext($context);
+        
+        return $manager;
+    }
+    
+    function executeManager($mapper) {
+                
+        $mapperId = $mapper;
+        $mapper = null;
+        
+        $mapper = Ac_Model_Mapper::getMapper($mapperId);
+
+        if (!$mapper) throw new Ac_Controller_Exception("No such mapper: ".$mapperId, 404);
+
+        $manager = $this->createManager($mapper);
+        
         $response = $manager->getResponse();
         if ($response->noWrap) {
             $this->_response = $response;

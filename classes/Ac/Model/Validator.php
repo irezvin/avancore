@@ -236,7 +236,7 @@ class Ac_Model_Validator {
     function valueIsEmpty($value) {
         if (is_object($value)) $res = false;
         elseif (is_array($value)) $res = !count($value);
-        else $res = !strlen($value);
+        else $res = is_null($value) || !strlen($value);
         return $res;
     }
     

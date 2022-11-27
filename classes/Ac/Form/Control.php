@@ -685,7 +685,7 @@ class Ac_Form_Control extends Ac_Controller {
         if ($this->caption === false) {
             $res = ucfirst($this->name);
             if ($p = $this->getModelProperty()) {
-                if (strlen($p->caption)) $res = $p->caption;
+                if (!is_null($p->caption) && strlen($p->caption)) $res = $p->caption;
             }
         } else {
             $res = $this->caption;

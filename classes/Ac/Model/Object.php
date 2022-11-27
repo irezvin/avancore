@@ -1055,7 +1055,7 @@ abstract class Ac_Model_Object extends Ac_Model_Data implements Ac_I_CollectionA
                     }
                     // set nullable empty foreign keys to null
                     if ($c || $this->isChanged($fieldName, true)) {
-                        if (!strlen($this->$fieldName) && $details['isNullable']) {
+                        if ((is_null($this->$fieldName) || !strlen($this->$fieldName)) && $details['isNullable']) {
                             $this->$fieldName = null;
                             $null = true;
                         }

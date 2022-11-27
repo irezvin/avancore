@@ -161,7 +161,7 @@ class Ac_Application_FrontController extends Ac_Application_Component {
             }
 
             if (strlen($this->defaultController)) {
-                if (!strlen($controllerId)) $controllerId = $this->defaultController;
+                if (empty($controllerId)) $controllerId = $this->defaultController;
             }
         }
         

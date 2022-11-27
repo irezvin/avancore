@@ -3,6 +3,11 @@
 abstract class Ac_Sql_Db extends Ac_Prototyped {
 
     static $defaultIndent = 4;
+
+    /**
+     * @var Ac_Sql_Db
+     */
+    protected static $defaultInstance = null;
     
     var $triggerErrorsOnSqlErrors = true;
     
@@ -490,6 +495,19 @@ abstract class Ac_Sql_Db extends Ac_Prototyped {
             $this->query($cmd);
         }
     }
-    
+
+    static function setDefaultInstance(Ac_Sql_Db $instance = null) {
+        self::$defaultInstance = $instance;
+    }
+
+    /**
+     * @return Ac_Sql_Db
+     */
+    static function getDefaultInstance($asIs = false) {
+        if (!$asIs && !self::$defaultInstance && class_exists('Ac_Application', false)) {
+             return Ac_Application::getDefaultInstance()->getDb();
+        }
+        return self::$defaultInstance;
+    }
 }
 

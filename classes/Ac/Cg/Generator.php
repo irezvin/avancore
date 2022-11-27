@@ -520,6 +520,7 @@ class Ac_Cg_Generator extends Ac_Prototyped {
         } else {
             if (is_string($json)) $json = json_decode ($json, true);
         }
+        if (!is_array($this->_domains)) $this->_domains = [];
         if (!is_array($json)) throw new Ac_E_InvalidCall("\$json not an array");
         if (!isset($json['__class']) || $json['__class'] !== 'Ac_Cg_Domain') {
             throw new Exception ("'__class' => 'Ac_Cg_Domain' missing in \$json data");

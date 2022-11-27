@@ -88,7 +88,7 @@ class Ac_Test_Collection extends Ac_Test_Base {
                 'myCallback' => new Ac_Model_Criterion_Callback(array($this, 'myCallback'))
             )
         ));
-        $this->checkedPeople = false;
+        $this->checkedPeople = [];
         $c->setQuery(array('myCallback' => true, 'notTest' => true));
         $itemsA = array();
         foreach ($c->fetchGroup() as $guy) $itemsA[$guy->personId] = $guy->name;

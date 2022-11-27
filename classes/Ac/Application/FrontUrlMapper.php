@@ -293,7 +293,7 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
             $controllerId = $params[$this->controllerParam];
         }
         
-        if (strlen($this->defaultController)  && !strlen($controllerId)) $controllerId = $this->defaultController;
+        if ($this->defaultController !== null && strlen($this->defaultController) && !($controllerId !== null && strlen($controllerId))) $controllerId = $this->defaultController;
         
         if (!strlen($controllerId)) return parent::moveParamsToString($params);
         
@@ -327,9 +327,9 @@ class Ac_Application_FrontUrlMapper extends Ac_UrlMapper_UrlMapper implements Ac
             $controllerId = $params[$this->controllerParam];
         }
         
-        if (strlen($this->defaultController)  && !strlen($controllerId)) $controllerId = $this->defaultController;
+        if (!empty($this->defaultController)  && empty($controllerId)) $controllerId = $this->defaultController;
         
-        if (!strlen($controllerId)) return $params;
+        if (empty($controllerId)) return $params;
         
         $childMapper = $this->getChildMapper($controllerId);
         

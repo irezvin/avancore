@@ -221,7 +221,7 @@ class Ac_UrlMapper_Pattern extends Ac_Prototyped {
                     if (preg_match($condition, '')) continue;
                     return;
                 }
-                if (!preg_match($condition, $params[$param])) return;
+                if (!preg_match($condition, (string) $params[$param])) return;
             } elseif ($condition === true) {
                 if (!array_key_exists($param, $params)) return;
                 if (!strlen($params[$param])) return;

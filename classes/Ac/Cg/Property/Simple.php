@@ -65,7 +65,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
     function processType() {
         $dataType = false;
         $controlType = false;
-        $valueList = false;
+        $valueList = [];
         
         $numeric = false;
         $default = false;
@@ -105,7 +105,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
                 }
                 $this->_useMaxLength();
                 $numeric = true;
-                if (strlen($default)) $default = intval($default);
+                if (!is_null($default) && strlen($default)) $default = intval($default);
                 if (!$this->_col->nullable && is_null($this->_col->default) && !in_array($this->_col->name, $this->_model->tableObject->listPkFields()))
                     $default = 0;
                 break;
@@ -128,7 +128,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
                     $this->extraPropertyInfo['internalDateFormat'] = 'Y-m-d H:i:s';
                 if (!isset($this->extraPropertyInfo['outputDateFormat']))
                     $this->extraPropertyInfo['outputDateFormat'] = 'Y-m-d H:i:s';
-                if (!strlen($default) && !is_null($default)) $default = '0000-00-00 00:00:00'; 
+                if (!is_null($default) && strlen($default)) $default = '0000-00-00 00:00:00'; 
                 if ($default == 'CURRENT_TIMESTAMP') $default = false;
                 break;
                 
@@ -157,7 +157,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
             case 'DECIMAL':    
                 $dataType = 'float';
                 $numeric = true;
-                if (strlen($default)) $default = floatval($default);
+                if (!is_null($default) && strlen($default)) $default = floatval($default);
                 if (!$this->_col->nullable && is_null($this->_col->default) && !in_array($this->_col->name, $this->_model->tableObject->listPkFields()))
                     $default = 0;
                 break;
@@ -185,7 +185,7 @@ class Ac_Cg_Property_Simple extends Ac_Cg_Property {
         }
         
         if (!$this->dataType) $this->dataType = $dataType;
-        if (!$this->valueList) $this->valueList = $valueList;
+        if (!$this->valueList && $valueList) $this->valueList = $valueList;
         if ($this->default === false) $this->default = $default;
         $this->isNullable = $this->_col->nullable;
         

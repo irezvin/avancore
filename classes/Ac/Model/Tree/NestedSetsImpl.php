@@ -52,7 +52,7 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     
     protected function getTreeNode() {
         if ($this->treeNode === false) {
-            if ($this->container && strlen($this->container->{$this->modelIdField})) {
+            if ($this->container && !empty($this->container->{$this->modelIdField})) {
                 $this->treeNode = $this->nestedSets->getNode($this->container->{$this->modelIdField});
                 if (!$this->treeNode) $this->treeNode = false;
             }
@@ -67,7 +67,7 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     function setParentNode(Ac_I_Tree_Node $parentNode = null) {
         if ($parentNode && !($parentNode instanceof Ac_Model_Tree_NestedSetsImpl))
         	throw new Exception("\$parentNode can be only Ac_Model_Tree_NestedSetsImpl instance, '".get_class($parentNode)."' given");
-        if ($parentNode && strlen($id = $parentNode->getNodeId())) {
+        if ($parentNode && !is_null($id = $parentNode->getNodeId()) && strlen($id)) {
             $this->setParentNodeId($id);
         } else {
             parent::setParentNode($parentNode);
@@ -196,7 +196,7 @@ class Ac_Model_Tree_NestedSetsImpl extends Ac_Model_Tree_AbstractImpl {
     
     protected function createNodeIfContainerPersists() {
         $res = false;
-        if (!$this->getTreeNode() && $this->container && strlen($cntId = $this->container->{$this->modelIdField})) {
+        if (!$this->getTreeNode() && $this->container && !empty($cntId = $this->container->{$this->modelIdField})) {
             $parentId = $this->getParentIdIfChanged();
             if (is_null($parentId)) $parentId = $this->getRootNodeId();
             if (strlen($parentId)) {

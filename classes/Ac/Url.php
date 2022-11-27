@@ -210,7 +210,7 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
 //        if (preg_match('#/sc/#', $this->path)) {
 //            Ac_Debug::ddd($pathInfo, $this->path);
 //        }
-        if (strlen($pathInfo)) {
+        if (!is_null($pathInfo) && strlen($pathInfo)) {
             $res = rtrim($this->path, '/').'/'.ltrim($pathInfo, '/');
         } else {
             $res = $this->path;
@@ -550,6 +550,7 @@ class Ac_Url implements Ac_I_RedirectTarget, JsonSerializable {
         return $res;
     }
 
+    #[\ReturnTypeWillChange]
     public function jsonSerialize() {
         return ''.$this;
     }

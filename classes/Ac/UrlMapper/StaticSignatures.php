@@ -32,6 +32,10 @@ class Ac_UrlMapper_StaticSignatures extends Ac_UrlMapper_UrlMapper {
      * @var array
      */
     protected $ignoreMethods = array();
+    
+    protected $argRegexes = [];
+    
+    protected $customPatterns = array();
 
     function setControllerClass($controllerClass) {
         if ($this->controllerClass === $controllerClass) return;
@@ -72,8 +76,6 @@ class Ac_UrlMapper_StaticSignatures extends Ac_UrlMapper_UrlMapper {
     function getMethodParamName() {
         return $this->methodParamName;
     }    
-    
-    protected $customPatterns = array();
     
     function setPatterns(array $patterns = array(), $overwrite = false) {
         $this->patterns = false;
@@ -125,7 +127,7 @@ class Ac_UrlMapper_StaticSignatures extends Ac_UrlMapper_UrlMapper {
     
     protected function makePatternDefinition($path, array $const = array()) {
         $path = $this->prefix.$path;
-        if (substr($path, -1)) $path = substr($path, 0, -1) . $this->suffix;
+        if (substr($path, -1) == "/") $path = substr($path, 0, -1) . $this->suffix;
         if ($const) $res = array('definition' => $path, 'const' => $const);
         else $res = $path;
         return $res;
@@ -146,9 +148,21 @@ class Ac_UrlMapper_StaticSignatures extends Ac_UrlMapper_UrlMapper {
             $path[] = "/";
             $const[$methodParamName] = null;
         }
-        foreach ($args as $name => $required) {
-            if ($required) $path[] = "{{$name}}/";
-            else $opt[$name] = "{{$name}}/";
+        foreach ($args as $argName => $required) {
+            $argRegex = null;
+            if (isset($this->argRegexes[$methodName.'.'.$argName])) {
+                $argRegex = $this->argRegexes[$methodName.'.'.$argName];
+            }
+            else if (isset($this->argRegexes[$argName])) {
+                $argRegex = $this->argRegexes[$argName];
+            }
+            if ($argRegex) {
+                $pattern = "{?'{$argName}'{$argRegex}}";
+            } else {
+                $pattern = "{{$argName}}/";
+            }
+            if ($required) $path[] = $pattern;
+            else $opt[$argName] = $pattern;
         }
         $res = array();
         if (count($path)) {
@@ -182,5 +196,27 @@ class Ac_UrlMapper_StaticSignatures extends Ac_UrlMapper_UrlMapper {
         return $this->ignoreMethods;
     }    
 
+    /**
+     * Sets custom regexes for controller's parameter values. 
+     * 
+     * Array key is 'param' or 'method.param', array value is part of regular expression, without
+     * delimiter, for that param. Delimiter used in UriMapper is "~", therefore "~" must be escaped.
+     * Method names usually begin with 'execute'.
+     * 
+     * By default, as per Ac_UrlMapper_Pattern, any SEF URI parameter is expected 
+     * to be a sequence of 'word' characters.
+     * 
+     * @param array $argRegexes
+     */
+    function setArgRegexes(array $argRegexes) {
+        $this->argRegexes = $argRegexes;
+    }
+
+    /**
+     * @return array
+     */
+    function getArgRegexes() {
+        return $this->argRegexes;
+    }
     
 }

@@ -152,7 +152,7 @@ class Ac_Template extends Ac_Prototyped {
         return $this->l($langString, $defaultOrArgs, $return);
     }
 
-    function setApp(Ac_Application $app) {
+    function setApp(Ac_Application $app = null) {
         $this->app = $app;
     }
 

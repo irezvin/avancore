@@ -279,6 +279,21 @@ abstract class Ac_Util {
         return explode('[', str_replace(']', '', $path));
     }
     
+    
+    /**
+     * Converts more url-friendly 'field path' "foo.bar.baz" into old Ac "foo[bar][baz]" notation
+     */
+    static function dotPathToBrackets($dotPath) {
+        return Ac_Util::arrayToPath(explode(".", $dotPath));
+    }
+    
+    /**
+     * Converts more url-friendly 'field path' "foo-bar-baz" into old Ac "foo[bar][baz]" notation
+     */
+    static function kebabPathToBrackets($kebabPath) {
+        return Ac_Util::arrayToPath(explode("-", $kebabPath));
+    }
+    
     /**
      * Transforms array('foo', 'bar', 'baz') into foo[bar][baz]
      */
@@ -910,7 +925,7 @@ abstract class Ac_Util {
         
         if (!strlen($charset)) $charset = null;
         if ($double_encode) return htmlspecialchars($string, $quote_style, $charset);
-        return htmlspecialchars($string, $quote_style, $charset, $double_encode);
+        return htmlspecialchars((string) $string, $quote_style, $charset, $double_encode);
     }
     
     static function addTrailingSlash($string, $slashes = '/\\', $slashType = DIRECTORY_SEPARATOR) {

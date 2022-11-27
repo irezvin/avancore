@@ -92,7 +92,7 @@ class Ac_Form_Control_Listable extends Ac_Form_Control {
             $arrValue = $this->_processArrValue($arrValue);
             $res = implode($sep, $arrValue);
         } else {
-            if ($this->trim) $value = trim($value);
+            if ($this->trim && !is_null($value)) $value = trim($value);
             $res = $value;
         }
         return $res;

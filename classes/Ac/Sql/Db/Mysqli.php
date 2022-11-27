@@ -30,7 +30,7 @@ class Ac_Sql_Db_Mysqli extends Ac_Sql_Db {
 
     protected $socket = null;
 
-    protected $flags = null;
+    protected $flags = 0;
 
     function setHost($host) {
         $this->host = $host;

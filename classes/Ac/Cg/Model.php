@@ -827,7 +827,7 @@ class Ac_Cg_Model extends Ac_Cg_Base {
                 }
                 $props[$prop->className]['props'][] = $i;
                 if (!isset($props[$prop->className]['byVarName'][$v = $prop->getDefaultVarName(true)])) {
-                    $props[$prop->className]['byVarName'][$v][] = 1;
+                    $props[$prop->className]['byVarName'][$v] = 1;
                 } else {
                     $props[$prop->className]['byVarName'][$v]++;
                     $props[$prop->className]['unresolved'] = 1;

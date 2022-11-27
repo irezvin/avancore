@@ -1110,6 +1110,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             if (isset($this->associations[$k]) && $this->associations[$k] !== $a) {
                 throw Ac_E_InvalidCall::alreadySuchItem('association', $k);
             }
+            if (!is_array($this->associations)) $this->associations = [];
             $this->associations[$k] = $a;
         }
         return $objects;
@@ -1838,7 +1839,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     }
     
     function getIdentifier(Ac_Model_Object $record) {
-        if (strlen($this->identifierField)) {
+        if (!is_null($this->identifierField) && strlen($this->identifierField)) {
             $res = $record->{$this->identifierField};
             if ($res === false) $res = $this->getStorage()->getIdentifier($record);
         } else {
@@ -1999,7 +2000,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
     
     function getIdentifierOfObject($object) {
         $res = $this->getIdentifier($object);
-        if (!strlen($res)) $res = self::INSTANCE_ID_PREFIX.$object->getModelObjectInstanceId();
+        if (is_null($res) || !strlen($res)) $res = self::INSTANCE_ID_PREFIX.$object->getModelObjectInstanceId();
         return $res;
     }
     
@@ -2199,7 +2200,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
             if (strlen($pField) && count($fieldCrit) === 1 && $fieldCrit[0] == $pField) $idField = $pField;
             elseif (strlen($pField) && count($fieldCrit) === 1 && $fieldCrit[0] == Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION) $idField = Ac_I_Search_FilterProvider::IDENTIFIER_CRITERION;
             
-            if (strlen($idField) && count($fieldCrit) === 1 && $fieldCrit[0] == $idField) {
+            if (!is_null($idField) && strlen($idField) && count($fieldCrit) === 1 && $fieldCrit[0] == $idField) {
                 
                 // SPECIAL CASE - only identifier provided
                 
@@ -2246,7 +2247,7 @@ class Ac_Model_Mapper extends Ac_Mixin_WithEvents implements Ac_I_LifecycleAware
                 }
                 if (count($scalarValues) === count($crit)) { // only simple criteria here. TODO: allow callbacks too
                     $byId = false;
-                    if (strlen($idField) && isset($scalarValues[$idField])) { // we have identifier here
+                    if (!is_null($idField) && strlen($idField) && isset($scalarValues[$idField])) { // we have identifier here
                         $byId = true;
                     } else {
                         $uidx = array();

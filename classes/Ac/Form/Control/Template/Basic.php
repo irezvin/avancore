@@ -494,7 +494,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
             }
         } else { ?>
             <span class='readOnly' <?php if ($control->htmlAttribs) echo Ac_Util::mkAttribs($control->htmlAttribs); ?>>
-                <?php if (strlen($control->getDisplayValue())) $this->d ($control->getOutputText(), $control->allowHtml); else $this->d($control->getEmptyCaption()); ?>
+                <?php if (strlen(''.$control->getDisplayValue())) $this->d($control->getOutputText(), $control->allowHtml); else $this->d($control->getEmptyCaption()); ?>
                 
             </span>       
 <?php   }
@@ -664,7 +664,7 @@ class Ac_Form_Control_Template_Basic extends Ac_Form_Control_Template {
     function _showReadOnlyList($control, $listItems) {
         $captions = array();
         foreach($listItems as $item) {
-            if ($item['selected']) $captions[] = $control->isHtmlAllowed()? $item['caption'] : htmlspecialchars($item['caption'], null, $this->charset);
+            if ($item['selected']) $captions[] = $control->isHtmlAllowed()? $item['caption'] : htmlspecialchars($item['caption'], ENT_QUOTES, $this->charset);
         }
 ?>
         

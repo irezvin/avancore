@@ -99,7 +99,7 @@ class Ac_Sql_Select extends Ac_Sql_Select_TableProvider implements Ac_I_Sql_Expr
      * @return Ac_Sql_Db
      */
     function getDb() {
-        if ($this->_db === false) return Ac_Application::getDefaultInstance()->getDb();
+        if ($this->_db === false) return Ac_Sql_Db::getDefaultInstance();
         return $this->_db;
     }
     

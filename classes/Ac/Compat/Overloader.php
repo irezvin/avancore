@@ -43,7 +43,7 @@ trait Ac_Compat_Overloader {
     }
     
     protected static function implCompatOverloaderAction($class, $action, $old, $new, $mode) {
-        if ($action === null) $action = Ac_Compat_Overloader::$defaultAction;
+        if ($action === null) $action = self::$defaultAction;
         if (!$action) return;
         $newMsg = $new;
         $oldMsg = $old;

@@ -226,9 +226,9 @@ class Ac_Test_Model extends Ac_Test_Base {
             foreach($mmk as $key) $mmn[] = $mn[$key];
             foreach($omk as $key) $omn[] = $mn[$key];
             foreach ($mmn as $method) 
-                if (strlen($method) && !$c($mapper, $method)) $nonMatching[$id]['mapper'][] = $method;
+                if (!empty($method) && !$c($mapper, $method)) $nonMatching[$id]['mapper'][] = $method;
             foreach ($omn as $method) 
-                if (strlen($method) && !$c($o, $method)) $nonMatching[$id]['model'][] = $method;
+                if (!empty($method) && !$c($o, $method)) $nonMatching[$id]['model'][] = $method;
         }
         if (!$this->assertTrue(!count($nonMatching), 'All mapper & model methods must be correctly set in Association')) {
             var_dump($nonMatching);

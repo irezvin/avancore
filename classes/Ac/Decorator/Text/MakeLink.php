@@ -9,7 +9,7 @@ class Ac_Decorator_Text_MakeLink extends Ac_Decorator {
     var $linkText = false;
     
     function apply($value) {
-        if (!strlen($value)) $res = '';
+        if (is_null($value) || !strlen($value)) $res = '';
         else {
 	        $attribs = $this->attribs;
 	        if (!isset($attribs['href']) || !strlen($attribs['href'])) $attribs['href'] = $value;

@@ -853,7 +853,7 @@ class Ac_Admin_Manager extends Ac_Controller {
     
     protected function initActions() {
         $this->_actions = array();
-        $actionPrototypes = false;
+        $actionPrototypes = [];
         foreach ($this->listFeatures() as $f)  {
             $feat = $this->getFeature($f);
             $a = $feat->getActions();
@@ -1443,8 +1443,9 @@ class Ac_Admin_Manager extends Ac_Controller {
             $this->_returnUrl = $this->getContext()->getData('returnUrl', null);
             if (is_null($this->_returnUrl)) {
                 $tmp = $this->getContext()->getData('returnUrl64', null);
-                if (strlen($tmp) && strlen($tmp = base64_decode($tmp))) 
+                if (!is_null($tmp) && strlen($tmp) && strlen($tmp = base64_decode($tmp))) {
                     $this->_returnUrl = $tmp;
+                }
             }
         }
         return $this->_returnUrl;

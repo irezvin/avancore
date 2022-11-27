@@ -302,6 +302,7 @@ abstract class Ac_Accessor {
      * @return bool
      */
     static function methodExists($object, $methodName) {
+        if (is_null($methodName)) return false;
         if (method_exists($object, $methodName)) return true;
         if (method_exists($object, 'hasMethod')) return $object->hasMethod($methodName);
         return false;
@@ -320,6 +321,19 @@ abstract class Ac_Accessor {
         } else return is_callable ($name);
     }
     
+    static function declaresArray(ReflectionParameter $reflectionParameter): bool
+    {
+        $reflectionType = $reflectionParameter->getType();
+
+        if (!$reflectionType) return false;
+
+        $types = $reflectionType instanceof ReflectionUnionType
+            ? $reflectionType->getTypes()
+            : [$reflectionType];
+
+       return in_array('array', array_map(fn(ReflectionNamedType $t) => $t->getName(), $types));
+    }
+
     static function getMethodSignature($class, $method) {
         if (!isset(self::$methodSignatures[$key = $class.'::'.$method])) {
             self::$methodSignatures[$key] = array();
@@ -327,7 +341,8 @@ abstract class Ac_Accessor {
             foreach ($m->getParameters() as $param) {
                 $s = $param.'';
                 $class = false;
-                if (!$param->isArray()) {
+                $arr = self::declaresArray($param);
+                if ($arr) {
                     $ss = explode(">", $s, 2);
                     $s1 = explode(" ", ltrim($ss[1], ' '), 2);
                     if ($s1[0][0] !== '$') $class = $s1[0];
@@ -336,7 +351,7 @@ abstract class Ac_Accessor {
                 self::$methodSignatures[$key][$paramName = $param->getName()] = array(
                     'name' => $param->getName(),
                     'class' => $class,
-                    'isArray' => $param->isArray(),
+                    'isArray' => $arr,
                     'optional' => $param->isOptional(),
                     'defaultValue' => $param->isOptional()? $param->getDefaultValue() : null,
                     'string' => $s,

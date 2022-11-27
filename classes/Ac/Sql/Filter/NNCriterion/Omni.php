@@ -52,7 +52,7 @@ class Ac_Sql_Filter_NNCriterion_Omni extends Ac_Sql_Filter_NNCriterion {
             $db = $this->currentSelect->getDb();
         }
         if (!$db) {
-            $db = Ac_Application::getDefaultInstance()->getDb();
+            $db = Ac_Sql_Db::getDefaultInstance();
         }
         // TODO: Optimization 1: remove duplicates from values! (how??? sort keys??? make a tree???)
         // TODO: Optimization 2: make nested criterias depending on values cardinality

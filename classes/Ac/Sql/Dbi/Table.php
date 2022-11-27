@@ -33,7 +33,7 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
     
     var $_relations = false;
     
-    var $_extras = array();
+    var $_extras = [];
     
     protected function setExtras(array $extras) {
         $this->_extras = $extras;
@@ -45,6 +45,7 @@ class Ac_Sql_Dbi_Table extends Ac_Sql_Dbi_Object {
     
     function listColumns() {
         if ($this->_columns === false) {
+            $this->_columns = [];
             $allColumns = $this->_inspector->getColumnsForTable($this->_database->deprefixizeTable($this->name), $this->_database->name);
             if (isset($this->_extras['columns']) && is_array($this->_extras['columns'])) Ac_Util::ms($allColumns, $this->_extras['columns']); 
             foreach ($allColumns as $colName => $colData) {

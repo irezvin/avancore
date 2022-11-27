@@ -1131,7 +1131,7 @@ class Ac_Model_Relation extends Ac_Model_Relation_Abstract {
         } else {
             $res = false;
         }
-        foreach (self::$deprecatedImplProps as $p) unset($res[$p]);
+        if (is_array($res)) foreach (self::$deprecatedImplProps as $p) unset($res[$p]);
         return $res;
     }
     
